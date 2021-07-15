@@ -2,4 +2,77 @@ cmake_minimum_required (VERSION 3.16)
 
 project (rsp-core-lib)
 
-add_library(rsp-core-lib STATIC rsp-core-lib.cpp)
+set (LIB_VERSION_MAJOR 0)
+set (LIB_VERSION_MINOR 1)
+
+# configure a header file to pass some of the CMake settings
+# to the source code
+configure_file (
+  "${PROJECT_SOURCE_DIR}/version.h.in"
+  "${PROJECT_BINARY_DIR}/src/version.h"
+  )
+
+#set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
+#set (THREADS_PREFER_PTHREAD_FLAG TRUE)
+#find_package(Threads REQUIRED)
+
+set (CMAKE_CXX_STANDARD 11)
+
+# Must use GNUInstallDirs to install libraries into correct
+# locations on all platforms.
+include(GNUInstallDirs)
+
+
+#message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
+
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+
+add_library(rsp-core-lib STATIC ${SOURCES})
+
+# Define headers for this library. PUBLIC headers are used for
+# compiling the library, and will be added to consumers' build
+# paths.
+target_include_directories(rsp-core-lib PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+    PRIVATE src)
+
+
+#
+# Rules to make tests
+#
+include(ExternalProject)
+find_package(Git REQUIRED)
+
+ExternalProject_Add(
+    Doctest
+    
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/ext-libs/doctest"
+    GIT_REPOSITORY https://github.com/onqtam/doctest.git
+    TIMEOUT 10
+
+    UPDATE_COMMAND ${GIT_EXECUTABLE} pull
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+    LOG_DOWNLOAD ON
+)
+ExternalProject_Get_Property(Doctest source_dir)
+set(Doctest_INCLUDE_DIR ${source_dir}/doctest CACHE INTERNAL "Path to include folder for doctest")
+include_directories(${Doctest_INCLUDE_DIR})
+
+enable_testing()
+
+file(GLOB_RECURSE TEST_SOURCES "tests/*.cpp")
+add_executable("rsp-core-lib-test" ${TEST_SOURCES})
+add_dependencies("rsp-core-lib-test" Doctest)
+target_link_libraries ("rsp-core-lib-test"
+    rsp-core-lib
+    #Threads::Threads
+)
+
+target_include_directories("rsp-core-lib-test" PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE src)
+
+add_test("tests" "rsp-core-lib-test")
