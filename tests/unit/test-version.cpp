@@ -8,14 +8,15 @@
  * \author      Steffen Brummer
  */
 
-#include "doctest.h"
+#include <doctest.h>
+#include <string>
 
 std::string get_library_version();
 
-TEST_CASE("Testing version string") {
+TEST_CASE("Testing Version String") {
 
     CHECK(get_library_version() == std::string("0.1.0"));
-
+    CHECK(get_library_version() != std::string("2.1.7"));
 }
 
 

@@ -7,7 +7,9 @@ At least one versioned release will be used in a TGM device by RSP Systems and s
 
 Developed by RSP Systems.
 
-File comment:
+## License information
+
+All source files shall include the following file header:
 
 ```
 /*!
@@ -20,8 +22,16 @@ File comment:
  * \author      <name>
  */
 ```
+**Note:** To add \license tag to doxygen, please see: https://stackoverflow.com/questions/12353409/doxygen-and-license-copyright-informations
+
+## Build and tests
+
+To build the library and accompanied test, simply go into the build directory and run `cmake ..`:
+
+```
+cd build
+cmake ..
+```
+Tests can now be executed with `./rsp-core-lib-test` or simply `ctest`
 
 
-**Notes:**
-  
-Add \license tag to doxygen: https://stackoverflow.com/questions/12353409/doxygen-and-license-copyright-informations

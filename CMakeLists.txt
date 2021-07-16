@@ -11,12 +11,13 @@ configure_file (
   "${PROJECT_SOURCE_DIR}/version.h.in"
   "${PROJECT_BINARY_DIR}/src/version.h"
   )
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
 
 #set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
 #set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 #find_package(Threads REQUIRED)
 
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 20)
 
 # Must use GNUInstallDirs to install libraries into correct
 # locations on all platforms.
@@ -24,6 +25,9 @@ include(GNUInstallDirs)
 
 
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
+
+message(STATUS "SrcDir: ${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS "BuildInterface: $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
@@ -38,9 +42,12 @@ target_include_directories(rsp-core-lib PUBLIC
     PRIVATE src)
 
 
-#
+#--------------------------------------------------------
 # Rules to make tests
-#
+#-----------------------
+
+# Include external projects Doctest from github.
+ 
 include(ExternalProject)
 find_package(Git REQUIRED)
 
@@ -58,8 +65,7 @@ ExternalProject_Add(
     LOG_DOWNLOAD ON
 )
 ExternalProject_Get_Property(Doctest source_dir)
-set(Doctest_INCLUDE_DIR ${source_dir}/doctest CACHE INTERNAL "Path to include folder for doctest")
-include_directories(${Doctest_INCLUDE_DIR})
+set(DOCTEST_INCLUDE_DIR ${source_dir}/doctest CACHE INTERNAL "Path to include folder for doctest")
 
 enable_testing()
 
@@ -72,6 +78,7 @@ target_link_libraries ("rsp-core-lib-test"
 )
 
 target_include_directories("rsp-core-lib-test" PUBLIC
+    ${DOCTEST_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE src)
 

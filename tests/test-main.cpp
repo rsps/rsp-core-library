@@ -8,15 +8,6 @@
  * \author      Steffen Brummer
  */
 
-#include <sstream>
-#include <version.h>
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest.h"
 
-using namespace std;
-
-string get_library_version() {
-    stringstream ss;
-
-    ss << LIB_VERSION_MAJOR << "." << LIB_VERSION_MINOR << ".0";
-
-    return ss.str();
-}
