@@ -7,16 +7,11 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+#ifndef INCLUDE_VERSION_H_
+#define INCLUDE_VERSION_H_
 
-#include <sstream>
-#include <version-def.h>
+#include <string>
 
-using namespace std;
+std::string get_library_version();
 
-string get_library_version() {
-    stringstream ss;
-
-    ss << LIB_VERSION_MAJOR << "." << LIB_VERSION_MINOR << ".0";
-
-    return ss.str();
-}
+#endif /* INCLUDE_VERSION_H_ */

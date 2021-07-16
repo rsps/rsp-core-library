@@ -8,10 +8,9 @@ set (LIB_VERSION_MINOR 1)
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
-  "${PROJECT_SOURCE_DIR}/version.h.in"
-  "${PROJECT_BINARY_DIR}/src/version.h"
+  "${PROJECT_SOURCE_DIR}/version-def.h.in"
+  "${PROJECT_BINARY_DIR}/src/version-def.h"
   )
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
 
 #set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
 #set (THREADS_PREFER_PTHREAD_FLAG TRUE)
@@ -26,12 +25,8 @@ include(GNUInstallDirs)
 
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 
-message(STATUS "SrcDir: ${CMAKE_CURRENT_SOURCE_DIR}")
-message(STATUS "BuildInterface: $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
-
-file(GLOB_RECURSE SOURCES "src/*.cpp")
-
-add_library(rsp-core-lib STATIC ${SOURCES})
+add_library("rsp-core-lib" STATIC)
+add_subdirectory(src)
 
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
@@ -39,7 +34,10 @@ add_library(rsp-core-lib STATIC ${SOURCES})
 target_include_directories(rsp-core-lib PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
-    PRIVATE src)
+    PRIVATE
+    src
+    ${CMAKE_CURRENT_BINARY_DIR}/src
+)
 
 
 #--------------------------------------------------------
@@ -69,17 +67,20 @@ set(DOCTEST_INCLUDE_DIR ${source_dir}/doctest CACHE INTERNAL "Path to include fo
 
 enable_testing()
 
-file(GLOB_RECURSE TEST_SOURCES "tests/*.cpp")
-add_executable("rsp-core-lib-test" ${TEST_SOURCES})
+add_executable("rsp-core-lib-test")
+add_subdirectory(tests)
 add_dependencies("rsp-core-lib-test" Doctest)
-target_link_libraries ("rsp-core-lib-test"
-    rsp-core-lib
-    #Threads::Threads
-)
-
 target_include_directories("rsp-core-lib-test" PUBLIC
     ${DOCTEST_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE src)
+
+#get_target_property(INCLUDE_DIRS "rsp-core-lib-test" INCLUDE_DIRECTORIES)
+#message(STATUS "IncDirs: ${INCLUDE_DIRS}")
+
+target_link_libraries ("rsp-core-lib-test"
+    rsp-core-lib
+    #Threads::Threads
+)
 
 add_test("tests" "rsp-core-lib-test")

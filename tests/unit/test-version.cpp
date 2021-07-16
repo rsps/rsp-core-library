@@ -9,9 +9,7 @@
  */
 
 #include <doctest.h>
-#include <string>
-
-std::string get_library_version();
+#include <version.h>
 
 TEST_CASE("Testing Version String") {
 
