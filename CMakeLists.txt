@@ -1,9 +1,12 @@
 cmake_minimum_required (VERSION 3.16)
 
+# https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
+
 project (rsp-core-lib)
 
 set (LIB_VERSION_MAJOR 0)
 set (LIB_VERSION_MINOR 1)
+set (LIB_VERSION_PATCH 0)
 
 # configure a header file to pass some of the CMake settings
 # to the source code
@@ -31,12 +34,13 @@ add_subdirectory(src)
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
 # paths.
-target_include_directories(rsp-core-lib PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+target_include_directories(rsp-core-lib
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
     PRIVATE
-    src
-    ${CMAKE_CURRENT_BINARY_DIR}/src
+        src
+        ${CMAKE_CURRENT_BINARY_DIR}/src
 )
 
 
@@ -70,10 +74,13 @@ enable_testing()
 add_executable("rsp-core-lib-test")
 add_subdirectory(tests)
 add_dependencies("rsp-core-lib-test" Doctest)
-target_include_directories("rsp-core-lib-test" PUBLIC
-    ${DOCTEST_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE src)
+target_include_directories("rsp-core-lib-test"
+    PUBLIC
+        ${DOCTEST_INCLUDE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE
+        src
+)
 
 #get_target_property(INCLUDE_DIRS "rsp-core-lib-test" INCLUDE_DIRECTORIES)
 #message(STATUS "IncDirs: ${INCLUDE_DIRS}")

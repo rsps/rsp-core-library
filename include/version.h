@@ -12,6 +12,10 @@
 
 #include <string>
 
+namespace rsp {
+
 std::string get_library_version();
+
+}
 
 #endif /* INCLUDE_VERSION_H_ */

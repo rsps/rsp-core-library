@@ -13,10 +13,15 @@
 
 using namespace std;
 
+namespace rsp {
+
 string get_library_version() {
     stringstream ss;
 
-    ss << LIB_VERSION_MAJOR << "." << LIB_VERSION_MINOR << ".0";
+    ss << LIB_VERSION_MAJOR << "." << LIB_VERSION_MINOR << "." << LIB_VERSION_PATCH;
 
     return ss.str();
 }
+
+}
+

@@ -13,8 +13,8 @@
 
 TEST_CASE("Testing Version String") {
 
-    CHECK(get_library_version() == std::string("0.1.0"));
-    CHECK(get_library_version() != std::string("2.1.7"));
+    CHECK(rsp::get_library_version() == std::string("0.1.0"));
+    CHECK(rsp::get_library_version() != std::string("2.1.7"));
 }
 
 
