@@ -1,0 +1,122 @@
+' Start of UML diagram
+@startuml
+
+title Graphics Core
+
+package "Graphic Objects" #DDDDDD{
+
+    Class Point{
+        +int x
+        +int y
+    
+        +Point()
+        +Point(int aX, int aY)
+        +Point(const Point &aPoint)
+    }
+
+    Class Rect{
+        +Point LeftTop
+        +Point RightBottom
+
+        +Rect(int aLeft, int aTop, int aWidth, int aHeight)
+        +Rect(const Point &aLeftTop, const Point &aRightBottom)
+        +Rect(const Point &aLeftTop, int aWidth, int aHeight)
+        +Rect(const Rect &aRect)
+
+        +int GetTop()
+        +void SetTop(int aValue)
+        +int GetBottom()
+        +void SetBottom(int aValue)
+        +int GetLeft()
+        +void SetLeft(int aValue)
+        +int GetRight()
+        +void SetRight(int aValue)
+        +int GetWidth()
+        +void SetWidth(int aValue)
+        +int GetHeight()
+        +void SetHeight(int aValue)
+        +bool IsHit(const Point &aPoint)
+    }
+
+    Class colorMap{
+        +uint32_t red : 8
+        +uint32_t green : 8
+        +uint32_t blue : 8
+        +uint32_t alpha : 8
+    }
+
+    Class Color{
+        +colorMap color
+
+        +Color(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha)
+        +Color(uint32_t aARGB)
+        +Color(const Color &aColor)
+
+        +uint8_t GetRed()
+        +void SetRed(uint8_t aValue)
+        +uint8_t GetGreen()
+        +void SetGreen(uint8_t aValue)
+        +uint8_t GetBlue()
+        +void SetBlue(uint8_t aValue)
+        +uint8_t GetAlpha()
+        +void SetAlpha(uint8_t aValue)
+        +operator uint32_t()
+        +void operator=(const Color &aColor)
+    }
+
+    Class Pen{
+        +int size
+        +Color color
+
+        +Pen(int size, Color color)
+    }
+
+    abstract Class Canvas{
+        +{abstract} void DrawDot(const Point &aPoint, const Pen &aPen);
+        +{abstract} void DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen);
+        +{abstract} void DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen);
+        +{abstract} void DrawLine(const Point &aA, const Point &aB, const Pen &aPen);
+        +{abstract} void DrawRectangle(const Rect &aRect, const Pen &aPen);
+        +{abstract} void DrawImage(const Point &LeftTop, const Bitmap &aBitmap);
+        +{abstract} void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit);
+    }
+
+    Point <|-up- Rect
+    colorMap <|-up- Color
+    Color <|-up- Pen
+    Canvas --|> Pen
+    'Canvas --|> Point
+    Canvas --|> Rect
+}
+
+package "Graphic Controls" #DDDDDD{
+    Class Button{
+
+    }
+
+    Class Checkbox{
+
+    }
+
+    Class Control{
+
+    }
+
+    Class Image{
+
+    }
+
+    Class Label{
+
+    }
+
+    Class Page{
+
+    }
+
+    Class Panel{
+
+    }
+}
+@enduml
+' End of UML diagram
