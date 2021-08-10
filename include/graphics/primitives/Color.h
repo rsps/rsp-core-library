@@ -5,18 +5,37 @@
 
 #include "../../src/utils/RSPCoreExceptions.h"
 
-typedef struct {
+typedef union {
+    uint32_t argb;
+#ifdef LITTLE_ENDIAN
+    struct {
+        uint32_t blue : 8;
+        uint32_t green : 8;
+        uint32_t red : 8;
+        uint32_t alpha : 8;
+    };
+#else
+    struct {
+        uint32_t alpha : 8;
+        uint32_t red : 8;
+        uint32_t green : 8;
+        uint32_t blue : 8;
+    };
+#endif
+} colorMap;
+
+/*typedef struct {
     uint32_t red : 8;
     uint32_t green : 8;
     uint32_t blue : 8;
     uint32_t alpha : 8;
-} colorMap;
+} colorMap;*/
 
 class Color {
    public:
     colorMap color;
 
-    Color(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha);
+    Color(uint8_t aAlpha, uint8_t aRed, uint8_t aGreen, uint8_t aBlue);
     Color(uint32_t aARGB);
     Color(const Color &aColor);
 

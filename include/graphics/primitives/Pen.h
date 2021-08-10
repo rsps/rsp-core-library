@@ -1,7 +1,7 @@
 #ifndef PEN_H
 #define PEN_H
 
-#include <cstdint>
+#include <iostream>
 
 #include "Color.h"
 

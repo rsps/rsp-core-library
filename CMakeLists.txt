@@ -38,7 +38,7 @@ target_include_directories(rsp-core-lib
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/graphics>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/graphics/objects>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/graphics/primitives>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/graphics/controls>
         $<INSTALL_INTERFACE:include>
     PRIVATE

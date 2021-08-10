@@ -10,17 +10,18 @@
 
 #include "Color.h"
 
-Color::Color(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha) {
+Color::Color(uint8_t aAlpha, uint8_t aRed, uint8_t aGreen, uint8_t aBlue) {
+    color.alpha = aAlpha;
     color.red = aRed;
     color.green = aGreen;
     color.blue = aBlue;
-    color.alpha = aAlpha;
 }
 Color::Color(uint32_t aARGB) {
-    color.alpha = (aARGB & 0xFF);
+    color.argb = aARGB;
+    /*color.alpha = (aARGB & 0xFF);
     color.blue = (aARGB >> 8) & 0xFF;
     color.green = (aARGB >> 16) & 0xFF;
-    color.red = (aARGB >> 24) & 0xFF;
+    color.red = (aARGB >> 24) & 0xFF;*/
 }
 Color::Color(const Color &aColor)
     : color(aColor.color) {

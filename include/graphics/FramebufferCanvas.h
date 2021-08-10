@@ -11,7 +11,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "graphics/objects/Canvas.h"
+#include "graphics/primitives/Canvas.h"
 
 class Framebuffer : Canvas {
    public:

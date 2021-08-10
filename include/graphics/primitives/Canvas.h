@@ -4,7 +4,7 @@
 #include "Bitmap.h"
 #include "Font.h"
 #include "Pen.h"
-//#include "Point.h"
+#include "Point.h"
 #include "Rect.h"
 
 class Canvas {

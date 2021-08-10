@@ -85,9 +85,28 @@ package "Graphic Objects" #DDDDDD{
     colorMap <|-up- Color
     Color <|-up- Pen
     Canvas --|> Pen
-    'Canvas --|> Point
+    Canvas --|> Point
     Canvas --|> Rect
 }
+Class FrameBuffer{
+    +int framebufferFile;
+    +int tty_fb;
+    +struct fb_fix_screeninfo finfo;
+    +struct fb_var_screeninfo vinfo;
+    +uint8_t *frontBuffer, *backBuffer, *tmp;
+
+    +Framebuffer();
+    +~Framebuffer();
+
+    +DrawDot(const Point &aPoint, const Pen &aPen);
+    +DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen);
+    +DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen);
+    +DrawLine(const Point &aA, const Point &aB, const Pen &aPen);
+    +DrawRectangle(const Rect &aRect, const Pen &aPen);
+    +DrawImage(const Point &LeftTop, const Bitmap &aBitmap);
+    +DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit);
+}
+FrameBuffer ..|> Canvas
 
 package "Graphic Controls" #DDDDDD{
     Class Button{
