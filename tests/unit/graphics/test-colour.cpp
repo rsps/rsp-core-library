@@ -8,18 +8,18 @@
  * \author      Simon Glashoff
  */
 
-#include <Color.h>
+#include <Colour.h>
 #include <doctest.h>
 
 uint8_t alpha = 0x12;
 uint8_t red = 0x34;
 uint8_t green = 0x56;
 uint8_t blue = 0x78;
-uint32_t coloVal = 0x12345678;
+uint32_t colourVal = 0x12345678;
 
-TEST_CASE("Color Contructors") {
+TEST_CASE("Colour Contructors") {
     SUBCASE("Separate values contructor") {
-        Color col(alpha, red, green, blue);
+        Colour col(alpha, red, green, blue);
 
         CHECK(col.GetAlpha() == alpha);
         CHECK(col.GetRed() == red);
@@ -27,7 +27,7 @@ TEST_CASE("Color Contructors") {
         CHECK(col.GetBlue() == blue);
     }
     SUBCASE("Single value contructor") {
-        Color col(coloVal);
+        Colour col(colourVal);
 
         CHECK(col.GetAlpha() == alpha);
         CHECK(col.GetRed() == red);
@@ -35,8 +35,8 @@ TEST_CASE("Color Contructors") {
         CHECK(col.GetBlue() == blue);
     }
     SUBCASE("Copy contructor") {
-        Color testCol(coloVal);
-        Color col(testCol);
+        Colour testCol(colourVal);
+        Colour col(testCol);
 
         CHECK(col.GetAlpha() == alpha);
         CHECK(col.GetRed() == red);
@@ -44,8 +44,8 @@ TEST_CASE("Color Contructors") {
         CHECK(col.GetBlue() == blue);
     }
 }
-TEST_CASE("Color Sets") {
-    Color testCol(coloVal);
+TEST_CASE("Colour Sets") {
+    Colour testCol(colourVal);
     uint8_t newCol = 0x55;
     SUBCASE("Set Alpha") {
         testCol.SetAlpha(newCol);

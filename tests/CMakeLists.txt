@@ -4,5 +4,5 @@ target_sources("rsp-core-lib-test" PRIVATE
     ${SRC_FILES}
     #unit/test-version.cpp
     #unit/graphics/test-rect.cpp
-    #unit/graphics/test-color.cpp
+    #unit/graphics/test-colour.cpp
 )

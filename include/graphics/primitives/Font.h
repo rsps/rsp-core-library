@@ -1,13 +1,13 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "Color.h"
+#include "Colour.h"
 
 class Font {
    public:
     std::string name;
     std::string style;
-    Color color;
+    Colour colour;
     int weigth;
     int size;
 

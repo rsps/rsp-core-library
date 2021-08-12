@@ -10,6 +10,6 @@
 
 #include "Pen.h"
 
-Pen::Pen(int aSize, Color aColor)
-    : size(aSize), color(aColor) {
+Pen::Pen(int aSize, Colour aColour)
+    : size(aSize), colour(aColour) {
 }

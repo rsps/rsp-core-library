@@ -3,14 +3,14 @@
 
 #include <iostream>
 
-#include "Color.h"
+#include "Colour.h"
 
 class Pen {
    public:
     int size;
-    Color color;
+    Colour colour;
 
-    Pen(int size, Color color);
+    Pen(int aSize, Colour aColour);
 };
 
 #endif  // PEN_H

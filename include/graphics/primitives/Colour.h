@@ -1,5 +1,5 @@
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef COLOUR_H
+#define COLOUR_H
 
 #include <stdint.h>
 
@@ -22,22 +22,15 @@ typedef union {
         uint32_t blue : 8;
     };
 #endif
-} colorMap;
+} colourMap;
 
-/*typedef struct {
-    uint32_t red : 8;
-    uint32_t green : 8;
-    uint32_t blue : 8;
-    uint32_t alpha : 8;
-} colorMap;*/
-
-class Color {
+class Colour {
    public:
-    colorMap color;
+    colourMap colour;
 
-    Color(uint8_t aAlpha, uint8_t aRed, uint8_t aGreen, uint8_t aBlue);
-    Color(uint32_t aARGB);
-    Color(const Color &aColor);
+    Colour(uint8_t aAlpha, uint8_t aRed, uint8_t aGreen, uint8_t aBlue);
+    Colour(uint32_t aARGB);
+    Colour(const Colour &aColour);
 
     uint8_t GetRed();
     void SetRed(uint8_t aValue);
@@ -48,7 +41,7 @@ class Color {
     uint8_t GetAlpha();
     void SetAlpha(uint8_t aValue);
     operator uint32_t();
-    void operator=(const Color &aColor);
+    void operator=(const Colour &aColour);
 };
 
-#endif  // COLOR_H
+#endif  // COLOUR_H

@@ -7,6 +7,6 @@ target_sources("rsp-core-lib"
         #graphics/objects/Rect.cpp
         #graphics/objects/Point.cpp
         #graphics/objects/Pen.cpp
-        #graphics/objects/Color.cpp
+        #graphics/objects/Colour.cpp
         #graphics/FramebufferCanvas.cpp
 )

@@ -7,8 +7,28 @@
 
 #include "../../../src/utils/RSPCoreExceptions.h"
 
+//Should be unsigned?
+struct BMPHeader {
+    short signature;
+    int fileSize;
+    int reserved;
+    int dataOffset;
+    int size;
+    int width;
+    int heigth;
+    short planes;
+    short bitsPerPixel;
+    int compression;
+    int imageSize;
+    int xPixelsPerM;
+    int yPixelsPerM;
+    int coloursUsed;
+    int importantColours;
+};
+
 class Bitmap {
    public:
+    BMPHeader bmpHeader;
     int height;
     int width;
     short bytesPerPixel;
@@ -20,7 +40,7 @@ class Bitmap {
     Bitmap(int aHeight, int aWidth, int aBytesPerPixel);
     ~Bitmap();
 
-    //Ask and return color type on pixel
+    //Ask and return colour type on pixel
 };
 
 #endif  //BITMAP_H
