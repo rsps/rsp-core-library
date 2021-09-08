@@ -67,6 +67,10 @@ Framebuffer::~Framebuffer() {
 }
 
 void Framebuffer::DrawDot(const Point &aPoint, const Pen &aPen) {
+    //Check if we are outside screen
+    if (aPoint.y > vinfo.yres || aPoint.x > vinfo.xres) {
+        return;
+    }
     //In the future use the Pen bitmap to draw
     long location = (aPoint.x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.y * finfo.line_length;
     //std::cout << "location:" << location << std::endl;
@@ -76,7 +80,22 @@ void Framebuffer::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int 
     throw NotImplementedException("");
 }
 void Framebuffer::DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen) {
-    throw NotImplementedException("");
+    int error = -aRadius;
+    //int x = aRadius;
+    int y = 0;
+
+    while (aRadius >= y) {
+        plot8Points(aCenter.x, aCenter.y, aRadius, y, aPen);
+        error += y;
+        y++;
+        error += y;
+
+        if (error >= 0) {
+            error += -aRadius;
+            aRadius--;
+            error += -aRadius;
+        }
+    }
 }
 void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen) {
     int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;

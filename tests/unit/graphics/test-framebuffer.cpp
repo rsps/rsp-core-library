@@ -16,55 +16,91 @@ TEST_CASE("Framebuffer Drawing Primitives") {
     srand(time(NULL));  //generates random seed val
     Framebuffer fb;
     fb.Clear();
+    Colour col(0, rand() % 256, rand() % 256, rand() % 256);
+    Pen pen(rand() % 10 + 1, col);
     SUBCASE("Drawing Lines") {
         //Arrange
-        for (size_t i = 0; i < 10; i++) {
-            Point pointA(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
-            Point pointB(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
-            Colour col(0, rand() % 256, rand() % 256, rand() % 256);
-            Pen pen(rand() % 10 + 1, col);
+        Point pointA(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
+        Point pointB(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
 
-            //Act
-            fb.DrawLine(pointA, pointB, pen);
+        //Act
+        fb.DrawLine(pointA, pointB, pen);
 
-            //Assert
-            //CHECK(col == fb.GetPixel(pointA, false));
-            //CHECK(col == fb.GetPixel(pointB, false));
+        //Assert
+        int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;
+
+        deltaX = pointB.x - pointA.x;
+        deltaY = pointB.y - pointA.y;
+        absDeltaX = abs(deltaX);
+        absDeltaY = abs(deltaY);
+        signumX = (deltaX > 0) ? 1 : -1;
+        signumY = (deltaY > 0) ? 1 : -1;
+        x = absDeltaX >> 1;
+        y = absDeltaY >> 1;
+        px = pointA.x;
+        py = pointA.y;
+        if (absDeltaX >= absDeltaY) {
+            for (i = 0; i < absDeltaX; i++) {
+                y += absDeltaY;
+                if (y >= absDeltaX) {
+                    y -= absDeltaX;
+                    py += signumY;
+                }
+                px += signumX;
+                CHECK(fb.GetPixel(Point(px, py), false) == col);
+            }
+        } else {
+            for (i = 0; i < absDeltaY; i++) {
+                x += absDeltaX;
+                if (x >= absDeltaY) {
+                    x -= absDeltaY;
+                    px += signumX;
+                }
+                py += signumY;
+                CHECK(fb.GetPixel(Point(px, py), false) == col);
+            }
         }
         //fb.SwapBuffer();
     }
     SUBCASE("Drawing Rectangles") {
-        SUBCASE("Giving Points correctly") {
-            //Arrange
-            //Generate random values in the LEFT and TOP halves of the screen
-            Point leftTop(rand() % (fb.vinfo.xres / 2),
-                          rand() % (fb.vinfo.yres / 2));
-            //Generate random values in the RIGHT and BOTTOM halves of the screen
-            Point rightBottom(rand() % (fb.vinfo.xres + 1 - (fb.vinfo.xres / 2)) + (fb.vinfo.xres / 2),
-                              rand() % (fb.vinfo.yres + 1 - (fb.vinfo.yres / 2)) + (fb.vinfo.yres / 2));
+        //Arrange
+        //Generate random values in the LEFT and TOP halves of the screen
+        Point leftTop(rand() % (fb.vinfo.xres / 2),
+                      rand() % (fb.vinfo.yres / 2));
+        //Generate random values in the RIGHT and BOTTOM halves of the screen
+        Point rightBottom(rand() % (fb.vinfo.xres + 1 - (fb.vinfo.xres / 2)) + (fb.vinfo.xres / 2),
+                          rand() % (fb.vinfo.yres + 1 - (fb.vinfo.yres / 2)) + (fb.vinfo.yres / 2));
+        Rect rect(leftTop, rightBottom);
 
-            Colour col(0, rand() % 256, rand() % 256, rand() % 256);
-            Rect rect(leftTop, rightBottom);
-            Pen pen(rand() % 10 + 1, col);
+        //Act
+        fb.DrawRectangle(rect, pen);
 
-            //Act
-            fb.DrawRectangle(rect, pen);
-
-            //Assert
-            //Expect all four side to hold values
-            for (size_t i = 0; i <= rect.GetWidth(); i++) {
-                //Check top side
-                CHECK(col == fb.GetPixel(Point(leftTop.x + i, leftTop.y), false));
-                //Check bottom side
-                CHECK(col == fb.GetPixel(Point(leftTop.x + i, rightBottom.y), false));
-            }
-            for (size_t i = 0; i <= rect.GetHeight(); i++) {
-                //Check left side
-                CHECK(col == fb.GetPixel(Point(leftTop.x, rightBottom.y - i), false));
-                //Check right side
-                CHECK(col == fb.GetPixel(Point(rightBottom.x, rightBottom.y - i), false));
-            }
-            //fb.SwapBuffer();
+        //Assert
+        //Expect all four side to hold values
+        for (size_t i = 0; i <= rect.GetWidth(); i++) {
+            //Check top side
+            CHECK(col == fb.GetPixel(Point(leftTop.x + i, leftTop.y), false));
+            //Check bottom side
+            CHECK(col == fb.GetPixel(Point(leftTop.x + i, rightBottom.y), false));
         }
+        for (size_t i = 0; i <= rect.GetHeight(); i++) {
+            //Check left side
+            CHECK(col == fb.GetPixel(Point(leftTop.x, rightBottom.y - i), false));
+            //Check right side
+            CHECK(col == fb.GetPixel(Point(rightBottom.x, rightBottom.y - i), false));
+        }
+        //fb.SwapBuffer();
+    }
+    SUBCASE("Drawing Circles") {
+        //Arrange
+        Point centerPoint(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
+        int radius = rand() % (fb.vinfo.xres / 2);
+
+        //Act
+        fb.DrawDot(centerPoint, pen);
+        fb.DrawCircle(centerPoint, radius, pen);
+
+        //Assert
+        fb.SwapBuffer();
     }
 }

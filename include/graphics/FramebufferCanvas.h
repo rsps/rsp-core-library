@@ -27,11 +27,25 @@ class Framebuffer : Canvas {
     void DrawDot(const Point &aPoint, const Pen &aPen);
     void DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen);
     void DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen);
+    inline void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Pen &aPen) {
+        DrawDot(Point(aCenterX + aX, aCenterY + aY), aPen);
+        DrawDot(Point(aCenterX - aX, aCenterY + aY), aPen);
+        DrawDot(Point(aCenterX + aX, aCenterY - aY), aPen);
+        DrawDot(Point(aCenterX - aX, aCenterY - aY), aPen);
+    }
+    inline void plot8Points(int aCenterX, int aCenterY, int aX, int aY, const Pen &aPen) {
+        plot4Points(aCenterX, aCenterY, aX, aY, aPen);
+        plot4Points(aCenterX, aCenterY, aY, aX, aPen);
+    }
     void DrawLine(const Point &aA, const Point &aB, const Pen &aPen);
     void DrawRectangle(const Rect &aRect, const Pen &aPen);
     void DrawImage(const Point &LeftTop, const Bitmap &aBitmap);
     void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit);
     inline void SetPixel(const Point &aPoint, const Colour aColor) {
+        //Check if we are outside screen
+        if (aPoint.y > vinfo.yres || aPoint.x > vinfo.xres) {
+            return;
+        }
         long location = (aPoint.x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.y * finfo.line_length;
         //std::cout << "location:" << location << std::endl;
         *((uint32_t *)(backBuffer + location)) = aColor;
