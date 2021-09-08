@@ -11,49 +11,45 @@
 #include "Colour.h"
 
 Colour::Colour(uint8_t aAlpha, uint8_t aRed, uint8_t aGreen, uint8_t aBlue) {
-    colour.alpha = aAlpha;
-    colour.red = aRed;
-    colour.green = aGreen;
-    colour.blue = aBlue;
+    colours.alpha = aAlpha;
+    colours.red = aRed;
+    colours.green = aGreen;
+    colours.blue = aBlue;
 }
 Colour::Colour(uint32_t aARGB) {
-    colour.argb = aARGB;
-    /*colour.alpha = (aARGB & 0xFF);
-    colour.blue = (aARGB >> 8) & 0xFF;
-    colour.green = (aARGB >> 16) & 0xFF;
-    colour.red = (aARGB >> 24) & 0xFF;*/
+    colours.argb = aARGB;
 }
 Colour::Colour(const Colour &aColour)
-    : colour(aColour.colour) {
+    : colours(aColour.colours) {
 }
 
-uint8_t Colour::GetRed() {
-    return colour.red;
+uint8_t Colour::GetRed() const {
+    return colours.red;
 }
 void Colour::SetRed(uint8_t aValue) {
-    colour.red = aValue;
+    colours.red = aValue;
 }
-uint8_t Colour::GetGreen() {
-    return colour.green;
+uint8_t Colour::GetGreen() const {
+    return colours.green;
 }
 void Colour::SetGreen(uint8_t aValue) {
-    colour.green = aValue;
+    colours.green = aValue;
 }
-uint8_t Colour::GetBlue() {
-    return colour.blue;
+uint8_t Colour::GetBlue() const {
+    return colours.blue;
 }
 void Colour::SetBlue(uint8_t aValue) {
-    colour.blue = aValue;
+    colours.blue = aValue;
 }
-uint8_t Colour::GetAlpha() {
-    return colour.alpha;
+uint8_t Colour::GetAlpha() const {
+    return colours.alpha;
 }
 void Colour::SetAlpha(uint8_t aValue) {
-    colour.alpha = aValue;
+    colours.alpha = aValue;
 }
-Colour::operator uint32_t() {
-    throw NotImplementedException("");
+Colour::operator uint32_t() const {
+    return colours.argb;
 }
-void Colour::operator=(const Colour &aColour) {
-    throw NotImplementedException("");
+Colour &Colour::operator=(const Colour &aColour) {
+    colours = aColour.colours;
 }

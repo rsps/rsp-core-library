@@ -26,22 +26,22 @@ typedef union {
 
 class Colour {
    public:
-    colourMap colour;
+    colourMap colours;
 
     Colour(uint8_t aAlpha, uint8_t aRed, uint8_t aGreen, uint8_t aBlue);
     Colour(uint32_t aARGB);
     Colour(const Colour &aColour);
 
-    uint8_t GetRed();
+    uint8_t GetRed() const;
     void SetRed(uint8_t aValue);
-    uint8_t GetGreen();
+    uint8_t GetGreen() const;
     void SetGreen(uint8_t aValue);
-    uint8_t GetBlue();
+    uint8_t GetBlue() const;
     void SetBlue(uint8_t aValue);
-    uint8_t GetAlpha();
+    uint8_t GetAlpha() const;
     void SetAlpha(uint8_t aValue);
-    operator uint32_t();
-    void operator=(const Colour &aColour);
+    operator uint32_t() const;
+    Colour &operator=(const Colour &aColour);
 };
 
 #endif  // COLOUR_H

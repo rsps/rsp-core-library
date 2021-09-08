@@ -11,7 +11,11 @@
 #include "FramebufferCanvas.h"
 
 Framebuffer::Framebuffer() {
-    framebufferFile = open("/dev/fb0", O_RDWR);
+    //framebufferFile = open("/dev/fb0", O_RDWR);
+    framebufferFile = open("/dev/fb1", O_RDWR);
+    if (framebufferFile == -1) {
+        throw std::system_error(errno, std::generic_category(), "Failed to open framebuffer");
+    }
 
     //get fixed screen info
     ioctl(framebufferFile, FBIOGET_VSCREENINFO, &vinfo);
@@ -26,6 +30,7 @@ Framebuffer::Framebuffer() {
 
     //set yres_virtual for double buffering
     vinfo.yres_virtual = vinfo.yres * 2;
+    vinfo.yoffset = 0;
     if (ioctl(framebufferFile, FBIOPUT_VSCREENINFO, &vinfo) == -1) {
         std::cout << "ioctl FBIOPUT_VSCREENINFO failed errno:" << strerror(errno) << std::endl;
     }
@@ -33,9 +38,11 @@ Framebuffer::Framebuffer() {
     std::cout << "vinfo yres_virtual:" << vinfo.yres_virtual << std::endl;
 
     //stop the console from drawing ontop of this programs graphics
-    tty_fb = open("/dev/tty0", O_RDWR);
-    if (ioctl(tty_fb, KDSETMODE, KD_GRAPHICS) == -1) {
-        std::cout << "ioctl KDSETMODE KD_GRAPHICS failed errno:" << strerror(errno) << std::endl;
+    if (access("/dev/tty0", O_RDWR) == 0) {
+        tty_fb = open("/dev/tty0", O_RDWR);
+        if (ioctl(tty_fb, KDSETMODE, KD_GRAPHICS) == -1) {
+            std::cout << "ioctl KDSETMODE KD_GRAPHICS failed errno:" << strerror(errno) << std::endl;
+        }
     }
 
     //calculate size of screen
@@ -45,20 +52,25 @@ Framebuffer::Framebuffer() {
     //map framebuffer to memory
     std::cout << "Mapping framebuffer" << std::endl;
     frontBuffer = static_cast<uint8_t *>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, framebufferFile, (off_t)0));
-    backBuffer = frontBuffer + screensize;
     if (frontBuffer == MAP_FAILED) {
         std::cout << "Mapping failed errno:" << strerror(errno) << std::endl;
     }
+    backBuffer = frontBuffer + screensize;
 }
 Framebuffer::~Framebuffer() {
     //At exit we MUST release the tty again
-    if (ioctl(tty_fb, KDSETMODE, KD_TEXT) == -1) {
-        std::cout << "ioctl KDSETMODE KD_TEXT failed errno:" << strerror(errno) << std::endl;
+    if (tty_fb > 0) {
+        if (ioctl(tty_fb, KDSETMODE, KD_TEXT) == -1) {
+            std::cout << "ioctl KDSETMODE KD_TEXT failed errno:" << strerror(errno) << std::endl;
+        }
     }
 }
 
 void Framebuffer::DrawDot(const Point &aPoint, const Pen &aPen) {
-    throw NotImplementedException("");
+    //In the future use the Pen bitmap to draw
+    long location = (aPoint.x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.y * finfo.line_length;
+    //std::cout << "location:" << location << std::endl;
+    *((uint32_t *)(backBuffer + location)) = aPen.colour;
 }
 void Framebuffer::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen) {
     throw NotImplementedException("");
@@ -67,14 +79,94 @@ void Framebuffer::DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen)
     throw NotImplementedException("");
 }
 void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen) {
-    throw NotImplementedException("");
+    int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;
+
+    deltaX = aB.x - aA.x;
+    deltaY = aB.y - aA.y;
+    absDeltaX = abs(deltaX);
+    absDeltaY = abs(deltaY);
+    signumX = (deltaX > 0) ? 1 : -1;
+    signumY = (deltaY > 0) ? 1 : -1;
+    x = absDeltaX >> 1;
+    y = absDeltaY >> 1;
+    px = aA.x;
+    py = aA.y;
+
+    if (absDeltaX >= absDeltaY) {
+        for (i = 0; i < absDeltaX; i++) {
+            y += absDeltaY;
+            if (y >= absDeltaX) {
+                y -= absDeltaX;
+                py += signumY;
+            }
+            px += signumX;
+            DrawDot(Point(px, py), aPen);
+        }
+    } else {
+        for (i = 0; i < absDeltaY; i++) {
+            x += absDeltaX;
+            if (x >= absDeltaY) {
+                x -= absDeltaY;
+                px += signumX;
+            }
+            py += signumY;
+            DrawDot(Point(px, py), aPen);
+        }
+    }
 }
 void Framebuffer::DrawRectangle(const Rect &aRect, const Pen &aPen) {
-    throw NotImplementedException("");
+    for (int i = aRect.LeftTop.x; i <= aRect.RightBottom.x; i++) {
+        DrawDot(Point(i, aRect.LeftTop.y), aPen);      //top
+        DrawDot(Point(i, aRect.RightBottom.y), aPen);  //bottom
+    }
+    for (int i = aRect.LeftTop.y; i <= aRect.RightBottom.y; i++) {
+        DrawDot(Point(aRect.LeftTop.x, i), aPen);      //left
+        DrawDot(Point(aRect.RightBottom.x, i), aPen);  //right
+    }
 }
 void Framebuffer::DrawImage(const Point &LeftTop, const Bitmap &aBitmap) {
     throw NotImplementedException("");
 }
 void Framebuffer::DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit) {
     throw NotImplementedException("");
+}
+void Framebuffer::SwapBuffer() {
+    std::cout << "Swapping buffer: " << vinfo.yoffset << std::endl;
+    //swap buffer
+    if (vinfo.yoffset == 0) {
+        vinfo.yoffset = vinfo.yres;
+    } else {
+        vinfo.yoffset = 0;
+    }
+    //Pan to back buffer
+    if (ioctl(framebufferFile, FBIOPAN_DISPLAY, &vinfo) == -1) {
+        std::cout << "ioctl FBIOPAN_DISPLAY failed errno:" << strerror(errno) << std::endl;
+    }
+
+    //update pointers
+    uint8_t *tmp = frontBuffer;
+    frontBuffer = backBuffer;
+    backBuffer = tmp;
+
+    Clear();
+}
+uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool &aFront) {
+    long location = (aPoint.x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.y * finfo.line_length;
+    //std::cout << "location:" << location << std::endl;
+    if (aFront) {
+        return *((uint32_t *)(frontBuffer + location));
+    } else {
+        return *((uint32_t *)(backBuffer + location));
+    }
+}
+void Framebuffer::Clear() {
+    long x, y;
+    //draw to back buffer
+    for (y = 0; y < vinfo.yres; y++) {
+        for (x = 0; x < vinfo.xres; x++) {
+            long location = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + y * finfo.line_length;
+            //std::cout << "location:" << location << std::endl;
+            *((uint32_t *)(backBuffer + location)) = 0x000000;
+        }
+    }
 }

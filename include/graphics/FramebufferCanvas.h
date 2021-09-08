@@ -31,6 +31,14 @@ class Framebuffer : Canvas {
     void DrawRectangle(const Rect &aRect, const Pen &aPen);
     void DrawImage(const Point &LeftTop, const Bitmap &aBitmap);
     void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit);
+    inline void SetPixel(const Point &aPoint, const Colour aColor) {
+        long location = (aPoint.x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.y * finfo.line_length;
+        //std::cout << "location:" << location << std::endl;
+        *((uint32_t *)(backBuffer + location)) = aColor;
+    }
+    uint32_t GetPixel(const Point &aPoint, const bool &aFront);
+    void SwapBuffer();
+    void Clear();
 };
 
 #endif  // FRAMEBUFFERCANVAS_H

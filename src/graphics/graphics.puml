@@ -3,7 +3,7 @@
 
 title Graphics Core
 
-package "Graphic Objects" #DDDDDD{
+package "Graphic Primitives" #DDDDDD{
 
     Class Point{
         +int x

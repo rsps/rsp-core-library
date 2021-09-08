@@ -15,18 +15,19 @@ class Rect {
     Rect(const Rect &aRect);
 
     int GetTop();
-    void SetTop(int aValue);
+    void SetTop(int aTopValue);
     int GetBottom();
-    void SetBottom(int aValue);
+    void SetBottom(int aBotValue);
     int GetLeft();
-    void SetLeft(int aValue);
+    void SetLeft(int aLeftValue);
     int GetRight();
-    void SetRight(int aValue);
+    void SetRight(int aRightValue);
     int GetWidth();
-    void SetWidth(int aValue);
+    void SetWidth(int aWidth);
     int GetHeight();
-    void SetHeight(int aValue);
+    void SetHeight(int aHeight);
     bool IsHit(const Point &aPoint);
+    bool VerifyDimensions();
 };
 
 #endif  // RECT_H

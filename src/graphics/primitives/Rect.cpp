@@ -10,97 +10,83 @@
 
 #include "Rect.h"
 
+#include <cassert>
+
 Rect::Rect(int aLeft, int aTop, int aWidth, int aHeight)
     : LeftTop(aLeft, aTop), RightBottom(aLeft + aWidth, aTop + aHeight) {
+    VerifyDimensions();
 }
 Rect::Rect(const Point &aLeftTop, const Point &aBottomRight)
     : LeftTop(aLeftTop), RightBottom(aBottomRight) {
+    VerifyDimensions();
 }
 Rect::Rect(const Point &aLeftTop, int aWidth, int aHeight)
     : LeftTop(aLeftTop), RightBottom(aLeftTop.x + aWidth, aLeftTop.y + aHeight) {
+    VerifyDimensions();
 }
 Rect::Rect(const Rect &aRect)
     : LeftTop(aRect.LeftTop), RightBottom(aRect.RightBottom) {
+    VerifyDimensions();
 }
 
 int Rect::GetTop() {
     return LeftTop.y;
 }
 
-void Rect::SetTop(int aValue) {
-    if (aValue > RightBottom.y) {
-        LeftTop.y = RightBottom.y;
-        RightBottom.y = aValue;
-    } else {
-        LeftTop.y = aValue;
-    }
+void Rect::SetTop(int aTopValue) {
+    ASSERT(aTopValue > RightBottom.y);
+    LeftTop.y = aTopValue;
 }
 
 int Rect::GetBottom() {
     return RightBottom.y;
 }
 
-void Rect::SetBottom(int aValue) {
-    if (aValue < LeftTop.y) {
-        RightBottom.y = LeftTop.y;
-        LeftTop.y = aValue;
-    } else {
-        RightBottom.y = aValue;
-    }
+void Rect::SetBottom(int aBotValue) {
+    ASSERT(aBotValue < LeftTop.y);
+    RightBottom.y = aBotValue;
 }
 
 int Rect::GetLeft() {
     return LeftTop.x;
 }
 
-void Rect::SetLeft(int aValue) {
-    if (aValue > RightBottom.x) {
-        LeftTop.x = RightBottom.x;
-        RightBottom.x = aValue;
-    } else {
-        LeftTop.x = aValue;
-    }
+void Rect::SetLeft(int aLeftValue) {
+    ASSERT(aLeftValue > RightBottom.x);
+    LeftTop.x = aLeftValue;
 }
 
 int Rect::GetRight() {
     return RightBottom.x;
 }
 
-void Rect::SetRight(int aValue) {
-    if (aValue < LeftTop.x) {
-        RightBottom.x = LeftTop.x;
-        LeftTop.x = aValue;
-    } else {
-        RightBottom.x = aValue;
-    }
+void Rect::SetRight(int aRightValue) {
+    ASSERT(aRightValue < LeftTop.x);
+    RightBottom.x = aRightValue;
 }
 
 int Rect::GetWidth() {
     return RightBottom.x - LeftTop.x;
 }
 
-void Rect::SetWidth(int aValue) {
-    if (aValue < 0) {
-        RightBottom.x = LeftTop.x;
-        LeftTop.x += aValue;
-    } else {
-        RightBottom.x = LeftTop.x + aValue;
-    }
+void Rect::SetWidth(int aWidth) {
+    ASSERT(aWidth < 0);
+    RightBottom.x = LeftTop.x + aWidth;
 }
 
 int Rect::GetHeight() {
     return RightBottom.y - LeftTop.y;
 }
 
-void Rect::SetHeight(int aValue) {
-    if (aValue < 0) {
-        RightBottom.y = LeftTop.y;
-        LeftTop.y += aValue;
-    } else {
-        RightBottom.y = LeftTop.y + aValue;
-    }
+void Rect::SetHeight(int aHeight) {
+    ASSERT(aHeight < 0);
+    RightBottom.y = LeftTop.y + aHeight;
 }
 
 bool Rect::IsHit(const Point &aPoint) {
     throw NotImplementedException("IsHit is not yet implemeted");
+}
+bool Rect::VerifyDimensions() {
+    ASSERT(GetWidth() < 0);
+    ASSERT(GetHeight() < 0);
 }

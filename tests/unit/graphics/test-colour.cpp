@@ -68,3 +68,16 @@ TEST_CASE("Colour Sets") {
         CHECK(testCol.GetBlue() == newCol);
     }
 }
+TEST_CASE("Colour Operators") {
+    Colour testCol(colourVal);
+    SUBCASE("uint32 Conversion") {
+        uint32_t newUint32 = testCol;
+
+        CHECK(newUint32 == colourVal);
+    }
+    SUBCASE("= Operator") {
+        Colour newColour = testCol;
+
+        CHECK(newColour.colours.argb == testCol.colours.argb);
+    }
+}

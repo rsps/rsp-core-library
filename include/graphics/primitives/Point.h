@@ -6,9 +6,15 @@ class Point {
     int x;
     int y;
 
-    Point();
-    Point(int aX, int aY);
-    Point(const Point &aPoint);
+    inline Point()
+        : x(0), y(0) {
+    }
+    inline Point(int aX, int aY)
+        : x(aX), y(aY) {
+    }
+    inline Point(const Point &aPoint)
+        : x(aPoint.x), y(aPoint.y) {
+    }
 };
 
 #endif  // POINT_H

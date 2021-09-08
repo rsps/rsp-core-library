@@ -9,13 +9,3 @@
  */
 
 #include "Point.h"
-
-Point::Point()
-    : x(0), y(0) {
-}
-Point::Point(int aX, int aY)
-    : x(aX), y(aY) {
-}
-Point::Point(const Point &aPoint)
-    : x(aPoint.x), y(aPoint.y) {
-}
