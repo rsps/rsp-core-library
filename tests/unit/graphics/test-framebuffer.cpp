@@ -11,7 +11,13 @@
 #include <doctest.h>
 
 #include "FramebufferCanvas.h"
-
+inline void CheckPixel(const Point &aPoint, const Colour &aColour, const Framebuffer &fb) {
+    if (fb.IsInsideScreen(aPoint)) {
+        CHECK(fb.GetPixel(aPoint) == aColour);
+    } else {
+        CHECK(fb.GetPixel(aPoint) == 0);
+    }
+}
 TEST_CASE("Framebuffer Drawing Primitives") {
     srand(time(NULL));  //generates random seed val
     Framebuffer fb;
@@ -60,6 +66,10 @@ TEST_CASE("Framebuffer Drawing Primitives") {
                 CHECK(fb.GetPixel(Point(px, py), false) == col);
             }
         }
+        SUBCASE("Lines are Inclusive") {
+            CHECK_EQ(fb.GetPixel(pointA, false), col);
+            CHECK_EQ(fb.GetPixel(pointB, false), col);
+        }
         //fb.SwapBuffer();
     }
     SUBCASE("Drawing Rectangles") {
@@ -97,10 +107,44 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         int radius = rand() % (fb.vinfo.xres / 2);
 
         //Act
-        fb.DrawDot(centerPoint, pen);
+        //fb.DrawDot(centerPoint, pen);
         fb.DrawCircle(centerPoint, radius, pen);
 
         //Assert
-        fb.SwapBuffer();
+        int error = -radius;
+        int y = 0;
+        while (radius >= y) {
+            CheckPixel(Point(centerPoint.x + radius, centerPoint.y + y), col, fb);
+            CheckPixel(Point(centerPoint.x - radius, centerPoint.y + y), col, fb);
+            CheckPixel(Point(centerPoint.x + radius, centerPoint.y - y), col, fb);
+            CheckPixel(Point(centerPoint.x - radius, centerPoint.y - y), col, fb);
+            CheckPixel(Point(centerPoint.x + y, centerPoint.y + radius), col, fb);
+            CheckPixel(Point(centerPoint.x - y, centerPoint.y + radius), col, fb);
+            CheckPixel(Point(centerPoint.x + y, centerPoint.y - radius), col, fb);
+            CheckPixel(Point(centerPoint.x - y, centerPoint.y - radius), col, fb);
+            error += y;
+            y++;
+            error += y;
+
+            if (error >= 0) {
+                error += -radius;
+                radius--;
+                error += -radius;
+            }
+        }
+        //fb.SwapBuffer();
+    }
+    SUBCASE("Set pixel outside screen") {
+        //Arrange
+        Point outSideXAxis(-1, 0);
+        Point outSideYAxis(0, -1);
+
+        //Act
+        CHECK_NOTHROW(fb.DrawDot(outSideXAxis, pen));
+        CHECK_NOTHROW(fb.DrawDot(outSideYAxis, pen));
+
+        //Assert
+        CHECK_EQ(fb.GetPixel(outSideXAxis), 0);
+        CHECK_EQ(fb.GetPixel(outSideYAxis), 0);
     }
 }

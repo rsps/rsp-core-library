@@ -18,7 +18,7 @@ int left = 100;
 int top = 50;
 int width = 400;
 int height = 600;
-void inline checkRect(Rect& aRect) {
+inline void checkRect(Rect& aRect) {
     CHECK(aRect.GetTop() == top);
     CHECK(aRect.GetBottom() == top + height);
     CHECK(aRect.GetLeft() == left);

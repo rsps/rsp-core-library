@@ -42,15 +42,17 @@ class Framebuffer : Canvas {
     void DrawImage(const Point &LeftTop, const Bitmap &aBitmap);
     void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit);
     inline void SetPixel(const Point &aPoint, const Colour aColor) {
-        //Check if we are outside screen
-        if (aPoint.y > vinfo.yres || aPoint.x > vinfo.xres) {
+        if (!IsInsideScreen(aPoint)) {
             return;
         }
         long location = (aPoint.x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.y * finfo.line_length;
         //std::cout << "location:" << location << std::endl;
         *((uint32_t *)(backBuffer + location)) = aColor;
     }
-    uint32_t GetPixel(const Point &aPoint, const bool &aFront);
+    uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
+    inline bool IsInsideScreen(const Point &aPoint) const {
+        return !(aPoint.x < 0 || aPoint.y < 0 || aPoint.y >= vinfo.yres || aPoint.x >= vinfo.xres);
+    }
     void SwapBuffer();
     void Clear();
 };

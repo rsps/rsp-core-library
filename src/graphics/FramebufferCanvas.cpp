@@ -68,7 +68,7 @@ Framebuffer::~Framebuffer() {
 
 void Framebuffer::DrawDot(const Point &aPoint, const Pen &aPen) {
     //Check if we are outside screen
-    if (aPoint.y > vinfo.yres || aPoint.x > vinfo.xres) {
+    if (!IsInsideScreen(aPoint)) {
         return;
     }
     //In the future use the Pen bitmap to draw
@@ -111,6 +111,7 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen) {
     px = aA.x;
     py = aA.y;
 
+    DrawDot(aA, aPen);
     if (absDeltaX >= absDeltaY) {
         for (i = 0; i < absDeltaX; i++) {
             y += absDeltaY;
@@ -144,10 +145,10 @@ void Framebuffer::DrawRectangle(const Rect &aRect, const Pen &aPen) {
     }
 }
 void Framebuffer::DrawImage(const Point &LeftTop, const Bitmap &aBitmap) {
-    throw NotImplementedException("");
+    throw NotImplementedException("Draw Image is not yet implemented");
 }
 void Framebuffer::DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit) {
-    throw NotImplementedException("");
+    throw NotImplementedException("Draw Text is not yet implemented");
 }
 void Framebuffer::SwapBuffer() {
     std::cout << "Swapping buffer: " << vinfo.yoffset << std::endl;
@@ -169,7 +170,10 @@ void Framebuffer::SwapBuffer() {
 
     Clear();
 }
-uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool &aFront) {
+uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const {
+    if (!IsInsideScreen(aPoint)) {
+        return 0;
+    }
     long location = (aPoint.x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.y * finfo.line_length;
     //std::cout << "location:" << location << std::endl;
     if (aFront) {
