@@ -5,16 +5,18 @@
 
 #include "Bitmap.h"
 #include "Colour.h"
+#include "Point.h"
+
+class Canvas;
 
 class Pen {
    public:
     int size;
     Colour colour;
-    //Future, pens takes bitmap to be used for drawing
-    //Bitmap penType;
 
     Pen();
     Pen(int aSize, Colour aColour);
+    void Draw(Canvas &aCanvas, const Point &aPoint) const;
 };
 
 #endif  // PEN_H

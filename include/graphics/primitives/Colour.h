@@ -6,13 +6,13 @@
 #include "../../src/utils/RSPCoreExceptions.h"
 
 typedef union {
-    uint32_t argb;
+    uint32_t rgba;
 #ifdef LITTLE_ENDIAN
     struct {
+        uint32_t alpha : 8;
         uint32_t blue : 8;
         uint32_t green : 8;
         uint32_t red : 8;
-        uint32_t alpha : 8;
     };
 #else
     struct {
@@ -28,7 +28,7 @@ class Colour {
    public:
     colourMap colours;
 
-    Colour(uint8_t aAlpha, uint8_t aRed, uint8_t aGreen, uint8_t aBlue);
+    Colour(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha);
     Colour(uint32_t aARGB);
     Colour(const Colour &aColour);
 

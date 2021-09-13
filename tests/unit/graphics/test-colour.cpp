@@ -11,15 +11,15 @@
 #include <Colour.h>
 #include <doctest.h>
 
-uint8_t alpha = 0x12;
-uint8_t red = 0x34;
-uint8_t green = 0x56;
-uint8_t blue = 0x78;
+uint8_t red = 0x12;
+uint8_t green = 0x34;
+uint8_t blue = 0x56;
+uint8_t alpha = 0x78;
 uint32_t colourVal = 0x12345678;
 
 TEST_CASE("Colour Contructors") {
     SUBCASE("Separate values contructor") {
-        Colour col(alpha, red, green, blue);
+        Colour col(red, green, blue, alpha);
 
         CHECK(col.GetAlpha() == alpha);
         CHECK(col.GetRed() == red);
@@ -78,6 +78,6 @@ TEST_CASE("Colour Operators") {
     SUBCASE("= Operator") {
         Colour newColour = testCol;
 
-        CHECK(newColour.colours.argb == testCol.colours.argb);
+        CHECK(newColour.colours.rgba == testCol.colours.rgba);
     }
 }

@@ -16,7 +16,7 @@
 class Framebuffer : Canvas {
    public:
     int framebufferFile;
-    int tty_fb;
+    int tty_fb = 0;
     struct fb_fix_screeninfo finfo;
     struct fb_var_screeninfo vinfo;
     uint8_t *frontBuffer, *backBuffer, *tmp;
@@ -39,7 +39,7 @@ class Framebuffer : Canvas {
     }
     void DrawLine(const Point &aA, const Point &aB, const Pen &aPen);
     void DrawRectangle(const Rect &aRect, const Pen &aPen);
-    void DrawImage(const Point &LeftTop, const Bitmap &aBitmap);
+    void DrawImage(const Point &aLeftTop, const Bitmap &aBitmap);
     void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit);
     inline void SetPixel(const Point &aPoint, const Colour aColor) {
         if (!IsInsideScreen(aPoint)) {

@@ -134,7 +134,7 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         }
         //fb.SwapBuffer();
     }
-    SUBCASE("Set pixel outside screen") {
+    SUBCASE("Set/Get pixel outside screen") {
         //Arrange
         Point outSideXAxis(-1, 0);
         Point outSideYAxis(0, -1);
@@ -146,5 +146,55 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         //Assert
         CHECK_EQ(fb.GetPixel(outSideXAxis), 0);
         CHECK_EQ(fb.GetPixel(outSideYAxis), 0);
+    }
+    SUBCASE("Drawing Images") {
+        //Arrange
+        Point topLeftPoint(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
+        Bitmap bitmap;
+        bitmap.pixels = std::vector<uint32_t>{
+            col,
+            col,
+            col,
+            col,
+            col,
+            col,
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            Colour(0xFF, 0x00, 0x00, 0xFF),
+            col,
+            col,
+            col,
+            col,
+            col,
+            col};
+        bitmap.width = 6;
+        bitmap.height = 6;
+
+        //Act
+        fb.DrawImage(topLeftPoint, bitmap);
+
+        //Assert
+        //fb.SwapBuffer();
     }
 }

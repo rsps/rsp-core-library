@@ -35,6 +35,7 @@ class Bitmap {
     std::string imgName;
     std::vector<uint32_t> pixels;
 
+    Bitmap();
     Bitmap(std::string aImgName);
     Bitmap(const uint32_t* apPixels, int aHeight, int aWidth, int aBytesPerPixel);
     Bitmap(int aHeight, int aWidth, int aBytesPerPixel);

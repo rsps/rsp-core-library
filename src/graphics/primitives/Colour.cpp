@@ -10,14 +10,21 @@
 
 #include "Colour.h"
 
-Colour::Colour(uint8_t aAlpha, uint8_t aRed, uint8_t aGreen, uint8_t aBlue) {
-    colours.alpha = aAlpha;
+Colour::Colour(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha) {
     colours.red = aRed;
     colours.green = aGreen;
     colours.blue = aBlue;
+    colours.alpha = aAlpha;
 }
-Colour::Colour(uint32_t aARGB) {
-    colours.argb = aARGB;
+Colour::Colour(uint32_t aRGBA) {
+#ifdef LITTLE_ENDIAN
+    colours.rgba = aRGBA;
+#else
+    colour.alpha = (aRGBA & 0xFF);
+    colour.blue = (aRGBA >> 8) & 0xFF;
+    colour.green = (aRGBA >> 16) & 0xFF;
+    colour.red = (aRGBA >> 24) & 0xFF;
+#endif
 }
 Colour::Colour(const Colour &aColour)
     : colours(aColour.colours) {
@@ -48,7 +55,14 @@ void Colour::SetAlpha(uint8_t aValue) {
     colours.alpha = aValue;
 }
 Colour::operator uint32_t() const {
-    return colours.argb;
+#ifdef LITTLE_ENDIAN
+    return colours.rgba;
+#else
+    return (((uint32_t)colours.red) << 24) |
+           (((uint32_t)colours.green) << 16) |
+           (((uint32_t)colours.blue) << 8) |
+           ((uint32_t)colours.alpha);
+#endif
 }
 Colour &Colour::operator=(const Colour &aColour) {
     colours = aColour.colours;

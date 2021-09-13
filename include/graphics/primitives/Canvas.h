@@ -16,6 +16,7 @@ class Canvas {
     virtual void DrawRectangle(const Rect &aRect, const Pen &aPen) = 0;
     virtual void DrawImage(const Point &LeftTop, const Bitmap &aBitmap) = 0;
     virtual void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit) = 0;
+    virtual void SetPixel(const Point &aPoint, const Colour aColor) = 0;
 };
 
 #endif  //CANVAS_H

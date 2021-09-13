@@ -10,6 +10,11 @@
 
 #include "Pen.h"
 
+#include "Canvas.h"
+
 Pen::Pen(int aSize, Colour aColour)
     : size(aSize), colour(aColour) {
+}
+void Pen::Draw(Canvas &aCanvas, const Point &aPoint) const {
+    aCanvas.SetPixel(aPoint, colour);
 }

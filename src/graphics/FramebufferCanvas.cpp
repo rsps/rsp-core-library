@@ -67,14 +67,8 @@ Framebuffer::~Framebuffer() {
 }
 
 void Framebuffer::DrawDot(const Point &aPoint, const Pen &aPen) {
-    //Check if we are outside screen
-    if (!IsInsideScreen(aPoint)) {
-        return;
-    }
-    //In the future use the Pen bitmap to draw
-    long location = (aPoint.x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.y * finfo.line_length;
-    //std::cout << "location:" << location << std::endl;
-    *((uint32_t *)(backBuffer + location)) = aPen.colour;
+    //Why are we going through this?
+    aPen.Draw(*this, aPoint);
 }
 void Framebuffer::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen) {
     throw NotImplementedException("");
@@ -111,7 +105,8 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen) {
     px = aA.x;
     py = aA.y;
 
-    DrawDot(aA, aPen);
+    //DrawDot(aA, aPen);
+    aPen.Draw(*this, aA);
     if (absDeltaX >= absDeltaY) {
         for (i = 0; i < absDeltaX; i++) {
             y += absDeltaY;
@@ -120,7 +115,8 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen) {
                 py += signumY;
             }
             px += signumX;
-            DrawDot(Point(px, py), aPen);
+            //DrawDot(Point(px, py), aPen);
+            aPen.Draw(*this, Point(px, py));
         }
     } else {
         for (i = 0; i < absDeltaY; i++) {
@@ -130,22 +126,33 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen) {
                 px += signumX;
             }
             py += signumY;
-            DrawDot(Point(px, py), aPen);
+            //DrawDot(Point(px, py), aPen);
+            aPen.Draw(*this, Point(px, py));
         }
     }
 }
 void Framebuffer::DrawRectangle(const Rect &aRect, const Pen &aPen) {
     for (int i = aRect.LeftTop.x; i <= aRect.RightBottom.x; i++) {
-        DrawDot(Point(i, aRect.LeftTop.y), aPen);      //top
-        DrawDot(Point(i, aRect.RightBottom.y), aPen);  //bottom
+        //DrawDot(Point(i, aRect.LeftTop.y), aPen);      //top
+        //DrawDot(Point(i, aRect.RightBottom.y), aPen);  //bottom
+        aPen.Draw(*this, Point(i, aRect.LeftTop.y));      //top
+        aPen.Draw(*this, Point(i, aRect.RightBottom.y));  //bottom
     }
     for (int i = aRect.LeftTop.y; i <= aRect.RightBottom.y; i++) {
-        DrawDot(Point(aRect.LeftTop.x, i), aPen);      //left
-        DrawDot(Point(aRect.RightBottom.x, i), aPen);  //right
+        //DrawDot(Point(aRect.LeftTop.x, i), aPen);      //left
+        //DrawDot(Point(aRect.RightBottom.x, i), aPen);  //right
+        aPen.Draw(*this, Point(aRect.LeftTop.x, i));      //left
+        aPen.Draw(*this, Point(aRect.RightBottom.x, i));  //right
     }
 }
-void Framebuffer::DrawImage(const Point &LeftTop, const Bitmap &aBitmap) {
-    throw NotImplementedException("Draw Image is not yet implemented");
+void Framebuffer::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap) {
+    int iter = 0;
+    for (size_t h = 0; h < aBitmap.height; h++) {
+        for (size_t w = 0; w < aBitmap.width; w++) {
+            SetPixel(Point(aLeftTop.x + w, aLeftTop.y + h), aBitmap.pixels[iter]);
+            iter++;
+        }
+    }
 }
 void Framebuffer::DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit) {
     throw NotImplementedException("Draw Text is not yet implemented");

@@ -9,7 +9,7 @@
  */
 
 #include "Bitmap.h"
-
+Bitmap::Bitmap() {}
 Bitmap::Bitmap(std::string aImgName)
     : imgName(aImgName) {
     FILE* file = fopen(&imgName[0], "rb");  //Pass reference to the first element in string, and read as binary
