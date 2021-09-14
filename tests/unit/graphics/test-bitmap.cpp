@@ -12,12 +12,9 @@
 #include <doctest.h>
 
 TEST_CASE("Bitmap file") {
-    /*std::cout << "Bitmap test" << std::endl;
-    std::string filepath = "/home/Documents/testImage.bmp";
+    std::string filepath = "testImages/testImage.bmp";
     Bitmap bitmap(filepath);
 
-    std::cout << "Bitmap Height: " << bitmap.height;
-    std::cout << " Width: " << bitmap.width << std::endl;
     CHECK(bitmap.height == 194);
-    CHECK(bitmap.width == 259);*/
+    CHECK(bitmap.width == 259);
 }

@@ -149,8 +149,8 @@ TEST_CASE("Framebuffer Drawing Primitives") {
     }
     SUBCASE("Drawing Images") {
         //Arrange
-        Point topLeftPoint(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
-        Bitmap bitmap;
+        Point topLeftPoint(100, 200);
+        /*Bitmap bitmap;
         bitmap.pixels = std::vector<uint32_t>{
             col,
             col,
@@ -189,12 +189,14 @@ TEST_CASE("Framebuffer Drawing Primitives") {
             col,
             col};
         bitmap.width = 6;
-        bitmap.height = 6;
+        bitmap.height = 6;*/
+        std::string filepath = "testImages/testImageCross.bmp";
+        Bitmap bitmap(filepath);
 
         //Act
         fb.DrawImage(topLeftPoint, bitmap);
 
         //Assert
-        //fb.SwapBuffer();
+        fb.SwapBuffer();
     }
 }

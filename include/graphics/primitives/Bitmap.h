@@ -9,29 +9,29 @@
 
 //Should be unsigned?
 struct BMPHeader {
-    short signature;
-    int fileSize;
-    int reserved;
-    int dataOffset;
-    int size;
-    int width;
-    int heigth;
-    short planes;
-    short bitsPerPixel;
-    int compression;
-    int imageSize;
-    int xPixelsPerM;
-    int yPixelsPerM;
-    int coloursUsed;
-    int importantColours;
-};
+    uint16_t signature;
+    uint32_t fileSize;
+    uint32_t reserved;
+    uint32_t dataOffset;
+    uint32_t size;
+    uint32_t width;
+    uint32_t heigth;
+    uint16_t planes;
+    uint16_t bitsPerPixel;
+    uint32_t compression;
+    uint32_t imageSize;
+    uint32_t xPixelsPerM;
+    uint32_t yPixelsPerM;
+    uint32_t coloursUsed;
+    uint32_t importantColours;
+} __attribute__((packed));  //To stop alignment
 
 class Bitmap {
    public:
     BMPHeader bmpHeader;
-    int height;
-    int width;
-    short bytesPerPixel;
+    uint32_t height;
+    uint32_t width;
+    uint16_t bytesPerPixel;
     std::string imgName;
     std::vector<uint32_t> pixels;
 

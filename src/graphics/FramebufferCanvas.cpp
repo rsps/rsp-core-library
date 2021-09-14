@@ -24,9 +24,11 @@ Framebuffer::Framebuffer() {
     ioctl(framebufferFile, FBIOGET_FSCREENINFO, &finfo);
 
     //cout general info
+    /*
     std::cout << "finfo ypanstep:" << finfo.ypanstep << std::endl;
     std::cout << "finfo xpanstep:" << finfo.xpanstep << std::endl;
     std::cout << "Bits per pixel:" << vinfo.bits_per_pixel << std::endl;
+    */
 
     //set yres_virtual for double buffering
     vinfo.yres_virtual = vinfo.yres * 2;
@@ -34,8 +36,10 @@ Framebuffer::Framebuffer() {
     if (ioctl(framebufferFile, FBIOPUT_VSCREENINFO, &vinfo) == -1) {
         std::cout << "ioctl FBIOPUT_VSCREENINFO failed errno:" << strerror(errno) << std::endl;
     }
+    /*
     std::cout << "vinfo yres:" << vinfo.yres << std::endl;
     std::cout << "vinfo yres_virtual:" << vinfo.yres_virtual << std::endl;
+    */
 
     //stop the console from drawing ontop of this programs graphics
     if (access("/dev/tty0", O_RDWR) == 0) {
@@ -47,10 +51,14 @@ Framebuffer::Framebuffer() {
 
     //calculate size of screen
     long screensize = vinfo.yres * finfo.line_length;
+    /*
     std::cout << "Screen size:" << screensize << std::endl;
+    */
 
     //map framebuffer to memory
+    /*
     std::cout << "Mapping framebuffer" << std::endl;
+    */
     frontBuffer = static_cast<uint8_t *>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, framebufferFile, (off_t)0));
     if (frontBuffer == MAP_FAILED) {
         std::cout << "Mapping failed errno:" << strerror(errno) << std::endl;
