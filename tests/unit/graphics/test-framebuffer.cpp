@@ -71,7 +71,7 @@ TEST_CASE("Framebuffer Drawing Primitives") {
             CHECK_EQ(fb.GetPixel(pointA, false), col);
             CHECK_EQ(fb.GetPixel(pointB, false), col);
         }
-        //fb.SwapBuffer();
+        fb.SwapBuffer();
     }
     SUBCASE("Drawing Rectangles") {
         //Arrange
@@ -133,9 +133,9 @@ TEST_CASE("Framebuffer Drawing Primitives") {
                 error += -radius;
             }
         }
-        fb.SwapBuffer();
+        //fb.SwapBuffer();
     }
-    /*SUBCASE("Set/Get pixel outside screen") {
+    SUBCASE("Set/Get pixel outside screen") {
         //Arrange
         Point outSideXAxis(-1, 0);
         Point outSideYAxis(0, -1);
@@ -161,5 +161,5 @@ TEST_CASE("Framebuffer Drawing Primitives") {
 
         //Assert
         fb.SwapBuffer();
-    }*/
+    }
 }
