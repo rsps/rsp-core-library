@@ -24,6 +24,7 @@ TEST_CASE("Framebuffer Drawing Primitives") {
     fb.Clear();
     Colour col(0, rand() % 256, rand() % 256, rand() % 256);
     Pen pen(rand() % 10 + 1, col);
+
     SUBCASE("Drawing Lines") {
         //Arrange
         Point pointA(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
@@ -132,9 +133,9 @@ TEST_CASE("Framebuffer Drawing Primitives") {
                 error += -radius;
             }
         }
-        //fb.SwapBuffer();
+        fb.SwapBuffer();
     }
-    SUBCASE("Set/Get pixel outside screen") {
+    /*SUBCASE("Set/Get pixel outside screen") {
         //Arrange
         Point outSideXAxis(-1, 0);
         Point outSideYAxis(0, -1);
@@ -147,49 +148,11 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         CHECK_EQ(fb.GetPixel(outSideXAxis), 0);
         CHECK_EQ(fb.GetPixel(outSideYAxis), 0);
     }
+
     SUBCASE("Drawing Images") {
         //Arrange
         Point topLeftPoint(100, 200);
-        /*Bitmap bitmap;
-        bitmap.pixels = std::vector<uint32_t>{
-            col,
-            col,
-            col,
-            col,
-            col,
-            col,
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            Colour(0xFF, 0x00, 0x00, 0xFF),
-            col,
-            col,
-            col,
-            col,
-            col,
-            col};
-        bitmap.width = 6;
-        bitmap.height = 6;*/
+
         std::string filepath = "testImages/testImageCross.bmp";
         Bitmap bitmap(filepath);
 
@@ -198,5 +161,5 @@ TEST_CASE("Framebuffer Drawing Primitives") {
 
         //Assert
         fb.SwapBuffer();
-    }
+    }*/
 }

@@ -33,7 +33,7 @@ class Bitmap {
     uint32_t width;
     uint16_t bytesPerPixel;
     std::string imgName;
-    std::vector<uint32_t> pixels;
+    std::vector<uint32_t> imagePixels;
 
     Bitmap();
     Bitmap(std::string aImgName);

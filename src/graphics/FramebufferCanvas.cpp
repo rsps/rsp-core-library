@@ -29,7 +29,6 @@ Framebuffer::Framebuffer() {
     std::cout << "finfo xpanstep:" << finfo.xpanstep << std::endl;
     std::cout << "Bits per pixel:" << vinfo.bits_per_pixel << std::endl;
     */
-
     //set yres_virtual for double buffering
     vinfo.yres_virtual = vinfo.yres * 2;
     vinfo.yoffset = 0;
@@ -40,7 +39,6 @@ Framebuffer::Framebuffer() {
     std::cout << "vinfo yres:" << vinfo.yres << std::endl;
     std::cout << "vinfo yres_virtual:" << vinfo.yres_virtual << std::endl;
     */
-
     //stop the console from drawing ontop of this programs graphics
     if (access("/dev/tty0", O_RDWR) == 0) {
         tty_fb = open("/dev/tty0", O_RDWR);
@@ -157,7 +155,7 @@ void Framebuffer::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap) {
     int iter = 0;
     for (size_t h = 0; h < aBitmap.height; h++) {
         for (size_t w = 0; w < aBitmap.width; w++) {
-            SetPixel(Point(aLeftTop.x + w, aLeftTop.y + h), aBitmap.pixels[iter]);
+            SetPixel(Point(aLeftTop.x + w, aLeftTop.y + h), aBitmap.imagePixels[iter]);
             iter++;
         }
     }
