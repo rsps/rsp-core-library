@@ -9,6 +9,8 @@
 
 class Canvas {
    public:
+    enum class SwapOperations { NoOp, Copy, Clear };
+
     virtual void DrawDot(const Point &aPoint, const Pen &aPen) = 0;
     virtual void DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen) = 0;
     virtual void DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen) = 0;
@@ -17,6 +19,7 @@ class Canvas {
     virtual void DrawImage(const Point &LeftTop, const Bitmap &aBitmap) = 0;
     virtual void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit) = 0;
     virtual void SetPixel(const Point &aPoint, const Colour aColor) = 0;
+    virtual void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy) = 0;
 };
 
 #endif  //CANVAS_H

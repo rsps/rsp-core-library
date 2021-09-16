@@ -9,8 +9,11 @@
  */
 
 #include <doctest.h>
+#include <chrono>
+#include <graphics/FramebufferCanvas.h>
 
-#include "FramebufferCanvas.h"
+static Framebuffer fb;
+
 inline void CheckPixel(const Point &aPoint, const Colour &aColour, const Framebuffer &fb) {
     if (fb.IsInsideScreen(aPoint)) {
         CHECK(fb.GetPixel(aPoint) == aColour);
@@ -18,12 +21,21 @@ inline void CheckPixel(const Point &aPoint, const Colour &aColour, const Framebu
         CHECK(fb.GetPixel(aPoint) == 0);
     }
 }
+
 TEST_CASE("Framebuffer Drawing Primitives") {
-    srand(time(NULL));  //generates random seed val
-    Framebuffer fb;
-    fb.Clear();
-    Colour col(0, rand() % 256, rand() % 256, rand() % 256);
+
+    std::chrono::milliseconds ms = std::chrono::duration_cast< std::chrono::milliseconds >(
+        std::chrono::system_clock::now().time_since_epoch()
+    );
+
+    srand(ms.count());  //generates random seed val
+    Colour col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
     Pen pen(rand() % 10 + 1, col);
+
+    SUBCASE("Clear Framebuffer") {
+        fb.SwapBuffer(Canvas::SwapOperations::Clear);
+        fb.SwapBuffer(Canvas::SwapOperations::Clear);
+    }
 
     SUBCASE("Drawing Lines") {
         //Arrange
@@ -71,11 +83,16 @@ TEST_CASE("Framebuffer Drawing Primitives") {
             CHECK_EQ(fb.GetPixel(pointA, false), col);
             CHECK_EQ(fb.GetPixel(pointB, false), col);
         }
-        //fb.SwapBuffer();
+        fb.SwapBuffer();
     }
+
     SUBCASE("Drawing Rectangles") {
         //Arrange
         //Generate random values in the LEFT and TOP halves of the screen
+//        Point leftTop(50, 50);
+//        Point rightBottom(200, 200);
+//        pen.colour = 0xFFFF0000;
+
         Point leftTop(rand() % (fb.vinfo.xres / 2),
                       rand() % (fb.vinfo.yres / 2));
         //Generate random values in the RIGHT and BOTTOM halves of the screen
@@ -90,18 +107,19 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         //Expect all four side to hold values
         for (size_t i = 0; i <= rect.GetWidth(); i++) {
             //Check top side
-            CHECK(col == fb.GetPixel(Point(leftTop.x + i, leftTop.y), false));
+            CHECK(pen.colour == fb.GetPixel(Point(leftTop.x + i, leftTop.y), false));
             //Check bottom side
-            CHECK(col == fb.GetPixel(Point(leftTop.x + i, rightBottom.y), false));
+            CHECK(pen.colour == fb.GetPixel(Point(leftTop.x + i, rightBottom.y), false));
         }
         for (size_t i = 0; i <= rect.GetHeight(); i++) {
             //Check left side
-            CHECK(col == fb.GetPixel(Point(leftTop.x, rightBottom.y - i), false));
+            CHECK(pen.colour == fb.GetPixel(Point(leftTop.x, rightBottom.y - i), false));
             //Check right side
-            CHECK(col == fb.GetPixel(Point(rightBottom.x, rightBottom.y - i), false));
+            CHECK(pen.colour == fb.GetPixel(Point(rightBottom.x, rightBottom.y - i), false));
         }
-        //fb.SwapBuffer();
+        fb.SwapBuffer();
     }
+
     SUBCASE("Drawing Circles") {
         //Arrange
         Point centerPoint(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
