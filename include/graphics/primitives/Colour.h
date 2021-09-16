@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "../../src/utils/RSPCoreExceptions.h"
+#include "utils/RSPCoreExceptions.h"
 
 typedef union {
     uint32_t rgba;
