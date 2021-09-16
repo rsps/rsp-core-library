@@ -8,7 +8,9 @@
  * \author      Simon Glashoff
  */
 
-#include "FramebufferCanvas.h"
+#include <thread>
+#include <chrono>
+#include <graphics/FramebufferCanvas.h>
 
 Framebuffer::Framebuffer() {
     //framebufferFile = open("/dev/fb0", O_RDWR);
@@ -31,7 +33,7 @@ Framebuffer::Framebuffer() {
     */
     //set yres_virtual for double buffering
     vinfo.yres_virtual = vinfo.yres * 2;
-    vinfo.yoffset = 0;
+//    vinfo.yoffset = 0;
     if (ioctl(framebufferFile, FBIOPUT_VSCREENINFO, &vinfo) == -1) {
         std::cout << "ioctl FBIOPUT_VSCREENINFO failed errno:" << strerror(errno) << std::endl;
     }
@@ -61,7 +63,14 @@ Framebuffer::Framebuffer() {
     if (frontBuffer == MAP_FAILED) {
         std::cout << "Mapping failed errno:" << strerror(errno) << std::endl;
     }
+
     backBuffer = frontBuffer + screensize;
+
+    if (vinfo.yoffset > 0) {
+        uint8_t *tmp = frontBuffer;
+        frontBuffer = backBuffer;
+        backBuffer = tmp;
+    }
 }
 Framebuffer::~Framebuffer() {
     //At exit we MUST release the tty again
@@ -137,6 +146,7 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen) {
         }
     }
 }
+
 void Framebuffer::DrawRectangle(const Rect &aRect, const Pen &aPen) {
     for (int i = aRect.LeftTop.x; i <= aRect.RightBottom.x; i++) {
         //DrawDot(Point(i, aRect.LeftTop.y), aPen);      //top
@@ -151,6 +161,7 @@ void Framebuffer::DrawRectangle(const Rect &aRect, const Pen &aPen) {
         aPen.Draw(*this, Point(aRect.RightBottom.x, i));  //right
     }
 }
+
 void Framebuffer::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap) {
     int iter = 0;
     for (size_t h = 0; h < aBitmap.height; h++) {
@@ -160,11 +171,16 @@ void Framebuffer::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap) {
         }
     }
 }
+
 void Framebuffer::DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit) {
     throw NotImplementedException("Draw Text is not yet implemented");
 }
-void Framebuffer::SwapBuffer() {
-    std::cout << "Swapping buffer: " << vinfo.yoffset << std::endl;
+
+void Framebuffer::SwapBuffer(const SwapOperations aSwapOp) {
+    std::cout << "Swapping buffer: " << vinfo.yoffset << ", " << vinfo.reserved[0] << std::endl;
+
+    vinfo.reserved[0]++;
+
     //swap buffer
     if (vinfo.yoffset == 0) {
         vinfo.yoffset = vinfo.yres;
@@ -181,8 +197,21 @@ void Framebuffer::SwapBuffer() {
     frontBuffer = backBuffer;
     backBuffer = tmp;
 
-    Clear();
+    switch (aSwapOp) {
+        case SwapOperations::Copy:
+            copy();
+            break;
+
+        case SwapOperations::Clear:
+            clear();
+            break;
+
+        case SwapOperations::NoOp:
+        default:
+            break;
+    }
 }
+
 uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const {
     if (!IsInsideScreen(aPoint)) {
         return 0;
@@ -195,14 +224,28 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const {
         return *((uint32_t *)(backBuffer + location));
     }
 }
-void Framebuffer::Clear() {
+void Framebuffer::clear() {
     long x, y;
     //draw to back buffer
+//    std::cout << "Clearing buffer" << std::endl;
     for (y = 0; y < vinfo.yres; y++) {
         for (x = 0; x < vinfo.xres; x++) {
             long location = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + y * finfo.line_length;
             //std::cout << "location:" << location << std::endl;
-            *((uint32_t *)(backBuffer + location)) = 0x000000;
+            *((uint32_t *)(backBuffer + location)) = 0x00000000;
+        }
+    }
+}
+
+void Framebuffer::copy() {
+    long x, y;
+    //copy front buffer to back buffer
+//    std::cout << "Copying buffer" << std::endl;
+    for (y = 0; y < vinfo.yres; y++) {
+        for (x = 0; x < vinfo.xres; x++) {
+            long location = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + y * finfo.line_length;
+            //std::cout << "location:" << location << std::endl;
+            *((uint32_t *)(backBuffer + location)) = *((uint32_t *)(frontBuffer + location));
         }
     }
 }

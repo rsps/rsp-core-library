@@ -8,9 +8,8 @@
  * \author      Simon Glashoff
  */
 
-#include "Rect.h"
-
-#include <cassert>
+#include <graphics/primitives/Rect.h>
+#include <utils/RSPCoreExceptions.h>
 
 Rect::Rect(int aLeft, int aTop, int aWidth, int aHeight)
     : LeftTop(aLeft, aTop), RightBottom(aLeft + aWidth, aTop + aHeight) {
@@ -85,8 +84,12 @@ void Rect::SetHeight(int aHeight) {
 
 bool Rect::IsHit(const Point &aPoint) {
     throw NotImplementedException("IsHit is not yet implemeted");
+
+    return false;
 }
 bool Rect::VerifyDimensions() {
     ASSERT(GetWidth() < 0);
     ASSERT(GetHeight() < 0);
+
+    return false;
 }

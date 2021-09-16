@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include "Colour.h"
+#include <graphics/primitives/Colour.h>
 
 Colour::Colour(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha) {
     colours.red = aRed;
@@ -66,4 +66,5 @@ Colour::operator uint32_t() const {
 }
 Colour &Colour::operator=(const Colour &aColour) {
     colours = aColour.colours;
+    return *this;
 }

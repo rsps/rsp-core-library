@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  */
 
-#include <Point.h>
-#include <Rect.h>
+#include <graphics/primitives/Point.h>
+#include <graphics/primitives/Rect.h>
 #include <doctest.h>
 
 #include <iostream>

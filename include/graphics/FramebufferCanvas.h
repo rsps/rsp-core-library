@@ -13,13 +13,10 @@
 
 #include "graphics/primitives/Canvas.h"
 
-class Framebuffer : Canvas {
-   public:
-    int framebufferFile;
-    int tty_fb = 0;
-    struct fb_fix_screeninfo finfo;
+class Framebuffer: Canvas
+{
+public:
     struct fb_var_screeninfo vinfo;
-    uint8_t *frontBuffer, *backBuffer, *tmp;
 
     Framebuffer();
     ~Framebuffer();
@@ -33,6 +30,7 @@ class Framebuffer : Canvas {
         DrawDot(Point(aCenterX + aX, aCenterY - aY), aPen);
         DrawDot(Point(aCenterX - aX, aCenterY - aY), aPen);
     }
+
     inline void plot8Points(int aCenterX, int aCenterY, int aX, int aY, const Pen &aPen) {
         plot4Points(aCenterX, aCenterY, aX, aY, aPen);
         plot4Points(aCenterX, aCenterY, aY, aX, aPen);
@@ -47,14 +45,24 @@ class Framebuffer : Canvas {
         }
         long location = (aPoint.x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.y * finfo.line_length;
         //std::cout << "location:" << location << std::endl;
-        *((uint32_t *)(backBuffer + location)) = aColor;
+        *((uint32_t*) (backBuffer + location)) = aColor;
     }
+
     uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
     inline bool IsInsideScreen(const Point &aPoint) const {
         return !(aPoint.x < 0 || aPoint.y < 0 || aPoint.y >= vinfo.yres || aPoint.x >= vinfo.xres);
     }
-    void SwapBuffer();
-    void Clear();
+
+    void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy);
+
+protected:
+    int framebufferFile;
+    int tty_fb = 0;
+    struct fb_fix_screeninfo finfo;
+    uint8_t *frontBuffer, *backBuffer, *tmp;
+
+    void clear();
+    void copy();
 };
 
 #endif  // FRAMEBUFFERCANVAS_H

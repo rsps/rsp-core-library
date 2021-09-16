@@ -15,27 +15,40 @@
 #include <stdexcept>
 #include <system_error>
 
-class RSPCoreException : public std::runtime_error {
-   public:
-    explicit RSPCoreException(const char* aMsg) : std::runtime_error("") {
+class RSPCoreException: public std::runtime_error
+{
+public:
+    explicit RSPCoreException(const char *aMsg)
+        : std::runtime_error("")
+    {
         mMsg = aMsg;
     }
 
-    const char* what() const noexcept override {
+    const char* what() const noexcept override
+    {
         return mMsg.c_str();
     }
 
-   protected:
+protected:
     std::string mMsg;
 };
 
-class NotImplementedException : public RSPCoreException {
-   public:
-    explicit NotImplementedException(const char* aMsg) : RSPCoreException(aMsg) {}
+class NotImplementedException: public RSPCoreException
+{
+public:
+    explicit NotImplementedException(const char *aMsg)
+        : RSPCoreException(aMsg)
+    {
+    }
 };
-class AssertException : public RSPCoreException {
-   public:
-    explicit AssertException(const char* aMsg) : RSPCoreException(aMsg) {}
+
+class AssertException: public RSPCoreException
+{
+public:
+    explicit AssertException(const char *aMsg)
+        : RSPCoreException(aMsg)
+    {
+    }
 };
 
 #ifndef NDEBUG
@@ -46,4 +59,5 @@ class AssertException : public RSPCoreException {
 #else
 #define ASSERT(a)
 #endif
+
 #endif  // RSPCOREEXCEPTIONS_H

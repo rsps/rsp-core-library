@@ -8,4 +8,4 @@
  * \author      Simon Glashoff
  */
 
-#include "Point.h"
+#include <graphics/primitives/Point.h>

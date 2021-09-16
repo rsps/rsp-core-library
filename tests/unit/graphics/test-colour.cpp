@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <Colour.h>
+#include <graphics/primitives/Colour.h>
 #include <doctest.h>
 
 uint8_t red = 0x12;

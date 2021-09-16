@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <Bitmap.h>
+#include <graphics/primitives/Bitmap.h>
 #include <doctest.h>
 
 /*TEST_CASE("Bitmap file") {

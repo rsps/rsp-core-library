@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../../../src/utils/RSPCoreExceptions.h"
+#include <utils/RSPCoreExceptions.h>
 
 //Should be unsigned?
 struct BMPHeader {

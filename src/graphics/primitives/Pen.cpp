@@ -8,9 +8,8 @@
  * \author      Simon Glashoff
  */
 
-#include "Pen.h"
-
-#include "Canvas.h"
+#include <graphics/primitives/Pen.h>
+#include <graphics/primitives/Canvas.h>
 
 Pen::Pen(int aSize, Colour aColour)
     : size(aSize), colour(aColour) {

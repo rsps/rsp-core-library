@@ -1,7 +1,7 @@
 #ifndef RECT_H
 #define RECT_H
 
-#include "../../src/utils/RSPCoreExceptions.h"
+#include <utils/RSPCoreExceptions.h>
 #include "Point.h"
 
 class Rect {
