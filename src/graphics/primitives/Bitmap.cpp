@@ -8,9 +8,10 @@
  * \author      Simon Glashoff
  */
 
-#include <cerrno>
-#include <algorithm>
 #include <graphics/primitives/Bitmap.h>
+
+#include <algorithm>
+#include <cerrno>
 
 Bitmap::Bitmap() {}
 Bitmap::Bitmap(std::string aImgName)

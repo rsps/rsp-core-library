@@ -1,11 +1,11 @@
 #ifndef BITMAP_H
 #define BITMAP_H
 
+#include <utils/RSPCoreExceptions.h>
+
 #include <cstring>
 #include <iostream>
 #include <vector>
-
-#include <utils/RSPCoreExceptions.h>
 
 //Should be unsigned?
 struct BMPHeader {
