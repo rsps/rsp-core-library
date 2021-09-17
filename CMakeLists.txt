@@ -11,9 +11,9 @@ set (LIB_VERSION_PATCH 0)
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
-  "${PROJECT_SOURCE_DIR}/version-def.h.in"
-  "${PROJECT_BINARY_DIR}/src/version-def.h"
-  )
+    "${PROJECT_SOURCE_DIR}/version-def.h.in"
+    "${PROJECT_BINARY_DIR}/src/version-def.h"
+)
 
 #set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
 #set (THREADS_PREFER_PTHREAD_FLAG TRUE)
@@ -29,8 +29,6 @@ include(GNUInstallDirs)
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 
 add_library("rsp-core-lib" STATIC)
-add_subdirectory(src)
-add_subdirectory(include)
 
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
@@ -43,6 +41,8 @@ target_include_directories(rsp-core-lib
         src
         ${CMAKE_CURRENT_BINARY_DIR}/src
 )
+
+add_subdirectory(src)
 
 
 #--------------------------------------------------------
