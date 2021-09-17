@@ -8,40 +8,19 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/primitives/Bitmap.h>
-#include <utils/ImgLoader.h>
+#include <utils/BmpLoader.h>
+#include <utils/RSPCoreExceptions.h>
 
 #include <algorithm>
 #include <cerrno>
 
-Bitmap::Bitmap() {}
-Bitmap::Bitmap(std::string aImgName)
-    : imgName(aImgName) {
+BmpLoader::BmpLoader() {}
+
+std::vector<uint32_t> BmpLoader::LoadImg(std::string aImgName) {
     std::cout << "Bitmap reading file name: " << aImgName << std::endl;
-
-    //Detect filetype
-    std::string filetype = "bmp";
-
-    //Convert to int via enum and map
-    //https://www.codeguru.com/cplusplus/switch-on-strings-in-c/
-    //Better way?
-
-    switch (filetype) {
-        case /* bmp file */:
-            bmpLoader loader();
-            loader.LoadImg(aImgName);
-            break;
-        case /* png file */:
-            /* code */
-            break;
-
-        default:
-            break;
-    }
-    /*
     errno = 0;
     //Pass reference to the first element in string, and read as binary
-    FILE* file = fopen(imgName.c_str(), "rb");
+    FILE* file = fopen(aImgName.c_str(), "rb");
     if (file == NULL) {
         std::cout << "File is null" << std::endl;
         std::cout << "Error: " << errno << std::endl;
@@ -52,8 +31,10 @@ Bitmap::Bitmap(std::string aImgName)
     fread(&bmpHeader, sizeof(uint8_t), sizeof(bmpHeader), file);
     std::cout << "File header read" << std::endl;
 
+    /*
     width = bmpHeader.width;
     height = bmpHeader.heigth;
+    */
 
     //std::cout << "Width:            " << width << std::endl;
     //std::cout << "Height:           " << height << std::endl;
@@ -83,11 +64,11 @@ Bitmap::Bitmap(std::string aImgName)
     //std::cout << "ImportantColours: " << bmpHeader.importantColours << std::endl;
     //std::cout << "BytesPerPix:      " << bytesPerPixel << std::endl;
 
-    // TODO: Get Compression and other useful stuff
+    /* TODO: Get Compression and other useful stuff */
 
     //Height can be negative, showing the image is stored from top to bottom
     bool normallyDrawn = true;
-    if (height < 0) {
+    if (bmpHeader.heigth < 0) {
         normallyDrawn = false;
     }
 
@@ -125,20 +106,4 @@ Bitmap::Bitmap(std::string aImgName)
     }
 
     fclose(file);
-    */
-}
-Bitmap::Bitmap(const uint32_t* apPixels, int aHeight, int aWidth, int aBytesPerPixel) {
-    throw NotImplementedException("");
-}
-Bitmap::Bitmap(int aHeight, int aWidth, int aBytesPerPixel)
-    : height(aHeight),
-      width(aWidth),
-      bytesPerPixel(aBytesPerPixel),
-      imagePixels(width * height) {
-    throw NotImplementedException("");
-    //Load file into memory here
-    //https://freeimage.sourceforge.io/
-    //http://libjpeg.sourceforge.net/
-}
-Bitmap::~Bitmap() {
 }

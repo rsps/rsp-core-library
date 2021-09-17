@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 
-//Should be unsigned?
+//Removed
 struct BMPHeader {
     uint16_t signature;
     uint32_t fileSize;
@@ -28,12 +28,12 @@ struct BMPHeader {
 
 class Bitmap {
    public:
-    BMPHeader bmpHeader;
-    uint32_t height;
-    uint32_t width;
-    uint16_t bytesPerPixel;
+    BMPHeader bmpHeader;     //Removed
+    uint32_t height;         //Removed
+    uint32_t width;          //Removed
+    uint16_t bytesPerPixel;  //Removed
     std::string imgName;
-    std::vector<uint32_t> imagePixels;
+    std::vector<uint32_t> imagePixels;  //Pointer?
 
     Bitmap();
     Bitmap(std::string aImgName);
