@@ -167,6 +167,14 @@ std::size_t FileIO::GetSize()
     return result;
 }
 
+void FileIO::SetSize(std::size_t aSize)
+{
+    int ret = ftruncate(mHandle, aSize);
+    if (ret < 0) {
+        THROW_SYSTEM("Error resizing file " + mFileName);
+    }
+}
+
 bool FileIO::WaitForDataReady(int aTimeoutms)
 {
     struct pollfd fd;

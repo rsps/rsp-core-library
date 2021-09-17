@@ -5,23 +5,63 @@
  *
  * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
- * \author      Simon Glashoff
+ * \author      Steffen Brummer
  */
 
 #include <filesystem/FileIO.h>
 #include <doctest.h>
+#include <unistd.h>
 
 using namespace rsp::filesystem;
 
 TEST_CASE("File IO") {
-    const std::string cFileName = "testImages/testImage.bmp";
+    const std::string cFileName = "temp.txt";
 
-    SUBCASE("Create") {
+    SUBCASE("Construct") {
         CHECK_NOTHROW(FileIO f);
     }
 
-    SUBCASE("Create And Load") {
-        CHECK_THROWS({ FileIO f(cFileName, std::ios_base::in); });
+    SUBCASE("Create File") {
+        CHECK_NOTHROW(FileIO f(cFileName, std::ios_base::out, 0664));
     }
 
+    SUBCASE("Write File") {
+        FileIO f(cFileName, std::ios_base::out);
+
+        CHECK_NOTHROW(f.PutContents("Hello World"));
+    }
+
+    SUBCASE("Read File") {
+        FileIO f(cFileName, std::ios_base::in);
+        std::string s = f.GetContents();
+
+        CHECK(s == "Hello World");
+    }
+
+    SUBCASE("Seek And Read") {
+        FileIO f(cFileName, std::ios_base::in);
+        f.Seek(6, std::ios_base::beg);
+        std::string s = f.GetLine();
+
+        CHECK(s == "World");
+    }
+
+    SUBCASE("Seek And Write") {
+        FileIO f(cFileName, std::ios_base::out);
+        f.Seek(6, std::ios_base::beg);
+
+        CHECK_NOTHROW(f.PutLine("File"));
+        CHECK_NOTHROW(f.SetSize(10));
+    }
+
+    SUBCASE("Read Hello") {
+        FileIO f(cFileName, std::ios_base::in);
+        std::string s = f.GetContents();
+
+        CHECK(s == "Hello File");
+    }
+
+    SUBCASE("Cleanup") {
+        unlink(cFileName.c_str());
+    }
 }
