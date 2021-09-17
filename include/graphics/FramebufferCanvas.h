@@ -19,7 +19,7 @@ public:
     struct fb_var_screeninfo vinfo;
 
     Framebuffer();
-    ~Framebuffer();
+    virtual ~Framebuffer();
 
     void DrawDot(const Point &aPoint, const Pen &aPen);
     void DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen);
@@ -59,7 +59,7 @@ protected:
     int framebufferFile;
     int tty_fb = 0;
     struct fb_fix_screeninfo finfo;
-    uint8_t *frontBuffer, *backBuffer, *tmp;
+    uint8_t *frontBuffer, *backBuffer;
 
     void clear();
     void copy();

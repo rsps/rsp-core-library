@@ -13,10 +13,12 @@
 #include <graphics/FramebufferCanvas.h>
 
 Framebuffer::Framebuffer() {
-    //framebufferFile = open("/dev/fb0", O_RDWR);
-    framebufferFile = open("/dev/fb1", O_RDWR);
+    framebufferFile = open("/dev/fb0", O_RDWR);
     if (framebufferFile == -1) {
-        throw std::system_error(errno, std::generic_category(), "Failed to open framebuffer");
+        framebufferFile = open("/dev/fb1", O_RDWR);
+        if (framebufferFile == -1) {
+            throw std::system_error(errno, std::generic_category(), "Failed to open framebuffer");
+        }
     }
 
     //get fixed screen info

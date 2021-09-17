@@ -12,9 +12,6 @@ _deps
 /ext-libs/*
 !/ext-libs/.gitkeep
 
-# Eclipse project files
-.project
-.cproject
 /build/
 !build/.gitkeep
 
