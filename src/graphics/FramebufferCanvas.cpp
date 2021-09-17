@@ -8,9 +8,10 @@
  * \author      Simon Glashoff
  */
 
-#include <thread>
-#include <chrono>
 #include <graphics/FramebufferCanvas.h>
+
+#include <chrono>
+#include <thread>
 
 Framebuffer::Framebuffer() {
     framebufferFile = open("/dev/fb0", O_RDWR);
@@ -35,7 +36,7 @@ Framebuffer::Framebuffer() {
     */
     //set yres_virtual for double buffering
     vinfo.yres_virtual = vinfo.yres * 2;
-//    vinfo.yoffset = 0;
+    //    vinfo.yoffset = 0;
     if (ioctl(framebufferFile, FBIOPUT_VSCREENINFO, &vinfo) == -1) {
         std::cout << "ioctl FBIOPUT_VSCREENINFO failed errno:" << strerror(errno) << std::endl;
     }
@@ -179,7 +180,7 @@ void Framebuffer::DrawText(const Rect &aRect, const Font &aFont, const char *apT
 }
 
 void Framebuffer::SwapBuffer(const SwapOperations aSwapOp) {
-    std::cout << "Swapping buffer: " << vinfo.yoffset << ", " << vinfo.reserved[0] << std::endl;
+    //std::cout << "Swapping buffer: " << vinfo.yoffset << ", " << vinfo.reserved[0] << std::endl;
 
     vinfo.reserved[0]++;
 
@@ -229,7 +230,7 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const {
 void Framebuffer::clear() {
     long x, y;
     //draw to back buffer
-//    std::cout << "Clearing buffer" << std::endl;
+    //    std::cout << "Clearing buffer" << std::endl;
     for (y = 0; y < vinfo.yres; y++) {
         for (x = 0; x < vinfo.xres; x++) {
             long location = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + y * finfo.line_length;
@@ -242,7 +243,7 @@ void Framebuffer::clear() {
 void Framebuffer::copy() {
     long x, y;
     //copy front buffer to back buffer
-//    std::cout << "Copying buffer" << std::endl;
+    //    std::cout << "Copying buffer" << std::endl;
     for (y = 0; y < vinfo.yres; y++) {
         for (x = 0; x < vinfo.xres; x++) {
             long location = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + y * finfo.line_length;

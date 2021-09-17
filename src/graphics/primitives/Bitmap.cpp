@@ -8,9 +8,10 @@
  * \author      Simon Glashoff
  */
 
-#include <cerrno>
-#include <algorithm>
 #include <graphics/primitives/Bitmap.h>
+
+#include <algorithm>
+#include <cerrno>
 
 Bitmap::Bitmap() {}
 Bitmap::Bitmap(std::string aImgName)
@@ -32,8 +33,8 @@ Bitmap::Bitmap(std::string aImgName)
     width = bmpHeader.width;
     height = bmpHeader.heigth;
 
-    std::cout << "Width:            " << width << std::endl;
-    std::cout << "Height:           " << height << std::endl;
+    //std::cout << "Width:            " << width << std::endl;
+    //std::cout << "Height:           " << height << std::endl;
 
     //short bitsPerPixel;
     //memcpy(&bitsPerPixel, info + 28, sizeof(short));
@@ -46,32 +47,31 @@ Bitmap::Bitmap(std::string aImgName)
     //std::cout << "Signature:        " << std::to_string(bmpHeader.signature) << std::endl;
     //std::cout << "FileSize:         " << bmpHeader.fileSize << std::endl;
     //std::cout << "Reserved:         " << bmpHeader.reserved << std::endl;
-    std::cout << "DataOffset:       " << bmpHeader.dataOffset << std::endl;
+    //std::cout << "DataOffset:       " << bmpHeader.dataOffset << std::endl;
     //std::cout << "Size:             " << bmpHeader.size << std::endl;
     //std::cout << "Width:            " << bmpHeader.width << std::endl;
     //std::cout << "Height:           " << bmpHeader.height << std::endl;
     //std::cout << "Planes:           " << bmpHeader.planes << std::endl;
-    std::cout << "BitsPerPix:       " << bmpHeader.bitsPerPixel << std::endl;
+    //std::cout << "BitsPerPix:       " << bmpHeader.bitsPerPixel << std::endl;
     //std::cout << "Compression:      " << bmpHeader.compression << std::endl;
-    std::cout << "ImageSize:        " << bmpHeader.imageSize << std::endl;
+    //std::cout << "ImageSize:        " << bmpHeader.imageSize << std::endl;
     //std::cout << "xPixelsPerM:      " << bmpHeader.xPixelsPerM << std::endl;
     //std::cout << "yPixelsPerM:      " << bmpHeader.yPixelsPerM << std::endl;
-    std::cout << "ColoursUSed:      " << bmpHeader.coloursUsed << std::endl;
+    //std::cout << "ColoursUSed:      " << bmpHeader.coloursUsed << std::endl;
     //std::cout << "ImportantColours: " << bmpHeader.importantColours << std::endl;
-    std::cout << "BytesPerPix:      " << bytesPerPixel << std::endl;
+    //std::cout << "BytesPerPix:      " << bytesPerPixel << std::endl;
 
     /* TODO: Get Compression and other useful stuff */
 
     //Height can be negative, showing the image is stored from top to bottom
-    /*int heightSign = 1;
+    bool normallyDrawn = true;
     if (height < 0) {
-        heightSign = -1;
-    }*/
-    /* TODO: Use HeightSign to flip the image correctly */
+        normallyDrawn = false;
+    }
 
     //Figure out amount to read
     int paddedRowSize = (bmpHeader.width * 3 + 3) & (~3);  //bytesPerPixel * abs(bmpHeader.heigth) * bmpHeader.width;
-    std::cout << "Padded row size: " << paddedRowSize << std::endl;
+    //std::cout << "Padded row size: " << paddedRowSize << std::endl;
 
     //Initialize containers for reading
     std::vector<uint8_t> pixelRow;
@@ -83,30 +83,25 @@ Bitmap::Bitmap(std::string aImgName)
     for (size_t i = 0; i < abs(bmpHeader.heigth); i++) {
         //Read a Row of pixels with the padding
         fread(pixelRow.data(), sizeof(uint8_t), paddedRowSize, file);
-        std::cout << "Bitmap row " << i << " read into memory" << std::endl;
-        //int counter = 0;
+        //std::cout << "Bitmap row " << i << " read into memory" << std::endl;
         for (size_t j = 0; j < bmpHeader.width * 3; j += 3) {
             uint8_t blue = pixelRow[j];       //*iter;
             uint8_t green = pixelRow[j + 1];  //*std::next(iter, 1);
             uint8_t red = pixelRow[j + 2];    //*std::next(iter, 2);
             uint8_t alpha = 0x00;
-            //std::cout << "Current:  " << std::hex << (int)current << std::endl;
-            //std::cout << "Next:     " << std::hex << (int)next << std::endl;
-            //std::cout << "NextNext: " << std::hex << (int)nextnext << std::endl;
 
             uint32_t combined = (((uint32_t)red) << 24) |
                                 (((uint32_t)green) << 16) |
                                 (((uint32_t)blue) << 8) |
                                 ((uint32_t)alpha);
-            /*if (counter++ < 265) {
-            std::cout << "Combined hex val: " << std::hex << combined << std::endl;
-            }*/
             imagePixels.push_back(combined);
             //std::cout << "Combined: " << std::hex << combined << std::endl;
         }
     }
+    if (normallyDrawn) {
+        std::reverse(imagePixels.begin(), imagePixels.end());
+    }
 
-    std::reverse(imagePixels.begin(), imagePixels.end());
     fclose(file);
 }
 Bitmap::Bitmap(const uint32_t* apPixels, int aHeight, int aWidth, int aBytesPerPixel) {

@@ -9,8 +9,9 @@
  */
 
 #include <doctest.h>
-#include <chrono>
 #include <graphics/FramebufferCanvas.h>
+
+#include <chrono>
 
 static Framebuffer fb;
 
@@ -23,10 +24,8 @@ inline void CheckPixel(const Point &aPoint, const Colour &aColour, const Framebu
 }
 
 TEST_CASE("Framebuffer Drawing Primitives") {
-
-    std::chrono::milliseconds ms = std::chrono::duration_cast< std::chrono::milliseconds >(
-        std::chrono::system_clock::now().time_since_epoch()
-    );
+    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch());
 
     srand(ms.count());  //generates random seed val
     Colour col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
@@ -83,15 +82,15 @@ TEST_CASE("Framebuffer Drawing Primitives") {
             CHECK_EQ(fb.GetPixel(pointA, false), col);
             CHECK_EQ(fb.GetPixel(pointB, false), col);
         }
-        fb.SwapBuffer();
+        //fb.SwapBuffer();
     }
 
     SUBCASE("Drawing Rectangles") {
         //Arrange
         //Generate random values in the LEFT and TOP halves of the screen
-//        Point leftTop(50, 50);
-//        Point rightBottom(200, 200);
-//        pen.colour = 0xFFFF0000;
+        //        Point leftTop(50, 50);
+        //        Point rightBottom(200, 200);
+        //        pen.colour = 0xFFFF0000;
 
         Point leftTop(rand() % (fb.vinfo.xres / 2),
                       rand() % (fb.vinfo.yres / 2));
@@ -117,7 +116,7 @@ TEST_CASE("Framebuffer Drawing Primitives") {
             //Check right side
             CHECK(pen.colour == fb.GetPixel(Point(rightBottom.x, rightBottom.y - i), false));
         }
-        fb.SwapBuffer();
+        //fb.SwapBuffer();
     }
 
     SUBCASE("Drawing Circles") {
@@ -151,9 +150,10 @@ TEST_CASE("Framebuffer Drawing Primitives") {
                 error += -radius;
             }
         }
-        fb.SwapBuffer();
+        //fb.SwapBuffer();
     }
-    /*SUBCASE("Set/Get pixel outside screen") {
+
+    SUBCASE("Set/Get pixel outside screen") {
         //Arrange
         Point outSideXAxis(-1, 0);
         Point outSideYAxis(0, -1);
@@ -167,7 +167,7 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         CHECK_EQ(fb.GetPixel(outSideYAxis), 0);
     }
 
-    SUBCASE("Drawing Images") {
+    SUBCASE("Drawing an Image") {
         //Arrange
         Point topLeftPoint(100, 200);
 
@@ -178,6 +178,33 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         fb.DrawImage(topLeftPoint, bitmap);
 
         //Assert
+    }
+
+    SUBCASE("Swapping between two images") {
+        //Arrange
+        Point topLeftPoint(100, 200);
+        Bitmap imgSimple("testImages/testImage.bmp");
+        Bitmap imgCross("testImages/testImageCross.bmp");
+        int iterations = 100;
+
+        //Act
+        auto begin = std::chrono::high_resolution_clock::now();
+        for (size_t i = 0; i < iterations; i++) {
+            fb.DrawImage(Point(topLeftPoint.x, topLeftPoint.y - i), imgSimple);
+            fb.SwapBuffer(Canvas::SwapOperations::Clear);
+            fb.DrawImage(Point(topLeftPoint.x, topLeftPoint.y - i), imgCross);
+            fb.SwapBuffer(Canvas::SwapOperations::Clear);
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+        int fps = (1000 * iterations / duration);
+
+        //Assert
+        CHECK(fps > 10);
+        std::cout << duration << "ms " << iterations << "iterations " << (1000 * iterations / duration) << "fps" << std::endl;
+    }
+
+    SUBCASE("Swapbuffer") {
         fb.SwapBuffer();
-    }*/
+    }
 }
