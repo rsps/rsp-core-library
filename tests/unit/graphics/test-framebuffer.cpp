@@ -88,10 +88,6 @@ TEST_CASE("Framebuffer Drawing Primitives") {
     SUBCASE("Drawing Rectangles") {
         //Arrange
         //Generate random values in the LEFT and TOP halves of the screen
-        //        Point leftTop(50, 50);
-        //        Point rightBottom(200, 200);
-        //        pen.colour = 0xFFFF0000;
-
         Point leftTop(rand() % (fb.vinfo.xres / 2),
                       rand() % (fb.vinfo.yres / 2));
         //Generate random values in the RIGHT and BOTTOM halves of the screen
@@ -125,7 +121,6 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         int radius = rand() % (fb.vinfo.xres / 2);
 
         //Act
-        //fb.DrawDot(centerPoint, pen);
         fb.DrawCircle(centerPoint, radius, pen);
 
         //Assert

@@ -18,7 +18,7 @@ Bitmap::Bitmap(std::string aImgName)
     : imgName(aImgName) {
     //Detect filetype
     std::string filetype = GetFileExtension(aImgName);
-    std::cout << "File type read as: " << filetype << std::endl;
+    //std::cout << "File type read as: " << filetype << std::endl;
 
     //Get raw data
     imagePixels = filetypeMap[filetype]->LoadImg(aImgName);

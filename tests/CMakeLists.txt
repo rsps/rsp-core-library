@@ -11,3 +11,5 @@ file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/testImageCross.bmp
     DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
 file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/testImage.bmp 
     DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
+file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/testImage.png 
+    DESTINATION ${CMAKE_BINARY_DIR}/testImages/)

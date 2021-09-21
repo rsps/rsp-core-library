@@ -15,19 +15,17 @@
 #include <cerrno>
 
 std::vector<uint32_t> BmpLoader::LoadImg(const std::string& aImgName) {
-    std::cout << "Bitmap reading file name: " << aImgName << std::endl;
+    //std::cout << "Bitmap reading file: " << aImgName << std::endl;
     errno = 0;
     //Pass reference to the first element in string, and read as binary
     FILE* file = fopen(aImgName.c_str(), "rb");
     if (file == NULL) {
         std::cout << "File is null" << std::endl;
         std::cout << "Error: " << errno << std::endl;
-    } else {
-        std::cout << "File opened" << std::endl;
     }
     //Read the 54 byte header
     fread(&bmpHeader, sizeof(uint8_t), sizeof(bmpHeader), file);
-    std::cout << "File header read" << std::endl;
+    //std::cout << "File header read" << std::endl;
 
     width = bmpHeader.width;
     height = bmpHeader.heigth;
@@ -60,7 +58,7 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string& aImgName) {
     //std::cout << "ImportantColours: " << bmpHeader.importantColours << std::endl;
     //std::cout << "BytesPerPix:      " << bytesPerPixel << std::endl;
 
-    /* TODO: Get Compression and other useful stuff */
+    // TODO: Get Compression and other useful stuff
 
     //Height can be negative, showing the image is stored from top to bottom
     bool normallyDrawn = true;
