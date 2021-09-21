@@ -9,7 +9,6 @@
  */
 
 #include <graphics/primitives/Bitmap.h>
-#include <utils/ImgLoader.h>
 
 #include <algorithm>
 #include <cerrno>
@@ -17,27 +16,33 @@
 Bitmap::Bitmap() {}
 Bitmap::Bitmap(std::string aImgName)
     : imgName(aImgName) {
-    std::cout << "Bitmap reading file name: " << aImgName << std::endl;
-
     //Detect filetype
-    std::string filetype = "bmp";
+    std::string filetype = GetFileExtension(aImgName);
+    std::cout << "File type read as: " << filetype << std::endl;
+
+    //Get raw data
+    imagePixels = filetypeMap[filetype]->LoadImg(aImgName);
+    height = filetypeMap[filetype]->height;
+    width = filetypeMap[filetype]->width;
 
     //Convert to int via enum and map
     //https://www.codeguru.com/cplusplus/switch-on-strings-in-c/
     //Better way?
 
-    switch (filetype) {
-        case /* bmp file */:
-            bmpLoader loader();
-            loader.LoadImg(aImgName);
+    /*switch (filetypeMap[filetype]) {
+        case FileTypes::bmp:
+            std::cout << "It is a bmp file" << std::endl;
+            //loader = new BmpLoader();
+            imagePixels = loader->LoadImg(aImgName);
             break;
-        case /* png file */:
-            /* code */
+        case FileTypes::png:
+            //png file
+            throw NotImplementedException("Png is not supported");
             break;
-
         default:
+            throw NotImplementedException("The file type is not supported");
             break;
-    }
+    }*/
     /*
     errno = 0;
     //Pass reference to the first element in string, and read as binary
@@ -141,4 +146,10 @@ Bitmap::Bitmap(int aHeight, int aWidth, int aBytesPerPixel)
     //http://libjpeg.sourceforge.net/
 }
 Bitmap::~Bitmap() {
+}
+
+std::string Bitmap::GetFileExtension(const std::string& FileName) {
+    if (FileName.find_last_of(".") != std::string::npos)
+        return FileName.substr(FileName.find_last_of(".") + 1);
+    return "";
 }

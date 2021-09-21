@@ -1,7 +1,7 @@
 #ifndef BMPLOADER_H
 #define BMPLOADER_H
 
-#include <ImgLoader.h>
+#include <utils/ImgLoader.h>
 
 #include <cstring>
 #include <iostream>
@@ -30,10 +30,7 @@ class BmpLoader : public ImgLoader {
     BMPHeader bmpHeader;
     uint16_t bytesPerPixel;
 
-    BmpLoader();
-    ~BmpLoader();
-
-    std::vector<uint32_t> LoadImg(std::string aImgName);
+    std::vector<uint32_t> LoadImg(const std::string &aImgName);
 };
 
 #endif  //BMPLOADER_H

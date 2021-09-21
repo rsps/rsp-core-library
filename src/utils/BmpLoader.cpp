@@ -14,9 +14,7 @@
 #include <algorithm>
 #include <cerrno>
 
-BmpLoader::BmpLoader() {}
-
-std::vector<uint32_t> BmpLoader::LoadImg(std::string aImgName) {
+std::vector<uint32_t> BmpLoader::LoadImg(const std::string& aImgName) {
     std::cout << "Bitmap reading file name: " << aImgName << std::endl;
     errno = 0;
     //Pass reference to the first element in string, and read as binary
@@ -31,10 +29,8 @@ std::vector<uint32_t> BmpLoader::LoadImg(std::string aImgName) {
     fread(&bmpHeader, sizeof(uint8_t), sizeof(bmpHeader), file);
     std::cout << "File header read" << std::endl;
 
-    /*
     width = bmpHeader.width;
     height = bmpHeader.heigth;
-    */
 
     //std::cout << "Width:            " << width << std::endl;
     //std::cout << "Height:           " << height << std::endl;
@@ -101,9 +97,9 @@ std::vector<uint32_t> BmpLoader::LoadImg(std::string aImgName) {
             //std::cout << "Combined: " << std::hex << combined << std::endl;
         }
     }
+    fclose(file);
     if (normallyDrawn) {
         std::reverse(imagePixels.begin(), imagePixels.end());
     }
-
-    fclose(file);
+    return imagePixels;
 }
