@@ -15,9 +15,9 @@ configure_file (
     "${PROJECT_BINARY_DIR}/src/version-def.h"
 )
 
-#set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
-#set (THREADS_PREFER_PTHREAD_FLAG TRUE)
-#find_package(Threads REQUIRED)
+set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set (THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(Threads REQUIRED)
 
 set (CMAKE_CXX_STANDARD 20)
 
@@ -88,7 +88,7 @@ target_include_directories("rsp-core-lib-test"
 
 target_link_libraries ("rsp-core-lib-test"
     rsp-core-lib
-    #Threads::Threads
+    Threads::Threads
 )
 
 add_test("tests" "rsp-core-lib-test")
