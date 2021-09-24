@@ -11,6 +11,8 @@ class PngLoader : public ImgLoader {
    public:
     struct IDAT {
     } __attribute__((packed));  //To stop alignment;
+    struct PLTE {
+    } __attribute__((packed));  //To stop alignment;
     struct IEND {
     } __attribute__((packed));  //To stop alignment;
     struct IHDRChunk {
@@ -29,6 +31,7 @@ class PngLoader : public ImgLoader {
             std::uint8_t data[231];
             struct IHDRChunk ihdr;
             struct IDAT idat;
+            struct PLTE plte;
             struct IEND iend;
         };
         uint32_t crc;

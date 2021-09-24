@@ -24,9 +24,8 @@ TEST_CASE("Bitmap file loading") {
         std::string filepath = "testImages/testImage.png";
         CHECK_NOTHROW(
             Bitmap bitmap(filepath);
-            /*CHECK(bitmap.imagePixels.size() > 0);
-            CHECK(bitmap.height == 194);
-            CHECK(bitmap.width == 259);*/
-        );
+            //CHECK(bitmap.imagePixels.size() > 0);
+            CHECK(bitmap.width == 259);
+            CHECK(bitmap.height == 194););
     }
 }

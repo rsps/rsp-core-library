@@ -12,6 +12,7 @@
 #include <utils/RSPCoreExceptions.h>
 
 #include <cerrno>
+#include <iomanip>
 
 std::vector<uint32_t> PngLoader::LoadImg(const std::string& aImgName) {
     std::cout << "Bitmap reading file: " << aImgName << std::endl;
@@ -32,19 +33,81 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string& aImgName) {
     }
 
     // TODO: Declare structs for data handling
-
-    //Read first data chunk (IHDR)
     PNGChunk pngchunk;
+
+    //-- Chunk reading loop begins here --
+
+    //Read length and type
     fread(&pngchunk, sizeof(uint8_t), sizeof(pngchunk.length) + sizeof(pngchunk.type), file);
-    pngchunk.length = be32toh(pngchunk.length);
-    //pngchunk.type = be32toh(pngchunk.type);
+    pngchunk.length = be32toh(pngchunk.length);  //Flip from big endian
 
-    fread(&pngchunk.data[0], sizeof(uint8_t), pngchunk.length + sizeof(pngchunk.crc), file);
-
-    pngchunk.crc = be32toh(pngchunk.crc);
     std::cout << "Length: " << pngchunk.length << std::endl;
     std::cout << "Type: " << pngchunk.type << std::endl;
-    std::cout << "Crc: " << std::hex << *(uint32_t*)(&pngchunk.data[pngchunk.length]) << std::endl;
+
+    //If ciritcal chunk
+    if (std::isupper(pngchunk.type[0])) {
+        std::cout << "Chunk is Critical" << std::endl;
+        //Chunk is critical
+        //If IHDR chunk
+        if (std::strcmp(pngchunk.type, "IHDR") == 0) {
+            std::cout << "IHDR chunk recognized" << std::endl;
+            //Use length to read the chunks data field
+            fread(&pngchunk.ihdr, sizeof(uint8_t), pngchunk.length, file);  // read whole chunk
+
+            //Flip time
+            pngchunk.ihdr.width = be32toh(pngchunk.ihdr.width);
+            pngchunk.ihdr.height = be32toh(pngchunk.ihdr.height);
+            pngchunk.ihdr.bitDepth = be32toh(pngchunk.ihdr.bitDepth);
+            pngchunk.ihdr.colourType = be32toh(pngchunk.ihdr.colourType);
+            pngchunk.ihdr.compressionMethod = be32toh(pngchunk.ihdr.compressionMethod);
+            pngchunk.ihdr.filterMethod = be32toh(pngchunk.ihdr.filterMethod);
+            pngchunk.ihdr.interlaceMethod = be32toh(pngchunk.ihdr.interlaceMethod);
+
+            //Set important bitmap variables
+            width = pngchunk.ihdr.width;
+            height = pngchunk.ihdr.height;
+
+            std::cout << "Width       :" << pngchunk.ihdr.width << std::endl;
+            std::cout << "Height      :" << pngchunk.ihdr.height << std::endl;
+            std::cout << "Bit Depth   :" << pngchunk.ihdr.bitDepth << std::endl;
+            std::cout << "Colour Type :" << pngchunk.ihdr.colourType << std::endl;
+            std::cout << "Compression :" << pngchunk.ihdr.compressionMethod << std::endl;
+            std::cout << "Filter      :" << pngchunk.ihdr.filterMethod << std::endl;
+            std::cout << "Interlace   :" << pngchunk.ihdr.interlaceMethod << std::endl;
+        }
+        //If IDAT chunk
+        else if (std::strcmp(pngchunk.type, "IDAT") == 0) {
+            std::cout << "IDAT chunk recognized" << std::endl;
+            //Use length to read the chunks data field
+            fread(&pngchunk.data[0], sizeof(uint8_t), pngchunk.length + sizeof(pngchunk.crc), file);
+
+            pngchunk.crc = be32toh(pngchunk.crc);
+            // TODO do something with crc
+            std::cout << "Crc: " << std::hex << *(uint32_t*)(&pngchunk.data[pngchunk.length]) << std::endl;
+        }
+        //If PLTE chunk | Do i really need?
+        else if (std::strcmp(pngchunk.type, "PLTE") == 0) {
+            std::cout << "PLTE chunk recognized" << std::endl;
+            throw NotImplementedException("Don't know how to handle PLTE chunks");
+        }
+        //If IEND
+        else if (std::strcmp(pngchunk.type, "IEND") == 0) {
+            std::cout << "IEND chunk recognized" << std::endl;
+            //Stop reading
+        }
+    } else {
+        std::cout << "Chunk is Non-Critical" << std::endl;
+        //Chunk is not critical
+        //Read next chunk
+    }
+
+    //Use length to read the chunks data field
+    //fread(&pngchunk.data[0], sizeof(uint8_t), pngchunk.length + sizeof(pngchunk.crc), file);
+    //
+    //pngchunk.crc = be32toh(pngchunk.crc);
+    //std::cout << "Length: " << pngchunk.length << std::endl;
+    //std::cout << "Type: " << pngchunk.type << std::endl;
+    //std::cout << "Crc: " << std::hex << *(uint32_t*)(&pngchunk.data[pngchunk.length]) << std::endl;
 
     //fseek(file, 8 + 3, SEEK_SET);
     //fread(&nothing, sizeof(uint8_t), sizeof(nothing), file);
