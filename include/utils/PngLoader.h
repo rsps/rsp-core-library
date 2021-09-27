@@ -9,13 +9,13 @@
 
 class PngLoader : public ImgLoader {
    public:
-    struct IDAT {
-    } __attribute__((packed));  //To stop alignment;
+    //struct IDAT {
+    //} __attribute__((packed));  //To stop alignment;
     struct PLTE {
     } __attribute__((packed));  //To stop alignment;
     struct IEND {
     } __attribute__((packed));  //To stop alignment;
-    struct IHDRChunk {
+    struct IHDR {
         uint32_t width;
         uint32_t height;
         uint8_t bitDepth;
@@ -27,10 +27,16 @@ class PngLoader : public ImgLoader {
     struct PNGChunk {
         uint32_t length;
         char type[4];
+        /*union {
+            uint8_t *data;
+            struct IHDR *ihdr;
+            struct PLTE *plte;
+            struct IEND *iend;
+        };*/
         union {
             std::uint8_t data[231];
-            struct IHDRChunk ihdr;
-            struct IDAT idat;
+            struct IHDR ihdr;
+            //struct IDAT idat;
             struct PLTE plte;
             struct IEND iend;
         };
@@ -39,9 +45,6 @@ class PngLoader : public ImgLoader {
 
     uint8_t pngSignature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
     std::vector<uint32_t> LoadImg(const std::string &aImgName);
-
-    uint8_t byteVal;
-    uint32_t nothing;
 
     bool CheckSignature(const uint8_t *aSig, const uint8_t &aSize);
 };
