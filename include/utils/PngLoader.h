@@ -27,20 +27,13 @@ class PngLoader : public ImgLoader {
     struct PNGChunk {
         uint32_t length;
         char type[4];
-        /*union {
-            uint8_t *data;
+        union {
+            uint8_t *data = nullptr;
             struct IHDR *ihdr;
             struct PLTE *plte;
             struct IEND *iend;
-        };*/
-        union {
-            std::uint8_t data[231];
-            struct IHDR ihdr;
-            //struct IDAT idat;
-            struct PLTE plte;
-            struct IEND iend;
         };
-        uint32_t crc;
+        //uint32_t crc; //Always just at the end of the pointer
     } __attribute__((packed));  //To stop alignment
 
     uint8_t pngSignature[8] = {137, 80, 78, 71, 13, 10, 26, 10};

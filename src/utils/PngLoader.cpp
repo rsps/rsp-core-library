@@ -47,8 +47,8 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string& aImgName) {
         //Flip length
         pngchunk.length = be32toh(pngchunk.length);
 
-        std::cout << "Length: " << pngchunk.length << std::endl;
         std::cout << "Type: " << pngchunk.type << std::endl;
+        std::cout << "Length: " << pngchunk.length << std::endl;
 
         //If ciritcal chunk
         if (std::isupper(pngchunk.type[0])) {
@@ -57,41 +57,55 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string& aImgName) {
             //If IHDR chunk
             if (std::strcmp(pngchunk.type, "IHDR") == 0) {
                 std::cout << "IHDR chunk recognized" << std::endl;
+
+                //Allocate buffer size of chunk length plus crc
+                pngchunk.data = new uint8_t[pngchunk.length + sizeof(uint32_t)];
+
                 //Use length to read the chunks data field
-                fread(&pngchunk.ihdr, sizeof(uint8_t), sizeof(pngchunk.ihdr) + sizeof(pngchunk.crc), file);  // read whole chunk
+                //Read chunk and crc into data buffer
+                fread(pngchunk.data, sizeof(uint8_t), pngchunk.length + sizeof(uint32_t), file);  // read whole chunk
 
                 //Flip time
                 //Only flip things that are larger than a byte
-                pngchunk.ihdr.width = be32toh(pngchunk.ihdr.width);
-                pngchunk.ihdr.height = be32toh(pngchunk.ihdr.height);
-                *(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
+                pngchunk.ihdr->width = be32toh(pngchunk.ihdr->width);
+                pngchunk.ihdr->height = be32toh(pngchunk.ihdr->height);
+                //Maybe, maybe not flip crc
+                //*(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
 
                 //Set important bitmap variables
-                width = pngchunk.ihdr.width;
-                height = pngchunk.ihdr.height;
+                width = pngchunk.ihdr->width;
+                height = pngchunk.ihdr->height;
 
-                std::cout << "Width       :" << pngchunk.ihdr.width << std::endl;
-                std::cout << "Height      :" << pngchunk.ihdr.height << std::endl;
-                std::cout << "Bit Depth   :" << +pngchunk.ihdr.bitDepth << std::endl;
-                std::cout << "Colour Type :" << +pngchunk.ihdr.colourType << std::endl;
-                std::cout << "Compression :" << +pngchunk.ihdr.compressionMethod << std::endl;
-                std::cout << "Filter      :" << +pngchunk.ihdr.filterMethod << std::endl;
-                std::cout << "Interlace   :" << +pngchunk.ihdr.interlaceMethod << std::endl;
+                std::cout << "Width       :" << pngchunk.ihdr->width << std::endl;
+                std::cout << "Height      :" << pngchunk.ihdr->height << std::endl;
+                std::cout << "Bit Depth   :" << +pngchunk.ihdr->bitDepth << std::endl;
+                std::cout << "Colour Type :" << +pngchunk.ihdr->colourType << std::endl;
+                std::cout << "Compression :" << +pngchunk.ihdr->compressionMethod << std::endl;
+                std::cout << "Filter      :" << +pngchunk.ihdr->filterMethod << std::endl;
+                std::cout << "Interlace   :" << +pngchunk.ihdr->interlaceMethod << std::endl;
 
                 std::cout << "Crc         :" << std::hex << *(uint32_t*)(&pngchunk.data[pngchunk.length]) << std::endl;
                 std::cout << std::dec;
+
+                // TODO Stuff save or use header info
+
             }
             //If IDAT chunk
             else if (std::strcmp(pngchunk.type, "IDAT") == 0) {
                 std::cout << "IDAT chunk recognized" << std::endl;
-                //Use length to read the chunks data field
-                fread(&pngchunk.data[0], sizeof(uint8_t), pngchunk.length + sizeof(pngchunk.crc), file);
 
-                //Flip crc
-                *(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
+                //Allocate buffer size of chunk length plus crc
+                pngchunk.data = new uint8_t[pngchunk.length + sizeof(uint32_t)];
+
+                //Use length to read the chunks data field
+                fread(pngchunk.data, sizeof(uint8_t), pngchunk.length + sizeof(uint32_t), file);
+
+                //Maybe, maybe not flip crc
+                //*(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
                 // TODO do something with crc
                 std::cout << "Crc: " << std::hex << *(uint32_t*)(&pngchunk.data[pngchunk.length]) << std::endl;
                 std::cout << std::dec;
+
             }
             //If PLTE chunk | Do i really need?
             else if (std::strcmp(pngchunk.type, "PLTE") == 0) {
@@ -102,13 +116,22 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string& aImgName) {
             else if (std::strcmp(pngchunk.type, "IEND") == 0) {
                 std::cout << "IEND chunk recognized" << std::endl;
                 //Stop reading
+            } else {
+                std::cout << pngchunk.type << " Chunk type not recognized" << std::endl;
             }
         } else {
             std::cout << "Chunk is Non-Critical" << std::endl;
             //Chunk is not critical
-            fseek(file, pngchunk.length + sizeof(pngchunk.crc), SEEK_CUR);
+            //Seek the chunks length of data plus its crc
+            fseek(file, pngchunk.length + sizeof(uint32_t), SEEK_CUR);
             //Read next chunk
         }
+        //Clean up memory
+        if (pngchunk.data != nullptr) {
+            delete pngchunk.data;
+            pngchunk.data = nullptr;
+        }
+        std::cout << std::endl;
     }
 
     //Use length to read the chunks data field
