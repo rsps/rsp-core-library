@@ -32,20 +32,30 @@ TEST_CASE("Rect Contructors")
 {
     SUBCASE("Simple value Rect")
     {
+        //Arrange & Act
         Rect rect_base_values(left, top, width, height);
+
+        //Assert
         checkRect(rect_base_values);
     }
     SUBCASE("Points Rect")
     {
+        //Arrange & Act
         Rect rect_points(Point(left, top), Point(left + width, top + height));
+
+        //Assert
         checkRect(rect_points);
     }
     SUBCASE("Mixed Rect")
     {
+        //Arrange & Act
         Rect rect_mix(Point(left, top), width, height);
+
+        //Assert
         checkRect(rect_mix);
     }
 }
+
 TEST_CASE("Rect Swapping Edges")
 {
     //Arrange
@@ -55,6 +65,7 @@ TEST_CASE("Rect Swapping Edges")
         //Act
         CHECK_THROWS_AS(rect.SetBottom(top - 1), const AssertException &);
 
+        //Assert
         CHECK(rect.GetTop() == top);
         CHECK(rect.GetBottom() == (top + height));
     }
@@ -86,7 +97,7 @@ TEST_CASE("Rect Swapping Edges")
         CHECK(rect.GetLeft() == left);
     }
 }
-//
+
 TEST_CASE("Rect Height and Width")
 {
     Rect rect(left, top, width, height);
@@ -97,34 +108,33 @@ TEST_CASE("Rect Height and Width")
         //Act
         rect.SetHeight(height + 1);
 
+        //Assert
         CHECK(rect.GetHeight() == (height + 1));
         CHECK(rect.GetBottom() == (oldBottom + 1));
     }
     SUBCASE("Set Width set correctly")
     {
-        int oldRight = rect.GetRight();
-
         //Act
+        int oldRight = rect.GetRight();
         rect.SetWidth(width + 1);
 
+        //Assert
         CHECK(rect.GetWidth() == (width + 1));
         CHECK(rect.GetRight() == (oldRight + 1));
     }
     SUBCASE("Set Negative Height")
     {
         //Not checking if the end result is negative (meaning outside the screen)
-        bool exceptionThrown = false;
 
-        //Act
+        //Act & Assert
         CHECK_THROWS_AS(rect.SetHeight(-50), const AssertException &);
         CHECK(rect.GetHeight() != -50);
     }
     SUBCASE("Set Negative Width")
     {
         //Not checking if the end result is negative (meaning outside the screen)
-        bool exceptionThrown = false;
 
-        //Act
+        //Act & Assert
         CHECK_THROWS_AS(rect.SetWidth(-50), const AssertException &);
         CHECK(rect.GetWidth() != -50);
     }

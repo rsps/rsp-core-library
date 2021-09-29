@@ -26,10 +26,10 @@ class Framebuffer : Canvas
     void DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen);
     inline void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Pen &aPen)
     {
-        DrawDot(Point(aCenterX + aX, aCenterY + aY), aPen);
-        DrawDot(Point(aCenterX - aX, aCenterY + aY), aPen);
-        DrawDot(Point(aCenterX + aX, aCenterY - aY), aPen);
-        DrawDot(Point(aCenterX - aX, aCenterY - aY), aPen);
+        aPen.Draw(*this, Point(aCenterX + aX, aCenterY + aY));
+        aPen.Draw(*this, Point(aCenterX - aX, aCenterY + aY));
+        aPen.Draw(*this, Point(aCenterX + aX, aCenterY - aY));
+        aPen.Draw(*this, Point(aCenterX - aX, aCenterY - aY));
     }
 
     inline void plot8Points(int aCenterX, int aCenterY, int aX, int aY, const Pen &aPen)
