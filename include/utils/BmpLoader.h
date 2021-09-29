@@ -7,8 +7,9 @@
 #include <iostream>
 #include <vector>
 
-class BmpLoader : public ImgLoader {
-   public:
+class BmpLoader : public ImgLoader
+{
+  public:
     struct BMPHeader {
         uint16_t signature;
         uint32_t fileSize;
@@ -25,10 +26,10 @@ class BmpLoader : public ImgLoader {
         uint32_t yPixelsPerM;
         uint32_t coloursUsed;
         uint32_t importantColours;
-    } __attribute__((packed)) bmpHeader;  //To stop alignment
+    } __attribute__((packed)) bmpHeader; //To stop alignment
     uint16_t bytesPerPixel;
 
     std::vector<uint32_t> LoadImg(const std::string &aImgName);
 };
 
-#endif  //BMPLOADER_H
+#endif //BMPLOADER_H

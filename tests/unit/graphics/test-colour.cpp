@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/primitives/Colour.h>
 #include <doctest.h>
+#include <graphics/primitives/Colour.h>
 
 uint8_t red = 0x12;
 uint8_t green = 0x34;
@@ -17,8 +17,10 @@ uint8_t blue = 0x56;
 uint8_t alpha = 0x78;
 uint32_t colourVal = 0x12345678;
 
-TEST_CASE("Colour Contructors") {
-    SUBCASE("Separate values contructor") {
+TEST_CASE("Colour Contructors")
+{
+    SUBCASE("Separate values contructor")
+    {
         Colour col(red, green, blue, alpha);
 
         CHECK(col.GetAlpha() == alpha);
@@ -26,7 +28,8 @@ TEST_CASE("Colour Contructors") {
         CHECK(col.GetGreen() == green);
         CHECK(col.GetBlue() == blue);
     }
-    SUBCASE("Single value contructor") {
+    SUBCASE("Single value contructor")
+    {
         Colour col(colourVal);
 
         CHECK(col.GetAlpha() == alpha);
@@ -34,7 +37,8 @@ TEST_CASE("Colour Contructors") {
         CHECK(col.GetGreen() == green);
         CHECK(col.GetBlue() == blue);
     }
-    SUBCASE("Copy contructor") {
+    SUBCASE("Copy contructor")
+    {
         Colour testCol(colourVal);
         Colour col(testCol);
 
@@ -44,38 +48,46 @@ TEST_CASE("Colour Contructors") {
         CHECK(col.GetBlue() == blue);
     }
 }
-TEST_CASE("Colour Sets") {
+TEST_CASE("Colour Sets")
+{
     Colour testCol(colourVal);
     uint8_t newCol = 0x55;
-    SUBCASE("Set Alpha") {
+    SUBCASE("Set Alpha")
+    {
         testCol.SetAlpha(newCol);
 
         CHECK(testCol.GetAlpha() == newCol);
     }
-    SUBCASE("Set Red") {
+    SUBCASE("Set Red")
+    {
         testCol.SetRed(newCol);
 
         CHECK(testCol.GetRed() == newCol);
     }
-    SUBCASE("Set Green") {
+    SUBCASE("Set Green")
+    {
         testCol.SetGreen(newCol);
 
         CHECK(testCol.GetGreen() == newCol);
     }
-    SUBCASE("Set Blue") {
+    SUBCASE("Set Blue")
+    {
         testCol.SetBlue(newCol);
 
         CHECK(testCol.GetBlue() == newCol);
     }
 }
-TEST_CASE("Colour Operators") {
+TEST_CASE("Colour Operators")
+{
     Colour testCol(colourVal);
-    SUBCASE("uint32 Conversion") {
+    SUBCASE("uint32 Conversion")
+    {
         uint32_t newUint32 = testCol;
 
         CHECK(newUint32 == colourVal);
     }
-    SUBCASE("= Operator") {
+    SUBCASE("= Operator")
+    {
         Colour newColour = testCol;
 
         CHECK(newColour.colours.rgba == testCol.colours.rgba);

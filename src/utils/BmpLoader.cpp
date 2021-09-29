@@ -14,11 +14,12 @@
 #include <algorithm>
 #include <cerrno>
 
-std::vector<uint32_t> BmpLoader::LoadImg(const std::string& aImgName) {
+std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
+{
     //std::cout << "Bitmap reading file: " << aImgName << std::endl;
     errno = 0;
     //Pass reference to the first element in string, and read as binary
-    FILE* file = fopen(aImgName.c_str(), "rb");
+    FILE *file = fopen(aImgName.c_str(), "rb");
     if (file == NULL) {
         std::cout << "File is null" << std::endl;
         std::cout << "Error: " << errno << std::endl;
@@ -35,7 +36,7 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string& aImgName) {
 
     //short bitsPerPixel;
     //memcpy(&bitsPerPixel, info + 28, sizeof(short));
-    bytesPerPixel = bmpHeader.bitsPerPixel / 8;  //Might be 1 or 4
+    bytesPerPixel = bmpHeader.bitsPerPixel / 8; //Might be 1 or 4
     //std::cout << "BytesPerPixel Pre Calc: " << bytesPerPixel << std::endl;
     //std::cout << "Mod calc:               " << (bytesPerPixel % 8) << std::endl;
     if ((bmpHeader.bitsPerPixel % 8) > 0) {
@@ -67,7 +68,7 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string& aImgName) {
     }
 
     //Figure out amount to read
-    int paddedRowSize = (bmpHeader.width * 3 + 3) & (~3);  //bytesPerPixel * abs(bmpHeader.heigth) * bmpHeader.width;
+    int paddedRowSize = (bmpHeader.width * 3 + 3) & (~3); //bytesPerPixel * abs(bmpHeader.heigth) * bmpHeader.width;
     //std::cout << "Padded row size: " << paddedRowSize << std::endl;
 
     //Initialize containers for reading
@@ -82,9 +83,9 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string& aImgName) {
         fread(pixelRow.data(), sizeof(uint8_t), paddedRowSize, file);
         //std::cout << "Bitmap row " << i << " read into memory" << std::endl;
         for (size_t j = 0; j < bmpHeader.width * 3; j += 3) {
-            uint8_t blue = pixelRow[j];       //*iter;
-            uint8_t green = pixelRow[j + 1];  //*std::next(iter, 1);
-            uint8_t red = pixelRow[j + 2];    //*std::next(iter, 2);
+            uint8_t blue = pixelRow[j];      //*iter;
+            uint8_t green = pixelRow[j + 1]; //*std::next(iter, 1);
+            uint8_t red = pixelRow[j + 2];   //*std::next(iter, 2);
             uint8_t alpha = 0x00;
 
             uint32_t combined = (((uint32_t)red) << 24) |

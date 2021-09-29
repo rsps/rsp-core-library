@@ -7,9 +7,12 @@
 #include "Point.h"
 #include "Rect.h"
 
-class Canvas {
-   public:
-    enum class SwapOperations { NoOp, Copy, Clear };
+class Canvas
+{
+  public:
+    enum class SwapOperations { NoOp,
+                                Copy,
+                                Clear };
 
     virtual void DrawDot(const Point &aPoint, const Pen &aPen) = 0;
     virtual void DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen) = 0;
@@ -22,4 +25,4 @@ class Canvas {
     virtual void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy) = 0;
 };
 
-#endif  //CANVAS_H
+#endif //CANVAS_H

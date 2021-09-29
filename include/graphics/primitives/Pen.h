@@ -9,8 +9,9 @@
 
 class Canvas;
 
-class Pen {
-   public:
+class Pen
+{
+  public:
     int size;
     Colour colour;
 
@@ -19,4 +20,4 @@ class Pen {
     void Draw(Canvas &aCanvas, const Point &aPoint) const;
 };
 
-#endif  // PEN_H
+#endif // PEN_H

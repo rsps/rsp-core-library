@@ -8,12 +8,14 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/primitives/Pen.h>
 #include <graphics/primitives/Canvas.h>
+#include <graphics/primitives/Pen.h>
 
 Pen::Pen(int aSize, Colour aColour)
-    : size(aSize), colour(aColour) {
+    : size(aSize), colour(aColour)
+{
 }
-void Pen::Draw(Canvas &aCanvas, const Point &aPoint) const {
+void Pen::Draw(Canvas &aCanvas, const Point &aPoint) const
+{
     aCanvas.SetPixel(aPoint, colour);
 }

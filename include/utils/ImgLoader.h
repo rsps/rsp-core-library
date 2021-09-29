@@ -5,8 +5,9 @@
 #include <iostream>
 #include <vector>
 
-class ImgLoader {
-   public:
+class ImgLoader
+{
+  public:
     std::vector<uint32_t> imagePixels;
     uint32_t height;
     uint32_t width;
@@ -14,4 +15,4 @@ class ImgLoader {
     virtual std::vector<uint32_t> LoadImg(const std::string &aImgName) = 0;
 };
 
-#endif  //IMGLOADER_H
+#endif //IMGLOADER_H

@@ -2,10 +2,12 @@
 #define RECT_H
 
 #include <utils/RSPCoreExceptions.h>
+
 #include "Point.h"
 
-class Rect {
-   public:
+class Rect
+{
+  public:
     Point LeftTop;
     Point RightBottom;
 
@@ -30,4 +32,4 @@ class Rect {
     bool VerifyDimensions();
 };
 
-#endif  // RECT_H
+#endif // RECT_H

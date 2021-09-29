@@ -7,14 +7,15 @@
 #include <iostream>
 #include <vector>
 
-class PngLoader : public ImgLoader {
-   public:
+class PngLoader : public ImgLoader
+{
+  public:
     //struct IDAT {
     //} __attribute__((packed));  //To stop alignment;
     struct PLTE {
-    } __attribute__((packed));  //To stop alignment;
+    } __attribute__((packed)); //To stop alignment;
     struct IEND {
-    } __attribute__((packed));  //To stop alignment;
+    } __attribute__((packed)); //To stop alignment;
     struct IHDR {
         uint32_t width;
         uint32_t height;
@@ -23,7 +24,7 @@ class PngLoader : public ImgLoader {
         uint8_t compressionMethod;
         uint8_t filterMethod;
         uint8_t interlaceMethod;
-    } __attribute__((packed));  //To stop alignment
+    } __attribute__((packed)); //To stop alignment
     struct PNGChunk {
         uint32_t length;
         char type[4];
@@ -34,7 +35,7 @@ class PngLoader : public ImgLoader {
             struct IEND *iend;
         };
         //uint32_t crc; //Always just at the end of the pointer
-    } __attribute__((packed));  //To stop alignment
+    } __attribute__((packed)); //To stop alignment
 
     uint8_t pngSignature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
     std::vector<uint32_t> LoadImg(const std::string &aImgName);
@@ -42,4 +43,4 @@ class PngLoader : public ImgLoader {
     bool CheckSignature(const uint8_t *aSig, const uint8_t &aSize);
 };
 
-#endif  //PNGLOADER_H
+#endif //PNGLOADER_H

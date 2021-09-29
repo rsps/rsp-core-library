@@ -15,7 +15,8 @@
 
 Bitmap::Bitmap() {}
 Bitmap::Bitmap(std::string aImgName)
-    : imgName(aImgName) {
+    : imgName(aImgName)
+{
     //Detect filetype
     std::string filetype = GetFileExtension(aImgName);
     //std::cout << "File type read as: " << filetype << std::endl;
@@ -132,23 +133,27 @@ Bitmap::Bitmap(std::string aImgName)
     fclose(file);
     */
 }
-Bitmap::Bitmap(const uint32_t* apPixels, int aHeight, int aWidth, int aBytesPerPixel) {
+Bitmap::Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerPixel)
+{
     throw NotImplementedException("");
 }
 Bitmap::Bitmap(int aHeight, int aWidth, int aBytesPerPixel)
     : height(aHeight),
       width(aWidth),
       bytesPerPixel(aBytesPerPixel),
-      imagePixels(width * height) {
+      imagePixels(width * height)
+{
     throw NotImplementedException("");
     //Load file into memory here
     //https://freeimage.sourceforge.io/
     //http://libjpeg.sourceforge.net/
 }
-Bitmap::~Bitmap() {
+Bitmap::~Bitmap()
+{
 }
 
-std::string Bitmap::GetFileExtension(const std::string& FileName) {
+std::string Bitmap::GetFileExtension(const std::string &FileName)
+{
     if (FileName.find_last_of(".") != std::string::npos)
         return FileName.substr(FileName.find_last_of(".") + 1);
     return "";

@@ -24,8 +24,9 @@ typedef union {
 #endif
 } colourMap;
 
-class Colour {
-   public:
+class Colour
+{
+  public:
     colourMap colours;
 
     Colour(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha);
@@ -44,4 +45,4 @@ class Colour {
     Colour &operator=(const Colour &aColour);
 };
 
-#endif  // COLOUR_H
+#endif // COLOUR_H

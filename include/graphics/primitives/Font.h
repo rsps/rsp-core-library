@@ -3,8 +3,9 @@
 
 #include "Colour.h"
 
-class Font {
-   public:
+class Font
+{
+  public:
     std::string name;
     std::string style;
     Colour colour;
@@ -15,4 +16,4 @@ class Font {
     ~Font();
 };
 
-#endif  //FONT_H
+#endif //FONT_H

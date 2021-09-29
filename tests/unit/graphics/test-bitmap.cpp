@@ -11,8 +11,10 @@
 #include <doctest.h>
 #include <graphics/primitives/Bitmap.h>
 
-TEST_CASE("Bitmap file loading") {
-    SUBCASE("Loading Bmp file") {
+TEST_CASE("Bitmap file loading")
+{
+    SUBCASE("Loading Bmp file")
+    {
         std::string filepath = "testImages/testImage.bmp";
         CHECK_NOTHROW(
             Bitmap bitmap(filepath);
@@ -20,12 +22,12 @@ TEST_CASE("Bitmap file loading") {
             CHECK(bitmap.height == 194);
             CHECK(bitmap.width == 259););
     }
-    SUBCASE("Loading Png file") {
+    /*SUBCASE("Loading Png file") {
         std::string filepath = "testImages/testImage.png";
         CHECK_NOTHROW(
             Bitmap bitmap(filepath);
             //CHECK(bitmap.imagePixels.size() > 0);
             CHECK(bitmap.width == 259);
             CHECK(bitmap.height == 194););
-    }
+    }*/
 }

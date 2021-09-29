@@ -14,12 +14,13 @@
 #include <cerrno>
 #include <iomanip>
 
-std::vector<uint32_t> PngLoader::LoadImg(const std::string& aImgName) {
+std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
+{
     std::cout << "Bitmap reading file: " << aImgName << std::endl;
     errno = 0;
 
     //Pass reference to the first element in string, and read as binary
-    FILE* file = fopen(aImgName.c_str(), "rb");
+    FILE *file = fopen(aImgName.c_str(), "rb");
     if (file == NULL) {
         std::cout << "File is null" << std::endl;
         std::cout << "Error: " << errno << std::endl;
@@ -29,7 +30,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string& aImgName) {
     uint8_t signature[8];
     fread(signature, sizeof(uint8_t), sizeof(signature), file);
     if (!CheckSignature(signature, 8)) {
-        throw RSPCoreException("Signature not matching");  //return;  //Some error, probably just throw exception
+        throw RSPCoreException("Signature not matching"); //return;  //Some error, probably just throw exception
     }
 
     // TODO: Declare structs for data handling
@@ -63,7 +64,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string& aImgName) {
 
                 //Use length to read the chunks data field
                 //Read chunk and crc into data buffer
-                fread(pngchunk.data, sizeof(uint8_t), pngchunk.length + sizeof(uint32_t), file);  // read whole chunk
+                fread(pngchunk.data, sizeof(uint8_t), pngchunk.length + sizeof(uint32_t), file); // read whole chunk
 
                 //Flip time
                 //Only flip things that are larger than a byte
@@ -84,7 +85,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string& aImgName) {
                 std::cout << "Filter      :" << +pngchunk.ihdr->filterMethod << std::endl;
                 std::cout << "Interlace   :" << +pngchunk.ihdr->interlaceMethod << std::endl;
 
-                std::cout << "Crc         :" << std::hex << *(uint32_t*)(&pngchunk.data[pngchunk.length]) << std::endl;
+                std::cout << "Crc         :" << std::hex << *(uint32_t *)(&pngchunk.data[pngchunk.length]) << std::endl;
                 std::cout << std::dec;
 
                 // TODO Stuff save or use header info
@@ -103,7 +104,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string& aImgName) {
                 //Maybe, maybe not flip crc
                 //*(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
                 // TODO do something with crc
-                std::cout << "Crc: " << std::hex << *(uint32_t*)(&pngchunk.data[pngchunk.length]) << std::endl;
+                std::cout << "Crc: " << std::hex << *(uint32_t *)(&pngchunk.data[pngchunk.length]) << std::endl;
                 std::cout << std::dec;
 
             }
@@ -174,7 +175,8 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string& aImgName) {
     return imagePixels;
 }
 
-bool PngLoader::CheckSignature(const uint8_t* aSig, const uint8_t& aSize) {
+bool PngLoader::CheckSignature(const uint8_t *aSig, const uint8_t &aSize)
+{
     /*std::cout << "Given Sig: ";
     for (size_t i = 0; i < aSize; i++) {
         std::cout << std::to_string(aSig[i]) << ", ";

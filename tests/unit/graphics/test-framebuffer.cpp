@@ -15,7 +15,8 @@
 
 static Framebuffer fb;
 
-inline void CheckPixel(const Point &aPoint, const Colour &aColour, const Framebuffer &fb) {
+inline void CheckPixel(const Point &aPoint, const Colour &aColour, const Framebuffer &fb)
+{
     if (fb.IsInsideScreen(aPoint)) {
         CHECK(fb.GetPixel(aPoint) == aColour);
     } else {
@@ -23,20 +24,23 @@ inline void CheckPixel(const Point &aPoint, const Colour &aColour, const Framebu
     }
 }
 
-TEST_CASE("Framebuffer Drawing Primitives") {
+TEST_CASE("Framebuffer Drawing Primitives")
+{
     std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
 
-    srand(ms.count());  //generates random seed val
+    srand(ms.count()); //generates random seed val
     Colour col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
     Pen pen(rand() % 10 + 1, col);
 
-    SUBCASE("Clear Framebuffer") {
+    SUBCASE("Clear Framebuffer")
+    {
         fb.SwapBuffer(Canvas::SwapOperations::Clear);
         fb.SwapBuffer(Canvas::SwapOperations::Clear);
     }
 
-    SUBCASE("Drawing Lines") {
+    SUBCASE("Drawing Lines")
+    {
         //Arrange
         Point pointA(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
         Point pointB(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
@@ -78,14 +82,16 @@ TEST_CASE("Framebuffer Drawing Primitives") {
                 CHECK(fb.GetPixel(Point(px, py), false) == col);
             }
         }
-        SUBCASE("Lines are Inclusive") {
+        SUBCASE("Lines are Inclusive")
+        {
             CHECK_EQ(fb.GetPixel(pointA, false), col);
             CHECK_EQ(fb.GetPixel(pointB, false), col);
         }
         //fb.SwapBuffer();
     }
 
-    SUBCASE("Drawing Rectangles") {
+    SUBCASE("Drawing Rectangles")
+    {
         //Arrange
         //Generate random values in the LEFT and TOP halves of the screen
         Point leftTop(rand() % (fb.vinfo.xres / 2),
@@ -115,7 +121,8 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         //fb.SwapBuffer();
     }
 
-    SUBCASE("Drawing Circles") {
+    SUBCASE("Drawing Circles")
+    {
         //Arrange
         Point centerPoint(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
         int radius = rand() % (fb.vinfo.xres / 2);
@@ -148,7 +155,8 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         //fb.SwapBuffer();
     }
 
-    SUBCASE("Set/Get pixel outside screen") {
+    SUBCASE("Set/Get pixel outside screen")
+    {
         //Arrange
         Point outSideXAxis(-1, 0);
         Point outSideYAxis(0, -1);
@@ -162,7 +170,8 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         CHECK_EQ(fb.GetPixel(outSideYAxis), 0);
     }
 
-    SUBCASE("Drawing an Image") {
+    SUBCASE("Drawing an Image")
+    {
         //Arrange
         Point topLeftPoint(100, 200);
 
@@ -175,7 +184,7 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         //Assert
     }
 
-    SUBCASE("Swapping between two images") {
+    /*SUBCASE("Swapping between two images") {
         //Arrange
         Point topLeftPoint(100, 200);
         Bitmap imgSimple("testImages/testImage.bmp");
@@ -197,9 +206,10 @@ TEST_CASE("Framebuffer Drawing Primitives") {
         //Assert
         CHECK(fps > 10);
         std::cout << duration << "ms " << iterations << "iterations " << (1000 * iterations / duration) << "fps" << std::endl;
-    }
+    }*/
 
-    SUBCASE("Swapbuffer") {
+    SUBCASE("Swapbuffer")
+    {
         fb.SwapBuffer();
     }
 }
