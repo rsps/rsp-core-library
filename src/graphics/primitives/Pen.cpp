@@ -12,10 +12,11 @@
 #include <graphics/primitives/Pen.h>
 
 Pen::Pen(int aSize, Colour aColour)
-    : size(aSize), colour(aColour)
+    : mSize(aSize), mColour(aColour)
 {
 }
+
 void Pen::Draw(Canvas &aCanvas, const Point &aPoint) const
 {
-    aCanvas.SetPixel(aPoint, colour);
+    aCanvas.SetPixel(aPoint, mColour);
 }

@@ -13,7 +13,8 @@
 #include <chrono>
 #include <thread>
 
-Framebuffer::Framebuffer() {
+Framebuffer::Framebuffer()
+{
     //framebufferFile = open("/dev/fb0", O_RDWR);
     framebufferFile = open("/dev/fb1", O_RDWR);
     if (framebufferFile == -1) {
@@ -73,7 +74,9 @@ Framebuffer::Framebuffer() {
         backBuffer = tmp;
     }
 }
-Framebuffer::~Framebuffer() {
+
+Framebuffer::~Framebuffer()
+{
     //At exit we MUST release the tty again
     if (tty_fb > 0) {
         if (ioctl(tty_fb, KDSETMODE, KD_TEXT) == -1) {
@@ -82,20 +85,25 @@ Framebuffer::~Framebuffer() {
     }
 }
 
-void Framebuffer::DrawDot(const Point &aPoint, const Pen &aPen) {
+void Framebuffer::DrawDot(const Point &aPoint, const Pen &aPen)
+{
     //Why are we going through this?
     aPen.Draw(*this, aPoint);
 }
-void Framebuffer::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen) {
+
+void Framebuffer::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen)
+{
     throw NotImplementedException("");
 }
-void Framebuffer::DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen) {
+
+void Framebuffer::DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen)
+{
     int error = -aRadius;
     //int x = aRadius;
     int y = 0;
 
     while (aRadius >= y) {
-        plot8Points(aCenter.x, aCenter.y, aRadius, y, aPen);
+        plot8Points(aCenter.mX, aCenter.mY, aRadius, y, aPen);
         error += y;
         y++;
         error += y;
@@ -107,19 +115,21 @@ void Framebuffer::DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen)
         }
     }
 }
-void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen) {
+
+void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen)
+{
     int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;
 
-    deltaX = aB.x - aA.x;
-    deltaY = aB.y - aA.y;
+    deltaX = aB.mX - aA.mX;
+    deltaY = aB.mY - aA.mY;
     absDeltaX = abs(deltaX);
     absDeltaY = abs(deltaY);
     signumX = (deltaX > 0) ? 1 : -1;
     signumY = (deltaY > 0) ? 1 : -1;
     x = absDeltaX >> 1;
     y = absDeltaY >> 1;
-    px = aA.x;
-    py = aA.y;
+    px = aA.mX;
+    py = aA.mY;
 
     //DrawDot(aA, aPen);
     aPen.Draw(*this, aA);
@@ -148,36 +158,36 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen) {
     }
 }
 
-void Framebuffer::DrawRectangle(const Rect &aRect, const Pen &aPen) {
-    for (int i = aRect.LeftTop.x; i <= aRect.RightBottom.x; i++) {
-        //DrawDot(Point(i, aRect.LeftTop.y), aPen);      //top
-        //DrawDot(Point(i, aRect.RightBottom.y), aPen);  //bottom
-        aPen.Draw(*this, Point(i, aRect.LeftTop.y));      //top
-        aPen.Draw(*this, Point(i, aRect.RightBottom.y));  //bottom
+void Framebuffer::DrawRectangle(const Rect &aRect, const Pen &aPen)
+{
+    for (int i = aRect.mLeftTop.mX; i <= aRect.mRightBottom.mX; i++) {
+        aPen.Draw(*this, Point(i, aRect.mLeftTop.mY));     //top
+        aPen.Draw(*this, Point(i, aRect.mRightBottom.mY)); //bottom
     }
-    for (int i = aRect.LeftTop.y; i <= aRect.RightBottom.y; i++) {
-        //DrawDot(Point(aRect.LeftTop.x, i), aPen);      //left
-        //DrawDot(Point(aRect.RightBottom.x, i), aPen);  //right
-        aPen.Draw(*this, Point(aRect.LeftTop.x, i));      //left
-        aPen.Draw(*this, Point(aRect.RightBottom.x, i));  //right
+    for (int i = aRect.mLeftTop.mY; i <= aRect.mRightBottom.mY; i++) {
+        aPen.Draw(*this, Point(aRect.mLeftTop.mX, i));     //left
+        aPen.Draw(*this, Point(aRect.mRightBottom.mX, i)); //right
     }
 }
 
-void Framebuffer::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap) {
+void Framebuffer::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
+{
     int iter = 0;
-    for (size_t h = 0; h < aBitmap.height; h++) {
-        for (size_t w = 0; w < aBitmap.width; w++) {
-            SetPixel(Point(aLeftTop.x + w, aLeftTop.y + h), aBitmap.imagePixels[iter]);
+    for (size_t h = 0; h < aBitmap.mHeight; h++) {
+        for (size_t w = 0; w < aBitmap.mWidth; w++) {
+            SetPixel(Point(aLeftTop.mX + w, aLeftTop.mY + h), aBitmap.mImagePixels[iter]);
             iter++;
         }
     }
 }
 
-void Framebuffer::DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit) {
+void Framebuffer::DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit)
+{
     throw NotImplementedException("Draw Text is not yet implemented");
 }
 
-void Framebuffer::SwapBuffer(const SwapOperations aSwapOp) {
+void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
+{
     //std::cout << "Swapping buffer: " << vinfo.yoffset << ", " << vinfo.reserved[0] << std::endl;
 
     vinfo.reserved[0]++;
@@ -199,25 +209,26 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp) {
     backBuffer = tmp;
 
     switch (aSwapOp) {
-        case SwapOperations::Copy:
-            copy();
-            break;
+    case SwapOperations::Copy:
+        copy();
+        break;
 
-        case SwapOperations::Clear:
-            clear();
-            break;
+    case SwapOperations::Clear:
+        clear();
+        break;
 
-        case SwapOperations::NoOp:
-        default:
-            break;
+    case SwapOperations::NoOp:
+    default:
+        break;
     }
 }
 
-uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const {
+uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
+{
     if (!IsInsideScreen(aPoint)) {
         return 0;
     }
-    long location = (aPoint.x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.y * finfo.line_length;
+    long location = (aPoint.mX + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.mY * finfo.line_length;
     //std::cout << "location:" << location << std::endl;
     if (aFront) {
         return *((uint32_t *)(frontBuffer + location));
@@ -225,7 +236,9 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const {
         return *((uint32_t *)(backBuffer + location));
     }
 }
-void Framebuffer::clear() {
+
+void Framebuffer::clear()
+{
     long x, y;
     //draw to back buffer
     //    std::cout << "Clearing buffer" << std::endl;
@@ -238,7 +251,8 @@ void Framebuffer::clear() {
     }
 }
 
-void Framebuffer::copy() {
+void Framebuffer::copy()
+{
     long x, y;
     //copy front buffer to back buffer
     //    std::cout << "Copying buffer" << std::endl;

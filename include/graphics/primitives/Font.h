@@ -6,11 +6,11 @@
 class Font
 {
   public:
-    std::string name;
-    std::string style;
-    Colour colour;
-    int weigth;
-    int size;
+    std::string mName;
+    std::string mStyle;
+    Colour mColour;
+    int mWeigth;
+    int mSize;
 
     Font(/* args */);
     ~Font();

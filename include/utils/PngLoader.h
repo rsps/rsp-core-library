@@ -37,9 +37,9 @@ class PngLoader : public ImgLoader
         //uint32_t crc; //Always just at the end of the pointer
     } __attribute__((packed)); //To stop alignment
 
-    uint8_t pngSignature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
-    std::vector<uint32_t> LoadImg(const std::string &aImgName);
+    uint8_t mPngSignature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
+    std::vector<uint32_t> LoadImg(const std::string &aImgName);
     bool CheckSignature(const uint8_t *aSig, const uint8_t &aSize);
 };
 

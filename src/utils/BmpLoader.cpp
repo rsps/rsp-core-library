@@ -28,8 +28,8 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
     fread(&bmpHeader, sizeof(uint8_t), sizeof(bmpHeader), file);
     //std::cout << "File header read" << std::endl;
 
-    width = bmpHeader.width;
-    height = bmpHeader.heigth;
+    mWidth = bmpHeader.width;
+    mHeight = bmpHeader.heigth;
 
     //std::cout << "Width:            " << width << std::endl;
     //std::cout << "Height:           " << height << std::endl;
@@ -92,13 +92,13 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
                                 (((uint32_t)green) << 16) |
                                 (((uint32_t)blue) << 8) |
                                 ((uint32_t)alpha);
-            imagePixels.push_back(combined);
+            mImagePixels.push_back(combined);
             //std::cout << "Combined: " << std::hex << combined << std::endl;
         }
     }
     fclose(file);
     if (normallyDrawn) {
-        std::reverse(imagePixels.begin(), imagePixels.end());
+        std::reverse(mImagePixels.begin(), mImagePixels.end());
     }
-    return imagePixels;
+    return mImagePixels;
 }

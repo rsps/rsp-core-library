@@ -12,8 +12,8 @@ class Canvas;
 class Pen
 {
   public:
-    int size;
-    Colour colour;
+    int mSize;
+    Colour mColour;
 
     Pen();
     Pen(int aSize, Colour aColour);

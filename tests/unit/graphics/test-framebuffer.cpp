@@ -51,16 +51,16 @@ TEST_CASE("Framebuffer Drawing Primitives")
         //Assert
         int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;
 
-        deltaX = pointB.x - pointA.x;
-        deltaY = pointB.y - pointA.y;
+        deltaX = pointB.mX - pointA.mX;
+        deltaY = pointB.mY - pointA.mY;
         absDeltaX = abs(deltaX);
         absDeltaY = abs(deltaY);
         signumX = (deltaX > 0) ? 1 : -1;
         signumY = (deltaY > 0) ? 1 : -1;
         x = absDeltaX >> 1;
         y = absDeltaY >> 1;
-        px = pointA.x;
-        py = pointA.y;
+        px = pointA.mX;
+        py = pointA.mY;
         if (absDeltaX >= absDeltaY) {
             for (i = 0; i < absDeltaX; i++) {
                 y += absDeltaY;
@@ -108,15 +108,15 @@ TEST_CASE("Framebuffer Drawing Primitives")
         //Expect all four side to hold values
         for (size_t i = 0; i <= rect.GetWidth(); i++) {
             //Check top side
-            CHECK(pen.colour == fb.GetPixel(Point(leftTop.x + i, leftTop.y), false));
+            CHECK(pen.mColour == fb.GetPixel(Point(leftTop.mX + i, leftTop.mY), false));
             //Check bottom side
-            CHECK(pen.colour == fb.GetPixel(Point(leftTop.x + i, rightBottom.y), false));
+            CHECK(pen.mColour == fb.GetPixel(Point(leftTop.mX + i, rightBottom.mY), false));
         }
         for (size_t i = 0; i <= rect.GetHeight(); i++) {
             //Check left side
-            CHECK(pen.colour == fb.GetPixel(Point(leftTop.x, rightBottom.y - i), false));
+            CHECK(pen.mColour == fb.GetPixel(Point(leftTop.mX, rightBottom.mY - i), false));
             //Check right side
-            CHECK(pen.colour == fb.GetPixel(Point(rightBottom.x, rightBottom.y - i), false));
+            CHECK(pen.mColour == fb.GetPixel(Point(rightBottom.mX, rightBottom.mY - i), false));
         }
         //fb.SwapBuffer();
     }
@@ -134,14 +134,14 @@ TEST_CASE("Framebuffer Drawing Primitives")
         int error = -radius;
         int y = 0;
         while (radius >= y) {
-            CheckPixel(Point(centerPoint.x + radius, centerPoint.y + y), col, fb);
-            CheckPixel(Point(centerPoint.x - radius, centerPoint.y + y), col, fb);
-            CheckPixel(Point(centerPoint.x + radius, centerPoint.y - y), col, fb);
-            CheckPixel(Point(centerPoint.x - radius, centerPoint.y - y), col, fb);
-            CheckPixel(Point(centerPoint.x + y, centerPoint.y + radius), col, fb);
-            CheckPixel(Point(centerPoint.x - y, centerPoint.y + radius), col, fb);
-            CheckPixel(Point(centerPoint.x + y, centerPoint.y - radius), col, fb);
-            CheckPixel(Point(centerPoint.x - y, centerPoint.y - radius), col, fb);
+            CheckPixel(Point(centerPoint.mX + radius, centerPoint.mY + y), col, fb);
+            CheckPixel(Point(centerPoint.mX - radius, centerPoint.mY + y), col, fb);
+            CheckPixel(Point(centerPoint.mX + radius, centerPoint.mY - y), col, fb);
+            CheckPixel(Point(centerPoint.mX - radius, centerPoint.mY - y), col, fb);
+            CheckPixel(Point(centerPoint.mX + y, centerPoint.mY + radius), col, fb);
+            CheckPixel(Point(centerPoint.mX - y, centerPoint.mY + radius), col, fb);
+            CheckPixel(Point(centerPoint.mX + y, centerPoint.mY - radius), col, fb);
+            CheckPixel(Point(centerPoint.mX - y, centerPoint.mY - radius), col, fb);
             error += y;
             y++;
             error += y;

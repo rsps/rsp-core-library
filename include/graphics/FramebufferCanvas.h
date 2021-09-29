@@ -46,7 +46,7 @@ class Framebuffer : Canvas
         if (!IsInsideScreen(aPoint)) {
             return;
         }
-        long location = (aPoint.x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.y * finfo.line_length;
+        long location = (aPoint.mX + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.mY * finfo.line_length;
         //std::cout << "location:" << location << std::endl;
         *((uint32_t *)(backBuffer + location)) = aColor;
     }
@@ -54,7 +54,7 @@ class Framebuffer : Canvas
     uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
     inline bool IsInsideScreen(const Point &aPoint) const
     {
-        return !(aPoint.x < 0 || aPoint.y < 0 || aPoint.y >= vinfo.yres || aPoint.x >= vinfo.xres);
+        return !(aPoint.mX < 0 || aPoint.mY < 0 || aPoint.mY >= vinfo.yres || aPoint.mX >= vinfo.xres);
     }
 
     void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy);

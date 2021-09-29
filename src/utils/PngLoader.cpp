@@ -74,8 +74,8 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
                 //*(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
 
                 //Set important bitmap variables
-                width = pngchunk.ihdr->width;
-                height = pngchunk.ihdr->height;
+                mWidth = pngchunk.ihdr->width;
+                mHeight = pngchunk.ihdr->height;
 
                 std::cout << "Width       :" << pngchunk.ihdr->width << std::endl;
                 std::cout << "Height      :" << pngchunk.ihdr->height << std::endl;
@@ -172,7 +172,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
 
     fclose(file);
 
-    return imagePixels;
+    return mImagePixels;
 }
 
 bool PngLoader::CheckSignature(const uint8_t *aSig, const uint8_t &aSize)
@@ -190,7 +190,7 @@ bool PngLoader::CheckSignature(const uint8_t *aSig, const uint8_t &aSize)
     //Do loop they decay to pointers
     //Or use std::array
     for (size_t i = 0; i < 8; i++) {
-        if (aSig[i] != pngSignature[i]) {
+        if (aSig[i] != mPngSignature[i]) {
             return false;
         }
     }

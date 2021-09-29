@@ -8,8 +8,8 @@
 class Rect
 {
   public:
-    Point LeftTop;
-    Point RightBottom;
+    Point mLeftTop;
+    Point mRightBottom;
 
     Rect(int aLeft, int aTop, int aWidth, int aHeight);
     Rect(const Point &aLeftTop, const Point &aRightBottom);

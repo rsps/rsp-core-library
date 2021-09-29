@@ -4,19 +4,19 @@
 class Point
 {
   public:
-    int x;
-    int y;
+    int mX;
+    int mY;
 
     inline Point()
-        : x(0), y(0)
+        : mX(0), mY(0)
     {
     }
     inline Point(int aX, int aY)
-        : x(aX), y(aY)
+        : mX(aX), mY(aY)
     {
     }
     inline Point(const Point &aPoint)
-        : x(aPoint.x), y(aPoint.y)
+        : mX(aPoint.mX), mY(aPoint.mY)
     {
     }
 };

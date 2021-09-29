@@ -122,6 +122,6 @@ TEST_CASE("Colour Operators")
         Colour newColour = testCol;
 
         //Assert
-        CHECK(newColour.colours.rgba == testCol.colours.rgba);
+        CHECK(newColour.mColours.rgba == testCol.mColours.rgba);
     }
 }

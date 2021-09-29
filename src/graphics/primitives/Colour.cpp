@@ -12,15 +12,16 @@
 
 Colour::Colour(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha)
 {
-    colours.red = aRed;
-    colours.green = aGreen;
-    colours.blue = aBlue;
-    colours.alpha = aAlpha;
+    mColours.red = aRed;
+    mColours.green = aGreen;
+    mColours.blue = aBlue;
+    mColours.alpha = aAlpha;
 }
+
 Colour::Colour(uint32_t aRGBA)
 {
 #ifdef LITTLE_ENDIAN
-    colours.rgba = aRGBA;
+    mColours.rgba = aRGBA;
 #else
     colour.alpha = (aRGBA & 0xFF);
     colour.blue = (aRGBA >> 8) & 0xFF;
@@ -28,56 +29,66 @@ Colour::Colour(uint32_t aRGBA)
     colour.red = (aRGBA >> 24) & 0xFF;
 #endif
 }
+
 Colour::Colour(const Colour &aColour)
-    : colours(aColour.colours)
+    : mColours(aColour.mColours)
 {
 }
 
 uint8_t Colour::GetRed() const
 {
-    return colours.red;
+    return mColours.red;
 }
+
 void Colour::SetRed(uint8_t aValue)
 {
-    colours.red = aValue;
+    mColours.red = aValue;
 }
+
 uint8_t Colour::GetGreen() const
 {
-    return colours.green;
+    return mColours.green;
 }
+
 void Colour::SetGreen(uint8_t aValue)
 {
-    colours.green = aValue;
+    mColours.green = aValue;
 }
+
 uint8_t Colour::GetBlue() const
 {
-    return colours.blue;
+    return mColours.blue;
 }
+
 void Colour::SetBlue(uint8_t aValue)
 {
-    colours.blue = aValue;
+    mColours.blue = aValue;
 }
+
 uint8_t Colour::GetAlpha() const
 {
-    return colours.alpha;
+    return mColours.alpha;
 }
+
 void Colour::SetAlpha(uint8_t aValue)
 {
-    colours.alpha = aValue;
+    mColours.alpha = aValue;
 }
+
 Colour::operator uint32_t() const
 {
 #ifdef LITTLE_ENDIAN
-    return colours.rgba;
+    return mColours.rgba;
 #else
-    return (((uint32_t)colours.red) << 24) |
-           (((uint32_t)colours.green) << 16) |
-           (((uint32_t)colours.blue) << 8) |
-           ((uint32_t)colours.alpha);
+    return (((uint32_t)mColours.red) << 24) |
+           (((uint32_t)mColours.green) << 16) |
+           (((uint32_t)mColours.blue) << 8) |
+           ((uint32_t)mColours.alpha);
 #endif
 }
+
 Colour &Colour::operator=(const Colour &aColour)
 {
-    colours = aColour.colours;
+    mColours = aColour.mColours;
     return *this;
 }

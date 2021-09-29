@@ -27,7 +27,7 @@ typedef union {
 class Colour
 {
   public:
-    colourMap colours;
+    colourMap mColours;
 
     Colour(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha);
     Colour(uint32_t aARGB);
