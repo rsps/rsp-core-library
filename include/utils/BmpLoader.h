@@ -30,6 +30,8 @@ class BmpLoader : public ImgLoader
     uint16_t bytesPerPixel;
 
     std::vector<uint32_t> LoadImg(const std::string &aImgName);
+    void ReadHeader(FILE *file);
+    void ReadData(FILE *file);
 };
 
 #endif //BMPLOADER_H

@@ -22,7 +22,8 @@ TEST_CASE("Bitmap file loading")
             CHECK(bitmap.mHeight == 194);
             CHECK(bitmap.mWidth == 259););
     }
-    /*SUBCASE("Loading Png file") {
+    /*SUBCASE("Loading Png file")
+    {
         std::string filepath = "testImages/testImage.png";
         CHECK_NOTHROW(
             Bitmap bitmap(filepath);

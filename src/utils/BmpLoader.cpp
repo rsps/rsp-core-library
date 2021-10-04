@@ -24,41 +24,7 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
         std::cout << "File is null" << std::endl;
         std::cout << "Error: " << errno << std::endl;
     }
-    //Read the 54 byte header
-    fread(&bmpHeader, sizeof(uint8_t), sizeof(bmpHeader), file);
-    //std::cout << "File header read" << std::endl;
-
-    mWidth = bmpHeader.width;
-    mHeight = bmpHeader.heigth;
-
-    //std::cout << "Width:            " << width << std::endl;
-    //std::cout << "Height:           " << height << std::endl;
-
-    //short bitsPerPixel;
-    //memcpy(&bitsPerPixel, info + 28, sizeof(short));
-    bytesPerPixel = bmpHeader.bitsPerPixel / 8; //Might be 1 or 4
-    //std::cout << "BytesPerPixel Pre Calc: " << bytesPerPixel << std::endl;
-    //std::cout << "Mod calc:               " << (bytesPerPixel % 8) << std::endl;
-    if ((bmpHeader.bitsPerPixel % 8) > 0) {
-        bytesPerPixel = bytesPerPixel + 1;
-    }
-    //std::cout << "Signature:        " << std::to_string(bmpHeader.signature) << std::endl;
-    //std::cout << "FileSize:         " << bmpHeader.fileSize << std::endl;
-    //std::cout << "Reserved:         " << bmpHeader.reserved << std::endl;
-    //std::cout << "DataOffset:       " << bmpHeader.dataOffset << std::endl;
-    //std::cout << "Size:             " << bmpHeader.size << std::endl;
-    //std::cout << "Width:            " << bmpHeader.width << std::endl;
-    //std::cout << "Height:           " << bmpHeader.height << std::endl;
-    //std::cout << "Planes:           " << bmpHeader.planes << std::endl;
-    //std::cout << "BitsPerPix:       " << bmpHeader.bitsPerPixel << std::endl;
-    //std::cout << "Compression:      " << bmpHeader.compression << std::endl;
-    //std::cout << "ImageSize:        " << bmpHeader.imageSize << std::endl;
-    //std::cout << "xPixelsPerM:      " << bmpHeader.xPixelsPerM << std::endl;
-    //std::cout << "yPixelsPerM:      " << bmpHeader.yPixelsPerM << std::endl;
-    //std::cout << "ColoursUSed:      " << bmpHeader.coloursUsed << std::endl;
-    //std::cout << "ImportantColours: " << bmpHeader.importantColours << std::endl;
-    //std::cout << "BytesPerPix:      " << bytesPerPixel << std::endl;
-
+    ReadHeader(file);
     // TODO: Get Compression and other useful stuff
 
     //Height can be negative, showing the image is stored from top to bottom
@@ -66,22 +32,45 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
     if (bmpHeader.heigth < 0) {
         normallyDrawn = false;
     }
+    ReadData(file);
 
+    fclose(file);
+    if (normallyDrawn) {
+        std::reverse(mImagePixels.begin(), mImagePixels.end());
+    }
+    return mImagePixels;
+}
+
+void BmpLoader::ReadHeader(FILE *aFile)
+{
+    //Read the 54 byte header
+    fread(&bmpHeader, sizeof(uint8_t), sizeof(bmpHeader), aFile);
+    //std::cout << "File header read" << std::endl;
+
+    mWidth = bmpHeader.width;
+    mHeight = bmpHeader.heigth;
+
+    bytesPerPixel = bmpHeader.bitsPerPixel / 8; //Might be 1 or 4
+    if ((bmpHeader.bitsPerPixel % 8) > 0) {
+        bytesPerPixel = bytesPerPixel + 1;
+    }
+}
+
+void BmpLoader::ReadData(FILE *aFile)
+{
     //Figure out amount to read
-    int paddedRowSize = (bmpHeader.width * 3 + 3) & (~3); //bytesPerPixel * abs(bmpHeader.heigth) * bmpHeader.width;
-    //std::cout << "Padded row size: " << paddedRowSize << std::endl;
+    int paddedRowSize = (bmpHeader.width * 3 + 3) & (~3);
 
     //Initialize containers for reading
     std::vector<uint8_t> pixelRow;
     pixelRow.resize(paddedRowSize);
 
     //Skip past the offset
-    fseek(file, bmpHeader.dataOffset, SEEK_SET);
+    fseek(aFile, bmpHeader.dataOffset, SEEK_SET);
 
     for (size_t i = 0; i < abs(bmpHeader.heigth); i++) {
         //Read a Row of pixels with the padding
-        fread(pixelRow.data(), sizeof(uint8_t), paddedRowSize, file);
-        //std::cout << "Bitmap row " << i << " read into memory" << std::endl;
+        fread(pixelRow.data(), sizeof(uint8_t), paddedRowSize, aFile);
         for (size_t j = 0; j < bmpHeader.width * 3; j += 3) {
             uint8_t blue = pixelRow[j];      //*iter;
             uint8_t green = pixelRow[j + 1]; //*std::next(iter, 1);
@@ -93,12 +82,6 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
                                 (((uint32_t)blue) << 8) |
                                 ((uint32_t)alpha);
             mImagePixels.push_back(combined);
-            //std::cout << "Combined: " << std::hex << combined << std::endl;
         }
     }
-    fclose(file);
-    if (normallyDrawn) {
-        std::reverse(mImagePixels.begin(), mImagePixels.end());
-    }
-    return mImagePixels;
 }

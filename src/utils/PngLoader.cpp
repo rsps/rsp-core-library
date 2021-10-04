@@ -16,6 +16,7 @@
 
 std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
 {
+    throw NotImplementedException("Png file format is not supported");
     std::cout << "Bitmap reading file: " << aImgName << std::endl;
     errno = 0;
 
@@ -37,9 +38,8 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
     PNGChunk pngchunk;
 
     //-- Chunk reading loop begins here --
-    /*while (std::strcmp(pngchunk.type, "IEND") != 0) {
-        
-    }*/
+    //while (std::strcmp(pngchunk.type, "IEND") != 0) {
+    //}
 
     //Temp loop for testing
     for (size_t i = 0; i < 3; i++) {
@@ -101,6 +101,8 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
                 //Use length to read the chunks data field
                 fread(pngchunk.data, sizeof(uint8_t), pngchunk.length + sizeof(uint32_t), file);
 
+                //Decode
+
                 //Maybe, maybe not flip crc
                 //*(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
                 // TODO do something with crc
@@ -135,41 +137,6 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
         std::cout << std::endl;
     }
 
-    //Use length to read the chunks data field
-    //fread(&pngchunk.data[0], sizeof(uint8_t), pngchunk.length + sizeof(pngchunk.crc), file);
-    //
-    //pngchunk.crc = be32toh(pngchunk.crc);
-    //std::cout << "Length: " << pngchunk.length << std::endl;
-    //std::cout << "Type: " << pngchunk.type << std::endl;
-    //std::cout << "Crc: " << std::hex << *(uint32_t*)(&pngchunk.data[pngchunk.length]) << std::endl;
-
-    //fseek(file, 8 + 3, SEEK_SET);
-    //fread(&nothing, sizeof(uint8_t), sizeof(nothing), file);
-    //nothing = be32toh(nothing);
-    //std::cout << "Nothing: " << nothing << std::endl;
-    //std::cout << "Bytes:" << std::endl;
-    //for (size_t i = 0; i < 4; i++) {
-    //    fread(&byteVal, sizeof(uint8_t), sizeof(uint8_t), file);
-    //    std::cout << byteVal << std::endl;
-    //}
-
-    //fread(&type, sizeof(uint8_t), sizeof(type), file);
-    //std::cout << "Type: " << std::to_string(type) << std::endl;
-
-    //fread(&pngChunk, sizeof(uint8_t), sizeof(pngChunk), file);
-    //std::cout << "Length: " << pngChunk.length << std::endl;
-    //std::cout << "Type: " << std::to_string(pngChunk.type) << std::endl;
-    //std::cout << "Crc: " << pngChunk.crc << std::endl;
-
-    //fread(&ihdrChunk, sizeof(uint8_t), sizeof(ihdrChunk), file);
-    //std::cout << "Width:       " << ihdrChunk.width << std::endl;
-    //std::cout << "Height:      " << ihdrChunk.height << std::endl;
-    //std::cout << "Bit Depth:   " << ihdrChunk.bitDepth << std::endl;
-    //std::cout << "Colour Type: " << ihdrChunk.colourType << std::endl;
-    //std::cout << "Compression: " << ihdrChunk.compressionMethod << std::endl;
-    //std::cout << "Filter:      " << ihdrChunk.filterMethod << std::endl;
-    //std::cout << "Interlace:   " << ihdrChunk.interlaceMethod << std::endl;
-
     fclose(file);
 
     return mImagePixels;
@@ -177,16 +144,6 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
 
 bool PngLoader::CheckSignature(const uint8_t *aSig, const uint8_t &aSize)
 {
-    /*std::cout << "Given Sig: ";
-    for (size_t i = 0; i < aSize; i++) {
-        std::cout << std::to_string(aSig[i]) << ", ";
-    }
-    std::cout << std::endl;
-    std::cout << "Png Header: ";
-    for (size_t i = 0; i < aSize; i++) {
-        std::cout << std::to_string(pngHeader[i]) << ", ";
-    }*/
-
     //Do loop they decay to pointers
     //Or use std::array
     for (size_t i = 0; i < 8; i++) {
@@ -195,4 +152,10 @@ bool PngLoader::CheckSignature(const uint8_t *aSig, const uint8_t &aSize)
         }
     }
     return true;
+}
+void PngLoader::ReadHeader(FILE *file)
+{
+}
+void PngLoader::ReadData(FILE *file)
+{
 }

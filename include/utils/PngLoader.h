@@ -41,6 +41,8 @@ class PngLoader : public ImgLoader
 
     std::vector<uint32_t> LoadImg(const std::string &aImgName);
     bool CheckSignature(const uint8_t *aSig, const uint8_t &aSize);
+    void ReadHeader(FILE *file);
+    void ReadData(FILE *file);
 };
 
 #endif //PNGLOADER_H
