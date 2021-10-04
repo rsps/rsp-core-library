@@ -22,13 +22,9 @@ TEST_CASE("Bitmap file loading")
             CHECK(bitmap.mHeight == 194);
             CHECK(bitmap.mWidth == 259););
     }
-    /*SUBCASE("Loading Png file")
+    SUBCASE("Loading Png file")
     {
         std::string filepath = "testImages/testImage.png";
-        CHECK_NOTHROW(
-            Bitmap bitmap(filepath);
-            //CHECK(bitmap.mImagePixels.size() > 0);
-            CHECK(bitmap.mWidth == 259);
-            CHECK(bitmap.mHeight == 194););
-    }*/
+        CHECK_THROWS_AS(Bitmap bitmap(filepath), const NotImplementedException &);
+    }
 }
