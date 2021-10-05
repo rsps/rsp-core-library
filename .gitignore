@@ -15,6 +15,7 @@ _deps
 # Eclipse project files
 .project
 .cproject
+/.settings/
 /build/
 !build/.gitkeep
 
