@@ -12,14 +12,17 @@
 #include <iostream>
 
 #include "graphics/primitives/Canvas.h"
+#include "graphics/primitives/Color.h"
+
+namespace rsp::graphics
+{
+
 
 class Framebuffer : Canvas
 {
   public:
-    struct fb_var_screeninfo vinfo;
-
     Framebuffer();
-    ~Framebuffer();
+    virtual ~Framebuffer();
 
     void DrawDot(const Point &aPoint, const Pen &aPen);
     void DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen);
@@ -37,18 +40,18 @@ class Framebuffer : Canvas
         plot4Points(aCenterX, aCenterY, aX, aY, aPen);
         plot4Points(aCenterX, aCenterY, aY, aX, aPen);
     }
-    void DrawLine(const Point &aA, const Point &aB, const Pen &aPen);
+    virtual void DrawLine(const Point &aA, const Point &aB, const Pen &aPen);
     void DrawRectangle(const Rect &aRect, const Pen &aPen);
     void DrawImage(const Point &aLeftTop, const Bitmap &aBitmap);
     void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit);
-    inline void SetPixel(const Point &aPoint, const Colour aColor)
+    inline void SetPixel(const Point &aPoint, const Color aColor)
     {
         if (!IsInsideScreen(aPoint)) {
             return;
         }
         long location = (aPoint.mX + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.mY * finfo.line_length;
         //std::cout << "location:" << location << std::endl;
-        *((uint32_t *)(backBuffer + location)) = aColor;
+        *(reinterpret_cast<uint32_t*>(backBuffer + location)) = aColor;
     }
 
     uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
@@ -59,14 +62,28 @@ class Framebuffer : Canvas
 
     void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy);
 
+    uint32_t GetWidth() const {
+        return vinfo.xres;
+    }
+    uint32_t GetHeight() const {
+        return vinfo.yres;
+    }
+
+    uint32_t GetColorDepth() const {
+        return vinfo.bits_per_pixel;
+    }
+
+
   protected:
     int framebufferFile;
     int tty_fb = 0;
     struct fb_fix_screeninfo finfo;
-    uint8_t *frontBuffer, *backBuffer, *tmp;
+    struct fb_var_screeninfo vinfo;
+    uint8_t *frontBuffer, *backBuffer;
 
     void clear();
     void copy();
 };
 
+}
 #endif // FRAMEBUFFERCANVAS_H

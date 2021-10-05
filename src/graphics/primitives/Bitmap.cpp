@@ -9,34 +9,37 @@
  */
 
 #include <graphics/primitives/Bitmap.h>
-
+#include <graphics/primitives/raster/BmpLoader.h>
+#include <graphics/primitives/raster/PngLoader.h>
 #include <algorithm>
-#include <cerrno>
+#include <utils/RSPCoreExceptions.h>
 
-Bitmap::Bitmap() {}
-Bitmap::Bitmap(std::string aImgName)
-    : mImgName(aImgName)
+namespace rsp::graphics
 {
-    //Detect filetype
-    std::string filetype = GetFileExtension(aImgName);
-    //std::cout << "File type read as: " << filetype << std::endl;
+
+Bitmap::Bitmap(std::string aImgName)
+    : mBytesPerPixel(0)
+{
+    auto &loader = GetRasterLoader(GetFileExtension(aImgName));
 
     //Get raw data
-    mImagePixels = filetypeMap[filetype]->LoadImg(aImgName);
-    mHeight = filetypeMap[filetype]->mHeight;
-    mWidth = filetypeMap[filetype]->mWidth;
+    mImagePixels = loader.LoadImg(aImgName);
+    mHeight = loader.GetHeight();
+    mWidth = loader.GetWidth();
 }
 
 Bitmap::Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerPixel)
+    : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel), mImagePixels(mWidth * mHeight)
 {
-    throw NotImplementedException("");
+    for(int y=0; y < mHeight ; y++) {
+        for(int x=0; x < mWidth ; x++) {
+            mImagePixels[x + (y * mWidth)] = *apPixels++;
+        }
+    }
 }
 
 Bitmap::Bitmap(int aHeight, int aWidth, int aBytesPerPixel)
-    : mHeight(aHeight),
-      mWidth(aWidth),
-      mBytesPerPixel(aBytesPerPixel),
-      mImagePixels(mWidth * mHeight)
+    : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel), mImagePixels(mWidth * mHeight)
 {
     throw NotImplementedException("");
     //Load file into memory here
@@ -48,9 +51,22 @@ Bitmap::~Bitmap()
 {
 }
 
+ImgLoader& Bitmap::GetRasterLoader(const std::string aFileType)
+{
+    if (aFileType == "png") {
+        static PngLoader png;
+        return png;
+    }
+
+    static BmpLoader bmp;
+    return bmp;
+}
+
 std::string Bitmap::GetFileExtension(const std::string &FileName)
 {
     if (FileName.find_last_of(".") != std::string::npos)
         return FileName.substr(FileName.find_last_of(".") + 1);
     return "";
+}
+
 }

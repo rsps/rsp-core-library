@@ -11,12 +11,17 @@
 #include <graphics/primitives/Canvas.h>
 #include <graphics/primitives/Pen.h>
 
-Pen::Pen(int aSize, Colour aColour)
-    : mSize(aSize), mColour(aColour)
+namespace rsp::graphics
+{
+
+Pen::Pen(int aSize, Color aColor)
+    : mSize(aSize), mColor(aColor)
 {
 }
 
 void Pen::Draw(Canvas &aCanvas, const Point &aPoint) const
 {
-    aCanvas.SetPixel(aPoint, mColour);
+    aCanvas.SetPixel(aPoint, mColor);
+}
+
 }

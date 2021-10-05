@@ -8,22 +8,32 @@
  * \author      Simon Glashoff
  */
 
-#include <utils/BmpLoader.h>
-#include <utils/RSPCoreExceptions.h>
+#include <graphics/primitives/raster/BmpLoader.h>
 
 #include <algorithm>
-#include <cerrno>
+//#include <cerrno>
+#include <iostream>
+#include <fstream>
+
+namespace rsp::graphics
+{
 
 std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
 {
+    std::ifstream file;
+
+    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    file.open(aImgName, std::ifstream::binary);
+
     //std::cout << "Bitmap reading file: " << aImgName << std::endl;
-    errno = 0;
-    //Pass reference to the first element in string, and read as binary
-    FILE *file = fopen(aImgName.c_str(), "rb");
-    if (file == NULL) {
-        std::cout << "File is null" << std::endl;
-        std::cout << "Error: " << errno << std::endl;
-    }
+//    errno = 0;
+//    //Pass reference to the first element in string, and read as binary
+//    FILE *file = fopen(aImgName.c_str(), "rb");
+//    if (file == NULL) {
+//        std::cout << "File is null" << std::endl;
+//        std::cout << "Error: " << errno << std::endl;
+//    }
+
     ReadHeader(file);
     // TODO: Get Compression and other useful stuff
 
@@ -34,17 +44,20 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
     }
     ReadData(file);
 
-    fclose(file);
+    file.close();
+
     if (normallyDrawn) {
         std::reverse(mImagePixels.begin(), mImagePixels.end());
     }
     return mImagePixels;
 }
 
-void BmpLoader::ReadHeader(FILE *aFile)
+void BmpLoader::ReadHeader(std::ifstream &aFile)
 {
+    aFile.read(reinterpret_cast<char*>(&bmpHeader), sizeof(bmpHeader));
+
     //Read the 54 byte header
-    fread(&bmpHeader, sizeof(uint8_t), sizeof(bmpHeader), aFile);
+//    fread(&bmpHeader, sizeof(uint8_t), sizeof(bmpHeader), aFile);
     //std::cout << "File header read" << std::endl;
 
     mWidth = bmpHeader.width;
@@ -56,7 +69,7 @@ void BmpLoader::ReadHeader(FILE *aFile)
     }
 }
 
-void BmpLoader::ReadData(FILE *aFile)
+void BmpLoader::ReadData(std::ifstream &aFile)
 {
     //Figure out amount to read
     int paddedRowSize = (bmpHeader.width * 3 + 3) & (~3);
@@ -66,22 +79,25 @@ void BmpLoader::ReadData(FILE *aFile)
     pixelRow.resize(paddedRowSize);
 
     //Skip past the offset
-    fseek(aFile, bmpHeader.dataOffset, SEEK_SET);
+    aFile.seekg(bmpHeader.dataOffset);
+//    fseek(aFile, bmpHeader.dataOffset, SEEK_SET);
 
     for (size_t i = 0; i < abs(bmpHeader.heigth); i++) {
         //Read a Row of pixels with the padding
-        fread(pixelRow.data(), sizeof(uint8_t), paddedRowSize, aFile);
-        for (size_t j = 0; j < bmpHeader.width * 3; j += 3) {
+        aFile.read(reinterpret_cast<char*>(pixelRow.data()), paddedRowSize);
+//        fread(pixelRow.data(), sizeof(uint8_t), paddedRowSize, aFile);
+        for (size_t j = 0; j < bmpHeader.width * bytesPerPixel; j += bytesPerPixel) {
             uint8_t blue = pixelRow[j];      //*iter;
             uint8_t green = pixelRow[j + 1]; //*std::next(iter, 1);
             uint8_t red = pixelRow[j + 2];   //*std::next(iter, 2);
             uint8_t alpha = 0x00;
 
-            uint32_t combined = (((uint32_t)red) << 24) |
-                                (((uint32_t)green) << 16) |
-                                (((uint32_t)blue) << 8) |
-                                ((uint32_t)alpha);
+            uint32_t combined = (static_cast<uint32_t>(red) << 24) | (static_cast<uint32_t>(green) << 16)
+                | (static_cast<uint32_t>(blue) << 8) | static_cast<uint32_t>(alpha);
             mImagePixels.push_back(combined);
         }
     }
 }
+
+}
+

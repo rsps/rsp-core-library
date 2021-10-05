@@ -10,6 +10,9 @@
 
 #include <doctest.h>
 #include <graphics/primitives/Bitmap.h>
+#include <utils/RSPCoreExceptions.h>
+
+using namespace rsp::graphics;
 
 TEST_CASE("Bitmap file loading")
 {
@@ -18,9 +21,9 @@ TEST_CASE("Bitmap file loading")
         std::string filepath = "testImages/testImage.bmp";
         CHECK_NOTHROW(
             Bitmap bitmap(filepath);
-            CHECK(bitmap.mImagePixels.size() > 0);
-            CHECK(bitmap.mHeight == 194);
-            CHECK(bitmap.mWidth == 259););
+            CHECK(bitmap.GetPixels().size() > 0);
+            CHECK(bitmap.GetHeight() == 194);
+            CHECK(bitmap.GetWidth() == 259););
     }
     SUBCASE("Loading Png file")
     {

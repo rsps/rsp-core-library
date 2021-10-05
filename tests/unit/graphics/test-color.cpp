@@ -9,7 +9,9 @@
  */
 
 #include <doctest.h>
-#include <graphics/primitives/Colour.h>
+#include <graphics/primitives/Color.h>
+
+using namespace rsp::graphics;
 
 uint8_t red = 0x12;
 uint8_t green = 0x34;
@@ -22,7 +24,7 @@ TEST_CASE("Colour Contructors")
     SUBCASE("Separate values contructor")
     {
         //Arrange & Act
-        Colour col(red, green, blue, alpha);
+        Color col(red, green, blue, alpha);
 
         //Assert
         CHECK(col.GetAlpha() == alpha);
@@ -33,7 +35,7 @@ TEST_CASE("Colour Contructors")
     SUBCASE("Single value contructor")
     {
         //Arrange & Act
-        Colour col(colourVal);
+        Color col(colourVal);
 
         //Assert
         CHECK(col.GetAlpha() == alpha);
@@ -44,8 +46,8 @@ TEST_CASE("Colour Contructors")
     SUBCASE("Copy contructor")
     {
         //Arrange & Act
-        Colour testCol(colourVal);
-        Colour col(testCol);
+        Color testCol(colourVal);
+        Color col(testCol);
 
         //Assert
         CHECK(col.GetAlpha() == alpha);
@@ -57,7 +59,7 @@ TEST_CASE("Colour Contructors")
 TEST_CASE("Colour Sets")
 {
     //Arrange
-    Colour testCol(colourVal);
+    Color testCol(colourVal);
     uint8_t newCol = 0x55;
     SUBCASE("Set Alpha")
     {
@@ -107,7 +109,7 @@ TEST_CASE("Colour Sets")
 TEST_CASE("Colour Operators")
 {
     //Arrange
-    Colour testCol(colourVal);
+    Color testCol(colourVal);
     SUBCASE("uint32 Conversion")
     {
         //Act
@@ -119,9 +121,9 @@ TEST_CASE("Colour Operators")
     SUBCASE("= Operator")
     {
         //Act
-        Colour newColour = testCol;
+        Color newColour = testCol;
 
         //Assert
-        CHECK(newColour.mColours.rgba == testCol.mColours.rgba);
+        CHECK((uint32_t)newColour == (uint32_t)testCol);
     }
 }

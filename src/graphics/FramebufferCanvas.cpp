@@ -13,12 +13,17 @@
 #include <chrono>
 #include <thread>
 
+namespace rsp::graphics
+{
+
 Framebuffer::Framebuffer()
 {
-    //framebufferFile = open("/dev/fb0", O_RDWR);
-    framebufferFile = open("/dev/fb1", O_RDWR);
+    framebufferFile = open("/dev/fb0", O_RDWR);
     if (framebufferFile == -1) {
-        throw std::system_error(errno, std::generic_category(), "Failed to open framebuffer");
+        framebufferFile = open("/dev/fb1", O_RDWR);
+        if (framebufferFile == -1) {
+            throw std::system_error(errno, std::generic_category(), "Failed to open framebuffer");
+        }
     }
 
     //get fixed screen info
@@ -60,7 +65,7 @@ Framebuffer::Framebuffer()
 
     //std::cout << "Mapping framebuffer" << std::endl;
 
-    frontBuffer = static_cast<uint8_t *>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, framebufferFile, (off_t)0));
+    frontBuffer = static_cast<uint8_t*>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, framebufferFile, (off_t)0));
     if (frontBuffer == MAP_FAILED) {
         std::cout << "Mapping failed errno:" << strerror(errno) << std::endl;
     }
@@ -143,7 +148,8 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen)
             //DrawDot(Point(px, py), aPen);
             aPen.Draw(*this, Point(px, py));
         }
-    } else {
+    }
+    else {
         for (i = 0; i < absDeltaY; i++) {
             x += absDeltaX;
             if (x >= absDeltaY) {
@@ -172,9 +178,10 @@ void Framebuffer::DrawRectangle(const Rect &aRect, const Pen &aPen)
 void Framebuffer::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
 {
     int iter = 0;
-    for (size_t h = 0; h < aBitmap.mHeight; h++) {
-        for (size_t w = 0; w < aBitmap.mWidth; w++) {
-            SetPixel(Point(aLeftTop.mX + w, aLeftTop.mY + h), aBitmap.mImagePixels[iter]);
+    auto pixels = aBitmap.GetPixels();
+    for (size_t h = 0; h < aBitmap.GetHeight(); h++) {
+        for (size_t w = 0; w < aBitmap.GetWidth(); w++) {
+            SetPixel(Point(aLeftTop.mX + w, aLeftTop.mY + h), pixels[iter]);
             iter++;
         }
     }
@@ -194,7 +201,8 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
     //swap buffer
     if (vinfo.yoffset == 0) {
         vinfo.yoffset = vinfo.yres;
-    } else {
+    }
+    else {
         vinfo.yoffset = 0;
     }
     //Pan to back buffer
@@ -208,17 +216,17 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
     backBuffer = tmp;
 
     switch (aSwapOp) {
-    case SwapOperations::Copy:
-        copy();
-        break;
+        case SwapOperations::Copy:
+            copy();
+            break;
 
-    case SwapOperations::Clear:
-        clear();
-        break;
+        case SwapOperations::Clear:
+            clear();
+            break;
 
-    case SwapOperations::NoOp:
-    default:
-        break;
+        case SwapOperations::NoOp:
+        default:
+            break;
     }
 }
 
@@ -230,9 +238,10 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
     long location = (aPoint.mX + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.mY * finfo.line_length;
     //std::cout << "location:" << location << std::endl;
     if (aFront) {
-        return *((uint32_t *)(frontBuffer + location));
-    } else {
-        return *((uint32_t *)(backBuffer + location));
+        return *((uint32_t*)(frontBuffer + location));
+    }
+    else {
+        return *((uint32_t*)(backBuffer + location));
     }
 }
 
@@ -245,7 +254,7 @@ void Framebuffer::clear()
         for (x = 0; x < vinfo.xres; x++) {
             long location = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + y * finfo.line_length;
             //std::cout << "location:" << location << std::endl;
-            *((uint32_t *)(backBuffer + location)) = 0x00000000;
+            *((uint32_t*)(backBuffer + location)) = 0x00000000;
         }
     }
 }
@@ -259,7 +268,9 @@ void Framebuffer::copy()
         for (x = 0; x < vinfo.xres; x++) {
             long location = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + y * finfo.line_length;
             //std::cout << "location:" << location << std::endl;
-            *((uint32_t *)(backBuffer + location)) = *((uint32_t *)(frontBuffer + location));
+            *((uint32_t*)(backBuffer + location)) = *((uint32_t*)(frontBuffer + location));
         }
     }
+}
+
 }
