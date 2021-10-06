@@ -13,6 +13,7 @@
 #include <graphics/primitives/raster/PngLoader.h>
 #include <algorithm>
 #include <utils/RSPCoreExceptions.h>
+#include <filesystem>
 
 namespace rsp::graphics
 {
@@ -20,10 +21,12 @@ namespace rsp::graphics
 Bitmap::Bitmap(std::string aImgName)
     : mBytesPerPixel(0)
 {
-    auto &loader = GetRasterLoader(GetFileExtension(aImgName));
+    std::filesystem::path aFileName(aImgName);
+
+    auto &loader = GetRasterLoader(aFileName.extension());
 
     //Get raw data
-    mImagePixels = loader.LoadImg(aImgName);
+    mImagePixels = loader.LoadImg(aFileName);
     mHeight = loader.GetHeight();
     mWidth = loader.GetWidth();
 }
@@ -60,13 +63,6 @@ ImgLoader& Bitmap::GetRasterLoader(const std::string aFileType)
 
     static BmpLoader bmp;
     return bmp;
-}
-
-std::string Bitmap::GetFileExtension(const std::string &FileName)
-{
-    if (FileName.find_last_of(".") != std::string::npos)
-        return FileName.substr(FileName.find_last_of(".") + 1);
-    return "";
 }
 
 }

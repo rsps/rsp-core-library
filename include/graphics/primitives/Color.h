@@ -17,30 +17,6 @@
 namespace rsp::graphics {
 
 /**
- * Color value type
- */
-typedef union
-{
-    uint32_t rgba;
-#ifdef LITTLE_ENDIAN
-    struct
-    {
-        uint32_t alpha :8;
-        uint32_t blue :8;
-        uint32_t green :8;
-        uint32_t red :8;
-    };
-#else
-    struct {
-        uint32_t alpha : 8;
-        uint32_t red : 8;
-        uint32_t green : 8;
-        uint32_t blue : 8;
-    };
-#endif
-} ColorMap_t;
-
-/**
  * Color class
  *
  * A color consist of tree base colors: Red, green and blue,
@@ -51,6 +27,30 @@ typedef union
 class Color
 {
 public:
+    /**
+     * Color value type
+     */
+    typedef union
+    {
+        uint32_t rgba;
+    #ifdef LITTLE_ENDIAN
+        struct
+        {
+            uint32_t alpha :8;
+            uint32_t blue :8;
+            uint32_t green :8;
+            uint32_t red :8;
+        };
+    #else
+        struct {
+            uint32_t alpha : 8;
+            uint32_t red : 8;
+            uint32_t green : 8;
+            uint32_t blue : 8;
+        };
+    #endif
+    } ColorValue_t;
+
     /**
      * Construct with given base colors.
      *
@@ -140,7 +140,7 @@ public:
     Color& operator=(const Color &aColor);
 
 protected:
-    ColorMap_t mValue;
+    ColorValue_t mValue;
 
 };
 

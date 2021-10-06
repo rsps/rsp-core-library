@@ -163,8 +163,8 @@ TEST_CASE("Framebuffer Drawing Primitives")
         Point outSideYAxis(0, -1);
 
         //Act
-        CHECK_NOTHROW(fb.DrawDot(outSideXAxis, pen));
-        CHECK_NOTHROW(fb.DrawDot(outSideYAxis, pen));
+        CHECK_NOTHROW(pen.Draw(fb, outSideXAxis));
+        CHECK_NOTHROW(pen.Draw(fb, outSideYAxis));
 
         //Assert
         CHECK_EQ(fb.GetPixel(outSideXAxis), 0);

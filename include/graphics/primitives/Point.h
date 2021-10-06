@@ -76,10 +76,10 @@ public:
     }
 
 protected:
+    // Allow friends to access members for speed optimizations.
     friend Framebuffer;
     friend Rect;
 
-    // public members, allowed for speed optimizations.
     int mX;
     int mY;
 };

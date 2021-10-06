@@ -3,19 +3,21 @@
 
 #include <graphics/primitives/Color.h>
 
-namespace rsp::graphics {
+namespace rsp::graphics
+{
 
 class Font
 {
-  public:
+public:
+    Font(/* args */);
+    ~Font();
+
+protected:
     std::string mName;
     std::string mStyle;
     Color mColor;
     int mWeigth;
     int mSize;
-
-    Font(/* args */);
-    ~Font();
 };
 
 }

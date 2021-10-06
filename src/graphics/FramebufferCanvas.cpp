@@ -12,25 +12,30 @@
 
 #include <chrono>
 #include <thread>
+#include <fcntl.h>
+#include <linux/kd.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
 namespace rsp::graphics
 {
 
 Framebuffer::Framebuffer()
 {
-    framebufferFile = open("/dev/fb0", O_RDWR);
-    if (framebufferFile == -1) {
-        framebufferFile = open("/dev/fb1", O_RDWR);
-        if (framebufferFile == -1) {
+    mFramebufferFile = open("/dev/fb0", O_RDWR);
+    if (mFramebufferFile == -1) {
+        mFramebufferFile = open("/dev/fb1", O_RDWR);
+        if (mFramebufferFile == -1) {
             throw std::system_error(errno, std::generic_category(), "Failed to open framebuffer");
         }
     }
 
     //get fixed screen info
-    ioctl(framebufferFile, FBIOGET_VSCREENINFO, &vinfo);
+    ioctl(mFramebufferFile, FBIOGET_VSCREENINFO, &mVariableInfo);
 
     //get variable screen info
-    ioctl(framebufferFile, FBIOGET_FSCREENINFO, &finfo);
+    ioctl(mFramebufferFile, FBIOGET_FSCREENINFO, &mFixedInfo);
 
     //cout general info
 
@@ -39,9 +44,9 @@ Framebuffer::Framebuffer()
     //std::cout << "Bits per pixel:" << vinfo.bits_per_pixel << std::endl;
 
     //set yres_virtual for double buffering
-    vinfo.yres_virtual = vinfo.yres * 2;
+    mVariableInfo.yres_virtual = mVariableInfo.yres * 2;
     //    vinfo.yoffset = 0;
-    if (ioctl(framebufferFile, FBIOPUT_VSCREENINFO, &vinfo) == -1) {
+    if (ioctl(mFramebufferFile, FBIOPUT_VSCREENINFO, &mVariableInfo) == -1) {
         std::cout << "ioctl FBIOPUT_VSCREENINFO failed errno:" << strerror(errno) << std::endl;
     }
 
@@ -50,14 +55,14 @@ Framebuffer::Framebuffer()
 
     //stop the console from drawing ontop of this programs graphics
     if (access("/dev/tty0", O_RDWR) == 0) {
-        tty_fb = open("/dev/tty0", O_RDWR);
-        if (ioctl(tty_fb, KDSETMODE, KD_GRAPHICS) == -1) {
+        mTtyFb = open("/dev/tty0", O_RDWR);
+        if (ioctl(mTtyFb, KDSETMODE, KD_GRAPHICS) == -1) {
             std::cout << "ioctl KDSETMODE KD_GRAPHICS failed errno:" << strerror(errno) << std::endl;
         }
     }
 
     //calculate size of screen
-    long screensize = vinfo.yres * finfo.line_length;
+    long screensize = mVariableInfo.yres * mFixedInfo.line_length;
 
     //std::cout << "Screen size:" << screensize << std::endl;
 
@@ -65,34 +70,33 @@ Framebuffer::Framebuffer()
 
     //std::cout << "Mapping framebuffer" << std::endl;
 
-    frontBuffer = static_cast<uint8_t*>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, framebufferFile, (off_t)0));
-    if (frontBuffer == MAP_FAILED) {
+    mpFrontBuffer = static_cast<uint8_t*>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
+    if (mpFrontBuffer == reinterpret_cast<uint8_t*>(-1)) /*MAP_FAILED*/ {
         std::cout << "Mapping failed errno:" << strerror(errno) << std::endl;
     }
 
-    backBuffer = frontBuffer + screensize;
+    mpBackBuffer = mpFrontBuffer + screensize;
 
-    if (vinfo.yoffset > 0) {
-        uint8_t *tmp = frontBuffer;
-        frontBuffer = backBuffer;
-        backBuffer = tmp;
+    if (mVariableInfo.yoffset > 0) {
+        uint8_t *tmp = mpFrontBuffer;
+        mpFrontBuffer = mpBackBuffer;
+        mpBackBuffer = tmp;
     }
 }
 
 Framebuffer::~Framebuffer()
 {
     //At exit we MUST release the tty again
-    if (tty_fb > 0) {
-        if (ioctl(tty_fb, KDSETMODE, KD_TEXT) == -1) {
+    if (mTtyFb > 0) {
+        if (ioctl(mTtyFb, KDSETMODE, KD_TEXT) == -1) {
             std::cout << "ioctl KDSETMODE KD_TEXT failed errno:" << strerror(errno) << std::endl;
         }
     }
-}
-
-void Framebuffer::DrawDot(const Point &aPoint, const Pen &aPen)
-{
-    //Why are we going through this?
-    aPen.Draw(*this, aPoint);
+    // Close the handle to the framebuffer device
+    if (mFramebufferFile > 0) {
+        close(mFramebufferFile);
+    }
+    // No need to call munmap on the shared memory region, this is done automatically on termination.
 }
 
 void Framebuffer::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen)
@@ -135,7 +139,6 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen)
     px = aA.mX;
     py = aA.mY;
 
-    //DrawDot(aA, aPen);
     aPen.Draw(*this, aA);
     if (absDeltaX >= absDeltaY) {
         for (i = 0; i < absDeltaX; i++) {
@@ -145,7 +148,6 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen)
                 py += signumY;
             }
             px += signumX;
-            //DrawDot(Point(px, py), aPen);
             aPen.Draw(*this, Point(px, py));
         }
     }
@@ -157,7 +159,6 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen)
                 px += signumX;
             }
             py += signumY;
-            //DrawDot(Point(px, py), aPen);
             aPen.Draw(*this, Point(px, py));
         }
     }
@@ -196,24 +197,24 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
 {
     //std::cout << "Swapping buffer: " << vinfo.yoffset << ", " << vinfo.reserved[0] << std::endl;
 
-    vinfo.reserved[0]++;
+    mVariableInfo.reserved[0]++;
 
     //swap buffer
-    if (vinfo.yoffset == 0) {
-        vinfo.yoffset = vinfo.yres;
+    if (mVariableInfo.yoffset == 0) {
+        mVariableInfo.yoffset = mVariableInfo.yres;
     }
     else {
-        vinfo.yoffset = 0;
+        mVariableInfo.yoffset = 0;
     }
     //Pan to back buffer
-    if (ioctl(framebufferFile, FBIOPAN_DISPLAY, &vinfo) == -1) {
+    if (ioctl(mFramebufferFile, FBIOPAN_DISPLAY, &mVariableInfo) == -1) {
         std::cout << "ioctl FBIOPAN_DISPLAY failed errno:" << strerror(errno) << std::endl;
     }
 
     //update pointers
-    uint8_t *tmp = frontBuffer;
-    frontBuffer = backBuffer;
-    backBuffer = tmp;
+    uint8_t *tmp = mpFrontBuffer;
+    mpFrontBuffer = mpBackBuffer;
+    mpBackBuffer = tmp;
 
     switch (aSwapOp) {
         case SwapOperations::Copy:
@@ -235,13 +236,13 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
     if (!IsInsideScreen(aPoint)) {
         return 0;
     }
-    long location = (aPoint.mX + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + aPoint.mY * finfo.line_length;
+    long location = (aPoint.mX + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + aPoint.mY * mFixedInfo.line_length;
     //std::cout << "location:" << location << std::endl;
     if (aFront) {
-        return *((uint32_t*)(frontBuffer + location));
+        return *(reinterpret_cast<uint32_t*>(mpFrontBuffer + location));
     }
     else {
-        return *((uint32_t*)(backBuffer + location));
+        return *(reinterpret_cast<uint32_t*>(mpBackBuffer + location));
     }
 }
 
@@ -250,11 +251,11 @@ void Framebuffer::clear()
     long x, y;
     //draw to back buffer
     //    std::cout << "Clearing buffer" << std::endl;
-    for (y = 0; y < vinfo.yres; y++) {
-        for (x = 0; x < vinfo.xres; x++) {
-            long location = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + y * finfo.line_length;
+    for (y = 0; y < mVariableInfo.yres; y++) {
+        for (x = 0; x < mVariableInfo.xres; x++) {
+            long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;
             //std::cout << "location:" << location << std::endl;
-            *((uint32_t*)(backBuffer + location)) = 0x00000000;
+            *(reinterpret_cast<uint32_t*>(mpBackBuffer + location)) = 0x00000000;
         }
     }
 }
@@ -264,11 +265,11 @@ void Framebuffer::copy()
     long x, y;
     //copy front buffer to back buffer
     //    std::cout << "Copying buffer" << std::endl;
-    for (y = 0; y < vinfo.yres; y++) {
-        for (x = 0; x < vinfo.xres; x++) {
-            long location = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + y * finfo.line_length;
+    for (y = 0; y < mVariableInfo.yres; y++) {
+        for (x = 0; x < mVariableInfo.xres; x++) {
+            long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;
             //std::cout << "location:" << location << std::endl;
-            *((uint32_t*)(backBuffer + location)) = *((uint32_t*)(frontBuffer + location));
+            *(reinterpret_cast<uint32_t*>(mpBackBuffer + location)) = *(reinterpret_cast<uint32_t*>(mpFrontBuffer + location));
         }
     }
 }

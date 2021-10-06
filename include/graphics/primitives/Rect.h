@@ -170,6 +170,7 @@ public:
     bool VerifyDimensions() const;
 
 protected:
+    // Allow friends to access members for speed optimizations.
     friend Framebuffer;
 
     Point mLeftTop;
