@@ -17,10 +17,10 @@ class Bitmap
         {"bmp", new BmpLoader()},
         {"png", new PngLoader()}};
     //BMPHeader bmpHeader;             //Removed
-    uint32_t mHeight;                   //Unused --> used by canvas, needs to be set
-    uint32_t mWidth;                    //Unused --> used by canvas, needs to be set
-    uint16_t mBytesPerPixel;            //Unused
-    std::string mImgName;               //Unused
+    uint32_t mHeight;
+    uint32_t mWidth;
+    uint16_t mBytesPerPixel; //Unused
+    std::string mImgName;
     std::vector<uint32_t> mImagePixels; //Pointer?
     //ImgLoader* loader;
 

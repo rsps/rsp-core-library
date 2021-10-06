@@ -3,7 +3,6 @@
 
 #include <iostream>
 
-#include "Bitmap.h"
 #include "Colour.h"
 #include "Point.h"
 
