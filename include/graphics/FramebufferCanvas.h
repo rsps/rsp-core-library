@@ -48,7 +48,7 @@ class Framebuffer : public Canvas
 
     inline bool IsInsideScreen(const Point &aPoint) const
     {
-        return !(aPoint.mX < 0 || aPoint.mY < 0 || aPoint.mY >= mVariableInfo.yres || aPoint.mX >= mVariableInfo.xres);
+        return !(aPoint.mX < 0 || aPoint.mY < 0 || static_cast<uint32_t>(aPoint.mY) >= mVariableInfo.yres || static_cast<uint32_t>(aPoint.mX) >= mVariableInfo.xres);
     }
 
   protected:

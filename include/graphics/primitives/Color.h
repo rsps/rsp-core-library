@@ -34,20 +34,20 @@ public:
     {
         uint32_t rgba;
     #ifdef LITTLE_ENDIAN
-        struct
+        struct __item_type
         {
             uint32_t alpha :8;
             uint32_t blue :8;
             uint32_t green :8;
             uint32_t red :8;
-        };
+        } item;
     #else
-        struct {
+        struct __item_type {
             uint32_t alpha : 8;
             uint32_t red : 8;
             uint32_t green : 8;
             uint32_t blue : 8;
-        };
+        } item;
     #endif
     } ColorValue_t;
 

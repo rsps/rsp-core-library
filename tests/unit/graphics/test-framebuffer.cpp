@@ -107,13 +107,13 @@ TEST_CASE("Framebuffer Drawing Primitives")
 
         //Assert
         //Expect all four side to hold values
-        for (size_t i = 0; i <= rect.GetWidth(); i++) {
+        for (int i = 0; i <= rect.GetWidth(); i++) {
             //Check top side
             CHECK(pen.GetColor() == fb.GetPixel(Point(leftTop.GetX() + i, leftTop.GetY()), false));
             //Check bottom side
             CHECK(pen.GetColor() == fb.GetPixel(Point(leftTop.GetX() + i, rightBottom.GetY()), false));
         }
-        for (size_t i = 0; i <= rect.GetHeight(); i++) {
+        for (int i = 0; i <= rect.GetHeight(); i++) {
             //Check left side
             CHECK(pen.GetColor() == fb.GetPixel(Point(leftTop.GetX(), rightBottom.GetY() - i), false));
             //Check right side

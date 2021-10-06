@@ -124,6 +124,6 @@ TEST_CASE("Colour Operators")
         Color newColour = testCol;
 
         //Assert
-        CHECK((uint32_t)newColour == (uint32_t)testCol);
+        CHECK(static_cast<uint32_t>(newColour) == static_cast<uint32_t>(testCol));
     }
 }
