@@ -21,12 +21,11 @@ namespace rsp::graphics
 Bitmap::Bitmap(std::string aImgName)
     : mBytesPerPixel(0)
 {
-    std::filesystem::path aFileName(aImgName);
+    std::filesystem::path filename(aImgName);
 
-    auto &loader = GetRasterLoader(aFileName.extension());
-
+    auto &loader = GetRasterLoader(filename.extension());
     //Get raw data
-    mImagePixels = loader.LoadImg(aFileName);
+    mImagePixels = loader.LoadImg(filename);
     mHeight = loader.GetHeight();
     mWidth = loader.GetWidth();
 }
@@ -34,8 +33,8 @@ Bitmap::Bitmap(std::string aImgName)
 Bitmap::Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerPixel)
     : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel), mImagePixels(mWidth * mHeight)
 {
-    for(int y=0; y < mHeight ; y++) {
-        for(int x=0; x < mWidth ; x++) {
+    for (int y = 0; y < mHeight; y++) {
+        for (int x = 0; x < mWidth; x++) {
             mImagePixels[x + (y * mWidth)] = *apPixels++;
         }
     }
@@ -56,7 +55,7 @@ Bitmap::~Bitmap()
 
 ImgLoader& Bitmap::GetRasterLoader(const std::string aFileType)
 {
-    if (aFileType == "png") {
+    if (aFileType == ".png") {
         static PngLoader png;
         return png;
     }
