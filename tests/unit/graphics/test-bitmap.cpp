@@ -10,17 +10,21 @@
 
 #include <doctest.h>
 #include <graphics/primitives/Bitmap.h>
+#include <graphics/primitives/Colour.h>
 
 TEST_CASE("Bitmap file loading")
 {
     SUBCASE("Loading Bmp file")
     {
         std::string filepath = "testImages/testImage.bmp";
-        CHECK_NOTHROW(
-            Bitmap bitmap(filepath);
-            CHECK(bitmap.mImagePixels.size() > 0);
-            CHECK(bitmap.mHeight == 194);
-            CHECK(bitmap.mWidth == 259););
+        Bitmap bitmap(filepath);
+        Colour col(bitmap.mImagePixels[0]);
+
+        CHECK(col == bitmap.mImagePixels[0]);
+
+        CHECK(bitmap.mImagePixels.size() > 0);
+        CHECK(bitmap.mHeight == 194);
+        CHECK(bitmap.mWidth == 259);
     }
     SUBCASE("Loading Png file")
     {

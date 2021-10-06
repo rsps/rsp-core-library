@@ -12,6 +12,7 @@
 #include <graphics/FramebufferCanvas.h>
 
 #include <chrono>
+#include <thread>
 
 static Framebuffer fb;
 
@@ -175,16 +176,29 @@ TEST_CASE("Framebuffer Drawing Primitives")
         //Arrange
         Point topLeftPoint(100, 200);
 
-        std::string filepath = "testImages/testImageCross.bmp";
-        Bitmap bitmap(filepath);
+        std::string testImage = "testImages/testImageCross.bmp";
+        Bitmap testImgMap(testImage);
+
+        std::string noAlpha = "testImages/Asset2NoAlpha.bmp";
+        Bitmap noAlphaMap(noAlpha);
 
         //Act
-        fb.DrawImage(topLeftPoint, bitmap);
+        fb.DrawImage(topLeftPoint, testImgMap);
+
+        fb.SwapBuffer(Canvas::SwapOperations::Clear);
+
+        fb.DrawImage(Point(0, 0), noAlpha);
+
+        fb.SwapBuffer(Canvas::SwapOperations::Clear);
+
+        //10s
+        std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 
         //Assert
     }
 
-    /*SUBCASE("Swapping between two images") {
+    SUBCASE("Swapping between two images")
+    {
         //Arrange
         Point topLeftPoint(100, 200);
         Bitmap imgSimple("testImages/testImage.bmp");
@@ -194,9 +208,9 @@ TEST_CASE("Framebuffer Drawing Primitives")
         //Act
         auto begin = std::chrono::high_resolution_clock::now();
         for (size_t i = 0; i < iterations; i++) {
-            fb.DrawImage(Point(topLeftPoint.x, topLeftPoint.y - i), imgSimple);
+            fb.DrawImage(Point(topLeftPoint.mX, topLeftPoint.mY - i), imgSimple);
             fb.SwapBuffer(Canvas::SwapOperations::Clear);
-            fb.DrawImage(Point(topLeftPoint.x, topLeftPoint.y - i), imgCross);
+            fb.DrawImage(Point(topLeftPoint.mX, topLeftPoint.mY - i), imgCross);
             fb.SwapBuffer(Canvas::SwapOperations::Clear);
         }
         auto end = std::chrono::high_resolution_clock::now();
@@ -205,8 +219,8 @@ TEST_CASE("Framebuffer Drawing Primitives")
 
         //Assert
         CHECK(fps > 10);
-        std::cout << duration << "ms " << iterations << "iterations " << (1000 * iterations / duration) << "fps" << std::endl;
-    }*/
+        //std::cout << duration << "ms " << iterations << "iterations " << (1000 * iterations / duration) << "fps" << std::endl;
+    }
 
     SUBCASE("Swapbuffer")
     {
