@@ -17,11 +17,30 @@
 
 namespace rsp::logging {
 
+/**
+ * \class FileLogWriter
+ *
+ * \brief A file based log writer
+ */
 class FileLogWriter : public LogWriterInterface {
 public:
+    /**
+     * Construct a log writer with accept level given as text.
+     *
+     * \param aFileName
+     * \param aAcceptLevel
+     */
     FileLogWriter(std::string aFileName, std::string aAcceptLevel);
+
+    /**
+     * Construct a log writer with accept level given as LogLevel type.
+     *
+     * \param aFileName
+     * \param aAcceptLevel
+     */
     FileLogWriter(std::string aFileName, LogLevel aAcceptLevel);
     ~FileLogWriter() override;
+
 
     void Write(const std::string &arMsg, LogLevel aCurrentLevel) override;
 

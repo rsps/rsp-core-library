@@ -15,6 +15,8 @@
 #include <utils/RSPCoreExceptions.h>
 #include <filesystem>
 
+using namespace rsp::utils;
+
 namespace rsp::graphics
 {
 

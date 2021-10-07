@@ -16,6 +16,10 @@
 
 namespace rsp::logging {
 
+/**
+ * \class ConsoleLogStreamInterface
+ * \brief Helper interface for console streams.
+ */
 class ConsoleLogStreamsInterface
 {
 public:
@@ -26,6 +30,12 @@ public:
 };
 
 
+/**
+ * \class ConsoleLogWriter
+ * \brief A log writer for console output.
+ *
+ * The writer supports ANSI terminal colors.
+ */
 class ConsoleLogWriter: public LogWriterInterface {
 public:
 	using ConsoleColors_t = std::array<const std::string, static_cast<int>(LogLevel::Debug)+1>;

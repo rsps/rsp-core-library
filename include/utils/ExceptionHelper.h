@@ -17,7 +17,7 @@
 #include <sstream>
 #include <type_traits>
 
-namespace rsp {
+namespace rsp::utils {
 
 /**
  * @see https://stackoverflow.com/questions/16945787/how-is-it-possible-to-overload-the-throw-function-while-writing-a-custom-excepti
@@ -58,10 +58,10 @@ public:
     };
 };
 
-#define THROW_WITH_BACKTRACE(EXCEPTION) throw rsp::backtraced_exception< EXCEPTION >(__FILE__, __LINE__)
-#define THROW_WITH_BACKTRACE1(EXCEPTION, ARG1) throw rsp::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1)
-#define THROW_WITH_BACKTRACE2(EXCEPTION, ARG1, ARG2) throw rsp::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2)
-#define THROW_WITH_BACKTRACE3(EXCEPTION, ARG1, ARG2, ARG3) throw rsp::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2, ARG3)
+#define THROW_WITH_BACKTRACE(EXCEPTION) throw rsp::utils::backtraced_exception< EXCEPTION >(__FILE__, __LINE__)
+#define THROW_WITH_BACKTRACE1(EXCEPTION, ARG1) throw rsp::utils::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1)
+#define THROW_WITH_BACKTRACE2(EXCEPTION, ARG1, ARG2) throw rsp::utils::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2)
+#define THROW_WITH_BACKTRACE3(EXCEPTION, ARG1, ARG2, ARG3) throw rsp::utils::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2, ARG3)
 
 // The CATCH macro does not work in all cases.
 //#define CATCH_WITH_BACKTRACE(EXCEPTION, EXCEPT_NAME) catch(const rsp::backtraced_exception< EXCEPTION >& EXCEPT_NAME)

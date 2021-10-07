@@ -101,7 +101,7 @@ Framebuffer::~Framebuffer()
 
 void Framebuffer::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen)
 {
-    throw NotImplementedException("");
+    throw rsp::utils::NotImplementedException("");
 }
 
 void Framebuffer::DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen)
@@ -190,7 +190,7 @@ void Framebuffer::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
 
 void Framebuffer::DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit)
 {
-    throw NotImplementedException("Draw Text is not yet implemented");
+    throw rsp::utils::NotImplementedException("Draw Text is not yet implemented");
 }
 
 void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)

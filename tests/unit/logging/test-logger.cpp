@@ -18,6 +18,7 @@
 #include <utils/AnsiEscapeCodes.h>
 
 using namespace rsp;
+using namespace rsp::utils;
 using namespace rsp::logging;
 
 const char *cFileName = "__logger-test.log";

@@ -6,12 +6,13 @@
  */
 
 #include <doctest.h>
+#include <posix/FileSystem.h>
 #include <string>
 #include <fstream>
 #include <utils/StrUtils.h>
-#include <filesystem/FileSystem.h>
 
-using namespace rsp;
+using namespace rsp::posix;
+using namespace rsp::utils;
 
 TEST_CASE("Testing FileSystem") {
 

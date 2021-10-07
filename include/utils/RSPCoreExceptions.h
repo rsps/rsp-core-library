@@ -15,6 +15,9 @@
 #include <stdexcept>
 #include <system_error>
 
+namespace rsp::utils
+{
+
 class RSPCoreException : public std::runtime_error
 {
   public:
@@ -54,10 +57,12 @@ class AssertException : public RSPCoreException
 #ifndef NDEBUG
 #define ASSERT(a)                  \
     if (a) {                       \
-        throw AssertException(#a); \
+        throw rsp::utils::AssertException(#a); \
     }
 #else
 #define ASSERT(a)
 #endif
+
+}
 
 #endif // RSPCOREEXCEPTIONS_H

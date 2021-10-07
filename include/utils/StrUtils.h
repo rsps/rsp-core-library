@@ -17,7 +17,7 @@
 #include <vector>
 #include <chrono>
 
-namespace rsp::StrUtils {
+namespace rsp::utils::StrUtils {
 
 /**
  * Split a string by given delimiter

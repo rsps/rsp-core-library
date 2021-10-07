@@ -13,6 +13,8 @@
 #include <utils/AnsiEscapeCodes.h>
 #include <logging/ConsoleLogWriter.h>
 
+using namespace rsp::utils;
+
 namespace rsp::logging {
 
 class DefaultConsoleStream : public ConsoleLogStreamsInterface

@@ -14,6 +14,8 @@
 #include <cerrno>
 #include <iomanip>
 
+using namespace rsp::utils;
+
 namespace rsp::graphics
 {
 

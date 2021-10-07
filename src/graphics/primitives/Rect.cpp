@@ -11,6 +11,8 @@
 #include <graphics/primitives/Rect.h>
 #include <utils/RSPCoreExceptions.h>
 
+using namespace rsp::utils;
+
 namespace rsp::graphics
 {
 

@@ -16,7 +16,7 @@
 #include <sstream>
 #include <fstream>
 
-namespace rsp::filesystem
+namespace rsp::posix
 {
 
 /**
@@ -57,7 +57,10 @@ public:
      *
      * \return True if file is open.
      */
-    bool IsOpen() { return (mHandle >= 0); }
+    bool IsOpen()
+    {
+        return (mHandle >= 0);
+    }
 
     /**
      * Move the cursor to the given position.
@@ -99,7 +102,6 @@ public:
      */
     void PutLine(const std::string &aData); // Write a string to the file
 
-
     /**
      * Read all file contents into a string.
      *
@@ -120,7 +122,10 @@ public:
      *
      * \return
      */
-    int GetHandle() { return mHandle; }
+    int GetHandle()
+    {
+        return mHandle;
+    }
 
     /**
      * Get the size of the current file.

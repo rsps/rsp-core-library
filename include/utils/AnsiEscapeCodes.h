@@ -12,15 +12,21 @@
 #define SRC_UTILS_ANSIESCAPECODES_H_
 
 /**
- * @see https://en.wikipedia.org/wiki/ANSI_escape_code
- * @see http://ascii-table.com/ansi-escape-sequences-vt-100.php
- * @see https://stackoverflow.com/a/13805058
+ * \namespace AnsiEscapeCodes
+ * \brief Namespace for ANSI escape codes
+ *
+ * \see https://en.wikipedia.org/wiki/ANSI_escape_code
+ * \see http://ascii-table.com/ansi-escape-sequences-vt-100.php
+ * \see https://stackoverflow.com/a/13805058
  */
-
-namespace rsp::AnsiEscapeCodes {
+namespace rsp::utils::AnsiEscapeCodes {
 
 typedef const char * EscString;
 
+/**
+ * \class ec
+ * \brief Helper class with some predefined ANSI escape codes
+ */
 class ec // Escape Codes
 {
 public:

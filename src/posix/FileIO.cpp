@@ -15,11 +15,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <poll.h>
+#include <posix/FileIO.h>
 
 #include <utils/ExceptionHelper.h>
-#include <filesystem/FileIO.h>
 
-namespace rsp::filesystem
+namespace rsp::posix
 {
 
 //const std::ios_base::openmode FileIO::cNonBlock = (std::ios_base::openmode)((int)std::_Ios_Openmode::_S_ios_openmode_end + 1);
@@ -154,8 +154,7 @@ void FileIO::PutLine(const std::string &aData)
         std::size_t count = Write(p + offset, remaining);
         remaining -= count;
         offset += count;
-    }
-    while (remaining > 0);
+    } while (remaining > 0);
 }
 
 std::size_t FileIO::GetSize()
@@ -203,7 +202,7 @@ std::string FileIO::GetContents()
     char buf[1024];
     std::size_t rlen;
 
-    while ( (rlen = Read(buf, 1024)) > 0) {
+    while ((rlen = Read(buf, 1024)) > 0) {
         ss.write(buf, rlen);
     }
 

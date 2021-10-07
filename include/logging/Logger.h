@@ -43,6 +43,14 @@ namespace rsp::logging {
 class LogStreamInterface;
 class LogStream;
 
+/**
+ * \class Abstract LoggerInterface
+ *
+ * \brief This is the interface for logging functionality.
+ *
+ * The logging design is a public logger interface with multiple writers attached to it.
+ * A writer can be limited in which log level should trigger its output.
+ */
 class LoggerInterface
 {
 public:
@@ -72,7 +80,15 @@ protected:
     virtual void write(const LogStreamInterface *apStream, const std::string &arMsg);
 };
 
-
+/**
+ * \class LogStreamInterface
+ *
+ * \brief This is the base class for log streams.
+ *
+ * LogStreams are used as temporary objects, holding logged information together until
+ * flushed or destroyed.
+ * It ensures thread safe write of the log data.
+ */
 class LogStreamInterface
 {
 public:
@@ -90,6 +106,11 @@ protected:
     void ownerWrite(const std::string &arMsg);
 };
 
+/**
+ * \class LogStream
+ *
+ * \brief A templated LogStream implementation
+ */
 class LogStream : public LogStreamInterface
 {
 public:
@@ -115,6 +136,11 @@ protected:
     std::stringstream mBuffer;
 };
 
+/**
+ * \class OutStreamBuf
+ *
+ * \brief An ostreambuf implementation allowing for std::ostream operations.
+ */
 class OutStreamBuf : public std::streambuf, public LogStreamInterface
 {
 public:
@@ -133,6 +159,11 @@ protected:
 std::ostream& operator<< (std::ostream& os, LogLevel aLevel);
 
 
+/**
+ * \class Logger
+ *
+ * \brief The default application logging instance type.
+ */
 class Logger : public LoggerInterface
 {
 public:

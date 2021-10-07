@@ -15,6 +15,10 @@
 
 namespace rsp::logging {
 
+/**
+ * \class SysLogWriter
+ * \brief A log writer that sends output to a syslog server.
+ */
 class SysLogWriter: public LogWriterInterface {
 public:
     SysLogWriter(std::string aIdent, LogType aType);

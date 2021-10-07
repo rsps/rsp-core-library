@@ -10,7 +10,7 @@
 
 #include <utils/Crc32.h>
 
-namespace rsp {
+namespace rsp::utils {
 
 
 std::uint32_t* Crc32::getTable()

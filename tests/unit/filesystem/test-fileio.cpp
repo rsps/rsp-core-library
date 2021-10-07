@@ -8,11 +8,11 @@
  * \author      Steffen Brummer
  */
 
-#include <filesystem/FileIO.h>
 #include <doctest.h>
+#include <posix/FileIO.h>
 #include <unistd.h>
 
-using namespace rsp::filesystem;
+using namespace rsp::posix;
 
 TEST_CASE("File IO") {
     const std::string cFileName = "temp.txt";

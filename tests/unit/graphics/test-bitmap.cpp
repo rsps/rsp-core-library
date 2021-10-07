@@ -12,6 +12,7 @@
 #include <graphics/primitives/Bitmap.h>
 #include <utils/RSPCoreExceptions.h>
 
+using namespace rsp::utils;
 using namespace rsp::graphics;
 
 TEST_CASE("Bitmap file loading")

@@ -15,6 +15,8 @@
 #include <utils/StrUtils.h>
 #include <logging/FileLogWriter.h>
 
+using namespace rsp::utils;
+
 namespace rsp::logging {
 
 FileLogWriter::FileLogWriter(std::string aFileName, std::string aAcceptLevel)

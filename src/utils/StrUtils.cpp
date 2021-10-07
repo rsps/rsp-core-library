@@ -21,7 +21,7 @@
 #include <utils/StrUtils.h>
 #include <utils/clock_cast.h>
 
-namespace rsp::StrUtils {
+namespace rsp::utils::StrUtils {
 
 size_t Split(const std::string &arTxt, std::vector<std::string> &aList, char aDelimiter, bool aKeepEmpty)
 {
@@ -217,7 +217,7 @@ std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats a
 
 std::string TimeStamp(std::chrono::steady_clock::time_point aTime, TimeFormats aFormat)
 {
-    return TimeStamp(rsp::clock_cast<std::chrono::system_clock::time_point>(aTime), aFormat);
+    return TimeStamp(rsp::utils::clock_cast<std::chrono::system_clock::time_point>(aTime), aFormat);
 }
 
 std::string TimeStamp(std::chrono:: milliseconds aMilliSeconds, TimeFormats aFormat)

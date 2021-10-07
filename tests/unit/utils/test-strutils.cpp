@@ -8,7 +8,7 @@
 #include <doctest.h>
 #include <utils/StrUtils.h>
 
-using namespace rsp;
+using namespace rsp::utils;
 
 TEST_CASE("Testing StrUtils") {
 

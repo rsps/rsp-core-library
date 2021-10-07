@@ -11,7 +11,7 @@
 #include <cstdio>
 #include <utils/AnsiEscapeCodes.h>
 
-namespace rsp::AnsiEscapeCodes {
+namespace rsp::utils::AnsiEscapeCodes {
 
 #define CC_CONSOLE_COLOR_DEFAULT "\033[0m"
 #define CC_FGCOLOR(C) "\033[" #C "m"

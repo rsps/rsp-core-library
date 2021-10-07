@@ -14,7 +14,7 @@
 #include <cstdint>
 #include <stdexcept>
 
-namespace rsp {
+namespace rsp::utils {
 
 
 class ECrcError : public std::runtime_error {

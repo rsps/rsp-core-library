@@ -16,6 +16,7 @@
 #include <arpa/inet.h>
 #include <linux/limits.h>
 #include <fts.h>
+#include <posix/FileSystem.h>
 #include <pthread.h>
 #include <sys/resource.h>
 #include <system_error>
@@ -26,38 +27,45 @@
 #include <iostream>
 #include <cstring>
 
-#include <filesystem/FileSystem.h>
 #include <utils/ExceptionHelper.h>
 
-
-namespace rsp::FileSystem {
+namespace rsp::posix::FileSystem
+{
 
 bool DirectoryExists(const std::string aPath)
 {
     struct stat info;
 
-    int statRC = stat( aPath.c_str(), &info );
-    if( statRC != 0 ) {
-        if (errno == ENOENT)  { return false; } // something along the path does not exist
-        if (errno == ENOTDIR) { return false; } // something in path prefix is not a dir
+    int statRC = stat(aPath.c_str(), &info);
+    if (statRC != 0) {
+        if (errno == ENOENT) {
+            return false;
+        } // something along the path does not exist
+        if (errno == ENOTDIR) {
+            return false;
+        } // something in path prefix is not a dir
         return false;
     }
 
-    return ( info.st_mode & S_IFDIR ) ? true : false;
+    return (info.st_mode & S_IFDIR) ? true : false;
 }
 
 bool FileExists(const std::string aPath)
 {
     struct stat info;
 
-    int statRC = stat( aPath.c_str(), &info );
-    if( statRC != 0 ) {
-        if (errno == ENOENT)  { return false; } // something along the path does not exist
-        if (errno == ENOTDIR) { return false; } // something in path prefix is not a dir
+    int statRC = stat(aPath.c_str(), &info);
+    if (statRC != 0) {
+        if (errno == ENOENT) {
+            return false;
+        } // something along the path does not exist
+        if (errno == ENOTDIR) {
+            return false;
+        } // something in path prefix is not a dir
         return false;
     }
 
-    return ( info.st_mode & (S_IFCHR  | S_IFBLK | S_IFREG) ) ? true : false;
+    return (info.st_mode & (S_IFCHR | S_IFBLK | S_IFREG)) ? true : false;
 }
 
 void DeleteFile(const std::string &arFileName)
@@ -75,7 +83,7 @@ void RecursiveDeleteDir(const std::string aDir)
     // Cast needed (in C) because fts_open() takes a "char * const *", instead
     // of a "const char * const *", which is only allowed in C++. fts_open()
     // does not modify the argument.
-    char *files[] = { const_cast<char *>(aDir.c_str()), nullptr };
+    char *files[] = { const_cast<char*>(aDir.c_str()), nullptr };
 
     // FTS_NOCHDIR  - Avoid changing cwd, which could cause unexpected behavior
     //                in multithreaded programs
@@ -84,43 +92,43 @@ void RecursiveDeleteDir(const std::string aDir)
     // FTS_XDEV     - Don't cross filesystem boundaries
     ftsp = fts_open(files, FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV, nullptr);
     if (!ftsp) {
-         THROW_SYSTEM("FileSystem - fts_open failed: " + aDir);
+        THROW_SYSTEM("FileSystem - fts_open failed: " + aDir);
     }
 
     while ((curr = fts_read(ftsp))) {
         switch (curr->fts_info) {
-        case FTS_NS:
-        case FTS_DNR:
-        case FTS_ERR:
-            if (curr->fts_errno == ENOENT) {
-                break; // Ignore "No such file or directory", dir does not exist, so nothing to delete.
-            }
-            THROW_SYSTEM("FileSystem - fts_read error: " + std::string(curr->fts_accpath));
-            break;
+            case FTS_NS:
+            case FTS_DNR:
+            case FTS_ERR:
+                if (curr->fts_errno == ENOENT) {
+                    break; // Ignore "No such file or directory", dir does not exist, so nothing to delete.
+                }
+                THROW_SYSTEM("FileSystem - fts_read error: " + std::string(curr->fts_accpath));
+                break;
 
-        case FTS_DC:
-        case FTS_DOT:
-        case FTS_NSOK:
-            // Not reached unless FTS_LOGICAL, FTS_SEEDOT, or FTS_NOSTAT were
-            // passed to fts_open()
-            break;
+            case FTS_DC:
+            case FTS_DOT:
+            case FTS_NSOK:
+                // Not reached unless FTS_LOGICAL, FTS_SEEDOT, or FTS_NOSTAT were
+                // passed to fts_open()
+                break;
 
-        case FTS_D:
-            // Do nothing. Need depth-first search, so directories are deleted
-            // in FTS_DP
-            break;
+            case FTS_D:
+                // Do nothing. Need depth-first search, so directories are deleted
+                // in FTS_DP
+                break;
 
-        case FTS_DP:
-        case FTS_F:
-        case FTS_SL:
-        case FTS_SLNONE:
-        case FTS_DEFAULT:
-            if (remove(curr->fts_accpath) < 0) {
-                THROW_SYSTEM("FileSystem - remove error: " + std::string(curr->fts_accpath));
-            }
-            break;
-        default:
-            break;
+            case FTS_DP:
+            case FTS_F:
+            case FTS_SL:
+            case FTS_SLNONE:
+            case FTS_DEFAULT:
+                if (remove(curr->fts_accpath) < 0) {
+                    THROW_SYSTEM("FileSystem - remove error: " + std::string(curr->fts_accpath));
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -137,10 +145,10 @@ void MakeDirectory(const std::string aDir)
     char *p = nullptr;
     size_t len = work.length();
 
-    if(tmp[len - 1] == '/')
-            tmp[len - 1] = 0;
-    for(p = tmp + 1; *p; p++) {
-        if(*p == '/') {
+    if (tmp[len - 1] == '/')
+        tmp[len - 1] = 0;
+    for (p = tmp + 1; *p; p++) {
+        if (*p == '/') {
             *p = 0;
             if ((mkdir(tmp, 0755) != 0) && (errno != EEXIST)) {
                 THROW_SYSTEM("DeviceScanner - Could not create directory: " + aDir);
@@ -195,7 +203,7 @@ std::string GetCurrentIpAddress()
         THROW_SYSTEM("FileSystem - Could not create socket");
     }
 
-    const char* kExternalIp = "1.1.1.1";
+    const char *kExternalIp = "1.1.1.1";
     uint16_t kDnsPort = 53;
     struct sockaddr_in serv;
 
@@ -217,7 +225,7 @@ std::string GetCurrentIpAddress()
     }
 
     char buffer[17];
-    const char* p = inet_ntop(AF_INET, &name.sin_addr, buffer, sizeof(buffer)-1);
+    const char *p = inet_ntop(AF_INET, &name.sin_addr, buffer, sizeof(buffer) - 1);
     buffer[16] = 0;
 
     close(sock);
@@ -247,15 +255,15 @@ int ExecuteCommand(const std::string &arCommand, std::string *apStdOut, std::str
 
     if (apStdOut) {
         std::ifstream out(tmp_name + ".txt");
-        std::string ret{ std::istreambuf_iterator<char>(out), std::istreambuf_iterator<char>() };
+        std::string ret { std::istreambuf_iterator<char>(out), std::istreambuf_iterator<char>() };
         out.close(); // close the file so it can be deleted
         *apStdOut = ret;
     }
     DeleteFile(tmp_name + ".txt");
 
-    if(apStdErrOut) {
+    if (apStdErrOut) {
         std::ifstream err(tmp_name + ".err");
-        std::string ret{ std::istreambuf_iterator<char>(err), std::istreambuf_iterator<char>() };
+        std::string ret { std::istreambuf_iterator<char>(err), std::istreambuf_iterator<char>() };
         err.close(); // close the file so it can be deleted
         *apStdErrOut = ret;
     }
@@ -264,9 +272,6 @@ int ExecuteCommand(const std::string &arCommand, std::string *apStdOut, std::str
     return result;
 }
 
-/**
- * Function to retrieve a unique id of the lastest resume
- */
 std::string GetLastResumeId()
 {
     std::string out;
@@ -321,7 +326,6 @@ void SetThreadPriority(std::thread &arThread, unsigned int aPriority)
         THROW_WITH_BACKTRACE1(std::runtime_error, ss.str());
     }
 }
-
 
 } // namespace FileSystem
 

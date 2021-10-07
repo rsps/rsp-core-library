@@ -20,7 +20,7 @@
 #include <chrono>
 #include <cassert>
 
-namespace rsp
+namespace rsp::utils
 {
 
 namespace detail
