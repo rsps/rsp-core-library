@@ -77,6 +77,7 @@ std::string GetLastResumeId();
  * \param aPriority Thread priority 1-99, Higher priority preempts lower
  */
 void SetThreadPriority(std::thread &arThread, unsigned int aPriority);
-};
+
+}
 
 #endif /* SRC_UTILS_FILESYSTEM_H_ */

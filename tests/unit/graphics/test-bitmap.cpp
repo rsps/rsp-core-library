@@ -8,13 +8,26 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/primitives/Bitmap.h>
 #include <doctest.h>
+#include <graphics/primitives/Bitmap.h>
+#include <utils/RSPCoreExceptions.h>
 
-/*TEST_CASE("Bitmap file") {
-    std::string filepath = "testImages/testImage.bmp";
-    Bitmap bitmap(filepath);
+using namespace rsp::graphics;
 
-    CHECK(bitmap.height == 194);
-    CHECK(bitmap.width == 259);
-}*/
+TEST_CASE("Bitmap file loading")
+{
+    SUBCASE("Loading Bmp file")
+    {
+        std::string filepath = "testImages/testImage.bmp";
+        CHECK_NOTHROW(
+            Bitmap bitmap(filepath);
+            CHECK(bitmap.GetPixels().size() > 0);
+            CHECK(bitmap.GetHeight() == 194);
+            CHECK(bitmap.GetWidth() == 259););
+    }
+    SUBCASE("Loading Png file")
+    {
+        std::string filepath = "testImages/testImage.png";
+        CHECK_THROWS_AS(Bitmap bitmap(filepath), const NotImplementedException &);
+    }
+}

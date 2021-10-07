@@ -3,6 +3,7 @@ target_sources("rsp-core-lib"
     PRIVATE 
         version.cpp
         ${SRC_FILES}
+        #${UTIL_FILES}
         #filesystem/file1.cpp
         #graphics/objects/Rect.cpp
         #graphics/objects/Point.cpp

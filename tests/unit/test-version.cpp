@@ -11,11 +11,9 @@
 #include <doctest.h>
 #include <version.h>
 
-TEST_CASE("Testing Version String") {
+TEST_CASE("Testing Version String")
+{
 
     CHECK(rsp::get_library_version() == std::string("0.1.0"));
     CHECK(rsp::get_library_version() != std::string("2.1.7"));
 }
-
-
-
