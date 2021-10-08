@@ -1,10 +1,9 @@
-file(GLOB_RECURSE GRPH_FILES graphics/*.cpp)
-file(GLOB_RECURSE UTIL_FILES utils/*.cpp)
+file(GLOB_RECURSE SRC_FILES graphics/*.cpp posix/*.cpp logging/*.cpp utils/*.cpp)
 target_sources("rsp-core-lib" 
     PRIVATE 
         version.cpp
-        ${GRPH_FILES}
-        ${UTIL_FILES}
+        ${SRC_FILES}
+        #${UTIL_FILES}
         #filesystem/file1.cpp
         #graphics/objects/Rect.cpp
         #graphics/objects/Point.cpp

@@ -8,11 +8,17 @@
  * \author      Simon Glashoff
  */
 
-#include <utils/PngLoader.h>
+#include <graphics/primitives/raster/PngLoader.h>
 #include <utils/RSPCoreExceptions.h>
 
 #include <cerrno>
 #include <iomanip>
+
+using namespace rsp::utils;
+
+namespace rsp::graphics
+{
+
 
 std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
 {
@@ -159,3 +165,6 @@ void PngLoader::ReadHeader(FILE *file)
 void PngLoader::ReadData(FILE *file)
 {
 }
+
+}
+

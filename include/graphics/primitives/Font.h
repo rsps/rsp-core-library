@@ -1,19 +1,25 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "Colour.h"
+#include <graphics/primitives/Color.h>
+
+namespace rsp::graphics
+{
 
 class Font
 {
-  public:
-    std::string mName;
-    std::string mStyle;
-    Colour mColour;
-    int mWeigth;
-    int mSize;
-
+public:
     Font(/* args */);
     ~Font();
+
+protected:
+    std::string mName;
+    std::string mStyle;
+    Color mColor;
+    int mWeigth;
+    int mSize;
 };
+
+}
 
 #endif //FONT_H

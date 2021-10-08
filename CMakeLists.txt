@@ -13,13 +13,13 @@ set (LIB_VERSION_PATCH 0)
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
-  "${PROJECT_SOURCE_DIR}/version-def.h.in"
-  "${PROJECT_BINARY_DIR}/src/version-def.h"
-  )
+    "${PROJECT_SOURCE_DIR}/version-def.h.in"
+    "${PROJECT_BINARY_DIR}/src/version-def.h"
+)
 
-#set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
-#set (THREADS_PREFER_PTHREAD_FLAG TRUE)
-#find_package(Threads REQUIRED)
+set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set (THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(Threads REQUIRED)
 
 set (CMAKE_CXX_STANDARD 20)
 
@@ -31,7 +31,6 @@ include(GNUInstallDirs)
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 
 add_library("rsp-core-lib" STATIC)
-add_subdirectory(src)
 
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
@@ -39,14 +38,14 @@ add_subdirectory(src)
 target_include_directories(rsp-core-lib
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/graphics>
-#        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/graphics/primitives>
-#        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/graphics/controls>
         $<INSTALL_INTERFACE:include>
     PRIVATE
         src
         ${CMAKE_CURRENT_BINARY_DIR}/src
 )
+add_compile_options(-Wall -Wextra -Wold-style-cast -pedantic -Werror)
+
+add_subdirectory(src)
 
 
 #--------------------------------------------------------
@@ -92,7 +91,7 @@ target_include_directories("rsp-core-lib-test"
 
 target_link_libraries ("rsp-core-lib-test"
     rsp-core-lib
-    #Threads::Threads
+    Threads::Threads
 )
 
 add_test("tests" "rsp-core-lib-test")

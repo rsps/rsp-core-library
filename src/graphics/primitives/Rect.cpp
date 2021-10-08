@@ -11,6 +11,12 @@
 #include <graphics/primitives/Rect.h>
 #include <utils/RSPCoreExceptions.h>
 
+using namespace rsp::utils;
+
+namespace rsp::graphics
+{
+
+
 Rect::Rect(int aLeft, int aTop, int aWidth, int aHeight)
     : mLeftTop(aLeft, aTop), mRightBottom(aLeft + aWidth, aTop + aHeight)
 {
@@ -35,7 +41,7 @@ Rect::Rect(const Rect &aRect)
     VerifyDimensions();
 }
 
-int Rect::GetTop()
+int Rect::GetTop() const
 {
     return mLeftTop.mY;
 }
@@ -46,7 +52,7 @@ void Rect::SetTop(int aTopValue)
     mLeftTop.mY = aTopValue;
 }
 
-int Rect::GetBottom()
+int Rect::GetBottom() const
 {
     return mRightBottom.mY;
 }
@@ -57,7 +63,7 @@ void Rect::SetBottom(int aBotValue)
     mRightBottom.mY = aBotValue;
 }
 
-int Rect::GetLeft()
+int Rect::GetLeft() const
 {
     return mLeftTop.mX;
 }
@@ -68,7 +74,7 @@ void Rect::SetLeft(int aLeftValue)
     mLeftTop.mX = aLeftValue;
 }
 
-int Rect::GetRight()
+int Rect::GetRight() const
 {
     return mRightBottom.mX;
 }
@@ -79,7 +85,7 @@ void Rect::SetRight(int aRightValue)
     mRightBottom.mX = aRightValue;
 }
 
-int Rect::GetWidth()
+int Rect::GetWidth() const
 {
     return mRightBottom.mX - mLeftTop.mX;
 }
@@ -90,7 +96,7 @@ void Rect::SetWidth(int aWidth)
     mRightBottom.mX = mLeftTop.mX + aWidth;
 }
 
-int Rect::GetHeight()
+int Rect::GetHeight() const
 {
     return mRightBottom.mY - mLeftTop.mY;
 }
@@ -101,17 +107,19 @@ void Rect::SetHeight(int aHeight)
     mRightBottom.mY = mLeftTop.mY + aHeight;
 }
 
-bool Rect::IsHit(const Point &aPoint)
+bool Rect::IsHit(const Point &aPoint) const
 {
     throw NotImplementedException("IsHit is not yet implemeted");
 
     return false;
 }
 
-bool Rect::VerifyDimensions()
+bool Rect::VerifyDimensions() const
 {
     ASSERT(GetWidth() < 0);
     ASSERT(GetHeight() < 0);
 
     return false;
+}
+
 }

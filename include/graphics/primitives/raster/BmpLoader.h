@@ -1,15 +1,21 @@
 #ifndef BMPLOADER_H
 #define BMPLOADER_H
 
-#include <utils/ImgLoader.h>
-
 #include <cstring>
+#include <fstream>
+#include <graphics/primitives/raster/ImgLoader.h>
 #include <iostream>
 #include <vector>
+
+namespace rsp::graphics
+{
 
 class BmpLoader : public ImgLoader
 {
   public:
+    std::vector<uint32_t> LoadImg(const std::string &aImgName);
+
+  protected:
     struct BMPHeader {
         uint16_t signature;
         uint32_t fileSize;
@@ -27,12 +33,12 @@ class BmpLoader : public ImgLoader
         uint32_t coloursUsed;
         uint32_t importantColours;
     } __attribute__((packed)) bmpHeader; //To stop alignment
-    uint16_t bytesPerPixel;
+    uint16_t mBytesPerPixel;
 
-    std::vector<uint32_t> LoadImg(const std::string &aImgName);
-    void ReadHeader(FILE *file);
-    void ReadData(FILE *file);
+    void ReadHeader(std::ifstream &arFile);
+    void ReadData(std::ifstream &arFile);
     uint32_t ReadPixel(const std::vector<uint8_t> &aPixelRow, const size_t &aRowPtr);
 };
 
+} // namespace rsp::graphics
 #endif //BMPLOADER_H

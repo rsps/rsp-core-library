@@ -14,6 +14,9 @@
 
 #include <iostream>
 
+using namespace rsp::utils;
+using namespace rsp::graphics;
+
 int left = 100;
 int top = 50;
 int width = 400;

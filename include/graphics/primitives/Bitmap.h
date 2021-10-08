@@ -1,38 +1,90 @@
 #ifndef BITMAP_H
 #define BITMAP_H
 
-#include <utils/BmpLoader.h>
-#include <utils/PngLoader.h>
-#include <utils/RSPCoreExceptions.h>
+#include <graphics/primitives/raster/ImgLoader.h>
 
-#include <cstring>
-#include <iostream>
-#include <map>
+#include <string>
 #include <vector>
 
+namespace rsp::graphics
+{
+
+/**
+ * Class Bitmap
+ *
+ * The Bitmap is an object wrapper around raster images.
+ * Various raster image formats can be implemented by descending specialized loaders
+ * from the ImgLoader class and adding those to the GetRasterLoader method.
+ */
 class Bitmap
 {
-  public:
-    std::map<std::string, ImgLoader *> filetypeMap = {
-        {"bmp", new BmpLoader()},
-        {"png", new PngLoader()}};
-    //BMPHeader bmpHeader;             //Removed
-    uint32_t mHeight;
-    uint32_t mWidth;
-    uint16_t mBytesPerPixel; //Unused
-    std::string mImgName;
-    std::vector<uint32_t> mImagePixels; //Pointer?
-    //ImgLoader* loader;
-
-    Bitmap();
+public:
+    /**
+     * Load bitmap from given file.
+     *
+     * \param aImgName
+     */
     Bitmap(std::string aImgName);
+
+    /**
+     * Create a bitmap of given pixel data
+     *
+     * \param apPixels
+     * \param aHeight
+     * \param aWidth
+     * \param aBytesPerPixel
+     */
     Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerPixel);
+
+    /**
+     * Create an empty in memory bitmap
+     *
+     * \param aHeight
+     * \param aWidth
+     * \param aBytesPerPixel
+     */
     Bitmap(int aHeight, int aWidth, int aBytesPerPixel);
+
+    /**
+     * Why?
+     */
     ~Bitmap();
 
-    std::string GetFileExtension(const std::string &FileName);
+    /**
+     * Get the height of the bitmap.
+     *
+     * \return uint32_t
+     */
+    uint32_t GetHeight() const {
+        return mHeight;
+    }
 
-    //Ask and return colour type on pixel
+    /**
+     * Get the width of the bitmap.
+     *
+     * \return uint32_t
+     */
+    uint32_t GetWidth() const {
+        return mWidth;
+    }
+
+    /**
+     * Get a read only reference to the pixel data.
+     *
+     * \return const std::vector<uint32_t>&
+     */
+    const std::vector<uint32_t>& GetPixels() const {
+        return mImagePixels;
+    }
+
+protected:
+    ImgLoader& GetRasterLoader(const std::string aFileExtension);
+
+    uint32_t mHeight;                   //Unused --> used by canvas, needs to be set
+    uint32_t mWidth;                    //Unused --> used by canvas, needs to be set
+    uint16_t mBytesPerPixel;            //Unused
+    std::vector<uint32_t> mImagePixels; //Pointer?
 };
 
+}
 #endif //BITMAP_H

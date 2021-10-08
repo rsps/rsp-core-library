@@ -12,9 +12,6 @@ _deps
 /ext-libs/*
 !/ext-libs/.gitkeep
 
-# Eclipse project files
-.project
-.cproject
 /build/
 !build/.gitkeep
 
@@ -29,3 +26,8 @@ _deps
 
 # Local History for Visual Studio Code
 .history/
+
+# Eclipse project files
+/.settings/
+.project
+.cproject

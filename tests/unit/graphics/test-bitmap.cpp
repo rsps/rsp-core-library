@@ -10,21 +10,24 @@
 
 #include <doctest.h>
 #include <graphics/primitives/Bitmap.h>
-#include <graphics/primitives/Colour.h>
+#include <graphics/primitives/Color.h>
+#include <utils/RSPCoreExceptions.h>
+
+using namespace rsp::utils;
+using namespace rsp::graphics;
 
 TEST_CASE("Bitmap file loading")
 {
     SUBCASE("Loading Bmp file")
     {
         std::string filepath = "testImages/testImage.bmp";
-        Bitmap bitmap(filepath);
-        Colour col(bitmap.mImagePixels[0]);
-
-        CHECK(col == bitmap.mImagePixels[0]);
-
-        CHECK(bitmap.mImagePixels.size() > 0);
-        CHECK(bitmap.mHeight == 194);
-        CHECK(bitmap.mWidth == 259);
+        CHECK_NOTHROW(
+            Bitmap bitmap(filepath);
+            Color col(bitmap.GetPixels()[0]);
+            CHECK(bitmap.GetPixels().size() > 0);
+            CHECK(bitmap.GetHeight() == 194);
+            CHECK(bitmap.GetWidth() == 259);
+            CHECK(col == bitmap.GetPixels()[0]););
     }
     SUBCASE("Loading Png file")
     {

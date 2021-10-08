@@ -8,15 +8,16 @@
  * \author      Simon Glashoff
  */
 
+#include <chrono>
 #include <doctest.h>
 #include <graphics/FramebufferCanvas.h>
-
-#include <chrono>
 #include <thread>
+
+using namespace rsp::graphics;
 
 static Framebuffer fb;
 
-inline void CheckPixel(const Point &aPoint, const Colour &aColour, const Framebuffer &fb)
+inline void CheckPixel(const Point &aPoint, const Color &aColour, const Framebuffer &fb)
 {
     if (fb.IsInsideScreen(aPoint)) {
         CHECK(fb.GetPixel(aPoint) == aColour);
@@ -31,7 +32,7 @@ TEST_CASE("Framebuffer Drawing Primitives")
         std::chrono::system_clock::now().time_since_epoch());
 
     srand(ms.count()); //generates random seed val
-    Colour col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
+    Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
     Pen pen(rand() % 10 + 1, col);
 
     SUBCASE("Clear Framebuffer")
@@ -43,8 +44,8 @@ TEST_CASE("Framebuffer Drawing Primitives")
     SUBCASE("Drawing Lines")
     {
         //Arrange
-        Point pointA(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
-        Point pointB(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
+        Point pointA(rand() % fb.GetWidth(), rand() % fb.GetHeight());
+        Point pointB(rand() % fb.GetWidth(), rand() % fb.GetHeight());
 
         //Act
         fb.DrawLine(pointA, pointB, pen);
@@ -52,16 +53,16 @@ TEST_CASE("Framebuffer Drawing Primitives")
         //Assert
         int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;
 
-        deltaX = pointB.mX - pointA.mX;
-        deltaY = pointB.mY - pointA.mY;
+        deltaX = pointB.GetX() - pointA.GetX();
+        deltaY = pointB.GetY() - pointA.GetY();
         absDeltaX = abs(deltaX);
         absDeltaY = abs(deltaY);
         signumX = (deltaX > 0) ? 1 : -1;
         signumY = (deltaY > 0) ? 1 : -1;
         x = absDeltaX >> 1;
         y = absDeltaY >> 1;
-        px = pointA.mX;
-        py = pointA.mY;
+        px = pointA.GetX();
+        py = pointA.GetY();
         if (absDeltaX >= absDeltaY) {
             for (i = 0; i < absDeltaX; i++) {
                 y += absDeltaY;
@@ -95,11 +96,11 @@ TEST_CASE("Framebuffer Drawing Primitives")
     {
         //Arrange
         //Generate random values in the LEFT and TOP halves of the screen
-        Point leftTop(rand() % (fb.vinfo.xres / 2),
-                      rand() % (fb.vinfo.yres / 2));
+        Point leftTop(rand() % (fb.GetWidth() / 2),
+                      rand() % (fb.GetHeight() / 2));
         //Generate random values in the RIGHT and BOTTOM halves of the screen
-        Point rightBottom(rand() % (fb.vinfo.xres + 1 - (fb.vinfo.xres / 2)) + (fb.vinfo.xres / 2),
-                          rand() % (fb.vinfo.yres + 1 - (fb.vinfo.yres / 2)) + (fb.vinfo.yres / 2));
+        Point rightBottom(rand() % (fb.GetWidth() + 1 - (fb.GetWidth() / 2)) + (fb.GetWidth() / 2),
+                          rand() % (fb.GetHeight() + 1 - (fb.GetHeight() / 2)) + (fb.GetHeight() / 2));
         Rect rect(leftTop, rightBottom);
 
         //Act
@@ -107,17 +108,17 @@ TEST_CASE("Framebuffer Drawing Primitives")
 
         //Assert
         //Expect all four side to hold values
-        for (size_t i = 0; i <= rect.GetWidth(); i++) {
+        for (int i = 0; i <= rect.GetWidth(); i++) {
             //Check top side
-            CHECK(pen.mColour == fb.GetPixel(Point(leftTop.mX + i, leftTop.mY), false));
+            CHECK(pen.GetColor() == fb.GetPixel(Point(leftTop.GetX() + i, leftTop.GetY()), false));
             //Check bottom side
-            CHECK(pen.mColour == fb.GetPixel(Point(leftTop.mX + i, rightBottom.mY), false));
+            CHECK(pen.GetColor() == fb.GetPixel(Point(leftTop.GetX() + i, rightBottom.GetY()), false));
         }
-        for (size_t i = 0; i <= rect.GetHeight(); i++) {
+        for (int i = 0; i <= rect.GetHeight(); i++) {
             //Check left side
-            CHECK(pen.mColour == fb.GetPixel(Point(leftTop.mX, rightBottom.mY - i), false));
+            CHECK(pen.GetColor() == fb.GetPixel(Point(leftTop.GetX(), rightBottom.GetY() - i), false));
             //Check right side
-            CHECK(pen.mColour == fb.GetPixel(Point(rightBottom.mX, rightBottom.mY - i), false));
+            CHECK(pen.GetColor() == fb.GetPixel(Point(rightBottom.GetX(), rightBottom.GetY() - i), false));
         }
         //fb.SwapBuffer();
     }
@@ -125,8 +126,8 @@ TEST_CASE("Framebuffer Drawing Primitives")
     SUBCASE("Drawing Circles")
     {
         //Arrange
-        Point centerPoint(rand() % fb.vinfo.xres, rand() % fb.vinfo.yres);
-        int radius = rand() % (fb.vinfo.xres / 2);
+        Point centerPoint(rand() % fb.GetWidth(), rand() % fb.GetHeight());
+        int radius = rand() % (fb.GetWidth() / 2);
 
         //Act
         fb.DrawCircle(centerPoint, radius, pen);
@@ -135,14 +136,14 @@ TEST_CASE("Framebuffer Drawing Primitives")
         int error = -radius;
         int y = 0;
         while (radius >= y) {
-            CheckPixel(Point(centerPoint.mX + radius, centerPoint.mY + y), col, fb);
-            CheckPixel(Point(centerPoint.mX - radius, centerPoint.mY + y), col, fb);
-            CheckPixel(Point(centerPoint.mX + radius, centerPoint.mY - y), col, fb);
-            CheckPixel(Point(centerPoint.mX - radius, centerPoint.mY - y), col, fb);
-            CheckPixel(Point(centerPoint.mX + y, centerPoint.mY + radius), col, fb);
-            CheckPixel(Point(centerPoint.mX - y, centerPoint.mY + radius), col, fb);
-            CheckPixel(Point(centerPoint.mX + y, centerPoint.mY - radius), col, fb);
-            CheckPixel(Point(centerPoint.mX - y, centerPoint.mY - radius), col, fb);
+            CheckPixel(Point(centerPoint.GetX() + radius, centerPoint.GetY() + y), col, fb);
+            CheckPixel(Point(centerPoint.GetX() - radius, centerPoint.GetY() + y), col, fb);
+            CheckPixel(Point(centerPoint.GetX() + radius, centerPoint.GetY() - y), col, fb);
+            CheckPixel(Point(centerPoint.GetX() - radius, centerPoint.GetY() - y), col, fb);
+            CheckPixel(Point(centerPoint.GetX() + y, centerPoint.GetY() + radius), col, fb);
+            CheckPixel(Point(centerPoint.GetX() - y, centerPoint.GetY() + radius), col, fb);
+            CheckPixel(Point(centerPoint.GetX() + y, centerPoint.GetY() - radius), col, fb);
+            CheckPixel(Point(centerPoint.GetX() - y, centerPoint.GetY() - radius), col, fb);
             error += y;
             y++;
             error += y;
@@ -163,8 +164,8 @@ TEST_CASE("Framebuffer Drawing Primitives")
         Point outSideYAxis(0, -1);
 
         //Act
-        CHECK_NOTHROW(fb.DrawDot(outSideXAxis, pen));
-        CHECK_NOTHROW(fb.DrawDot(outSideYAxis, pen));
+        CHECK_NOTHROW(pen.Draw(fb, outSideXAxis));
+        CHECK_NOTHROW(pen.Draw(fb, outSideYAxis));
 
         //Assert
         CHECK_EQ(fb.GetPixel(outSideXAxis), 0);
@@ -206,8 +207,8 @@ TEST_CASE("Framebuffer Drawing Primitives")
 
         //Act
         auto begin = std::chrono::high_resolution_clock::now();
-        for (size_t i = 0; i < iterations; i++) {
-            fb.DrawImage(Point(topLeftPoint.mX, topLeftPoint.mY - i), imgSimple);
+        for (int i = 0; i < iterations; i++) {
+            fb.DrawImage(Point(topLeftPoint.GetX(), topLeftPoint.GetY() - i), imgSimple);
             fb.SwapBuffer(Canvas::SwapOperations::Clear);
         }
         auto end = std::chrono::high_resolution_clock::now();
