@@ -72,23 +72,19 @@ void BmpLoader::ReadData(FILE *aFile)
         //Read a Row of pixels with the padding
         fread(pixelRow.data(), sizeof(uint8_t), paddedRowSize, aFile);
 
-        for (size_t j = 0; j < bmpHeader.width * 3; j += 3) {
-            uint8_t blue = pixelRow[j];      //*iter;
-            uint8_t green = pixelRow[j + 1]; //*std::next(iter, 1);
-            uint8_t red = pixelRow[j + 2];   //*std::next(iter, 2);
-            uint8_t alpha = 0x00;
-#ifdef LITTLE_ENDIAN
-            uint32_t combined = (((uint32_t)alpha) << 24) |
-                                (((uint32_t)red) << 16) |
-                                (((uint32_t)green) << 8) |
-                                ((uint32_t)blue);
-#else
-            uint32_t combined = (((uint32_t)blue) << 24) |
-                                (((uint32_t)green) << 16) |
-                                (((uint32_t)red) << 8) |
-                                ((uint32_t)alpha);
-#endif
+        for (size_t j = bmpHeader.width * bytesPerPixel; j > 0; j -= bytesPerPixel) {
+            uint32_t combined = ReadPixel(pixelRow, j);
             mImagePixels.push_back(combined);
         }
     }
+}
+
+uint32_t BmpLoader::ReadPixel(const std::vector<uint8_t> &aPixelRow, const size_t &aRowPtr)
+{
+    uint32_t pixel = 0;
+    //Reads other direction than the row loop
+    for (size_t i = 0; i < bytesPerPixel; i++) {
+        pixel |= (((uint32_t)aPixelRow[aRowPtr + i]) << (8 * i));
+    }
+    return pixel;
 }
