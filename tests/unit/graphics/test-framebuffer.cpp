@@ -179,15 +179,15 @@ TEST_CASE("Framebuffer Drawing Primitives")
         std::string testImage = "testImages/testImageCross.bmp";
         Bitmap testImgMap(testImage);
 
-        std::string noAlpha = "testImages/Asset2NoAlpha.bmp";
-        Bitmap noAlphaMap(noAlpha);
+        std::string screenImg = "testImages/Asset2NoAlpha.bmp";
+        Bitmap noAlphaMap(screenImg);
 
         //Act
-        fb.DrawImage(topLeftPoint, testImgMap);
+        //fb.DrawImage(topLeftPoint, testImgMap);
 
-        fb.SwapBuffer(Canvas::SwapOperations::Clear);
+        //fb.SwapBuffer(Canvas::SwapOperations::Clear);
 
-        fb.DrawImage(Point(0, 0), noAlpha);
+        fb.DrawImage(Point(0, 0), noAlphaMap);
 
         fb.SwapBuffer(Canvas::SwapOperations::Clear);
 
@@ -202,15 +202,12 @@ TEST_CASE("Framebuffer Drawing Primitives")
         //Arrange
         Point topLeftPoint(100, 200);
         Bitmap imgSimple("testImages/testImage.bmp");
-        Bitmap imgCross("testImages/testImageCross.bmp");
         int iterations = 100;
 
         //Act
         auto begin = std::chrono::high_resolution_clock::now();
         for (size_t i = 0; i < iterations; i++) {
             fb.DrawImage(Point(topLeftPoint.mX, topLeftPoint.mY - i), imgSimple);
-            fb.SwapBuffer(Canvas::SwapOperations::Clear);
-            fb.DrawImage(Point(topLeftPoint.mX, topLeftPoint.mY - i), imgCross);
             fb.SwapBuffer(Canvas::SwapOperations::Clear);
         }
         auto end = std::chrono::high_resolution_clock::now();
@@ -219,7 +216,7 @@ TEST_CASE("Framebuffer Drawing Primitives")
 
         //Assert
         CHECK(fps > 10);
-        //std::cout << duration << "ms " << iterations << "iterations " << (1000 * iterations / duration) << "fps" << std::endl;
+        MESSAGE("Fps: " << fps);
     }
 
     SUBCASE("Swapbuffer")
