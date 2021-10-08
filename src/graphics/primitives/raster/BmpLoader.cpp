@@ -54,11 +54,8 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
 
 void BmpLoader::ReadHeader(std::ifstream &aFile)
 {
-    aFile.read(reinterpret_cast<char *>(&bmpHeader), sizeof(bmpHeader));
-
     //Read the 54 byte header
-    //    fread(&bmpHeader, sizeof(uint8_t), sizeof(bmpHeader), aFile);
-    //std::cout << "File header read" << std::endl;
+    aFile.read(reinterpret_cast<char *>(&bmpHeader), sizeof(bmpHeader));
 
     mWidth = bmpHeader.width;
     mHeight = bmpHeader.heigth;

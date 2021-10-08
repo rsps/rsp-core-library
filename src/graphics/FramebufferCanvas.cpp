@@ -11,11 +11,11 @@
 #include <graphics/FramebufferCanvas.h>
 
 #include <chrono>
-#include <thread>
 #include <fcntl.h>
 #include <linux/kd.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <thread>
 #include <unistd.h>
 
 namespace rsp::graphics
@@ -23,9 +23,9 @@ namespace rsp::graphics
 
 Framebuffer::Framebuffer()
 {
-    mFramebufferFile = open("/dev/fb0", O_RDWR);
+    mFramebufferFile = open("/dev/fb1", O_RDWR);
     if (mFramebufferFile == -1) {
-        mFramebufferFile = open("/dev/fb1", O_RDWR);
+        mFramebufferFile = open("/dev/fb0", O_RDWR);
         if (mFramebufferFile == -1) {
             throw std::system_error(errno, std::generic_category(), "Failed to open framebuffer");
         }
@@ -54,8 +54,8 @@ Framebuffer::Framebuffer()
     //calculate size of screen
     long screensize = mVariableInfo.yres * mFixedInfo.line_length;
 
-    mpFrontBuffer = static_cast<uint8_t*>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
-    if (mpFrontBuffer == reinterpret_cast<uint8_t*>(-1)) /*MAP_FAILED*/ {
+    mpFrontBuffer = static_cast<uint8_t *>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
+    if (mpFrontBuffer == reinterpret_cast<uint8_t *>(-1)) /*MAP_FAILED*/ {
         std::cout << "Mapping failed errno:" << strerror(errno) << std::endl;
     }
 
@@ -134,8 +134,7 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen)
             px += signumX;
             aPen.Draw(*this, Point(px, py));
         }
-    }
-    else {
+    } else {
         for (i = 0; i < absDeltaY; i++) {
             x += absDeltaX;
             if (x >= absDeltaY) {
@@ -179,15 +178,13 @@ void Framebuffer::DrawText(const Rect &aRect, const Font &aFont, const char *apT
 
 void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
 {
-    //std::cout << "Swapping buffer: " << vinfo.yoffset << ", " << vinfo.reserved[0] << std::endl;
 
     mVariableInfo.reserved[0]++;
 
     //swap buffer
     if (mVariableInfo.yoffset == 0) {
         mVariableInfo.yoffset = mVariableInfo.yres;
-    }
-    else {
+    } else {
         mVariableInfo.yoffset = 0;
     }
     //Pan to back buffer
@@ -201,17 +198,17 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
     mpBackBuffer = tmp;
 
     switch (aSwapOp) {
-        case SwapOperations::Copy:
-            copy();
-            break;
+    case SwapOperations::Copy:
+        copy();
+        break;
 
-        case SwapOperations::Clear:
-            clear();
-            break;
+    case SwapOperations::Clear:
+        clear();
+        break;
 
-        case SwapOperations::NoOp:
-        default:
-            break;
+    case SwapOperations::NoOp:
+    default:
+        break;
     }
 }
 
@@ -223,10 +220,9 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
     long location = (aPoint.mX + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + aPoint.mY * mFixedInfo.line_length;
     //std::cout << "location:" << location << std::endl;
     if (aFront) {
-        return *(reinterpret_cast<uint32_t*>(mpFrontBuffer + location));
-    }
-    else {
-        return *(reinterpret_cast<uint32_t*>(mpBackBuffer + location));
+        return *(reinterpret_cast<uint32_t *>(mpFrontBuffer + location));
+    } else {
+        return *(reinterpret_cast<uint32_t *>(mpBackBuffer + location));
     }
 }
 
@@ -239,7 +235,7 @@ void Framebuffer::clear()
         for (x = 0; x < mVariableInfo.xres; x++) {
             long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;
             //std::cout << "location:" << location << std::endl;
-            *(reinterpret_cast<uint32_t*>(mpBackBuffer + location)) = 0x00000000;
+            *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = 0x00000000;
         }
     }
 }
@@ -253,9 +249,9 @@ void Framebuffer::copy()
         for (x = 0; x < mVariableInfo.xres; x++) {
             long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;
             //std::cout << "location:" << location << std::endl;
-            *(reinterpret_cast<uint32_t*>(mpBackBuffer + location)) = *(reinterpret_cast<uint32_t*>(mpFrontBuffer + location));
+            *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = *(reinterpret_cast<uint32_t *>(mpFrontBuffer + location));
         }
     }
 }
 
-}
+} // namespace rsp::graphics
