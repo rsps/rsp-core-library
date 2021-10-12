@@ -18,7 +18,7 @@ namespace rsp::graphics
  */
 class Bitmap
 {
-public:
+  public:
     /**
      * Load bitmap from given file.
      *
@@ -55,7 +55,8 @@ public:
      *
      * \return uint32_t
      */
-    uint32_t GetHeight() const {
+    uint32_t GetHeight() const
+    {
         return mHeight;
     }
 
@@ -64,7 +65,8 @@ public:
      *
      * \return uint32_t
      */
-    uint32_t GetWidth() const {
+    uint32_t GetWidth() const
+    {
         return mWidth;
     }
 
@@ -73,18 +75,19 @@ public:
      *
      * \return const std::vector<uint32_t>&
      */
-    const std::vector<uint32_t>& GetPixels() const {
+    const std::vector<uint32_t> &GetPixels() const
+    {
         return mImagePixels;
     }
 
-protected:
-    ImgLoader& GetRasterLoader(const std::string aFileExtension);
+  protected:
+    ImgLoader &GetRasterLoader(const std::string aFileExtension);
 
-    uint32_t mHeight;                   //Unused --> used by canvas, needs to be set
-    uint32_t mWidth;                    //Unused --> used by canvas, needs to be set
+    uint32_t mHeight;
+    uint32_t mWidth;
     uint16_t mBytesPerPixel;            //Unused
     std::vector<uint32_t> mImagePixels; //Pointer?
 };
 
-}
+} // namespace rsp::graphics
 #endif //BITMAP_H

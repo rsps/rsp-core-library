@@ -21,13 +21,28 @@ TEST_CASE("Bitmap file loading")
     SUBCASE("Loading Bmp file")
     {
         std::string filepath = "testImages/testImage.bmp";
+        uint32_t height = 194;
+        uint32_t width = 259;
         CHECK_NOTHROW(
             Bitmap bitmap(filepath);
             Color col(bitmap.GetPixels()[0]);
-            CHECK(bitmap.GetPixels().size() > 0);
-            CHECK(bitmap.GetHeight() == 194);
-            CHECK(bitmap.GetWidth() == 259);
+            CHECK(bitmap.GetHeight() == height);
+            CHECK(bitmap.GetWidth() == width);
+            CHECK(bitmap.GetPixels().size() == (width * height));
             CHECK(col == bitmap.GetPixels()[0]););
+    }
+    SUBCASE("Loading another Bmp file")
+    {
+        std::string filepath = "testImages/Asset3.bmp";
+        uint32_t height = 800;
+        uint32_t width = 480;
+        CHECK_NOTHROW(
+            Bitmap bitmap2(filepath);
+            Color col2(bitmap2.GetPixels()[0]);
+            CHECK(bitmap2.GetHeight() == height);
+            CHECK(bitmap2.GetWidth() == width);
+            CHECK(bitmap2.GetPixels().size() == (width * height));
+            CHECK(col2 == bitmap2.GetPixels()[0]););
     }
     SUBCASE("Loading Png file")
     {

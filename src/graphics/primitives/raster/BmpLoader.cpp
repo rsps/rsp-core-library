@@ -20,19 +20,12 @@ namespace rsp::graphics
 
 std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
 {
+    mImagePixels.clear();
+
     std::ifstream file;
 
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     file.open(aImgName, std::ifstream::binary);
-
-    //std::cout << "Bitmap reading file: " << aImgName << std::endl;
-    //    errno = 0;
-    //    //Pass reference to the first element in string, and read as binary
-    //    FILE *file = fopen(aImgName.c_str(), "rb");
-    //    if (file == NULL) {
-    //        std::cout << "File is null" << std::endl;
-    //        std::cout << "Error: " << errno << std::endl;
-    //    }
 
     ReadHeader(file);
     // TODO: Get Compression and other useful stuff
@@ -68,8 +61,9 @@ void BmpLoader::ReadHeader(std::ifstream &aFile)
 
 void BmpLoader::ReadData(std::ifstream &aFile)
 {
-    //Figure out amount to read
+    //Figure out amount to read per row
     int paddedRowSize = (bmpHeader.width * 3 + 3) & (~3);
+    std::cout << "Padded Row size: " << paddedRowSize << std::endl;
 
     //Initialize containers for reading
     std::vector<uint8_t> pixelRow;
@@ -83,7 +77,7 @@ void BmpLoader::ReadData(std::ifstream &aFile)
         aFile.read(reinterpret_cast<char *>(pixelRow.data()), paddedRowSize);
 
         for (size_t j = bmpHeader.width * mBytesPerPixel; j > 0; j -= mBytesPerPixel) {
-            uint32_t combined = ReadPixel(pixelRow, j);
+            uint32_t combined = ReadPixel(pixelRow, j - mBytesPerPixel);
             mImagePixels.push_back(combined);
         }
     }

@@ -17,3 +17,7 @@ file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/Asset2NoAlpha.bmp
     DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
 file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/Asset2WithAlpha.bmp 
     DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
+file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/Asset3.bmp 
+    DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
+file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/Asset6.bmp 
+    DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
