@@ -5,15 +5,23 @@
  *
  * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
- * \author      Steffen Brummer
+ * \author      Simon Glashoff
  */
 
-#include <doctest.h>
-#include <version.h>
+#include <graphics/primitives/Canvas.h>
+#include <graphics/primitives/Pen.h>
 
-TEST_CASE("Testing Version String")
+namespace rsp::graphics
 {
 
-    CHECK(rsp::get_library_version() == std::string("0.1.0"));
-    CHECK(rsp::get_library_version() != std::string("2.1.7"));
+Pen::Pen(int aSize, Color aColor)
+    : mSize(aSize), mColor(aColor)
+{
+}
+
+void Pen::Draw(Canvas &aCanvas, const Point &aPoint) const
+{
+    aCanvas.SetPixel(aPoint, mColor);
+}
+
 }
