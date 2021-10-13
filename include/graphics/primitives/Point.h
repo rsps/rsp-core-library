@@ -24,7 +24,7 @@ class Framebuffer;
  */
 class Point
 {
-public:
+  public:
     /**
      * Construct an empty point
      */
@@ -60,22 +60,24 @@ public:
      * \param aPoint
      * \return self
      */
-    inline Point& operator=(const Point &aPoint)
+    inline Point &operator=(const Point &aPoint)
     {
         mX = aPoint.mX;
         mY = aPoint.mY;
         return *this;
     }
 
-    inline int GetX() const {
+    inline int GetX() const
+    {
         return mX;
     }
 
-    inline int GetY() const {
+    inline int GetY() const
+    {
         return mY;
     }
 
-protected:
+  protected:
     // Allow friends to access members for speed optimizations.
     friend Framebuffer;
     friend Rect;
@@ -84,5 +86,5 @@ protected:
     int mY;
 };
 
-}
+} // namespace rsp::graphics
 #endif // POINT_H

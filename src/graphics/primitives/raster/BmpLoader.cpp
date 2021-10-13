@@ -62,7 +62,7 @@ void BmpLoader::ReadHeader(std::ifstream &aFile)
 void BmpLoader::ReadData(std::ifstream &aFile)
 {
     //Figure out amount to read per row
-    int paddedRowSize = (bmpHeader.width * 3 + 3) & (~3);
+    int paddedRowSize = (bmpHeader.width * mBytesPerPixel + 3) & (~3);
     std::cout << "Padded Row size: " << paddedRowSize << std::endl;
 
     //Initialize containers for reading
