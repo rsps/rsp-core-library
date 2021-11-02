@@ -13,6 +13,7 @@
 #include <graphics/primitives/Bitmap.h>
 #include <graphics/primitives/raster/BmpLoader.h>
 #include <graphics/primitives/raster/PngLoader.h>
+
 #include <utils/RSPCoreExceptions.h>
 
 using namespace rsp::utils;
@@ -20,16 +21,20 @@ using namespace rsp::utils;
 namespace rsp::graphics
 {
 
+std::map<std::string, std::function<std::shared_ptr<ImgLoader>()>> Bitmap::filetypeMap3 = {
+    {".bmp", std::function<std::shared_ptr<ImgLoader>()>([]() { return std::make_shared<BmpLoader>(); })},
+    {".png", std::function<std::shared_ptr<ImgLoader>()>([]() { return std::make_shared<PngLoader>(); })}};
+
 Bitmap::Bitmap(std::string aImgName)
     : mBytesPerPixel(0)
 {
     std::filesystem::path filename(aImgName);
 
-    auto &loader = GetRasterLoader(filename.extension());
+    auto loader = GetRasterLoader(filename.extension());
     //Get raw data
-    mImagePixels = loader.LoadImg(filename);
-    mHeight = loader.GetHeight();
-    mWidth = loader.GetWidth();
+    mImagePixels = loader->LoadImg(filename);
+    mHeight = loader->GetHeight();
+    mWidth = loader->GetWidth();
 }
 
 Bitmap::Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerPixel)
@@ -55,15 +60,9 @@ Bitmap::~Bitmap()
 {
 }
 
-ImgLoader &Bitmap::GetRasterLoader(const std::string aFileType)
+std::shared_ptr<ImgLoader> Bitmap::GetRasterLoader(const std::string aFileType)
 {
-    if (aFileType == ".png") {
-        static PngLoader png;
-        return png;
-    }
-
-    static BmpLoader bmp;
-    return bmp;
+    return filetypeMap3[aFileType]();
 }
 
 } // namespace rsp::graphics

@@ -2,7 +2,10 @@
 #define BITMAP_H
 
 #include <graphics/primitives/raster/ImgLoader.h>
+#include <memory>
 
+#include <functional>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -19,6 +22,7 @@ namespace rsp::graphics
 class Bitmap
 {
   public:
+    static std::map<std::string, std::function<std::shared_ptr<ImgLoader>()>> filetypeMap3;
     /**
      * Load bitmap from given file.
      *
@@ -81,7 +85,7 @@ class Bitmap
     }
 
   protected:
-    ImgLoader &GetRasterLoader(const std::string aFileExtension);
+    std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
 
     uint32_t mHeight;
     uint32_t mWidth;
