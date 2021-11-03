@@ -22,7 +22,7 @@ namespace rsp::graphics
 class Bitmap
 {
   public:
-    static std::map<std::string, std::function<std::shared_ptr<ImgLoader>()>> filetypeMap3;
+    static std::map<std::string, std::function<std::shared_ptr<ImgLoader>()>> filetypeMap;
     /**
      * Load bitmap from given file.
      *

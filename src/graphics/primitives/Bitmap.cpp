@@ -21,7 +21,7 @@ using namespace rsp::utils;
 namespace rsp::graphics
 {
 
-std::map<std::string, std::function<std::shared_ptr<ImgLoader>()>> Bitmap::filetypeMap3 = {
+std::map<std::string, std::function<std::shared_ptr<ImgLoader>()>> Bitmap::filetypeMap = {
     {".bmp", std::function<std::shared_ptr<ImgLoader>()>([]() { return std::make_shared<BmpLoader>(); })},
     {".png", std::function<std::shared_ptr<ImgLoader>()>([]() { return std::make_shared<PngLoader>(); })}};
 
@@ -62,7 +62,7 @@ Bitmap::~Bitmap()
 
 std::shared_ptr<ImgLoader> Bitmap::GetRasterLoader(const std::string aFileType)
 {
-    return filetypeMap3[aFileType]();
+    return filetypeMap[aFileType]();
 }
 
 } // namespace rsp::graphics
