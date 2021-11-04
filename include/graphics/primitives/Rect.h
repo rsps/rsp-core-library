@@ -11,8 +11,8 @@
 #ifndef RECT_H
 #define RECT_H
 
-#include <utils/RSPCoreExceptions.h>
 #include "Point.h"
+#include <utils/RSPCoreExceptions.h>
 
 namespace rsp::graphics
 {
@@ -27,7 +27,7 @@ class Framebuffer;
  */
 class Rect
 {
-public:
+  public:
     /**
      * Constructs a Rect from coordinate and size.
      *
@@ -119,7 +119,8 @@ public:
      *
      * \return Point
      */
-    const Point& GetTopLeft() const {
+    const Point &GetTopLeft() const
+    {
         return mLeftTop;
     }
 
@@ -128,7 +129,8 @@ public:
      *
      * \return Point
      */
-    const Point& GetBottomRight() const {
+    const Point &GetBottomRight() const
+    {
         return mRightBottom;
     }
 
@@ -166,10 +168,9 @@ public:
      */
     bool IsHit(const Point &aPoint) const;
 
-
     bool VerifyDimensions() const;
 
-protected:
+  protected:
     // Allow friends to access members for speed optimizations.
     friend Framebuffer;
 
@@ -177,5 +178,5 @@ protected:
     Point mRightBottom;
 };
 
-}
+} // namespace rsp::graphics
 #endif // RECT_H
