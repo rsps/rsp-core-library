@@ -19,7 +19,7 @@ class Control
 
     void Invalidate();
     bool IsInvalid() const;
-    bool IsHit();
+    bool IsHit(const Point &aPoint);
 };
 } // namespace rsp::graphics
 

@@ -32,8 +32,16 @@ bool Control::IsInvalid() const
     return mIsInvalid;
 }
 
-bool Control::IsHit()
+bool Control::IsHit(const Point &aPoint)
 {
+    //Only works with non-rotated rectangles
+    if (aPoint.GetX() > mArea.GetTopLeft().GetX() and
+        aPoint.GetX() < mArea.GetBottomRight().GetX() and
+        aPoint.GetY() > mArea.GetTopLeft().GetY() and
+        aPoint.GetY() < mArea.GetBottomRight().GetY())
+        return true;
+
+    return false;
 }
 
 } // namespace rsp::graphics
