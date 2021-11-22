@@ -35,9 +35,9 @@ bool Control::IsInvalid() const
 bool Control::IsHit(const Point &aPoint)
 {
     //Only works with non-rotated rectangles
-    if (aPoint.GetX() > mArea.GetTopLeft().GetX() and
-        aPoint.GetX() < mArea.GetBottomRight().GetX() and
-        aPoint.GetY() > mArea.GetTopLeft().GetY() and
+    if (aPoint.GetX() > mArea.GetTopLeft().GetX() &&
+        aPoint.GetX() < mArea.GetBottomRight().GetX() &&
+        aPoint.GetY() > mArea.GetTopLeft().GetY() &&
         aPoint.GetY() < mArea.GetBottomRight().GetY())
         return true;
 
