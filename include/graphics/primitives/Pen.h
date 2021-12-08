@@ -5,8 +5,8 @@
 #include <iostream>
 
 #include "Bitmap.h"
-#include "Point.h"
 #include "Color.h"
+#include "Point.h"
 
 namespace rsp::graphics
 {
@@ -21,7 +21,7 @@ class Canvas;
  */
 class Pen
 {
-public:
+  public:
     /**
      * Construct a pen of a certain size and color.
      *
@@ -43,7 +43,8 @@ public:
      *
      * \return
      */
-    inline const Color& GetColor() {
+    inline const Color &GetColor()
+    {
         return mColor;
     }
     /**
@@ -52,16 +53,16 @@ public:
      * \param aColor
      * \return
      */
-    inline Pen& SetColor(Color aColor) {
+    inline Pen &SetColor(Color aColor)
+    {
         mColor = aColor;
         return *this;
     }
 
-protected:
+  protected:
     int mSize;
     Color mColor;
-
 };
 
-}
+} // namespace rsp::graphics
 #endif // PEN_H

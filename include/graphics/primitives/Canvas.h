@@ -15,7 +15,7 @@
 #include "Color.h"
 #include "Font.h"
 #include "Pen.h"
-#include "Point.h"
+//#include "Point.h"
 #include "Rect.h"
 
 namespace rsp::graphics
@@ -28,7 +28,7 @@ namespace rsp::graphics
  */
 class Canvas
 {
-public:
+  public:
     /**
      * Enumerated SwapOperations
      *
@@ -38,9 +38,10 @@ public:
      *  Copy:  The current view content is copied int new buffer
      *  Clear: The new buffer is filled with the background color.
      */
-    enum class SwapOperations
-    {
-        NoOp, Copy, Clear
+    enum class SwapOperations {
+        NoOp,
+        Copy,
+        Clear
     };
 
     /**
@@ -157,8 +158,7 @@ public:
      * \return uint32_t
      */
     virtual uint32_t GetColorDepth() const = 0;
-
 };
 
-}
-#endif //CANVAS_H
+} // namespace rsp::graphics
+#endif // CANVAS_H

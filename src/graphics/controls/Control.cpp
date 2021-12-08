@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include "Control.h"
+#include "graphics/controls/Control.h"
 
 namespace rsp::graphics
 {
@@ -34,7 +34,7 @@ bool Control::IsInvalid() const
 
 bool Control::IsHit(const Point &aPoint)
 {
-    //Only works with non-rotated rectangles
+    // Only works with non-rotated rectangles
     if (aPoint.GetX() > mArea.GetTopLeft().GetX() &&
         aPoint.GetX() < mArea.GetBottomRight().GetX() &&
         aPoint.GetY() > mArea.GetTopLeft().GetY() &&

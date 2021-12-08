@@ -2,7 +2,7 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include "primitives/Rect.h"
+#include "graphics/primitives/Rect.h"
 
 namespace rsp::graphics
 {
@@ -23,4 +23,4 @@ class Control
 };
 } // namespace rsp::graphics
 
-#endif //CONTROL_H
+#endif // CONTROL_H
