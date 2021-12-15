@@ -47,6 +47,13 @@ TEST_CASE("Bitmap file loading")
     SUBCASE("Loading Png file")
     {
         std::string filepath = "testImages/testImage.png";
-        CHECK_THROWS_AS(Bitmap bitmap(filepath), const NotImplementedException &);
+        CHECK_THROWS_WITH_AS(Bitmap bitmap(filepath), "Png file format is not supported",
+                             const NotImplementedException &);
+    }
+    SUBCASE("Loading filetype not found")
+    {
+        std::string filepath = "testImages/testImage.txt";
+        CHECK_THROWS_WITH_AS(Bitmap bitmap(filepath), "Filetype loader not found",
+                             const NotImplementedException &);
     }
 }

@@ -31,7 +31,7 @@ Bitmap::Bitmap(std::string aImgName)
     std::filesystem::path filename(aImgName);
 
     auto loader = GetRasterLoader(filename.extension());
-    //Get raw data
+    // Get raw data
     mImagePixels = loader->LoadImg(filename);
     mHeight = loader->GetHeight();
     mWidth = loader->GetWidth();
@@ -51,9 +51,9 @@ Bitmap::Bitmap(int aHeight, int aWidth, int aBytesPerPixel)
     : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel), mImagePixels(mWidth * mHeight)
 {
     throw NotImplementedException("");
-    //Load file into memory here
-    //https://freeimage.sourceforge.io/
-    //http://libjpeg.sourceforge.net/
+    // Load file into memory here
+    // https://freeimage.sourceforge.io/
+    // http://libjpeg.sourceforge.net/
 }
 
 Bitmap::~Bitmap()
@@ -62,7 +62,11 @@ Bitmap::~Bitmap()
 
 std::shared_ptr<ImgLoader> Bitmap::GetRasterLoader(const std::string aFileType)
 {
-    return filetypeMap[aFileType]();
+    if (filetypeMap.contains(aFileType)) {
+        return filetypeMap[aFileType]();
+    } else {
+        throw NotImplementedException("Filetype loader not found");
+    }
 }
 
 } // namespace rsp::graphics
