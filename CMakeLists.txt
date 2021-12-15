@@ -61,10 +61,11 @@ ExternalProject_Add(
     Doctest
     
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/ext-libs/doctest"
-    GIT_REPOSITORY https://github.com/onqtam/doctest.git
+    GIT_REPOSITORY "https://github.com/onqtam/doctest"
+    GIT_TAG "2.4.6"
     TIMEOUT 10
 
-    UPDATE_COMMAND ${GIT_EXECUTABLE} pull
+    UPDATE_COMMAND ${GIT_EXECUTABLE} checkout ${GIT_TAG}
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
     INSTALL_COMMAND ""
