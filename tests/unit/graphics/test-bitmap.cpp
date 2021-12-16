@@ -53,7 +53,7 @@ TEST_CASE("Bitmap file loading")
     SUBCASE("Loading filetype not found")
     {
         std::string filepath = "testImages/testImage.txt";
-        CHECK_THROWS_WITH_AS(Bitmap bitmap(filepath), "Filetype loader not found",
-                             const NotImplementedException &);
+        CHECK_THROWS_WITH_AS(Bitmap bitmap(filepath), "Filetype loader not found: _Map_base::at",
+                             const std::out_of_range &);
     }
 }

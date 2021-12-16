@@ -22,7 +22,7 @@ namespace rsp::graphics
 class Bitmap
 {
   public:
-    static std::map<std::string, std::function<std::shared_ptr<ImgLoader>()>> filetypeMap;
+    static std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> filetypeMap;
     /**
      * Load bitmap from given file.
      *
@@ -89,9 +89,9 @@ class Bitmap
 
     uint32_t mHeight;
     uint32_t mWidth;
-    uint16_t mBytesPerPixel;            //Unused
-    std::vector<uint32_t> mImagePixels; //Pointer?
+    uint16_t mBytesPerPixel;            // Unused
+    std::vector<uint32_t> mImagePixels; // Pointer?
 };
 
 } // namespace rsp::graphics
-#endif //BITMAP_H
+#endif // BITMAP_H
