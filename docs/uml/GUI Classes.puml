@@ -1,0 +1,181 @@
+@startuml
+
+title GUI Classes
+
+class Point {
+    A simple class with properties\nfor a 2D coordinate.
+    +uint16_t x
+    +uint16_t y
+--
+    +Point(int aX, int aY)
+    +Point(const Point &arPoint)
+}
+
+class Rect {
+    A class with two Point properties.
+    #Point mTopLeft
+    #Point mBottomRight
+--
+    +Rect(int aTop, int aLeft, int aWidth, int aHeight)
+    +Rect(const Point &arTopLeft, int aWidth, int aHeight)
+    +Rect(const Point &arTopLeft, const Point &arBottomRigth)
+    +Rect(const Rect &arRect)
+    +Point& TopLeft()
+    +Point& BottomRight()
+    +int GetWidth()
+    +void SetWidth(int aValue)
+    +int GetHeight()
+    +void SetHeight(int aValue)
+    +bool IsHit(const Point &arPoint)
+}
+Point *-- Rect
+
+class Color {
+    Class with uint32_t property for RGB
+    and Alpha channel color information.
+    The alpha channel is used for opacity.
+    Not all platforms support alpha blending.
+    #uint32_t mColor
+--
+    +Color(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha)
+    +Color(uint32_t aARGB)
+    +Color(const Color &arColor)
+    +uint8_t GetRed()
+    +void SetRed(uint8_t aValue)
+    +uint8_t GetGreen()
+    +void SetGreen(uint8_t aValue)
+    +uint8_t GetBlue()
+    +void SetBlue(uint8_t aValue)
+    +uint8_t GetAlpha()
+    +void SetAlpha(uint8_t aValue)
+    +operator uint32_t()
+    +operator =(const Color &arColor)
+}
+
+enum FontStyle {
+    Normal
+    Bold
+    Italic
+}
+
+class Font {
+    When used on Linux, the GUI library can
+    use the FreeType2 library to render fonts.
+    #string mFontName
+    #FontStyle mStyle
+    #Color mColor
+--
+    +Font(const string &arName)
+}
+FontStyle *-- Font
+Color *-- Font
+
+class Pen <<DEPRECATED>> {
+    Class to control pen color and width.
+    #Color mColor
+    #int mWidth
+}
+Color *-- Pen
+
+class Bitmap {
+    Class to handle raster images.
+    Can load bmp and png files through
+    filesystem and do some basic
+    manipulation like resize/stretch.
+}
+
+class Canvas {
+    All drawing operations are performed on a Canvas.
+    Descendants can implement in memory canvas, Linux
+    Framebuffer canvas or even a DirectX Canvas.
+--
+    +void DrawDot(const Point &arPoint, const Pen &arPen)
+    +void DrawArc(const Point &arCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &arPen)
+    +void DrawCircle(const Point &arCenter, int aRadius, const Pen &arPen)
+    +void DrawLine(const Point &arA, const Point &arB, const Pen &arPen)
+    +void DrawRectangle(const Rect &arRect, const Pen &arPen)
+    +void DrawImage(const Point &arTopLeft, const Bitmap &arBitmap)
+    +void DrawText(const Rect &arRect, const Font &arFont, const string &arText, bool aScaleToFit)
+}
+Canvas <|-- Bitmap
+
+class FrameBufferCanvas {
+}
+Canvas <|-- FrameBufferCanvas
+
+interface Touchable {
+    #Rect mTouchArea
+--
+    +bool ProcessEvent(Event &aEvent)
+    +bool IsHit(const Point aPoint) const
+}
+Rect *-- Touchable
+
+class Ctrl {
+    The base GUI element. All other elements
+    decent from the Ctrl class.
+    Ctrl objects contains a boolean "invalidated"
+    property, this is flagged in case the object needs
+    rendering. Setter functions can invalidate a Ctrl
+    object.
+    #Color mBackground
+    #bool mTransparent
+    #Rect mArea
+    #Ctrl *mpParent
+    #std::vector<Ctrl*> mChildren
+--
+    +void Invalidate()
+    +bool IsInvalid() const
+    +bool IsTransparent() const
+    +void Render(Canvas &aCanvas)
+    +void SetArea(const Rect &arRect)
+    +Rect& GetArea()
+}
+Color *-- Ctrl
+Rect *-- Ctrl
+
+class Page {
+    Each view class must decent from Page.
+    #std::vector<Touchable*> mTouchables
+--
+    +void ProcessEvent(Event &aEvent)
+}
+Ctrl <|-- Page 
+
+class Image {
+    A control to draw bitmap images.
+    #Bitmap mBitmap
+}
+Ctrl <|-- Image
+Bitmap *-- Image
+
+class Label {
+    A control used to draw text and graphics.
+    #string mCaption
+    #Font mFont
+--
+    void SetCaption(const string &arCaption)
+}
+Ctrl <|-- Label
+Font *-- Label
+
+class Button {
+    Decents from Label.
+    Draws a button in different states.
+    Posts an event when pressed.
+    Posts an event when dragged.
+    Posts an event when released.
+}
+Label <|-- Button
+Touchable <|-- Button
+
+class CheckBox {
+    A control used to draw a checkbox
+    in different states.
+    Posts an event when clicked.
+}
+Button <|-- CheckBox
+Image <|-- CheckBox
+
+@enduml
+

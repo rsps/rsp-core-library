@@ -1,24 +1,16 @@
 @startuml
 
-title GUI Process Flow
-
-'object "Operational state machine" as sm
+title Intended GUI Process Flow
 
 start
-#palegreen:Allocate GUI elements;
 repeat
     #palegreen:Poll touch input;
     if (Got touch event?) then (yes)
-        #lightblue:Traverse touch control handlers\non all elements on active page;
-        note left: GUI elements can notify\noperational state machine\nif hit by touch event.
+        #lightblue:Traverse touch control\n handlers on active page;
     endif
-    #palegreen:Poll state machine\nfor current state;
-    #palegreen:Get page (view)\nfor current state;
     #lightblue:Render invalidated page elements from\nbackground to topmost element;
-    #palegreen:Throttle to max 10 FPS; 
 repeat while (Is Terminated?) is (no)
 ->yes;
-#palegreen:Deallocate GUI elements;
 stop
 
 @enduml
