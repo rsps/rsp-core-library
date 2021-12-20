@@ -64,6 +64,7 @@ class Font {
     #string mFontName
     #FontStyle mStyle
     #Color mColor
+    #int mSize
 --
     +Font(const string &arName)
 }

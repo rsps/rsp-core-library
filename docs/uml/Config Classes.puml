@@ -1,0 +1,68 @@
+@startuml
+
+skinparam stereotypeCBackgroundColor<<Exception>> Red
+'hide stereotype
+
+title Configuration Classes
+
+abstract class Jsonable {
+    +string ToJson() const
+    +void FromJson(const string &arJson)
+}
+
+class Singleton<class T, class A> {
+    #static T mInstance
+--
+    +Singleton<T>;
+    +static T& Create()
+    +static T& Create(std::initializer_list<std:.pair<T, A>> aInitList)
+    +static T& Get()
+    +static void Delete()
+}
+
+class ConfigValueBase {
+    #void *mpData
+    #int mSize
+    #int mType
+--
+    ConfigValueBase(void *apBuffer, int aSize, int aType)
+}
+
+class ConfigValue<typename T> {
+    #T mData
+--
+    +ConfigValue()
+    +ConfigValue(T aValue)
+    +bool IsEmpty() const
+    +operator T() const
+    +void SetValidator(std::function<bool(Config&, ConfigValue<T>&)> aValidator)
+}
+
+class Config<enum T> {
+    #map<T,ConfigValue> mData
+    #bool validate()
+    #Config(std::initializer_list<std:.pair<T, ConfigValue>> aInitList)
+    #ConfigValueBase* operator[](T aIndex)
+--
+    +ConfigValue<A>& operator[](T aIndex)
+    +void SetValidator(std::function<bool(Config&)> aValidator)
+}
+
+ConfigValueBase <|-- ConfigValue
+ConfigValue *-- Config
+Jsonable <|-- Config
+Jsonable <|-- ConfigValue
+Singleton <|-- Config
+
+class ConfigException <<Exception>>
+class InvalidKey <<Exception>>
+class NotSet <<Exception>>
+class IllegalConversion <<Exception>>
+
+ConfigException <|-- InvalidKey
+ConfigException <|-- NotSet
+ConfigException <|-- IllegalConversion
+
+Config <-down[hidden]- ConfigException
+
+@enduml
