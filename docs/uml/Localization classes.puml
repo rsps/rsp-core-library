@@ -1,0 +1,12 @@
+@startuml
+
+title Localization Classes
+
+class Translation
+
+class Language
+
+class Locale
+
+
+@enduml

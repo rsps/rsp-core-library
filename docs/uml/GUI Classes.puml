@@ -6,29 +6,31 @@ namespace rsp {
 
 class Point {
     A simple class with properties\nfor a 2D coordinate.
-    +uint16_t x
-    +uint16_t y
 --
-    +Point(int aX, int aY)
-    +Point(const Point &arPoint)
+    +x: uint16_t
+    +y: uint16_t
+--
+    +Point(aX: int, aY: int)
+    +Point(arPoint: const Point&)
 }
 
 class Rect {
     A class with two Point properties.
-    #Point mTopLeft
-    #Point mBottomRight
 --
-    +Rect(int aTop, int aLeft, int aWidth, int aHeight)
-    +Rect(const Point &arTopLeft, int aWidth, int aHeight)
-    +Rect(const Point &arTopLeft, const Point &arBottomRigth)
-    +Rect(const Rect &arRect)
-    +Point& TopLeft()
-    +Point& BottomRight()
-    +int GetWidth()
-    +void SetWidth(int aValue)
-    +int GetHeight()
-    +void SetHeight(int aValue)
-    +bool IsHit(const Point &arPoint)
+    #mTopLeft: Point
+    #mBottomRight: Point
+--
+    +Rect(aTop: int, aLeft: int, aWidth: int, aHeight: int)
+    +Rect(arTopLeft: const Point&, aWidth: int, aHeight: int)
+    +Rect(arTopLeft: const Point&, arBottomRigth: const Point&)
+    +Rect(arRect: const Rect&)
+    +TopLeft(): Point&
+    +BottomRight(): Point&
+    +GetWidth(): int
+    +SetWidth(aValue: int)
+    +GetHeight(): int
+    +void SetHeight(aValue: int)
+    +bool IsHit(arPoint: const Point&)
 }
 Point *-- Rect
 
@@ -37,21 +39,22 @@ class Color {
     and Alpha channel color information.
     The alpha channel is used for opacity.
     Not all platforms support alpha blending.
-    #uint32_t mColor
 --
-    +Color(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha)
-    +Color(uint32_t aARGB)
-    +Color(const Color &arColor)
-    +uint8_t GetRed()
-    +void SetRed(uint8_t aValue)
-    +uint8_t GetGreen()
-    +void SetGreen(uint8_t aValue)
-    +uint8_t GetBlue()
-    +void SetBlue(uint8_t aValue)
-    +uint8_t GetAlpha()
-    +void SetAlpha(uint8_t aValue)
-    +operator uint32_t()
-    +operator =(const Color &arColor)
+    #mColor: uint32_t
+--
+    +Color(aRed: uint8_t, aGreen: uint8_t, aBlue: uint8_t, aAlpha: uint8_t)
+    +Color(aARGB: uint32_t)
+    +Color(arColor: const Color&)
+    +GetRed(): uint8_t
+    +SetRed(aValue: uint8_t)
+    +GetGreen(): uint8_t
+    +SetGreen(aValue: uint8_t)
+    +GetBlue(): uint8_t
+    +SetBlue(aValue: uint8_t)
+    +GetAlpha(): uint8_t
+    +SetAlpha(aValue: uint8_t)
+    +operator uint32_t(): uint32_t
+    +operator =(arColor: const Color&)
 }
 
 enum FontStyle {
@@ -63,20 +66,22 @@ enum FontStyle {
 class Font {
     When used on Linux, the GUI library can
     use the FreeType2 library to render fonts.
-    #string mFontName
-    #FontStyle mStyle
-    #Color mColor
-    #int mSize
 --
-    +Font(const string &arName)
+    #mFontName: string
+    #mStyle: FontStyle
+    #mColor: Color
+    #mSize: int
+--
+    +Font(arName: const string&)
 }
 FontStyle *-- Font
 Color *-- Font
 
 class Pen <<DEPRECATED>> {
     Class to control pen color and width.
-    #Color mColor
-    #int mWidth
+--
+    #mColor: Color
+    #mWidth: int
 }
 Color *-- Pen
 
@@ -92,13 +97,13 @@ class Canvas {
     Descendants can implement in memory canvas, Linux
     Framebuffer canvas or even a DirectX Canvas.
 --
-    +void DrawDot(const Point &arPoint, const Pen &arPen)
-    +void DrawArc(const Point &arCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &arPen)
-    +void DrawCircle(const Point &arCenter, int aRadius, const Pen &arPen)
-    +void DrawLine(const Point &arA, const Point &arB, const Pen &arPen)
-    +void DrawRectangle(const Rect &arRect, const Pen &arPen)
-    +void DrawImage(const Point &arTopLeft, const Bitmap &arBitmap)
-    +void DrawText(const Rect &arRect, const Font &arFont, const string &arText, bool aScaleToFit)
+    +DrawDot(arPoint: const Point&, arPen: const Pen&)
+    +DrawArc(arCenter: const Point&, aRadius1: int, aRadius2: int, aStartAngel: int, aSweepAngle: int, arPen: const Pen&)
+    +DrawCircle(arCenter: const Point&, aRadius: int, arPen: const Pen&)
+    +DrawLine(arA: const Point&, arB: const Point&, arPen: const Pen&)
+    +DrawRectangle(arRect: const Rect&, arPen: const Pen&)
+    +DrawImage(arTopLeft: const Point&, arBitmap: const Bitmap&)
+    +DrawText(arRect: const Rect&, arFont: const Font&, arText: const string&, aScaleToFit: bool)
 }
 Canvas <|-- Bitmap
 
@@ -107,10 +112,10 @@ class FrameBufferCanvas {
 Canvas <|-- FrameBufferCanvas
 
 interface Touchable {
-    #Rect mTouchArea
+    #mTouchArea: Rect
 --
-    +bool ProcessEvent(Event &aEvent)
-    +bool IsHit(const Point aPoint) const
+    +ProcessEvent(arEvent: Event&): bool
+    +IsHit(arPoint: const Point&) const: bool
 }
 Rect *-- Touchable
 
@@ -121,43 +126,47 @@ class Ctrl {
     property, this is flagged in case the object needs
     rendering. Setter functions can invalidate a Ctrl
     object.
-    #Color mBackground
-    #bool mTransparent
-    #Rect mArea
-    #Ctrl *mpParent
-    #std::vector<Ctrl*> mChildren
 --
-    +void Invalidate()
-    +bool IsInvalid() const
-    +bool IsTransparent() const
-    +void Render(Canvas &aCanvas)
-    +void SetArea(const Rect &arRect)
-    +Rect& GetArea()
+    #mBackground: Color
+    #mTransparent: bool
+    #mArea: Rect
+    #mpParent: Ctrl*
+    #mChildren: std::vector<Ctrl*>
+--
+    +Invalidate()
+    +IsInvalid() const: bool
+    +IsTransparent() const: bool
+    +Render(arCanvas: Canvas&)
+    +SetArea(arRect: const Rect&)
+    +GetArea(): Rect&
 }
 Color *-- Ctrl
 Rect *-- Ctrl
 
 class Page {
     Each view class must decent from Page.
-    #std::vector<Touchable*> mTouchables
 --
-    +void ProcessEvent(Event &aEvent)
+    #mTouchables: std::vector<Touchable*>
+--
+    +ProcessEvent(arEvent: Event&)
 }
 Ctrl <|-- Page 
 
 class Image {
     A control to draw bitmap images.
-    #Bitmap mBitmap
+--
+    #mBitmap: Bitmap
 }
 Ctrl <|-- Image
 Bitmap *-- Image
 
 class Label {
     A control used to draw text and graphics.
-    #string mCaption
-    #Font mFont
 --
-    void SetCaption(const string &arCaption)
+    #mCaption: string
+    #mFont: Font
+--
+    +SetCaption(arCaption: const string&)
 }
 Ctrl <|-- Label
 Font *-- Label

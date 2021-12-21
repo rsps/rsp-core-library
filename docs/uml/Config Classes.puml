@@ -9,35 +9,35 @@ namespace rsp {
 
 abstract class Jsonable {
     +string ToJson() const
-    +void FromJson(const string &arJson)
+    +void FromJson(arJson: const string&)
 }
 
 class Singleton<class T, class A> {
-    #static T mInstance
+    #{static} mInstance: T
 --
-    +Singleton<T>;
-    +static T& Create()
-    +static T& Create(std::initializer_list<std:.pair<T, A>> aInitList)
-    +static T& Get()
-    +static void Delete()
+    +Singleton<T>()
+    +{static} Create(): T&
+    +{static} Create(aInitList: std::initializer_list<std:.pair<T, A>>): T& 
+    +{static} T& Get(): T& 
+    +{static} Delete()
 }
 
 class ConfigValueBase {
-    #void *mpData
-    #int mSize
-    #int mType
+    #mpData: void*
+    #mSize: int
+    #mType: int
 --
-    ConfigValueBase(void *apBuffer, int aSize, int aType)
+    ConfigValueBase(apBuffer: void*, aSize: int, aType: int)
 }
 
 class ConfigValue<typename T> {
-    #T mData
+    #mData: T
 --
     +ConfigValue()
-    +ConfigValue(T aValue)
-    +bool IsEmpty() const
-    +operator T() const
-    +void SetValidator(std::function<bool(Config&, ConfigValue<T>&)> aValidator)
+    +ConfigValue(aValue: T)
+    +IsEmpty() const: bool
+    +operator T() const: T
+    +SetValidator(aValidator: std::function<bool(Config&, ConfigValue<T>&)>)
 }
 
 class Config<enum T> {
