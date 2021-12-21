@@ -1,0 +1,119 @@
+@startuml
+
+skinparam stereotypeCBackgroundColor<<Exception>> Red
+skinparam stereotypeCBackgroundColor<<std::runtime_error>> Red
+'hide stereotype
+
+title JSON Classes
+
+namespace rsp {
+
+class UTF8String <<dataType>> {
+    std::string
+}
+
+enum JsonTypes {
+    Null
+    Bool
+    Number
+    String
+    Object
+    Array
+}
+
+class Variant
+
+class JsonValue {
+    +{static} Decode(apJson:const char*) : JsonValue*
+    +{static} Decode(arJson:const UTF8String&) : JsonValue*
+    +{static} Decode(arJson:UTF8String&) : JsonValue*
+    +Encode(aPrettyPrint:bool = false) : UTF8String
+
+    +JsonValue()
+    +JsonValue<T>(aValue:T)
+    +virtual ~JsonValue()
+
+    +GetJsonType() const : JsonTypes
+    +operator<T> =(aValue:T) : JsonValue&
+
+    +AsArray() const : JsonArray&
+    +AsObject() const : JsonObject&
+}
+
+class JsonArray {
+    +GetCount() const : std::size_t
+    +operator[](aIndex:int) : JsonValue&
+
+    +Add(apValue:JsonValue*) : JsonValue&
+    +Remove(aIndex:int) : JsonValue&
+    +Clear()
+}
+
+class JsonObject {
+    +GetCount() const : std::size_t
+    +MemberExists(arName:const std::string&) const : bool
+
+    +operator[](apName:const char*) : JsonValue&
+    +operator[](arName:const std::string&) : JsonValue&
+
+    +Add(arName:const std::string&, apValue:JsonValue*) : JsonValue&
+    +Remove(arName:const std::string&) : JsonValue&
+    +Clear()
+}
+
+class Json<typename T> {
+    Simple wrapper to cast
+    JsonValue to type T
+--
+    Get() : T
+    Set(aValue:T)
+}
+
+class EJsonException <<std::runtime_error>> {
+    Base class for all
+    JSON exceptions
+}
+
+class EJsonParseError <<Exception>> {
+    Thrown if a JSON element
+    is not spelled correctly:
+    true, false, null, or if
+    string contains illegal
+    escape codes.
+}
+
+class EJsonNumberError <<Exception>> {
+    Thrown if a JSON number
+    element contains illegal
+    characters.
+}
+
+class EJsonTypeError <<Exception>> {
+    Thrown if a JsonValue is
+    accessed as an array or
+    object, but the value can
+    not be converted to either.
+}
+
+class EJsonUnicodeError <<Exception>> {
+    Thrown if unicode value
+    is greater than U+00FF
+}
+
+JsonObject -down[hidden]- EJsonException
+
+EJsonException <|-- EJsonParseError
+EJsonException <|-- EJsonTypeError
+EJsonParseError <|-- EJsonNumberError
+EJsonParseError <|-- EJsonUnicodeError
+
+Variant <|-- JsonValue
+JsonValue <|-- JsonArray
+JsonValue <|-- JsonObject
+JsonValue <|-- Json
+JsonArray o-- JsonValue
+JsonObject o-- JsonValue
+
+}
+
+@enduml

@@ -5,6 +5,8 @@ skinparam stereotypeCBackgroundColor<<Exception>> Red
 
 title Network Classes
 
+namespace rsp {
+
 class LibCurlWrapper {
 }
 
@@ -20,16 +22,7 @@ class HttpDownload {
 class DnsLookup {
 }
 
-class JsonValue {
-}
-
-class JsonArray {
-}
-
-class JsonObject {
-}
-
-class Json {
+class Json <<utils>> {
 }
 
 class Crc32 {
@@ -42,13 +35,9 @@ LibCurlWrapper <|-- DnsLookup
 
 Crc32 *-- HttpDownload
 
-JsonValue *-- JsonArray
-JsonValue *-- JsonObject
-JsonObject <|-- Json
-JsonArray <|-- Json
-JsonValue <|-- Json
-
 Json *-- HttpRequest
 Json *-- HttpResponse
+
+}
 
 @enduml

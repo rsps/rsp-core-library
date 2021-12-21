@@ -5,6 +5,8 @@ skinparam stereotypeCBackgroundColor<<Exception>> Red
 
 title Configuration Classes
 
+namespace rsp {
+
 abstract class Jsonable {
     +string ToJson() const
     +void FromJson(const string &arJson)
@@ -64,5 +66,7 @@ ConfigException <|-- NotSet
 ConfigException <|-- IllegalConversion
 
 Config <-down[hidden]- ConfigException
+
+}
 
 @enduml

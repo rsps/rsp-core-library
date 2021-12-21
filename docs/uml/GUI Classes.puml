@@ -2,6 +2,8 @@
 
 title GUI Classes
 
+namespace rsp {
+
 class Point {
     A simple class with properties\nfor a 2D coordinate.
     +uint16_t x
@@ -177,6 +179,8 @@ class CheckBox {
 }
 Button <|-- CheckBox
 Image <|-- CheckBox
+
+}
 
 @enduml
 
