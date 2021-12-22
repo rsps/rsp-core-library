@@ -12,12 +12,12 @@ abstract class Jsonable {
     +void FromJson(arJson: const string&)
 }
 
-class Singleton<class T, class A> {
+class Singleton<class T> {
     #{static} mInstance: T
 --
     +Singleton<T>()
     +{static} Create(): T&
-    +{static} Create(aInitList: std::initializer_list<std:.pair<T, A>>): T& 
+    +{static} Create<A, B>(aInitList: std::initializer_list<std:.pair<A, B>>): T& 
     +{static} T& Get(): T& 
     +{static} Delete()
 }
