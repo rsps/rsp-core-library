@@ -120,9 +120,6 @@ TEST_CASE("Framebuffer Drawing Primitives")
             // Check right side
             CHECK(pen.GetColor() == fb.GetPixel(Point(rightBottom.GetX(), rightBottom.GetY() - i), false));
         }
-
-        Rect fullScreen(Point(0, 0), Point(479, 799));
-        fb.DrawRectangle(fullScreen, pen);
         // fb.SwapBuffer();
     }
 
@@ -180,8 +177,8 @@ TEST_CASE("Framebuffer Drawing Primitives")
         // Arrange
         Point topLeftPoint(100, 200);
 
-        // std::string testImage = "testImages/testImageCross.bmp";
-        // Bitmap testImgMap(testImage);
+        std::string testImage = "testImages/testImageCross.bmp";
+        Bitmap testImgMap(testImage);
 
         std::string screenImg = "testImages/Asset2NoAlpha.bmp";
         Bitmap noAlphaMap(screenImg);
@@ -193,16 +190,9 @@ TEST_CASE("Framebuffer Drawing Primitives")
         CHECK(noAlphaMap.GetPixels().size() == (width * height));
 
         // Act
-        // fb.DrawImage(topLeftPoint, testImgMap);
+        fb.DrawImage(topLeftPoint, testImgMap);
 
         // fb.SwapBuffer(Canvas::SwapOperations::Clear);
-        MESSAGE("Showing full image");
-
-        fb.DrawImage(Point(0, 0), screenImg);
-
-        fb.SwapBuffer(Canvas::SwapOperations::Clear);
-
-        // std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
         // Assert
     }
