@@ -75,15 +75,7 @@ class Font {
     +Font(arName: const string&)
 }
 FontStyle *-- Font
-Color *-- Font
-
-class Pen <<DEPRECATED>> {
-    Class to control pen color and width.
---
-    #mColor: Color
-    #mWidth: int
-}
-Color *-- Pen
+Color *--- Font
 
 class Bitmap {
     Class to handle raster images.
@@ -97,11 +89,11 @@ class Canvas {
     Descendants can implement in memory canvas, Linux
     Framebuffer canvas or even a DirectX Canvas.
 --
-    +DrawDot(arPoint: const Point&, arPen: const Pen&)
-    +DrawArc(arCenter: const Point&, aRadius1: int, aRadius2: int, aStartAngel: int, aSweepAngle: int, arPen: const Pen&)
-    +DrawCircle(arCenter: const Point&, aRadius: int, arPen: const Pen&)
-    +DrawLine(arA: const Point&, arB: const Point&, arPen: const Pen&)
-    +DrawRectangle(arRect: const Rect&, arPen: const Pen&)
+    +DrawDot(arPoint: const Point&)
+    +DrawArc(arCenter: const Point&, aRadius1: int, aRadius2: int, aStartAngel: int, aSweepAngle: int)
+    +DrawCircle(arCenter: const Point&, aRadius: int)
+    +DrawLine(arA: const Point&, arB: const Point&)
+    +DrawRectangle(arRect: const Rect&)
     +DrawImage(arTopLeft: const Point&, arBitmap: const Bitmap&)
     +DrawText(arRect: const Rect&, arFont: const Font&, arText: const string&, aScaleToFit: bool)
 }
@@ -143,14 +135,14 @@ class Ctrl {
 Color *-- Ctrl
 Rect *-- Ctrl
 
-class Page {
-    Each view class must decent from Page.
+class Scene {
+    Each fullscreen view must decent from Scene.
 --
     #mTouchables: std::vector<Touchable*>
 --
     +ProcessEvent(arEvent: Event&)
 }
-Ctrl <|-- Page 
+Ctrl <|-- Scene 
 
 class Image {
     A control to draw bitmap images.
