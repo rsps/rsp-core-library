@@ -41,9 +41,9 @@ class ConfigValue<typename T> {
 }
 
 class Config<enum T> {
-    #map<T,ConfigValue> mData
+    #map<T,ConfigValueBase*> mData
     #bool validate()
-    #Config(std::initializer_list<std:.pair<T, ConfigValue>> aInitList)
+    #Config(std::initializer_list<std:.pair<T, ConfigValueBase*>> aInitList)
     #ConfigValueBase* operator[](T aIndex)
 --
     +ConfigValue<A>& operator[](T aIndex)

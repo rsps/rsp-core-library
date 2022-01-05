@@ -103,13 +103,13 @@ class FrameBufferCanvas {
 }
 Canvas <|-- FrameBufferCanvas
 
-interface Touchable {
+class TouchArea {
     #mTouchArea: Rect
 --
     +ProcessEvent(arEvent: Event&): bool
     +IsHit(arPoint: const Point&) const: bool
 }
-Rect *-- Touchable
+Rect *-- TouchArea
 
 class Ctrl {
     The base GUI element. All other elements
@@ -171,7 +171,7 @@ class Button {
     Posts an event when released.
 }
 Label <|-- Button
-Touchable <|-- Button
+TouchArea *-- Button
 
 class CheckBox {
     A control used to draw a checkbox
