@@ -10,6 +10,9 @@ class FileIO {
     On Linux it is guaranteed not to have any caching and therefore preferred to
     interact with virtual files (sysfs) and character devices.
 --
+    #mFileName : std::string
+    #mHandle : int    
+--
     +FileIO()
     +FileIO(arFileName: const std::string&, aMode: std::ios_base::openmode, aPermissions:int = 0)
     +Open(arFileName: const std::string&, aMode: std::ios_base::openmode, aPermissions:int = 0)
