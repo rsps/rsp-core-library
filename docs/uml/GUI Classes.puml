@@ -1,0 +1,187 @@
+@startuml
+
+title GUI Classes
+
+namespace rsp {
+
+class Point {
+    A simple class with properties\nfor a 2D coordinate.
+--
+    +x: uint16_t
+    +y: uint16_t
+--
+    +Point(aX: int, aY: int)
+    +Point(arPoint: const Point&)
+}
+
+class Rect {
+    A class with two Point properties.
+--
+    #mTopLeft: Point
+    #mBottomRight: Point
+--
+    +Rect(aTop: int, aLeft: int, aWidth: int, aHeight: int)
+    +Rect(arTopLeft: const Point&, aWidth: int, aHeight: int)
+    +Rect(arTopLeft: const Point&, arBottomRigth: const Point&)
+    +Rect(arRect: const Rect&)
+    +TopLeft(): Point&
+    +BottomRight(): Point&
+    +GetWidth(): int
+    +SetWidth(aValue: int)
+    +GetHeight(): int
+    +void SetHeight(aValue: int)
+    +bool IsHit(arPoint: const Point&)
+}
+Point *-- Rect
+
+class Color {
+    Class with uint32_t property for RGB
+    and Alpha channel color information.
+    The alpha channel is used for opacity.
+    Not all platforms support alpha blending.
+--
+    #mColor: uint32_t
+--
+    +Color(aRed: uint8_t, aGreen: uint8_t, aBlue: uint8_t, aAlpha: uint8_t)
+    +Color(aARGB: uint32_t)
+    +Color(arColor: const Color&)
+    +GetRed(): uint8_t
+    +SetRed(aValue: uint8_t)
+    +GetGreen(): uint8_t
+    +SetGreen(aValue: uint8_t)
+    +GetBlue(): uint8_t
+    +SetBlue(aValue: uint8_t)
+    +GetAlpha(): uint8_t
+    +SetAlpha(aValue: uint8_t)
+    +operator uint32_t(): uint32_t
+    +operator =(arColor: const Color&)
+}
+
+enum FontStyle {
+    Normal
+    Bold
+    Italic
+}
+
+class Font {
+    When used on Linux, the GUI library can
+    use the FreeType2 library to render fonts.
+--
+    #mFontName: string
+    #mStyle: FontStyle
+    #mColor: Color
+    #mSize: int
+--
+    +Font(arName: const string&)
+}
+FontStyle *-- Font
+Color *--- Font
+
+class Bitmap {
+    Class to handle raster images.
+    Can load bmp and png files through
+    filesystem and do some basic
+    manipulation like resize/stretch.
+}
+
+class Canvas {
+    All drawing operations are performed on a Canvas.
+    Descendants can implement in memory canvas, Linux
+    Framebuffer canvas or even a DirectX Canvas.
+--
+    +DrawDot(arPoint: const Point&)
+    +DrawArc(arCenter: const Point&, aRadius1: int, aRadius2: int, aStartAngel: int, aSweepAngle: int)
+    +DrawCircle(arCenter: const Point&, aRadius: int)
+    +DrawLine(arA: const Point&, arB: const Point&)
+    +DrawRectangle(arRect: const Rect&)
+    +DrawImage(arTopLeft: const Point&, arBitmap: const Bitmap&)
+    +DrawText(arRect: const Rect&, arFont: const Font&, arText: const string&, aScaleToFit: bool)
+}
+Canvas <|-- Bitmap
+
+class FrameBufferCanvas {
+}
+Canvas <|-- FrameBufferCanvas
+
+class TouchArea {
+    #mTouchArea: Rect
+--
+    +ProcessEvent(arEvent: Event&): bool
+    +IsHit(arPoint: const Point&) const: bool
+}
+Rect *-- TouchArea
+
+class Ctrl {
+    The base GUI element. All other elements
+    decent from the Ctrl class.
+    Ctrl objects contains a boolean "invalidated"
+    property, this is flagged in case the object needs
+    rendering. Setter functions can invalidate a Ctrl
+    object.
+--
+    #mBackground: Color
+    #mTransparent: bool
+    #mArea: Rect
+    #mpParent: Ctrl*
+    #mChildren: std::vector<Ctrl*>
+--
+    +Invalidate()
+    +IsInvalid() const: bool
+    +IsTransparent() const: bool
+    +Render(arCanvas: Canvas&)
+    +SetArea(arRect: const Rect&)
+    +GetArea(): Rect&
+}
+Color *-- Ctrl
+Rect *-- Ctrl
+
+class Scene {
+    Each fullscreen view must decent from Scene.
+--
+    #mTouchables: std::vector<Touchable*>
+--
+    +ProcessEvent(arEvent: Event&)
+}
+Ctrl <|-- Scene 
+
+class Image {
+    A control to draw bitmap images.
+--
+    #mBitmap: Bitmap
+}
+Ctrl <|-- Image
+Bitmap *-- Image
+
+class Label {
+    A control used to draw text and graphics.
+--
+    #mCaption: string
+    #mFont: Font
+--
+    +SetCaption(arCaption: const string&)
+}
+Ctrl <|-- Label
+Font *-- Label
+
+class Button {
+    Decents from Label.
+    Draws a button in different states.
+    Posts an event when pressed.
+    Posts an event when dragged.
+    Posts an event when released.
+}
+Label <|-- Button
+TouchArea *-- Button
+
+class CheckBox {
+    A control used to draw a checkbox
+    in different states.
+    Posts an event when clicked.
+}
+Button <|-- CheckBox
+Image <|-- CheckBox
+
+}
+
+@enduml
+

@@ -1,0 +1,72 @@
+@startuml
+
+skinparam stereotypeCBackgroundColor<<Exception>> Red
+'hide stereotype
+
+title Configuration Classes
+
+namespace rsp {
+
+abstract class Jsonable {
+    +string ToJson() const
+    +void FromJson(arJson: const string&)
+}
+
+class Singleton<class T> {
+    #{static} mInstance: T
+--
+    +Singleton<T>()
+    +{static} Create(): T&
+    +{static} Create<A, B>(aInitList: std::initializer_list<std:.pair<A, B>>): T& 
+    +{static} T& Get(): T& 
+    +{static} Delete()
+}
+
+class ConfigValueBase {
+    #mpData: void*
+    #mSize: int
+    #mType: int
+--
+    ConfigValueBase(apBuffer: void*, aSize: int, aType: int)
+}
+
+class ConfigValue<typename T> {
+    #mData: T
+--
+    +ConfigValue()
+    +ConfigValue(aValue: T)
+    +IsEmpty() const: bool
+    +operator T() const: T
+    +SetValidator(aValidator: std::function<bool(Config&, ConfigValue<T>&)>)
+}
+
+class Config<enum T> {
+    #map<T,ConfigValueBase*> mData
+    #bool validate()
+    #Config(std::initializer_list<std:.pair<T, ConfigValueBase*>> aInitList)
+    #ConfigValueBase* operator[](T aIndex)
+--
+    +ConfigValue<A>& operator[](T aIndex)
+    +void SetValidator(std::function<bool(Config&)> aValidator)
+}
+
+ConfigValueBase <|-- ConfigValue
+ConfigValue *-- Config
+Jsonable <|-- Config
+Jsonable <|-- ConfigValue
+Singleton <|-- Config
+
+class ConfigException <<Exception>>
+class InvalidKey <<Exception>>
+class NotSet <<Exception>>
+class IllegalConversion <<Exception>>
+
+ConfigException <|-- InvalidKey
+ConfigException <|-- NotSet
+ConfigException <|-- IllegalConversion
+
+Config <-down[hidden]- ConfigException
+
+}
+
+@enduml

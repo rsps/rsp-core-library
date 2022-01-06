@@ -1,0 +1,143 @@
+@startuml
+
+
+title Logging Classes
+
+namespace rsp::logging {
+
+enum LogLevel {
+    Emergency
+    Alert
+    Critical
+    Error
+    Warning
+    Notice
+    Info
+    Debug
+    
+    +const cDefautLogLevel = Info
+    +ToLogLevel(aLevelString: std::string): LogLevel
+    +ToString(aLevel: LogLevel): std::string
+}
+
+enum LogType {
+    Auth
+    Cron
+    Daemon
+    Local0
+    Local1
+    Local2
+    Local3
+    Local4
+    Local5
+    Local6
+    Local7
+    Print
+    Mail
+    News
+    User
+    Uucp
+}
+
+abstract LoggerInterface {
+    +{static} GetDefault(): LoggerInterface&
+    +{static} SetDefault(apLogger: LoggerInterface*)
+    +{abstract} Emergency(): LogStream
+    +{abstract} Alert(): LogStream
+    +{abstract} Critical(): LogStream
+    +{abstract} Error(): LogStream
+    +{abstract} Warning(): LogStream
+    +{abstract} Notice(): LogStream
+    +{abstract} Info(): LogStream
+    +{abstract} Debug(): LogStream
+    +HasWriters() const: bool
+    +AddLogWriter(aWriter: std::shared_ptr<LogWriterInterface>): Handle_t
+    +RemoveLogWriter(aHandle: Handle_t)
+    #{abstract} write(apStream: const LogStreamInterface*, arMsg: const std::string&)
+}
+
+abstract LogStreamInterface {
+    +LogStreamInterface(apOwner: LoggerInterface*, aLevel: LogLevel)
+    +LogStreamInterface(aFrom: const LogStreamInterface&)
+    +GetLevel() const: LogLevel
+    +SetLevel(aLevel: LogLevel)
+    #ownerWrite(arMsg: const std::string &)
+}
+
+abstract LogWriterInterface {
+    +{abstract} Write(arMsg: const std::string&, aCurrentLevel: LogLevel)
+    +SetAcceptLogLevel(aLevel: LogLevel)
+}
+
+class LogStream<type> {
+    +LogStream(apOwner: LoggerInterface*, aLevel: LogLevel)
+    +LogStream(aFrom: LogStream &&)
+    +operator<type><<(aValue: type): LogStream&
+    +operator<<(apFunc: std::ostream&(*)(std::ostream&): LogStream&
+    +Flush()
+}
+
+class Logger {
+    +Logger(aCaptureClog: bool = false)
+    +Emergency(): LogStream
+    +Alert(): LogStream
+    +Critical(): LogStream
+    +Error(): LogStream
+    +Warning(): LogStream
+    +Notice(): LogStream
+    +Info(): LogStream
+    +Debug(): LogStream
+}
+
+class streambuf as "std::streambuf" <<internal>>
+
+class OutStreamBuf {
+    +OutStreamBuf(apOwner: LoggerInterface*, aLevel: LogLevel);
+    +Lock()
+}
+
+class ConsoleLogStreamsInterface {
+    +{abstract} Info(arMsg: const std::string&)
+    +{abstract} Error(arMsg: const std::string&)
+}
+
+class ConsoleLogWriter {
+    +ConsoleLogWriter(aAcceptLevel: std::string, apConsole: ConsoleLogStreamsInterface* = nullptr, apColors: const ConsoleColors_t* = nullptr);
+    +ConsoleLogWriter(aAcceptLevel: LogLevel, apConsole: ConsoleLogStreamsInterface* = nullptr, apColors: const ConsoleColors_t* = nullptr)
+    +Write(arMsg: const std::string&, aCurrentLevel: LogLevel)
+
+}
+
+class SysLogWriter {
+    +SysLogWriter(aIdent: std::string, aType: LogType)
+    +Write(arMsg: const std::string&, aCurrentLevel: LogLevel)
+}
+
+class FileLogWriter {
+    +FileLogWriter(aFileName: std::string, aAcceptLevel: std::string)
+    +FileLogWriter(aFileName: std::string, aAcceptLevel: LogLevel)
+    +Write(arMsg: const std::string&, aCurrentLevel: LogLevel)
+}
+
+streambuf <|-- OutStreamBuf
+LoggerInterface <|-- Logger
+LogStreamInterface <|--- LogStream
+OutStreamBuf *-- LogStream
+
+LogWriterInterface <|-- ConsoleLogWriter
+LogWriterInterface <|-- SysLogWriter
+LogWriterInterface <|--- FileLogWriter
+LogType *--- SysLogWriter
+LogLevel *-- LogWriterInterface
+
+ConsoleLogStreamsInterface *-- ConsoleLogWriter
+
+LogWriterInterface *---- LoggerInterface
+
+'LogStream <-[hidden]- LoggerInterface
+ConsoleLogWriter <-[hidden]- LogStreamInterface
+ConsoleLogWriter <-[hidden]- streambuf
+
+}
+
+@enduml

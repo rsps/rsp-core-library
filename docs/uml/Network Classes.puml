@@ -1,0 +1,43 @@
+@startuml
+
+skinparam stereotypeCBackgroundColor<<Exception>> Red
+'hide stereotype
+
+title Network Classes
+
+namespace rsp {
+
+class LibCurlWrapper {
+}
+
+class HttpRequest {
+}
+
+class HttpResponse {
+}
+
+class HttpDownload {
+}
+
+class DnsLookup {
+}
+
+class Json <<utils>> {
+}
+
+class Crc32 {
+}
+
+LibCurlWrapper <|-- HttpRequest
+LibCurlWrapper <|-- HttpResponse
+LibCurlWrapper <|-- HttpDownload
+LibCurlWrapper <|-- DnsLookup
+
+Crc32 *-- HttpDownload
+
+Json *-- HttpRequest
+Json *-- HttpResponse
+
+}
+
+@enduml
