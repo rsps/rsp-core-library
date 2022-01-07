@@ -84,24 +84,43 @@ class Bitmap {
     manipulation like resize/stretch.
 }
 
-class Canvas {
+enum SwapOperations
+{
+When swapping buffers these values can control
+the baseline content of the new buffer.
+--
+    NoOp // No initialization of the buffer is performed
+    Copy  // The current view content is copied int new buffer
+    Clear // The new buffer is filled with the background color
+}
+
+abstract Canvas {
     All drawing operations are performed on a Canvas.
     Descendants can implement in memory canvas, Linux
     Framebuffer canvas or even a DirectX Canvas.
 --
-    +DrawDot(arPoint: const Point&)
-    +DrawArc(arCenter: const Point&, aRadius1: int, aRadius2: int, aStartAngel: int, aSweepAngle: int)
-    +DrawCircle(arCenter: const Point&, aRadius: int)
-    +DrawLine(arA: const Point&, arB: const Point&)
-    +DrawRectangle(arRect: const Rect&)
-    +DrawImage(arTopLeft: const Point&, arBitmap: const Bitmap&)
-    +DrawText(arRect: const Rect&, arFont: const Font&, arText: const string&, aScaleToFit: bool)
+    +{abstract}DrawDot(arPoint: const Point&, aColor: Color)
+    +{abstract}DrawArc(arCenter: const Point&, aRadius1: int, aRadius2: int, aStartAngle: int, aSweepAngle: int, aColor: Color)
+    +{abstract}DrawCircle(arCenter: const Point&, aRadius: int, aColor: Color)
+    +{abstract}DrawLine(arA: const Point&, arB: const Point&, aColor: Color)
+    +{abstract}DrawRectangle(arRect: const Rect&, aColor: Color)
+    +{abstract}DrawImage(arTopLeft: const Point&, arBitmap: const Bitmap&)
+    +{abstract}DrawText(arRect: const Rect&, arFont: const Font&, arText: const string&, aScaleToFit: bool)
+    +{abstract}GetPixel(arPoint: const Point&, aFront: const bool = false) const : uint32_t
+    +{abstract}SetPixel(arPoint: const Point&, aColor: const Color)
 }
 Canvas <|-- Bitmap
 
+abstract BufferedCanvas {
+    +{abstract} SwapBuffers(aOperation: SwapOperations);
+}
+
+SwapOperations ... BufferedCanvas
+Canvas <|-- BufferedCanvas
+
 class FrameBufferCanvas {
 }
-Canvas <|-- FrameBufferCanvas
+BufferedCanvas <|-- FrameBufferCanvas
 
 class TouchArea {
     #mTouchArea: Rect
