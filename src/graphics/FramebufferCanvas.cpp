@@ -31,19 +31,19 @@ Framebuffer::Framebuffer()
         }
     }
 
-    //get fixed screen info
+    // get fixed screen info
     ioctl(mFramebufferFile, FBIOGET_VSCREENINFO, &mVariableInfo);
 
-    //get variable screen info
+    // get variable screen info
     ioctl(mFramebufferFile, FBIOGET_FSCREENINFO, &mFixedInfo);
 
-    //set yres_virtual for double buffering
+    // set yres_virtual for double buffering
     mVariableInfo.yres_virtual = mVariableInfo.yres * 2;
     if (ioctl(mFramebufferFile, FBIOPUT_VSCREENINFO, &mVariableInfo) == -1) {
         std::cout << "ioctl FBIOPUT_VSCREENINFO failed errno:" << strerror(errno) << std::endl;
     }
 
-    //stop the console from drawing ontop of this programs graphics
+    // stop the console from drawing ontop of this programs graphics
     if (access("/dev/tty0", O_RDWR) == 0) {
         mTtyFb = open("/dev/tty0", O_RDWR);
         if (ioctl(mTtyFb, KDSETMODE, KD_GRAPHICS) == -1) {
@@ -51,7 +51,7 @@ Framebuffer::Framebuffer()
         }
     }
 
-    //calculate size of screen
+    // calculate size of screen
     long screensize = mVariableInfo.yres * mFixedInfo.line_length;
 
     mpFrontBuffer = static_cast<uint8_t *>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
@@ -70,7 +70,7 @@ Framebuffer::Framebuffer()
 
 Framebuffer::~Framebuffer()
 {
-    //At exit we MUST release the tty again
+    // At exit we MUST release the tty again
     if (mTtyFb > 0) {
         if (ioctl(mTtyFb, KDSETMODE, KD_TEXT) == -1) {
             std::cout << "ioctl KDSETMODE KD_TEXT failed errno:" << strerror(errno) << std::endl;
@@ -83,19 +83,19 @@ Framebuffer::~Framebuffer()
     // No need to call munmap on the shared memory region, this is done automatically on termination.
 }
 
-void Framebuffer::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen)
+void Framebuffer::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &aColor)
 {
     throw rsp::utils::NotImplementedException("");
 }
 
-void Framebuffer::DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen)
+void Framebuffer::DrawCircle(const Point &aCenter, int aRadius, const Color &aColor)
 {
     int error = -aRadius;
-    //int x = aRadius;
+    // int x = aRadius;
     int y = 0;
 
     while (aRadius >= y) {
-        plot8Points(aCenter.mX, aCenter.mY, aRadius, y, aPen);
+        plot8Points(aCenter.mX, aCenter.mY, aRadius, y, aColor);
         error += y;
         y++;
         error += y;
@@ -108,7 +108,7 @@ void Framebuffer::DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen)
     }
 }
 
-void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen)
+void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Color &aColor)
 {
     int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;
 
@@ -123,7 +123,7 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen)
     px = aA.mX;
     py = aA.mY;
 
-    aPen.Draw(*this, aA);
+    SetPixel(aA, aColor);
     if (absDeltaX >= absDeltaY) {
         for (i = 0; i < absDeltaX; i++) {
             y += absDeltaY;
@@ -132,7 +132,7 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen)
                 py += signumY;
             }
             px += signumX;
-            aPen.Draw(*this, Point(px, py));
+            SetPixel(Point(px, py), aColor);
         }
     } else {
         for (i = 0; i < absDeltaY; i++) {
@@ -142,20 +142,20 @@ void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Pen &aPen)
                 px += signumX;
             }
             py += signumY;
-            aPen.Draw(*this, Point(px, py));
+            SetPixel(Point(px, py), aColor);
         }
     }
 }
 
-void Framebuffer::DrawRectangle(const Rect &aRect, const Pen &aPen)
+void Framebuffer::DrawRectangle(const Rect &aRect, const Color &aColor)
 {
     for (int i = aRect.mLeftTop.mX; i <= aRect.mRightBottom.mX; i++) {
-        aPen.Draw(*this, Point(i, aRect.mLeftTop.mY));     //top
-        aPen.Draw(*this, Point(i, aRect.mRightBottom.mY)); //bottom
+        SetPixel(Point(i, aRect.mLeftTop.mY), aColor);     // top
+        SetPixel(Point(i, aRect.mRightBottom.mY), aColor); // bottom
     }
     for (int i = aRect.mLeftTop.mY; i <= aRect.mRightBottom.mY; i++) {
-        aPen.Draw(*this, Point(aRect.mLeftTop.mX, i));     //left
-        aPen.Draw(*this, Point(aRect.mRightBottom.mX, i)); //right
+        SetPixel(Point(aRect.mLeftTop.mX, i), aColor);     // left
+        SetPixel(Point(aRect.mRightBottom.mX, i), aColor); // right
     }
 }
 
@@ -181,18 +181,18 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
 
     mVariableInfo.reserved[0]++;
 
-    //swap buffer
+    // swap buffer
     if (mVariableInfo.yoffset == 0) {
         mVariableInfo.yoffset = mVariableInfo.yres;
     } else {
         mVariableInfo.yoffset = 0;
     }
-    //Pan to back buffer
+    // Pan to back buffer
     if (ioctl(mFramebufferFile, FBIOPAN_DISPLAY, &mVariableInfo) == -1) {
         std::cout << "ioctl FBIOPAN_DISPLAY failed errno:" << strerror(errno) << std::endl;
     }
 
-    //update pointers
+    // update pointers
     uint8_t *tmp = mpFrontBuffer;
     mpFrontBuffer = mpBackBuffer;
     mpBackBuffer = tmp;
@@ -218,7 +218,7 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
         return 0;
     }
     long location = (aPoint.mX + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + aPoint.mY * mFixedInfo.line_length;
-    //std::cout << "location:" << location << std::endl;
+    // std::cout << "location:" << location << std::endl;
     if (aFront) {
         return *(reinterpret_cast<uint32_t *>(mpFrontBuffer + location));
     } else {
@@ -229,12 +229,12 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
 void Framebuffer::clear()
 {
     long x, y;
-    //draw to back buffer
-    //    std::cout << "Clearing buffer" << std::endl;
+    // draw to back buffer
+    //     std::cout << "Clearing buffer" << std::endl;
     for (y = 0; y < mVariableInfo.yres; y++) {
         for (x = 0; x < mVariableInfo.xres; x++) {
             long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;
-            //std::cout << "location:" << location << std::endl;
+            // std::cout << "location:" << location << std::endl;
             *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = 0x00000000;
         }
     }
@@ -243,12 +243,12 @@ void Framebuffer::clear()
 void Framebuffer::copy()
 {
     long x, y;
-    //copy front buffer to back buffer
-    //    std::cout << "Copying buffer" << std::endl;
+    // copy front buffer to back buffer
+    //     std::cout << "Copying buffer" << std::endl;
     for (y = 0; y < mVariableInfo.yres; y++) {
         for (x = 0; x < mVariableInfo.xres; x++) {
             long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;
-            //std::cout << "location:" << location << std::endl;
+            // std::cout << "location:" << location << std::endl;
             *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = *(reinterpret_cast<uint32_t *>(mpFrontBuffer + location));
         }
     }

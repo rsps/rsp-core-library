@@ -15,6 +15,7 @@ namespace rsp::graphics
 {
 
 class Rect;
+class Canvas;
 class Framebuffer;
 
 /**
@@ -80,6 +81,7 @@ class Point
   protected:
     // Allow friends to access members for speed optimizations.
     friend Framebuffer;
+    friend Canvas;
     friend Rect;
 
     int mX;
