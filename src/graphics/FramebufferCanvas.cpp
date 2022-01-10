@@ -82,7 +82,7 @@ Framebuffer::~Framebuffer()
     }
     // No need to call munmap on the shared memory region, this is done automatically on termination.
 }
-
+/*
 void Framebuffer::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &aColor)
 {
     throw rsp::utils::NotImplementedException("");
@@ -175,6 +175,7 @@ void Framebuffer::DrawText(const Rect &aRect, const Font &aFont, const char *apT
 {
     throw rsp::utils::NotImplementedException("Draw Text is not yet implemented");
 }
+*/
 
 void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
 {

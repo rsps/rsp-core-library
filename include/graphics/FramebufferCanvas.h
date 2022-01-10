@@ -3,38 +3,26 @@
 
 #include <linux/fb.h>
 
+#include "BufferedCanvas.h"
 #include "primitives/Canvas.h"
 
 namespace rsp::graphics
 {
 
-class Framebuffer : public Canvas
+class Framebuffer : public BufferedCanvas
 {
   public:
-    /**
-     * Enumerated SwapOperations
-     *
-     * In case of double buffer support, these values can control
-     * the content of the new buffer:
-     *  NoOp:  No initialization of the buffer is performed
-     *  Copy:  The current view content is copied int new buffer
-     *  Clear: The new buffer is filled with the background color.
-     */
-    enum class SwapOperations {
-        NoOp,
-        Copy,
-        Clear
-    };
-
     Framebuffer();
     virtual ~Framebuffer();
 
+    /*
     void DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &aColor);
     void DrawCircle(const Point &aCenter, int aRadius, const Color &aColor);
     void DrawLine(const Point &aA, const Point &aB, const Color &aColor);
     void DrawRectangle(const Rect &aRect, const Color &aColor);
     void DrawImage(const Point &aLeftTop, const Bitmap &aBitmap);
     void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit);
+    */
     inline void SetPixel(const Point &aPoint, const Color aColor)
     {
         if (!IsInsideScreen(aPoint)) {
@@ -46,9 +34,7 @@ class Framebuffer : public Canvas
     }
 
     uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
-
-    void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy);
-
+    /*
     uint32_t GetWidth() const
     {
         return mVariableInfo.xres;
@@ -67,6 +53,8 @@ class Framebuffer : public Canvas
     {
         return !(aPoint.mX < 0 || aPoint.mY < 0 || static_cast<uint32_t>(aPoint.mY) >= mVariableInfo.yres || static_cast<uint32_t>(aPoint.mX) >= mVariableInfo.xres);
     }
+    */
+    void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy);
 
   protected:
     int mFramebufferFile;
