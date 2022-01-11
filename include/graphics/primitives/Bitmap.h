@@ -1,6 +1,7 @@
 #ifndef BITMAP_H
 #define BITMAP_H
 
+#include <graphics/primitives/Canvas.h>
 #include <graphics/primitives/raster/ImgLoader.h>
 #include <memory>
 
@@ -19,7 +20,7 @@ namespace rsp::graphics
  * Various raster image formats can be implemented by descending specialized loaders
  * from the ImgLoader class and adding those to the GetRasterLoader method.
  */
-class Bitmap
+class Bitmap : public Canvas
 {
   public:
     static std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> filetypeMap;
@@ -54,6 +55,17 @@ class Bitmap
      */
     ~Bitmap();
 
+    inline void SetPixel(const Point &aPoint, const Color aColor)
+    {
+        if (!IsInsideScreen(aPoint)) {
+            return;
+        }
+        long location = (mWidth * aPoint.mY) + aPoint.mX;
+        mImagePixels[location] = aColor;
+    }
+
+    uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
+
     /**
      * Get the height of the bitmap.
      *
@@ -86,10 +98,6 @@ class Bitmap
 
   protected:
     std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
-
-    uint32_t mHeight;
-    uint32_t mWidth;
-    uint16_t mBytesPerPixel;            // Unused
     std::vector<uint32_t> mImagePixels; // Pointer?
 };
 

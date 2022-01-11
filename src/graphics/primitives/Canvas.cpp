@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/primitives/Canvas.h>
+#include "graphics/primitives/Bitmap.h"
 
 #include <chrono>
 #include <fcntl.h>

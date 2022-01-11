@@ -11,7 +11,9 @@
 #include <graphics/FramebufferCanvas.h>
 
 #include <chrono>
+#include <cstring>
 #include <fcntl.h>
+#include <iostream>
 #include <linux/kd.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -40,7 +42,7 @@ Framebuffer::Framebuffer()
     // set Canvas specific variables
     mWidth = mVariableInfo.yres;
     mHeight = mVariableInfo.xres;
-    mColorDepth = mVariableInfo.bits_per_pixel;
+    mBytesPerPixel = mVariableInfo.bits_per_pixel / 8;
 
     // set yres_virtual for double buffering
     mVariableInfo.yres_virtual = mVariableInfo.yres * 2;
@@ -87,100 +89,6 @@ Framebuffer::~Framebuffer()
     }
     // No need to call munmap on the shared memory region, this is done automatically on termination.
 }
-/*
-void Framebuffer::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &aColor)
-{
-    throw rsp::utils::NotImplementedException("");
-}
-
-void Framebuffer::DrawCircle(const Point &aCenter, int aRadius, const Color &aColor)
-{
-    int error = -aRadius;
-    // int x = aRadius;
-    int y = 0;
-
-    while (aRadius >= y) {
-        plot8Points(aCenter.mX, aCenter.mY, aRadius, y, aColor);
-        error += y;
-        y++;
-        error += y;
-
-        if (error >= 0) {
-            error += -aRadius;
-            aRadius--;
-            error += -aRadius;
-        }
-    }
-}
-
-void Framebuffer::DrawLine(const Point &aA, const Point &aB, const Color &aColor)
-{
-    int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;
-
-    deltaX = aB.mX - aA.mX;
-    deltaY = aB.mY - aA.mY;
-    absDeltaX = abs(deltaX);
-    absDeltaY = abs(deltaY);
-    signumX = (deltaX > 0) ? 1 : -1;
-    signumY = (deltaY > 0) ? 1 : -1;
-    x = absDeltaX >> 1;
-    y = absDeltaY >> 1;
-    px = aA.mX;
-    py = aA.mY;
-
-    SetPixel(aA, aColor);
-    if (absDeltaX >= absDeltaY) {
-        for (i = 0; i < absDeltaX; i++) {
-            y += absDeltaY;
-            if (y >= absDeltaX) {
-                y -= absDeltaX;
-                py += signumY;
-            }
-            px += signumX;
-            SetPixel(Point(px, py), aColor);
-        }
-    } else {
-        for (i = 0; i < absDeltaY; i++) {
-            x += absDeltaX;
-            if (x >= absDeltaY) {
-                x -= absDeltaY;
-                px += signumX;
-            }
-            py += signumY;
-            SetPixel(Point(px, py), aColor);
-        }
-    }
-}
-
-void Framebuffer::DrawRectangle(const Rect &aRect, const Color &aColor)
-{
-    for (int i = aRect.mLeftTop.mX; i <= aRect.mRightBottom.mX; i++) {
-        SetPixel(Point(i, aRect.mLeftTop.mY), aColor);     // top
-        SetPixel(Point(i, aRect.mRightBottom.mY), aColor); // bottom
-    }
-    for (int i = aRect.mLeftTop.mY; i <= aRect.mRightBottom.mY; i++) {
-        SetPixel(Point(aRect.mLeftTop.mX, i), aColor);     // left
-        SetPixel(Point(aRect.mRightBottom.mX, i), aColor); // right
-    }
-}
-
-void Framebuffer::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
-{
-    int iter = 0;
-    auto pixels = aBitmap.GetPixels();
-    for (size_t h = 0; h < aBitmap.GetHeight(); h++) {
-        for (size_t w = 0; w < aBitmap.GetWidth(); w++) {
-            SetPixel(Point(aLeftTop.mX + w, aLeftTop.mY + h), pixels[iter]);
-            iter++;
-        }
-    }
-}
-
-void Framebuffer::DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit)
-{
-    throw rsp::utils::NotImplementedException("Draw Text is not yet implemented");
-}
-*/
 
 void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
 {

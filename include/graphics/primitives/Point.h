@@ -16,6 +16,7 @@ namespace rsp::graphics
 
 class Rect;
 class Canvas;
+class Bitmap;
 class Framebuffer;
 
 /**
@@ -82,6 +83,7 @@ class Point
     // Allow friends to access members for speed optimizations.
     friend Framebuffer;
     friend Canvas;
+    friend Bitmap;
     friend Rect;
 
     int mX;

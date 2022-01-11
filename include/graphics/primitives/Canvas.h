@@ -11,10 +11,8 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include "Bitmap.h"
 #include "Color.h"
 #include "Font.h"
-//#include "Pen.h"
 #include "Point.h"
 #include "Rect.h"
 
@@ -25,9 +23,15 @@ namespace rsp::graphics
  *
  * Abstract class with function declarations for low level drawing operations.
  */
+class Bitmap;
+
 class Canvas
 {
   public:
+    Canvas()
+        : mHeight(0), mWidth(0), mBytesPerPixel(0) {}
+    Canvas(int aHeight, int aWidth, int aBytesPerPixel)
+        : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel) {}
     /**
      * Virtual destructor for the abstract class.
      */
@@ -100,7 +104,7 @@ class Canvas
      * \param Point aPoint
      * \param bool aFront Set to read pixel from frontbuffer
      */
-    virtual uint32_t GetPixel(__attribute__((unused)) const Point &aPoint, __attribute__((unused)) const bool aFront = false) const { return 0; };
+    virtual uint32_t GetPixel(const Point &, const bool) const { return 0; };
 
     /**
      * Set the color value of a single pixel.
@@ -110,7 +114,7 @@ class Canvas
      * \param aPoint
      * \param aColor
      */
-    virtual inline void SetPixel(__attribute__((unused)) const Point &aPoint, __attribute__((unused)) const Color aColor) {}
+    virtual inline void SetPixel(const Point &, const Color) {}
 
     /**
      * Get the width of the canvas.
@@ -142,7 +146,7 @@ class Canvas
     uint32_t GetColorDepth() const
     {
         // return mVariableInfo.bits_per_pixel;
-        return mColorDepth;
+        return mBytesPerPixel;
     }
 
     /**
@@ -158,9 +162,9 @@ class Canvas
     }
 
   protected:
-    uint32_t mWidth;
     uint32_t mHeight;
-    uint32_t mColorDepth;
+    uint32_t mWidth;
+    uint32_t mBytesPerPixel;
 
     inline void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Color &aColor)
     {

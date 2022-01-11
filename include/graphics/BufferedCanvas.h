@@ -1,7 +1,7 @@
 #ifndef BUFFEREDCANVAS_H
 #define BUFFEREDCANVAS_H
 
-#include "primitives/Canvas.h"
+#include "graphics/primitives/Canvas.h"
 
 namespace rsp::graphics
 {

@@ -26,7 +26,7 @@ std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> Bit
     {".png", std::function<std::shared_ptr<ImgLoader>()>([]() { return std::make_shared<PngLoader>(); })}};
 
 Bitmap::Bitmap(std::string aImgName)
-    : mBytesPerPixel(0)
+    : Canvas()
 {
     std::filesystem::path filename(aImgName);
 
@@ -38,7 +38,7 @@ Bitmap::Bitmap(std::string aImgName)
 }
 
 Bitmap::Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerPixel)
-    : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel), mImagePixels(mWidth * mHeight)
+    : Canvas(aHeight, aWidth, aBytesPerPixel), mImagePixels(aWidth * aHeight)
 {
     for (int y = 0; y < mHeight; y++) {
         for (int x = 0; x < mWidth; x++) {
@@ -48,16 +48,21 @@ Bitmap::Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerP
 }
 
 Bitmap::Bitmap(int aHeight, int aWidth, int aBytesPerPixel)
-    : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel), mImagePixels(mWidth * mHeight)
+    : Canvas(aHeight, aWidth, aBytesPerPixel), mImagePixels(aWidth * aHeight)
 {
-    throw NotImplementedException("");
-    // Load file into memory here
-    // https://freeimage.sourceforge.io/
-    // http://libjpeg.sourceforge.net/
 }
 
 Bitmap::~Bitmap()
 {
+}
+
+uint32_t Bitmap::GetPixel(const Point &aPoint, const bool aFront) const
+{
+    if (!IsInsideScreen(aPoint)) {
+        return 0;
+    }
+    long location = (mWidth * aPoint.mY) + aPoint.mX;
+    return mImagePixels[location];
 }
 
 std::shared_ptr<ImgLoader> Bitmap::GetRasterLoader(const std::string aFileType)
@@ -68,5 +73,4 @@ std::shared_ptr<ImgLoader> Bitmap::GetRasterLoader(const std::string aFileType)
         throw std::out_of_range(std::string("Filetype loader not found") + ": " + e.what());
     }
 }
-
 } // namespace rsp::graphics

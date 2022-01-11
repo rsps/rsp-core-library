@@ -3,8 +3,8 @@
 
 #include <linux/fb.h>
 
-#include "BufferedCanvas.h"
-#include "primitives/Canvas.h"
+#include "graphics/BufferedCanvas.h"
+#include "graphics/primitives/Canvas.h"
 
 namespace rsp::graphics
 {

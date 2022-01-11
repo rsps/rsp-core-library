@@ -29,7 +29,12 @@ TEST_CASE("Bitmap file loading")
             CHECK(bitmap.GetHeight() == height);
             CHECK(bitmap.GetWidth() == width);
             CHECK(bitmap.GetPixels().size() == (width * height));
-            CHECK(col == bitmap.GetPixels()[0]););
+            CHECK(col == bitmap.GetPixels()[0]);
+            SUBCASE("Drawing on loaded Img") {
+                Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
+                bitmap.SetPixel(Point(100, 100), col);
+                CHECK(1 == 1);
+            });
     }
     SUBCASE("Loading another Bmp file")
     {
@@ -56,4 +61,18 @@ TEST_CASE("Bitmap file loading")
         CHECK_THROWS_WITH_AS(Bitmap bitmap(filepath), "Filetype loader not found: _Map_base::at",
                              const std::out_of_range &);
     }
+}
+TEST_CASE("Bitmap empty construction")
+{
+    Bitmap bitmap(200, 200, 4);
+    Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
+    Point pt(100, 100);
+    CHECK(bitmap.IsInsideScreen(pt));
+    bitmap.SetPixel(pt, col);
+    CHECK(bitmap.GetPixel(pt) == col);
+
+    /*SUBCASE("Drawing line inside empty bitmap")
+    {
+
+    }*/
 }
