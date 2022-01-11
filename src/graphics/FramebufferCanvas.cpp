@@ -37,6 +37,11 @@ Framebuffer::Framebuffer()
     // get variable screen info
     ioctl(mFramebufferFile, FBIOGET_FSCREENINFO, &mFixedInfo);
 
+    // set Canvas specific variables
+    mWidth = mVariableInfo.yres;
+    mHeight = mVariableInfo.xres;
+    mColorDepth = mVariableInfo.bits_per_pixel;
+
     // set yres_virtual for double buffering
     mVariableInfo.yres_virtual = mVariableInfo.yres * 2;
     if (ioctl(mFramebufferFile, FBIOPUT_VSCREENINFO, &mVariableInfo) == -1) {
@@ -179,9 +184,6 @@ void Framebuffer::DrawText(const Rect &aRect, const Font &aFont, const char *apT
 
 void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
 {
-
-    mVariableInfo.reserved[0]++;
-
     // swap buffer
     if (mVariableInfo.yoffset == 0) {
         mVariableInfo.yoffset = mVariableInfo.yres;

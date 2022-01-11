@@ -35,6 +35,9 @@ class BufferedCanvas : public Canvas
   protected:
     virtual void clear() = 0;
     virtual void copy() = 0;
+
+    uint8_t *mpFrontBuffer;
+    uint8_t *mpBackBuffer;
 };
 
 } // namespace rsp::graphics

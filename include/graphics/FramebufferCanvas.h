@@ -15,14 +15,6 @@ class Framebuffer : public BufferedCanvas
     Framebuffer();
     virtual ~Framebuffer();
 
-    /*
-    void DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &aColor);
-    void DrawCircle(const Point &aCenter, int aRadius, const Color &aColor);
-    void DrawLine(const Point &aA, const Point &aB, const Color &aColor);
-    void DrawRectangle(const Rect &aRect, const Color &aColor);
-    void DrawImage(const Point &aLeftTop, const Bitmap &aBitmap);
-    void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit);
-    */
     inline void SetPixel(const Point &aPoint, const Color aColor)
     {
         if (!IsInsideScreen(aPoint)) {
@@ -34,26 +26,7 @@ class Framebuffer : public BufferedCanvas
     }
 
     uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
-    /*
-    uint32_t GetWidth() const
-    {
-        return mVariableInfo.xres;
-    }
-    uint32_t GetHeight() const
-    {
-        return mVariableInfo.yres;
-    }
 
-    uint32_t GetColorDepth() const
-    {
-        return mVariableInfo.bits_per_pixel;
-    }
-
-    inline bool IsInsideScreen(const Point &aPoint) const
-    {
-        return !(aPoint.mX < 0 || aPoint.mY < 0 || static_cast<uint32_t>(aPoint.mY) >= mVariableInfo.yres || static_cast<uint32_t>(aPoint.mX) >= mVariableInfo.xres);
-    }
-    */
     void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy);
 
   protected:
@@ -61,8 +34,6 @@ class Framebuffer : public BufferedCanvas
     int mTtyFb = 0;
     struct fb_fix_screeninfo mFixedInfo;
     struct fb_var_screeninfo mVariableInfo;
-    uint8_t *mpFrontBuffer;
-    uint8_t *mpBackBuffer;
 
     void clear();
     void copy();

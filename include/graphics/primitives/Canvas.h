@@ -100,7 +100,7 @@ class Canvas
      * \param Point aPoint
      * \param bool aFront Set to read pixel from frontbuffer
      */
-    virtual uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const {};
+    virtual uint32_t GetPixel(__attribute__((unused)) const Point &aPoint, __attribute__((unused)) const bool aFront = false) const { return 0; };
 
     /**
      * Set the color value of a single pixel.
@@ -110,7 +110,7 @@ class Canvas
      * \param aPoint
      * \param aColor
      */
-    virtual inline void SetPixel(const Point &aPoint, const Color aColor) {}
+    virtual inline void SetPixel(__attribute__((unused)) const Point &aPoint, __attribute__((unused)) const Color aColor) {}
 
     /**
      * Get the width of the canvas.
@@ -158,7 +158,6 @@ class Canvas
     }
 
   protected:
-    uint32_t mOffset;
     uint32_t mWidth;
     uint32_t mHeight;
     uint32_t mColorDepth;
