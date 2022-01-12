@@ -177,13 +177,25 @@ TEST_CASE("Framebuffer Drawing Primitives")
         // Arrange
         Point topLeftImgCorner(100, 200);
         std::string testImage = "testImages/testImageCross.bmp";
+        uint32_t height = 194;
+        uint32_t width = 259;
+        Point topLeft(0, 0);
+        Point topRight(width - 1, 0);
+        Point botLeft(0, height - 1);
+        Point botRight(width - 1, height - 1);
+
+        // Act
         Bitmap testImgMap(testImage);
+
+        // Assert
+        CHECK(testImgMap.IsInsideScreen(topLeft));
+        CHECK(testImgMap.IsInsideScreen(topRight));
+        CHECK(testImgMap.IsInsideScreen(botLeft));
+        CHECK(testImgMap.IsInsideScreen(botRight));
 
         SUBCASE("Draw image from file")
         {
             // Act
-            uint32_t height = 194;
-            uint32_t width = 259;
             fb.DrawImage(topLeftImgCorner, testImgMap);
 
             // Assert
@@ -196,27 +208,38 @@ TEST_CASE("Framebuffer Drawing Primitives")
         SUBCASE("Draw edited image file")
         {
             // Arrange
-            // Point centerPoint(rand() % testImgMap.GetWidth(), rand() % testImgMap.GetHeight());
-            // int radius = rand() % (testImgMap.GetWidth() / 2);
-            Point topLeft(1, 1);
-            Point topRight(258, 1);
-            Point botLeft(1, 193);
-            Point botRight(258, 193);
+            Color red(0xFF0000);
+            Color green(0x00FF00);
+            Color blue(0x0000FF);
+            Color thisColor(0x777777);
 
             // Act
-            // testImgMap.DrawCircle(centerPoint, radius, col);
-            testImgMap.DrawLine(topLeft, topRight, Color(0xFF0000));
-            testImgMap.DrawLine(topLeft, botLeft, Color(0x00FF00));
-            testImgMap.DrawLine(topRight, botRight, Color(0x0000FF));
-            testImgMap.DrawLine(botLeft, botRight, Color(0x777777));
+            testImgMap.DrawLine(topLeft, topRight, red);
+            testImgMap.DrawLine(topLeft, botLeft, green);
+            testImgMap.DrawLine(topRight, botRight, blue);
+            testImgMap.DrawLine(botLeft, botRight, thisColor);
 
             fb.DrawImage(topLeftImgCorner, testImgMap);
             fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-            std::this_thread::sleep_for(std::chrono::milliseconds(50000));
-        }
-        /*SUBCASE("Draw memory created image"){
 
-        }*/
+            // Assert
+            CHECK(testImgMap.GetPixel(Point(width / 2, 0)) == red);
+            CHECK(testImgMap.GetPixel(Point(0, height / 2)) == green);
+            CHECK(testImgMap.GetPixel(Point(width - 1, height / 2)) == blue);
+            CHECK(testImgMap.GetPixel(Point(width / 2, height - 1)) == thisColor);
+        }
+        SUBCASE("Draw memory created image")
+        {
+            // Arrange
+            Bitmap emptyMap(height, width, 4);
+            Point randomPoint(rand() % emptyMap.GetWidth(), rand() % emptyMap.GetHeight());
+
+            // Act
+            testImgMap.SetPixel(randomPoint, col);
+
+            // Assert
+            CHECK(testImgMap.GetPixel(randomPoint) == col);
+        }
     }
 
     SUBCASE("Swapping between two images")

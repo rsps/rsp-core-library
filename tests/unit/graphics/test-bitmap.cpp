@@ -20,30 +20,48 @@ TEST_CASE("Bitmap file loading")
 {
     SUBCASE("Loading Bmp file")
     {
+        // Arrange
         std::string filepath = "testImages/testImage.bmp";
         uint32_t height = 194;
         uint32_t width = 259;
+
+        // Act
         CHECK_NOTHROW(
             Bitmap bitmap(filepath);
             Color col(bitmap.GetPixels()[0]);
+
+            // Assert
             CHECK(bitmap.GetHeight() == height);
             CHECK(bitmap.GetWidth() == width);
             CHECK(bitmap.GetPixels().size() == (width * height));
             CHECK(col == bitmap.GetPixels()[0]);
             SUBCASE("Drawing on loaded Img") {
+                // Arrange
                 Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
-                bitmap.SetPixel(Point(100, 100), col);
-                CHECK(1 == 1);
+                Point pt(100, 100);
+
+                // Act
+                bitmap.SetPixel(pt, col);
+
+                // Assert
+                CHECK(bitmap.GetPixel(pt) == col);
             });
     }
     SUBCASE("Loading another Bmp file")
     {
+        // Arrange
         std::string filepath = "testImages/Asset3.bmp";
         uint32_t height = 800;
         uint32_t width = 480;
+
+        // Act
         CHECK_NOTHROW(
+
+            // Arrange
             Bitmap bitmap2(filepath);
             Color col2(bitmap2.GetPixels()[0]);
+
+            // Assert
             CHECK(bitmap2.GetHeight() == height);
             CHECK(bitmap2.GetWidth() == width);
             CHECK(bitmap2.GetPixels().size() == (width * height));
@@ -51,28 +69,38 @@ TEST_CASE("Bitmap file loading")
     }
     SUBCASE("Loading Png file")
     {
+        // Arrange
         std::string filepath = "testImages/testImage.png";
+
+        // Act / Assert
         CHECK_THROWS_WITH_AS(Bitmap bitmap(filepath), "Png file format is not supported",
                              const NotImplementedException &);
     }
     SUBCASE("Loading filetype not found")
     {
+        // Arrange
         std::string filepath = "testImages/testImage.txt";
+
+        // Act Assert
         CHECK_THROWS_WITH_AS(Bitmap bitmap(filepath), "Filetype loader not found: _Map_base::at",
                              const std::out_of_range &);
     }
 }
 TEST_CASE("Bitmap empty construction")
 {
+    // Arrange
     Bitmap bitmap(200, 200, 4);
-    Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
-    Point pt(100, 100);
-    CHECK(bitmap.IsInsideScreen(pt));
-    bitmap.SetPixel(pt, col);
-    CHECK(bitmap.GetPixel(pt) == col);
-
-    /*SUBCASE("Drawing line inside empty bitmap")
+    SUBCASE("Drawing inside empty bitmap")
     {
+        // Arrange
+        Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
+        Point pt(100, 100);
 
-    }*/
+        // Act
+        bitmap.SetPixel(pt, col);
+
+        // Assert
+        CHECK(bitmap.IsInsideScreen(pt));
+        CHECK(bitmap.GetPixel(pt) == col);
+    }
 }
