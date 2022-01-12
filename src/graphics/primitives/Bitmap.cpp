@@ -52,10 +52,6 @@ Bitmap::Bitmap(int aHeight, int aWidth, int aBytesPerPixel)
 {
 }
 
-Bitmap::~Bitmap()
-{
-}
-
 uint32_t Bitmap::GetPixel(const Point &aPoint, const bool aFront) const
 {
     if (!IsInsideScreen(aPoint)) {

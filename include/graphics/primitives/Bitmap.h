@@ -50,11 +50,6 @@ class Bitmap : public Canvas
      */
     Bitmap(int aHeight, int aWidth, int aBytesPerPixel);
 
-    /**
-     * Why?
-     */
-    ~Bitmap();
-
     inline void SetPixel(const Point &aPoint, const Color aColor)
     {
         if (!IsInsideScreen(aPoint)) {
