@@ -10,7 +10,7 @@
 
 #include <chrono>
 #include <doctest.h>
-#include <graphics/FramebufferCanvas.h>
+#include <graphics/Framebuffer.h>
 #include <graphics/primitives/Bitmap.h>
 #include <thread>
 
@@ -177,15 +177,15 @@ TEST_CASE("Framebuffer Drawing Primitives")
         // Arrange
         Point topLeftImgCorner(100, 200);
         std::string testImage = "testImages/testImageCross.bmp";
-        uint32_t height = 194;
-        uint32_t width = 259;
+
+        // Act
+        Bitmap testImgMap(testImage);
+        uint32_t height = testImgMap.GetHeight();
+        uint32_t width = testImgMap.GetWidth();
         Point topLeft(0, 0);
         Point topRight(width - 1, 0);
         Point botLeft(0, height - 1);
         Point botRight(width - 1, height - 1);
-
-        // Act
-        Bitmap testImgMap(testImage);
 
         // Assert
         CHECK(testImgMap.IsInsideScreen(topLeft));
@@ -235,10 +235,12 @@ TEST_CASE("Framebuffer Drawing Primitives")
             Point randomPoint(rand() % emptyMap.GetWidth(), rand() % emptyMap.GetHeight());
 
             // Act
-            testImgMap.SetPixel(randomPoint, col);
+            emptyMap.SetPixel(randomPoint, col);
+            fb.DrawImage(topLeftImgCorner, emptyMap);
+            fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
 
             // Assert
-            CHECK(testImgMap.GetPixel(randomPoint) == col);
+            CHECK(emptyMap.GetPixel(randomPoint) == col);
         }
     }
 

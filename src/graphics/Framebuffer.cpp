@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/FramebufferCanvas.h>
+#include <graphics/Framebuffer.h>
 
 #include <chrono>
 #include <cstring>
@@ -40,8 +40,8 @@ Framebuffer::Framebuffer()
     ioctl(mFramebufferFile, FBIOGET_FSCREENINFO, &mFixedInfo);
 
     // set Canvas specific variables
-    mWidth = mVariableInfo.yres;
-    mHeight = mVariableInfo.xres;
+    mWidth = mVariableInfo.xres;
+    mHeight = mVariableInfo.yres;
     mBytesPerPixel = mVariableInfo.bits_per_pixel / 8;
 
     // set yres_virtual for double buffering
@@ -129,7 +129,6 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
         return 0;
     }
     long location = (aPoint.mX + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + aPoint.mY * mFixedInfo.line_length;
-    // std::cout << "location:" << location << std::endl;
     if (aFront) {
         return *(reinterpret_cast<uint32_t *>(mpFrontBuffer + location));
     } else {
@@ -145,7 +144,6 @@ void Framebuffer::clear()
     for (y = 0; y < mVariableInfo.yres; y++) {
         for (x = 0; x < mVariableInfo.xres; x++) {
             long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;
-            // std::cout << "location:" << location << std::endl;
             *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = 0x00000000;
         }
     }
@@ -155,11 +153,9 @@ void Framebuffer::copy()
 {
     long x, y;
     // copy front buffer to back buffer
-    //     std::cout << "Copying buffer" << std::endl;
     for (y = 0; y < mVariableInfo.yres; y++) {
         for (x = 0; x < mVariableInfo.xres; x++) {
             long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;
-            // std::cout << "location:" << location << std::endl;
             *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = *(reinterpret_cast<uint32_t *>(mpFrontBuffer + location));
         }
     }
