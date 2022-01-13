@@ -11,38 +11,27 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include "Bitmap.h"
 #include "Color.h"
 #include "Font.h"
-#include "Pen.h"
 #include "Point.h"
 #include "Rect.h"
 
 namespace rsp::graphics
 {
-
 /**
  * Canvas interface class
  *
  * Abstract class with function declarations for low level drawing operations.
  */
+class Bitmap;
+
 class Canvas
 {
-public:
-    /**
-     * Enumerated SwapOperations
-     *
-     * In case of double buffer support, these values can control
-     * the content of the new buffer:
-     *  NoOp:  No initialization of the buffer is performed
-     *  Copy:  The current view content is copied int new buffer
-     *  Clear: The new buffer is filled with the background color.
-     */
-    enum class SwapOperations
-    {
-        NoOp, Copy, Clear
-    };
-
+  public:
+    Canvas()
+        : mHeight(0), mWidth(0), mBytesPerPixel(0) {}
+    Canvas(int aHeight, int aWidth, int aBytesPerPixel)
+        : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel) {}
     /**
      * Virtual destructor for the abstract class.
      */
@@ -58,26 +47,26 @@ public:
      * \param aRadius2
      * \param aStartAngel
      * \param aSweepAngle
-     * \param aPen
+     * \param aColor
      */
-    virtual void DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Pen &aPen) = 0;
+    void DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &aColor);
     /**
      * Draw a full circle
      *
      * \param aCenter
      * \param aRadius
-     * \param aPen
+     * \param aColor
      */
-    virtual void DrawCircle(const Point &aCenter, int aRadius, const Pen &aPen) = 0;
+    void DrawCircle(const Point &aCenter, int aRadius, const Color &aColor);
 
     /**
      * Draw a straight line from A to B.
      *
      * \param aA
      * \param aB
-     * \param aPen
+     * \param aColor
      */
-    virtual void DrawLine(const Point &aA, const Point &aB, const Pen &aPen) = 0;
+    void DrawLine(const Point &aA, const Point &aB, const Color &aColor);
 
     /**
      * Draw a rectangle
@@ -85,9 +74,9 @@ public:
      * The rectangle is not rotated in any way, but simply a box with horizontal and vertical sides.
      *
      * \param aRect
-     * \param aPen
+     * \param aColor
      */
-    virtual void DrawRectangle(const Rect &aRect, const Pen &aPen) = 0;
+    void DrawRectangle(const Rect &aRect, const Color &aColor);
 
     /**
      * Copies the bitmap content into the canvas.
@@ -95,7 +84,7 @@ public:
      * \param LeftTop
      * \param aBitmap
      */
-    virtual void DrawImage(const Point &LeftTop, const Bitmap &aBitmap) = 0;
+    void DrawImage(const Point &LeftTop, const Bitmap &aBitmap);
 
     /**
      * Draws the given text within the given rectangle on the canvas.
@@ -105,7 +94,7 @@ public:
      * \param apText
      * \param aScaleToFit
      */
-    virtual void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit) = 0;
+    void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit);
 
     /**
      * Get the color value of a single pixel.
@@ -115,7 +104,7 @@ public:
      * \param Point aPoint
      * \param bool aFront Set to read pixel from frontbuffer
      */
-    virtual uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const = 0;
+    virtual uint32_t GetPixel(const Point &, const bool) const = 0;
 
     /**
      * Set the color value of a single pixel.
@@ -125,40 +114,72 @@ public:
      * \param aPoint
      * \param aColor
      */
-    virtual void SetPixel(const Point &aPoint, const Color aColor) = 0;
-
-    /**
-     * Swap the view port.
-     *
-     * For systems without double buffer capabilities, the Copy operation will
-     * result in a NoOp.
-     *
-     * \param aSwapOp
-     */
-    virtual void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy) = 0;
+    virtual inline void SetPixel(const Point &, const Color) = 0;
 
     /**
      * Get the width of the canvas.
      *
      * \return uint32_t
      */
-    virtual uint32_t GetWidth() const = 0;
+    uint32_t GetWidth() const
+    {
+        // return mVariableInfo.xres;
+        return mWidth;
+    }
 
     /**
      * Get the height of the canvas.
      *
      * \return uint32_t
      */
-    virtual uint32_t GetHeight() const = 0;
+    uint32_t GetHeight() const
+    {
+        // return mVariableInfo.yres;
+        return mHeight;
+    }
 
     /**
      * Get the color depth of the canvas.
      *
      * \return uint32_t
      */
-    virtual uint32_t GetColorDepth() const = 0;
+    uint32_t GetColorDepth() const
+    {
+        // return mVariableInfo.bits_per_pixel;
+        return mBytesPerPixel;
+    }
 
+    /**
+     * Checks if coordinates is inside screens boundary
+     *
+     * \param aPoint
+     * \return bool
+     */
+    inline bool IsInsideScreen(const Point &aPoint) const
+    {
+        // return !(aPoint.mX < 0 || aPoint.mY < 0 || static_cast<uint32_t>(aPoint.mY) >= mVariableInfo.yres || static_cast<uint32_t>(aPoint.mX) >= mVariableInfo.xres);
+        return !(aPoint.mX < 0 || aPoint.mY < 0 || static_cast<uint32_t>(aPoint.mY) >= mHeight || static_cast<uint32_t>(aPoint.mX) >= mWidth);
+    }
+
+  protected:
+    uint32_t mHeight;
+    uint32_t mWidth;
+    uint32_t mBytesPerPixel;
+
+    inline void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Color &aColor)
+    {
+        SetPixel(Point(aCenterX + aX, aCenterY + aY), aColor);
+        SetPixel(Point(aCenterX - aX, aCenterY + aY), aColor);
+        SetPixel(Point(aCenterX + aX, aCenterY - aY), aColor);
+        SetPixel(Point(aCenterX - aX, aCenterY - aY), aColor);
+    }
+
+    inline void plot8Points(int aCenterX, int aCenterY, int aX, int aY, const Color &aColor)
+    {
+        plot4Points(aCenterX, aCenterY, aX, aY, aColor);
+        plot4Points(aCenterX, aCenterY, aY, aX, aColor);
+    }
 };
 
-}
-#endif //CANVAS_H
+} // namespace rsp::graphics
+#endif // CANVAS_H

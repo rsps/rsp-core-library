@@ -33,6 +33,7 @@ class BmpLoader : public ImgLoader
         uint32_t coloursUsed;
         uint32_t importantColours;
     } __attribute__((packed)) bmpHeader; //To stop alignment
+
     uint16_t mBytesPerPixel;
 
     void ReadHeader(std::ifstream &arFile);

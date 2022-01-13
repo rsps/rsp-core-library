@@ -19,14 +19,14 @@ uint8_t blue = 0x56;
 uint8_t alpha = 0x78;
 uint32_t colourVal = 0x12345678;
 
-TEST_CASE("Colour Contructors")
+TEST_CASE("Color Contructors")
 {
     SUBCASE("Separate values contructor")
     {
-        //Arrange & Act
+        // Arrange & Act
         Color col(red, green, blue, alpha);
 
-        //Assert
+        // Assert
         CHECK(col.GetAlpha() == alpha);
         CHECK(col.GetRed() == red);
         CHECK(col.GetGreen() == green);
@@ -34,10 +34,10 @@ TEST_CASE("Colour Contructors")
     }
     SUBCASE("Single value contructor")
     {
-        //Arrange & Act
+        // Arrange & Act
         Color col(colourVal);
 
-        //Assert
+        // Assert
         CHECK(col.GetAlpha() == alpha);
         CHECK(col.GetRed() == red);
         CHECK(col.GetGreen() == green);
@@ -45,28 +45,28 @@ TEST_CASE("Colour Contructors")
     }
     SUBCASE("Copy contructor")
     {
-        //Arrange & Act
+        // Arrange & Act
         Color testCol(colourVal);
         Color col(testCol);
 
-        //Assert
+        // Assert
         CHECK(col.GetAlpha() == alpha);
         CHECK(col.GetRed() == red);
         CHECK(col.GetGreen() == green);
         CHECK(col.GetBlue() == blue);
     }
 }
-TEST_CASE("Colour Sets")
+TEST_CASE("Color Sets")
 {
-    //Arrange
+    // Arrange
     Color testCol(colourVal);
     uint8_t newCol = 0x55;
     SUBCASE("Set Alpha")
     {
-        //Act
+        // Act
         testCol.SetAlpha(newCol);
 
-        //Assert only wanted part has changed
+        // Assert only wanted part has changed
         CHECK(testCol.GetAlpha() == newCol);
         CHECK(testCol.GetRed() == red);
         CHECK(testCol.GetGreen() == green);
@@ -74,10 +74,10 @@ TEST_CASE("Colour Sets")
     }
     SUBCASE("Set Red")
     {
-        //Act
+        // Act
         testCol.SetRed(newCol);
 
-        //Assert only wanted part has changed
+        // Assert only wanted part has changed
         CHECK(testCol.GetRed() == newCol);
         CHECK(testCol.GetGreen() == green);
         CHECK(testCol.GetBlue() == blue);
@@ -85,10 +85,10 @@ TEST_CASE("Colour Sets")
     }
     SUBCASE("Set Green")
     {
-        //Act
+        // Act
         testCol.SetGreen(newCol);
 
-        //Assert only wanted part has changed
+        // Assert only wanted part has changed
         CHECK(testCol.GetGreen() == newCol);
         CHECK(testCol.GetRed() == red);
         CHECK(testCol.GetBlue() == blue);
@@ -96,34 +96,34 @@ TEST_CASE("Colour Sets")
     }
     SUBCASE("Set Blue")
     {
-        //Act
+        // Act
         testCol.SetBlue(newCol);
 
-        //Assert only wanted part has changed
+        // Assert only wanted part has changed
         CHECK(testCol.GetBlue() == newCol);
         CHECK(testCol.GetRed() == red);
         CHECK(testCol.GetGreen() == green);
         CHECK(testCol.GetAlpha() == alpha);
     }
 }
-TEST_CASE("Colour Operators")
+TEST_CASE("Color Operators")
 {
-    //Arrange
+    // Arrange
     Color testCol(colourVal);
     SUBCASE("uint32 Conversion")
     {
-        //Act
+        // Act
         uint32_t newUint32 = testCol;
 
-        //Assert
+        // Assert
         CHECK(newUint32 == colourVal);
     }
     SUBCASE("= Operator")
     {
-        //Act
+        // Act
         Color newColour = testCol;
 
-        //Assert
+        // Assert
         CHECK(static_cast<uint32_t>(newColour) == static_cast<uint32_t>(testCol));
     }
 }
