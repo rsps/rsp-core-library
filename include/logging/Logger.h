@@ -96,6 +96,8 @@ public:
     LogStreamInterface(const LogStreamInterface & aFrom)
         : mpOwner(aFrom.mpOwner), mLevel(aFrom.mLevel) {}
 
+    LogStreamInterface& operator=(const LogStreamInterface &arOther);
+
     LogLevel GetLevel() const { return mLevel; }
     void SetLevel(LogLevel aLevel) { mLevel = aLevel; }
 
@@ -118,6 +120,9 @@ public:
     LogStream(const LogStream &aFrom) = delete; /* No copy, move is OK */
     LogStream(LogStream &&aFrom);
     ~LogStream();
+
+    LogStream& operator=(const LogStream &arOther) = delete;
+    LogStream& operator=(LogStream &&arOther);
 
     template< class type> LogStream& operator<<( type aValue) {
         mBuffer << aValue;

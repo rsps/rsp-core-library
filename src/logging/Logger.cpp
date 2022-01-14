@@ -58,6 +58,13 @@ LogStreamInterface::LogStreamInterface(LoggerInterface *apOwner, LogLevel aLevel
 {
 }
 
+LogStreamInterface& LogStreamInterface::operator=(const LogStreamInterface &arOther)
+{
+    mpOwner = arOther.mpOwner;
+    mLevel = arOther.mLevel;
+    return *this;
+}
+
 void LogStreamInterface::ownerWrite(const std::string &arMsg)
 {
     mpOwner->write(this, arMsg);
@@ -73,6 +80,14 @@ LogStream::LogStream(LogStream &&aFrom)
     : LogStreamInterface(aFrom.mpOwner, aFrom.mLevel)
 {
     mBuffer = std::move(aFrom.mBuffer);
+}
+
+LogStream& LogStream::operator=(LogStream &&arOther)
+{
+    mpOwner = arOther.mpOwner;
+    mLevel = arOther.mLevel;
+    mBuffer = std::move(arOther.mBuffer);
+    return *this;
 }
 
 LogStream::~LogStream()
