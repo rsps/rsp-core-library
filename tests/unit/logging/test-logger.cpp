@@ -16,6 +16,7 @@
 #include <logging/FileLogWriter.h>
 #include <utils/StrUtils.h>
 #include <utils/AnsiEscapeCodes.h>
+#include <utils/RSPCoreExceptions.h>
 
 using namespace rsp;
 using namespace rsp::utils;
@@ -58,6 +59,9 @@ TEST_CASE("Testing the Logger class") {
     mConsoleInfoBuffer.clear();
 
     logging::Logger log(true);
+
+    CHECK_THROWS_AS(logging::LoggerInterface::GetDefault(), const utils::NotsetException &);
+    logging::LoggerInterface::SetDefault(log);
 
     log.AddLogWriter(std::make_shared<logging::FileLogWriter>(cFileName, logging::LogLevel::Info));
     log.AddLogWriter(std::make_shared<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors));
@@ -143,6 +147,8 @@ TEST_CASE("Testing the Logger class") {
 
     std::getline(fin, line);
     CHECK(fin.eof() == true);
+
+    CHECK(&(logging::LoggerInterface::GetDefault()) == &log);
 }
 
 

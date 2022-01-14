@@ -56,6 +56,9 @@ class LoggerInterface
 public:
     virtual ~LoggerInterface() {}
 
+    static LoggerInterface& GetDefault();
+    static void SetDefault(LoggerInterface& arLogger);
+
     virtual LogStream Emergency() = 0;
     virtual LogStream Alert() = 0;
     virtual LogStream Critical() = 0;
@@ -73,6 +76,7 @@ public:
     void RemoveLogWriter(Handle_t aHandle);
 
 protected:
+    static LoggerInterface* mpDefaultInstance;
     std::mutex mMutex;
     std::vector<std::shared_ptr<LogWriterInterface>> mWriters;
 

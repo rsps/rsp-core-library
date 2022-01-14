@@ -20,7 +20,7 @@ namespace rsp::utils
 
 class RSPCoreException : public std::runtime_error
 {
-  public:
+public:
     explicit RSPCoreException(const char *aMsg)
         : std::runtime_error("")
     {
@@ -38,7 +38,7 @@ class RSPCoreException : public std::runtime_error
 
 class NotImplementedException : public RSPCoreException
 {
-  public:
+public:
     explicit NotImplementedException(const char *aMsg)
         : RSPCoreException(aMsg)
     {
@@ -47,7 +47,7 @@ class NotImplementedException : public RSPCoreException
 
 class AssertException : public RSPCoreException
 {
-  public:
+public:
     explicit AssertException(const char *aMsg)
         : RSPCoreException(aMsg)
     {
@@ -62,6 +62,16 @@ class AssertException : public RSPCoreException
 #else
 #define ASSERT(a)
 #endif
+
+
+class NotsetException : public RSPCoreException
+{
+public:
+    explicit NotsetException(const char *aMsg)
+    : RSPCoreException(aMsg)
+    {
+    }
+};
 
 }
 
