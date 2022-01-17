@@ -97,8 +97,8 @@ class LogStreamInterface
 {
 public:
     LogStreamInterface(LoggerInterface *apOwner, LogLevel aLevel);
-    LogStreamInterface(const LogStreamInterface & aFrom)
-        : mpOwner(aFrom.mpOwner), mLevel(aFrom.mLevel) {}
+    LogStreamInterface(const LogStreamInterface & arFrom)
+        : mpOwner(arFrom.mpOwner), mLevel(arFrom.mLevel) {}
 
     LogStreamInterface& operator=(const LogStreamInterface &arOther);
 
@@ -121,8 +121,8 @@ class LogStream : public LogStreamInterface
 {
 public:
     LogStream(LoggerInterface *apOwner, LogLevel aLevel);
-    LogStream(const LogStream &aFrom) = delete; /* No copy, move is OK */
-    LogStream(LogStream &&aFrom);
+    LogStream(const LogStream &arFrom) = delete; /* No copy, move is OK */
+    LogStream(LogStream &&arFrom);
     ~LogStream();
 
     LogStream& operator=(const LogStream &arOther) = delete;

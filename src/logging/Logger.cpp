@@ -33,8 +33,8 @@ void LoggerInterface::RemoveLogWriter(Handle_t aHandle)
         return;
     }
 
-    auto it = std::find_if(mWriters.begin(), mWriters.end(), [&](std::shared_ptr<LogWriterInterface> const& aWriter) {
-        return aHandle == reinterpret_cast<Handle_t>(aWriter.get());
+    auto it = std::find_if(mWriters.begin(), mWriters.end(), [&](std::shared_ptr<LogWriterInterface> const& arWriter) {
+        return aHandle == reinterpret_cast<Handle_t>(arWriter.get());
     });
     if (it != mWriters.end()) {
         mWriters.erase(it);
@@ -94,10 +94,10 @@ LogStream::LogStream(LoggerInterface *apOwner, LogLevel aLevel)
 {
 }
 
-LogStream::LogStream(LogStream &&aFrom)
-    : LogStreamInterface(aFrom.mpOwner, aFrom.mLevel)
+LogStream::LogStream(LogStream &&arFrom)
+    : LogStreamInterface(arFrom.mpOwner, arFrom.mLevel)
 {
-    mBuffer = std::move(aFrom.mBuffer);
+    mBuffer = std::move(arFrom.mBuffer);
 }
 
 LogStream& LogStream::operator=(LogStream &&arOther)
@@ -159,15 +159,15 @@ int OutStreamBuf::sync()
     return 0;
 }
 
-std::ostream& operator <<(std::ostream &os, LogLevel aLevel)
+std::ostream& operator <<(std::ostream &arOs, LogLevel aLevel)
 {
-    OutStreamBuf *stream = static_cast<OutStreamBuf *>(os.rdbuf());
+    OutStreamBuf *stream = static_cast<OutStreamBuf *>(arOs.rdbuf());
 
     stream->Lock();
 //    std::cout << "Locked by " << std::this_thread::get_id() << std::endl;
     stream->SetLevel(aLevel);
 
-    return os;
+    return arOs;
 }
 
 

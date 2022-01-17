@@ -14,6 +14,7 @@
 #include <exception>
 #include <stdexcept>
 #include <system_error>
+#include "ExceptionHelper.h"
 
 namespace rsp::utils
 {

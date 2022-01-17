@@ -37,7 +37,7 @@ public:
         ss << "From '" << aFilename << ":" << aLineNum << "'->\n"
                 << BaseException::what();
         mBacktrace = ss.str();
-    };
+    }
 
     backtraced_exception(const std::exception &e, const char *aFilename, int aLineNum)
             : BaseException(static_cast<const BaseException&>(e))
@@ -46,16 +46,16 @@ public:
         ss << "From '" << aFilename << ":" << aLineNum << "'->\n"
                 << e.what();
         mBacktrace = ss.str();
-    };
+    }
 
     virtual ~backtraced_exception() noexcept
     {
-    };
+    }
 
     virtual const char* what() const noexcept
     {
         return mBacktrace.c_str();
-    };
+    }
 };
 
 #define THROW_WITH_BACKTRACE(EXCEPTION) throw rsp::utils::backtraced_exception< EXCEPTION >(__FILE__, __LINE__)
