@@ -16,7 +16,6 @@ using namespace rsp::utils;
 namespace rsp::graphics
 {
 
-
 Rect::Rect(int aLeft, int aTop, int aWidth, int aHeight)
     : mLeftTop(aLeft, aTop), mRightBottom(aLeft + aWidth, aTop + aHeight)
 {
@@ -107,9 +106,14 @@ void Rect::SetHeight(int aHeight)
     mRightBottom.mY = mLeftTop.mY + aHeight;
 }
 
-bool Rect::IsHit(const Point &aPoint) const
+bool Rect::IsHit(const Point &aPoint)
 {
-    throw NotImplementedException("IsHit is not yet implemeted");
+    // Only works with non-rotated rectangles
+    if (aPoint.GetX() > mLeftTop.GetX() &&
+        aPoint.GetX() < mRightBottom.GetX() &&
+        aPoint.GetY() > mLeftTop.GetY() &&
+        aPoint.GetY() < mRightBottom.GetY())
+        return true;
 
     return false;
 }
@@ -122,4 +126,4 @@ bool Rect::VerifyDimensions() const
     return false;
 }
 
-}
+} // namespace rsp::graphics

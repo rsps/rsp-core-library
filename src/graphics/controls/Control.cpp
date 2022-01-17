@@ -14,7 +14,7 @@ namespace rsp::graphics
 {
 
 Control::Control(Rect &aRect)
-    : mArea(aRect)
+    : mArea(aRect), mBackground(0x000000)
 {
 }
 
@@ -30,18 +30,6 @@ void Control::Invalidate()
 bool Control::IsInvalid() const
 {
     return mIsInvalid;
-}
-
-bool Control::IsHit(const Point &aPoint)
-{
-    // Only works with non-rotated rectangles
-    if (aPoint.GetX() > mArea.GetTopLeft().GetX() &&
-        aPoint.GetX() < mArea.GetBottomRight().GetX() &&
-        aPoint.GetY() > mArea.GetTopLeft().GetY() &&
-        aPoint.GetY() < mArea.GetBottomRight().GetY())
-        return true;
-
-    return false;
 }
 
 } // namespace rsp::graphics

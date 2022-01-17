@@ -167,7 +167,7 @@ class Rect
      * \param aPoint
      * \return bool
      */
-    bool IsHit(const Point &aPoint) const;
+    bool IsHit(const Point &aPoint);
 
     bool VerifyDimensions() const;
 
