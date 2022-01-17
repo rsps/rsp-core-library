@@ -1,0 +1,17 @@
+@startuml
+
+title Intended GUI Process Flow
+
+start
+repeat
+    #palegreen:Poll touch input;
+    if (Got touch event?) then (yes)
+        #lightblue:Traverse touch control\n handlers on active scene;
+    endif
+    #lightblue:Render invalidated elements from\nbackground to topmost element;
+repeat while (Is Terminated?) is (no)
+->yes;
+stop
+
+@enduml
+

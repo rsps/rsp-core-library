@@ -13,6 +13,7 @@
 #include <graphics/primitives/Bitmap.h>
 #include <graphics/primitives/raster/BmpLoader.h>
 #include <graphics/primitives/raster/PngLoader.h>
+
 #include <utils/RSPCoreExceptions.h>
 
 using namespace rsp::utils;
@@ -20,20 +21,24 @@ using namespace rsp::utils;
 namespace rsp::graphics
 {
 
+std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> Bitmap::filetypeMap = {
+    {".bmp", std::function<std::shared_ptr<ImgLoader>()>([]() { return std::make_shared<BmpLoader>(); })},
+    {".png", std::function<std::shared_ptr<ImgLoader>()>([]() { return std::make_shared<PngLoader>(); })}};
+
 Bitmap::Bitmap(std::string aImgName)
-    : mBytesPerPixel(0)
+    : Canvas()
 {
     std::filesystem::path filename(aImgName);
 
-    auto &loader = GetRasterLoader(filename.extension());
-    //Get raw data
-    mImagePixels = loader.LoadImg(filename);
-    mHeight = loader.GetHeight();
-    mWidth = loader.GetWidth();
+    auto loader = GetRasterLoader(filename.extension());
+    // Get raw data
+    mImagePixels = loader->LoadImg(filename);
+    mHeight = loader->GetHeight();
+    mWidth = loader->GetWidth();
 }
 
 Bitmap::Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerPixel)
-    : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel), mImagePixels(mWidth * mHeight)
+    : Canvas(aHeight, aWidth, aBytesPerPixel), mImagePixels(aWidth * aHeight)
 {
     for (int y = 0; y < mHeight; y++) {
         for (int x = 0; x < mWidth; x++) {
@@ -43,27 +48,25 @@ Bitmap::Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerP
 }
 
 Bitmap::Bitmap(int aHeight, int aWidth, int aBytesPerPixel)
-    : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel), mImagePixels(mWidth * mHeight)
-{
-    throw NotImplementedException("");
-    //Load file into memory here
-    //https://freeimage.sourceforge.io/
-    //http://libjpeg.sourceforge.net/
-}
-
-Bitmap::~Bitmap()
+    : Canvas(aHeight, aWidth, aBytesPerPixel), mImagePixels(aWidth * aHeight)
 {
 }
 
-ImgLoader &Bitmap::GetRasterLoader(const std::string aFileType)
+uint32_t Bitmap::GetPixel(const Point &aPoint, const bool aFront) const
 {
-    if (aFileType == ".png") {
-        static PngLoader png;
-        return png;
+    if (!IsInsideScreen(aPoint)) {
+        return 0;
     }
-
-    static BmpLoader bmp;
-    return bmp;
+    long location = (mWidth * aPoint.mY) + aPoint.mX;
+    return mImagePixels[location];
 }
 
+std::shared_ptr<ImgLoader> Bitmap::GetRasterLoader(const std::string aFileType)
+{
+    try {
+        return filetypeMap.at(aFileType)();
+    } catch (const std::out_of_range &e) {
+        throw std::out_of_range(std::string("Filetype loader not found") + ": " + e.what());
+    }
+}
 } // namespace rsp::graphics

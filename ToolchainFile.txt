@@ -8,8 +8,8 @@ set (CMAKE_CXX_COMPILER_WORKS 1)
 set (CMAKE_TRY_COMPILE_TARGET_TYPE         STATIC_LIBRARY)
 
 # Path
-set (ARM_TOOLCHAIN_PATH /opt/fslc-framebuffer/2.4.1/sysroots/x86_64-fslcsdk-linux/usr/bin/arm-fslc-linux-gnueabi/)
-set (CMAKE_SYSROOT /opt/fslc-framebuffer/2.4.1/sysroots/armv7at2hf-neon-fslc-linux-gnueabi/)
+set (ARM_TOOLCHAIN_PATH /opt/fslc-framebuffer/3.1/sysroots/x86_64-fslcsdk-linux/usr/bin/arm-fslc-linux-gnueabi/)
+set (CMAKE_SYSROOT /opt/fslc-framebuffer/3.1/sysroots/cortexa7t2hf-neon-fslc-linux-gnueabi/)
 
 # Toolchain Binaries
 #set (CMAKE_AR                    ${ARM_TOOLCHAIN_PATH}arm-fslc-linux-gnueabi-ar${CMAKE_EXECUTABLE_SUFFIX})
@@ -23,7 +23,7 @@ set (CMAKE_CXX_COMPILER          ${ARM_TOOLCHAIN_PATH}arm-fslc-linux-gnueabi-g++
 #set (CMAKE_STRIP                 ${ARM_TOOLCHAIN_PATH}arm-fslc-linux-gnueabi-strip${CMAKE_EXECUTABLE_SUFFIX} CACHE INTERNAL "")
 
 # Linking Flags
-set (CMAKE_C_FLAGS               "-Wno-psabi -mfloat-abi=hard -fdata-sections -ffunction-sections -Wl,--gc-sections" CACHE INTERNAL "")
+set (CMAKE_C_FLAGS               "-Wno-psabi -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a7 -fdata-sections -ffunction-sections -Wl,--gc-sections -pthread" CACHE INTERNAL "")
 set (CMAKE_CXX_FLAGS             "${CMAKE_C_FLAGS}" CACHE INTERNAL "")
 
 set (CMAKE_C_FLAGS_DEBUG         "-Os -g" CACHE INTERNAL "")

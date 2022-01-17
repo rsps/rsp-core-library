@@ -10,8 +10,8 @@
 
 using namespace rsp::utils;
 
-TEST_CASE("Testing StrUtils") {
-
+TEST_CASE("Testing StrUtils")
+{
     CHECK(StrUtils::GetHomeDir() != "");
 
     CHECK(StrUtils::GetConfigDir() != "");
@@ -34,6 +34,4 @@ TEST_CASE("Testing StrUtils") {
     CHECK(StrUtils::TimeStamp(std::chrono::steady_clock::now()) == StrUtils::TimeStamp(std::chrono::system_clock::now()));
 
     CHECK(StrUtils::TimeStamp(std::chrono::milliseconds(0)) == "1970-01-01 00:00:00.000");
-
 }
-

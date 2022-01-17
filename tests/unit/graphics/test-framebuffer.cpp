@@ -10,7 +10,8 @@
 
 #include <chrono>
 #include <doctest.h>
-#include <graphics/FramebufferCanvas.h>
+#include <graphics/Framebuffer.h>
+#include <graphics/primitives/Bitmap.h>
 #include <thread>
 
 using namespace rsp::graphics;
@@ -31,26 +32,25 @@ TEST_CASE("Framebuffer Drawing Primitives")
     std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
 
-    srand(ms.count()); //generates random seed val
+    srand(ms.count()); // generates random seed val
     Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
-    Pen pen(rand() % 10 + 1, col);
 
     SUBCASE("Clear Framebuffer")
     {
-        fb.SwapBuffer(Canvas::SwapOperations::Clear);
-        fb.SwapBuffer(Canvas::SwapOperations::Clear);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     }
 
     SUBCASE("Drawing Lines")
     {
-        //Arrange
+        // Arrange
         Point pointA(rand() % fb.GetWidth(), rand() % fb.GetHeight());
         Point pointB(rand() % fb.GetWidth(), rand() % fb.GetHeight());
 
-        //Act
-        fb.DrawLine(pointA, pointB, pen);
+        // Act
+        fb.DrawLine(pointA, pointB, col);
 
-        //Assert
+        // Assert
         int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;
 
         deltaX = pointB.GetX() - pointA.GetX();
@@ -89,53 +89,50 @@ TEST_CASE("Framebuffer Drawing Primitives")
             CHECK_EQ(fb.GetPixel(pointA, false), col);
             CHECK_EQ(fb.GetPixel(pointB, false), col);
         }
-        //fb.SwapBuffer();
+        // fb.SwapBuffer();
     }
 
     SUBCASE("Drawing Rectangles")
     {
-        //Arrange
-        //Generate random values in the LEFT and TOP halves of the screen
+        // Arrange
+        // Generate random values in the LEFT and TOP halves of the screen
         Point leftTop(rand() % (fb.GetWidth() / 2),
                       rand() % (fb.GetHeight() / 2));
-        //Generate random values in the RIGHT and BOTTOM halves of the screen
+        // Generate random values in the RIGHT and BOTTOM halves of the screen
         Point rightBottom(rand() % (fb.GetWidth() + 1 - (fb.GetWidth() / 2)) + (fb.GetWidth() / 2),
                           rand() % (fb.GetHeight() + 1 - (fb.GetHeight() / 2)) + (fb.GetHeight() / 2));
         Rect rect(leftTop, rightBottom);
 
-        //Act
-        fb.DrawRectangle(rect, pen);
+        // Act
+        fb.DrawRectangle(rect, col);
 
-        //Assert
-        //Expect all four side to hold values
+        // Assert
+        // Expect all four side to hold values
         for (int i = 0; i <= rect.GetWidth(); i++) {
-            //Check top side
-            CHECK(pen.GetColor() == fb.GetPixel(Point(leftTop.GetX() + i, leftTop.GetY()), false));
-            //Check bottom side
-            CHECK(pen.GetColor() == fb.GetPixel(Point(leftTop.GetX() + i, rightBottom.GetY()), false));
+            // Check top side
+            CHECK(col == fb.GetPixel(Point(leftTop.GetX() + i, leftTop.GetY()), false));
+            // Check bottom side
+            CHECK(col == fb.GetPixel(Point(leftTop.GetX() + i, rightBottom.GetY()), false));
         }
         for (int i = 0; i <= rect.GetHeight(); i++) {
-            //Check left side
-            CHECK(pen.GetColor() == fb.GetPixel(Point(leftTop.GetX(), rightBottom.GetY() - i), false));
-            //Check right side
-            CHECK(pen.GetColor() == fb.GetPixel(Point(rightBottom.GetX(), rightBottom.GetY() - i), false));
+            // Check left side
+            CHECK(col == fb.GetPixel(Point(leftTop.GetX(), rightBottom.GetY() - i), false));
+            // Check right side
+            CHECK(col == fb.GetPixel(Point(rightBottom.GetX(), rightBottom.GetY() - i), false));
         }
-
-        Rect fullScreen(Point(0, 0), Point(479, 799));
-        fb.DrawRectangle(fullScreen, pen);
-        //fb.SwapBuffer();
+        // fb.SwapBuffer();
     }
 
     SUBCASE("Drawing Circles")
     {
-        //Arrange
+        // Arrange
         Point centerPoint(rand() % fb.GetWidth(), rand() % fb.GetHeight());
         int radius = rand() % (fb.GetWidth() / 2);
 
-        //Act
-        fb.DrawCircle(centerPoint, radius, pen);
+        // Act
+        fb.DrawCircle(centerPoint, radius, col);
 
-        //Assert
+        // Assert
         int error = -radius;
         int y = 0;
         while (radius >= y) {
@@ -157,74 +154,145 @@ TEST_CASE("Framebuffer Drawing Primitives")
                 error += -radius;
             }
         }
-        //fb.SwapBuffer();
+        // fb.SwapBuffer();
     }
 
     SUBCASE("Set/Get pixel outside screen")
     {
-        //Arrange
+        // Arrange
         Point outSideXAxis(-1, 0);
         Point outSideYAxis(0, -1);
 
-        //Act
-        CHECK_NOTHROW(pen.Draw(fb, outSideXAxis));
-        CHECK_NOTHROW(pen.Draw(fb, outSideYAxis));
+        // Act
+        CHECK_NOTHROW(fb.SetPixel(outSideXAxis, col));
+        CHECK_NOTHROW(fb.SetPixel(outSideYAxis, col));
 
-        //Assert
+        // Assert
         CHECK_EQ(fb.GetPixel(outSideXAxis), 0);
         CHECK_EQ(fb.GetPixel(outSideYAxis), 0);
     }
 
-    SUBCASE("Drawing an Image")
+    SUBCASE("Drawing Images")
     {
-        //Arrange
-        Point topLeftPoint(100, 200);
+        // Arrange
+        Point topLeftImgCorner(100, 200);
+        std::string testImage = "testImages/testImageCross.bmp";
 
-        //std::string testImage = "testImages/testImageCross.bmp";
-        //Bitmap testImgMap(testImage);
+        // Act
+        Bitmap testImgMap(testImage);
+        uint32_t height = testImgMap.GetHeight();
+        uint32_t width = testImgMap.GetWidth();
+        Point topLeft(0, 0);
+        Point topRight(width - 1, 0);
+        Point botLeft(0, height - 1);
+        Point botRight(width - 1, height - 1);
 
-        std::string screenImg = "testImages/Asset2NoAlpha.bmp";
-        Bitmap noAlphaMap(screenImg);
+        // Assert
+        CHECK(testImgMap.IsInsideScreen(topLeft));
+        CHECK(testImgMap.IsInsideScreen(topRight));
+        CHECK(testImgMap.IsInsideScreen(botLeft));
+        CHECK(testImgMap.IsInsideScreen(botRight));
 
-        uint32_t height = 800;
-        uint32_t width = 480;
-        CHECK(noAlphaMap.GetHeight() == height);
-        CHECK(noAlphaMap.GetWidth() == width);
-        CHECK(noAlphaMap.GetPixels().size() == (width * height));
+        SUBCASE("Draw image from file")
+        {
+            // Act
+            fb.DrawImage(topLeftImgCorner, testImgMap);
 
-        //Act
-        //fb.DrawImage(topLeftPoint, testImgMap);
+            // Assert
+            CHECK(testImgMap.GetHeight() == height);
+            CHECK(testImgMap.GetWidth() == width);
+            CHECK(testImgMap.GetPixels().size() == (width * height));
 
-        //fb.SwapBuffer(Canvas::SwapOperations::Clear);
-        MESSAGE("Showing full image");
+            fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        }
+        SUBCASE("Draw edited image file")
+        {
+            // Arrange
+            Color red(0xFF0000);
+            Color green(0x00FF00);
+            Color blue(0x0000FF);
+            Color thisColor(0x777777);
 
-        fb.DrawImage(Point(0, 0), screenImg);
+            // Act
+            testImgMap.DrawLine(topLeft, topRight, red);
+            testImgMap.DrawLine(topLeft, botLeft, green);
+            testImgMap.DrawLine(topRight, botRight, blue);
+            testImgMap.DrawLine(botLeft, botRight, thisColor);
 
-        fb.SwapBuffer(Canvas::SwapOperations::Clear);
+            fb.DrawImage(topLeftImgCorner, testImgMap);
+            fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+            // Assert
+            CHECK(testImgMap.GetPixel(Point(width / 2, 0)) == red);
+            CHECK(testImgMap.GetPixel(Point(0, height / 2)) == green);
+            CHECK(testImgMap.GetPixel(Point(width - 1, height / 2)) == blue);
+            CHECK(testImgMap.GetPixel(Point(width / 2, height - 1)) == thisColor);
+        }
+        SUBCASE("Draw memory created image")
+        {
+            // Arrange
+            Bitmap emptyMap(height, width, 4);
+            Point randomPoint(rand() % emptyMap.GetWidth(), rand() % emptyMap.GetHeight());
 
-        //Assert
+            // Act
+            emptyMap.SetPixel(randomPoint, col);
+            fb.DrawImage(topLeftImgCorner, emptyMap);
+            fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+
+            // Assert
+            CHECK(emptyMap.GetPixel(randomPoint) == col);
+        }
+    }
+
+    SUBCASE("Drawing image larger than screen")
+    {
+        // Arrange
+        Point topLeft(0, 0);
+        Point randomPoint(rand() % fb.GetWidth(), rand() % fb.GetHeight());
+        std::string largeImg = "testImages/largeTestImg.bmp";
+        Bitmap largeImgMap(largeImg);
+        // Make sure screen is empty
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+
+        // Act
+        fb.DrawImage(topLeft, largeImgMap);
+
+        // Assert
+        CHECK(largeImgMap.GetHeight() > fb.GetHeight());
+        CHECK(largeImgMap.GetWidth() > fb.GetWidth());
+        CHECK(fb.GetPixel(randomPoint) != 0);
+
+        SUBCASE("Spill large imgage into screen")
+        {
+            // Arrange
+            Point topLeft(-100, -100);
+
+            // Act
+            fb.DrawImage(topLeft, largeImgMap);
+
+            // Assert
+            CHECK(fb.GetPixel(randomPoint) != 0);
+        }
     }
 
     SUBCASE("Swapping between two images")
     {
-        //Arrange
+        // Arrange
         Point topLeftPoint(100, 200);
         Bitmap imgSimple("testImages/testImage.bmp");
         int iterations = 100;
 
-        //Act
+        // Act
         auto begin = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < iterations; i++) {
             fb.DrawImage(Point(topLeftPoint.GetX(), topLeftPoint.GetY() - i), imgSimple);
-            fb.SwapBuffer(Canvas::SwapOperations::Clear);
+            fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
         }
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
         int fps = (1000 * iterations / duration);
 
-        //Assert
+        // Assert
         CHECK(fps > 10);
         MESSAGE("Fps: " << fps);
     }

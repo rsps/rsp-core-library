@@ -1,0 +1,56 @@
+@startuml
+
+title FileSystem Classes
+
+namespace rsp::posix {
+
+class FileIO {
+    A C++ wrapper around the POSIX file IO functions.
+    It throws std::system_error excepions on errors.
+    On Linux it is guaranteed not to have any caching and therefore preferred to
+    interact with virtual files (sysfs) and character devices.
+--
+    #mFileName : std::string
+    #mHandle : int    
+--
+    +FileIO()
+    +FileIO(arFileName: const std::string&, aMode: std::ios_base::openmode, aPermissions:int = 0)
+    +Open(arFileName: const std::string&, aMode: std::ios_base::openmode, aPermissions:int = 0)
+    +Close()
+    +IsOpen(): bool
+    +Seek(aOffset: std::size_t, aSeekDir: std::ios_base::seekdir = std::ios_base::beg): std::size_t
+    +Read(apBuffer: void*, aNumberOfBytesToRead: std::size_t): std::size_t
+    +Write(apBuffer: const void*, aNumberOfBytesToWrite: std::size_t): std::size_t
+    +GetLine(): std::string
+    +PutLine(arData: const std::string&)
+    +GetContents(): std::string
+    +PutContents(arData: const std::string&)
+    +GetHandle(): int
+    +GetSize(): std::size_t
+    +SetSize(aSize: std::size_t);
+    +WaitForDataReady(aTimeoutms: int): bool
+}
+
+class FileSystem {
+    A simple scope wrapper with static methods.
+--
+    +{static} DirectoryExists(arPath: const std::string&): bool
+    +{static} FileExists(arPath: const std::string&): bool
+    +{static} DeleteFile(arFileName: const std::string&)
+    +{static} RecursiveDeleteDir(arDir: const std::string&)
+    +{static} MakeDirectory(arDir: const std::string&)
+    +{static} MakeSymlink(arExisting: const std::string&, arSymlink: const std::string&)
+    +{static} Sleep(aMilliSeconds: unsigned int)
+    +{static} GetCurrentWorkingDirectory(): std::string
+    +{static} SetPermissions(arPath: const std::string&, int aPermissions)
+    +{static} GetCurrentIpAddress(): std::string
+    +{static} ExecuteCommand(arCommand: const std::string&, apStdOut: std::string* = nullptr, apStdErr: std::string* = nullptr): int
+    +{static} GetLastResumeId(): std::string
+    +{static} SetThreadPriority(arThread: std::thread&, aPriority: unsigned int)
+}
+
+FileSystem <-[hidden]- FileIO
+
+}
+
+@enduml
