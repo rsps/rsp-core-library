@@ -31,3 +31,5 @@ _deps
 /.settings/
 .project
 .cproject
+
+.~lock*

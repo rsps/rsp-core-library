@@ -30,7 +30,7 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
     ReadHeader(file);
     // TODO: Get Compression and other useful stuff
 
-    //Height can be negative, showing the image is stored from top to bottom
+    // Height can be negative, showing the image is stored from top to bottom
     bool normallyDrawn = true;
     if (bmpHeader.heigth < 0) {
         normallyDrawn = false;
@@ -47,13 +47,13 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
 
 void BmpLoader::ReadHeader(std::ifstream &aFile)
 {
-    //Read the 54 byte header
+    // Read the 54 byte header
     aFile.read(reinterpret_cast<char *>(&bmpHeader), sizeof(bmpHeader));
 
     mWidth = bmpHeader.width;
     mHeight = bmpHeader.heigth;
 
-    mBytesPerPixel = bmpHeader.bitsPerPixel / 8; //Might be 1 or 4
+    mBytesPerPixel = bmpHeader.bitsPerPixel / 8; // Might be 1 or 4
     if ((bmpHeader.bitsPerPixel % 8) > 0) {
         mBytesPerPixel = mBytesPerPixel + 1;
     }
@@ -61,19 +61,19 @@ void BmpLoader::ReadHeader(std::ifstream &aFile)
 
 void BmpLoader::ReadData(std::ifstream &aFile)
 {
-    //Figure out amount to read per row
+    // Figure out amount to read per row
     int paddedRowSize = (bmpHeader.width * mBytesPerPixel + 3) & (~3);
-    std::cout << "Padded Row size: " << paddedRowSize << std::endl;
+    // std::cout << "Padded Row size: " << paddedRowSize << std::endl;
 
-    //Initialize containers for reading
+    // Initialize containers for reading
     std::vector<uint8_t> pixelRow;
     pixelRow.resize(paddedRowSize);
 
-    //Skip past the offset
+    // Skip past the offset
     aFile.seekg(bmpHeader.dataOffset);
 
     for (size_t i = 0; i < abs(bmpHeader.heigth); i++) {
-        //Read a Row of pixels with the padding
+        // Read a Row of pixels with the padding
         aFile.read(reinterpret_cast<char *>(pixelRow.data()), paddedRowSize);
 
         for (size_t j = bmpHeader.width * mBytesPerPixel; j > 0; j -= mBytesPerPixel) {
@@ -86,7 +86,7 @@ void BmpLoader::ReadData(std::ifstream &aFile)
 uint32_t BmpLoader::ReadPixel(const std::vector<uint8_t> &aPixelRow, const size_t &aRowPtr)
 {
     uint32_t pixel = 0;
-    //Reads other direction than the row loop
+    // Reads other direction than the row loop
     for (size_t i = 0; i < mBytesPerPixel; i++) {
         pixel |= (((uint32_t)aPixelRow[aRowPtr + i]) << (8 * i));
     }
