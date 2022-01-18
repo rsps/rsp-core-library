@@ -12,8 +12,13 @@
 #include <sstream>
 #include <map>
 #include <logging/Logger.h>
+#include <utils/RSPCoreExceptions.h>
+#include <utils/ExceptionHelper.h>
 
 namespace rsp::logging {
+
+
+LoggerInterface* LoggerInterface::mpDefaultInstance = nullptr;
 
 
 LoggerInterface::Handle_t LoggerInterface::AddLogWriter(std::shared_ptr<LogWriterInterface> aWriter)
@@ -28,8 +33,8 @@ void LoggerInterface::RemoveLogWriter(Handle_t aHandle)
         return;
     }
 
-    auto it = std::find_if(mWriters.begin(), mWriters.end(), [&](std::shared_ptr<LogWriterInterface> const& aWriter) {
-        return aHandle == reinterpret_cast<Handle_t>(aWriter.get());
+    auto it = std::find_if(mWriters.begin(), mWriters.end(), [&](std::shared_ptr<LogWriterInterface> const& arWriter) {
+        return aHandle == reinterpret_cast<Handle_t>(arWriter.get());
     });
     if (it != mWriters.end()) {
         mWriters.erase(it);
@@ -58,21 +63,49 @@ LogStreamInterface::LogStreamInterface(LoggerInterface *apOwner, LogLevel aLevel
 {
 }
 
+LogStreamInterface& LogStreamInterface::operator=(const LogStreamInterface &arOther)
+{
+    mpOwner = arOther.mpOwner;
+    mLevel = arOther.mLevel;
+    return *this;
+}
+
 void LogStreamInterface::ownerWrite(const std::string &arMsg)
 {
     mpOwner->write(this, arMsg);
 }
 
+LoggerInterface& LoggerInterface::GetDefault()
+{
+    if (!mpDefaultInstance) {
+        THROW_WITH_BACKTRACE1(rsp::utils::NotsetException, "Logger instance not set.");
+    }
+
+    return *mpDefaultInstance;
+}
+
+void LoggerInterface::SetDefault(LoggerInterface &arLogger)
+{
+    mpDefaultInstance = &arLogger;
+}
 
 LogStream::LogStream(LoggerInterface *apOwner, LogLevel aLevel)
     : LogStreamInterface(apOwner, aLevel)
 {
 }
 
-LogStream::LogStream(LogStream &&aFrom)
-    : LogStreamInterface(aFrom.mpOwner, aFrom.mLevel)
+LogStream::LogStream(LogStream &&arFrom)
+    : LogStreamInterface(arFrom.mpOwner, arFrom.mLevel)
 {
-    mBuffer = std::move(aFrom.mBuffer);
+    mBuffer = std::move(arFrom.mBuffer);
+}
+
+LogStream& LogStream::operator=(LogStream &&arOther)
+{
+    mpOwner = arOther.mpOwner;
+    mLevel = arOther.mLevel;
+    mBuffer = std::move(arOther.mBuffer);
+    return *this;
 }
 
 LogStream::~LogStream()
@@ -126,15 +159,15 @@ int OutStreamBuf::sync()
     return 0;
 }
 
-std::ostream& operator <<(std::ostream &os, LogLevel aLevel)
+std::ostream& operator <<(std::ostream &arOs, LogLevel aLevel)
 {
-    OutStreamBuf *stream = static_cast<OutStreamBuf *>(os.rdbuf());
+    OutStreamBuf *stream = static_cast<OutStreamBuf *>(arOs.rdbuf());
 
     stream->Lock();
 //    std::cout << "Locked by " << std::this_thread::get_id() << std::endl;
     stream->SetLevel(aLevel);
 
-    return os;
+    return arOs;
 }
 
 
