@@ -1,4 +1,4 @@
-#include "graphics/controls/EventCreator.h"
+#include "graphics/EventCreator.h"
 
 #include <linux/input.h>
 
@@ -24,8 +24,6 @@ bool EventCreator::HasNewEvents()
 const Event &EventCreator::GetEvent()
 {
     ReadType();
-    ReadBody();
-
     return event;
 }
 
@@ -40,6 +38,7 @@ void EventCreator::ReadType()
                (eventInput.code == ABS_MT_POSITION_X || eventInput.code == ABS_MT_POSITION_Y)) {
         event.type = EventType::Drag;
     }
+    ReadBody();
 }
 
 void EventCreator::ReadBody()

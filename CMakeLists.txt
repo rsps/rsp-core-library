@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.16)
 
 # https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
 
-#set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
+set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
 
 project (rsp-core-lib)
 
