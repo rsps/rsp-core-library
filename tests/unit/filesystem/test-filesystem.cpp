@@ -10,6 +10,8 @@
 #include <string>
 #include <fstream>
 #include <utils/StrUtils.h>
+#include <algorithm>
+#include <sstream>
 
 using namespace rsp::posix;
 using namespace rsp::utils;
@@ -73,6 +75,19 @@ TEST_CASE("Testing FileSystem") {
 
         CHECK(ip.length() >= 7);
         CHECK(!StrUtils::Contains(ip, "127.0.0.1"));
+    }
+
+    SUBCASE("List Directory") {
+        std::vector<std::filesystem::path> list = FileSystem::Glob(std::filesystem::path{"/etc/hostn*"});
+        CHECK(list[0].string() == "/etc/hostname");
+    }
+
+    SUBCASE("Get Device By Driver Name") {
+        std::string p = FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+
+        MESSAGE(p);
+
+        CHECK(StrUtils::StartsWith(p, "/dev/fb"));
     }
 }
 

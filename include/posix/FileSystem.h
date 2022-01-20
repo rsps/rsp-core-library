@@ -12,7 +12,9 @@
 #define SRC_POSIX_FILESYSTEM_H_
 
 #include <string>
+#include <vector>
 #include <thread>
+#include <filesystem>
 
 /**
  * Namespace with common directory and OS operations.
@@ -128,6 +130,10 @@ std::string GetLastResumeId();
  * \param aPriority Thread priority 1-99, Higher priority preempts lower
  */
 void SetThreadPriority(std::thread &arThread, unsigned int aPriority);
+
+std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, bool aRecursive = false, bool aDirOnly = false);
+
+std::string GetCharacterDeviceByDriverName(const std::string &arDriverName, const std::filesystem::path &arPath);
 
 }
 

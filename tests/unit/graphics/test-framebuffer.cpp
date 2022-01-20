@@ -16,8 +16,6 @@
 
 using namespace rsp::graphics;
 
-static Framebuffer fb;
-
 inline void CheckPixel(const Point &aPoint, const Color &aColour, const Framebuffer &fb)
 {
     if (fb.IsInsideScreen(aPoint)) {
@@ -29,6 +27,8 @@ inline void CheckPixel(const Point &aPoint, const Color &aColour, const Framebuf
 
 TEST_CASE("Framebuffer Drawing Primitives")
 {
+    Framebuffer fb;
+
     std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
 

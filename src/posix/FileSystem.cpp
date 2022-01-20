@@ -16,6 +16,8 @@
 #include <arpa/inet.h>
 #include <linux/limits.h>
 #include <fts.h>
+#include <glob.h>
+#include <sys/sysmacros.h>
 #include <posix/FileSystem.h>
 #include <pthread.h>
 #include <sys/resource.h>
@@ -26,8 +28,13 @@
 #include <fstream>
 #include <iostream>
 #include <cstring>
+#include <algorithm>
+#include <regex>
+#include <utils/StrUtils.h>
 
 #include <utils/ExceptionHelper.h>
+
+using namespace rsp::utils;
 
 namespace rsp::posix::FileSystem
 {
@@ -325,6 +332,102 @@ void SetThreadPriority(std::thread &arThread, unsigned int aPriority)
         ss << "FileSystem - Could not set thread priority. Expected: " << aPriority << ", Current: " << sch.sched_priority;
         THROW_WITH_BACKTRACE1(std::runtime_error, ss.str());
     }
+}
+
+std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, bool aRecursive, bool aDirOnly)
+{
+    std::vector<std::filesystem::path> result;
+
+    std::filesystem::path path = arPath.parent_path();
+
+    std::string filter = std::string("^") + arPath.string() + std::string("$");
+    StrUtils::ReplaceAll(filter, "*", ".*");
+    StrUtils::ReplaceAll(filter, "?", ".");
+//    std::cout << "Filter: " << filter << std::endl;
+
+    std::regex self_regex(filter, std::regex_constants::basic);
+
+    if (aRecursive) {
+        for(auto const& dir_entry: std::filesystem::recursive_directory_iterator{path}) {
+            if (std::regex_search(dir_entry.path().string(), self_regex)) {
+                if (!aDirOnly || dir_entry.is_directory()) {
+                    result.push_back(dir_entry.path());
+                }
+            }
+        }
+    }
+    else {
+        for(auto const& dir_entry: std::filesystem::directory_iterator{path}) {
+            if (std::regex_search(dir_entry.path().string(), self_regex)) {
+//                std::cout << "Match: " << dir_entry.path() << std::endl;
+                if (!aDirOnly || dir_entry.is_directory()) {
+                    result.push_back(dir_entry.path());
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+std::string GetCharacterDeviceByDriverName(const std::string &arDriverName, const std::filesystem::path &arPath)
+{
+    struct stat stat_buf;
+
+    auto list = Glob(arPath, false, false);
+
+    for (auto dir : list) {
+        if (stat(dir.string().c_str(), &stat_buf) == -1) {
+            THROW_SYSTEM("stat ERROR");
+        }
+
+        unsigned int major = major(stat_buf.st_rdev);
+        unsigned int minor = minor(stat_buf.st_rdev);
+
+        std::filesystem::path sys_path(StrUtils::Format("/sys/dev/char/%d:%d/device/driver", major, minor).c_str());
+//        std::cout << "Sys Path: " << sys_path << std::endl;
+
+        if (!std::filesystem::directory_entry(sys_path).exists()) {
+            continue;
+        }
+
+        std::filesystem::path real(std::filesystem::read_symlink(sys_path));
+//        std::cout << "Real: " << real << std::endl;
+
+        if (arDriverName == real.stem()) {
+            return dir.string();
+        }
+    }
+
+    return std::string();
+
+//        struct stat
+//          {
+//            __dev_t st_dev;     /* Device.  */
+//            __ino_t st_ino;     /* File serial number.  */
+//            __nlink_t st_nlink;     /* Link count.  */
+//            __mode_t st_mode;       /* File mode.  */
+//            __uid_t st_uid;     /* User ID of the file's owner. */
+//            __gid_t st_gid;     /* Group ID of the file's group.*/
+//            __dev_t st_rdev;        /* Device number, if device.  */
+//            __off_t st_size;            /* Size of file, in bytes.  */
+//            __blksize_t st_blksize; /* Optimal block size for I/O.  */
+//            __blkcnt_t st_blocks;       /* Number 512-byte blocks allocated. */
+//            __time_t st_atime;          /* Time of last access.  */
+//            __syscall_ulong_t st_atimensec; /* Nscecs of last access.  */
+//            __time_t st_mtime;          /* Time of last modification.  */
+//            __syscall_ulong_t st_mtimensec; /* Nsecs of last modification.  */
+//            __time_t st_ctime;          /* Time of last status change.  */
+//            __syscall_ulong_t st_ctimensec; /* Nsecs of last status change.  */
+//          };
+
+//        result.Path = fullpath;
+//        result.Size = stat_buf.st_size;
+//        result.Uid = stat_buf.st_uid;
+//        result.Gid = stat_buf.st_gid;
+//        result.Mode = stat_buf.st_mode;
+//        result.Major = major(stat_buf.st_rdev);
+//        result.Minor = minor(stat_buf.st_rdev);
 }
 
 } // namespace FileSystem
