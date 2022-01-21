@@ -20,6 +20,7 @@ configure_file (
 set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
+find_package(Freetype REQUIRED)
 
 set (CMAKE_CXX_STANDARD 20)
 
@@ -27,6 +28,8 @@ set (CMAKE_CXX_STANDARD 20)
 # locations on all platforms.
 include(GNUInstallDirs)
 
+#include_directories( ${FREETYPE2_INCLUDE_DIRS} )
+#SET( CMAKE_C_FLAGS "${FREETYPE2_CFLAGS_OTHER}" )
 
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 
@@ -42,6 +45,7 @@ target_include_directories(rsp-core-lib
     PRIVATE
         src
         ${CMAKE_CURRENT_BINARY_DIR}/src
+        ${FREETYPE_INCLUDE_DIRS}
 )
 add_compile_options(-Wall -Wextra -Wold-style-cast -pedantic -Werror)
 
@@ -93,6 +97,8 @@ target_include_directories("rsp-core-lib-test"
 target_link_libraries ("rsp-core-lib-test"
     rsp-core-lib
     Threads::Threads
+    Freetype::Freetype
 )
+#target_link_libraries(demo ${FREETYPE_LIBRARIES})
 
 add_test("tests" "rsp-core-lib-test")

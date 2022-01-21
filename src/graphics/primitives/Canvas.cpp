@@ -47,22 +47,20 @@ void Canvas::DrawCircle(const Point &aCenter, int aRadius, const Color &aColor)
 
 void Canvas::DrawLine(const Point &aA, const Point &aB, const Color &aColor)
 {
-    int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;
-
-    deltaX = aB.mX - aA.mX;
-    deltaY = aB.mY - aA.mY;
-    absDeltaX = abs(deltaX);
-    absDeltaY = abs(deltaY);
-    signumX = (deltaX > 0) ? 1 : -1;
-    signumY = (deltaY > 0) ? 1 : -1;
-    x = absDeltaX >> 1;
-    y = absDeltaY >> 1;
-    px = aA.mX;
-    py = aA.mY;
+    int deltaX = aB.mX - aA.mX;
+    int deltaY = aB.mY - aA.mY;
+    int absDeltaX = abs(deltaX);
+    int absDeltaY = abs(deltaY);
+    int signumX = (deltaX > 0) ? 1 : -1;
+    int signumY = (deltaY > 0) ? 1 : -1;
+    int x = absDeltaX >> 1;
+    int y = absDeltaY >> 1;
+    int px = aA.mX;
+    int py = aA.mY;
 
     SetPixel(aA, aColor);
     if (absDeltaX >= absDeltaY) {
-        for (i = 0; i < absDeltaX; i++) {
+        for (int i = 0; i < absDeltaX; i++) {
             y += absDeltaY;
             if (y >= absDeltaX) {
                 y -= absDeltaX;
@@ -72,7 +70,7 @@ void Canvas::DrawLine(const Point &aA, const Point &aB, const Color &aColor)
             SetPixel(Point(px, py), aColor);
         }
     } else {
-        for (i = 0; i < absDeltaY; i++) {
+        for (int i = 0; i < absDeltaY; i++) {
             x += absDeltaX;
             if (x >= absDeltaY) {
                 x -= absDeltaY;
