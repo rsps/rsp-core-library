@@ -19,17 +19,24 @@
 #include <sys/mman.h>
 #include <thread>
 #include <unistd.h>
+#include <utils/ExceptionHelper.h>
 
 namespace rsp::graphics
 {
 
-Framebuffer::Framebuffer()
+Framebuffer::Framebuffer(const char *apDevPath)
 {
-    mFramebufferFile = open("/dev/fb1", O_RDWR);
+    mFramebufferFile = -1;
+    if (apDevPath) {
+        mFramebufferFile = open(apDevPath, O_RDWR);
+        if (mFramebufferFile == -1) {
+            std::clog << "Failed to open framebuffer at " << apDevPath << " trying /dev/fb0" << std::endl;
+        }
+    }
     if (mFramebufferFile == -1) {
         mFramebufferFile = open("/dev/fb0", O_RDWR);
         if (mFramebufferFile == -1) {
-            throw std::system_error(errno, std::generic_category(), "Failed to open framebuffer");
+            THROW_SYSTEM("Failed to open framebuffer");
         }
     }
 
@@ -43,18 +50,19 @@ Framebuffer::Framebuffer()
     mWidth = mVariableInfo.xres;
     mHeight = mVariableInfo.yres;
     mBytesPerPixel = mVariableInfo.bits_per_pixel / 8;
+    std::clog << "Framebuffer opened. Width=" << mWidth << " Height=" << mHeight << " BytesPerPixel=" << mBytesPerPixel << std::endl;
 
     // set yres_virtual for double buffering
     mVariableInfo.yres_virtual = mVariableInfo.yres * 2;
     if (ioctl(mFramebufferFile, FBIOPUT_VSCREENINFO, &mVariableInfo) == -1) {
-        std::cout << "ioctl FBIOPUT_VSCREENINFO failed errno:" << strerror(errno) << std::endl;
+        THROW_SYSTEM("Framebuffer ioctl FBIOPUT_VSCREENINFO failed");
     }
 
     // stop the console from drawing ontop of this programs graphics
     if (access("/dev/tty0", O_RDWR) == 0) {
         mTtyFb = open("/dev/tty0", O_RDWR);
         if (ioctl(mTtyFb, KDSETMODE, KD_GRAPHICS) == -1) {
-            std::cout << "ioctl KDSETMODE KD_GRAPHICS failed errno:" << strerror(errno) << std::endl;
+            THROW_SYSTEM("Framebuffer ioctl KDSETMODE KD_GRAPHICS failed");
         }
     }
 
@@ -63,7 +71,7 @@ Framebuffer::Framebuffer()
 
     mpFrontBuffer = static_cast<uint8_t *>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
     if (mpFrontBuffer == reinterpret_cast<uint8_t *>(-1)) /*MAP_FAILED*/ {
-        std::cout << "Mapping failed errno:" << strerror(errno) << std::endl;
+        THROW_SYSTEM("Framebuffer shared memory mapping failed");
     }
 
     mpBackBuffer = mpFrontBuffer + screensize;

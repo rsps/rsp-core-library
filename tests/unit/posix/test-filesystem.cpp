@@ -82,12 +82,12 @@ TEST_CASE("Testing FileSystem") {
         CHECK(list[0].string() == "/etc/hostname");
     }
 
-    SUBCASE("Get Device By Driver Name") {
-        std::string p = FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+    SUBCASE("Get Framebuffer Device By Driver Name") {
+        std::filesystem::path p = FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
 
-        MESSAGE(p);
+        MESSAGE((p.empty() ? "Not Found!" : p.string()));
 
-        CHECK(StrUtils::StartsWith(p, "/dev/fb"));
+        CHECK(StrUtils::StartsWith(p.string(), "/dev/fb"));
     }
 }
 

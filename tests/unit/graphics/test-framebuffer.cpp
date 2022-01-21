@@ -13,6 +13,8 @@
 #include <graphics/Framebuffer.h>
 #include <graphics/primitives/Bitmap.h>
 #include <thread>
+#include <filesystem>
+#include <posix/FileSystem.h>
 
 using namespace rsp::graphics;
 
@@ -27,7 +29,9 @@ inline void CheckPixel(const Point &aPoint, const Color &aColour, const Framebuf
 
 TEST_CASE("Framebuffer Drawing Primitives")
 {
-    Framebuffer fb;
+    std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+
+    Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
 
     std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());

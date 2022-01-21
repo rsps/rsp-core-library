@@ -12,7 +12,7 @@ namespace rsp::graphics
 class Framebuffer : public BufferedCanvas
 {
   public:
-    Framebuffer();
+    Framebuffer(const char *apDevPath = nullptr);
     virtual ~Framebuffer();
 
     inline void SetPixel(const Point &aPoint, const Color aColor)

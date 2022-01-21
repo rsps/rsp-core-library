@@ -343,7 +343,6 @@ std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, boo
     std::string filter = std::string("^") + arPath.string() + std::string("$");
     StrUtils::ReplaceAll(filter, "*", ".*");
     StrUtils::ReplaceAll(filter, "?", ".");
-//    std::cout << "Filter: " << filter << std::endl;
 
     std::regex self_regex(filter, std::regex_constants::basic);
 
@@ -359,7 +358,6 @@ std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, boo
     else {
         for(auto const& dir_entry: std::filesystem::directory_iterator{path}) {
             if (std::regex_search(dir_entry.path().string(), self_regex)) {
-//                std::cout << "Match: " << dir_entry.path() << std::endl;
                 if (!aDirOnly || dir_entry.is_directory()) {
                     result.push_back(dir_entry.path());
                 }
@@ -370,7 +368,7 @@ std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, boo
     return result;
 }
 
-std::string GetCharacterDeviceByDriverName(const std::string &arDriverName, const std::filesystem::path &arPath)
+std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriverName, const std::filesystem::path &arPath)
 {
     struct stat stat_buf;
 
@@ -385,22 +383,19 @@ std::string GetCharacterDeviceByDriverName(const std::string &arDriverName, cons
         unsigned int minor = minor(stat_buf.st_rdev);
 
         std::filesystem::path sys_path(StrUtils::Format("/sys/dev/char/%d:%d/device/driver", major, minor).c_str());
-//        std::cout << "Sys Path: " << sys_path << std::endl;
 
         if (!std::filesystem::directory_entry(sys_path).exists()) {
             continue;
         }
 
         std::filesystem::path real(std::filesystem::read_symlink(sys_path));
-//        std::cout << "Real: " << real << std::endl;
 
         if (arDriverName == real.stem()) {
-            return dir.string();
+            return dir;
         }
     }
 
     return std::string();
-
 //        struct stat
 //          {
 //            __dev_t st_dev;     /* Device.  */
@@ -420,14 +415,13 @@ std::string GetCharacterDeviceByDriverName(const std::string &arDriverName, cons
 //            __time_t st_ctime;          /* Time of last status change.  */
 //            __syscall_ulong_t st_ctimensec; /* Nsecs of last status change.  */
 //          };
-
-//        result.Path = fullpath;
-//        result.Size = stat_buf.st_size;
-//        result.Uid = stat_buf.st_uid;
-//        result.Gid = stat_buf.st_gid;
-//        result.Mode = stat_buf.st_mode;
-//        result.Major = major(stat_buf.st_rdev);
-//        result.Minor = minor(stat_buf.st_rdev);
+//        Path = fullpath;
+//        Size = stat_buf.st_size;
+//        Uid = stat_buf.st_uid;
+//        Gid = stat_buf.st_gid;
+//        Mode = stat_buf.st_mode;
+//        Major = major(stat_buf.st_rdev);
+//        Minor = minor(stat_buf.st_rdev);
 }
 
 } // namespace FileSystem
