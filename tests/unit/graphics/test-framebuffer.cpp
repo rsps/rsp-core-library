@@ -55,20 +55,18 @@ TEST_CASE("Framebuffer Drawing Primitives")
         fb.DrawLine(pointA, pointB, col);
 
         // Assert
-        int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;
-
-        deltaX = pointB.GetX() - pointA.GetX();
-        deltaY = pointB.GetY() - pointA.GetY();
-        absDeltaX = abs(deltaX);
-        absDeltaY = abs(deltaY);
-        signumX = (deltaX > 0) ? 1 : -1;
-        signumY = (deltaY > 0) ? 1 : -1;
-        x = absDeltaX >> 1;
-        y = absDeltaY >> 1;
-        px = pointA.GetX();
-        py = pointA.GetY();
+        int deltaX = pointB.GetX() - pointA.GetX();
+        int deltaY = pointB.GetY() - pointA.GetY();
+        int absDeltaX = abs(deltaX);
+        int absDeltaY = abs(deltaY);
+        int signumX = (deltaX > 0) ? 1 : -1;
+        int signumY = (deltaY > 0) ? 1 : -1;
+        int x = absDeltaX >> 1;
+        int y = absDeltaY >> 1;
+        int px = pointA.GetX();
+        int py = pointA.GetY();
         if (absDeltaX >= absDeltaY) {
-            for (i = 0; i < absDeltaX; i++) {
+            for (int i = 0; i < absDeltaX; i++) {
                 y += absDeltaY;
                 if (y >= absDeltaX) {
                     y -= absDeltaX;
@@ -78,7 +76,7 @@ TEST_CASE("Framebuffer Drawing Primitives")
                 CHECK(fb.GetPixel(Point(px, py), false) == col);
             }
         } else {
-            for (i = 0; i < absDeltaY; i++) {
+            for (int i = 0; i < absDeltaY; i++) {
                 x += absDeltaX;
                 if (x >= absDeltaY) {
                     x -= absDeltaY;
