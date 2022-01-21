@@ -1,10 +1,12 @@
-/*
- * ExceptionHelper.h
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- *  Created on: 5. mar. 2020
- *      Author: steffen
+ * \copyright   Copyright 2020 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Steffen Brummer
  */
-
 #ifndef SRC_UTILS_EXCEPTIONHELPER_H_
 #define SRC_UTILS_EXCEPTIONHELPER_H_
 
@@ -37,7 +39,7 @@ public:
         ss << "From '" << aFilename << ":" << aLineNum << "'->\n"
                 << BaseException::what();
         mBacktrace = ss.str();
-    };
+    }
 
     backtraced_exception(const std::exception &e, const char *aFilename, int aLineNum)
             : BaseException(static_cast<const BaseException&>(e))
@@ -46,16 +48,16 @@ public:
         ss << "From '" << aFilename << ":" << aLineNum << "'->\n"
                 << e.what();
         mBacktrace = ss.str();
-    };
+    }
 
     virtual ~backtraced_exception() noexcept
     {
-    };
+    }
 
     virtual const char* what() const noexcept
     {
         return mBacktrace.c_str();
-    };
+    }
 };
 
 #define THROW_WITH_BACKTRACE(EXCEPTION) throw rsp::utils::backtraced_exception< EXCEPTION >(__FILE__, __LINE__)

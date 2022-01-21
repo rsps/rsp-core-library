@@ -9,8 +9,7 @@
  */
 
 #include <graphics/primitives/raster/PngLoader.h>
-#include <utils/RSPCoreExceptions.h>
-
+#include <utils/CoreException.h>
 #include <cerrno>
 #include <iomanip>
 
@@ -37,7 +36,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
     uint8_t signature[8];
     fread(signature, sizeof(uint8_t), sizeof(signature), file);
     if (!CheckSignature(signature, 8)) {
-        throw RSPCoreException("Signature not matching"); //return;  //Some error, probably just throw exception
+        throw CoreException("Signature not matching"); //return;  //Some error, probably just throw exception
     }
 
     // TODO: Declare structs for data handling

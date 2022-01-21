@@ -6,6 +6,7 @@
  * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
+ * \author      Steffen Brummer
  */
 
 #ifndef RSPCOREEXCEPTIONS_H
@@ -14,14 +15,15 @@
 #include <exception>
 #include <stdexcept>
 #include <system_error>
+#include "ExceptionHelper.h"
 
 namespace rsp::utils
 {
 
-class RSPCoreException : public std::runtime_error
+class CoreException : public std::runtime_error
 {
   public:
-    explicit RSPCoreException(const char *aMsg)
+    explicit CoreException(const char *aMsg)
         : std::runtime_error("")
     {
         mMsg = aMsg;
@@ -36,20 +38,20 @@ class RSPCoreException : public std::runtime_error
     std::string mMsg;
 };
 
-class NotImplementedException : public RSPCoreException
+class NotImplementedException : public CoreException
 {
   public:
     explicit NotImplementedException(const char *aMsg)
-        : RSPCoreException(aMsg)
+        : CoreException(aMsg)
     {
     }
 };
 
-class AssertException : public RSPCoreException
+class AssertException : public CoreException
 {
   public:
     explicit AssertException(const char *aMsg)
-        : RSPCoreException(aMsg)
+        : CoreException(aMsg)
     {
     }
 };

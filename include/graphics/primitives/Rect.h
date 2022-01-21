@@ -11,8 +11,8 @@
 #ifndef RECT_H
 #define RECT_H
 
+#include <utils/CoreException.h>
 #include "Point.h"
-#include <utils/RSPCoreExceptions.h>
 
 namespace rsp::graphics
 {
