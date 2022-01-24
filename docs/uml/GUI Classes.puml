@@ -157,7 +157,7 @@ Rect *-- Ctrl
 class Scene {
     Each fullscreen view must decent from Scene.
 --
-    #mTouchables: std::vector<Touchable*>
+    #mTouchables: std::vector<TouchArea*>
 --
     +ProcessEvent(arEvent: Event&)
 }
@@ -189,16 +189,17 @@ class Button {
     Posts an event when dragged.
     Posts an event when released.
 }
-Label <|-- Button
+Label *-- Button
 TouchArea *-- Button
+Image *-- Button
 
-class CheckBox {
-    A control used to draw a checkbox
-    in different states.
-    Posts an event when clicked.
-}
-Button <|-- CheckBox
-Image <|-- CheckBox
+'class CheckBox {
+'    A control used to draw a checkbox
+'    in different states.
+'    Posts an event when clicked.
+'}
+'Button <|-- CheckBox
+'Image <|-- CheckBox
 
 }
 
