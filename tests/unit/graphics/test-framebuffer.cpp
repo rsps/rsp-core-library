@@ -268,6 +268,18 @@ TEST_CASE("Framebuffer Drawing Primitives")
         MESSAGE("Fps: " << fps);
     }
 
+    SUBCASE("Draw text")
+    {
+        const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
+        Font font(cFontFile);
+        font.SetSize(82);
+        Rect r(100, 200, 180, 500);
+
+        fb.DrawText(r, font, "Hello World.", false);
+        fb.SwapBuffer();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+
     SUBCASE("Swapbuffer")
     {
         fb.SwapBuffer();

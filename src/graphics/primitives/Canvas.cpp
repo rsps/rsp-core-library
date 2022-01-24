@@ -17,6 +17,7 @@
 #include <sys/mman.h>
 #include <thread>
 #include <unistd.h>
+#include <stdint.h>
 
 namespace rsp::graphics
 {
@@ -106,8 +107,20 @@ void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
     }
 }
 
-void Canvas::DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit)
+void Canvas::DrawText(const Rect &arRect, const Font &arFont, const char *apText, bool aScaleToFit)
 {
-    throw rsp::utils::NotImplementedException("Draw Text is not yet implemented");
+    TextMask tm = arFont.MakeTextMask(apText);
+
+    int w = std::min(static_cast<uint32_t>(arRect.GetWidth()), tm.mWidth) + arRect.GetLeft();
+    int h = std::min(static_cast<uint32_t>(arRect.GetHeight()), tm.mHeight) + arRect.GetTop();
+    int index = 0;
+
+    for (int y = arRect.GetTop() ; y < h ; y++) {
+        for (int x = arRect.GetLeft() ; x < w ; x++) {
+            uint8_t c = tm.mBits[index++];
+            Color cl(c, c, c, 0x00);
+            SetPixel(Point(x, y), cl);
+        }
+    }
 }
 } // namespace rsp::graphics

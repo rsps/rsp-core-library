@@ -11,13 +11,20 @@
 #define FONT_H
 
 #include <vector>
+#include <string>
 #include <utils/CoreException.h>
 #include <graphics/primitives/Color.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-namespace rsp::graphics
+namespace rsp::graphics {
+
+
+class FontException : public rsp::utils::CoreException
 {
+public:
+    explicit FontException(const char *aMsg, FT_Error aCode);
+};
 
 typedef FT_Face FontFace;
 
@@ -58,19 +65,21 @@ private:
     FT_Library mFtLib { };
 };
 
-
 class Font
 {
 public:
     Font(const char *apFilename, int aFaceIndex = 0);
     ~Font();
 
-    operator FontFace() const { return mFace; }
+    operator FontFace() const {
+        return mFace;
+    }
 
-    void SetSize(uint32_t aWidth, uint32_t aHeight);
+    void SetSize(uint32_t aPx);
 
-    TextMask GetSymbol(uint32_t aSymbolCode);
-    TextMask MakeTextMask(const std::string& arText);
+    TextMask GetSymbol(uint32_t aSymbolCode) const;
+    TextMask MakeTextMask(const char *apText) const { return MakeTextMask(std::string(apText)); };
+    TextMask MakeTextMask(const std::string &arText) const;
 
 protected:
     std::string mName;
@@ -79,16 +88,16 @@ protected:
     int mWeigth;
     int mSize;
 
-    FreeTypeLibrary mLib {};
-    FontFace mFace {};
+    FreeTypeLibrary mLib { };
+    FontFace mFace { };
 
-    int getKerning(uint aFirst, uint aSecond, uint aKerningMode = 0);
-    void getBbox(TextMask& arTextMask);
-    std::u32string stringToU32(const std::string &arText);
+    int getKerning(uint aFirst, uint aSecond, uint aKerningMode = 0) const;
+    std::u32string stringToU32(const std::string &arText) const;
+    void paintOver(const TextMask &aSrc, TextMask &aDst, int aX, int aY) const;
 
 private:
-    Font(const Font &) = delete;
-    Font &operator =(const Font &) = delete;
+    Font(const Font&) = delete;
+    Font& operator =(const Font&) = delete;
 };
 
 }

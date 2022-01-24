@@ -49,7 +49,7 @@ class Canvas
      * \param aSweepAngle
      * \param aColor
      */
-    void DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &aColor);
+    void DrawArc(const Point &arCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &arColor);
     /**
      * Draw a full circle
      *
@@ -66,7 +66,7 @@ class Canvas
      * \param aB
      * \param aColor
      */
-    void DrawLine(const Point &aA, const Point &aB, const Color &aColor);
+    void DrawLine(const Point &arA, const Point &arB, const Color &arColor);
 
     /**
      * Draw a rectangle
@@ -76,7 +76,7 @@ class Canvas
      * \param aRect
      * \param aColor
      */
-    void DrawRectangle(const Rect &aRect, const Color &aColor);
+    void DrawRectangle(const Rect &arRect, const Color &arColor);
 
     /**
      * Copies the bitmap content into the canvas.
@@ -84,7 +84,7 @@ class Canvas
      * \param LeftTop
      * \param aBitmap
      */
-    void DrawImage(const Point &LeftTop, const Bitmap &aBitmap);
+    void DrawImage(const Point &arLeftTop, const Bitmap &arBitmap);
 
     /**
      * Draws the given text within the given rectangle on the canvas.
@@ -94,7 +94,7 @@ class Canvas
      * \param apText
      * \param aScaleToFit
      */
-    void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit);
+    void DrawText(const Rect &arRect, const Font &arFont, const char *apText, bool aScaleToFit);
 
     /**
      * Get the color value of a single pixel.
@@ -155,10 +155,10 @@ class Canvas
      * \param aPoint
      * \return bool
      */
-    inline bool IsInsideScreen(const Point &aPoint) const
+    inline bool IsInsideScreen(const Point &arPoint) const
     {
         // return !(aPoint.mX < 0 || aPoint.mY < 0 || static_cast<uint32_t>(aPoint.mY) >= mVariableInfo.yres || static_cast<uint32_t>(aPoint.mX) >= mVariableInfo.xres);
-        return !(aPoint.mX < 0 || aPoint.mY < 0 || static_cast<uint32_t>(aPoint.mY) >= mHeight || static_cast<uint32_t>(aPoint.mX) >= mWidth);
+        return !(arPoint.mX < 0 || arPoint.mY < 0 || static_cast<uint32_t>(arPoint.mY) >= mHeight || static_cast<uint32_t>(arPoint.mX) >= mWidth);
     }
 
   protected:
@@ -166,18 +166,18 @@ class Canvas
     uint32_t mWidth;
     uint32_t mBytesPerPixel;
 
-    inline void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Color &aColor)
+    inline void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Color &arColor)
     {
-        SetPixel(Point(aCenterX + aX, aCenterY + aY), aColor);
-        SetPixel(Point(aCenterX - aX, aCenterY + aY), aColor);
-        SetPixel(Point(aCenterX + aX, aCenterY - aY), aColor);
-        SetPixel(Point(aCenterX - aX, aCenterY - aY), aColor);
+        SetPixel(Point(aCenterX + aX, aCenterY + aY), arColor);
+        SetPixel(Point(aCenterX - aX, aCenterY + aY), arColor);
+        SetPixel(Point(aCenterX + aX, aCenterY - aY), arColor);
+        SetPixel(Point(aCenterX - aX, aCenterY - aY), arColor);
     }
 
-    inline void plot8Points(int aCenterX, int aCenterY, int aX, int aY, const Color &aColor)
+    inline void plot8Points(int aCenterX, int aCenterY, int aX, int aY, const Color &arColor)
     {
-        plot4Points(aCenterX, aCenterY, aX, aY, aColor);
-        plot4Points(aCenterX, aCenterY, aY, aX, aColor);
+        plot4Points(aCenterX, aCenterY, aX, aY, arColor);
+        plot4Points(aCenterX, aCenterY, aY, aX, arColor);
     }
 };
 

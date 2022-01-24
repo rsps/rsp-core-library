@@ -47,7 +47,7 @@ target_include_directories(rsp-core-lib
         ${CMAKE_CURRENT_BINARY_DIR}/src
         ${FREETYPE_INCLUDE_DIRS}
 )
-add_compile_options(-Wall -Wextra -Wold-style-cast -pedantic -Werror)
+add_compile_options(-Wall -Wextra -Wold-style-cast -pedantic -Werror -DFT_CONFIG_OPTION_ERROR_STRINGS)
 
 add_subdirectory(src)
 
