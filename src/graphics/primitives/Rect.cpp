@@ -16,6 +16,15 @@ using namespace rsp::utils;
 namespace rsp::graphics
 {
 
+std::ostream& operator <<(std::ostream &aStream, const Rect &arRect)
+{
+    aStream << "Top: " << arRect.GetTop() << ", "
+        << "Left: " << arRect.GetLeft() << ", "
+        << "Height: " << arRect.GetHeight() << ", "
+        << "Width: " << arRect.GetWidth();
+    return aStream;
+}
+
 
 Rect::Rect(int aLeft, int aTop, int aWidth, int aHeight)
     : mLeftTop(aLeft, aTop), mRightBottom(aLeft + aWidth, aTop + aHeight)
@@ -107,11 +116,9 @@ void Rect::SetHeight(int aHeight)
     mRightBottom.mY = mLeftTop.mY + aHeight;
 }
 
-bool Rect::IsHit(const Point &aPoint) const
+bool Rect::IsHit(const Point &arPoint) const
 {
-    throw NotImplementedException("IsHit is not yet implemeted");
-
-    return false;
+    return !(arPoint.mX < mLeftTop.mX || arPoint.mY < mLeftTop.mY || arPoint.mY >= mRightBottom.mY || arPoint.mX >= mRightBottom.mX);
 }
 
 bool Rect::VerifyDimensions() const

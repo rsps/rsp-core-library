@@ -43,6 +43,8 @@ public:
     uint32_t mHeight = 0;
 };
 
+std::ostream& operator <<(std::ostream &os, TextMask &tm);
+
 /**
  * \class FreeTypeLibrary
  * \brief Simple object to load the freetype library
@@ -76,8 +78,11 @@ public:
     }
 
     void SetSize(uint32_t aPx);
+    void ScaleToFit(const std::string &arText, uint32_t aWidthPx, uint32_t aHeightPx);
 
     TextMask GetSymbol(uint32_t aSymbolCode) const;
+    std::vector<TextMask> MakeTextMasks(const std::string &arText) const;
+
     TextMask MakeTextMask(const char *apText) const { return MakeTextMask(std::string(apText)); };
     TextMask MakeTextMask(const std::string &arText) const;
 

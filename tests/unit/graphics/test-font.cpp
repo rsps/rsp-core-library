@@ -10,6 +10,7 @@
 
 #include <doctest.h>
 #include <graphics/primitives/Font.h>
+#include <graphics/primitives/Rect.h>
 
 using namespace rsp::graphics;
 
@@ -52,6 +53,20 @@ TEST_CASE("Font Primitive")
         TextMask tm = font.MakeTextMask(text);
         CHECK(tm.mHeight < 16);
         CHECK(tm.mWidth < (16 * text.size()));
+    }
+
+    SUBCASE("Scale To fit") {
+        const std::string text("Hello World");
+        Font font(cFontFile);
+        Rect r(100, 200, 280, 200);
+
+        font.ScaleToFit(text, r.GetWidth(), r.GetHeight());
+
+        TextMask tm = font.MakeTextMask(text);
+        MESSAGE(tm.mHeight, " < ", r.GetHeight());
+        MESSAGE(tm.mWidth, " < ", r.GetWidth());
+        CHECK(tm.mHeight < r.GetHeight());
+        CHECK(tm.mWidth < r.GetWidth());
     }
 }
 

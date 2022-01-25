@@ -94,7 +94,8 @@ class Canvas
      * \param apText
      * \param aScaleToFit
      */
-    void DrawText(const Rect &arRect, const Font &arFont, const char *apText, bool aScaleToFit);
+    void DrawText(const Rect &arRect, Font &arFont, const char *apText, bool aScaleToFit);
+    void DrawText1(const Rect &arRect, Font &arFont, const char *apText, bool aScaleToFit);
 
     /**
      * Get the color value of a single pixel.

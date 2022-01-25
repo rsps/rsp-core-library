@@ -10,6 +10,7 @@
 
 #include <string>
 #include <locale>
+#include <algorithm>
 #include <graphics/primitives/Font.h>
 
 #include <ft2build.h>
@@ -45,6 +46,25 @@ inline uint unsign(int aValue)
     return static_cast<uint>(aValue);
 }
 
+std::ostream& operator <<(std::ostream &os, TextMask &tm)
+{
+    os << "Symbol: ";
+    if ((tm.mSymbolUnicode > 31) && (tm.mSymbolUnicode < 127)) {
+        os << static_cast<char>(tm.mSymbolUnicode);
+    }
+    else {
+        os << std::hex << static_cast<int>(tm.mSymbolUnicode) << std::dec;
+    }
+    os << ", "
+        << "Top: " << tm.mTop << ", "
+        << "Left: " << tm.mLeft << ", "
+        << "Height: " << tm.mHeight << ", "
+        << "Width: " << tm.mWidth;
+
+    return os;
+}
+
+
 Font::Font(const char *apFilename, int aFaceIndex)
     : mSize(0), mWeigth(0), mColor(0), mFace(nullptr)
 {
@@ -70,9 +90,38 @@ void Font::SetSize(uint32_t aPx)
     }
 }
 
+void Font::ScaleToFit(const std::string &arText, uint32_t aWidthPx, uint32_t aHeightPx)
+{
+    int lines = 1;
+    int chars = 0;
+    int count = 0;
+
+    for (int i = 0; i < arText.size(); i++) {
+        if (arText[i] == '\n') {
+            lines++;
+            count = 0;
+        }
+        else {
+            if (++count > chars) {
+                chars = count;
+            }
+        }
+    }
+
+    std::cout << "ScaleToFit( w:" << ((chars) ? ((aWidthPx + (chars/2)) / chars) : 0) << ", h:" << (aHeightPx / lines) << ")" << std::endl;
+
+    FT_Error error = FT_Set_Pixel_Sizes(mFace, (chars) ? ((aWidthPx + (chars/2)) / chars) : 0, aHeightPx / lines);
+    if (error) {
+        THROW_WITH_BACKTRACE2(FontException, "FT_Set_Pixel_Sizes() failed", error);
+    }
+}
+
 TextMask Font::GetSymbol(uint32_t aSymbolCode) const
 {
-    FT_Error error = FT_Load_Char(mFace, aSymbolCode, FT_LOAD_RENDER);
+#undef FT_LOAD_TARGET_
+#define FT_LOAD_TARGET_( x )   ( static_cast<FT_Int32>(( (x) & 15 ) << 16 ) )
+
+    FT_Error error = FT_Load_Char(mFace, aSymbolCode, FT_LOAD_RENDER /*| FT_LOAD_TARGET_LCD_V*/);
     if (error) {
         THROW_WITH_BACKTRACE2(FontException, "FT_Load_Char() failed", error);
     }
@@ -110,6 +159,58 @@ void Font::paintOver(const TextMask &aSrc, TextMask &aDst, int aX, int aY) const
     }
 }
 
+std::vector<TextMask> Font::MakeTextMasks(const std::string &arText) const
+{
+    std::u32string unicode = stringToU32(arText);
+    uint32_t line_height = 0;
+
+    std::vector<TextMask> result;
+    for (auto s : unicode) {
+        switch (s) {
+            case '\n':
+            case '\r':
+                break;
+
+            default:
+                result.push_back(GetSymbol(s));
+                line_height = std::max(line_height, result.back().mHeight);
+                auto rs = result.size();
+                if (rs > 1) {
+                    result[rs - 2].mWidth += getKerning(result[rs - 2].mSymbolUnicode, result[rs - 1].mSymbolUnicode);
+
+                    // Space ' ' has no width, add width of next character to space character
+                    if (result[rs - 2].mWidth == 0) {
+                        result[rs - 2].mWidth = result[rs - 1].mWidth;
+                    }
+                }
+                break;
+        }
+    }
+
+    std::cout << "Line Height: " << line_height << std::endl;
+
+    uint32_t top = line_height;
+    uint32_t left = 0;
+    for (auto &tm : result) {
+        std::cout << "Before: " << tm << std::endl;
+        switch (tm.mSymbolUnicode) {
+            case '\n':
+                std::cout << "newline " << top << ", " << line_height << std::endl;
+                top += line_height;
+                left = 0;
+                break;
+
+            default:
+                tm.mTop += top - tm.mHeight - tm.mTop;
+                tm.mLeft += left;
+                left += tm.mWidth;
+                break;
+        }
+        std::cout << "After: " << tm << std::endl;
+    }
+    return result;
+}
+
 TextMask Font::MakeTextMask(const std::string &arText) const
 {
     std::u32string unicode = stringToU32(arText);
@@ -119,6 +220,8 @@ TextMask Font::MakeTextMask(const std::string &arText) const
 
     for (auto s : unicode) {
         TmpArray.push_back(GetSymbol(s));
+
+        std::cout << TmpArray.back() << std::endl;
 
         Result.mHeight = std::max(Result.mHeight, TmpArray.back().mHeight);
         Result.mWidth += TmpArray.back().mWidth + TmpArray.back().mLeft;
@@ -145,6 +248,7 @@ TextMask Font::MakeTextMask(const std::string &arText) const
     uint32_t prev_symbol_unicode = 0;
     for (auto &M : TmpArray) {
         x += M.mLeft + getKerning(prev_symbol_unicode, M.mSymbolUnicode);
+        prev_symbol_unicode = M.mSymbolUnicode;
         paintOver(M, Result, x, Result.mHeight - M.mTop - Result.mTop);
         x += static_cast<int>(M.mWidth);
     }

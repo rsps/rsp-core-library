@@ -11,6 +11,7 @@
 #ifndef RECT_H
 #define RECT_H
 
+#include <ostream>
 #include <utils/CoreException.h>
 #include "Point.h"
 
@@ -167,7 +168,7 @@ class Rect
      * \param aPoint
      * \return bool
      */
-    bool IsHit(const Point &aPoint) const;
+    bool IsHit(const Point &arPoint) const;
 
     bool VerifyDimensions() const;
 
@@ -179,6 +180,8 @@ class Rect
     Point mLeftTop;
     Point mRightBottom;
 };
+
+std::ostream& operator <<(std::ostream &aStream, const Rect &arRect);
 
 } // namespace rsp::graphics
 #endif // RECT_H

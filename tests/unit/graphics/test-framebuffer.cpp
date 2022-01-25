@@ -272,10 +272,11 @@ TEST_CASE("Framebuffer Drawing Primitives")
     {
         const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
         Font font(cFontFile);
-        font.SetSize(82);
-        Rect r(100, 200, 180, 500);
+        Rect r(100, 200, 280, 200);
+//        font.SetSize(82);
 
-        fb.DrawText(r, font, "Hello World.", false);
+        fb.DrawRectangle(r, Color(0xFFFFFFFF));
+        fb.DrawText1(r, font, "Hello World", true);
         fb.SwapBuffer();
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }

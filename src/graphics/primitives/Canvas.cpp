@@ -18,6 +18,8 @@
 #include <thread>
 #include <unistd.h>
 #include <stdint.h>
+#include <string>
+#include <vector>
 
 namespace rsp::graphics
 {
@@ -107,15 +109,18 @@ void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
     }
 }
 
-void Canvas::DrawText(const Rect &arRect, const Font &arFont, const char *apText, bool aScaleToFit)
+void Canvas::DrawText(const Rect &arRect, Font &arFont, const char *apText, bool aScaleToFit)
 {
+    if (aScaleToFit) {
+        arFont.ScaleToFit(std::string(apText), arRect.GetWidth(), arRect.GetHeight());
+    }
     TextMask tm = arFont.MakeTextMask(apText);
 
     int w = std::min(static_cast<uint32_t>(arRect.GetWidth()), tm.mWidth) + arRect.GetLeft();
     int h = std::min(static_cast<uint32_t>(arRect.GetHeight()), tm.mHeight) + arRect.GetTop();
-    int index = 0;
 
     for (int y = arRect.GetTop() ; y < h ; y++) {
+        int index = (y - arRect.GetTop()) * tm.mWidth;
         for (int x = arRect.GetLeft() ; x < w ; x++) {
             uint8_t c = tm.mBits[index++];
             Color cl(c, c, c, 0x00);
@@ -123,4 +128,35 @@ void Canvas::DrawText(const Rect &arRect, const Font &arFont, const char *apText
         }
     }
 }
+
+void Canvas::DrawText1(const Rect &arRect, Font &arFont, const char *apText, bool aScaleToFit)
+{
+    if (aScaleToFit) {
+        arFont.ScaleToFit(std::string(apText), arRect.GetWidth(), arRect.GetHeight());
+    }
+    std::vector<TextMask> tms = arFont.MakeTextMasks(apText);
+
+//    int left = 0;
+    for (auto tm : tms) {
+        std::cout << tm << std::endl;
+//        left += tm.mLeft;
+
+        for (uint32_t y = 0 ; y < tm.mHeight ; y++) {
+            int index = static_cast<int>(y * tm.mWidth);
+            for (uint32_t x = 0 ; x < tm.mWidth ; x++) {
+                uint8_t c = tm.mBits[index++];
+                Color cl(c, c, c, 0x00);
+                auto p = Point(x + tm.mLeft + arRect.GetLeft(), y + tm.mTop + arRect.GetTop());
+                if (arRect.IsHit(p)) {
+                    SetPixel(p, cl);
+                }
+                else {
+//                    std::cout << p << " not inside " << arRect << std::endl;
+                }
+            }
+        }
+//        left += tm.mWidth;
+    }
+}
+
 } // namespace rsp::graphics
