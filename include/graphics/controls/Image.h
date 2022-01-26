@@ -10,7 +10,8 @@ namespace rsp::graphics
 class Image : public Control
 {
   private:
-    Bitmap mBitmap;
+    Bitmap mNormal;
+    Bitmap mPressed;
 
   public:
     Image();

@@ -11,14 +11,14 @@ namespace rsp::graphics
 
 class Scene : public Control
 {
-  private:
-    std::vector<TouchArea *> mTouchables;
-
   public:
     Scene();
     ~Scene();
 
     void ProcessEvent(Event &aEvent);
+    void AddArea(TouchArea *aArea);
+
+    std::vector<TouchArea *> mTouchables;
 };
 
 } // namespace rsp::graphics

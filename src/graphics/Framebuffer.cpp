@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/Framebuffer.h>
+#include "graphics/Framebuffer.h"
 
 #include <chrono>
 #include <cstring>

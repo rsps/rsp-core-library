@@ -84,6 +84,7 @@ TEST_CASE("Framebuffer Drawing Primitives")
                 CHECK(fb.GetPixel(Point(px, py), false) == col);
             }
         }
+
         SUBCASE("Lines are Inclusive")
         {
             CHECK_EQ(fb.GetPixel(pointA, false), col);

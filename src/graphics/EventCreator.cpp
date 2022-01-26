@@ -1,6 +1,18 @@
-#include "graphics/EventCreator.h"
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Simon Glashoff
+ */
 
+#include "graphics/EventCreator.h"
 #include <linux/input.h>
+
+namespace rsp::graphics
+{
 
 EventCreator::EventCreator()
 {
@@ -53,3 +65,4 @@ void EventCreator::ReadBody()
         touchDriver.read(reinterpret_cast<char *>(&eventInput), sizeof(eventInput));
     }
 }
+} // namespace rsp::graphics

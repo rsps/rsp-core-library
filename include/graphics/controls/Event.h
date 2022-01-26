@@ -1,7 +1,11 @@
-#pragma once
+#ifndef EVENT_H
+#define EVENT_H
 
 #include <iostream>
 #include <linux/input.h>
+
+namespace rsp::graphics
+{
 
 struct EventInput {
     struct timeval time;
@@ -30,3 +34,5 @@ class Event
     {
     }
 };
+} // namespace rsp::graphics
+#endif // EVENT_H
