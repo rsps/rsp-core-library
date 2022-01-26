@@ -72,11 +72,13 @@ class Canvas
      * Draw a rectangle
      *
      * The rectangle is not rotated in any way, but simply a box with horizontal and vertical sides.
+     * If aFilled is set, the entire rectangle is filled with given color.
      *
      * \param aRect
      * \param aColor
+     * \param aFilled
      */
-    void DrawRectangle(const Rect &arRect, const Color &arColor);
+    void DrawRectangle(const Rect &arRect, const Color &arColor, bool aFilled = false);
 
     /**
      * Copies the bitmap content into the canvas.
@@ -95,7 +97,8 @@ class Canvas
      * \param aScaleToFit
      */
     void DrawText(const Rect &arRect, Font &arFont, const char *apText, bool aScaleToFit);
-    void DrawText1(const Rect &arRect, Font &arFont, const char *apText, bool aScaleToFit);
+    void DrawTextMasks(const Rect &arRect, const Color &arColor, const std::vector<TextMask> &arTms);
+    void DrawTextMasks(const Rect &arRect, const Color &arColor, const Color &arBackColor, const std::vector<TextMask> &arTms);
 
     /**
      * Get the color value of a single pixel.
@@ -122,7 +125,7 @@ class Canvas
      *
      * \return uint32_t
      */
-    uint32_t GetWidth() const
+    int GetWidth() const
     {
         // return mVariableInfo.xres;
         return mWidth;
@@ -133,7 +136,7 @@ class Canvas
      *
      * \return uint32_t
      */
-    uint32_t GetHeight() const
+    int GetHeight() const
     {
         // return mVariableInfo.yres;
         return mHeight;
@@ -144,7 +147,7 @@ class Canvas
      *
      * \return uint32_t
      */
-    uint32_t GetColorDepth() const
+    int GetColorDepth() const
     {
         // return mVariableInfo.bits_per_pixel;
         return mBytesPerPixel;
@@ -158,14 +161,13 @@ class Canvas
      */
     inline bool IsInsideScreen(const Point &arPoint) const
     {
-        // return !(aPoint.mX < 0 || aPoint.mY < 0 || static_cast<uint32_t>(aPoint.mY) >= mVariableInfo.yres || static_cast<uint32_t>(aPoint.mX) >= mVariableInfo.xres);
-        return !(arPoint.mX < 0 || arPoint.mY < 0 || static_cast<uint32_t>(arPoint.mY) >= mHeight || static_cast<uint32_t>(arPoint.mX) >= mWidth);
+        return !(arPoint.mX < 0 || arPoint.mY < 0 || arPoint.mY >= mHeight || arPoint.mX >= mWidth);
     }
 
   protected:
-    uint32_t mHeight;
-    uint32_t mWidth;
-    uint32_t mBytesPerPixel;
+    int mHeight;
+    int mWidth;
+    int mBytesPerPixel;
 
     inline void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Color &arColor)
     {

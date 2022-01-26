@@ -45,28 +45,33 @@ TEST_CASE("Font Primitive")
     }
 
     SUBCASE("Get Text Mask") {
-        Font font(cFontFile);
-        font.SetSize(16);
-
         const std::string text("Hello World");
+        const int size = 16;
 
-        TextMask tm = font.MakeTextMask(text);
-        CHECK(tm.mHeight < 16);
-        CHECK(tm.mWidth < (16 * text.size()));
+        Font font(cFontFile);
+        font.SetSize(size);
+
+        auto tms = font.MakeTextMasks(text);
+        Rect r = font.GetTextBoundingRect(tms);
+
+        CHECK(r.GetHeight() < size);
+        CHECK(r.GetWidth() < (size * text.size()));
     }
 
     SUBCASE("Scale To fit") {
         const std::string text("Hello World");
         Font font(cFontFile);
-        Rect r(100, 200, 280, 200);
+        Rect dst(100, 200, 280, 200);
 
-        font.ScaleToFit(text, r.GetWidth(), r.GetHeight());
+        font.ScaleToFit(text, dst.GetWidth(), dst.GetHeight());
 
-        TextMask tm = font.MakeTextMask(text);
-        MESSAGE(tm.mHeight, " < ", r.GetHeight());
-        MESSAGE(tm.mWidth, " < ", r.GetWidth());
-        CHECK(tm.mHeight < r.GetHeight());
-        CHECK(tm.mWidth < r.GetWidth());
+        auto tms = font.MakeTextMasks(text);
+        Rect r = font.GetTextBoundingRect(tms);
+
+        MESSAGE(r.GetHeight(), " < ", dst.GetHeight());
+        MESSAGE(r.GetWidth(), " < ", dst.GetWidth());
+        CHECK(r.GetHeight() < dst.GetHeight());
+        CHECK(r.GetWidth() < dst.GetWidth());
     }
 }
 

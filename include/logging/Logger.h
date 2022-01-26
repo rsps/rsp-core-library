@@ -23,8 +23,9 @@
 namespace rsp::logging {
 
 // Usage: make CXXFLAGS="-DDEBUG_LOG"
+// Usage: cmake -DCMAKE_CXX_FLAGS="-DDEBUG_LOG" ..
 
-//#define DEBUG_LOG 1
+// #define DEBUG_LOG 1
 
 #ifdef DEBUG_LOG
 #include <iostream>
@@ -95,10 +96,12 @@ public:
     LogStreamInterface(LoggerInterface *apOwner, LogLevel aLevel);
     LogStreamInterface(const LogStreamInterface & aFrom)
         : mpOwner(aFrom.mpOwner), mLevel(aFrom.mLevel) {}
+    virtual ~LogStreamInterface() {}
 
     LogLevel GetLevel() const { return mLevel; }
     void SetLevel(LogLevel aLevel) { mLevel = aLevel; }
 
+    LogStreamInterface& operator= (const LogStreamInterface&) = delete;
 protected:
     LoggerInterface *mpOwner;
     LogLevel mLevel;
@@ -179,6 +182,8 @@ public:
     LogStream Notice() override;
     LogStream Info() override;
     LogStream Debug() override;
+
+    Logger& operator= (const Logger&) = delete;
 
 protected:
     std::streambuf *mpClogBackup;

@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <logging/Logger.h>
 
 namespace rsp::graphics
 {
@@ -72,7 +73,8 @@ void Canvas::DrawLine(const Point &aA, const Point &aB, const Color &aColor)
             px += signumX;
             SetPixel(Point(px, py), aColor);
         }
-    } else {
+    }
+    else {
         for (int i = 0; i < absDeltaY; i++) {
             x += absDeltaX;
             if (x >= absDeltaY) {
@@ -85,15 +87,24 @@ void Canvas::DrawLine(const Point &aA, const Point &aB, const Color &aColor)
     }
 }
 
-void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor)
+void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor, bool aFilled)
 {
-    for (int i = aRect.mLeftTop.mX; i <= aRect.mRightBottom.mX; i++) {
-        SetPixel(Point(i, aRect.mLeftTop.mY), aColor);     // top
-        SetPixel(Point(i, aRect.mRightBottom.mY), aColor); // bottom
+    if (aFilled) {
+        for (int y = aRect.mLeftTop.mY; y <= aRect.mRightBottom.mY; y++) {
+            for (int x = aRect.mLeftTop.mX; x <= aRect.mRightBottom.mX; x++) {
+                SetPixel(Point(x, y), aColor);
+            }
+        }
     }
-    for (int i = aRect.mLeftTop.mY; i <= aRect.mRightBottom.mY; i++) {
-        SetPixel(Point(aRect.mLeftTop.mX, i), aColor);     // left
-        SetPixel(Point(aRect.mRightBottom.mX, i), aColor); // right
+    else {
+        for (int i = aRect.mLeftTop.mX; i <= aRect.mRightBottom.mX; i++) {
+            SetPixel(Point(i, aRect.mLeftTop.mY), aColor);     // top
+            SetPixel(Point(i, aRect.mRightBottom.mY), aColor); // bottom
+        }
+        for (int i = aRect.mLeftTop.mY; i <= aRect.mRightBottom.mY; i++) {
+            SetPixel(Point(aRect.mLeftTop.mX, i), aColor);     // left
+            SetPixel(Point(aRect.mRightBottom.mX, i), aColor); // right
+        }
     }
 }
 
@@ -111,51 +122,48 @@ void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
 
 void Canvas::DrawText(const Rect &arRect, Font &arFont, const char *apText, bool aScaleToFit)
 {
+    std::vector<TextMask> tms;
     if (aScaleToFit) {
-        arFont.ScaleToFit(std::string(apText), arRect.GetWidth(), arRect.GetHeight());
+        tms = arFont.ScaleToFit(std::string(apText), arRect.GetWidth(), arRect.GetHeight());
     }
-    TextMask tm = arFont.MakeTextMask(apText);
+    else {
+        tms = arFont.MakeTextMasks(apText);
+    }
 
-    int w = std::min(static_cast<uint32_t>(arRect.GetWidth()), tm.mWidth) + arRect.GetLeft();
-    int h = std::min(static_cast<uint32_t>(arRect.GetHeight()), tm.mHeight) + arRect.GetTop();
+    DrawTextMasks(arRect, arFont.GetColor(), tms);
+}
 
-    for (int y = arRect.GetTop() ; y < h ; y++) {
-        int index = (y - arRect.GetTop()) * tm.mWidth;
-        for (int x = arRect.GetLeft() ; x < w ; x++) {
-            uint8_t c = tm.mBits[index++];
-            Color cl(c, c, c, 0x00);
-            SetPixel(Point(x, y), cl);
+void Canvas::DrawTextMasks(const Rect &arRect, const Color &arColor, const std::vector<TextMask> &arTms)
+{
+    for (auto tm : arTms) {
+//        DLOG(tm);
+        for (uint32_t y = 0; y < tm.mHeight; y++) {
+            int index = static_cast<int>(y * tm.mWidth);
+            for (uint32_t x = 0; x < tm.mWidth; x++) {
+                uint8_t c = tm.mBits[index++];
+                auto p = Point(x + tm.mLeft + arRect.GetLeft(), y + tm.mTop + arRect.GetTop());
+                if (c && arRect.IsHit(p)) {
+                    SetPixel(p, arColor);
+                }
+            }
         }
     }
 }
 
-void Canvas::DrawText1(const Rect &arRect, Font &arFont, const char *apText, bool aScaleToFit)
+void Canvas::DrawTextMasks(const Rect &arRect, const Color &arColor, const Color &arBackColor, const std::vector<TextMask> &arTms)
 {
-    if (aScaleToFit) {
-        arFont.ScaleToFit(std::string(apText), arRect.GetWidth(), arRect.GetHeight());
-    }
-    std::vector<TextMask> tms = arFont.MakeTextMasks(apText);
-
-//    int left = 0;
-    for (auto tm : tms) {
-        std::cout << tm << std::endl;
-//        left += tm.mLeft;
-
-        for (uint32_t y = 0 ; y < tm.mHeight ; y++) {
+    for (auto tm : arTms) {
+//        DLOG(tm);
+        for (uint32_t y = 0; y < tm.mHeight; y++) {
             int index = static_cast<int>(y * tm.mWidth);
-            for (uint32_t x = 0 ; x < tm.mWidth ; x++) {
+            for (uint32_t x = 0; x < tm.mWidth; x++) {
                 uint8_t c = tm.mBits[index++];
-                Color cl(c, c, c, 0x00);
                 auto p = Point(x + tm.mLeft + arRect.GetLeft(), y + tm.mTop + arRect.GetTop());
                 if (arRect.IsHit(p)) {
-                    SetPixel(p, cl);
-                }
-                else {
-//                    std::cout << p << " not inside " << arRect << std::endl;
+                    SetPixel(p, c ? arColor : arBackColor);
                 }
             }
         }
-//        left += tm.mWidth;
     }
 }
 

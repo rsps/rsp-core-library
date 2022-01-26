@@ -29,7 +29,7 @@ class Framebuffer : public BufferedCanvas
         if (!IsInsideScreen(aPoint)) {
             return;
         }
-        long location = (aPoint.mX + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + aPoint.mY * mFixedInfo.line_length;
+        long location = (aPoint.mX + static_cast<int>(mVariableInfo.xoffset)) * (static_cast<int>(mVariableInfo.bits_per_pixel) / 8) + aPoint.mY * static_cast<int>(mFixedInfo.line_length);
         *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = aColor;
     }
 

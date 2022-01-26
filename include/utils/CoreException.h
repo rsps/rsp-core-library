@@ -24,9 +24,9 @@ class CoreException : public std::runtime_error
 {
   public:
     explicit CoreException(const char *aMsg)
-        : std::runtime_error("")
+        : std::runtime_error(""),
+          mMsg(aMsg)
     {
-        mMsg = aMsg;
     }
 
     const char *what() const noexcept override

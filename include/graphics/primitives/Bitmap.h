@@ -64,7 +64,7 @@ class Bitmap : public Canvas
         if (!IsInsideScreen(aPoint)) {
             return;
         }
-        long location = (mWidth * aPoint.mY) + aPoint.mX;
+        uint32_t location = static_cast<uint32_t>((mWidth * aPoint.mY) + aPoint.mX);
         mImagePixels[location] = aColor;
     }
 
@@ -75,7 +75,7 @@ class Bitmap : public Canvas
      *
      * \return uint32_t
      */
-    uint32_t GetHeight() const
+    int GetHeight() const
     {
         return mHeight;
     }
@@ -85,7 +85,7 @@ class Bitmap : public Canvas
      *
      * \return uint32_t
      */
-    uint32_t GetWidth() const
+    int GetWidth() const
     {
         return mWidth;
     }

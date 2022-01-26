@@ -15,6 +15,7 @@
 #include <thread>
 #include <filesystem>
 #include <posix/FileSystem.h>
+#include <utils/StopWatch.h>
 
 using namespace rsp::graphics;
 
@@ -182,8 +183,8 @@ TEST_CASE("Framebuffer Drawing Primitives")
 
         // Act
         Bitmap testImgMap(testImage);
-        uint32_t height = testImgMap.GetHeight();
-        uint32_t width = testImgMap.GetWidth();
+        int height = testImgMap.GetHeight();
+        int width = testImgMap.GetWidth();
         Point topLeft(0, 0);
         Point topRight(width - 1, 0);
         Point botLeft(0, height - 1);
@@ -273,12 +274,59 @@ TEST_CASE("Framebuffer Drawing Primitives")
         const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
         Font font(cFontFile);
         Rect r(100, 200, 280, 200);
-//        font.SetSize(82);
 
-        fb.DrawRectangle(r, Color(0xFFFFFFFF));
-        fb.DrawText1(r, font, "Hello World", true);
+        fb.DrawRectangle(r, Color::White);
+        font.SetColor(Color::Red);
+        fb.DrawText(r, font, "Hello World", true);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        fb.DrawRectangle(r, Color::Grey);
+        font.SetColor(Color::Green);
+        fb.DrawText(r, font, "Hello\nWorld", true);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        fb.DrawRectangle(r, Color::Purple);
+        font.SetColor(Color::Grey);
+        fb.DrawText(r, font, "Hello\nWorld\nHELLO\nMOON", true);
         fb.SwapBuffer();
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        const Color rainbow[] = { Color::White, Color::Red, Color::Yellow, Color::Green, Color::Aqua, Color::Lime, Color::Blue, Color::Silver };
+
+        std::string s;
+        rsp::utils::StopWatch sw;
+        for (int i = 0 ; i < 1000 ; i++) {
+            fb.DrawRectangle(r, rainbow[i & 0x07], true);
+            font.SetColor(rainbow[(i + 2) & 0x07]);
+//            if ((i & 15) == 0) {
+                int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
+                std::stringstream ss;
+                ss << "FPS:\n" << fps;
+                s = ss.str();
+//            }
+            fb.DrawText(r, font, s.c_str(), false);
+            fb.SwapBuffer(BufferedCanvas::SwapOperations::NoOp);
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        sw.Reset();
+        std::vector<TextMask> tms;
+        for (int i = 0 ; i < 1000 ; i++) {
+            fb.DrawRectangle(r, rainbow[i & 0x07], true);
+//            if ((i & 15) == 0) {
+                int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
+                std::stringstream ss;
+                ss << "FPS:\n" << fps;
+                s = ss.str();
+                tms = font.MakeTextMasks(s.c_str());
+//            }
+            fb.DrawTextMasks(r, rainbow[(i + 2) & 0x07], tms);
+            fb.SwapBuffer(BufferedCanvas::SwapOperations::NoOp);
+        }
+
     }
 
     SUBCASE("Swapbuffer")

@@ -14,6 +14,7 @@
 #include <string>
 #include <utils/CoreException.h>
 #include <graphics/primitives/Color.h>
+#include <graphics/primitives/Rect.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
@@ -39,8 +40,8 @@ public:
 
     int mTop = 0;
     int mLeft = 0;
-    uint32_t mWidth = 0;
-    uint32_t mHeight = 0;
+    int mWidth = 0;
+    int mHeight = 0;
 };
 
 std::ostream& operator <<(std::ostream &os, TextMask &tm);
@@ -70,6 +71,11 @@ private:
 class Font
 {
 public:
+    typedef int Style;
+
+    static const int Normal = 0;
+    static const int Italic = 1;
+
     Font(const char *apFilename, int aFaceIndex = 0);
     ~Font();
 
@@ -77,21 +83,31 @@ public:
         return mFace;
     }
 
-    void SetSize(uint32_t aPx);
-    void ScaleToFit(const std::string &arText, uint32_t aWidthPx, uint32_t aHeightPx);
+    std::vector<TextMask> ScaleToFit(const std::string &arText, int aWidthPx, int aHeightPx);
 
     TextMask GetSymbol(uint32_t aSymbolCode) const;
     std::vector<TextMask> MakeTextMasks(const std::string &arText) const;
 
-    TextMask MakeTextMask(const char *apText) const { return MakeTextMask(std::string(apText)); };
-    TextMask MakeTextMask(const std::string &arText) const;
+    Rect GetTextBoundingRect(const std::vector<TextMask> &arTms) const;
+
+    Font& SetName(const std::string &arString) { mName = arString; return *this; }
+    std::string GetName() const { return mName; }
+
+    Font& SetSize(int aSizePx);
+    Font& SetSize(int aWidthPx, int aHeightPx);
+    int GetSize() const { return mSizePx; }
+
+    Font& SetColor(const Color &arColor) { mColor = arColor; return *this; }
+    Color GetColor() const { return mColor; }
+
+    Font& SetStyle(Style aStyle) { mStyle = aStyle; return *this; }
+    Style GetStyle() const { return mStyle; }
 
 protected:
     std::string mName;
-    std::string mStyle;
+    Style mStyle;
     Color mColor;
-    int mWeigth;
-    int mSize;
+    int mSizePx;
 
     FreeTypeLibrary mLib { };
     FontFace mFace { };

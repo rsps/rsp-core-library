@@ -27,29 +27,29 @@ namespace rsp::graphics {
 class Color
 {
 public:
+    typedef uint32_t RGB_t;
+
     /**
-     * Color value type
+     * Predefined basic colors
      */
-    typedef union
-    {
-        uint32_t rgba;
-    #ifdef LITTLE_ENDIAN
-        struct __item_type
-        {
-            uint32_t alpha :8;
-            uint32_t blue :8;
-            uint32_t green :8;
-            uint32_t red :8;
-        } item;
-    #else
-        struct __item_type {
-            uint32_t alpha : 8;
-            uint32_t red : 8;
-            uint32_t green : 8;
-            uint32_t blue : 8;
-        } item;
-    #endif
-    } ColorValue_t;
+    enum :RGB_t {
+        White   = 0xFFFFFF,
+        Silver  = 0xC0C0C0,
+        Grey    = 0x808080,
+        Black   = 0x000000,
+        Red     = 0xFF0000,
+        Maroon  = 0x800000,
+        Yellow  = 0xFFFF00,
+        Olive   = 0x808000,
+        Lime    = 0x00FF00,
+        Green   = 0x008000,
+        Aqua    = 0x00FFFF,
+        Teal    = 0x008080,
+        Blue    = 0x0000FF,
+        Navy    = 0x000080,
+        Fuchsia = 0xFF00FF,
+        Purple  = 0x800080
+    };
 
     /**
      * Construct with given base colors.
@@ -66,7 +66,7 @@ public:
      *
      * \param aARGB
      */
-    Color(uint32_t aARGB);
+    Color(RGB_t aARGB);
 
     /**
      * Copy constructor.
@@ -131,7 +131,7 @@ public:
      * Get the ARGB value.
      * \return ARGB
      */
-    operator uint32_t() const;
+    operator RGB_t() const;
     /**
      * Assign the value from the given Color object.
      *
@@ -140,6 +140,30 @@ public:
     Color& operator=(const Color &aColor);
 
 protected:
+    /**
+     * Color value type
+     */
+    typedef union
+    {
+        RGB_t rgba;
+    #ifdef LITTLE_ENDIAN
+        struct __item_type
+        {
+            uint32_t alpha :8;
+            uint32_t blue :8;
+            uint32_t green :8;
+            uint32_t red :8;
+        } item;
+    #else
+        struct __item_type {
+            uint32_t alpha : 8;
+            uint32_t red : 8;
+            uint32_t green : 8;
+            uint32_t blue : 8;
+        } item;
+    #endif
+    } ColorValue_t;
+
     ColorValue_t mValue;
 
 };
