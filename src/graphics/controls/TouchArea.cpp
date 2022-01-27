@@ -16,9 +16,21 @@ TouchArea::TouchArea(Rect &aArea, Image &aImage)
     : mTouchArea(aArea), mImage(aImage)
 {
 }
-bool TouchArea::ProcessEvent(Event &aEvent)
+TouchArea::~TouchArea()
 {
-    mImage.Invalidate();
+}
+void TouchArea::ProcessEvent(Event &aEvent)
+{
+    switch (aEvent.type) {
+    case EventType::Press:
+        mImage.SetState(Control::States::pressed);
+        break;
+    case EventType::Lift:
+        mImage.SetState(Control::States::normal);
+        break;
+    default:
+        break;
+    }
 }
 bool TouchArea::IsHit(const Point &aPoint) const
 {

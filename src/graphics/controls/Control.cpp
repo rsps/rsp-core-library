@@ -21,7 +21,13 @@ Control::Control(Rect &aRect)
 Control::~Control()
 {
 }
-
+void Control::SetState(States aState)
+{
+    if (mState != aState) {
+        mState = aState;
+        Invalidate();
+    }
+}
 void Control::Invalidate()
 {
     mIsInvalid = true;

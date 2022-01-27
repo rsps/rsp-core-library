@@ -18,7 +18,7 @@ class TouchArea
     TouchArea(Rect &aArea, Image &aImage);
     ~TouchArea();
 
-    bool ProcessEvent(Event &aEvent);
+    void ProcessEvent(Event &aEvent);
     bool IsHit(const Point &aPoint) const;
 };
 

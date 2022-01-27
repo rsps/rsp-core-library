@@ -12,11 +12,14 @@ namespace rsp::graphics
 class Scene : public Control
 {
   public:
-    Scene();
+    Scene(Rect &aRect);
     ~Scene();
 
     void ProcessEvent(Event &aEvent);
     void AddArea(TouchArea *aArea);
+    void Render(Canvas &aCanvas) override;
+
+    void SetChildren(std::vector<Control *> aChildrenList);
 
     std::vector<TouchArea *> mTouchables;
 };

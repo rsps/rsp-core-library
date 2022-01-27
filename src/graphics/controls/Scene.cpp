@@ -12,6 +12,13 @@
 
 namespace rsp::graphics
 {
+Scene::Scene(Rect &aRect)
+    : Control(aRect)
+{
+}
+Scene::~Scene()
+{
+}
 
 void Scene::ProcessEvent(Event &aEvent)
 {
@@ -20,6 +27,18 @@ void Scene::ProcessEvent(Event &aEvent)
             area->ProcessEvent(aEvent);
         }
     }
+}
+void Scene::Render(Canvas &aCanvas)
+{
+    for (auto child : mChildren) {
+        child->Render(aCanvas);
+    }
+}
+
+void Scene::SetChildren(std::vector<Control *> aChildrenList)
+{
+    mChildren = aChildrenList;
+    std::cout << "Number of given children: " << aChildrenList.size() << "\nNumber of children remembered: " << mChildren.size() << std::endl;
 }
 
 void Scene::AddArea(TouchArea *aArea)

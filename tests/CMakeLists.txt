@@ -23,6 +23,10 @@ file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/Asset6.bmp
     DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
 file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/testImage.txt 
     DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
-    file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/largeTestImg.bmp 
+file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/largeTestImg.bmp 
+    DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
+file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/Green.bmp 
+    DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
+file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/Red.bmp 
     DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
 

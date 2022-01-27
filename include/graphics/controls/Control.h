@@ -9,10 +9,11 @@ namespace rsp::graphics
 {
 class Control
 {
-  private:
-    bool mIsInvalid = false;
-
   public:
+    enum class States : int {
+        pressed,
+        normal
+    };
     Rect mArea;
     Color mBackground;
     bool mTransparent;
@@ -22,12 +23,16 @@ class Control
     Control(Rect &aRect);
     ~Control();
 
+    void SetState(States aState);
     void Invalidate();
     bool IsInvalid() const;
     bool IsTransparent() const;
-    void Render(Canvas &aCanvas);
+    virtual void Render(Canvas &aCanvas) = 0;
     void SetArea(Rect const &aRect);
     Rect &GetArea();
+
+    bool mIsInvalid = false;
+    States mState;
 };
 } // namespace rsp::graphics
 

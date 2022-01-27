@@ -12,5 +12,30 @@
 
 namespace rsp::graphics
 {
-
+Image::Image(std::string aPressed, std::string aNormal, Rect &aRect)
+    : mPressed(aPressed), mNormal(aNormal), Control(aRect)
+{
 }
+Image::~Image()
+{
+}
+
+void Image::Render(Canvas &aCanvas)
+{
+    if (!mIsInvalid) {
+        return;
+    }
+    switch (mState) {
+    case States::pressed:
+        aCanvas.DrawImage(mArea.GetTopLeft(), mPressed);
+        mIsInvalid = false;
+        break;
+    case States::normal:
+        aCanvas.DrawImage(mArea.GetTopLeft(), mNormal);
+        mIsInvalid = false;
+        break;
+    default:
+        break;
+    }
+}
+} // namespace rsp::graphics

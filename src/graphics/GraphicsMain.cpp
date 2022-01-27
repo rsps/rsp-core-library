@@ -9,12 +9,17 @@
  */
 
 #include "graphics/GraphicsMain.h"
+#include <chrono>
+#include <thread>
 
 namespace rsp::graphics
 {
 
 GraphicsMain::GraphicsMain(BufferedCanvas &aCanvas, EventCreator &aEvents, Scene &aScene)
     : mCanvas(aCanvas), mEvents(aEvents), mActiveScene(aScene)
+{
+}
+GraphicsMain::~GraphicsMain()
 {
 }
 
@@ -26,10 +31,12 @@ void GraphicsMain::Run()
             Event event = mEvents.GetEvent();
             // invalidate stuff
             mActiveScene.ProcessEvent(event);
+            // re-render invalidated things
+            mActiveScene.Render(mCanvas);
+        } else {
+            // do Idle
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
-        // anything to render?
-        // re-render invalidated things
-        // do Idle
     }
 }
 } // namespace rsp::graphics
