@@ -31,7 +31,7 @@ class Control
     void SetArea(Rect const &aRect);
     Rect &GetArea();
 
-    bool mIsInvalid = false;
+    bool mIsInvalid = true;
     States mState;
 };
 } // namespace rsp::graphics

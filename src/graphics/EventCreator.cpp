@@ -16,21 +16,18 @@ namespace rsp::graphics
 
 EventCreator::EventCreator()
 {
-    touchDriver.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    touchDriver.open("/dev/input/event1", std::ifstream::binary);
+    // touchDriver.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    touchDriver.Open("/dev/input/event1", std::ifstream::binary);
 }
 
 EventCreator::~EventCreator()
 {
-    touchDriver.close();
+    touchDriver.Close();
 }
 
 bool EventCreator::HasNewEvents()
 {
-    if (touchDriver.peek() == EOF) {
-        return false;
-    }
-    return true;
+    return touchDriver.WaitForDataReady(50);
 }
 
 const Event &EventCreator::GetEvent()
@@ -41,7 +38,7 @@ const Event &EventCreator::GetEvent()
 
 void EventCreator::ReadType()
 {
-    touchDriver.read(reinterpret_cast<char *>(&eventInput), sizeof(eventInput));
+    touchDriver.Read(reinterpret_cast<char *>(&eventInput), sizeof(eventInput));
     if (eventInput.type == EV_ABS && eventInput.code == ABS_MT_TRACKING_ID && eventInput.value == 0xFFFFFFFF) {
         event.type = EventType::Lift;
     } else if (eventInput.type == EV_ABS && eventInput.code == ABS_MT_TRACKING_ID) {
@@ -62,7 +59,7 @@ void EventCreator::ReadBody()
         if (eventInput.type == EV_ABS && eventInput.code == ABS_Y) {
             event.y = eventInput.value;
         }
-        touchDriver.read(reinterpret_cast<char *>(&eventInput), sizeof(eventInput));
+        touchDriver.Read(reinterpret_cast<char *>(&eventInput), sizeof(eventInput));
     }
 }
 } // namespace rsp::graphics

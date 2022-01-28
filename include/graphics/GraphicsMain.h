@@ -19,10 +19,11 @@ class GraphicsMain
     void Terminate() { mTerminated = true; }
 
   private:
-    BufferedCanvas &mCanvas;
+    BufferedCanvas &mBufferedCanvas;
     EventCreator &mEvents;
     Scene &mActiveScene;
     bool mTerminated = false;
+    void PrintEvent(Event event);
 };
 } // namespace rsp::graphics
 #endif // GRAPHICSMAIN_H

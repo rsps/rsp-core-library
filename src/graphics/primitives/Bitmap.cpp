@@ -28,6 +28,7 @@ std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> Bit
 Bitmap::Bitmap(std::string aImgName)
     : Canvas()
 {
+    std::cout << "Bitmap Constructor" << std::endl;
     std::filesystem::path filename(aImgName);
 
     auto loader = GetRasterLoader(filename.extension());

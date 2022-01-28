@@ -35,14 +35,13 @@ void Scene::Render(Canvas &aCanvas)
     }
 }
 
-void Scene::SetChildren(std::vector<Control *> aChildrenList)
+void Scene::AddChildren(Image &aImg)
 {
-    mChildren = aChildrenList;
-    std::cout << "Number of given children: " << aChildrenList.size() << "\nNumber of children remembered: " << mChildren.size() << std::endl;
+    mChildren.push_back(&aImg);
 }
 
-void Scene::AddArea(TouchArea *aArea)
+void Scene::AddArea(TouchArea &aArea)
 {
-    mTouchables.push_back(aArea);
+    mTouchables.push_back(&aArea);
 }
 } // namespace rsp::graphics

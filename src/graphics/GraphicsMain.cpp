@@ -15,8 +15,8 @@
 namespace rsp::graphics
 {
 
-GraphicsMain::GraphicsMain(BufferedCanvas &aCanvas, EventCreator &aEvents, Scene &aScene)
-    : mCanvas(aCanvas), mEvents(aEvents), mActiveScene(aScene)
+GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, EventCreator &aEvents, Scene &aScene)
+    : mBufferedCanvas(aBufferedCanvas), mEvents(aEvents), mActiveScene(aScene)
 {
 }
 GraphicsMain::~GraphicsMain()
@@ -27,16 +27,31 @@ void GraphicsMain::Run()
 {
     while (!mTerminated) {
         // new events?
-        if (mEvents.HasNewEvents()) {
+        while (mEvents.HasNewEvents()) {
             Event event = mEvents.GetEvent();
+            PrintEvent(event); // Temp
             // invalidate stuff
             mActiveScene.ProcessEvent(event);
-            // re-render invalidated things
-            mActiveScene.Render(mCanvas);
-        } else {
-            // do Idle
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
+        // re-render invalidated things
+        mActiveScene.Render(mBufferedCanvas);
+        mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy); // Should be if Render returns true
+    }
+}
+
+// Temp method
+void GraphicsMain::PrintEvent(Event event)
+{
+    if (event.type == EventType::Press) {
+        std::cout << "New Press" << std::endl;
+        std::cout << "X: " << event.x << " Y: " << event.y << std::endl;
+    }
+    if (event.type == EventType::Drag) {
+        std::cout << "New Drag" << std::endl;
+        std::cout << "X: " << event.x << " Y: " << event.y << std::endl;
+    }
+    if (event.type == EventType::Lift) {
+        std::cout << "New Lift" << std::endl;
     }
 }
 } // namespace rsp::graphics

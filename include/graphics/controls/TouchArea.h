@@ -12,7 +12,7 @@ class TouchArea
 {
   private:
     Rect mTouchArea;
-    Image mImage;
+    Image *mImage;
 
   public:
     TouchArea(Rect &aArea, Image &aImage);

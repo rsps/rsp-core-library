@@ -16,10 +16,10 @@ class Scene : public Control
     ~Scene();
 
     void ProcessEvent(Event &aEvent);
-    void AddArea(TouchArea *aArea);
+    void AddArea(TouchArea &aArea);
     void Render(Canvas &aCanvas) override;
 
-    void SetChildren(std::vector<Control *> aChildrenList);
+    void AddChildren(Image &aImg);
 
     std::vector<TouchArea *> mTouchables;
 };

@@ -98,6 +98,7 @@ void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor)
 
 void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
 {
+    std::cout << "Drawing Image" << std::endl;
     int iter = 0;
     auto pixels = aBitmap.GetPixels();
     for (size_t h = 0; h < aBitmap.GetHeight(); h++) {
