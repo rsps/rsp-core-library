@@ -12,7 +12,7 @@
 #define CANVAS_H
 
 #include "Color.h"
-#include "Font.h"
+#include "Text.h"
 #include "Point.h"
 #include "Rect.h"
 
@@ -96,9 +96,7 @@ class Canvas
      * \param apText
      * \param aScaleToFit
      */
-    void DrawText(const Rect &arRect, Font &arFont, const char *apText, bool aScaleToFit);
-    void DrawTextMasks(const Rect &arRect, const Color &arColor, const std::vector<TextMask> &arTms);
-    void DrawTextMasks(const Rect &arRect, const Color &arColor, const Color &arBackColor, const std::vector<TextMask> &arTms);
+    void DrawText(const Text &arText, const Color &arColor);
 
     /**
      * Get the color value of a single pixel.

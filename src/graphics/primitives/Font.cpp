@@ -67,7 +67,7 @@ std::ostream& operator <<(std::ostream &os, TextMask &tm)
 
 
 Font::Font(const char *apFilename, int aFaceIndex)
-    : mSizePx(0), mStyle(Normal), mColor(Color::White), mFace(nullptr)
+    : mSizePx(0), mStyle(Normal), mColor(Color::White), mFace(nullptr), mFamily(apFilename)
 {
     FT_Error error = FT_New_Face(mLib, apFilename, aFaceIndex, &mFace);
 
@@ -203,6 +203,10 @@ TextMask Font::GetSymbol(uint32_t aSymbolCode) const
     FT_Error error = FT_Load_Char(mFace, aSymbolCode, FT_LOAD_RENDER /*| FT_LOAD_TARGET_LCD_V*/);
     if (error) {
         THROW_WITH_BACKTRACE2(FontException, "FT_Load_Char() failed", error);
+    }
+
+    if ((mStyle & Bold) && (mFace->glyph->format == FT_GLYPH_FORMAT_OUTLINE)) {
+        FT_Outline_Embolden( &mFace->glyph->outline,  (1 << 6));
     }
 
     TextMask Result { mFace };

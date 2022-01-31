@@ -120,21 +120,10 @@ void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
     }
 }
 
-void Canvas::DrawText(const Rect &arRect, Font &arFont, const char *apText, bool aScaleToFit)
-{
-    std::vector<TextMask> tms;
-    if (aScaleToFit) {
-        tms = arFont.ScaleToFit(std::string(apText), arRect.GetWidth(), arRect.GetHeight());
-    }
-    else {
-        tms = arFont.MakeTextMasks(apText);
-    }
 
-    DrawTextMasks(arRect, arFont.GetColor(), tms);
-}
-
-void Canvas::DrawTextMasks(const Rect &arRect, const Color &arColor, const std::vector<TextMask> &arTms)
+void Canvas::DrawText(const Text &arText, const Color &arColor)
 {
+
     for (auto tm : arTms) {
 //        DLOG(tm);
         for (uint32_t y = 0; y < tm.mHeight; y++) {

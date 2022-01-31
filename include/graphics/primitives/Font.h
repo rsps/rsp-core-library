@@ -75,6 +75,7 @@ public:
 
     static const int Normal = 0;
     static const int Italic = 1;
+    static const int Bold = 2;
 
     Font(const char *apFilename, int aFaceIndex = 0);
     ~Font();
@@ -83,15 +84,11 @@ public:
         return mFace;
     }
 
-    std::vector<TextMask> ScaleToFit(const std::string &arText, int aWidthPx, int aHeightPx);
 
     TextMask GetSymbol(uint32_t aSymbolCode) const;
     std::vector<TextMask> MakeTextMasks(const std::string &arText) const;
 
-    Rect GetTextBoundingRect(const std::vector<TextMask> &arTms) const;
-
-    Font& SetName(const std::string &arString) { mName = arString; return *this; }
-    std::string GetName() const { return mName; }
+    std::string GetFamilyName() const { return mFace->family_name; }
 
     Font& SetSize(int aSizePx);
     Font& SetSize(int aWidthPx, int aHeightPx);
@@ -104,7 +101,6 @@ public:
     Style GetStyle() const { return mStyle; }
 
 protected:
-    std::string mName;
     Style mStyle;
     Color mColor;
     int mSizePx;
@@ -119,6 +115,9 @@ protected:
 private:
     Font(const Font&) = delete;
     Font& operator =(const Font&) = delete;
+
+    std::vector<TextMask> ScaleToFit(const std::string &arText, int aWidthPx, int aHeightPx);
+    Rect GetTextBoundingRect(const std::vector<TextMask> &arTms) const;
 };
 
 }
