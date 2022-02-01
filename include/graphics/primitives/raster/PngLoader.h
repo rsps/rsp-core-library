@@ -44,7 +44,7 @@ protected:
     } __attribute__((packed)); //To stop alignment
     struct PNGChunk
     {
-        uint32_t length;
+        uint32_t length = 0;
         char type[4];
         union
         {

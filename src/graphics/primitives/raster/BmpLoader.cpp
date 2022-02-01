@@ -67,7 +67,7 @@ void BmpLoader::ReadData(std::ifstream &aFile)
 
     //Initialize containers for reading
     std::vector<uint8_t> pixelRow;
-    pixelRow.resize(paddedRowSize);
+    pixelRow.resize(static_cast<unsigned long int>(paddedRowSize));
 
     //Skip past the offset
     aFile.seekg(bmpHeader.dataOffset);
@@ -76,8 +76,8 @@ void BmpLoader::ReadData(std::ifstream &aFile)
         //Read a Row of pixels with the padding
         aFile.read(reinterpret_cast<char *>(pixelRow.data()), paddedRowSize);
 
-        for (size_t j = bmpHeader.width * mBytesPerPixel; j > 0; j -= mBytesPerPixel) {
-            uint32_t combined = ReadPixel(pixelRow, j - mBytesPerPixel);
+        for (int j = bmpHeader.width * mBytesPerPixel; j > 0; j -= mBytesPerPixel) {
+            uint32_t combined = ReadPixel(pixelRow, static_cast<size_t>(j - mBytesPerPixel));
             mImagePixels.push_back(combined);
         }
     }
@@ -88,7 +88,7 @@ uint32_t BmpLoader::ReadPixel(const std::vector<uint8_t> &aPixelRow, const size_
     uint32_t pixel = 0;
     //Reads other direction than the row loop
     for (size_t i = 0; i < mBytesPerPixel; i++) {
-        pixel |= (((uint32_t)aPixelRow[aRowPtr + i]) << (8 * i));
+        pixel |= ((static_cast<uint32_t>(aPixelRow[aRowPtr + i])) << (8 * i));
     }
     return pixel;
 }

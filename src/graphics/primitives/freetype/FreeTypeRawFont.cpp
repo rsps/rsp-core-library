@@ -19,12 +19,12 @@
 namespace rsp::graphics {
 
 
-const char* FreeTypeErrorToString(int aCode)
+static const char* FreeTypeErrorToString(int aCode)
 {
     #undef FTERRORS_H_
     #define FT_ERROR_START_LIST     switch ( aCode ) {
     #define FT_ERRORDEF( e, v, s )    case v: return s;
-    #define FT_ERROR_END_LIST       }
+    #define FT_ERROR_END_LIST       default: break; }
     #include FT_ERRORS_H
     return "Unknown Error";
 }
@@ -48,7 +48,7 @@ inline static uint unsign(int aValue)
 
 Glyph::Glyph(void* apFace)
 {
-    FT_Face arFace = apFace;
+    FT_Face arFace = reinterpret_cast<FT_Face>(apFace);
 
     mWidth = static_cast<int>(arFace->glyph->bitmap.width);
     mHeight = static_cast<int>(arFace->glyph->bitmap.rows);
@@ -60,14 +60,9 @@ Glyph::Glyph(void* apFace)
 }
 
 
-FreeTypeRawFont::FreeTypeRawFont(const std::string &arFontName, int aFaceIndex)
-    : mSizePx(0), mStyle(Font::Styles::Normal)
+FreeTypeRawFont::FreeTypeRawFont(const std::string &arFontName, int /*aFaceIndex*/)
 {
-    FT_Error error = FT_New_Face(FreeTypeLibrary::Get(), apFilename, aFaceIndex, &mpFace);
-
-    if (error) {
-        THROW_WITH_BACKTRACE2(FontException, "FT_New_Face() failed", error);
-    }
+    mFontName = arFontName;
 }
 
 FreeTypeRawFont::~FreeTypeRawFont()
@@ -77,14 +72,14 @@ FreeTypeRawFont::~FreeTypeRawFont()
     }
 }
 
-std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aLineSpacing, Font::Styles aStyle, int aSizePx) const
+std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aLineSpacing) const
 {
     std::u32string unicode = stringToU32(arText);
     int line_height = 0;
 
     std::vector<Glyph> result;
     for (auto s : unicode) {
-        result.push_back(getSymbol(s, aStyle));
+        result.push_back(getSymbol(s, mStyle));
         line_height = std::max(line_height, result.back().mHeight);
         auto rs = result.size();
         if (rs > 1) {
@@ -92,7 +87,7 @@ std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aL
 
             // Space ' ' has no width, add width of next character to space character
             if (result[rs - 2].mWidth == 0) {
-                result[rs - 2].mWidth = aSizePx;
+                result[rs - 2].mWidth = mSizePx;
 //                result[rs - 2].mWidth = result[rs - 1].mWidth;
             }
         }
@@ -100,19 +95,19 @@ std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aL
 
 //    DLOG("Line Height: " << line_height);
 
-    uint32_t top = line_height;
-    uint32_t left = 0;
-    for (auto &tm : result) {
-        switch (tm.mSymbolUnicode) {
+    int top = line_height;
+    int left = 0;
+    for (auto &glyph : result) {
+        switch (glyph.mSymbolUnicode) {
             case '\n':
                 top += line_height + aLineSpacing;
                 left = 0;
                 break;
 
             default:
-                tm.mTop += top - tm.mHeight - tm.mTop;
-                tm.mLeft += left;
-                left += tm.mWidth;
+                glyph.mTop += top - glyph.mHeight - glyph.mTop;
+                glyph.mLeft += left;
+                left += glyph.mWidth;
                 break;
         }
     }
@@ -150,7 +145,7 @@ Glyph FreeTypeRawFont::getSymbol(uint32_t aSymbolCode, Font::Styles aStyle) cons
         THROW_WITH_BACKTRACE2(FontException, "FT_Load_Char() failed", error);
     }
 
-    if ((aStyle & Font::Styles::Bold) && (mpFace->glyph->format == FT_GLYPH_FORMAT_OUTLINE)) {
+    if ((static_cast<int>(aStyle) & static_cast<int>(Font::Styles::Bold)) && (mpFace->glyph->format == FT_GLYPH_FORMAT_OUTLINE)) {
         FT_Outline_Embolden( &mpFace->glyph->outline,  (1 << 6));
     }
 
@@ -182,7 +177,16 @@ int FreeTypeRawFont::getKerning(uint aFirst, uint aSecond, uint aKerningMode) co
 
 void FreeTypeRawFont::createFace()
 {
-    mpFace
+    if (mpFace) {
+        return;
+    }
+
+    FT_Error error = FT_New_Face(FreeTypeLibrary::Get(), FreeTypeLibrary::Get().GetFileName(mFontName), 0, &mpFace);
+
+    if (error) {
+        THROW_WITH_BACKTRACE2(FontException, "FT_New_Face() failed", error);
+    }
+
 }
 
 void FreeTypeRawFont::freeFace()

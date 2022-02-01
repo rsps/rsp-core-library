@@ -45,7 +45,7 @@ private:
 
     FT_Library mFtLib { };
 
-    std::map<std::string, std::string> mFontFileNames;
+    std::map<std::string, std::string> mFontFileNames{ };
 };
 
 }

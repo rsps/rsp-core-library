@@ -110,10 +110,10 @@ void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor, bool aFilled)
 
 void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
 {
-    int iter = 0;
+    long unsigned int iter = 0;
     auto pixels = aBitmap.GetPixels();
-    for (size_t h = 0; h < aBitmap.GetHeight(); h++) {
-        for (size_t w = 0; w < aBitmap.GetWidth(); w++) {
+    for (int h = 0; h < aBitmap.GetHeight(); h++) {
+        for (int w = 0; w < aBitmap.GetWidth(); w++) {
             SetPixel(Point(aLeftTop.mX + w, aLeftTop.mY + h), pixels[iter]);
             iter++;
         }
@@ -125,9 +125,9 @@ void Canvas::DrawText(const Text &arText, const Color &arColor)
 {
 
     for (auto glyph : arText.GetGlyphs()) {
-        for (uint32_t y = 0; y < glyph.mHeight; y++) {
-            int index = static_cast<int>(y * glyph.mWidth);
-            for (uint32_t x = 0; x < glyph.mWidth; x++) {
+        for (int y = 0; y < glyph.mHeight; y++) {
+            long unsigned int index = static_cast<long unsigned int>(y * glyph.mWidth);
+            for (int x = 0; x < glyph.mWidth; x++) {
                 uint8_t c = glyph.mPixels[index++];
                 auto p = Point(x + glyph.mLeft + arText.GetArea().GetLeft(), y + glyph.mTop + arText.GetArea().GetTop());
                 if (c && arText.GetArea().IsHit(p)) {

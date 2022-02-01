@@ -48,18 +48,17 @@ target_include_directories(rsp-core-lib
         ${FREETYPE_INCLUDE_DIRS}
 )
 
-add_subdirectory(src)
-
-add_compile_options(-pedantic -Wall -Wextra -Wold-style-cast -Weffc++ -Werror
+target_compile_options(rsp-core-lib PUBLIC -pedantic -Wall -Wextra -Wold-style-cast
     -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization
     -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations
     -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual
     -Wredundant-decls -Wsign-conversion -Wsign-promo
     -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
-    -Wundef -Wno-unused
+    -Wundef -Wno-unused -Weffc++ -Werror
     -Wshadow
     -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
 
+add_subdirectory(src)
 
 #--------------------------------------------------------
 # Rules to make tests

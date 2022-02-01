@@ -25,8 +25,8 @@ namespace rsp::graphics
 {
 
 Framebuffer::Framebuffer(const char *apDevPath)
+    : mFramebufferFile(-1)
 {
-    mFramebufferFile = -1;
     if (apDevPath) {
         mFramebufferFile = open(apDevPath, O_RDWR);
         if (mFramebufferFile == -1) {
@@ -47,9 +47,9 @@ Framebuffer::Framebuffer(const char *apDevPath)
     ioctl(mFramebufferFile, FBIOGET_FSCREENINFO, &mFixedInfo);
 
     // set Canvas specific variables
-    mWidth = mVariableInfo.xres;
-    mHeight = mVariableInfo.yres;
-    mBytesPerPixel = mVariableInfo.bits_per_pixel / 8;
+    mWidth = static_cast<int>(mVariableInfo.xres);
+    mHeight = static_cast<int>(mVariableInfo.yres);
+    mBytesPerPixel = static_cast<int>(mVariableInfo.bits_per_pixel / 8);
     std::clog << "Framebuffer opened. Width=" << mWidth << " Height=" << mHeight << " BytesPerPixel=" << mBytesPerPixel << std::endl;
 
     // set yres_virtual for double buffering
@@ -69,7 +69,7 @@ Framebuffer::Framebuffer(const char *apDevPath)
     // calculate size of screen
     long screensize = mVariableInfo.yres * mFixedInfo.line_length;
 
-    mpFrontBuffer = static_cast<uint8_t *>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
+    mpFrontBuffer = static_cast<uint8_t *>(mmap(0, static_cast<size_t>(screensize * 2), PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
     if (mpFrontBuffer == reinterpret_cast<uint8_t *>(-1)) /*MAP_FAILED*/ {
         THROW_SYSTEM("Framebuffer shared memory mapping failed");
     }
@@ -136,7 +136,7 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
     if (!IsInsideScreen(aPoint)) {
         return 0;
     }
-    long location = (aPoint.mX + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + aPoint.mY * mFixedInfo.line_length;
+    long location = (aPoint.mX + static_cast<int>(mVariableInfo.xoffset)) * static_cast<int>(mVariableInfo.bits_per_pixel / 8) + aPoint.mY * static_cast<int>(mFixedInfo.line_length);
     if (aFront) {
         return *(reinterpret_cast<uint32_t *>(mpFrontBuffer + location));
     } else {

@@ -14,10 +14,12 @@
 namespace rsp::graphics {
 
 Text::Text()
+    : mFont("exo2"), mArea()
 {
 }
 
 Text::Text(const std::string &arText)
+    : mFont("exo2"), mArea()
 {
     SetValue(arText);
 }
@@ -28,7 +30,7 @@ Text& Text::Invalidate()
     mLineMaxChar = 1; // Avoid division by zero
     int count = 0;
 
-    for (int i = 0; i < mValue.size(); i++) {
+    for (long unsigned int i = 0; i < mValue.size(); i++) {
         if (mValue[i] == '\n') {
             mLineCount++;
             count = 0;

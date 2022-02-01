@@ -30,6 +30,9 @@ class Framebuffer;
 class Rect
 {
   public:
+
+    Rect() {}
+
     /**
      * Constructs a Rect from coordinate and size.
      *
@@ -63,6 +66,8 @@ class Rect
      * \param aRect
      */
     Rect(const Rect &aRect);
+
+    Rect& operator=(const Rect &aRect);
 
     /**
      * Get the top value
@@ -177,8 +182,8 @@ class Rect
     friend Canvas;
     friend Framebuffer;
 
-    Point mLeftTop;
-    Point mRightBottom;
+    Point mLeftTop{};
+    Point mRightBottom{};
 };
 
 std::ostream& operator <<(std::ostream &aStream, const Rect &arRect);

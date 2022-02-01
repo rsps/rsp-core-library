@@ -319,7 +319,7 @@ void SetThreadPriority(std::thread &arThread, unsigned int aPriority)
     if (pthread_getschedparam(arThread.native_handle(), &policy, &sch)) {
         THROW_SYSTEM("FileSystem - Failed to get thread priority");
     }
-    sch.sched_priority = aPriority;
+    sch.sched_priority = static_cast<int>(aPriority);
     if (pthread_setschedparam(arThread.native_handle(), SCHED_FIFO, &sch)) {
         THROW_SYSTEM("FileSystem - Failed to set thread priority");
     }

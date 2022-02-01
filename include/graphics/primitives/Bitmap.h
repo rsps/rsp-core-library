@@ -102,7 +102,7 @@ class Bitmap : public Canvas
 
   protected:
     std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
-    std::vector<uint32_t> mImagePixels; // Pointer?
+    std::vector<uint32_t> mImagePixels{ }; // Pointer?
 };
 
 } // namespace rsp::graphics

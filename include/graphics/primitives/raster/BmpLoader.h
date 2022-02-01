@@ -31,8 +31,8 @@ class BmpLoader : public ImgLoader
         uint32_t reserved;
         uint32_t dataOffset;
         uint32_t size;
-        uint32_t width;
-        uint32_t heigth;
+        int32_t  width;
+        int32_t  heigth;
         uint16_t planes;
         uint16_t bitsPerPixel;
         uint32_t compression;
@@ -41,9 +41,9 @@ class BmpLoader : public ImgLoader
         uint32_t yPixelsPerM;
         uint32_t coloursUsed;
         uint32_t importantColours;
-    } __attribute__((packed)) bmpHeader; //To stop alignment
+    } __attribute__((packed)) bmpHeader{}; //To stop alignment
 
-    uint16_t mBytesPerPixel;
+    uint16_t mBytesPerPixel = 0;
 
     void ReadHeader(std::ifstream &arFile);
     void ReadData(std::ifstream &arFile);

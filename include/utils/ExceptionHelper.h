@@ -28,7 +28,7 @@ template<typename BaseException>
 class backtraced_exception: public BaseException
 {
 private:
-    std::string mBacktrace;
+    std::string mBacktrace{ };
 
 public:
     template<typename... Args>

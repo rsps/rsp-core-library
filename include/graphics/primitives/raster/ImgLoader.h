@@ -28,19 +28,19 @@ class ImgLoader
         return mImagePixels;
     }
 
-    uint32_t GetHeight() const
+    int GetHeight() const
     {
         return mHeight;
     }
-    uint32_t GetWidth() const
+    int GetWidth() const
     {
         return mWidth;
     }
 
   protected:
-    std::vector<uint32_t> mImagePixels;
-    uint32_t mHeight;
-    uint32_t mWidth;
+    std::vector<uint32_t> mImagePixels{ };
+    int mHeight = 0;
+    int mWidth = 0;
 };
 
 } // namespace rsp::graphics

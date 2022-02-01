@@ -31,8 +31,8 @@ public:
     Font::Styles GetStyle() const { return mStyle; }
 
 protected:
-    Font::Styles mStyle;
-    int mSizePx;
+    Font::Styles mStyle = Font::Styles::Normal;
+    int mSizePx = 0;
 };
 
 }

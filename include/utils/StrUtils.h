@@ -169,7 +169,7 @@ std::string TimeStamp(std::chrono::milliseconds aMilliSeconds, TimeFormats aForm
 template< typename ... Args >
 std::string Format(const std::string &arFormat, Args ... args)
 {
-    size_t size = snprintf(nullptr, 0, arFormat.c_str(), args ...) + 1; // Extra space for '\0'
+    int size = snprintf(static_cast<char*>(nullptr), 0, arFormat.c_str(), args ...) + 1; // Extra space for '\0'
     if (size <= 0) {
         throw std::runtime_error("Error during formatting.");
     }

@@ -29,6 +29,9 @@ public:
 
 protected:
     FT_Face mpFace = nullptr;
+    std::string mFontName{};
+    FreeTypeRawFont(const FreeTypeRawFont&) = delete;
+    FreeTypeRawFont& operator=(const FreeTypeRawFont&) = delete;
 
     void createFace();
     void freeFace();

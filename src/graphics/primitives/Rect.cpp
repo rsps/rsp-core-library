@@ -25,7 +25,6 @@ std::ostream& operator <<(std::ostream &aStream, const Rect &arRect)
     return aStream;
 }
 
-
 Rect::Rect(int aLeft, int aTop, int aWidth, int aHeight)
     : mLeftTop(aLeft, aTop), mRightBottom(aLeft + aWidth, aTop + aHeight)
 {
@@ -48,6 +47,13 @@ Rect::Rect(const Rect &aRect)
     : mLeftTop(aRect.mLeftTop), mRightBottom(aRect.mRightBottom)
 {
     VerifyDimensions();
+}
+
+Rect& Rect::operator=(const Rect &aRect)
+{
+    mLeftTop = aRect.mLeftTop;
+    mRightBottom = aRect.mRightBottom;
+    return *this;
 }
 
 int Rect::GetTop() const

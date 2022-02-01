@@ -15,8 +15,8 @@ namespace rsp::logging {
 
 
 SysLogWriter::SysLogWriter(std::string aIdent, LogType aType)
+    : mIdent(aIdent)
 {
-    mIdent = aIdent;
     openlog(mIdent.c_str(), LOG_PID, static_cast<int>(aType));
 }
 

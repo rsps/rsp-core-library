@@ -74,8 +74,8 @@ public:
     void RemoveLogWriter(Handle_t aHandle);
 
 protected:
-    std::mutex mMutex;
-    std::vector<std::shared_ptr<LogWriterInterface>> mWriters;
+    std::mutex mMutex{};
+    std::vector<std::shared_ptr<LogWriterInterface>> mWriters{};
 
     friend class LogStreamInterface;
     virtual void write(const LogStreamInterface *apStream, const std::string &arMsg);
@@ -136,7 +136,7 @@ public:
     void Flush();
 
 protected:
-    std::stringstream mBuffer;
+    std::stringstream mBuffer{};
 };
 
 /**
@@ -152,8 +152,8 @@ public:
     void Lock() { mMutex.lock(); }
 
 protected:
-    std::string mBuffer;
-    std::mutex mMutex;
+    std::string mBuffer{};
+    std::mutex mMutex{};
 
     int overflow(int c) override;
     int sync() override;

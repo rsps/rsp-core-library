@@ -54,6 +54,7 @@ Font::Font(const std::string &arFontName, Styles aStyle)
 
 Font::~Font()
 {
+    delete mpImpl;
 }
 
 Font& Font::SetSize(int aSizePx)

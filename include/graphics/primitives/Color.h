@@ -164,7 +164,7 @@ protected:
     #endif
     } ColorValue_t;
 
-    ColorValue_t mValue;
+    ColorValue_t mValue{};
 
 };
 

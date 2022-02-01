@@ -31,7 +31,7 @@ public:
     Text& SetArea(const Rect &arRect) { mArea = arRect; return *this; }
 
     Font& GetFont() { return mFont; }
-    Text& SetFont(const Font &arFont) { mFont = arFont; return *this; }
+//    Text& SetFont(const Font &arFont) { mFont = arFont; return *this; }
 
     bool GetScaleToFit() const { return mScaleToFit; }
     Text& SetScaleToFit(bool aValue = true) { mScaleToFit = aValue; return *this; }
@@ -48,9 +48,9 @@ public:
 protected:
     Font mFont;
     Rect mArea;
-    std::string mValue;
+    std::string mValue{};
     bool mScaleToFit = false;
-    std::vector<Glyph> mGlyphs;
+    std::vector<Glyph> mGlyphs{};
     int mLineCount = 0;
     int mLineMaxChar = 0;
     int mLineSpacing = 1;

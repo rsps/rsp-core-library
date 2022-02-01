@@ -40,8 +40,8 @@ class Framebuffer : public BufferedCanvas
   protected:
     int mFramebufferFile;
     int mTtyFb = 0;
-    struct fb_fix_screeninfo mFixedInfo;
-    struct fb_var_screeninfo mVariableInfo;
+    struct fb_fix_screeninfo mFixedInfo {};
+    struct fb_var_screeninfo mVariableInfo {};
 
     void clear();
     void copy();

@@ -73,7 +73,10 @@ public:
 
 protected:
     Color mColor;
-    FontRawInterface *mpImpl;
+    FontRawInterface *mpImpl = nullptr;
+
+    Font(const Font&) = delete;
+    Font& operator=(const Font&) = delete;
 };
 
 }
