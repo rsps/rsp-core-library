@@ -313,7 +313,7 @@ TEST_CASE("Framebuffer Drawing Primitives")
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         sw.Reset();
-        std::vector<TextMask> tms;
+        std::vector<Glyph> tms;
         for (int i = 0 ; i < 1000 ; i++) {
             fb.DrawRectangle(r, rainbow[i & 0x07], true);
 //            if ((i & 15) == 0) {

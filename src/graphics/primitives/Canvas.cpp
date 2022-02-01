@@ -124,14 +124,13 @@ void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
 void Canvas::DrawText(const Text &arText, const Color &arColor)
 {
 
-    for (auto tm : arTms) {
-//        DLOG(tm);
-        for (uint32_t y = 0; y < tm.mHeight; y++) {
-            int index = static_cast<int>(y * tm.mWidth);
-            for (uint32_t x = 0; x < tm.mWidth; x++) {
-                uint8_t c = tm.mBits[index++];
-                auto p = Point(x + tm.mLeft + arRect.GetLeft(), y + tm.mTop + arRect.GetTop());
-                if (c && arRect.IsHit(p)) {
+    for (auto glyph : arText.GetGlyphs()) {
+        for (uint32_t y = 0; y < glyph.mHeight; y++) {
+            int index = static_cast<int>(y * glyph.mWidth);
+            for (uint32_t x = 0; x < glyph.mWidth; x++) {
+                uint8_t c = glyph.mPixels[index++];
+                auto p = Point(x + glyph.mLeft + arText.GetArea().GetLeft(), y + glyph.mTop + arText.GetArea().GetTop());
+                if (c && arText.GetArea().IsHit(p)) {
                     SetPixel(p, arColor);
                 }
             }
@@ -139,21 +138,5 @@ void Canvas::DrawText(const Text &arText, const Color &arColor)
     }
 }
 
-void Canvas::DrawTextMasks(const Rect &arRect, const Color &arColor, const Color &arBackColor, const std::vector<TextMask> &arTms)
-{
-    for (auto tm : arTms) {
-//        DLOG(tm);
-        for (uint32_t y = 0; y < tm.mHeight; y++) {
-            int index = static_cast<int>(y * tm.mWidth);
-            for (uint32_t x = 0; x < tm.mWidth; x++) {
-                uint8_t c = tm.mBits[index++];
-                auto p = Point(x + tm.mLeft + arRect.GetLeft(), y + tm.mTop + arRect.GetTop());
-                if (arRect.IsHit(p)) {
-                    SetPixel(p, c ? arColor : arBackColor);
-                }
-            }
-        }
-    }
-}
 
 } // namespace rsp::graphics

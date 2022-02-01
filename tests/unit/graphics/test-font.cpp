@@ -36,7 +36,7 @@ TEST_CASE("Font Primitive")
         Font font(cFontFile);
         font.SetSize(16);
 
-        TextMask tm = font.GetSymbol('A');
+        Glyph tm = font.GetSymbol('A');
         CHECK(tm.mSymbolUnicode == 'A');
         CHECK(tm.mHeight > 0);
         CHECK(tm.mHeight < 16);

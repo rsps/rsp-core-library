@@ -47,6 +47,9 @@ target_include_directories(rsp-core-lib
         ${CMAKE_CURRENT_BINARY_DIR}/src
         ${FREETYPE_INCLUDE_DIRS}
 )
+
+add_subdirectory(src)
+
 add_compile_options(-pedantic -Wall -Wextra -Wold-style-cast -Weffc++ -Werror
     -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization
     -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations
@@ -55,9 +58,7 @@ add_compile_options(-pedantic -Wall -Wextra -Wold-style-cast -Weffc++ -Werror
     -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
     -Wundef -Wno-unused
     -Wshadow
-    -DFT_CONFIG_OPTION_ERROR_STRINGS)
-
-add_subdirectory(src)
+    -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
 
 
 #--------------------------------------------------------

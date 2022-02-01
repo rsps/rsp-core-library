@@ -15,27 +15,24 @@
 #include <utils/CoreException.h>
 #include <graphics/primitives/Color.h>
 #include <graphics/primitives/Rect.h>
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
 namespace rsp::graphics {
 
+class FontRawInterface;
 
 class FontException : public rsp::utils::CoreException
 {
 public:
-    explicit FontException(const char *aMsg, FT_Error aCode);
+    explicit FontException(const char *aMsg, int aCode);
 };
 
-typedef FT_Face FontFace;
-
-class TextMask
+class Glyph
 {
 public:
-    TextMask() {}
-    TextMask(const FontFace &arFace);
+    Glyph() {}
+    Glyph(void* apFace);
 
-    std::vector<uint8_t> mBits { };
+    std::vector<uint8_t> mPixels { };
     uint32_t mSymbolUnicode = 0;
 
     int mTop = 0;
@@ -44,80 +41,39 @@ public:
     int mHeight = 0;
 };
 
-std::ostream& operator <<(std::ostream &os, TextMask &tm);
-
-/**
- * \class FreeTypeLibrary
- * \brief Simple object to load the freetype library
- *
- */
-class FreeTypeLibrary
-{
-public:
-    FreeTypeLibrary(void);
-    ~FreeTypeLibrary(void);
-
-    operator FT_Library() const {
-        return mFtLib;
-    }
-
-private:
-    FreeTypeLibrary(const FreeTypeLibrary&) = delete;
-    FreeTypeLibrary& operator =(const FreeTypeLibrary&) = delete;
-
-    FT_Library mFtLib { };
-};
+std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph);
 
 class Font
 {
 public:
-    typedef int Style;
+    enum class Styles {
+        Normal = 0,
+        Italic = 1,
+        Bold = 2
+    };
 
-    static const int Normal = 0;
-    static const int Italic = 1;
-    static const int Bold = 2;
+    static void RegisterFont(const char *apFileName);
 
-    Font(const char *apFilename, int aFaceIndex = 0);
-    ~Font();
+    Font(const std::string &arFontName, Styles aStyle = Styles::Normal);
+    virtual ~Font();
 
-    operator FontFace() const {
-        return mFace;
-    }
+    std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing) const;
 
-
-    TextMask GetSymbol(uint32_t aSymbolCode) const;
-    std::vector<TextMask> MakeTextMasks(const std::string &arText) const;
-
-    std::string GetFamilyName() const { return mFace->family_name; }
+    std::string GetFamilyName() const;
 
     Font& SetSize(int aSizePx);
-    Font& SetSize(int aWidthPx, int aHeightPx);
-    int GetSize() const { return mSizePx; }
+    virtual Font& SetSize(int aWidthPx, int aHeightPx);
+    int GetSize() const;
 
-    Font& SetColor(const Color &arColor) { mColor = arColor; return *this; }
+    Font& SetColor(const Color &arColor);
     Color GetColor() const { return mColor; }
 
-    Font& SetStyle(Style aStyle) { mStyle = aStyle; return *this; }
-    Style GetStyle() const { return mStyle; }
+    Font& SetStyle(Styles aStyle);
+    Styles GetStyle() const;
 
 protected:
-    Style mStyle;
     Color mColor;
-    int mSizePx;
-
-    FreeTypeLibrary mLib { };
-    FontFace mFace { };
-
-    int getKerning(uint aFirst, uint aSecond, uint aKerningMode = 0) const;
-    std::u32string stringToU32(const std::string &arText) const;
-    void paintOver(const TextMask &aSrc, TextMask &aDst, int aX, int aY) const;
-
-private:
-    Font(const Font&) = delete;
-    Font& operator =(const Font&) = delete;
-
-    std::vector<TextMask> ScaleToFit(const std::string &arText, int aWidthPx, int aHeightPx);
-    Rect GetTextBoundingRect(const std::vector<TextMask> &arTms) const;
+    FontRawInterface *mpImpl;
 };
 
 }

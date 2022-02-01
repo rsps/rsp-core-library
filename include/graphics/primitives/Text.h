@@ -21,39 +21,42 @@ class Text
 {
 public:
     Text();
-    Text(const Font &arFont);
-    Text(const std::string &arText, const Font &arFont);
+    Text(const std::string &arText);
     virtual ~Text() {};
 
-    Text& SetValue(const std::string &arValue);
-    std::string& GetValue() { return mValue; }
+    const std::string& GetValue() const { return mValue; }
+    Text& SetValue(const std::string &arValue) { mValue = arValue; return *this; }
 
-    int GetLineCount() { return mLineCount; }
-
-    Rect& GetArea() { return mArea; }
-    Text& SetArea(const Rect &arRect);
+    const Rect& GetArea() const { return mArea; }
+    Text& SetArea(const Rect &arRect) { mArea = arRect; return *this; }
 
     Font& GetFont() { return mFont; }
-    Text& SetFont(const Font &arFont);
+    Text& SetFont(const Font &arFont) { mFont = arFont; return *this; }
 
-    Text& SetScaleToFit(bool aValue = true);
-    bool GetScaleToFit() { return mScaleToFit; }
+    bool GetScaleToFit() const { return mScaleToFit; }
+    Text& SetScaleToFit(bool aValue = true) { mScaleToFit = aValue; return *this; }
+
+    Text& SetLineSpacing(int aSpacing) { mLineSpacing = aSpacing; return *this; }
+    int GetLineSpacing() const { return mLineSpacing; }
+
+    int GetLineCount() const { return mLineCount; }
 
     Text& Invalidate();
 
-    std::vector<TextMask>& GetMasks() { return mMasks; }
+    const std::vector<Glyph>& GetGlyphs() const { return mGlyphs; }
 
 protected:
     Font mFont;
     Rect mArea;
     std::string mValue;
     bool mScaleToFit = false;
-    std::vector<TextMask> mMasks;
+    std::vector<Glyph> mGlyphs;
     int mLineCount = 0;
     int mLineMaxChar = 0;
+    int mLineSpacing = 1;
 
     void scaleToFit();
-    Rect calcBoundingRect();
+    Rect calcBoundingRect(const std::vector<Glyph> &arGlyphs);
     void loadGlyphs();
 };
 

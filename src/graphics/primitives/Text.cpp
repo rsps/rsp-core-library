@@ -17,32 +17,9 @@ Text::Text()
 {
 }
 
-Text::Text(const Font &arFont)
-    : mFont(arFont)
+Text::Text(const std::string &arText)
 {
-}
-
-Text::Text(const std::string &arText, const Font &arFont)
-    : mValue(arText), mFont(arFont)
-{
-}
-
-Text& Text::SetValue(const std::string &arValue)
-{
-    mValue = arValue;
-    return *this;
-}
-
-Text& Text::SetArea(const Rect &arRect)
-{
-    mArea = arRect;
-    return *this;
-}
-
-Text& Text::SetFont(const Font &arFont)
-{
-    mFont = arFont;
-    return *this;
+    SetValue(arText);
 }
 
 Text& Text::Invalidate()
@@ -63,23 +40,12 @@ Text& Text::Invalidate()
         }
     }
 
-    scaleToFit();
     loadGlyphs();
-    return *this;
-}
-
-Text& Text::SetScaleToFit(bool aValue)
-{
-    mScaleToFit = aValue;
     return *this;
 }
 
 void Text::scaleToFit()
 {
-    if (!mScaleToFit) {
-        return;
-    }
-
     int width = ((mArea.GetWidth() + (mLineMaxChar/2)) / mLineMaxChar) * 2; // Texts seems to be about 1/3 of desired width
     int height = mArea.GetHeight() / mLineCount;
     int done;
@@ -91,8 +57,8 @@ void Text::scaleToFit()
     do {
         mFont.SetSize(width, height);
 
-        mMasks = mFont.MakeTextMasks(mValue);
-        auto r = calcBoundingRect();
+        mGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
+        auto r = calcBoundingRect(mGlyphs);
         DLOG("Bounding Rect: " << r);
 
         done = 0;
@@ -113,9 +79,46 @@ void Text::scaleToFit()
     while( (done != 2) && --attempts);
 }
 
+Rect Text::calcBoundingRect(const std::vector<Glyph> &arGlyphs)
+{
+    int w = 0;
+    int h = 0;
+    int line_count = 1;
+    int line_width = 0;
+    for (auto tm : arGlyphs) {
+        switch (tm.mSymbolUnicode) {
+            case '\n':
+                line_count++;
+                if (w > line_width) {
+                    line_width = w;
+                }
+                w = 0;
+                break;
+            default:
+                w += tm.mWidth;
+                if (h < tm.mHeight) {
+                    h = tm.mHeight;
+                }
+                break;
+        }
+    }
+    if (w > line_width) {
+        line_width = w;
+    }
+
+    DLOG("Line Width: " << line_width << " Line Height: " << h  << " Line Count: " << line_count);
+    return Rect(0, 0, line_width, h * line_count);
+
+}
+
 void Text::loadGlyphs()
 {
-    mMasks = mFont.MakeTextMasks(mValue);
+    if (mScaleToFit) {
+        scaleToFit();
+    }
+    else {
+        mGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
+    }
 }
 
 }
