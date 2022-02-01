@@ -31,6 +31,6 @@ protected:
 };
 
 
-}; /* namespace rsp */
+} /* namespace rsp */
 
 #endif /* SRC_UTILS_CRC32_H_ */
