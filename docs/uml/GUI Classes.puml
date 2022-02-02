@@ -6,20 +6,20 @@ namespace rsp {
 
 class Point {
     A simple class with properties\nfor a 2D coordinate.
---
+    --
     +x: uint16_t
     +y: uint16_t
---
+    --
     +Point(aX: int, aY: int)
     +Point(arPoint: const Point&)
 }
 
 class Rect {
     A class with two Point properties.
---
+    --
     #mTopLeft: Point
     #mBottomRight: Point
---
+    --
     +Rect(aTop: int, aLeft: int, aWidth: int, aHeight: int)
     +Rect(arTopLeft: const Point&, aWidth: int, aHeight: int)
     +Rect(arTopLeft: const Point&, arBottomRigth: const Point&)
@@ -39,9 +39,9 @@ class Color {
     and Alpha channel color information.
     The alpha channel is used for opacity.
     Not all platforms support alpha blending.
---
+    --
     #mColor: uint32_t
---
+    --
     +Color(aRed: uint8_t, aGreen: uint8_t, aBlue: uint8_t, aAlpha: uint8_t)
     +Color(aARGB: uint32_t)
     +Color(arColor: const Color&)
@@ -66,12 +66,12 @@ enum FontStyle {
 class Font {
     When used on Linux, the GUI library can
     use the FreeType2 library to render fonts.
---
+    --
     #mFontName: string
     #mStyle: FontStyle
     #mColor: Color
     #mSize: int
---
+    --
     +Font(arName: const string&)
 }
 FontStyle *-- Font
@@ -86,9 +86,9 @@ class Bitmap {
 
 enum SwapOperations
 {
-When swapping buffers these values can control
-the baseline content of the new buffer.
---
+    When swapping buffers these values can control
+    the baseline content of the new buffer.
+    --
     NoOp // No initialization of the buffer is performed
     Copy  // The current view content is copied int new buffer
     Clear // The new buffer is filled with the background color
@@ -98,7 +98,7 @@ abstract Canvas {
     All drawing operations are performed on a Canvas.
     Descendants can implement in memory canvas, Linux
     Framebuffer canvas or even a DirectX Canvas.
---
+    --
     +{abstract}DrawDot(arPoint: const Point&, aColor: Color)
     +{abstract}DrawArc(arCenter: const Point&, aRadius1: int, aRadius2: int, aStartAngle: int, aSweepAngle: int, aColor: Color)
     +{abstract}DrawCircle(arCenter: const Point&, aRadius: int, aColor: Color)
@@ -124,7 +124,7 @@ BufferedCanvas <|-- FrameBufferCanvas
 
 class TouchArea {
     #mTouchArea: Rect
---
+    --
     +ProcessEvent(arEvent: Event&): bool
     +IsHit(arPoint: const Point&) const: bool
 }
@@ -137,13 +137,13 @@ class Ctrl {
     property, this is flagged in case the object needs
     rendering. Setter functions can invalidate a Ctrl
     object.
---
+    --
     #mBackground: Color
     #mTransparent: bool
     #mArea: Rect
     #mpParent: Ctrl*
     #mChildren: std::vector<Ctrl*>
---
+    --
     +Invalidate()
     +IsInvalid() const: bool
     +IsTransparent() const: bool
@@ -156,42 +156,43 @@ Rect *-- Ctrl
 
 class Scene {
     Each fullscreen view must decent from Scene.
---
+    --
     #mTouchables: std::vector<TouchArea*>
---
+    --
     +ProcessEvent(arEvent: Event&)
 }
 Ctrl <|-- Scene 
 
 class Image {
     A control to draw bitmap images.
---
+    --
     #mBitmap: Bitmap
 }
 Ctrl <|-- Image
 Bitmap *-- Image
+TouchArea --* Image
 
 class Label {
     A control used to draw text and graphics.
---
+    --
     #mCaption: string
     #mFont: Font
---
+    --
     +SetCaption(arCaption: const string&)
 }
-Ctrl <|-- Label
+Ctrl <|-left- Label
 Font *-- Label
 
-class Button {
-    Decents from Label.
-    Draws a button in different states.
-    Posts an event when pressed.
-    Posts an event when dragged.
-    Posts an event when released.
-}
-Label *-- Button
-TouchArea *-- Button
-Image *-- Button
+'class Button {
+'    Decents from Label.
+'    Draws a button in different states.
+'    Posts an event when pressed.
+'    Posts an event when dragged.
+'    Posts an event when released.
+'}
+'Label *-- Button
+'TouchArea *-- Button
+'Image *-- Button
 
 'class CheckBox {
 '    A control used to draw a checkbox
@@ -200,6 +201,89 @@ Image *-- Button
 '}
 'Button <|-- CheckBox
 'Image <|-- CheckBox
+
+class EventInput {
+    Struct that matches the format read from the touch driver.
+    --
+    +struct timeval time
+    +uint16_t type
+    +uint16_t code
+    +uint32_t value
+}
+
+enum EventType {
+    When using Events these values describe the type of event.
+    --
+    Press // A press with one set of absolute coordinates
+    Drag  // A drag with one set of absolute coordinates, often followed by more drag events
+    Lift  // A lift has no coordinates, but stops all active presses
+}
+
+class Event{
+    Simple class defining structure of an event
+    --
+    +EventType type
+    +uint32_t x
+    +uint32_t y
+}
+
+class EventCreator{
+    Read touch driver and publishes events based on driver input
+    --
+    -FileIO touchDriver
+    -EventInput eventInput
+    -Event event
+    --
+    -void ReadType()
+    -void ReadBody()
+    +bool HasNewEvents()
+    +const Event &GetEvent()
+}
+EventCreator --* Event
+EventCreator --* EventInput
+Event --* EventType
+
+abstract class Publisher {
+    Abstract class to inherit from for publishing to a broker
+    --
+    #int mDataForAA
+    #int mDataForBB
+    #int mCntForAA
+    #int mCntForBB
+    --
+    +virtual void registerBroker(Broker *pBroker)
+    +virtual void publishToBroker(std::string topic, int newData)
+    +virtual void update(void)
+}
+
+abstract class Subscriber {
+    Abstract class to inherit from for subscribing to events from a given broker
+    --
+    #int mData
+    #std::string mTopic
+    --
+    +virtual void subscribeToBroker(Broker *ptr, std::string topic)
+    +virtual void updateCallback(int newVal)
+}
+
+class Broker {
+    A meesage broker for publishing and subcribing to topics
+    --
+    #Publisher *mPublisher
+    #std::vector<Subscriber *> mSubscriberForAA
+    #std::vector<Subscriber *> mSubscriberForBB
+    --
+    +virtual void addSubscriber(Subscriber *ptr, std::string topic)
+    +virtual void registerToPublisher(Publisher *ptr)
+    +virtual void onPublish(std::string topic, int newData)
+}
+Broker -up-* Subscriber
+Publisher -up-* Broker
+TouchArea --|> Subscriber
+TouchArea --|> Publisher
+Ctrl --|> Subscriber
+EventCreator --|> Publisher
+
 
 }
 
