@@ -35,7 +35,7 @@ class Framebuffer : public BufferedCanvas
 
     uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
 
-    void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy);
+    void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy, Color aColor = Color::Black);
 
   protected:
     int mFramebufferFile;
@@ -43,7 +43,7 @@ class Framebuffer : public BufferedCanvas
     struct fb_fix_screeninfo mFixedInfo {};
     struct fb_var_screeninfo mVariableInfo {};
 
-    void clear();
+    void clear(Color aColor);
     void copy();
 };
 

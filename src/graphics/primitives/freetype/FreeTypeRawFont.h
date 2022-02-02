@@ -17,6 +17,10 @@
 
 namespace rsp::graphics {
 
+/**
+ * \class FreeTypeRawFont
+ * \brief A FontRawInterface implementation for the FreeType library.
+ */
 class FreeTypeRawFont : public FontRawInterface
 {
 public:

@@ -13,18 +13,18 @@
 
 namespace rsp::graphics {
 
-Text::Text()
-    : mFont("exo2"), mArea()
+Text::Text(const std::string &arFontName)
+    : mFont(arFontName), mArea()
 {
 }
 
-Text::Text(const std::string &arText)
-    : mFont("exo2"), mArea()
+Text::Text(const std::string &arFontName, const std::string &arText)
+    : mFont(arFontName), mArea()
 {
     SetValue(arText);
 }
 
-Text& Text::Invalidate()
+Text& Text::Reload()
 {
     mLineCount = 1;
     mLineMaxChar = 1; // Avoid division by zero
@@ -60,7 +60,7 @@ void Text::scaleToFit()
         mFont.SetSize(width, height);
 
         mGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
-        auto r = calcBoundingRect(mGlyphs);
+        auto r = CalcBoundingRect(mGlyphs);
         DLOG("Bounding Rect: " << r);
 
         done = 0;
@@ -79,16 +79,18 @@ void Text::scaleToFit()
         DLOG("done: " << done << " attempts: " << attempts);
     }
     while( (done != 2) && --attempts);
+
+    alignGlyphs();
 }
 
-Rect Text::calcBoundingRect(const std::vector<Glyph> &arGlyphs)
+Rect Text::CalcBoundingRect(const std::vector<Glyph> &arGlyphs)
 {
     int w = 0;
     int h = 0;
     int line_count = 1;
     int line_width = 0;
-    for (auto tm : arGlyphs) {
-        switch (tm.mSymbolUnicode) {
+    for (auto glyph : arGlyphs) {
+        switch (glyph.mSymbolUnicode) {
             case '\n':
                 line_count++;
                 if (w > line_width) {
@@ -97,9 +99,9 @@ Rect Text::calcBoundingRect(const std::vector<Glyph> &arGlyphs)
                 w = 0;
                 break;
             default:
-                w += tm.mWidth;
-                if (h < tm.mHeight) {
-                    h = tm.mHeight;
+                w += glyph.mWidth;
+                if (h < glyph.mHeight) {
+                    h = glyph.mHeight;
                 }
                 break;
         }
@@ -109,7 +111,7 @@ Rect Text::calcBoundingRect(const std::vector<Glyph> &arGlyphs)
     }
 
     DLOG("Line Width: " << line_width << " Line Height: " << h  << " Line Count: " << line_count);
-    return Rect(0, 0, line_width, h * line_count);
+    return Rect(0, 0, line_width, (h * line_count) + ((line_count - 1) * mLineSpacing));
 
 }
 
@@ -120,8 +122,48 @@ void Text::loadGlyphs()
     }
     else {
         mGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
+        alignGlyphs();
+    }
+}
+
+void Text::alignGlyphs()
+{
+    if (mVAlign == VAlign::Top && mHAlign == HAlign::Left) {
+        return;
+    }
+
+    auto r = CalcBoundingRect(mGlyphs);
+
+    int voffset = 0;
+    int hoffset = 0;
+    switch(mVAlign) {
+        default:
+        case VAlign::Top:
+            voffset = 0;
+            break;
+        case VAlign::Center:
+            voffset = (mArea.GetHeight() - r.GetHeight()) / 2;
+            break;
+        case VAlign::Bottom:
+            voffset = (mArea.GetHeight() - r.GetHeight());
+            break;
+    }
+    switch(mHAlign) {
+        default:
+        case HAlign::Left:
+            hoffset = 0;
+            break;
+        case HAlign::Center:
+            hoffset = (mArea.GetWidth() - r.GetWidth()) / 2;
+            break;
+        case HAlign::Right:
+            hoffset = (mArea.GetWidth()- r.GetWidth());
+            break;
+    }
+    for (auto &glyph : mGlyphs) {
+        glyph.mTop += voffset;
+        glyph.mLeft += hoffset;
     }
 }
 
 }
-

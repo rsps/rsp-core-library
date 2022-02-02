@@ -89,14 +89,19 @@ class Canvas
     void DrawImage(const Point &arLeftTop, const Bitmap &arBitmap);
 
     /**
-     * Draws the given text within the given rectangle on the canvas.
+     * Draws the given Text object in the given color on the canvas.
      *
      * \param aRect
-     * \param aFont
-     * \param apText
-     * \param aScaleToFit
+     * \param arColor
      */
     void DrawText(const Text &arText, const Color &arColor);
+
+    /**
+     * Draws the given Text object in the color of the objects own font.
+     *
+     * \param arText
+     */
+    void DrawText(Text &arText);
 
     /**
      * Get the color value of a single pixel.

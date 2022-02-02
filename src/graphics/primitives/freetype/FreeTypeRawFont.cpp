@@ -63,13 +63,12 @@ Glyph::Glyph(void* apFace)
 FreeTypeRawFont::FreeTypeRawFont(const std::string &arFontName, int /*aFaceIndex*/)
 {
     mFontName = arFontName;
+    createFace();
 }
 
 FreeTypeRawFont::~FreeTypeRawFont()
 {
-    if (mpFace) {
-        FT_Done_Face(mpFace);
-    }
+    freeFace();
 }
 
 std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aLineSpacing) const
@@ -126,7 +125,7 @@ void FreeTypeRawFont::SetSize(int aWidthPx, int aHeightPx)
         THROW_WITH_BACKTRACE2(FontException, "FT_Set_Pixel_Sizes() failed", error);
     }
     mSizePx = std::min(aWidthPx, aHeightPx);
-    DLOG("Font.SetSize(" << aWidthPx << ", " << aHeightPx << ") -> " << result);
+    DLOG("Font.SetSize(" << aWidthPx << ", " << aHeightPx << ") -> " << mSizePx);
 }
 
 Glyph FreeTypeRawFont::getSymbol(uint32_t aSymbolCode, Font::Styles aStyle) const
@@ -139,6 +138,8 @@ Glyph FreeTypeRawFont::getSymbol(uint32_t aSymbolCode, Font::Styles aStyle) cons
         nl.mSymbolUnicode = aSymbolCode;
         return nl;
     }
+
+    std::cout << "SymbolCode: " << aSymbolCode << std::endl;
 
     FT_Error error = FT_Load_Char(mpFace, aSymbolCode, FT_LOAD_RENDER /*| FT_LOAD_TARGET_LCD_V*/);
     if (error) {
@@ -191,6 +192,9 @@ void FreeTypeRawFont::createFace()
 
 void FreeTypeRawFont::freeFace()
 {
+    if (mpFace) {
+        FT_Done_Face(mpFace);
+    }
 }
 
 std::u32string FreeTypeRawFont::stringToU32(const std::string &arText) const

@@ -11,62 +11,64 @@
 #include <doctest.h>
 #include <graphics/primitives/Font.h>
 #include <graphics/primitives/Rect.h>
+#include <graphics/primitives/Text.h>
+#include <graphics/primitives/freetype/FreeTypeLibrary.h>
 
 using namespace rsp::graphics;
 
 TEST_CASE("Font Primitive")
 {
     const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
+    const char* cFontName = "Exo 2";
 
     SUBCASE("Load Library") {
-        FreeTypeLibrary lib { };
+        FreeTypeLibrary::Get();
         FT_Library ft;
-        CHECK_NOTHROW(ft = lib); // Call operator
+        CHECK_NOTHROW(ft = FreeTypeLibrary::Get()); // Call operator
         CHECK(ft);
     }
 
     SUBCASE("Load Font") {
-        Font font(cFontFile);
-        FontFace ff;
-        CHECK_NOTHROW(ff = font); // call operator
-        CHECK(ff);
+        CHECK_NOTHROW(FreeTypeLibrary::Get().RegisterFont(cFontFile));
     }
 
     SUBCASE("Get Single Symbol Mask") {
-        Font font(cFontFile);
+        CHECK_NOTHROW(Font::RegisterFont(cFontFile));
+        Font font(cFontName);
         font.SetSize(16);
 
-        Glyph tm = font.GetSymbol('A');
-        CHECK(tm.mSymbolUnicode == 'A');
-        CHECK(tm.mHeight > 0);
-        CHECK(tm.mHeight < 16);
-        CHECK(tm.mWidth > 0);
-        CHECK(tm.mWidth < 16);
+        auto glyphs = font.MakeGlyphs("A");
+        CHECK(glyphs.size() == 1);
+        CHECK(glyphs[0].mHeight > 0);
+        CHECK(glyphs[0].mHeight < 16);
+        CHECK(glyphs[0].mWidth > 0);
+        CHECK(glyphs[0].mWidth < 16);
     }
 
     SUBCASE("Get Text Mask") {
-        const std::string text("Hello World");
+        CHECK_NOTHROW(Font::RegisterFont(cFontFile));
+        Text text(cFontName, "Hello World");
         const int size = 16;
 
-        Font font(cFontFile);
-        font.SetSize(size);
+        text.GetFont().SetSize(size);
 
-        auto tms = font.MakeTextMasks(text);
-        Rect r = font.GetTextBoundingRect(tms);
+        auto glyphs = text.GetGlyphs();
+        Rect r = text.CalcBoundingRect(glyphs);
 
         CHECK(r.GetHeight() < size);
-        CHECK(r.GetWidth() < (size * text.size()));
+        CHECK(r.GetWidth() < (size * text.GetValue().size()));
     }
 
     SUBCASE("Scale To fit") {
-        const std::string text("Hello World");
-        Font font(cFontFile);
+        CHECK_NOTHROW(Font::RegisterFont(cFontFile));
+        Text text(cFontName, "Hello World");
+        const int size = 16;
+
         Rect dst(100, 200, 280, 200);
+        text.SetScaleToFit(true).SetArea(dst).Reload();
 
-        font.ScaleToFit(text, dst.GetWidth(), dst.GetHeight());
-
-        auto tms = font.MakeTextMasks(text);
-        Rect r = font.GetTextBoundingRect(tms);
+        auto glyphs = text.GetGlyphs();
+        Rect r = text.CalcBoundingRect(glyphs);
 
         MESSAGE(r.GetHeight(), " < ", dst.GetHeight());
         MESSAGE(r.GetWidth(), " < ", dst.GetWidth());

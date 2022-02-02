@@ -120,11 +120,15 @@ void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
     }
 }
 
+void Canvas::DrawText(Text &arText)
+{
+    DrawText(arText, arText.GetFont().GetColor());
+}
 
 void Canvas::DrawText(const Text &arText, const Color &arColor)
 {
-
     for (auto glyph : arText.GetGlyphs()) {
+        DLOG("DrawText " << glyph);
         for (int y = 0; y < glyph.mHeight; y++) {
             long unsigned int index = static_cast<long unsigned int>(y * glyph.mWidth);
             for (int x = 0; x < glyph.mWidth; x++) {

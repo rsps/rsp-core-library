@@ -10,6 +10,7 @@
 
 #include "FreeTypeLibrary.h"
 #include <graphics/primitives/Font.h>
+#include <utils/StrUtils.h>
 
 namespace rsp::graphics {
 
@@ -34,12 +35,17 @@ FreeTypeLibrary& FreeTypeLibrary::Get()
 
 const char* FreeTypeLibrary::GetFileName(const std::string &arFontName) const
 {
-    return mFontFileNames.at(arFontName).c_str();
+    auto it = mFontFileNames.find(arFontName);
+    if (it == mFontFileNames.end()) {
+        THROW_WITH_BACKTRACE1(FontException,  rsp::utils::StrUtils::Format("Font named %s is not installed.", arFontName.c_str()));
+    }
+
+    return it->second.c_str();
 }
 
 void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
 {
-    FT_Face face;
+    FT_Face face = nullptr;
 
     FT_Error error = FT_New_Face(mFtLib, arFileName.c_str(), 0, &face);
 
@@ -48,10 +54,42 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
     }
 
     mFontFileNames.insert ( std::pair<std::string,std::string>(std::string(face->family_name), arFileName) );
+    std::clog << "Font named " << face->family_name << " is installed" << std::endl;
 
     if (face) {
         FT_Done_Face(face);
     }
+/*
+    int index = 0;
+    do {
+        if (face) {
+            FT_Done_Face(face);
+        }
+
+        FT_Error error = FT_New_Face(mFtLib, arFileName.c_str(), index, &face);
+
+        if (error) {
+            THROW_WITH_BACKTRACE2(FontException, "FT_New_Face() failed", error);
+        }
+
+        std::cout << "num_faces: " << face->num_faces << "\n"
+            << "face_index: " << face->face_index << "\n"
+            << "face_flags: " << std::hex << face->face_flags << std::dec << "\n"
+            << "style_flags: " << std::hex << face->style_flags << std::dec << "\n"
+            << "num_glyphs: " << std::hex << face->num_glyphs << std::dec << "\n"
+            << "family_name: " << std::hex << face->family_name << std::dec << "\n"
+            << "style_name: " << std::hex << face->style_name << std::dec << "\n"
+            << "num_fixed_sizes: " << face->num_fixed_sizes << "\n"
+            << "available_sizes: " << face->available_sizes << "\n"
+            << "num_charmaps: " << face->num_charmaps << "\n"
+            << "charmaps: " << face->charmaps << "\n";
+    }
+    while(++index < face->num_faces);
+
+    if (face) {
+        FT_Done_Face(face);
+    }
+*/
 }
 
 }

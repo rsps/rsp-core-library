@@ -15,11 +15,14 @@
 
 namespace rsp::graphics {
 
-
+/**
+ * \class FontRawInterface
+ * \brief An abstract interface used to separate different font engines.
+ */
 class FontRawInterface
 {
 public:
-    virtual ~FontRawInterface();
+    virtual ~FontRawInterface() {};
 
     virtual std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing) const = 0;
     virtual std::string GetFamilyName() const = 0;
@@ -27,7 +30,7 @@ public:
 
     int GetSize() const { return mSizePx; }
 
-    virtual Font& SetStyle(Font::Styles aStyle);
+    virtual void SetStyle(Font::Styles aStyle) { mStyle = aStyle; }
     Font::Styles GetStyle() const { return mStyle; }
 
 protected:

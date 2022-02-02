@@ -98,7 +98,7 @@ Framebuffer::~Framebuffer()
     // No need to call munmap on the shared memory region, this is done automatically on termination.
 }
 
-void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
+void Framebuffer::SwapBuffer(const SwapOperations aSwapOp, Color aColor)
 {
     // swap buffer
     if (mVariableInfo.yoffset == 0) {
@@ -122,7 +122,7 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
         break;
 
     case SwapOperations::Clear:
-        clear();
+        clear(aColor);
         break;
 
     case SwapOperations::NoOp:
@@ -144,7 +144,7 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
     }
 }
 
-void Framebuffer::clear()
+void Framebuffer::clear(Color aColor)
 {
     long x, y;
     // draw to back buffer
@@ -152,7 +152,7 @@ void Framebuffer::clear()
     for (y = 0; y < mVariableInfo.yres; y++) {
         for (x = 0; x < mVariableInfo.xres; x++) {
             long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;
-            *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = 0x00000000;
+            *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = aColor;
         }
     }
 }
