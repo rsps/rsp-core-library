@@ -284,7 +284,6 @@ TouchArea --|> Publisher
 Ctrl --|> Subscriber
 EventCreator --|> Publisher
 
-
 }
 
 @enduml
