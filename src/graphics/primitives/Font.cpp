@@ -49,12 +49,14 @@ void Font::RegisterFont(const char *apFileName)
 Font::Font(const std::string &arFontName, Styles aStyle)
     : mColor(Color::White)
 {
-    mpImpl = new FreeTypeRawFont(arFontName, 0);
+#ifdef USE_FREETYPE
+    mpImpl = std::make_unique<FreeTypeRawFont>(arFontName, 0);
+#endif
+    ASSERT(!mpImpl);
 }
 
 Font::~Font()
 {
-    delete mpImpl;
 }
 
 Font& Font::SetSize(int aSizePx)

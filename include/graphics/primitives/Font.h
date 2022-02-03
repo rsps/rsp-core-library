@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 #include <utils/CoreException.h>
 #include <graphics/primitives/Color.h>
 #include <graphics/primitives/Rect.h>
@@ -162,7 +163,7 @@ public:
 
 protected:
     Color mColor;
-    FontRawInterface *mpImpl = nullptr;
+    std::unique_ptr<FontRawInterface> mpImpl{};
 
     Font(const Font&) = delete;
     Font& operator=(const Font&) = delete;

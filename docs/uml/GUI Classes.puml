@@ -57,10 +57,24 @@ class Color {
     +operator =(arColor: const Color&)
 }
 
-enum FontStyle {
+enum Font::Styles {
     Normal
     Bold
     Italic
+}
+
+class FontRawInterface {
+    Interface for pImpl pattern of font class.
+--
+    #mStyle: Font::Styles = Normal
+    #mSizePx: int;
+--
+    +{abstract} MakeGlyphs(arText: const std::string&, aLineSpacing: int) const: std::vector<Glyph>;
+    +{abstract} GetFamilyName() const: std::string;
+    +{abstract} SetSize(aWidthPx: int, aHeightPx: int);
+    +GetSize() const: int
+    +{abstract} SetStyle(aStyle: Font::Styles)
+    +GetStyle() const: Font::Styles
 }
 
 class Font {
@@ -68,14 +82,15 @@ class Font {
     use the FreeType2 library to render fonts.
 --
     #mFontName: string
-    #mStyle: FontStyle
+    #mStyle: Font::Styles
     #mColor: Color
     #mSize: int
 --
     +Font(arName: const string&)
 }
-FontStyle *-- Font
+Font::Styles *-- Font
 Color *--- Font
+FontRawInterface *-- Font
 
 class Bitmap {
     Class to handle raster images.
@@ -97,11 +112,11 @@ class Canvas {
     +DrawImage(arTopLeft: const Point&, arBitmap: const Bitmap&)
     +DrawText(arRect: const Rect&, arFont: const Font&, arText: const string&, aScaleToFit: bool)
 }
-Canvas <|-- Bitmap
+Canvas <|--- Bitmap
 
 class FrameBufferCanvas {
 }
-Canvas <|-- FrameBufferCanvas
+Canvas <|--- FrameBufferCanvas
 
 class TouchArea {
     #mTouchArea: Rect
