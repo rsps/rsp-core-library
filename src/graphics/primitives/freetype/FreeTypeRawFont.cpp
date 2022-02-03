@@ -71,8 +71,10 @@ FreeTypeRawFont::~FreeTypeRawFont()
     freeFace();
 }
 
-std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aLineSpacing) const
+std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aLineSpacing)
 {
+    createFace();
+
     std::u32string unicode = stringToU32(arText);
     int line_height = 0;
 
@@ -120,6 +122,8 @@ std::string FreeTypeRawFont::GetFamilyName() const
 
 void FreeTypeRawFont::SetSize(int aWidthPx, int aHeightPx)
 {
+    createFace();
+
     FT_Error error = FT_Set_Pixel_Sizes(mpFace, static_cast<uint32_t>(aWidthPx), static_cast<uint32_t>(aHeightPx));
     if (error) {
         THROW_WITH_BACKTRACE2(FontException, "FT_Set_Pixel_Sizes() failed", error);
@@ -127,6 +131,13 @@ void FreeTypeRawFont::SetSize(int aWidthPx, int aHeightPx)
     mSizePx = std::min(aWidthPx, aHeightPx);
     DLOG("Font.SetSize(" << aWidthPx << ", " << aHeightPx << ") -> " << mSizePx);
 }
+
+void FreeTypeRawFont::SetStyle(Font::Styles aStyle)
+{
+    mStyle = aStyle;
+    freeFace();
+}
+
 
 Glyph FreeTypeRawFont::getSymbol(uint32_t aSymbolCode, Font::Styles aStyle) const
 {
@@ -180,18 +191,14 @@ void FreeTypeRawFont::createFace()
         return;
     }
 
-    FT_Error error = FT_New_Face(FreeTypeLibrary::Get(), FreeTypeLibrary::Get().GetFileName(mFontName), 0, &mpFace);
-
-    if (error) {
-        THROW_WITH_BACKTRACE2(FontException, "FT_New_Face() failed", error);
-    }
-
+    mpFace = FreeTypeLibrary::Get().CreateFontFace(mFontName, mStyle);
 }
 
 void FreeTypeRawFont::freeFace()
 {
     if (mpFace) {
         FT_Done_Face(mpFace);
+        mpFace = nullptr;
     }
 }
 

@@ -27,9 +27,10 @@ public:
     FreeTypeRawFont(const std::string &arFontName, int aFaceIndex = 0);
     ~FreeTypeRawFont();
 
-    std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing) const override;
+    std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing) override;
     std::string GetFamilyName() const override;
     void SetSize(int aWidthPx, int aHeightPx) override;
+    void SetStyle(Font::Styles aStyle) override;
 
 protected:
     FT_Face mpFace = nullptr;

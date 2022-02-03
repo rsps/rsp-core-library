@@ -73,7 +73,8 @@ public:
     enum class Styles {
         Normal = 0,
         Italic = 1,
-        Bold = 2
+        Bold = 2,
+        BoldItalic = 3
     };
 
     /**

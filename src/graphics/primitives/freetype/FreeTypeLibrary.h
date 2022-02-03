@@ -13,11 +13,18 @@
 
 #include <string>
 #include <map>
+#include <graphics/primitives/Font.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
 namespace rsp::graphics {
+
+struct FontInfo {
+    std::string FileName{};
+    std::string StyleName{};
+    FT_Long Id = 0;
+};
 
 /**
  * \class FreeTypeLibrary
@@ -35,7 +42,7 @@ public:
         return mFtLib;
     }
 
-    const char* GetFileName(const std::string &arFontName) const;
+    FT_Face CreateFontFace(const std::string &arFontName, Font::Styles aStyle);
 
 private:
     FreeTypeLibrary(void);
@@ -45,7 +52,7 @@ private:
 
     FT_Library mFtLib { };
 
-    std::map<std::string, std::string> mFontFileNames{ };
+    std::map<std::string, std::map<Font::Styles, FontInfo> > mFontSets{ };
 };
 
 }

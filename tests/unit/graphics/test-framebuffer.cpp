@@ -361,6 +361,35 @@ TEST_CASE("Framebuffer Drawing Primitives")
         }
     }
 
+    SUBCASE("Font Styles")
+    {
+        Font::RegisterFont("fonts/Exo2-Italic-VariableFont_wght.ttf");
+        Font::RegisterFont("fonts/Exo2-VariableFont_wght.ttf");
+        Rect r(10, 10, 460, 280);
+
+        fb.DrawRectangle(r, Color::White);
+        Text text("Exo 2", "Regular");
+        text.SetArea(r).SetScaleToFit(true).GetFont().SetSize(50).SetColor(Color::Yellow);
+        fb.DrawText(text.Reload());
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        text.SetValue("Bold").GetFont().SetStyle(Font::Styles::Bold);
+        fb.DrawText(text.Reload());
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        text.SetValue("Italic").GetFont().SetStyle(Font::Styles::Italic);
+        fb.DrawText(text.Reload());
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        text.SetValue("Bold Italic").GetFont().SetStyle(Font::Styles::BoldItalic);
+        fb.DrawText(text.Reload());
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+
     SUBCASE("Swapbuffer")
     {
         fb.SwapBuffer();

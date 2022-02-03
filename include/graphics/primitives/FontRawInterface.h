@@ -24,7 +24,7 @@ class FontRawInterface
 public:
     virtual ~FontRawInterface() {};
 
-    virtual std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing) const = 0;
+    virtual std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing) = 0;
     virtual std::string GetFamilyName() const = 0;
     virtual void SetSize(int aWidthPx, int aHeightPx) = 0;
 

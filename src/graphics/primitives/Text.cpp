@@ -48,7 +48,7 @@ Text& Text::Reload()
 
 void Text::scaleToFit()
 {
-    int width = ((mArea.GetWidth() + (mLineMaxChar/2)) / mLineMaxChar) * 2; // Texts seems to be about 1/3 of desired width
+    int width = ((mArea.GetWidth() + (mLineMaxChar/2)) / mLineMaxChar); // Texts seems to be about 1/3 of desired width
     int height = mArea.GetHeight() / mLineCount;
     int done;
     int attempts = 5;
