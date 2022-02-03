@@ -139,8 +139,6 @@ Glyph FreeTypeRawFont::getSymbol(uint32_t aSymbolCode, Font::Styles aStyle) cons
         return nl;
     }
 
-    std::cout << "SymbolCode: " << aSymbolCode << std::endl;
-
     FT_Error error = FT_Load_Char(mpFace, aSymbolCode, FT_LOAD_RENDER /*| FT_LOAD_TARGET_LCD_V*/);
     if (error) {
         THROW_WITH_BACKTRACE2(FontException, "FT_Load_Char() failed", error);

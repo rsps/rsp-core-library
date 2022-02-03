@@ -27,28 +27,28 @@ namespace rsp::graphics {
 class Color
 {
 public:
-    typedef uint32_t RGB_t;
+    typedef uint32_t ARGB_t;
 
     /**
      * Predefined basic colors
      */
-    enum :RGB_t {
-        White   = 0xFFFFFF,
-        Silver  = 0xC0C0C0,
-        Grey    = 0x808080,
-        Black   = 0x000000,
-        Red     = 0xFF0000,
-        Maroon  = 0x800000,
-        Yellow  = 0xFFFF00,
-        Olive   = 0x808000,
-        Lime    = 0x00FF00,
-        Green   = 0x008000,
-        Aqua    = 0x00FFFF,
-        Teal    = 0x008080,
-        Blue    = 0x0000FF,
-        Navy    = 0x000080,
-        Fuchsia = 0xFF00FF,
-        Purple  = 0x800080
+    enum :ARGB_t {
+        White   = 0x00FFFFFF,
+        Silver  = 0x00C0C0C0,
+        Grey    = 0x00808080,
+        Black   = 0x00000000,
+        Red     = 0x00FF0000,
+        Maroon  = 0x00800000,
+        Yellow  = 0x00FFFF00,
+        Olive   = 0x00808000,
+        Lime    = 0x0000FF00,
+        Green   = 0x00008000,
+        Aqua    = 0x0000FFFF,
+        Teal    = 0x00008080,
+        Blue    = 0x000000FF,
+        Navy    = 0x00000080,
+        Fuchsia = 0x00FF00FF,
+        Purple  = 0x00800080
     };
 
     /**
@@ -66,7 +66,7 @@ public:
      *
      * \param aARGB
      */
-    Color(RGB_t aARGB);
+    Color(ARGB_t aARGB);
 
     /**
      * Copy constructor.
@@ -131,7 +131,7 @@ public:
      * Get the ARGB value.
      * \return ARGB
      */
-    operator RGB_t() const;
+    operator ARGB_t() const;
     /**
      * Assign the value from the given Color object.
      *
@@ -145,14 +145,14 @@ protected:
      */
     typedef union
     {
-        RGB_t rgba;
+        ARGB_t rgba;
     #ifdef LITTLE_ENDIAN
         struct __item_type
         {
-            uint32_t alpha :8;
             uint32_t blue :8;
             uint32_t green :8;
             uint32_t red :8;
+            uint32_t alpha :8;
         } item;
     #else
         struct __item_type {

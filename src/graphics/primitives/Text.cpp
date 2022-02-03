@@ -54,14 +54,14 @@ void Text::scaleToFit()
     int attempts = 5;
     int w_limit = mArea.GetWidth() * 90 / 100; // >90%
     int h_limit = mArea.GetHeight() * 90 / 100; // > 90%
-    DLOG("w_limit: " << w_limit << " h_limit: " << h_limit);
+    DLOG("scaleToFit w_limit: " << w_limit << " h_limit: " << h_limit);
 
     do {
         mFont.SetSize(width, height);
 
         mGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
         auto r = CalcBoundingRect(mGlyphs);
-        DLOG("Bounding Rect: " << r);
+//        DLOG("scaleToFit Bounding Rect: " << r);
 
         done = 0;
         if ((r.GetWidth() < w_limit) || (r.GetWidth() > mArea.GetWidth())) {
@@ -76,9 +76,9 @@ void Text::scaleToFit()
         else {
             done++;
         }
-        DLOG("done: " << done << " attempts: " << attempts);
     }
     while( (done != 2) && --attempts);
+    DLOG("scaleToFit done: " << done << " attempts: " << attempts);
 
     alignGlyphs();
 }
@@ -110,7 +110,7 @@ Rect Text::CalcBoundingRect(const std::vector<Glyph> &arGlyphs)
         line_width = w;
     }
 
-    DLOG("Line Width: " << line_width << " Line Height: " << h  << " Line Count: " << line_count);
+//    DLOG("Line Width: " << line_width << " Line Height: " << h  << " Line Count: " << line_count);
     return Rect(0, 0, line_width, (h * line_count) + ((line_count - 1) * mLineSpacing));
 
 }

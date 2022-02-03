@@ -128,7 +128,7 @@ void Canvas::DrawText(Text &arText)
 void Canvas::DrawText(const Text &arText, const Color &arColor)
 {
     for (auto glyph : arText.GetGlyphs()) {
-        DLOG("DrawText " << glyph);
+//        DLOG("DrawText " << glyph);
         for (int y = 0; y < glyph.mHeight; y++) {
             long unsigned int index = static_cast<long unsigned int>(y * glyph.mWidth);
             for (int x = 0; x < glyph.mWidth; x++) {

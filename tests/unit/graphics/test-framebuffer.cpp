@@ -281,20 +281,37 @@ TEST_CASE("Framebuffer Drawing Primitives")
         text.SetArea(r).GetFont().SetColor(Color::Red);
         fb.DrawText(text.Reload());
         fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-        std::this_thread::sleep_for(std::chrono::milliseconds(800));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
         fb.DrawRectangle(r, Color::Grey);
-        text.SetValue("Hello\nWorld");
+        text.SetScaleToFit().SetValue("Hello\nWorld");
         fb.DrawText(text.Reload(), Color::Green);
         fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-        std::this_thread::sleep_for(std::chrono::milliseconds(800));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
         fb.DrawRectangle(r, Color::Purple);
         text.SetValue("Hello\nWorld\nHELLO\nMOON");
-        text.GetFont().SetColor(Color::Grey);
         fb.DrawText(text.Reload(), Color::Grey);
-        fb.SwapBuffer();
-        std::this_thread::sleep_for(std::chrono::milliseconds(800));
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+        fb.DrawRectangle(r, Color::White);
+        text.SetValue("RED");
+        fb.DrawText(text.Reload(), Color::Red);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+        fb.DrawRectangle(r, Color::White);
+        text.SetValue("GREEN");
+        fb.DrawText(text.Reload(), Color::Green);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+        fb.DrawRectangle(r, Color::White);
+        text.SetValue("BLUE");
+        fb.DrawText(text.Reload(), Color::Blue);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
         const Color rainbow[] = { Color::White, Color::Red, Color::Yellow, Color::Green, Color::Aqua, Color::Lime, Color::Blue, Color::Silver };
 
@@ -313,7 +330,7 @@ TEST_CASE("Framebuffer Drawing Primitives")
         }
         MESSAGE(text.GetValue());
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
         fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     }
 
@@ -326,11 +343,10 @@ TEST_CASE("Framebuffer Drawing Primitives")
 
         fb.DrawRectangle(r, Color::White);
         Text text("Exo 2", "Hello\nWorld");
-        text.GetFont().SetSize(50);
-        text.SetArea(r).GetFont().SetColor(Color::Red);
+        text.SetArea(r).GetFont().SetSize(50).SetColor(Color::Yellow);
         fb.DrawText(text.Reload());
         fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
         const Text::VAlign cVertical[] = { Text::VAlign::Top, Text::VAlign::Center, Text::VAlign::Bottom };
         const Text::HAlign cHorizontal[] = { Text::HAlign::Left, Text::HAlign::Center, Text::HAlign::Right };
@@ -340,13 +356,20 @@ TEST_CASE("Framebuffer Drawing Primitives")
                 fb.DrawRectangle(r, Color::White);
                 fb.DrawText(text.SetVAlignment(cVertical[v]).SetHAlignment(cHorizontal[h]).Reload());
                 fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-                std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
         }
     }
 
     SUBCASE("Swapbuffer")
     {
-//        fb.SwapBuffer();
+        fb.SwapBuffer();
+    }
+
+    SUBCASE("Draw Fullscreen") {
+        std::string testImage = "testImages/Asset3.bmp";
+        Bitmap testImgMap(testImage);
+        fb.DrawImage(Point(0,0), testImgMap);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     }
 }
