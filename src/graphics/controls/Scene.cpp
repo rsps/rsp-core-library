@@ -20,11 +20,11 @@ Scene::~Scene()
 {
 }
 
-void Scene::ProcessEvent(Event &aEvent)
+void Scene::ProcessInput(Input &aInput)
 {
     for (TouchArea *area : mTouchables) {
-        if (area->IsHit(Point(aEvent.x, aEvent.y))) {
-            area->ProcessEvent(aEvent);
+        if (area->IsHit(Point(aInput.x, aInput.y))) {
+            area->ProcessInput(aInput);
         }
     }
 }

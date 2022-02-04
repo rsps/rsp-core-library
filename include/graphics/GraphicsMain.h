@@ -2,7 +2,7 @@
 #define GRAPHICSMAIN_H
 
 #include "graphics/BufferedCanvas.h"
-#include "graphics/EventCreator.h"
+#include "graphics/InputCreator.h"
 #include "graphics/controls/Scene.h"
 
 namespace rsp::graphics
@@ -11,7 +11,7 @@ namespace rsp::graphics
 class GraphicsMain
 {
   public:
-    GraphicsMain(BufferedCanvas &aCanvas, EventCreator &aEvents, Scene &aScene);
+    GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, Scene &aScene);
     ~GraphicsMain();
 
     void Run();
@@ -20,10 +20,10 @@ class GraphicsMain
 
   private:
     BufferedCanvas &mBufferedCanvas;
-    EventCreator &mEvents;
+    InputCreator &mInputs;
     Scene &mActiveScene;
     bool mTerminated = false;
-    void PrintEvent(Event event);
+    void PrintInput(Input aInput);
 };
 } // namespace rsp::graphics
 #endif // GRAPHICSMAIN_H

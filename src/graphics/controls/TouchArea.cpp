@@ -19,15 +19,15 @@ TouchArea::TouchArea(Rect &aArea, Image &aImage)
 TouchArea::~TouchArea()
 {
 }
-void TouchArea::ProcessEvent(Event &aEvent)
+void TouchArea::ProcessInput(Input &aInput)
 {
-    std::cout << "TouchArea Processing Event" << std::endl;
-    switch (aEvent.type) {
-    case EventType::Press:
+    std::cout << "TouchArea Processing Input" << std::endl;
+    switch (aInput.type) {
+    case InputType::Press:
         std::cout << "TouchArea Setting pressed state" << std::endl;
         mImage->SetState(Control::States::pressed);
         break;
-    case EventType::Lift:
+    case InputType::Lift:
         std::cout << "TouchArea Setting normal state" << std::endl;
         mImage->SetState(Control::States::normal);
         break;

@@ -40,13 +40,13 @@ TEST_CASE("Graphics Main Test")
     myScene.AddChildren(img);
     std::cout << "Image pointer: " << &img << std::endl;
 
-    MESSAGE("Init EventCreator");
-    // Make EventCreator
-    EventCreator ec;
+    MESSAGE("Init InputCreator");
+    // Make InputCreator
+    InputCreator ic;
 
     MESSAGE("Init Main");
     // Make GraphicsMain
-    GraphicsMain gMain(fb, ec, myScene);
+    GraphicsMain gMain(fb, ic, myScene);
 
     // Run?
     gMain.Run();

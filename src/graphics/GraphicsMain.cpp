@@ -15,8 +15,8 @@
 namespace rsp::graphics
 {
 
-GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, EventCreator &aEvents, Scene &aScene)
-    : mBufferedCanvas(aBufferedCanvas), mEvents(aEvents), mActiveScene(aScene)
+GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInputs, Scene &aScene)
+    : mBufferedCanvas(aBufferedCanvas), mInputs(aInputs), mActiveScene(aScene)
 {
 }
 GraphicsMain::~GraphicsMain()
@@ -26,12 +26,12 @@ GraphicsMain::~GraphicsMain()
 void GraphicsMain::Run()
 {
     while (!mTerminated) {
-        // new events?
-        while (mEvents.HasNewEvents()) {
-            Event event = mEvents.GetEvent();
-            PrintEvent(event); // Temp
+        // new inputs?
+        while (mInputs.HasNewInputs()) {
+            Input input = mInputs.GetInput();
+            PrintInput(input); // Temp
             // invalidate stuff
-            mActiveScene.ProcessEvent(event);
+            mActiveScene.ProcessInput(input);
         }
         // re-render invalidated things
         mActiveScene.Render(mBufferedCanvas);
@@ -40,17 +40,17 @@ void GraphicsMain::Run()
 }
 
 // Temp method
-void GraphicsMain::PrintEvent(Event event)
+void GraphicsMain::PrintInput(Input aInput)
 {
-    if (event.type == EventType::Press) {
+    if (aInput.type == InputType::Press) {
         std::cout << "New Press" << std::endl;
-        std::cout << "X: " << event.x << " Y: " << event.y << std::endl;
+        std::cout << "X: " << aInput.x << " Y: " << aInput.y << std::endl;
     }
-    if (event.type == EventType::Drag) {
+    if (aInput.type == InputType::Drag) {
         std::cout << "New Drag" << std::endl;
-        std::cout << "X: " << event.x << " Y: " << event.y << std::endl;
+        std::cout << "X: " << aInput.x << " Y: " << aInput.y << std::endl;
     }
-    if (event.type == EventType::Lift) {
+    if (aInput.type == InputType::Lift) {
         std::cout << "New Lift" << std::endl;
     }
 }

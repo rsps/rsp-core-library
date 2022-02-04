@@ -125,7 +125,7 @@ BufferedCanvas <|-- FrameBufferCanvas
 class TouchArea {
     #mTouchArea: Rect
     --
-    +ProcessEvent(arEvent: Event&): bool
+    +ProcessInput(arInput: Input&): bool
     +IsHit(arPoint: const Point&) const: bool
 }
 Rect *-- TouchArea
@@ -159,7 +159,7 @@ class Scene {
     --
     #mTouchables: std::vector<TouchArea*>
     --
-    +ProcessEvent(arEvent: Event&)
+    +ProcessInput(arInput: Input&)
 }
 Ctrl <|-- Scene 
 

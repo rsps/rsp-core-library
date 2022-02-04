@@ -1,8 +1,8 @@
 #ifndef TOUCHAREA_H
 #define TOUCHAREA_H
 
-#include "graphics/controls/Event.h"
 #include "graphics/controls/Image.h"
+#include "graphics/controls/Input.h"
 #include "graphics/primitives/Rect.h"
 
 namespace rsp::graphics
@@ -18,7 +18,7 @@ class TouchArea
     TouchArea(Rect &aArea, Image &aImage);
     ~TouchArea();
 
-    void ProcessEvent(Event &aEvent);
+    void ProcessInput(Input &aInput);
     bool IsHit(const Point &aPoint) const;
 };
 
