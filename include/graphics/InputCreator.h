@@ -1,7 +1,7 @@
-#ifndef EVENTCREATOR_H
-#define EVENTCREATOR_H
+#ifndef INPUTCREATOR_H
+#define INPUTCREATOR_H
 
-#include "graphics/controls/Event.h"
+#include "graphics/controls/Input.h"
 #include "posix/FileIO.h"
 #include <fstream>
 #include <iostream>
@@ -9,26 +9,26 @@
 namespace rsp::graphics
 {
 
-class EventCreator
+class InputCreator
 {
   private:
     // std::ifstream touchDriver;
     rsp::posix::FileIO touchDriver;
 
-    EventInput eventInput;
+    InputLine inputLine;
 
-    Event event;
+    Input input;
 
     void ReadType();
     void ReadBody();
 
   public:
-    EventCreator();
-    ~EventCreator();
+    InputCreator();
+    ~InputCreator();
 
-    bool HasNewEvents();
-    const Event &GetEvent();
+    bool HasNewInputs();
+    const Input &GetInput();
 };
 
 } // namespace rsp::graphics
-#endif // EVENTCREATOR_H
+#endif // INPUTCREATOR_H

@@ -1,0 +1,62 @@
+@startuml
+
+title Event Management Classes
+
+namespace rsp{
+    class Event{
+        Template class and the Base event used by Broker and wrapped by EventType
+        --
+        +size_t typeHash
+        --
+        +Event(size_t aHash)
+        +Event()
+        +T &GetAs()
+    }
+
+    class EventType{
+        Wraps Event, inherit this for a type cast safe Event
+        --
+        EventType()
+    }
+    EventType -up-|> Event
+
+    enum Topic {
+        Defines the different topics there can be published and subscribed to
+        --
+        Base // The base topic
+    }
+
+    abstract class Publisher {
+        Abstract class to inherit from for publishing to a broker
+        --
+        Topic mTopic
+        --
+        +virtual void registerBroker(Broker *pBroker)
+        +virtual void publishToBroker(Topic topic, Event &newEvent)
+    }
+
+    abstract class Subscriber {
+        Abstract class to inherit from for subscribing to events from a given broker
+        --
+        #int mData
+        #std::string mTopic
+        --
+        +virtual void subscribeToBroker(Broker *ptr, Topic topic)
+        +virtual void updateCallback(Event &newEvent)
+    }
+
+    class Broker {
+        A meesage broker for publishing and subcribing to topics
+        --
+        +std::map<Topic, std::vector<Subscriber *>> mSubscriberMap;
+        --
+        +virtual void addSubscriber(Subscriber *ptr, Topic topic)
+        +virtual void registerToPublisher(Publisher *ptr)
+        +virtual void onPublish(Topic topic, Event &newEvent)
+    }
+
+    Broker --* Subscriber
+    Publisher --* Broker
+}
+
+@enduml

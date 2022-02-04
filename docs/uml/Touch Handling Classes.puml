@@ -1,0 +1,47 @@
+@startuml
+
+namespace rsp{
+    class InputLine {
+        Struct that matches the format read from the touch driver.
+        --
+        +struct timeval time
+        +uint16_t type
+        +uint16_t code
+        +uint32_t value
+    }
+
+    enum InputType {
+        When using Events these values describe the type of event.
+        --
+        Press // A press with one set of absolute coordinates
+        Drag  // A drag with one set of absolute coordinates, often followed by more drag events
+        Lift  // A lift has no coordinates, but stops all active presses
+    }
+
+    class Input{
+        Simple class defining structure of an event
+        --
+        +InputType type
+        +uint32_t x
+        +uint32_t y
+    }
+
+    class InputCreator{
+        Read touch driver and publishes events based on driver input
+        --
+        -FileIO touchDriver
+        -InputLine inputLine
+        -Input input
+        --
+        -void ReadType()
+        -void ReadBody()
+        +bool HasNewInputs()
+        +const Input &GetInput()
+    }
+    InputCreator --* Input
+    InputCreator --* InputLine
+    Input --* InputType
+
+}
+
+@enduml
