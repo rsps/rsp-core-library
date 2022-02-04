@@ -12,7 +12,7 @@
 #include <sstream>
 #include <map>
 #include <logging/Logger.h>
-#include <utils/RSPCoreExceptions.h>
+#include <utils/CoreExceptions.h>
 #include <utils/ExceptionHelper.h>
 
 namespace rsp::logging {

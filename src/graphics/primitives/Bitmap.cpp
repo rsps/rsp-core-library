@@ -14,7 +14,7 @@
 #include <graphics/primitives/raster/BmpLoader.h>
 #include <graphics/primitives/raster/PngLoader.h>
 
-#include <utils/RSPCoreExceptions.h>
+#include <utils/CoreExceptions.h>
 
 using namespace rsp::utils;
 

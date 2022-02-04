@@ -12,7 +12,7 @@
 #define COLOR_H
 
 #include <stdint.h>
-#include "utils/RSPCoreExceptions.h"
+#include <utils/CoreExceptions.h>
 
 namespace rsp::graphics {
 

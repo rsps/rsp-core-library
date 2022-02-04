@@ -28,4 +28,20 @@ ApplicationBase::~ApplicationBase()
     mpInstance = nullptr;
 }
 
+
+int ApplicationBase::Run()
+{
+    while(!mTerminated) {
+        try {
+            execute();
+        }
+        catch(const std::exception &e) {
+            mLogger.Critical() << "Unhandled exception: " << e.what() << std::endl;
+            mApplicationResult = cResultUnhandledError;
+            mTerminated = true;
+        }
+    }
+    return mApplicationResult;
+}
+
 } /* namespace rsp::application */

@@ -45,6 +45,9 @@ ConsoleLogWriter::ConsoleLogWriter(LogLevel aAcceptLevel, ConsoleLogStreamsInter
 
 logging::ConsoleLogWriter::~ConsoleLogWriter()
 {
+    if (mpConsole) {
+        delete mpConsole;
+    }
 }
 
 void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel)

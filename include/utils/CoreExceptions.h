@@ -19,10 +19,10 @@
 namespace rsp::utils
 {
 
-class RSPCoreException : public std::runtime_error
+class CoreException : public std::runtime_error
 {
 public:
-    explicit RSPCoreException(const char *aMsg)
+    explicit CoreException(const char *aMsg)
         : std::runtime_error("")
     {
         mMsg = aMsg;
@@ -37,20 +37,20 @@ public:
     std::string mMsg;
 };
 
-class NotImplementedException : public RSPCoreException
+class NotImplementedException : public CoreException
 {
 public:
     explicit NotImplementedException(const char *aMsg)
-        : RSPCoreException(aMsg)
+        : CoreException(aMsg)
     {
     }
 };
 
-class AssertException : public RSPCoreException
+class AssertException : public CoreException
 {
 public:
     explicit AssertException(const char *aMsg)
-        : RSPCoreException(aMsg)
+        : CoreException(aMsg)
     {
     }
 };
@@ -65,13 +65,34 @@ public:
 #endif
 
 
-class NotsetException : public RSPCoreException
+class NotsetException : public CoreException
 {
 public:
     explicit NotsetException(const char *aMsg)
-    : RSPCoreException(aMsg)
+    : CoreException(aMsg)
     {
     }
+};
+
+
+class ApplicationException : public CoreException {
+public:
+    explicit ApplicationException(const char* aMsg) : CoreException(aMsg) {}
+};
+
+class ESingletonViolation: public ApplicationException {
+public:
+    explicit ESingletonViolation() : ApplicationException("Application already exist") {}
+};
+
+class ENoInstance: public ApplicationException {
+public:
+    explicit ENoInstance() : ApplicationException("Application has not been created") {}
+};
+
+class EMissingArgument : public std::invalid_argument {
+public:
+    explicit EMissingArgument() : std::invalid_argument("Missing argument") {}
 };
 
 }

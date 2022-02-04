@@ -9,7 +9,7 @@
  */
 
 #include <graphics/primitives/Rect.h>
-#include <utils/RSPCoreExceptions.h>
+#include <utils/CoreExceptions.h>
 
 using namespace rsp::utils;
 

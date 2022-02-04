@@ -16,7 +16,7 @@
 #include <logging/FileLogWriter.h>
 #include <utils/StrUtils.h>
 #include <utils/AnsiEscapeCodes.h>
-#include <utils/RSPCoreExceptions.h>
+#include <utils/CoreExceptions.h>
 
 using namespace rsp;
 using namespace rsp::utils;

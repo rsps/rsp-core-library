@@ -11,14 +11,19 @@
 #ifndef INCLUDE_APPLICATION_APPLICATIONBASE_H_
 #define INCLUDE_APPLICATION_APPLICATIONBASE_H_
 
-#include <application/Exceptions.h>
+#include <utils/CoreExceptions.h>
 #include <logging/Logger.h>
+
+using namespace rsp::utils;
 
 namespace rsp::application {
 
 class ApplicationBase
 {
 public:
+    const int cResultSuccess = 0;
+    const int cResultUnhandledError = -1;
+
     ApplicationBase();
     virtual ~ApplicationBase();
     ApplicationBase(const ApplicationBase &other) = delete;
@@ -26,17 +31,17 @@ public:
     ApplicationBase& operator=(const ApplicationBase &other) = delete;
     ApplicationBase& operator=(ApplicationBase &&other) = delete;
 
-    logging::Logger& GetLog() const { return mLogger; }
+    logging::Logger& GetLog() { return mLogger; }
 
     template<class T>
-    static T& Get() const {
+    static T& Get() {
         if (!mpInstance) {
             THROW_WITH_BACKTRACE(ENoInstance);
         }
         return *static_cast<T*>(mpInstance);
     }
 
-    virtual int Run() = 0;
+    virtual int Run();
 
     template<class T>
     T& Terminate(int aResult) {
@@ -50,10 +55,12 @@ public:
 protected:
     int mApplicationResult = 0;
     bool mTerminated = false;
+    logging::Logger mLogger;
+
+    virtual void execute() = 0;
 
 private:
     static ApplicationBase* mpInstance;
-    logging::Logger mLogger;
 };
 
 } /* namespace rsp::application */
