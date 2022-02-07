@@ -9,14 +9,18 @@
  */
 
 #include <logging/FileLogWriter.h>
+#include <application/Console.h>
 #include "TestApplication.h"
+
+using namespace rsp::application;
+using namespace rsp::logging;
 
 const char *cLogFileName = "rsp-core-test.log";
 
 TestApplication::TestApplication(rsp::application::CommandLine &aCmd)
     : CliApplication(aCmd)
 {
-    mLogHandle = mLogger.AddLogWriter(std::make_shared<rsp::logging::FileLogWriter>(cLogFileName, rsp::logging::LogLevel::Info));
+    mLogHandle = mLogger.AddLogWriter(std::make_shared<FileLogWriter>(cLogFileName, LogLevel::Info));
 }
 
 TestApplication::~TestApplication()
@@ -31,8 +35,14 @@ void TestApplication::execute()
 
 void TestApplication::handleOptions()
 {
+    CliApplication::handleOptions();
+
+    if ( mCmd.HasOption("-c") || mCmd.HasOption("--configure")) {
+        Console::Info() << "Configuration prints here..." << std::endl;
+    }
 }
 
 void TestApplication::showHelp()
 {
+    Console::Info() << "Usage: " << mCmd.GetAppName() << " --help\tShows this help" << std::endl;
 }
