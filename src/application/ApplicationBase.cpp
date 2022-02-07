@@ -15,16 +15,21 @@ namespace rsp::application {
 ApplicationBase* ApplicationBase::mpInstance = nullptr;
 
 ApplicationBase::ApplicationBase()
+    : mLogger(true)
 {
     if (mpInstance) {
         THROW_WITH_BACKTRACE(ESingletonViolation);
     }
+
+    rsp::logging::LoggerInterface::SetDefault(mLogger);
 
     mpInstance = this;
 }
 
 ApplicationBase::~ApplicationBase()
 {
+    rsp::logging::LoggerInterface::SetDefault(*static_cast<rsp::logging::LoggerInterface*>(nullptr));
+
     mpInstance = nullptr;
 }
 

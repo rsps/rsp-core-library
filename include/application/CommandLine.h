@@ -54,14 +54,26 @@ public:
     bool GetOptionValue(const std::string aOption, std::string &arValue);
 
     /**
-     * Get a list of all commands on the command line. E.g. everything not starting with a '-'.
+     * Get a list of all commands on the command line, except the one invoking this application.
+     * E.g. everything not starting with a '-'.
+     *
      * \return List of strings
      */
     std::vector<std::string>& GetCommands() { return mCommands; }
 
+    /**
+     * \brief Get the application name.
+     *
+     * The name is extracted from the invoking command line string.
+     *
+     * \return string
+     */
+    const std::string& GetAppName() { return mAppName; }
+
 protected:
-    std::vector<std::string> mOptions;
-    std::vector<std::string> mCommands;
+    std::string mAppName{};
+    std::vector<std::string> mOptions{};
+    std::vector<std::string> mCommands{};
 };
 
 } /* namespace rsp::application */

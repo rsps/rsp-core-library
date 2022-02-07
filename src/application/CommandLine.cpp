@@ -10,11 +10,17 @@
 
 #include <application/CommandLine.h>
 #include <algorithm>
+#include <filesystem>
 
 namespace rsp::application {
 
 CommandLine::CommandLine(int argc, char **argv)
 {
+    if (argc > 0) {
+        auto p = std::filesystem::path(argv[0]);
+        mAppName = p.stem();
+    }
+
     for (int i = 1; i < argc; i++) {
         if (argv[i][0] == '-') {
             mOptions.push_back(std::string(argv[i]));
