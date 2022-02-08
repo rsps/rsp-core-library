@@ -11,7 +11,7 @@
 #ifndef INCLUDE_APPLICATION_APPLICATIONBASE_H_
 #define INCLUDE_APPLICATION_APPLICATIONBASE_H_
 
-#include <utils/CoreExceptions.h>
+#include <utils/CoreException.h>
 #include <logging/Logger.h>
 
 using namespace rsp::utils;

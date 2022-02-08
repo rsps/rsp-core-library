@@ -42,12 +42,14 @@ public:
     ConsoleStream(ConsoleStream &&aFrom);
     ConsoleStream(const ConsoleStream &) = delete;
 
+    ConsoleStream& operator=(const ConsoleStream &) = delete;
+
     friend class Console;
     ~ConsoleStream();
 
 protected:
-    Console *mpConsole;
-    TextColor mColor;
+    Console *mpConsole = nullptr;
+    TextColor mColor{};
 };
 
 /**

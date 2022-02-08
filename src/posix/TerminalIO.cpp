@@ -46,12 +46,12 @@ TerminalIO& TerminalIO::SetEcho(bool aEcho)
 {
     mCurrentTermios = mOldTermios;          // make new settings same as old settings
 
-    mCurrentTermios.c_lflag &= ~ICANON;     // disable buffered i/o
+    mCurrentTermios.c_lflag &= static_cast<tcflag_t>(~ICANON);     // disable buffered i/o
     if (aEcho) {
         mCurrentTermios.c_lflag |= ECHO;    // set echo mode
     }
     else {
-        mCurrentTermios.c_lflag &= ~ECHO;   // set no echo mode
+        mCurrentTermios.c_lflag &= static_cast<tcflag_t>(~ECHO);   // set no echo mode
     }
 
     mCurrentTermios.c_cc[VTIME] = 1; // is non-zero: Wait up to 20ms for a character
@@ -129,8 +129,8 @@ std::string TerminalIO::GetLine()
 {
     char ch;
     std::string line;
-    int cursor = 0;
-    int history_cursor = mHistory.size();
+    unsigned int cursor = 0;
+    unsigned int history_cursor = mHistory.size();
     bool edit_mode = false;
     int tab_count = 0;
     EscapeCodes esc;
@@ -229,7 +229,7 @@ std::string TerminalIO::GetLine()
                         break;
                     }
 
-                    size_t n = std::count(line.begin(), line.end(), ' ');
+                    int n = std::count(line.begin(), line.end(), ' ');
 
                     Console::Info() << std::endl;
                     for (auto s : matches) {
