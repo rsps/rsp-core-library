@@ -12,14 +12,15 @@ class TouchArea
 {
   private:
     Rect mTouchArea;
-    Image *mImage;
+    // Image *mImage;
 
   public:
-    TouchArea(Rect &aArea, Image &aImage);
+    TouchArea(Rect &aArea /*, Image &aImage*/);
     ~TouchArea();
 
     void ProcessInput(Input &aInput);
     bool IsHit(const Point &aPoint) const;
+    // Register callback method for an Image or simply a Control?
 };
 
 } // namespace rsp::graphics
