@@ -427,7 +427,7 @@ TEST_CASE("Framebuffer Drawing Primitives")
     }
 
     SUBCASE("Draw Fullscreen") {
-        std::string testImage = "testImages/Asset3.bmp";
+        std::string testImage = "testImages/Asset2WithAlpha.bmp";
         Bitmap testImgMap(testImage);
         fb.DrawImage(Point(0,0), testImgMap);
         fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
