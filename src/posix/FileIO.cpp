@@ -29,10 +29,10 @@ FileIO::FileIO()
 {
 }
 
-FileIO::FileIO(const std::string &aFileName, std::ios_base::openmode aMode, int aPermissions)
+FileIO::FileIO(const std::string &arFileName, std::ios_base::openmode aMode, int aPermissions)
     : mHandle(-1)
 {
-    Open(aFileName, aMode, aPermissions);
+    Open(arFileName, aMode, aPermissions);
 }
 
 FileIO::~FileIO()
@@ -40,7 +40,7 @@ FileIO::~FileIO()
     Close();
 }
 
-void FileIO::Open(const std::string &aFileName, std::ios_base::openmode aMode, int aPermissions)
+void FileIO::Open(const std::string &arFileName, std::ios_base::openmode aMode, int aPermissions)
 {
     int flags = 0;
     if (aMode & std::ios_base::ate) {
@@ -68,7 +68,7 @@ void FileIO::Open(const std::string &aFileName, std::ios_base::openmode aMode, i
 //        flags |= O_NONBLOCK;
 //    }
 
-    mFileName = aFileName;
+    mFileName = arFileName;
 
     int ret = open(mFileName.c_str(), flags, aPermissions);
     if (ret < 0) {
@@ -109,9 +109,9 @@ std::size_t FileIO::Seek(std::size_t aOffset, std::ios_base::seekdir aSeekdir)
     return static_cast<std::size_t>(ret);
 }
 
-std::size_t FileIO::Read(void *aBuffer, std::size_t aNumberOfBytesToRead)
+std::size_t FileIO::Read(void *apBuffer, std::size_t aNumberOfBytesToRead)
 {
-    int ret = read(mHandle, aBuffer, aNumberOfBytesToRead);
+    int ret = read(mHandle, apBuffer, aNumberOfBytesToRead);
     if (ret < 0) {
         THROW_SYSTEM("Error reading from file " + mFileName);
     }
@@ -119,9 +119,9 @@ std::size_t FileIO::Read(void *aBuffer, std::size_t aNumberOfBytesToRead)
     return static_cast<std::size_t>(ret);
 }
 
-std::size_t FileIO::Write(const void *aBuffer, std::size_t aNumberOfBytesToWrite)
+std::size_t FileIO::Write(const void *apBuffer, std::size_t aNumberOfBytesToWrite)
 {
-    int ret = write(mHandle, aBuffer, aNumberOfBytesToWrite);
+    int ret = write(mHandle, apBuffer, aNumberOfBytesToWrite);
     if (ret < 0) {
         THROW_SYSTEM("Error writing to file " + mFileName);
     }
@@ -144,11 +144,11 @@ std::string FileIO::GetLine()
     return ss.str();
 }
 
-void FileIO::PutLine(const std::string &aData)
+void FileIO::PutLine(const std::string &arData)
 {
     std::size_t offset = 0;
-    std::size_t remaining = aData.size();
-    char *p = const_cast<char*>(aData.data());
+    std::size_t remaining = arData.size();
+    char *p = const_cast<char*>(arData.data());
 
     do {
         std::size_t count = Write(p + offset, remaining);
@@ -209,10 +209,10 @@ std::string FileIO::GetContents()
     return ss.str();
 }
 
-void FileIO::PutContents(const std::string &aData)
+void FileIO::PutContents(const std::string &arData)
 {
     Seek(0, std::ios_base::beg);
-    PutLine(aData);
+    PutLine(arData);
 }
 
 } /* namespace posix */

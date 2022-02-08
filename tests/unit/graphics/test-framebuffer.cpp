@@ -247,6 +247,37 @@ TEST_CASE("Framebuffer Drawing Primitives")
         }
     }
 
+    SUBCASE("Drawing image larger than screen")
+    {
+        // Arrange
+        Point topLeft(0, 0);
+        Point randomPoint(rand() % fb.GetWidth(), rand() % fb.GetHeight());
+        std::string largeImg = "testImages/largeTestImg.bmp";
+        Bitmap largeImgMap(largeImg);
+        // Make sure screen is empty
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+
+        // Act
+        fb.DrawImage(topLeft, largeImgMap);
+
+        // Assert
+        CHECK(largeImgMap.GetHeight() > fb.GetHeight());
+        CHECK(largeImgMap.GetWidth() > fb.GetWidth());
+        CHECK(fb.GetPixel(randomPoint) != 0);
+
+        SUBCASE("Spill large imgage into screen")
+        {
+            // Arrange
+            Point topLeft(-100, -100);
+
+            // Act
+            fb.DrawImage(topLeft, largeImgMap);
+
+            // Assert
+            CHECK(fb.GetPixel(randomPoint) != 0);
+        }
+    }
+
     SUBCASE("Swapping between two images")
     {
         // Arrange

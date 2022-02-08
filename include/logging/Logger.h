@@ -57,6 +57,9 @@ class LoggerInterface
 public:
     virtual ~LoggerInterface() {}
 
+    static void SetDefault(LoggerInterface &arLogger);
+    static LoggerInterface& GetDefault();
+
     virtual LogStream Emergency() = 0;
     virtual LogStream Alert() = 0;
     virtual LogStream Critical() = 0;
@@ -74,6 +77,7 @@ public:
     void RemoveLogWriter(Handle_t aHandle);
 
 protected:
+    static LoggerInterface* mpDefaultInstance;
     std::mutex mMutex{};
     std::vector<std::shared_ptr<LogWriterInterface>> mWriters{};
 
@@ -102,6 +106,7 @@ public:
     void SetLevel(LogLevel aLevel) { mLevel = aLevel; }
 
     LogStreamInterface& operator= (const LogStreamInterface&) = delete;
+    LogStreamInterface& operator= (const LogStreamInterface&&);
 protected:
     LoggerInterface *mpOwner;
     LogLevel mLevel;
@@ -121,6 +126,8 @@ public:
     LogStream(const LogStream &aFrom) = delete; /* No copy, move is OK */
     LogStream(LogStream &&aFrom);
     ~LogStream();
+
+    LogStream& operator=(LogStream &&arOther);
 
     template< class type> LogStream& operator<<( type aValue) {
         mBuffer << aValue;

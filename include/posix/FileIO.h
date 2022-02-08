@@ -34,7 +34,7 @@ public:
      * Construct a FileIO object, open/create file if given as argument.
      */
     FileIO();
-    FileIO(const std::string &aFileName, std::ios_base::openmode aMode, int aPermissions = 0);
+    FileIO(const std::string &arFileName, std::ios_base::openmode aMode, int aPermissions = 0);
     virtual ~FileIO();
 
     /**
@@ -45,7 +45,7 @@ public:
      * \param aMode
      * \param aPermissions
      */
-    void Open(const std::string &aFileName, std::ios_base::openmode aMode, int aPermissions = 0);
+    void Open(const std::string &arFileName, std::ios_base::openmode aMode, int aPermissions = 0);
 
     /**
      * Close the current file if it is open.
@@ -78,7 +78,7 @@ public:
      * \param aNumberOfBytesToRead
      * \return
      */
-    std::size_t Read(void *aBuffer, std::size_t aNumberOfBytesToRead);
+    std::size_t Read(void *apBuffer, std::size_t aNumberOfBytesToRead);
 
     /**
      * Write an amount of bytes from the buffer to the file.
@@ -87,7 +87,7 @@ public:
      * \param aNumberOfBytesToWrite
      * \return
      */
-    std::size_t Write(const void *aBuffer, std::size_t aNumberOfBytesToWrite);
+    std::size_t Write(const void *apBuffer, std::size_t aNumberOfBytesToWrite);
 
     /**
      * Get the rest of the current line.
@@ -100,7 +100,7 @@ public:
      *
      * \param aData
      */
-    void PutLine(const std::string &aData); // Write a string to the file
+    void PutLine(const std::string &arData); // Write a string to the file
 
     /**
      * Read all file contents into a string.
@@ -115,7 +115,7 @@ public:
      *
      * \param aData
      */
-    void PutContents(const std::string &aData); // Write the string to file
+    void PutContents(const std::string &arData); // Write the string to file
 
     /**
      * Return the OS file handle.

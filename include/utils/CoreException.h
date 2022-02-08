@@ -47,6 +47,15 @@ class NotImplementedException : public CoreException
     }
 };
 
+class NotSetException : public CoreException
+{
+  public:
+    explicit NotSetException(const char *aMsg)
+        : CoreException(aMsg)
+    {
+    }
+};
+
 class AssertException : public CoreException
 {
   public:
