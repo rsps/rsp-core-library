@@ -131,7 +131,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
             std::cout << "Chunk is Non-Critical" << std::endl;
             //Chunk is not critical
             //Seek the chunks length of data plus its crc
-            fseek(file, pngchunk.length + sizeof(uint32_t), SEEK_CUR);
+            fseek(file, static_cast<long int>(pngchunk.length + sizeof(uint32_t)), SEEK_CUR);
             //Read next chunk
         }
         //Clean up memory
