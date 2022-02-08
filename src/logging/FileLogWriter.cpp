@@ -20,9 +20,9 @@ using namespace rsp::utils;
 namespace rsp::logging {
 
 FileLogWriter::FileLogWriter(std::string aFileName, std::string aAcceptLevel)
-    : mOutput(aFileName, std::ios_base::out | std::ios_base::app)
+    : mOutput(aFileName, std::ios_base::out | std::ios_base::app),
+      mAcceptLevel(ToLogLevel(aAcceptLevel))
 {
-    mAcceptLevel = ToLogLevel(aAcceptLevel);
 }
 
 FileLogWriter::FileLogWriter(std::string aFileName, LogLevel aAcceptLevel)

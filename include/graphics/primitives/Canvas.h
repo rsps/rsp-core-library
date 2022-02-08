@@ -12,7 +12,7 @@
 #define CANVAS_H
 
 #include "Color.h"
-#include "Font.h"
+#include "Text.h"
 #include "Point.h"
 #include "Rect.h"
 
@@ -49,7 +49,7 @@ class Canvas
      * \param aSweepAngle
      * \param aColor
      */
-    void DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &aColor);
+    void DrawArc(const Point &arCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &arColor);
     /**
      * Draw a full circle
      *
@@ -66,17 +66,19 @@ class Canvas
      * \param aB
      * \param aColor
      */
-    void DrawLine(const Point &aA, const Point &aB, const Color &aColor);
+    void DrawLine(const Point &arA, const Point &arB, const Color &arColor);
 
     /**
      * Draw a rectangle
      *
      * The rectangle is not rotated in any way, but simply a box with horizontal and vertical sides.
+     * If aFilled is set, the entire rectangle is filled with given color.
      *
      * \param aRect
      * \param aColor
+     * \param aFilled
      */
-    void DrawRectangle(const Rect &aRect, const Color &aColor);
+    void DrawRectangle(const Rect &arRect, const Color &arColor, bool aFilled = false);
 
     /**
      * Copies the bitmap content into the canvas.
@@ -84,17 +86,22 @@ class Canvas
      * \param LeftTop
      * \param aBitmap
      */
-    void DrawImage(const Point &LeftTop, const Bitmap &aBitmap);
+    void DrawImage(const Point &arLeftTop, const Bitmap &arBitmap);
 
     /**
-     * Draws the given text within the given rectangle on the canvas.
+     * Draws the given Text object in the given color on the canvas.
      *
      * \param aRect
-     * \param aFont
-     * \param apText
-     * \param aScaleToFit
+     * \param arColor
      */
-    void DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit);
+    void DrawText(const Text &arText, const Color &arColor);
+
+    /**
+     * Draws the given Text object in the color of the objects own font.
+     *
+     * \param arText
+     */
+    void DrawText(Text &arText);
 
     /**
      * Get the color value of a single pixel.
@@ -121,7 +128,7 @@ class Canvas
      *
      * \return uint32_t
      */
-    uint32_t GetWidth() const
+    int GetWidth() const
     {
         // return mVariableInfo.xres;
         return mWidth;
@@ -132,7 +139,7 @@ class Canvas
      *
      * \return uint32_t
      */
-    uint32_t GetHeight() const
+    int GetHeight() const
     {
         // return mVariableInfo.yres;
         return mHeight;
@@ -143,7 +150,7 @@ class Canvas
      *
      * \return uint32_t
      */
-    uint32_t GetColorDepth() const
+    int GetColorDepth() const
     {
         // return mVariableInfo.bits_per_pixel;
         return mBytesPerPixel;
@@ -155,29 +162,28 @@ class Canvas
      * \param aPoint
      * \return bool
      */
-    inline bool IsInsideScreen(const Point &aPoint) const
+    inline bool IsInsideScreen(const Point &arPoint) const
     {
-        // return !(aPoint.mX < 0 || aPoint.mY < 0 || static_cast<uint32_t>(aPoint.mY) >= mVariableInfo.yres || static_cast<uint32_t>(aPoint.mX) >= mVariableInfo.xres);
-        return !(aPoint.mX < 0 || aPoint.mY < 0 || static_cast<uint32_t>(aPoint.mY) >= mHeight || static_cast<uint32_t>(aPoint.mX) >= mWidth);
+        return !(arPoint.mX < 0 || arPoint.mY < 0 || arPoint.mY >= mHeight || arPoint.mX >= mWidth);
     }
 
   protected:
-    uint32_t mHeight;
-    uint32_t mWidth;
-    uint32_t mBytesPerPixel;
+    int mHeight;
+    int mWidth;
+    int mBytesPerPixel;
 
-    inline void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Color &aColor)
+    inline void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Color &arColor)
     {
-        SetPixel(Point(aCenterX + aX, aCenterY + aY), aColor);
-        SetPixel(Point(aCenterX - aX, aCenterY + aY), aColor);
-        SetPixel(Point(aCenterX + aX, aCenterY - aY), aColor);
-        SetPixel(Point(aCenterX - aX, aCenterY - aY), aColor);
+        SetPixel(Point(aCenterX + aX, aCenterY + aY), arColor);
+        SetPixel(Point(aCenterX - aX, aCenterY + aY), arColor);
+        SetPixel(Point(aCenterX + aX, aCenterY - aY), arColor);
+        SetPixel(Point(aCenterX - aX, aCenterY - aY), arColor);
     }
 
-    inline void plot8Points(int aCenterX, int aCenterY, int aX, int aY, const Color &aColor)
+    inline void plot8Points(int aCenterX, int aCenterY, int aX, int aY, const Color &arColor)
     {
-        plot4Points(aCenterX, aCenterY, aX, aY, aColor);
-        plot4Points(aCenterX, aCenterY, aY, aX, aColor);
+        plot4Points(aCenterX, aCenterY, aX, aY, arColor);
+        plot4Points(aCenterX, aCenterY, aY, aX, arColor);
     }
 };
 

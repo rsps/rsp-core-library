@@ -20,7 +20,7 @@ Color::Color(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha)
     mValue.item.alpha = aAlpha;
 }
 
-Color::Color(uint32_t aRGBA)
+Color::Color(ARGB_t aRGBA)
 {
 #ifdef LITTLE_ENDIAN
     mValue.rgba = aRGBA;
@@ -77,15 +77,16 @@ void Color::SetAlpha(uint8_t aValue)
     mValue.item.alpha = aValue;
 }
 
-Color::operator uint32_t() const
+Color::operator ARGB_t() const
 {
 #ifdef LITTLE_ENDIAN
     return mValue.rgba;
 #else
-    return (((uint32_t)mValue.item.red) << 24) |
-           (((uint32_t)mValue.item.green) << 16) |
-           (((uint32_t)mValue.item.blue) << 8) |
-           ((uint32_t)mValue.item.alpha);
+    std::err << "UPPPSSSSS" << std::endl;
+    return (((ARGB_t)mValue.item.red) << 24) |
+           (((ARGB_t)mValue.item.green) << 16) |
+           (((ARGB_t)mValue.item.blue) << 8) |
+           ((ARGB_t)mValue.item.alpha);
 #endif
 }
 

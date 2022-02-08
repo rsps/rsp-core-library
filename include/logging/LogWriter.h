@@ -96,7 +96,7 @@ public:
     void SetAcceptLogLevel(LogLevel aLevel) { mAcceptLevel = aLevel; }
 
 protected:
-    LogLevel mAcceptLevel;
+    LogLevel mAcceptLevel = LogLevel::Info;
 };
 
 } /* namespace logging */

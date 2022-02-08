@@ -1,10 +1,12 @@
-/*
- * ExceptionHelper.h
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- *  Created on: 5. mar. 2020
- *      Author: steffen
+ * \copyright   Copyright 2020 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Steffen Brummer
  */
-
 #ifndef SRC_UTILS_EXCEPTIONHELPER_H_
 #define SRC_UTILS_EXCEPTIONHELPER_H_
 
@@ -26,7 +28,7 @@ template<typename BaseException>
 class backtraced_exception: public BaseException
 {
 private:
-    std::string mBacktrace;
+    std::string mBacktrace{ };
 
 public:
     template<typename... Args>

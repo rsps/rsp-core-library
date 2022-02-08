@@ -11,7 +11,7 @@
 #include <doctest.h>
 #include <graphics/primitives/Bitmap.h>
 #include <graphics/primitives/Color.h>
-#include <utils/CoreExceptions.h>
+#include <utils/CoreException.h>
 
 using namespace rsp::utils;
 using namespace rsp::graphics;

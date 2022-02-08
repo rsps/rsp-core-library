@@ -19,17 +19,24 @@
 #include <sys/mman.h>
 #include <thread>
 #include <unistd.h>
+#include <utils/ExceptionHelper.h>
 
 namespace rsp::graphics
 {
 
-Framebuffer::Framebuffer()
+Framebuffer::Framebuffer(const char *apDevPath)
+    : mFramebufferFile(-1)
 {
-    mFramebufferFile = open("/dev/fb1", O_RDWR);
+    if (apDevPath) {
+        mFramebufferFile = open(apDevPath, O_RDWR);
+        if (mFramebufferFile == -1) {
+            std::clog << "Failed to open framebuffer at " << apDevPath << " trying /dev/fb0" << std::endl;
+        }
+    }
     if (mFramebufferFile == -1) {
         mFramebufferFile = open("/dev/fb0", O_RDWR);
         if (mFramebufferFile == -1) {
-            throw std::system_error(errno, std::generic_category(), "Failed to open framebuffer");
+            THROW_SYSTEM("Failed to open framebuffer");
         }
     }
 
@@ -40,30 +47,31 @@ Framebuffer::Framebuffer()
     ioctl(mFramebufferFile, FBIOGET_FSCREENINFO, &mFixedInfo);
 
     // set Canvas specific variables
-    mWidth = mVariableInfo.xres;
-    mHeight = mVariableInfo.yres;
-    mBytesPerPixel = mVariableInfo.bits_per_pixel / 8;
+    mWidth = static_cast<int>(mVariableInfo.xres);
+    mHeight = static_cast<int>(mVariableInfo.yres);
+    mBytesPerPixel = static_cast<int>(mVariableInfo.bits_per_pixel / 8);
+    std::clog << "Framebuffer opened. Width=" << mWidth << " Height=" << mHeight << " BytesPerPixel=" << mBytesPerPixel << std::endl;
 
     // set yres_virtual for double buffering
     mVariableInfo.yres_virtual = mVariableInfo.yres * 2;
     if (ioctl(mFramebufferFile, FBIOPUT_VSCREENINFO, &mVariableInfo) == -1) {
-        std::cout << "ioctl FBIOPUT_VSCREENINFO failed errno:" << strerror(errno) << std::endl;
+        THROW_SYSTEM("Framebuffer ioctl FBIOPUT_VSCREENINFO failed");
     }
 
     // stop the console from drawing ontop of this programs graphics
     if (access("/dev/tty0", O_RDWR) == 0) {
         mTtyFb = open("/dev/tty0", O_RDWR);
         if (ioctl(mTtyFb, KDSETMODE, KD_GRAPHICS) == -1) {
-            std::cout << "ioctl KDSETMODE KD_GRAPHICS failed errno:" << strerror(errno) << std::endl;
+            THROW_SYSTEM("Framebuffer ioctl KDSETMODE KD_GRAPHICS failed");
         }
     }
 
     // calculate size of screen
     long screensize = mVariableInfo.yres * mFixedInfo.line_length;
 
-    mpFrontBuffer = static_cast<uint8_t *>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
+    mpFrontBuffer = static_cast<uint8_t *>(mmap(0, static_cast<size_t>(screensize * 2), PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
     if (mpFrontBuffer == reinterpret_cast<uint8_t *>(-1)) /*MAP_FAILED*/ {
-        std::cout << "Mapping failed errno:" << strerror(errno) << std::endl;
+        THROW_SYSTEM("Framebuffer shared memory mapping failed");
     }
 
     mpBackBuffer = mpFrontBuffer + screensize;
@@ -90,7 +98,7 @@ Framebuffer::~Framebuffer()
     // No need to call munmap on the shared memory region, this is done automatically on termination.
 }
 
-void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
+void Framebuffer::SwapBuffer(const SwapOperations aSwapOp, Color aColor)
 {
     // swap buffer
     if (mVariableInfo.yoffset == 0) {
@@ -114,7 +122,7 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp)
         break;
 
     case SwapOperations::Clear:
-        clear();
+        clear(aColor);
         break;
 
     case SwapOperations::NoOp:
@@ -128,7 +136,7 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
     if (!IsInsideScreen(aPoint)) {
         return 0;
     }
-    long location = (aPoint.mX + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + aPoint.mY * mFixedInfo.line_length;
+    long location = (aPoint.mX + static_cast<int>(mVariableInfo.xoffset)) * static_cast<int>(mVariableInfo.bits_per_pixel / 8) + aPoint.mY * static_cast<int>(mFixedInfo.line_length);
     if (aFront) {
         return *(reinterpret_cast<uint32_t *>(mpFrontBuffer + location));
     } else {
@@ -136,7 +144,7 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
     }
 }
 
-void Framebuffer::clear()
+void Framebuffer::clear(Color aColor)
 {
     long x, y;
     // draw to back buffer
@@ -144,7 +152,7 @@ void Framebuffer::clear()
     for (y = 0; y < mVariableInfo.yres; y++) {
         for (x = 0; x < mVariableInfo.xres; x++) {
             long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;
-            *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = 0x00000000;
+            *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = aColor;
         }
     }
 }

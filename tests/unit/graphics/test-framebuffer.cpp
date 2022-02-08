@@ -13,10 +13,11 @@
 #include <graphics/Framebuffer.h>
 #include <graphics/primitives/Bitmap.h>
 #include <thread>
+#include <filesystem>
+#include <posix/FileSystem.h>
+#include <utils/StopWatch.h>
 
 using namespace rsp::graphics;
-
-static Framebuffer fb;
 
 inline void CheckPixel(const Point &aPoint, const Color &aColour, const Framebuffer &fb)
 {
@@ -29,6 +30,10 @@ inline void CheckPixel(const Point &aPoint, const Color &aColour, const Framebuf
 
 TEST_CASE("Framebuffer Drawing Primitives")
 {
+    std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+
+    Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
+
     std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
 
@@ -51,20 +56,18 @@ TEST_CASE("Framebuffer Drawing Primitives")
         fb.DrawLine(pointA, pointB, col);
 
         // Assert
-        int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;
-
-        deltaX = pointB.GetX() - pointA.GetX();
-        deltaY = pointB.GetY() - pointA.GetY();
-        absDeltaX = abs(deltaX);
-        absDeltaY = abs(deltaY);
-        signumX = (deltaX > 0) ? 1 : -1;
-        signumY = (deltaY > 0) ? 1 : -1;
-        x = absDeltaX >> 1;
-        y = absDeltaY >> 1;
-        px = pointA.GetX();
-        py = pointA.GetY();
+        int deltaX = pointB.GetX() - pointA.GetX();
+        int deltaY = pointB.GetY() - pointA.GetY();
+        int absDeltaX = abs(deltaX);
+        int absDeltaY = abs(deltaY);
+        int signumX = (deltaX > 0) ? 1 : -1;
+        int signumY = (deltaY > 0) ? 1 : -1;
+        int x = absDeltaX >> 1;
+        int y = absDeltaY >> 1;
+        int px = pointA.GetX();
+        int py = pointA.GetY();
         if (absDeltaX >= absDeltaY) {
-            for (i = 0; i < absDeltaX; i++) {
+            for (int i = 0; i < absDeltaX; i++) {
                 y += absDeltaY;
                 if (y >= absDeltaX) {
                     y -= absDeltaX;
@@ -74,7 +77,7 @@ TEST_CASE("Framebuffer Drawing Primitives")
                 CHECK(fb.GetPixel(Point(px, py), false) == col);
             }
         } else {
-            for (i = 0; i < absDeltaY; i++) {
+            for (int i = 0; i < absDeltaY; i++) {
                 x += absDeltaX;
                 if (x >= absDeltaY) {
                     x -= absDeltaY;
@@ -180,8 +183,8 @@ TEST_CASE("Framebuffer Drawing Primitives")
 
         // Act
         Bitmap testImgMap(testImage);
-        uint32_t height = testImgMap.GetHeight();
-        uint32_t width = testImgMap.GetWidth();
+        int height = testImgMap.GetHeight();
+        int width = testImgMap.GetWidth();
         Point topLeft(0, 0);
         Point topRight(width - 1, 0);
         Point botLeft(0, height - 1);
@@ -297,8 +300,136 @@ TEST_CASE("Framebuffer Drawing Primitives")
         MESSAGE("Fps: " << fps);
     }
 
+    SUBCASE("Draw text")
+    {
+        const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
+        Font::RegisterFont(cFontFile);
+        Rect r(100, 200, 280, 200);
+
+        fb.DrawRectangle(r, Color::White);
+        Text text("Exo 2", "Hello World");
+        text.GetFont().SetSize(30);
+        text.SetArea(r).GetFont().SetColor(Color::Red);
+        fb.DrawText(text.Reload());
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+        fb.DrawRectangle(r, Color::Grey);
+        text.SetScaleToFit().SetValue("Hello\nWorld");
+        fb.DrawText(text.Reload(), Color::Green);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+        fb.DrawRectangle(r, Color::Purple);
+        text.SetValue("Hello\nWorld\nHELLO\nMOON");
+        fb.DrawText(text.Reload(), Color::Grey);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+        fb.DrawRectangle(r, Color::White);
+        text.SetValue("RED");
+        fb.DrawText(text.Reload(), Color::Red);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+        fb.DrawRectangle(r, Color::White);
+        text.SetValue("GREEN");
+        fb.DrawText(text.Reload(), Color::Green);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+        fb.DrawRectangle(r, Color::White);
+        text.SetValue("BLUE");
+        fb.DrawText(text.Reload(), Color::Blue);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+        const Color rainbow[] = { Color::White, Color::Red, Color::Yellow, Color::Green, Color::Aqua, Color::Lime, Color::Blue, Color::Silver };
+
+        text.SetScaleToFit(true).SetLineSpacing(50);
+//        Rect screen(0, 0, 480, 800);
+        rsp::utils::StopWatch sw;
+        for (int i = 0 ; i < 1000 ; i++) {
+//            fb.DrawRectangle(screen, rainbow[i & 0x07], true);
+            int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
+            std::stringstream ss;
+            ss << "FPS:\n" << fps;
+            text.SetValue(ss.str());
+            fb.DrawText(text.Reload(), rainbow[(i + 3) & 0x07]);
+            text.SetScaleToFit(false); // Only scale first time to speed it up
+            fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear, rainbow[i & 0x07]);
+        }
+        MESSAGE(text.GetValue());
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+    }
+
+    SUBCASE("Text Alignment")
+    {
+        const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
+        Font::RegisterFont(cFontFile);
+//        Rect r(10, 10, 60, 80);
+        Rect r(10, 10, 460, 780);
+
+        fb.DrawRectangle(r, Color::White);
+        Text text("Exo 2", "Hello\nWorld");
+        text.SetArea(r).GetFont().SetSize(50).SetColor(Color::Yellow);
+        fb.DrawText(text.Reload());
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+        const Text::VAlign cVertical[] = { Text::VAlign::Top, Text::VAlign::Center, Text::VAlign::Bottom };
+        const Text::HAlign cHorizontal[] = { Text::HAlign::Left, Text::HAlign::Center, Text::HAlign::Right };
+
+        for (int h = 0 ; h < 3 ; h++) {
+            for (int v = 0 ; v < 3 ; v++) {
+                fb.DrawRectangle(r, Color::White);
+                fb.DrawText(text.SetVAlignment(cVertical[v]).SetHAlignment(cHorizontal[h]).Reload());
+                fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+        }
+    }
+
+    SUBCASE("Font Styles")
+    {
+        Font::RegisterFont("fonts/Exo2-Italic-VariableFont_wght.ttf");
+        Font::RegisterFont("fonts/Exo2-VariableFont_wght.ttf");
+        Rect r(10, 10, 460, 280);
+
+        fb.DrawRectangle(r, Color::White);
+        Text text("Exo 2", "Regular");
+        text.SetArea(r).SetScaleToFit(true).GetFont().SetSize(50).SetColor(Color::Yellow);
+        fb.DrawText(text.Reload());
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        text.SetValue("Bold").GetFont().SetStyle(Font::Styles::Bold);
+        fb.DrawText(text.Reload());
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        text.SetValue("Italic").GetFont().SetStyle(Font::Styles::Italic);
+        fb.DrawText(text.Reload());
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        text.SetValue("Bold Italic").GetFont().SetStyle(Font::Styles::BoldItalic);
+        fb.DrawText(text.Reload());
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+
     SUBCASE("Swapbuffer")
     {
         fb.SwapBuffer();
+    }
+
+    SUBCASE("Draw Fullscreen") {
+        std::string testImage = "testImages/Asset2WithAlpha.bmp";
+        Bitmap testImgMap(testImage);
+        fb.DrawImage(Point(0,0), testImgMap);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     }
 }

@@ -10,6 +10,7 @@
 
 #include <sstream>
 #include <version-def.h>
+#include <version.h>
 
 using namespace std;
 

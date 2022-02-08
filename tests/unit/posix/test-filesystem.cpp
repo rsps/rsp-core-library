@@ -1,8 +1,11 @@
-/*
- * test-filesystem.cpp
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- *  Created on: 12. jun. 2020
- *      Author: steffen
+ * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Steffen Brummer
  */
 
 #include <doctest.h>
@@ -10,6 +13,8 @@
 #include <string>
 #include <fstream>
 #include <utils/StrUtils.h>
+#include <algorithm>
+#include <sstream>
 
 using namespace rsp::posix;
 using namespace rsp::utils;
@@ -73,6 +78,19 @@ TEST_CASE("Testing FileSystem") {
 
         CHECK(ip.length() >= 7);
         CHECK(!StrUtils::Contains(ip, "127.0.0.1"));
+    }
+
+    SUBCASE("List Directory") {
+        std::vector<std::filesystem::path> list = FileSystem::Glob(std::filesystem::path{"/etc/hostn*"});
+        CHECK(list[0].string() == "/etc/hostname");
+    }
+
+    SUBCASE("Get Framebuffer Device By Driver Name") {
+        std::filesystem::path p = FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+
+        MESSAGE((p.empty() ? "Not Found!" : p.string()));
+
+        CHECK(StrUtils::StartsWith(p.string(), "/dev/fb"));
     }
 }
 

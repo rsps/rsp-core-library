@@ -19,7 +19,7 @@ std::uint32_t* Crc32::getTable()
 
     if (mTable[0] == 0) {
         uint32_t polynomial = 0xEDB88320;
-        for (int i = 0; i < 256; i++) {
+        for (uint32_t i = 0; i < 256; i++) {
             uint32_t c = i;
             for (int j = 0; j < 8; j++) {
                 if (c & 1) {
@@ -50,4 +50,4 @@ std::uint32_t Crc32::Calc(const void* aBuf, std::size_t aLen, std::uint32_t aIni
 }
 
 
-}; /* namespace rsp */
+} /* namespace rsp */

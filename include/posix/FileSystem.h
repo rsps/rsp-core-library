@@ -12,7 +12,9 @@
 #define SRC_POSIX_FILESYSTEM_H_
 
 #include <string>
+#include <vector>
 #include <thread>
+#include <filesystem>
 
 /**
  * Namespace with common directory and OS operations.
@@ -128,6 +130,28 @@ std::string GetLastResumeId();
  * \param aPriority Thread priority 1-99, Higher priority preempts lower
  */
 void SetThreadPriority(std::thread &arThread, unsigned int aPriority);
+
+/**
+ * \fn std::vector<std::filesystem::path> Glob(const std::filesystem::path&, bool=false, bool=false)
+ * \brief Generates a list of directory items, as specified in the path argument.
+ *        The common shell wildcards * and ? are supported in the path.
+ *
+ * \param arPath
+ * \param aRecursive
+ * \param aDirOnly
+ * \return List with real paths of every item matching.
+ */
+std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, bool aRecursive = false, bool aDirOnly = false);
+
+/**
+ * \fn std::string GetCharacterDeviceByDriverName(const std::string&, const std::filesystem::path&)
+ * \brief Extension for Linux systems to locate a specific enumerated character device by the name of the driver behind it.
+ *
+ * \param arDriverName
+ * \param arPath
+ * \return Path to character device
+ */
+std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriverName, const std::filesystem::path &arPath);
 
 }
 

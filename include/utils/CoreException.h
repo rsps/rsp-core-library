@@ -6,10 +6,11 @@
  * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
+ * \author      Steffen Brummer
  */
 
-#ifndef RSPCOREEXCEPTIONS_H
-#define RSPCOREEXCEPTIONS_H
+#ifndef RSPCOREEXCEPTION_H
+#define RSPCOREEXCEPTION_H
 
 #include <exception>
 #include <stdexcept>
@@ -21,11 +22,11 @@ namespace rsp::utils
 
 class CoreException : public std::runtime_error
 {
-public:
+  public:
     explicit CoreException(const char *aMsg)
-        : std::runtime_error("")
+        : std::runtime_error(""),
+          mMsg(aMsg)
     {
-        mMsg = aMsg;
     }
 
     const char *what() const noexcept override
@@ -39,8 +40,17 @@ public:
 
 class NotImplementedException : public CoreException
 {
-public:
+  public:
     explicit NotImplementedException(const char *aMsg)
+        : CoreException(aMsg)
+    {
+    }
+};
+
+class NotSetException : public CoreException
+{
+  public:
+    explicit NotSetException(const char *aMsg)
         : CoreException(aMsg)
     {
     }
@@ -48,7 +58,7 @@ public:
 
 class AssertException : public CoreException
 {
-public:
+  public:
     explicit AssertException(const char *aMsg)
         : CoreException(aMsg)
     {
@@ -63,17 +73,6 @@ public:
 #else
 #define ASSERT(a)
 #endif
-
-
-class NotsetException : public CoreException
-{
-public:
-    explicit NotsetException(const char *aMsg)
-    : CoreException(aMsg)
-    {
-    }
-};
-
 
 class ApplicationException : public CoreException {
 public:
@@ -95,6 +94,6 @@ public:
     explicit EMissingArgument() : std::invalid_argument("Missing argument") {}
 };
 
-}
+} /* namespace rsp::utils */
 
-#endif // RSPCOREEXCEPTIONS_H
+#endif // RSPCOREEXCEPTION_H

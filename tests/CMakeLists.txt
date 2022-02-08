@@ -26,3 +26,6 @@ file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/testImage.txt
     file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/largeTestImg.bmp 
     DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
 
+file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/fonts 
+    DESTINATION ${CMAKE_BINARY_DIR}/)
+

@@ -11,7 +11,8 @@
 #ifndef RECT_H
 #define RECT_H
 
-#include <utils/CoreExceptions.h>
+#include <ostream>
+#include <utils/CoreException.h>
 #include "Point.h"
 
 namespace rsp::graphics
@@ -29,6 +30,9 @@ class Framebuffer;
 class Rect
 {
   public:
+
+    Rect() {}
+
     /**
      * Constructs a Rect from coordinate and size.
      *
@@ -62,6 +66,8 @@ class Rect
      * \param aRect
      */
     Rect(const Rect &aRect);
+
+    Rect& operator=(const Rect &aRect);
 
     /**
      * Get the top value
@@ -167,7 +173,7 @@ class Rect
      * \param aPoint
      * \return bool
      */
-    bool IsHit(const Point &aPoint) const;
+    bool IsHit(const Point &arPoint) const;
 
     bool VerifyDimensions() const;
 
@@ -176,9 +182,11 @@ class Rect
     friend Canvas;
     friend Framebuffer;
 
-    Point mLeftTop;
-    Point mRightBottom;
+    Point mLeftTop{};
+    Point mRightBottom{};
 };
+
+std::ostream& operator <<(std::ostream &aStream, const Rect &arRect);
 
 } // namespace rsp::graphics
 #endif // RECT_H

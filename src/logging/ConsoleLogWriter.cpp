@@ -30,10 +30,10 @@ public:
 };
 
 ConsoleLogWriter::ConsoleLogWriter(std::string aAcceptLevel, ConsoleLogStreamsInterface *apConsole, const ConsoleColors_t *apColors)
-    : mpConsole(apConsole),
+    : mAcceptLevel(ToLogLevel(aAcceptLevel)),
+      mpConsole(apConsole),
 	  mpColors(apColors)
 {
-    mAcceptLevel = ToLogLevel(aAcceptLevel);
 }
 
 ConsoleLogWriter::ConsoleLogWriter(LogLevel aAcceptLevel, ConsoleLogStreamsInterface *apConsole, const ConsoleColors_t *apColors)
@@ -60,7 +60,7 @@ void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel)
 
     	std::string s;
     	if (mpColors) {
-    		s = (*mpColors)[static_cast<int>(aCurrentLevel)] + arMsg + std::string(AnsiEscapeCodes::ec::ConsoleDefault);
+    		s = (*mpColors)[static_cast<long unsigned int>(aCurrentLevel)] + arMsg + std::string(AnsiEscapeCodes::ec::ConsoleDefault);
     	}
     	else {
     		s = arMsg;
