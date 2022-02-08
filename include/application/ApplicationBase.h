@@ -14,8 +14,6 @@
 #include <utils/CoreException.h>
 #include <logging/Logger.h>
 
-using namespace rsp::utils;
-
 namespace rsp::application {
 
 class ApplicationBase
@@ -36,7 +34,7 @@ public:
     template<class T>
     static T& Get() {
         if (!mpInstance) {
-            THROW_WITH_BACKTRACE(ENoInstance);
+            THROW_WITH_BACKTRACE(rsp::utils::ENoInstance);
         }
         return *static_cast<T*>(mpInstance);
     }

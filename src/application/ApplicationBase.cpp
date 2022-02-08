@@ -10,6 +10,8 @@
 
 #include <application/ApplicationBase.h>
 
+using namespace rsp::utils;
+
 namespace rsp::application {
 
 ApplicationBase* ApplicationBase::mpInstance = nullptr;

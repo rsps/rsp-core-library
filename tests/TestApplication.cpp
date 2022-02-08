@@ -15,12 +15,11 @@
 using namespace rsp::application;
 using namespace rsp::logging;
 
-const char *cLogFileName = "rsp-core-test.log";
 
 TestApplication::TestApplication(rsp::application::CommandLine &aCmd)
     : CliApplication(aCmd)
 {
-    mLogHandle = mLogger.AddLogWriter(std::make_shared<FileLogWriter>(cLogFileName, LogLevel::Info));
+    mLogHandle = mLogger.AddLogWriter(std::make_shared<FileLogWriter>(aCmd.GetAppName() + ".log", LogLevel::Info));
 }
 
 TestApplication::~TestApplication()
