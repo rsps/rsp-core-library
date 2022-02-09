@@ -3,13 +3,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \copyright   Copyright 2022 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_UTILS_ROUNDING_H_
-#define SRC_UTILS_ROUNDING_H_
+#ifndef RSP_UTILS_ROUNDING_H_
+#define RSP_UTILS_ROUNDING_H_
 
 // Precision: 1 (all integers)
 #define ROUND1(a) (static_cast<int>(static_cast<float>(a) + 0.5f))
@@ -27,4 +27,4 @@
 #define ROUND02(a) (ROUND2((a) * 10.0f) * 0.1f)
 
 
-#endif /* SRC_UTILS_ROUNDING_H_ */
+#endif /* RSP_UTILS_ROUNDING_H_ */
