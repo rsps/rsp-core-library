@@ -12,29 +12,71 @@
 #include <filesystem>
 #include <doctest.h>
 #include <application/CommandLine.h>
+#include <utils/StrUtils.h>
+#include <utils/CoreException.h>
 #include "../../TestApplication.h"
 
 using namespace rsp::application;
 
 const char *cLogFileName = "MyApplication.log";
 
-TEST_CASE("Application Instance Tests")
+TEST_CASE("Application Instance")
 {
-    std::remove(cLogFileName);
-
-    char *arguments[] = {
+    const char *arguments[] = {
         "./MyApplication",
         "-c",
+        "--version",
         "--help"
     };
 
-    CommandLine cmd(3, arguments);
+    SUBCASE("Instantiate CommandLine") {
+        CommandLine cmd(4, arguments);
+    }
 
-    TestApplication app(cmd);
+    SUBCASE("Instantiate ApplicationBase") {
+        ApplicationBase app;
 
-    app.showHelp();
+        CHECK(app.GetCommandLine().GetOptions().size() == 0);
+        CHECK(app.GetCommandLine().GetCommands().size() == 0);
+    }
 
-    CHECK(std::filesystem::exists(std::filesystem::path(cLogFileName)));
+    SUBCASE("Instantiate TestApplication") {
+        std::remove(cLogFileName);
+
+        CHECK_THROWS_AS(ApplicationBase::Get<TestApplication>(), const rsp::utils::ENoInstance &);
+
+        TestApplication app(2, arguments);
+
+        ApplicationBase::Get<TestApplication>().Run();
+
+        CHECK(std::filesystem::exists(std::filesystem::path(cLogFileName)));
+
+        std::ifstream fin;
+        fin.open(cLogFileName);
+        CHECK(fin.is_open() == true);
+        std::string line;
+        std::getline(fin, line);
+        CHECK(rsp::utils::StrUtils::EndsWith(line, "\"Hello World.\"") == true);
+    }
+
+    SUBCASE("Execute Callback") {
+        TestApplication app(1, arguments);
+
+        app.SetCallback([](TestApplication &arApp) -> bool {
+            arApp.GetLog().Notice() << "Logged from callback." << std::endl;
+            return true;
+        });
+        ApplicationBase::Get<TestApplication>().Run();
+
+        std::ifstream fin;
+        fin.open(cLogFileName);
+        CHECK(fin.is_open() == true);
+        std::string line;
+        std::getline(fin, line);
+        std::getline(fin, line);
+        CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback.") == true);
+    }
+
 }
 
 

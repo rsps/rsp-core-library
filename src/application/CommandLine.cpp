@@ -14,7 +14,7 @@
 
 namespace rsp::application {
 
-CommandLine::CommandLine(int argc, char **argv)
+CommandLine::CommandLine(int argc, const char **argv)
 {
     if (argc > 0) {
         auto p = std::filesystem::path(argv[0]);

@@ -16,10 +16,10 @@ using namespace rsp::application;
 using namespace rsp::logging;
 
 
-TestApplication::TestApplication(rsp::application::CommandLine &aCmd)
-    : CliApplication(aCmd)
+TestApplication::TestApplication(int argc, const char **argv)
+    : ApplicationBase(argc, argv)
 {
-    mLogHandle = mLogger.AddLogWriter(std::make_shared<FileLogWriter>(aCmd.GetAppName() + ".log", LogLevel::Info));
+    mLogHandle = mLogger.AddLogWriter(std::make_shared<FileLogWriter>(mCmd.GetAppName() + ".log", LogLevel::Info));
 }
 
 TestApplication::~TestApplication()
@@ -29,12 +29,18 @@ TestApplication::~TestApplication()
 
 void TestApplication::execute()
 {
-    GetLog().Info() << "\"Hello World.\" says " << mCmd.GetAppName() << std::endl;
+    if (!mCallback) {
+        GetLog().Info() <<  mCmd.GetAppName() << " says \"Hello World.\"" << std::endl;
+        Terminate(true);
+    }
+    else if (mCallback(*this)) {
+        Terminate(true);
+    }
 }
 
 void TestApplication::handleOptions()
 {
-    CliApplication::handleOptions();
+    ApplicationBase::handleOptions();
 
     if ( mCmd.HasOption("-c") || mCmd.HasOption("--configure")) {
         Console::Info() << "Configuration prints here..." << std::endl;

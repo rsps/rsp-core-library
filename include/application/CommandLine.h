@@ -29,7 +29,7 @@ public:
      * \param argc
      * \param argv
      */
-    CommandLine(int argc, char **argv);
+    CommandLine(int argc, const char **argv);
 
     /**
      * Get the decoded command line options.

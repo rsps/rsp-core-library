@@ -8,20 +8,36 @@
  * \author      Steffen Brummer
  */
 
+#include <functional>
 #include <logging/Logger.h>
+#include <application/ApplicationBase.h>
 
 #ifndef TESTS_TESTAPPLICATION_H_
 #define TESTS_TESTAPPLICATION_H_
 
-#include <application/CliApplication.h>
-
-class TestApplication: public rsp::application::CliApplication
+/**
+ * \class TestApplication
+ * \brief Application customized for use during unit and integration testing.
+ */
+class TestApplication: public rsp::application::ApplicationBase
 {
 public:
-    TestApplication(rsp::application::CommandLine &aCmd);
+    TestApplication(int argc = 0, const char **argv = nullptr);
     virtual ~TestApplication();
 
+    typedef std::function<bool(TestApplication&)> Callback_t;
+
+    /**
+     * Set this callback to execute specialized code during the Run loop.
+     *
+     * \param aCb
+     * \return
+     */
+    TestApplication& SetCallback(Callback_t aCb) { mCallback = aCb; return *this; }
+
 protected:
+    std::function<bool(TestApplication&)> mCallback{};
+
     void execute() override;
     void handleOptions() override;
     void showHelp() override;

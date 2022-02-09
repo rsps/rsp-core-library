@@ -9,6 +9,9 @@
  */
 
 #include <application/ApplicationBase.h>
+#include <application/Console.h>
+#include <logging/FileLogWriter.h>
+#include <version.h>
 
 using namespace rsp::utils;
 
@@ -16,8 +19,10 @@ namespace rsp::application {
 
 ApplicationBase* ApplicationBase::mpInstance = nullptr;
 
-ApplicationBase::ApplicationBase()
-    : mLogger(true)
+
+ApplicationBase::ApplicationBase(int argc, const char **argv)
+    : mLogger(true),
+      mCmd(argc, argv)
 {
     if (mpInstance) {
         THROW_WITH_BACKTRACE(ESingletonViolation);
@@ -38,6 +43,7 @@ ApplicationBase::~ApplicationBase()
 
 int ApplicationBase::Run()
 {
+    beforeExecute();
     while(!mTerminated) {
         try {
             execute();
@@ -48,7 +54,45 @@ int ApplicationBase::Run()
             mTerminated = true;
         }
     }
+    afterExecute();
     return mApplicationResult;
 }
 
+void ApplicationBase::beforeExecute()
+{
+    handleOptions();
+}
+
+void ApplicationBase::handleOptions()
+{
+    std::string s;
+    if (mCmd.GetOptionValue("--log=", s)) {
+        std::string l;
+        if (!mCmd.GetOptionValue("--loglevel=", l)) {
+            l = ToString(rsp::logging::LogLevel::Info);
+        }
+
+        mLogger.AddLogWriter(std::make_shared<logging::FileLogWriter>(s, l));
+    }
+
+    if ( mCmd.HasOption("-h") || mCmd.HasOption("--help")) {
+        showHelp();
+        mTerminated = true;
+    }
+
+    if ( mCmd.HasOption("--version")) {
+        showVersion();
+        mTerminated = true;
+    }
+}
+
+void ApplicationBase::showHelp()
+{
+    Console::Info() << "No help text available." << std::endl;
+}
+
+void ApplicationBase::showVersion()
+{
+    Console::Info() << "Library version: " << get_library_version() << std::endl;
+}
 } /* namespace rsp::application */
