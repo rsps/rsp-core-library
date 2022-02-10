@@ -13,9 +13,11 @@
 namespace rsp::graphics
 {
 Image::Image(std::string aPressed, std::string aNormal, Rect &aRect)
-    : mPressed(aPressed), mNormal(aNormal), Control(aRect)
+    : Control(aRect)
 {
     std::cout << "Constructor of Image" << std::endl;
+    mStateMap.insert(std::pair<States, Bitmap>(States::pressed, Bitmap(aPressed)));
+    mStateMap.insert(std::pair<States, Bitmap>(States::normal, Bitmap(aNormal)));
 }
 Image::~Image()
 {
@@ -23,13 +25,15 @@ Image::~Image()
 
 void Image::Render(Canvas &aCanvas)
 {
-    std::cout << "Rendering Img" << std::endl;
-    std::cout << this << " " << (int)mState << std::endl;
+    // std::cout << "Rendering Img" << std::endl;
+    // std::cout << this << " " << (int)mState << std::endl;
     if (!mIsInvalid) {
-        std::cout << "Img NOT invalid" << std::endl;
+        // std::cout << "Img NOT invalid" << std::endl;
         return;
     }
-    switch (mState) {
+    std::cout << "Rendering Img" << std::endl;
+    aCanvas.DrawImage(mArea.GetTopLeft(), mStateMap.at(mState));
+    /*switch (mState) {
     case States::pressed:
         std::cout << "Rendering Pressed" << std::endl;
         aCanvas.DrawImage(mArea.GetTopLeft(), mPressed);
@@ -40,7 +44,14 @@ void Image::Render(Canvas &aCanvas)
         break;
     default:
         break;
-    }
+    }*/
     mIsInvalid = false;
+}
+void Image::HandleCallback(States aState)
+{
+    if (aState != mState) {
+        mState = aState;
+        mIsInvalid = true;
+    }
 }
 } // namespace rsp::graphics

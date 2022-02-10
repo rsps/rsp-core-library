@@ -23,9 +23,10 @@ Scene::~Scene()
 void Scene::ProcessInput(Input &aInput)
 {
     for (TouchArea *area : mTouchables) {
-        if (area->IsHit(Point(aInput.x, aInput.y))) {
+        area->ProcessInput(aInput);
+        /*if (area->IsHit(Point(aInput.x, aInput.y))) {
             area->ProcessInput(aInput);
-        }
+        }*/
     }
 }
 void Scene::Render(Canvas &aCanvas)

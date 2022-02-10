@@ -13,8 +13,8 @@
 namespace rsp::graphics
 {
 
-Control::Control(Rect &aRect)
-    : mArea(aRect), mBackground(0x000000), mState(States::normal)
+Control::Control(Rect &aRect, Control *aParent)
+    : mArea(aRect), mParent(aParent)
 {
     std::cout << "Constructor of Control" << std::endl;
 }
@@ -25,7 +25,7 @@ Control::~Control()
 void Control::SetState(States aState)
 {
     std::cout << "Control Image setting State" << std::endl;
-    std::cout << this << std::endl;
+    // std::cout << this << std::endl;
     if (mState != aState) {
         mState = aState;
         Invalidate();
@@ -34,7 +34,7 @@ void Control::SetState(States aState)
 void Control::Invalidate()
 {
     std::cout << "Control Image is set invalid" << std::endl;
-    std::cout << this << std::endl;
+    // std::cout << this << std::endl;
     mIsInvalid = true;
 }
 

@@ -26,12 +26,22 @@ void TouchArea::ProcessInput(Input &aInput)
     case InputType::Press:
         std::cout << "TouchArea Setting pressed state" << std::endl;
         // mImage->SetState(Control::States::pressed);
-        // Call all registered callbacks?
+        if (IsHit(Point(aInput.x, aInput.y))) {
+            mPressed(Control::States::pressed);
+        }
         break;
     case InputType::Lift:
         std::cout << "TouchArea Setting normal state" << std::endl;
         // mImage->SetState(Control::States::normal);
-        // Call all registered callbacks?
+        if (IsHit(Point(aInput.x, aInput.y))) {
+            mClicked();
+        }
+        mPressed(Control::States::normal);
+        break;
+    case InputType::Drag:
+        if (!IsHit(Point(aInput.x, aInput.y))) {
+            mPressed(Control::States::normal);
+        }
         break;
     default:
         break;
@@ -40,5 +50,13 @@ void TouchArea::ProcessInput(Input &aInput)
 bool TouchArea::IsHit(const Point &aPoint) const
 {
     return mTouchArea.IsHit(aPoint);
+}
+void TouchArea::RegisterOnPressed(std::function<void(Control::States)> aFunc)
+{
+    mPressed = aFunc;
+}
+void TouchArea::RegisterOnClicked(std::function<void()> aFunc)
+{
+    mClicked = aFunc;
 }
 } // namespace rsp::graphics

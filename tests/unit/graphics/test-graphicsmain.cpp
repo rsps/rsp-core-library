@@ -11,19 +11,91 @@
 #include "graphics/Framebuffer.h"
 #include "graphics/GraphicsMain.h"
 #include <doctest.h>
+#include <functional>
 #include <vector>
 
 using namespace rsp::graphics;
 
+class firstScene : public Scene
+{
+  public:
+    firstScene(Rect &aRect)
+        : Scene(aRect)
+    {
+        // Set member variables values
+        Rect topRect(Point(100, 400), 200, 100);
+        topBtn = TouchArea(topRect);
+        topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
+
+        Rect botRect(Point(100, 600), 200, 100);
+        botBtn = TouchArea(botRect);
+        botBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
+
+        // Bind onPressed
+        topBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &topBtnImg, std::placeholders::_1));
+        botBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &botBtnImg, std::placeholders::_1));
+
+        //  Bind onClicked
+
+        //  Add them to the lists?
+        mTouchables.push_back(&topBtn);
+        mTouchables.push_back(&botBtn);
+        mChildren.push_back(&topBtnImg);
+        mChildren.push_back(&botBtnImg);
+    };
+
+    ~firstScene() {}
+
+    Color background{0x323232}; // color from old main.qml
+
+    TouchArea topBtn;
+    TouchArea botBtn;
+
+    Image topBtnImg;
+    Image botBtnImg;
+};
+class secondScene : public Scene
+{
+  public:
+    secondScene(Rect &aRect)
+        : Scene(aRect)
+    {
+        // Set member variables values
+        Rect topRect(Point(100, 100), 200, 100);
+        topBtn = TouchArea(topRect);
+        topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
+
+        Rect botRect(Point(100, 300), 200, 100);
+        botBtn = TouchArea(botRect);
+        botBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
+
+        // Bind onPressed
+        topBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &topBtnImg, std::placeholders::_1));
+        botBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &botBtnImg, std::placeholders::_1));
+
+        //  Bind onClicked
+
+        //  Add them to the lists?
+        mTouchables.push_back(&topBtn);
+        mTouchables.push_back(&botBtn);
+        mChildren.push_back(&topBtnImg);
+        mChildren.push_back(&botBtnImg);
+    };
+
+    ~secondScene() {}
+
+    Color background{0x232323}; // reverse color from old main.qml
+
+    TouchArea topBtn;
+    TouchArea botBtn;
+
+    Image topBtnImg;
+    Image botBtnImg;
+};
+
 TEST_CASE("Graphics Main Test")
 {
     MESSAGE("Start");
-    // Make touch area(s)
-    Rect rect(Point(100, 100), Point(400, 400));
-    MESSAGE("Making Image");
-    Image img("testImages/Red.bmp", "testImages/Green.bmp", rect);
-    MESSAGE("Making Touch Area");
-    TouchArea area(rect, img);
 
     MESSAGE("Init Framebufer");
     // Make framebuffer
@@ -32,13 +104,7 @@ TEST_CASE("Graphics Main Test")
 
     MESSAGE("Making Scene");
     // Make scene
-    Scene myScene(screenSize);
-    // Give scene touch areas
-    myScene.AddArea(area);
-    // Give scene control/image children
-    // std::vector<Control *> images = {&img};
-    myScene.AddChildren(img);
-    std::cout << "Image pointer: " << &img << std::endl;
+    firstScene myScene(screenSize);
 
     MESSAGE("Init InputCreator");
     // Make InputCreator

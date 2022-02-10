@@ -34,11 +34,11 @@ Rect::Rect(const Point &aLeftTop, int aWidth, int aHeight)
     VerifyDimensions();
 }
 
-Rect::Rect(const Rect &aRect)
+/*Rect::Rect(const Rect &aRect)
     : mLeftTop(aRect.mLeftTop), mRightBottom(aRect.mRightBottom)
 {
     VerifyDimensions();
-}
+}*/
 
 int Rect::GetTop() const
 {

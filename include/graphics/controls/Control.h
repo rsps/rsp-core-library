@@ -14,13 +14,16 @@ class Control
         pressed,
         normal
     };
-    Rect mArea;
-    Color mBackground;
-    bool mTransparent;
+    Rect mArea{};
+    Color mBackground{0};
+    bool mTransparent = false;
     Control *mParent;
-    std::vector<Control *> mChildren;
+    std::vector<Control *> mChildren{};
+    bool mIsInvalid = true;
+    States mState = States::normal;
 
-    Control(Rect &aRect);
+    Control(Control *aParent = nullptr) : mParent(aParent){};
+    Control(Rect &aRect, Control *aParent = nullptr);
     ~Control();
 
     void SetState(States aState);
@@ -30,9 +33,6 @@ class Control
     virtual void Render(Canvas &aCanvas) = 0;
     void SetArea(Rect const &aRect);
     Rect &GetArea();
-
-    bool mIsInvalid = true;
-    States mState;
 };
 } // namespace rsp::graphics
 

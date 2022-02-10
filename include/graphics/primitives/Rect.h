@@ -29,6 +29,7 @@ class Framebuffer;
 class Rect
 {
   public:
+    Rect() : mLeftTop(0, 0), mRightBottom(0, 0){};
     /**
      * Constructs a Rect from coordinate and size.
      *
@@ -61,7 +62,7 @@ class Rect
      *
      * \param aRect
      */
-    Rect(const Rect &aRect);
+    // Rect(const Rect &aRect);
 
     /**
      * Get the top value
