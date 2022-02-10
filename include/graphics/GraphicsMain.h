@@ -11,10 +11,12 @@ namespace rsp::graphics
 class GraphicsMain
 {
   public:
-    GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, Scene &aScene);
+    GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, Scene &aScene, Scene &aOtherScene);
     ~GraphicsMain();
 
     void Run();
+    // Temp
+    void ChangeScene();
 
     void Terminate() { mTerminated = true; }
 
@@ -24,6 +26,9 @@ class GraphicsMain
     Scene &mActiveScene;
     bool mTerminated = false;
     void PrintInput(Input aInput);
+
+    // Temp
+    Scene &otherScene;
 };
 } // namespace rsp::graphics
 #endif // GRAPHICSMAIN_H
