@@ -20,22 +20,40 @@
 
 namespace rsp::utils {
 
+/**
+ * \class ENullableException
+ * \brief Base class for some helpful Nullable excetpions.
+ */
 class ENullableException : public CoreException {
 public:
     explicit ENullableException(const char *aMsg) : CoreException(aMsg) {}
 };
 
+/**
+ * \class ENullValueError
+ * \brief Exception thrown on attempt to use a nulled value.
+ */
 class ENullValueError : public ENullableException {
 public:
     explicit ENullValueError() : ENullableException("Value is null") {}
 };
 
+/**
+ * \class ETypeMismatchError
+ * \brief Exception thrown if trying to assign a wrong type to a Nullable variable.
+ *
+ */
 class ETypeMismatchError : public ENullableException {
 public:
     explicit ETypeMismatchError() : ENullableException("Value types are not the same") {}
 };
 
 
+/**
+ * \class Nullable
+ * \brief Interface for Nullable types.
+ *
+ */
 class Nullable
 {
 public:

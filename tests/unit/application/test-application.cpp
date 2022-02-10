@@ -77,6 +77,32 @@ TEST_CASE("Application Instance")
         CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback.") == true);
     }
 
+    SUBCASE("Execute Callback to member function") {
+        class MyClass {
+        public:
+            bool MyFunction(TestApplication &arApp) {
+                arApp.GetLog().Notice() << "Logged from callback to member function." << std::endl;
+                return true;
+            }
+        };
+
+        MyClass cls;
+        TestApplication app(1, arguments);
+
+        app.SetCallback(std::bind(&MyClass::MyFunction, &cls, std::placeholders::_1));
+
+        ApplicationBase::Get<TestApplication>().Run();
+
+        std::ifstream fin;
+        fin.open(cLogFileName);
+        CHECK(fin.is_open() == true);
+        std::string line;
+        std::getline(fin, line);
+        std::getline(fin, line);
+        std::getline(fin, line);
+        CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback to member function.") == true);
+    }
+
 }
 
 

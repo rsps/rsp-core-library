@@ -25,17 +25,17 @@ namespace rsp::utils
 
 namespace detail
 {
-template<typename DurationT, typename ReprT = typename DurationT::rep>
-constexpr DurationT max_duration() noexcept
-{
-    return DurationT { std::numeric_limits<ReprT>::max() };
-}
+    template<typename DurationT, typename ReprT = typename DurationT::rep>
+    constexpr DurationT max_duration() noexcept
+    {
+        return DurationT { std::numeric_limits<ReprT>::max() };
+    }
 
-template<typename DurationT>
-constexpr DurationT abs_duration(const DurationT d) noexcept
-{
-    return DurationT { (d.count() < 0) ? -d.count() : d.count() };
-}
+    template<typename DurationT>
+    constexpr DurationT abs_duration(const DurationT d) noexcept
+    {
+        return DurationT { (d.count() < 0) ? -d.count() : d.count() };
+    }
 }
 
 template<
