@@ -81,12 +81,12 @@ public:
 
 class ESingletonViolation: public ApplicationException {
 public:
-    explicit ESingletonViolation() : ApplicationException("Application already exist") {}
+    explicit ESingletonViolation() : ApplicationException("Singleton object already exist") {}
 };
 
 class ENoInstance: public ApplicationException {
 public:
-    explicit ENoInstance() : ApplicationException("Application has not been created") {}
+    explicit ENoInstance() : ApplicationException("Singleton object has not been created") {}
 };
 
 class EMissingArgument : public std::invalid_argument {
