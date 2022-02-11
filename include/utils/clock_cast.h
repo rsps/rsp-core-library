@@ -18,11 +18,15 @@
 #define SRC_UTILS_CLOCK_CAST_H_
 
 #include <chrono>
-#include <cassert>
+#include <utils/CoreException.h>
 
 namespace rsp::utils
 {
 
+/**
+ * \namespace detail
+ * \brief Private helper template functions
+ */
 namespace detail
 {
     template<typename DurationT, typename ReprT = typename DurationT::rep>
@@ -38,6 +42,26 @@ namespace detail
     }
 }
 
+/**
+ * \fn DstTimePointT clock_cast(const SrcTimePointT, const SrcDurationT=std::chrono::nanoseconds={100}, const int=10)
+ * \brief Helper functions to convert between the different C++ clock types.
+ *
+ * The C++ chrono library has three different clock domains, this function helps convert
+ * timestamps (TimePoint) from one domain to another.
+ *
+ * \see https://stackoverflow.com/questions/35282308/convert-between-c11-clocks
+ *
+ * \tparam DstTimePointT
+ * \tparam SrcTimePointT
+ * \tparam DstDurationT
+ * \tparam SrcDurationT
+ * \tparam DstClockT
+ * \tparam SrcClockT
+ * \param tp
+ * \param tolerance
+ * \param limit
+ * \return TimePoint in destination domain
+ */
 template<
     typename DstTimePointT,
     typename SrcTimePointT,
@@ -46,11 +70,11 @@ template<
     typename DstClockT = typename DstTimePointT::clock,
     typename SrcClockT = typename SrcTimePointT::clock
 >
-DstTimePointT clock_cast(const SrcTimePointT tp,
+DstTimePointT ClockCast(const SrcTimePointT tp,
     const SrcDurationT tolerance = std::chrono::nanoseconds { 100 },
     const int limit = 10)
 {
-    assert(limit > 0);
+    ASSERT(limit > 0);
     auto itercnt = 0;
     auto src_now = SrcTimePointT { };
     auto dst_now = DstTimePointT { };
