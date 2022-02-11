@@ -17,8 +17,6 @@ class Image : public Control
     void Render(Canvas &aCanvas) override;
     void HandleCallback(States aState);
 
-    // Bitmap mNormal;
-    // Bitmap mPressed;
     std::map<States, Bitmap> mStateMap;
 };
 

@@ -25,7 +25,6 @@ Control::~Control()
 void Control::SetState(States aState)
 {
     std::cout << "Control Image setting State" << std::endl;
-    // std::cout << this << std::endl;
     if (mState != aState) {
         mState = aState;
         Invalidate();
@@ -34,7 +33,6 @@ void Control::SetState(States aState)
 void Control::Invalidate()
 {
     std::cout << "Control Image is set invalid" << std::endl;
-    // std::cout << this << std::endl;
     mIsInvalid = true;
 }
 

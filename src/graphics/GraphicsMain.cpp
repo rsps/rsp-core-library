@@ -46,6 +46,7 @@ void GraphicsMain::ChangeScene()
     Scene temp = mActiveScene;
     mActiveScene = otherScene;
     otherScene = temp;
+    otherScene.Invalidate();
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mActiveScene.Render(mBufferedCanvas);
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);

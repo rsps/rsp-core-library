@@ -12,8 +12,8 @@
 
 namespace rsp::graphics
 {
-TouchArea::TouchArea(Rect &aArea /*, Image &aImage*/)
-    : mTouchArea(aArea) /*, mImage(&aImage)*/
+TouchArea::TouchArea(Rect &aArea)
+    : mTouchArea(aArea)
 {
 }
 TouchArea::~TouchArea()
@@ -25,14 +25,12 @@ void TouchArea::ProcessInput(Input &aInput)
     switch (aInput.type) {
     case InputType::Press:
         std::cout << "TouchArea Setting pressed state" << std::endl;
-        // mImage->SetState(Control::States::pressed);
         if (IsHit(Point(aInput.x, aInput.y))) {
             mPressed(Control::States::pressed);
         }
         break;
     case InputType::Lift:
         std::cout << "TouchArea Setting normal state" << std::endl;
-        // mImage->SetState(Control::States::normal);
         if (IsHit(Point(aInput.x, aInput.y))) {
             mClicked();
         }

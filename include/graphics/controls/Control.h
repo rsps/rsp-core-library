@@ -27,7 +27,7 @@ class Control
     ~Control();
 
     void SetState(States aState);
-    void Invalidate();
+    virtual void Invalidate();
     bool IsInvalid() const;
     bool IsTransparent() const;
     virtual void Render(Canvas &aCanvas) = 0;

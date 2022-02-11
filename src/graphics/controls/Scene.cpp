@@ -24,15 +24,19 @@ void Scene::ProcessInput(Input &aInput)
 {
     for (TouchArea *area : mTouchables) {
         area->ProcessInput(aInput);
-        /*if (area->IsHit(Point(aInput.x, aInput.y))) {
-            area->ProcessInput(aInput);
-        }*/
     }
 }
 void Scene::Render(Canvas &aCanvas)
 {
     for (auto child : mChildren) {
         child->Render(aCanvas);
+    }
+}
+
+void Scene::Invalidate()
+{
+    for (auto child : mChildren) {
+        child->Invalidate();
     }
 }
 

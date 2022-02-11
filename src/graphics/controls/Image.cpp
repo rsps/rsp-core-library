@@ -25,26 +25,11 @@ Image::~Image()
 
 void Image::Render(Canvas &aCanvas)
 {
-    // std::cout << "Rendering Img" << std::endl;
-    // std::cout << this << " " << (int)mState << std::endl;
     if (!mIsInvalid) {
-        // std::cout << "Img NOT invalid" << std::endl;
         return;
     }
     std::cout << "Rendering Img" << std::endl;
     aCanvas.DrawImage(mArea.GetTopLeft(), mStateMap.at(mState));
-    /*switch (mState) {
-    case States::pressed:
-        std::cout << "Rendering Pressed" << std::endl;
-        aCanvas.DrawImage(mArea.GetTopLeft(), mPressed);
-        break;
-    case States::normal:
-        std::cout << "Rendering Normal" << std::endl;
-        aCanvas.DrawImage(mArea.GetTopLeft(), mNormal);
-        break;
-    default:
-        break;
-    }*/
     mIsInvalid = false;
 }
 void Image::HandleCallback(States aState)

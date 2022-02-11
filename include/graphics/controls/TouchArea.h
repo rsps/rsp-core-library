@@ -12,11 +12,10 @@ class TouchArea
 {
   private:
     Rect mTouchArea;
-    // Image *mImage;
 
   public:
     TouchArea() : mTouchArea(0, 0, 0, 0){};
-    TouchArea(Rect &aArea /*, Image &aImage*/);
+    TouchArea(Rect &aArea);
     ~TouchArea();
 
     void ProcessInput(Input &aInput);
@@ -27,8 +26,8 @@ class TouchArea
 
     TouchArea &operator=(const TouchArea &) = default;
 
-    std::function<void(Control::States)> mPressed = [](Control::States) {}; // = [](void) {};
-    std::function<void()> mClicked = [](void) {};                           // = [](void) {};
+    std::function<void(Control::States)> mPressed = [](Control::States) {};
+    std::function<void()> mClicked = [](void) {};
 };
 
 } // namespace rsp::graphics
