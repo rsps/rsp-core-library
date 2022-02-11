@@ -6,14 +6,8 @@
  * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
- *
- * clock_cast.h
- *
- * Helper functions to convert between the different C++ clock types.
- *
- * \see https://stackoverflow.com/questions/35282308/convert-between-c11-clocks
- *
  */
+
 #ifndef SRC_UTILS_CLOCK_CAST_H_
 #define SRC_UTILS_CLOCK_CAST_H_
 
@@ -43,7 +37,7 @@ namespace detail
 }
 
 /**
- * \fn DstTimePointT clock_cast(const SrcTimePointT, const SrcDurationT=std::chrono::nanoseconds={100}, const int=10)
+ * \fn DstTimePointT ClockCast(const SrcTimePointT, const SrcDurationT=std::chrono::nanoseconds={100}, const int=10)
  * \brief Helper functions to convert between the different C++ clock types.
  *
  * The C++ chrono library has three different clock domains, this function helps convert

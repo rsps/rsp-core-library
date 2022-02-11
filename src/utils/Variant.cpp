@@ -318,4 +318,10 @@ std::string Variant::typeToText() const
     }
 }
 
+std::ostream& operator<< (std::ostream& os, Variant aValue)
+{
+    os << aValue.typeToText() << ":" << aValue.AsString();
+    return os;
+}
+
 } /* namespace rsp::utils */

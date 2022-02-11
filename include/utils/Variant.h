@@ -17,23 +17,52 @@
 
 namespace rsp::utils {
 
+/**
+ * \class EVariantException
+ * \brief Base exception for Variant class.
+ *
+ */
 class EVariantException : public CoreException {
 public:
     explicit EVariantException(const char *apMsg) : CoreException(apMsg) {}
 };
 
+/**
+ * \class EConversionError
+ * \brief Thrown if tried to read a value as a type which is not convertible from the vurrent type of a Variant.
+ *
+ */
 class EConversionError : public EVariantException {
 public:
     explicit EConversionError(const std::string aFrom, const std::string aTo) : EVariantException(std::string("Variant Conversion Error. From " + aFrom + " to " + aTo).c_str()) {}
 };
 
 
+/**
+ * \class Variant
+ * \brief Generic type class. Can hold all native types in the same object and often convert between them.
+ *
+ */
 class Variant : public Nullable
 {
 public:
+    /**
+     * \enum Types
+     * \brief Type declaration used for each native type.
+     */
     enum class Types {Null, Bool, Int, Int64, Uint64, Uint32, Float, Double, Pointer, String};
 
+    /**
+     * \fn  Variant()
+     * \brief Construct an empty Variant (null)
+     */
     Variant();
+    /**
+     * \fn  Variant(...)
+     * \brief Constructs a Variant with the given value and type of that value.
+     *
+     * \param aValue
+     */
     Variant(bool aValue);
     Variant(int aValue);
     Variant(std::int64_t aValue);
@@ -44,15 +73,39 @@ public:
     Variant(void* apValue);
     Variant(const std::string &arValue);
     Variant(const char *apValue);
+    /**
+     * \fn  ~Variant()
+     * \brief Virtual destructor
+     */
     virtual ~Variant();
 
-//    Variant(const Variant&) = delete;
-//    Variant& operator=(const Variant&) = delete;
+//    Variant(const Variant&);
+//    Variant& operator=(const Variant&);
 
+    /**
+     * \fn bool IsNull()const
+     * \brief Returns true if the content is null, not set or empty.
+     *
+     * \return bool
+     */
     bool IsNull() const override { return mType == Types::Null; }
+    /**
+     * \fn void Clear()
+     * \brief Resets the Variant content to null
+     */
     void Clear() override { mType = Types::Null; }
+    /**
+     * \fn Types GetType()const
+     * \brief Returns the current type of the Variant content.
+     *
+     * \return Variant::Types
+     */
     Types GetType() const { return mType; }
 
+    /**
+     * \fn  operator <T>()const
+     * \brief Operator overloads for all native types.
+     */
     operator bool() const              { return AsBool(); }
     operator int() const               { return static_cast<int>(AsInt()); }
     operator std::int64_t() const      { return AsInt(); }
@@ -64,6 +117,13 @@ public:
     operator const std::string() const { return AsString(); }
     operator const char*() const       { return AsString().c_str(); }
 
+    /**
+     * \fn Variant operator =&(T)
+     * \brief Assignment operator overloads for all native types.
+     *
+     * \param aValue
+     * \return Reference to this
+     */
     Variant& operator =(bool aValue);
     Variant& operator =(int aValue);
     Variant& operator =(std::int64_t aValue);
@@ -75,6 +135,12 @@ public:
     Variant& operator =(const std::string &arValue);
     Variant& operator =(const char* apValue);
 
+    /**
+     * \fn bool AsBool()const
+     * \brief Named conversion functions. Tries to convert the current value and type to the basic native return type.
+     *
+     * \return T
+     */
     bool AsBool() const;
     std::int64_t AsInt() const;
     double AsDouble() const;
@@ -91,8 +157,11 @@ protected:
     };
     std::string mString{};
 
+    friend std::ostream& operator<< (std::ostream& os, Variant aValue);
     std::string typeToText() const;
 };
+
+std::ostream& operator<< (std::ostream& os, Variant aValue);
 
 } /* namespace rsp::utils */
 

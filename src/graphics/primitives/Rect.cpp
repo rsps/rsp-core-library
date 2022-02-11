@@ -63,7 +63,7 @@ int Rect::GetTop() const
 
 void Rect::SetTop(int aTopValue)
 {
-    ASSERT(aTopValue > mRightBottom.mY);
+    ASSERT(aTopValue <= mRightBottom.mY);
     mLeftTop.mY = aTopValue;
 }
 
@@ -74,7 +74,7 @@ int Rect::GetBottom() const
 
 void Rect::SetBottom(int aBotValue)
 {
-    ASSERT(aBotValue < mLeftTop.mY);
+    ASSERT(aBotValue >= mLeftTop.mY);
     mRightBottom.mY = aBotValue;
 }
 
@@ -85,7 +85,7 @@ int Rect::GetLeft() const
 
 void Rect::SetLeft(int aLeftValue)
 {
-    ASSERT(aLeftValue > mRightBottom.mX);
+    ASSERT(aLeftValue <= mRightBottom.mX);
     mLeftTop.mX = aLeftValue;
 }
 
@@ -96,7 +96,7 @@ int Rect::GetRight() const
 
 void Rect::SetRight(int aRightValue)
 {
-    ASSERT(aRightValue < mLeftTop.mX);
+    ASSERT(aRightValue >= mLeftTop.mX);
     mRightBottom.mX = aRightValue;
 }
 
@@ -107,7 +107,7 @@ int Rect::GetWidth() const
 
 void Rect::SetWidth(int aWidth)
 {
-    ASSERT(aWidth < 0);
+    ASSERT(aWidth >= 0);
     mRightBottom.mX = mLeftTop.mX + aWidth;
 }
 
@@ -118,7 +118,7 @@ int Rect::GetHeight() const
 
 void Rect::SetHeight(int aHeight)
 {
-    ASSERT(aHeight < 0);
+    ASSERT(aHeight >= 0);
     mRightBottom.mY = mLeftTop.mY + aHeight;
 }
 
@@ -129,8 +129,8 @@ bool Rect::IsHit(const Point &arPoint) const
 
 bool Rect::VerifyDimensions() const
 {
-    ASSERT(GetWidth() < 0);
-    ASSERT(GetHeight() < 0);
+    ASSERT(GetWidth() >= 0);
+    ASSERT(GetHeight() >= 0);
 
     return false;
 }

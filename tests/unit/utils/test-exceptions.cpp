@@ -11,11 +11,12 @@
 #include "doctest.h"
 #include <sstream>
 #include <utils/StrUtils.h>
+#undef NDEBUG
 #include <utils/CoreException.h>
 
 using namespace rsp::utils;
 
-TEST_CASE("Testing the exception macros") {
+TEST_CASE("Core Exceptions") {
 
 
     SUBCASE("Test backtraced exceptions") {
@@ -60,19 +61,19 @@ TEST_CASE("Testing the exception macros") {
 
         MESSAGE(result1.str());
         CHECK(StrUtils::EndsWith(result1.str(), "This is an example!\n") == true);
-        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:33") == true);
+        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:34") == true);
 
         MESSAGE(result2.str());
         CHECK(StrUtils::EndsWith(result2.str(), "This is an example!\n") == true);
-        CHECK(StrUtils::Contains(result2.str(), "test-exceptions.cpp:42") == true);
+        CHECK(StrUtils::Contains(result2.str(), "test-exceptions.cpp:43") == true);
 
         MESSAGE(result3.str());
         CHECK(StrUtils::EndsWith(result3.str(), "This is an example!\n") == true);
-        CHECK(StrUtils::Contains(result3.str(), "test-exceptions.cpp:48") == true);
+        CHECK(StrUtils::Contains(result3.str(), "test-exceptions.cpp:49") == true);
 
         MESSAGE(result4.str());
         CHECK(StrUtils::EndsWith(result4.str(), "This is an example!\n") == true);
-        CHECK(StrUtils::Contains(result4.str(), "test-exceptions.cpp:54") == true);
+        CHECK(StrUtils::Contains(result4.str(), "test-exceptions.cpp:55") == true);
     }
 
 
@@ -88,7 +89,23 @@ TEST_CASE("Testing the exception macros") {
 
         MESSAGE(result1.str());
         CHECK(StrUtils::EndsWith(result1.str(), "File IO error: Input/output error\n") == true);
-        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:83") == true);
+        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:84") == true);
+    }
+
+    SUBCASE("Assertions") {
+        std::stringstream result1;
+        try {
+            ASSERT(true == false);
+        }
+        catch(const std::exception &e) {
+            result1 << "Caught exception:\n" << e.what() << std::endl;
+        }
+
+        MESSAGE(result1.str());
+        CHECK(StrUtils::EndsWith(result1.str(), "true == false\n") == true);
+        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:98") == true);
+
+        CHECK_NOTHROW(ASSERT(true));
     }
 }
 

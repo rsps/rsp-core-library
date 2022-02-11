@@ -18,8 +18,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <utils/ClockCast.h>
 #include <utils/StrUtils.h>
-#include <utils/clock_cast.h>
 
 namespace rsp::utils::StrUtils {
 
@@ -217,7 +217,7 @@ std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats a
 
 std::string TimeStamp(std::chrono::steady_clock::time_point aTime, TimeFormats aFormat)
 {
-    return TimeStamp(rsp::utils::clock_cast<std::chrono::system_clock::time_point>(aTime), aFormat);
+    return TimeStamp(rsp::utils::ClockCast<std::chrono::system_clock::time_point>(aTime), aFormat);
 }
 
 std::string TimeStamp(std::chrono:: milliseconds aMilliSeconds, TimeFormats aFormat)

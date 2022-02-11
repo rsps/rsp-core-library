@@ -67,8 +67,8 @@ class AssertException : public CoreException
 
 #ifndef NDEBUG
 #define ASSERT(a)                  \
-    if (a) {                       \
-        throw rsp::utils::AssertException(#a); \
+    if (!(a)) {                       \
+        THROW_WITH_BACKTRACE1(rsp::utils::AssertException, #a); \
     }
 #else
 #define ASSERT(a)
