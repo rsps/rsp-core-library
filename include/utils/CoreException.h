@@ -28,6 +28,11 @@ class CoreException : public std::runtime_error
           mMsg(aMsg)
     {
     }
+    CoreException(const std::string &arMsg)
+        : std::runtime_error(""),
+          mMsg(arMsg)
+    {
+    }
 
     const char *what() const noexcept override
     {

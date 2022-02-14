@@ -11,11 +11,13 @@
 #ifndef INCLUDE_UTILS_INRANGE_H_
 #define INCLUDE_UTILS_INRANGE_H_
 
+#include <cmath>
+
 namespace rsp::utils {
 
 /**
  * \fn bool IsInRange(const T&, const T&, const T&)
- * \brief Template class to check if a value is within given range boundaries.
+ * \brief Template function to check if a value is within given range boundaries.
  *
  *  The class only uses the < operator, so any type implementing the < operator can be given as values.
  *
@@ -26,8 +28,24 @@ namespace rsp::utils {
  * \return True if value is within boundaries
  */
 template <typename T>
-bool IsInRange(const T& value, const T& low, const T& high) {
+inline bool IsInRange(const T& value, const T& low, const T& high) {
     return !(value < low) && !(high < value);
+}
+
+
+/**
+ * \fn bool IsEqual(const T&, const T&, const T&)
+ * \brief Template function to compare floating point values with an epsilon.
+ *
+ * \tparam T
+ * \param v1
+ * \param v2
+ * \param epsilon
+ * \return True if values are equal.
+ */
+template <typename T>
+inline bool IsEqual(const T& v1, const T& v2, const T& epsilon) {
+    return (std::fabs(v1 - v2) < epsilon);
 }
 
 } /* namespace rsp::utils */

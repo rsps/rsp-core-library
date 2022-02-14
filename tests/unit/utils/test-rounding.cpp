@@ -12,7 +12,7 @@
 #include <utils/Rounding.h>
 #include <cmath>
 
-TEST_CASE("Testing the Rounding macros") {
+TEST_CASE("Rounding") {
 
 #define COMPARE_AND_CHECK(a, b) CHECK(std::fabs(a - b) < 0.00000001f)
 

@@ -151,7 +151,7 @@ protected:
     Types mType;
     union {
         bool mBool;
-        std::int64_t mInt;
+        std::int64_t mInt{};
         double mDouble;
         uintptr_t mPointer;
     };
