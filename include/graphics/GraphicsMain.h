@@ -15,20 +15,21 @@ class GraphicsMain
     ~GraphicsMain();
 
     void Run();
+    void Terminate() { mTerminated = true; }
+
     // Temp
     void ChangeScene();
-
-    void Terminate() { mTerminated = true; }
 
   private:
     BufferedCanvas &mBufferedCanvas;
     InputCreator &mInputs;
     Scene &mActiveScene;
     bool mTerminated = false;
-    void PrintInput(Input aInput);
+    std::vector<Input> inputCache{};
 
     // Temp
     Scene &otherScene;
+    void PrintInput(Input aInput);
 };
 } // namespace rsp::graphics
 #endif // GRAPHICSMAIN_H

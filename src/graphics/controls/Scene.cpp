@@ -16,6 +16,7 @@ Scene::Scene(Rect &aRect)
     : Control(aRect)
 {
 }
+
 Scene::~Scene()
 {
 }
@@ -26,19 +27,21 @@ void Scene::ProcessInput(Input &aInput)
         area->ProcessInput(aInput);
     }
 }
+
 void Scene::Render(Canvas &aCanvas)
 {
+    // std::cout << "Rendering" << std::endl;
     for (auto child : mChildren) {
         child->Render(aCanvas);
     }
 }
 
-void Scene::Invalidate()
+/*void Scene::Invalidate()
 {
     for (auto child : mChildren) {
         child->Invalidate();
     }
-}
+}*/
 
 void Scene::AddChildren(Image &aImg)
 {

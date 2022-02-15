@@ -24,20 +24,25 @@ void TouchArea::ProcessInput(Input &aInput)
     std::cout << "TouchArea Processing Input" << std::endl;
     switch (aInput.type) {
     case InputType::Press:
-        std::cout << "TouchArea Setting pressed state" << std::endl;
-        if (IsHit(Point(aInput.x, aInput.y))) {
+        mCurrentPress = Point(aInput.x, aInput.y);
+        mOriginalPress = Point(aInput.x, aInput.y);
+        if (IsHit(mCurrentPress)) {
+            std::cout << "TouchArea Setting pressed state" << std::endl;
             mPressed(Control::States::pressed);
         }
         break;
     case InputType::Lift:
         std::cout << "TouchArea Setting normal state" << std::endl;
-        if (IsHit(Point(aInput.x, aInput.y))) {
+        mPressed(Control::States::normal);
+        if (IsHit(mCurrentPress) && IsHit(mOriginalPress)) {
             mClicked();
         }
-        mPressed(Control::States::normal);
+        // Will this return true for IsHit on things outside the scene?
+        mCurrentPress = Point(-1, -1);
         break;
     case InputType::Drag:
-        if (!IsHit(Point(aInput.x, aInput.y))) {
+        mCurrentPress = Point(aInput.x, aInput.y);
+        if (!IsHit(mCurrentPress)) {
             mPressed(Control::States::normal);
         }
         break;

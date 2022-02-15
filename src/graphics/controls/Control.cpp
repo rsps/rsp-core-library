@@ -30,10 +30,19 @@ void Control::SetState(States aState)
         Invalidate();
     }
 }
-void Control::Invalidate()
+/*void Control::Invalidate()
 {
     std::cout << "Control Image is set invalid" << std::endl;
     mIsInvalid = true;
+}*/
+void Control::Invalidate()
+{
+    mIsInvalid = true;
+    std::cout << "Invalidating Ctrl object" << std::endl;
+    std::cout << this << std::endl;
+    for (auto child : mChildren) {
+        child->Invalidate();
+    }
 }
 
 bool Control::IsInvalid() const

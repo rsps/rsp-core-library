@@ -95,6 +95,7 @@ class secondScene : public Scene
 
 TEST_CASE("Graphics Main Test")
 {
+    /*
     MESSAGE("Start");
 
     MESSAGE("Init Framebufer");
@@ -121,4 +122,5 @@ TEST_CASE("Graphics Main Test")
 
     // Run?
     gMain.Run();
+    */
 }

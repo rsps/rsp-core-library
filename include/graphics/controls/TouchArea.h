@@ -10,9 +10,6 @@ namespace rsp::graphics
 
 class TouchArea
 {
-  private:
-    Rect mTouchArea;
-
   public:
     TouchArea() : mTouchArea(0, 0, 0, 0){};
     TouchArea(Rect &aArea);
@@ -28,6 +25,10 @@ class TouchArea
 
     std::function<void(Control::States)> mPressed = [](Control::States) {};
     std::function<void()> mClicked = [](void) {};
+
+    Rect mTouchArea;
+    Point mCurrentPress{0, 0};
+    Point mOriginalPress{0, 0};
 };
 
 } // namespace rsp::graphics

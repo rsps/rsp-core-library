@@ -21,6 +21,7 @@ GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInput
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
 }
+
 GraphicsMain::~GraphicsMain()
 {
 }
@@ -30,10 +31,18 @@ void GraphicsMain::Run()
     while (!mTerminated) {
         // new inputs?
         while (mInputs.HasNewInputs()) {
-            Input input = mInputs.GetInput();
-            PrintInput(input); // Temp
+            inputCache.push_back(mInputs.GetInput());
+            // Input input = mInputs.GetInput();
+            PrintInput(inputCache.back());
+            // PrintInput(input); // Temp
             // invalidate stuff
-            mActiveScene.ProcessInput(input);
+            mActiveScene.ProcessInput(inputCache.back());
+            // mActiveScene.ProcessInput(input);
+            if (inputCache.size() > 5) {
+                mActiveScene.Render(mBufferedCanvas);
+                inputCache.clear();
+                mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
+            }
         }
         // re-render invalidated things
         mActiveScene.Render(mBufferedCanvas);

@@ -32,11 +32,14 @@ void Image::Render(Canvas &aCanvas)
     aCanvas.DrawImage(mArea.GetTopLeft(), mStateMap.at(mState));
     mIsInvalid = false;
 }
+
 void Image::HandleCallback(States aState)
 {
     if (aState != mState) {
         mState = aState;
-        mIsInvalid = true;
+        std::cout << "Invalidating Image object" << std::endl;
+        std::cout << this << std::endl;
+        this->Invalidate();
     }
 }
 } // namespace rsp::graphics
