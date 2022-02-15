@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <utils/Jsonable.h>
+#include <utils/json/Jsonable.h>
 #include <iostream>
 
 namespace rsp::utils {

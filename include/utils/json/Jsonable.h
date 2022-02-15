@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_JSONABLE_H_
-#define INCLUDE_UTILS_JSONABLE_H_
+#ifndef INCLUDE_UTILS_JSON_JSONABLE_H_
+#define INCLUDE_UTILS_JSON_JSONABLE_H_
 
 #include <string>
 #include <sstream>
@@ -43,4 +43,4 @@ public:
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_JSONABLE_H_ */
+#endif /* INCLUDE_UTILS_JSON_JSONABLE_H_ */
