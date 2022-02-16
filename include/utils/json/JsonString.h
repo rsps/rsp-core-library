@@ -20,21 +20,44 @@ namespace rsp::utils::json {
 
 class JsonValue;
 
+/**
+ * \class JsonString
+ * \brief String derivative specialized in traversing a Json formatted string.
+ */
 class JsonString : public std::string
 {
 public:
-    JsonString(const std::string &arJson): std::string(arJson) { mStack.emplace_back(begin(), end()); }
+    /**
+     * Constructor that takes a json formatted string.
+     *
+     * \param std::string
+     */
+    JsonString(const std::string &arJson): std::string(arJson),mIt(begin()), mEnd(end())  { }
 
-    void Push(const char aToken1, const char aToken2);
-    void Pop();
-    void SkipWhiteSpace();
-    std::string GetString();
+    /**
+     * Decode a value object from the content. The result can be a complex hierarchy of value objects.
+     * \return JsonValue*
+     */
     JsonValue* GetValue();
 
 protected:
-    std::string::iterator mIt; // Current index iterator
-    std::string::iterator mEnd; // Current end iterator
-    std::vector<std::pair<std::string::iterator, std::string::iterator>> mStack{}; // begin, end iterators
+    std::string::iterator mIt; // Current index iterator, this is always moving forward.
+    std::string::iterator mEnd; // Current end iterator, to limit the end of the current extraction.
+    std::vector<std::string::iterator> mStack{}; // Used to stack end iterators when parsing sub-strings.
+
+    void findSubString(const char aToken1, const char aToken2);
+    void push();
+    void pop();
+    void skipWhiteSpace();
+    std::string getString();
+    JsonValue* getObject();
+    JsonValue* getArray();
+    JsonValue* getNumber();
+
+    unsigned int getOffset() { return static_cast<unsigned int>(mIt - begin()); };
+    unsigned int getLength() { return static_cast<unsigned int>(mIt - mEnd); };
+
+    void debug();
 };
 
 } /* rsp::utils::json */

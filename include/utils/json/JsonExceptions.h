@@ -39,12 +39,12 @@ class EJsonTypeError : public EJsonException {
 public:
     explicit EJsonTypeError(const std::string &aMsg) : EJsonException(aMsg) {}
 };
-
+/*
 class EJsonUnicodeError : public EJsonException {
 public:
     explicit EJsonUnicodeError() : EJsonException("This Json implementation does not support unicode values greater than U+00FF") {}
 };
-
+*/
 } /* namespace rsp::utils::json */
 
 #endif /* INCLUDE_UTILS_JSON_JSONEXCEPTIONS_H_ */

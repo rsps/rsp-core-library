@@ -19,25 +19,6 @@ JsonArray::JsonArray()
     mPointer = static_cast<uintptr_t>(JsonTypes::Array);
 }
 
-JsonArray::JsonArray(UTF8String &arJson)
-{
-    mType = Types::Pointer;
-    mPointer = static_cast<uintptr_t>(JsonTypes::Array);
-
-    UTF8String s;
-
-    JsonValue::jWalk('[', ']', arJson, s);
-
-    while (s.length() > 0) {
-        Add(JsonValue::Decode(s));
-        auto it = whitespace(s.begin());
-        s.erase(s.begin(), it);
-        if (it != s.end() && *it == ',') {
-            s.erase(0, 1);
-        }
-    }
-}
-
 JsonArray::~JsonArray()
 {
     Clear();

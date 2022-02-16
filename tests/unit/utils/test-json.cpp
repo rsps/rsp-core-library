@@ -19,7 +19,7 @@ using namespace rsp::utils::json;
 
 TEST_CASE("Json") {
 
-    UTF8String json_object = R"(
+    JsonString json_object{ R"(
 {
     "NullValue": null,
     "BooleanValue": true,
@@ -37,7 +37,7 @@ TEST_CASE("Json") {
         "Empty": null
     }
 }    
-)";
+)" };
 
     SUBCASE("Create Float") {
         JsonValue v1(1.4f);
@@ -54,20 +54,15 @@ TEST_CASE("Json") {
     }
 
     SUBCASE("Create Unicode String") {
-        JsonValue* v3 = JsonValue::Decode("\"My \\u0057orld\"");
+        JsonValue* v3 = JsonString("\"My \\u0057orld\"").GetValue();
         CHECK(v3->GetType() == JsonValue::Types::String);
         CHECK("My World" == v3->AsString());
+        delete v3;
 
-        try {
-            v3 = JsonValue::Decode("\"Euro sign: \\u20AC\"");
+        v3 = JsonString("\"Euro sign: \\u20AC\"").GetValue();
 //            CHECK("Euro sign: €" == "Euro sign: \\u20AC");
-            CHECK(v3->GetType() == JsonValue::Types::String);
-            CHECK("Euro sign: €" == v3->AsString());
-            FAIL("We should not get here!!");
-        }
-        catch (const EJsonUnicodeError &e) {
-            CHECK(StrUtils::Contains(e.what(), "unicode values greater than U+00FF"));
-        }
+        CHECK(v3->GetType() == JsonValue::Types::String);
+        CHECK("Euro sign: €" == v3->AsString());
     }
 
     SUBCASE("Ignore Whitespace") {
@@ -76,16 +71,17 @@ TEST_CASE("Json") {
 	
 null }
 )";
-        JsonValue& v4 = *JsonValue::Decode(ws);
+        JsonValue& v4 = *JsonString(ws).GetValue();
 
         CHECK(v4.GetJsonType() == JsonTypes::Object);
         CHECK(v4.AsObject().GetCount() == 1);
         CHECK(v4.AsObject()["whitespace"].IsNull());
         MESSAGE(v4.Encode());
+        delete &v4;
     }
 
     SUBCASE("Decode Object") {
-        JsonValue& v = *JsonValue::Decode(json_object);
+        JsonValue& v = *JsonString(json_object).GetValue();
 
         CHECK(v.GetJsonType() == JsonTypes::Object);
         CHECK(v.AsObject().GetCount() == 7);
@@ -130,11 +126,13 @@ null }
         o["ObjectMember"].AsObject()["Empty"] = 12.34;
         CHECK_FALSE(o["ObjectMember"].AsObject()["Empty"].IsNull());
         CHECK(IsEqual(static_cast<double>(o["ObjectMember"].AsObject()["Empty"]), 12.34, 0.00000000001));
+
+        delete &v;
     }
 
     SUBCASE("Encode Object") {
         std::string orig = json_object;
-        JsonValue& v = *JsonValue::Decode(json_object);
+        JsonValue& v = *JsonString(json_object).GetValue();
 
         CHECK(v.GetJsonType() == JsonTypes::Object);
         CHECK(v.AsObject().GetCount() == 7);
@@ -146,13 +144,15 @@ null }
         MESSAGE(result.length());
         MESSAGE(orig.length());
         CHECK(result == orig);
+
+        delete &v;
     }
 
     SUBCASE("Validate") {
-        CHECK_THROWS_AS(JsonValue::Decode(R"(1.23456.7)"), const EJsonNumberError &); // Bad number
-        CHECK_THROWS_AS(JsonValue::Decode(R"(BadString)"), const EJsonException &);
-        CHECK_THROWS_AS(JsonValue::Decode(R"(TRUE)"), const EJsonException &);
-        CHECK_THROWS_AS(JsonValue::Decode(R"({ "BadObject": "Excessive Delimiter",)"), const EJsonException &);
+        CHECK_THROWS_AS(JsonString(R"(1.23456.7)").GetValue(), const EJsonNumberError &); // Bad number
+        CHECK_THROWS_AS(JsonString(R"(BadString)").GetValue(), const EJsonException &);
+        CHECK_THROWS_AS(JsonString(R"(TRUE)").GetValue(), const EJsonException &);
+        CHECK_THROWS_AS(JsonString(R"({ "BadObject": "Excessive Delimiter",)").GetValue(), const EJsonException &);
     }
 }
 

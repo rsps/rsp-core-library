@@ -19,35 +19,6 @@ JsonObject::JsonObject()
     mPointer = static_cast<uintptr_t>(JsonTypes::Object);
 }
 
-JsonObject::JsonObject(UTF8String &arJson)
-{
-    mType = Types::Pointer;
-    mPointer = static_cast<uintptr_t>(JsonTypes::Object);
-
-    UTF8String s;
-    std::string name;
-
-    JsonValue::jWalk('{', '}', arJson, s);
-
-    while (s.length() > 0) {
-        std::cout << "s: (" << s << ")" << std::endl;
-        name = JsonValue::parseString(s);
-        auto it = whitespace(s.begin());
-        std::cout << "it: (" << *it << ")" << std::endl;
-        if (*it != ':') {
-            THROW_WITH_BACKTRACE(EJsonFormatError);
-        }
-        it++;
-        s.erase(s.begin(), it);
-        Add(name, JsonValue::Decode(s));
-        it = whitespace(s.begin());
-        s.erase(s.begin(), it);
-        if (it != s.end() && *it == ',') {
-            s.erase(s.begin(), it + 1);
-        }
-    }
-}
-
 JsonObject::~JsonObject()
 {
     Clear();

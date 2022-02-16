@@ -17,28 +17,25 @@ namespace rsp::utils::json {
 
 class JsonObject;
 class JsonArray;
+class JsonString;
 
 enum class JsonTypes : unsigned int { Null, Bool, Number, String, Object, Array };
 
 class JsonValue : public Variant
 {
 public:
-//    static JsonValue* Decode(const char* apJson) { JsonString js(apJson); return Decode(js); }
-//    static JsonValue* Decode(const JsonString &arJson) { JsonString js(arJson); return Decode(js); }
-//    static JsonValue* Decode(JsonString &arJson);
-    JsonString Encode(bool aPrettyPrint = false);
-
-    JsonTypes GetJsonType() const;
+    JsonValue() : Variant() {}
+    // Use template to call inherited constructors
+    template<class T>
+    JsonValue(T aValue) : Variant(aValue) {}
 
     virtual ~JsonValue();
     JsonValue(const JsonValue&) = delete;
     JsonValue& operator=(const JsonValue&) = delete;
 
-    JsonValue() : Variant() {}
+    JsonString Encode(bool aPrettyPrint = false);
 
-    // Use template to call inherited constructors
-    template<class T>
-    JsonValue(T aValue) : Variant(aValue) {}
+    JsonTypes GetJsonType() const;
 
 // Disable wrong effc++ warning on "return *this;" in template functions. Fixed in GCC 11.
 #pragma GCC diagnostic push
@@ -61,18 +58,11 @@ protected:
         std::string sp{};
     };
 
+    friend JsonArray;
+    friend JsonObject;
     std::string jsonTypeToText() const;
 
     virtual void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel);
-
-private:
-    friend class JsonArray;
-    friend class JsonObject;
-
-//    static void jWalk(const char aToken1, const char aToken2, UTF8String &arJson, UTF8String &arResult);
-//    static std::string::iterator whitespace(std::string::iterator aIt);
-//    static UTF8String parseString(UTF8String &arJson);
-//    static void parseNumber(UTF8String &arJson, JsonValue* apResult);
 };
 
 
