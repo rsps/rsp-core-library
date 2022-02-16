@@ -30,11 +30,6 @@ void Control::SetState(States aState)
         Invalidate();
     }
 }
-/*void Control::Invalidate()
-{
-    std::cout << "Control Image is set invalid" << std::endl;
-    mIsInvalid = true;
-}*/
 void Control::Invalidate()
 {
     mIsInvalid = true;
