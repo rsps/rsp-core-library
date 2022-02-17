@@ -32,7 +32,7 @@ public:
 protected:
     std::vector<JsonValue*> mData{};
 
-    void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel) override;
+    void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) override;
 };
 
 

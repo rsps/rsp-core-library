@@ -8,6 +8,7 @@
  * \author      Steffen Brummer
  */
 
+#include <sstream>
 #include <utils/json/JsonString.h>
 #include <utils/json/JsonExceptions.h>
 #include <utils/json/JsonObject.h>
@@ -15,6 +16,25 @@
 #include <logging/Logger.h>
 
 using namespace rsp::utils::json;
+
+//#define JLOG(a) DLOG(a)
+#define JLOG(a)
+
+JsonString::JsonString(const std::string &arJson)
+    : std::string(arJson),
+      mIt(begin()),
+      mEnd(end())
+{
+//    JLOG("JsonString Created: " << std::distance(begin(), mIt) << ", " << getLength());
+}
+
+JsonString::JsonString(const JsonString &arJson)
+    : std::string(arJson),
+      mIt(begin()),
+      mEnd(end())
+{
+//    JLOG("JsonString Copied: " << std::distance(begin(), mIt) << ", " << getLength());
+}
 
 /**
  * Traverse the string to locate start and end of a substring.
@@ -24,16 +44,17 @@ using namespace rsp::utils::json;
  */
 void JsonString::findSubString(const char aToken1, const char aToken2)
 {
-    auto it = mIt;
-
+    JLOG("findSubString(" << aToken1 << ", " << aToken2 << "), " << debug());
     skipWhiteSpace();
 
-    if (it == mEnd) { // String was only whitespace
-        THROW_WITH_BACKTRACE(EJsonFormatError);
+    auto it = mIt;
+
+    if (it == mEnd) {
+        THROW_WITH_BACKTRACE1(EJsonFormatError, "Substring was only whitespace");
     }
 
     if (*it != aToken1) {
-        THROW_WITH_BACKTRACE(EJsonFormatError);
+        THROW_WITH_BACKTRACE1(EJsonFormatError, "Substring start token was not found. " + debug(false, true));
     }
     it++;
     mIt = it;
@@ -46,7 +67,7 @@ void JsonString::findSubString(const char aToken1, const char aToken2)
                 push();
                 mEnd = it;
                 it++;
-                DLOG("Stacked: " << *mIt << ", " << *mEnd);
+                JLOG("findSubString stacked: " << *mIt << ", " << *mEnd);
                 return;
             }
             else {
@@ -66,7 +87,7 @@ void JsonString::findSubString(const char aToken1, const char aToken2)
         it++;
     }
 
-    THROW_WITH_BACKTRACE(EJsonFormatError);
+    THROW_WITH_BACKTRACE1(EJsonFormatError, "End token was not found. " + aToken2);
 }
 
 void JsonString::push()
@@ -100,8 +121,7 @@ void JsonString::skipWhiteSpace()
 
 std::string JsonString::getString()
 {
-    debug();
-
+    JLOG("getString: " << debug(false, true));
     findSubString('"', '"');
 
     std::string result;
@@ -157,7 +177,7 @@ std::string JsonString::getString()
                     break;
 
                 default:
-                    THROW_WITH_BACKTRACE(EJsonParseError);
+                    THROW_WITH_BACKTRACE1(EJsonParseError, "String contains illegal escape character. " + debug(false, true));
                     break;
             }
         }
@@ -166,7 +186,8 @@ std::string JsonString::getString()
         }
         mIt++;
     }
-    debug();
+    mIt = mEnd + 1;
+    JLOG("getString exit: " << debug());
 
     pop();
     return result;
@@ -174,6 +195,7 @@ std::string JsonString::getString()
 
 JsonValue* JsonString::getObject()
 {
+    JLOG("getObject: " << debug(false, true));
     findSubString('{', '}');
 
     auto result = new JsonObject();
@@ -181,8 +203,9 @@ JsonValue* JsonString::getObject()
     while (mIt != mEnd) {
         auto name = getString();
         skipWhiteSpace();
+//        JLOG("Object Name: " << name << ", next: " << *mIt);
         if (*mIt != ':') {
-            THROW_WITH_BACKTRACE(EJsonFormatError);
+            THROW_WITH_BACKTRACE1(EJsonFormatError, "Object key/value delimiter not found." + debug(false, true));
         }
         mIt++;
         result->Add(name, GetValue());
@@ -191,31 +214,37 @@ JsonValue* JsonString::getObject()
             mIt++;
         }
     }
+    mIt++;
 
     pop();
+    JLOG("getObject exit: " << debug());
     return result;
 }
 
 JsonValue* JsonString::getArray()
 {
-    auto result = new JsonArray();
-
+    JLOG("getArray: " << debug(false, true));
     findSubString('[', ']');
+
+    auto result = new JsonArray();
 
     while (mIt != mEnd) {
         result->Add(GetValue());
         skipWhiteSpace();
+        JLOG("getArray: " << debug());
         if (mIt != mEnd && *mIt == ',') {
             mIt++;
         }
     }
-
+    mIt++;
     pop();
+    JLOG("getArray exit: " << debug());
     return result;
 }
 
 JsonValue* JsonString::getNumber()
 {
+    JLOG("getNumber: " << debug(false, true));
     bool is_float = false;
     bool is_negative = false;
     int i = 0;
@@ -226,7 +255,7 @@ JsonValue* JsonString::getNumber()
     while (mIt != mEnd) {
         char c = *mIt;
         int skip = 0;
-        DLOG("c: " << c << ", i: " << i);
+        JLOG("c: " << c << ", i: " << i);
         switch (i) {
             case 0:
                 if (c == '-') {
@@ -246,7 +275,7 @@ JsonValue* JsonString::getNumber()
                     i = 2;
                 }
                 else {
-                    THROW_WITH_BACKTRACE(EJsonNumberError);
+                    THROW_WITH_BACKTRACE1(EJsonNumberError, "First character is not a sign or numeric.");
                 }
                 break;
 
@@ -268,7 +297,7 @@ JsonValue* JsonString::getNumber()
 
             case 4:
                 if (!(c >= '0' && c <= '9')) {
-                    THROW_WITH_BACKTRACE(EJsonNumberError);
+                    THROW_WITH_BACKTRACE1(EJsonNumberError, "Floating point decimal digit is not numeric.");
                 }
                 else {
                     i = 5;
@@ -302,7 +331,7 @@ JsonValue* JsonString::getNumber()
 
             case 8:
                 if (!(c >= '0' && c <= '9')) {
-                    THROW_WITH_BACKTRACE(EJsonNumberError);
+                    THROW_WITH_BACKTRACE1(EJsonNumberError, "Floating point exponent is not numeric.");
                 }
                 else {
                     i = 9;
@@ -320,7 +349,7 @@ JsonValue* JsonString::getNumber()
                     skip = 100;
                 }
                 else {
-                    THROW_WITH_BACKTRACE(EJsonNumberError);
+                    THROW_WITH_BACKTRACE1(EJsonNumberError, "Numeric value has non numeric ending..");
                 }
                 break;
 
@@ -354,6 +383,7 @@ JsonValue* JsonString::getNumber()
 
 JsonValue* JsonString::GetValue()
 {
+    JLOG("GetValue: " << debug(false, true));
     JsonValue* result = nullptr;
 
     skipWhiteSpace();
@@ -361,21 +391,21 @@ JsonValue* JsonString::GetValue()
     if (mIt != mEnd) {
         switch (*mIt) {
             case '{':
-                LOG("Object detected: " << substr(getOffset(), getLength()));
+                JLOG("Object detected: " << getOffset() << ", " << getLength() << "; " << substr(getOffset(), getLength()));
                 result = getObject();
-                LOG("Result Type: " << *result << ", Count: " << result->AsObject().GetCount());
+                JLOG("Result Type: " << *result << ", Count: " << result->AsObject().GetCount());
                 break;
 
             case '[':
-                LOG("Array detected: " << substr(getOffset(), getLength()));
+                JLOG("Array detected: " << substr(getOffset(), getLength()));
                 result = getArray();
-                LOG("Result Type: " << *result << ", Count: " << result->AsArray().GetCount());
+                JLOG("Result Type: " << *result << ", Count: " << result->AsArray().GetCount());
                 break;
 
             case '"':
-                LOG("String detected: " << substr(getOffset(), getLength()));
+                JLOG("String detected: " << substr(getOffset(), getLength()));
                 result = new JsonValue(getString());
-                LOG("Result Type: " << *result << ", Length: " << result->AsString().size());
+                JLOG("Result Type: " << *result << ", Length: " << result->AsString().size());
                 break;
 
             case '0':
@@ -389,56 +419,64 @@ JsonValue* JsonString::GetValue()
             case '8':
             case '9':
             case '-':
-                DLOG("Number detected: " << substr(getOffset(), getLength()));
+                JLOG("Number detected: " << substr(getOffset(), getLength()));
                 result = getNumber();
-                DLOG("Result Type: " << *result);
+                JLOG("Result Type: " << *result);
                 break;
 
             case 't':
-                DLOG("true detected: " << substr(getOffset(), getLength()));
+                JLOG("true detected: " << substr(getOffset(), getLength()));
                 if (substr(getOffset(), 4) == "true") {
                     mIt += 4;
                     result = new JsonValue(true);
                 }
                 else {
-                    THROW_WITH_BACKTRACE(EJsonParseError);
+                    THROW_WITH_BACKTRACE1(EJsonParseError, "True is not formatted correctly. " + debug(false, true));
                 }
                 break;
 
             case 'f':
-                DLOG("false detected: " << substr(getOffset(), getLength()));
+                JLOG("false detected: " << substr(getOffset(), getLength()));
                 if (substr(getOffset(), 5) == "false") {
                     mIt += 5;
                     result = new JsonValue(false);
                 }
                 else {
-                    THROW_WITH_BACKTRACE(EJsonParseError);
+                    THROW_WITH_BACKTRACE1(EJsonParseError, "False is not formatted correctly. " + debug(false, true));
                 }
                 break;
 
             case 'n':
-                DLOG("null detected: " << substr(getOffset(), getLength()));
+                JLOG("null detected: " << substr(getOffset(), getLength()));
                 if (substr(getOffset(), 4) == "null") {
                     mIt += 4;
                     result = new JsonValue();
                 }
                 else {
-                    THROW_WITH_BACKTRACE(EJsonParseError);
+                    THROW_WITH_BACKTRACE1(EJsonParseError, "Null is not formatted correctly. " + debug(false, true));
                 }
                 break;
 
             default:
-                DLOG("Illegal start character: " << std::hex << static_cast<int>(*mIt) << ", input: " << substr(getOffset(), getLength()));
-                THROW_WITH_BACKTRACE(EJsonParseError);
+                THROW_WITH_BACKTRACE1(EJsonParseError, "Illegal start character: " + debug(false, true));
                 break;
         }
         skipWhiteSpace();
     }
 
+    JLOG("getValue exit: " << debug());
     return result;
 }
 
-void JsonString::debug()
+std::string JsonString::debug(bool aIncludeText, bool aIncludeSubstr)
 {
-    DLOG("JsonString: (" << *this << "), (" << *mIt << "), (" << *mEnd << ")");
+    std::stringstream ss;
+    if (aIncludeText) {
+        ss << *this << "; ";
+    }
+    ss << "Iterators: " << getOffset() << "(" << *mIt << "), " << getLength() << "(" << *mEnd << ");\n";
+    if (aIncludeSubstr) {
+        ss << " Substr: " << substr(getOffset(), getLength()) << ";";
+    }
+    return ss.str();
 }

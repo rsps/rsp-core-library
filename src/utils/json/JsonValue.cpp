@@ -8,6 +8,7 @@
  * \author      Steffen Brummer
  */
 
+#include <iomanip>
 #include <utils/json/JsonValue.h>
 #include <utils/json/JsonArray.h>
 #include <utils/json/JsonObject.h>
@@ -24,17 +25,17 @@ JsonValue::~JsonValue()
 }
 
 
-JsonString JsonValue::Encode(bool aPrettyPrint)
+JsonString JsonValue::Encode(bool aPrettyPrint, bool aForceToUCS2)
 {
     std::stringstream result;
 
     if (aPrettyPrint) {
         PrintFormat pf(4, "\n", " ");
-        toStringStream(result, pf, 0);
+        toStringStream(result, pf, 0, aForceToUCS2);
     }
     else {
         PrintFormat pf;
-        toStringStream(result, pf, 0);
+        toStringStream(result, pf, 0, aForceToUCS2);
     }
 
     return JsonString(result.str());
@@ -61,7 +62,7 @@ JsonObject& JsonValue::AsObject() const
     }
 }
 
-void JsonValue::toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel)
+void JsonValue::toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2)
 {
     std::string in(arPf.indent * aLevel, ' ');
 
@@ -92,15 +93,40 @@ void JsonValue::toStringStream(std::stringstream &arResult, PrintFormat &arPf, u
                     s.replace(i, 1, "\\t");
                     break;
                 default:
-                    if (static_cast<std::uint8_t>(c) > 127) {
+                    if (aForceToUCS2 && static_cast<uint8_t>(c) > 127) {
+                        int v = 0;
                         char buf[12];
-                        sprintf(buf, "\\u%04x", static_cast<int>(c));
-                        s.replace(i, 1, buf);
+                        switch (static_cast<uint8_t>(c) & 0xE0) {
+                            case 0xE0:
+                                v =   ((static_cast<int>(s[i]) & 0x0F) << 12)
+                                    + ((static_cast<int>(s[i+1]) & 0x3F) << 6)
+                                    + (static_cast<int>(s[i+2]) & 0x3F);
+                                sprintf(buf, "\\u%04x", v);
+                                s.replace(i, 3, buf);
+                                i += 4;
+                                break;
+
+                            case 0xC0:
+                                v =   ((static_cast<int>(s[i]) & 0x1F) << 6)
+                                    + (static_cast<int>(s[i+1]) & 0x3F);
+                                sprintf(buf, "\\u%04x", v);
+                                s.replace(i, 2, buf);
+                                i += 4;
+                                break;
+
+                            default:
+                                THROW_WITH_BACKTRACE1(EJsonParseError, "JsonValue of type string has illegal character: " + c);
+                                break;
+                        }
                     }
                     break;
             }
         }
         arResult << "\"" << s << "\"";
+//        DLOG("toStringSteam: " << s);
+//        for (auto c : s) {
+//            DLOG("toStringSteam: " << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c) << std::dec << " " << c);
+//        }
     }
     else {
         arResult << AsString();

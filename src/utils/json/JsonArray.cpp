@@ -61,7 +61,7 @@ void JsonArray::Clear()
     mType = Types::Null;
 }
 
-void JsonArray::toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel)
+void JsonArray::toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2)
 {
     std::string in(arPf.indent * (aLevel + 1), ' ');
     std::string c = ",";
@@ -71,7 +71,7 @@ void JsonArray::toStringStream(std::stringstream &arResult, PrintFormat &arPf, u
     int rest = mData.size();
     for (auto el : mData) {
        arResult << in;
-       el->toStringStream(arResult, arPf, aLevel+1);
+       el->toStringStream(arResult, arPf, aLevel+1, aForceToUCS2);
        if (--rest == 0) {
            c = "";
        }

@@ -32,7 +32,8 @@ public:
      *
      * \param std::string
      */
-    JsonString(const std::string &arJson): std::string(arJson),mIt(begin()), mEnd(end())  { }
+    JsonString(const std::string &arJson);
+    JsonString(const JsonString &arJson);
 
     /**
      * Decode a value object from the content. The result can be a complex hierarchy of value objects.
@@ -55,9 +56,9 @@ protected:
     JsonValue* getNumber();
 
     unsigned int getOffset() { return static_cast<unsigned int>(mIt - begin()); };
-    unsigned int getLength() { return static_cast<unsigned int>(mIt - mEnd); };
+    unsigned int getLength() { return static_cast<unsigned int>(mEnd - mIt); };
 
-    void debug();
+    std::string debug(bool aIncludeText = false, bool aIncludeSubstr = false);
 };
 
 } /* rsp::utils::json */

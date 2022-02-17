@@ -16,28 +16,27 @@ namespace rsp::utils::json {
 
 class EJsonException : public rsp::utils::CoreException {
 public:
-    explicit EJsonException(const char *apMsg) : rsp::utils::CoreException(apMsg) {}
-    EJsonException(const std::string &aMsg) : rsp::utils::CoreException(aMsg) {}
+    explicit EJsonException(const std::string &aMsg) : rsp::utils::CoreException(aMsg) {}
 };
 
 class EJsonParseError : public EJsonException {
 public:
-    explicit EJsonParseError() : EJsonException("Json Parse Error") {}
+    explicit EJsonParseError(const std::string &aMsg) : EJsonException("Json Parse Error: " + aMsg) {}
 };
 
 class EJsonFormatError : public EJsonException {
 public:
-    explicit EJsonFormatError() : EJsonException("Json Format Error") {}
+    explicit EJsonFormatError(const std::string &aMsg) : EJsonException("Json Format Error: " + aMsg) {}
 };
 
 class EJsonNumberError : public EJsonException {
 public:
-    explicit EJsonNumberError() : EJsonException("Json Number Error") {}
+    explicit EJsonNumberError(const std::string &aMsg) : EJsonException("Json Number Error: " + aMsg) {}
 };
 
 class EJsonTypeError : public EJsonException {
 public:
-    explicit EJsonTypeError(const std::string &aMsg) : EJsonException(aMsg) {}
+    explicit EJsonTypeError(const std::string &aMsg) : EJsonException("Json Type Error: " + aMsg) {}
 };
 /*
 class EJsonUnicodeError : public EJsonException {

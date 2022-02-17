@@ -11,6 +11,7 @@
 #define INCLUDE_UTILS_JSON_JSONOBJECT_H_
 
 #include <map>
+#include <vector>
 #include "JsonValue.h"
 
 namespace rsp::utils::json {
@@ -32,9 +33,10 @@ public:
     void Clear() override;
 
 protected:
-    std::map<const std::string, JsonValue*> mData{};
+    std::vector<std::string> mKeyNames{}; // Vector maintains insertion order.
+    std::map<std::string, JsonValue*> mData{};
 
-    void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel) override;
+    void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) override;
 };
 
 

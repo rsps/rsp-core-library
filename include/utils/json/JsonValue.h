@@ -33,7 +33,7 @@ public:
     JsonValue(const JsonValue&) = delete;
     JsonValue& operator=(const JsonValue&) = delete;
 
-    JsonString Encode(bool aPrettyPrint = false);
+    JsonString Encode(bool aPrettyPrint = false, bool aForceToUCS2 = false);
 
     JsonTypes GetJsonType() const;
 
@@ -62,7 +62,9 @@ protected:
     friend JsonObject;
     std::string jsonTypeToText() const;
 
-    virtual void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel);
+    virtual void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2);
+
+    static bool mEncodeToUCS2;
 };
 
 

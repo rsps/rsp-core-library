@@ -42,7 +42,7 @@ JsonValue& JsonObject::operator [](const char *apName)
 JsonValue& JsonObject::operator [](const std::string &aName)
 {
     try {
-        return *(mData[aName]);
+        return *(mData.at(aName));
     }
     catch (const std::exception &e) {
         THROW_WITH_BACKTRACE1(EJsonException, "JsonObject: Member \"" + aName + "\" not found. <- " + e.what());
@@ -55,7 +55,8 @@ JsonObject& JsonObject::Add(const std::string &aName, JsonValue* apValue)
         return *this;
     }
 
-    DLOG("JsonObject::Add(): \"" << aName << "\": (" << apValue->Encode() << ")");
+    DLOG("JsonObject::Add(): \"" << aName << "\": " << apValue->Encode());
+    mKeyNames.push_back(aName);
     mData[aName] = apValue;
     return *this;
 }
@@ -66,6 +67,12 @@ JsonObject& JsonObject::Remove(const std::string &aName)
     if (it != mData.end()) {
         mData.erase(it);
     }
+
+    auto position = std::find(mKeyNames.begin(), mKeyNames.end(), aName);
+    if (position != mKeyNames.end()) {
+        mKeyNames.erase(position);
+    }
+
     return *this;
 }
 
@@ -79,7 +86,7 @@ void JsonObject::Clear()
     mType = Types::Null;
 }
 
-void JsonObject::toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel)
+void JsonObject::toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2)
 {
     std::string in(arPf.indent * (aLevel+1), ' ');
     std::string c = ",";
@@ -87,9 +94,10 @@ void JsonObject::toStringStream(std::stringstream &arResult, PrintFormat &arPf, 
     arResult << "{" << arPf.nl;
 
     int rest = mData.size();
-    for (auto el : mData) {
-       arResult << in << "\"" << el.first << "\":" << arPf.sp;
-       el.second->toStringStream(arResult, arPf, aLevel+1);
+    for (auto key : mKeyNames) {
+       auto value = mData[key];
+       arResult << in << "\"" << key << "\":" << arPf.sp;
+       value->toStringStream(arResult, arPf, aLevel+1, aForceToUCS2);
        if (--rest == 0) {
            c = "";
        }

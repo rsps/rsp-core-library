@@ -71,13 +71,14 @@ TEST_CASE("Json") {
 	
 null }
 )";
-        JsonValue& v4 = *JsonString(ws).GetValue();
+        auto p = JsonString(ws).GetValue();
+        JsonValue& v4 = *p;
 
         CHECK(v4.GetJsonType() == JsonTypes::Object);
         CHECK(v4.AsObject().GetCount() == 1);
         CHECK(v4.AsObject()["whitespace"].IsNull());
         MESSAGE(v4.Encode());
-        delete &v4;
+        delete p;
     }
 
     SUBCASE("Decode Object") {
@@ -146,6 +147,16 @@ null }
         CHECK(result == orig);
 
         delete &v;
+
+        // Validate UCS2 code-points in output:
+        orig = "\"Euro sign: \\u20ac\"";
+        JsonValue *v1 = JsonString(orig).GetValue();
+        CHECK(v1->GetType() == JsonValue::Types::String);
+        CHECK("Euro sign: €" == v1->AsString());
+        result = v1->Encode(true, true);
+        CHECK(result == orig);
+
+        delete v1;
     }
 
     SUBCASE("Validate") {

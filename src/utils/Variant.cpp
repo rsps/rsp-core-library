@@ -271,7 +271,7 @@ std::string Variant::AsString() const
         case Types::Pointer:
         {
             char buf[40];
-            sprintf(buf, "0x%p", reinterpret_cast<void*>(mPointer));
+            sprintf(buf, "%p", reinterpret_cast<void*>(mPointer));
             return std::string(buf);
         }
 
