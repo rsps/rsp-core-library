@@ -12,8 +12,7 @@
 #include <sstream>
 #include <map>
 #include <logging/Logger.h>
-#include <utils/RSPCoreExceptions.h>
-#include <utils/ExceptionHelper.h>
+#include <utils/CoreException.h>
 
 namespace rsp::logging {
 
@@ -63,7 +62,7 @@ LogStreamInterface::LogStreamInterface(LoggerInterface *apOwner, LogLevel aLevel
 {
 }
 
-LogStreamInterface& LogStreamInterface::operator=(const LogStreamInterface &arOther)
+LogStreamInterface& LogStreamInterface::operator=(const LogStreamInterface &&arOther)
 {
     mpOwner = arOther.mpOwner;
     mLevel = arOther.mLevel;
@@ -78,7 +77,7 @@ void LogStreamInterface::ownerWrite(const std::string &arMsg)
 LoggerInterface& LoggerInterface::GetDefault()
 {
     if (!mpDefaultInstance) {
-        THROW_WITH_BACKTRACE1(rsp::utils::NotsetException, "Logger instance not set.");
+        THROW_WITH_BACKTRACE1(rsp::utils::NotSetException, "Logger instance not set.");
     }
 
     return *mpDefaultInstance;

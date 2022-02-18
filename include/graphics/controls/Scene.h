@@ -11,8 +11,8 @@ namespace rsp::graphics
 
 class Scene : public Control
 {
-  public:
-    Scene(Rect &aRect);
+public:
+    Scene(const Rect &aRect);
     ~Scene();
 
     void ProcessInput(Input &aInput);
@@ -22,7 +22,8 @@ class Scene : public Control
 
     void AddChildren(Image &aImg);
 
-    std::vector<TouchArea *> mTouchables;
+protected:
+    std::vector<TouchArea *> mTouchables{};
 };
 
 } // namespace rsp::graphics

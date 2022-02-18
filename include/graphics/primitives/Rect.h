@@ -12,7 +12,6 @@
 #define RECT_H
 
 #include "Point.h"
-#include <utils/RSPCoreExceptions.h>
 
 namespace rsp::graphics
 {
@@ -62,7 +61,15 @@ class Rect
      *
      * \param aRect
      */
-    // Rect(const Rect &aRect);
+    Rect(const Rect &aRect);
+
+    /**
+     * Assignment operator
+     *
+     * \param arRect
+     * \return
+     */
+    Rect& operator=(const Rect &arRect);
 
     /**
      * Get the top value
@@ -181,5 +188,8 @@ class Rect
     Point mRightBottom;
 };
 
+std::ostream& operator <<(std::ostream &aStream, const Rect &arRect);
+
 } // namespace rsp::graphics
+
 #endif // RECT_H

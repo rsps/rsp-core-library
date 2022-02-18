@@ -1,3 +1,12 @@
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2022 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Simon Glashoff
+ */
 #ifndef BUFFEREDCANVAS_H
 #define BUFFEREDCANVAS_H
 
@@ -30,14 +39,14 @@ class BufferedCanvas : public Canvas
         Copy,
         Clear
     };
-    virtual void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy) = 0;
+    virtual void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy, Color aColor = Color::Black) = 0;
 
   protected:
-    virtual void clear() = 0;
+    virtual void clear(Color aColor) = 0;
     virtual void copy() = 0;
 
-    uint8_t *mpFrontBuffer;
-    uint8_t *mpBackBuffer;
+    uint8_t *mpFrontBuffer = nullptr;
+    uint8_t *mpBackBuffer = nullptr;
 };
 
 } // namespace rsp::graphics

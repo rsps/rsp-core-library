@@ -6,6 +6,7 @@
  * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
+ * \author      Steffen Brummer
  */
 
 #ifndef RSPCOREEXCEPTIONS_H
@@ -19,13 +20,13 @@
 namespace rsp::utils
 {
 
-class RSPCoreException : public std::runtime_error
+class CoreException : public std::runtime_error
 {
-public:
-    explicit RSPCoreException(const char *aMsg)
-        : std::runtime_error("")
+  public:
+    explicit CoreException(const char *aMsg)
+        : std::runtime_error(""),
+          mMsg(aMsg)
     {
-        mMsg = aMsg;
     }
 
     const char *what() const noexcept override
@@ -37,20 +38,29 @@ public:
     std::string mMsg;
 };
 
-class NotImplementedException : public RSPCoreException
+class NotImplementedException : public CoreException
 {
-public:
+  public:
     explicit NotImplementedException(const char *aMsg)
-        : RSPCoreException(aMsg)
+        : CoreException(aMsg)
     {
     }
 };
 
-class AssertException : public RSPCoreException
+class NotSetException : public CoreException
 {
-public:
+  public:
+    explicit NotSetException(const char *aMsg)
+        : CoreException(aMsg)
+    {
+    }
+};
+
+class AssertException : public CoreException
+{
+  public:
     explicit AssertException(const char *aMsg)
-        : RSPCoreException(aMsg)
+        : CoreException(aMsg)
     {
     }
 };
@@ -63,16 +73,6 @@ public:
 #else
 #define ASSERT(a)
 #endif
-
-
-class NotsetException : public RSPCoreException
-{
-public:
-    explicit NotsetException(const char *aMsg)
-    : RSPCoreException(aMsg)
-    {
-    }
-};
 
 }
 

@@ -10,23 +10,29 @@ namespace rsp::graphics
 
 class TouchArea
 {
-  public:
-    TouchArea() : mTouchArea(0, 0, 0, 0){};
+public:
+    TouchArea() {};
     TouchArea(Rect &aArea);
     ~TouchArea();
 
     void ProcessInput(Input &aInput);
+
     bool IsHit(const Point &aPoint) const;
+
     // Register callback method for an Image or simply a Control?
     void RegisterOnPressed(std::function<void(Control::States)> aFunc);
     void RegisterOnClicked(std::function<void()> aFunc);
 
     TouchArea &operator=(const TouchArea &) = default;
 
-    std::function<void(Control::States)> mPressed = [](Control::States) {};
-    std::function<void()> mClicked = [](void) {};
+    TouchArea& SetArea(const Rect &arRect) { mTouchArea = arRect; return *this; }
+    const Rect& GetArea() const { return mTouchArea; }
 
-    Rect mTouchArea;
+protected:
+    std::function<void(Control::States)> mPressed{}; // = [](Control::States) {};
+    std::function<void()> mClicked{}; // = [](void) {};
+
+    Rect mTouchArea{};
     Point mCurrentPress{0, 0};
     Point mOriginalPress{0, 0};
 };

@@ -42,9 +42,12 @@ public:
 
     ConsoleLogWriter(std::string aAcceptLevel, ConsoleLogStreamsInterface *apConsole = nullptr, const ConsoleColors_t *apColors = nullptr);
     ConsoleLogWriter(LogLevel aAcceptLevel, ConsoleLogStreamsInterface *apConsole = nullptr, const ConsoleColors_t *apColors = nullptr);
+    ConsoleLogWriter(const ConsoleLogWriter&) = delete;
     ~ConsoleLogWriter();
 
     void Write(const std::string &arMsg, LogLevel aCurrentLevel) override;
+
+    ConsoleLogWriter& operator= (const ConsoleLogWriter&) = delete;
 
 protected:
     LogLevel mAcceptLevel;

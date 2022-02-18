@@ -18,79 +18,82 @@ using namespace rsp::graphics;
 
 class firstScene : public Scene
 {
-  public:
-    firstScene(Rect &aRect)
+public:
+    firstScene(const Rect &aRect)
         : Scene(aRect)
     {
         // Set member variables values
         Rect topRect(Point(100, 400), 200, 100);
-        topBtn = TouchArea(topRect);
-        topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
+        mTopBtn = TouchArea(topRect);
+        mTopBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
 
         Rect botRect(Point(100, 600), 200, 100);
-        botBtn = TouchArea(botRect);
-        botBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
+        mBotBtn = TouchArea(botRect);
+        mBotBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
 
         // Bind onPressed
-        topBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &topBtnImg, std::placeholders::_1));
-        botBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &botBtnImg, std::placeholders::_1));
+        mTopBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &mTopBtnImg, std::placeholders::_1));
+        mBotBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &mBotBtnImg, std::placeholders::_1));
 
         //  Bind onClicked
 
         //  Add them to the lists?
-        mTouchables.push_back(&topBtn);
-        mTouchables.push_back(&botBtn);
-        mChildren.push_back(&topBtnImg);
-        mChildren.push_back(&botBtnImg);
+        mTouchables.push_back(&mTopBtn);
+        mTouchables.push_back(&mBotBtn);
+        mChildren.push_back(&mTopBtnImg);
+        mChildren.push_back(&mBotBtnImg);
     };
 
     ~firstScene() {}
 
+protected:
     Color background{0x323232}; // color from old main.qml
 
-    TouchArea topBtn;
-    TouchArea botBtn;
+    TouchArea mTopBtn{};
+    TouchArea mBotBtn{};
 
-    Image topBtnImg;
-    Image botBtnImg;
+    Image mTopBtnImg{};
+    Image mBotBtnImg{};
 };
+
 class secondScene : public Scene
 {
-  public:
-    secondScene(Rect &aRect)
+public:
+    secondScene(const Rect &aRect)
         : Scene(aRect)
     {
         // Set member variables values
         Rect topRect(Point(100, 100), 200, 100);
-        topBtn = TouchArea(topRect);
-        topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
+        mTopBtn = TouchArea(topRect);
+        mTopBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
 
         Rect botRect(Point(100, 300), 200, 100);
-        botBtn = TouchArea(botRect);
-        botBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
+        mBotBtn = TouchArea(botRect);
+        mBotBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
 
         // Bind onPressed
-        topBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &topBtnImg, std::placeholders::_1));
-        botBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &botBtnImg, std::placeholders::_1));
+        mTopBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &mTopBtnImg, std::placeholders::_1));
+        mBotBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &mBotBtnImg, std::placeholders::_1));
 
         //  Bind onClicked
 
         //  Add them to the lists?
-        mTouchables.push_back(&topBtn);
-        mTouchables.push_back(&botBtn);
-        mChildren.push_back(&topBtnImg);
-        mChildren.push_back(&botBtnImg);
+        mTouchables.push_back(&mTopBtn);
+        mTouchables.push_back(&mBotBtn);
+        mChildren.push_back(&mTopBtnImg);
+        mChildren.push_back(&mBotBtnImg);
     };
 
     ~secondScene() {}
 
-    Color background{0x232323}; // reverse color from old main.qml
+protected:
+    Color mBackground{0x232323}; // reverse color from old main.qml
 
-    TouchArea topBtn;
-    TouchArea botBtn;
+    TouchArea mTopBtn{};
+    TouchArea mBotBtn{};
 
-    Image topBtnImg;
-    Image botBtnImg;
+    Image mTopBtnImg{};
+    Image mBotBtnImg{};
 };
 
 TEST_CASE("Graphics Main Test")

@@ -1,3 +1,12 @@
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2022 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Simon Glashoff
+ */
 #ifndef BITMAP_H
 #define BITMAP_H
 
@@ -55,7 +64,7 @@ class Bitmap : public Canvas
         if (!IsInsideScreen(aPoint)) {
             return;
         }
-        long location = (mWidth * aPoint.mY) + aPoint.mX;
+        uint32_t location = static_cast<uint32_t>((mWidth * aPoint.mY) + aPoint.mX);
         mImagePixels[location] = aColor;
     }
 
@@ -66,7 +75,7 @@ class Bitmap : public Canvas
      *
      * \return uint32_t
      */
-    uint32_t GetHeight() const
+    int GetHeight() const
     {
         return mHeight;
     }
@@ -76,7 +85,7 @@ class Bitmap : public Canvas
      *
      * \return uint32_t
      */
-    uint32_t GetWidth() const
+    int GetWidth() const
     {
         return mWidth;
     }
@@ -93,7 +102,7 @@ class Bitmap : public Canvas
 
   protected:
     std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
-    std::vector<uint32_t> mImagePixels; // Pointer?
+    std::vector<uint32_t> mImagePixels{ }; // Pointer?
 };
 
 } // namespace rsp::graphics

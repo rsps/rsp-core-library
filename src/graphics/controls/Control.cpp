@@ -13,8 +13,8 @@
 namespace rsp::graphics
 {
 
-Control::Control(Rect &aRect, Control *aParent)
-    : mArea(aRect), mParent(aParent)
+Control::Control(const Rect &arRect)
+    : mArea(arRect)
 {
     std::cout << "Constructor of Control" << std::endl;
 }
@@ -22,6 +22,7 @@ Control::Control(Rect &aRect, Control *aParent)
 Control::~Control()
 {
 }
+
 void Control::SetState(States aState)
 {
     std::cout << "Control Image setting State" << std::endl;
@@ -30,19 +31,21 @@ void Control::SetState(States aState)
         Invalidate();
     }
 }
+
 void Control::Invalidate()
 {
+    if (mIsInvalid) {
+        return;
+    }
     mIsInvalid = true;
     std::cout << "Invalidating Ctrl object" << std::endl;
     std::cout << this << std::endl;
     for (auto child : mChildren) {
         child->Invalidate();
     }
-}
-
-bool Control::IsInvalid() const
-{
-    return mIsInvalid;
+    if (mTransparent && mpParent) {
+        mpParent->Invalidate();
+    }
 }
 
 } // namespace rsp::graphics

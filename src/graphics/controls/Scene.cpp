@@ -12,7 +12,7 @@
 
 namespace rsp::graphics
 {
-Scene::Scene(Rect &aRect)
+Scene::Scene(const Rect &aRect)
     : Control(aRect)
 {
 }
@@ -35,13 +35,6 @@ void Scene::Render(Canvas &aCanvas)
         child->Render(aCanvas);
     }
 }
-
-/*void Scene::Invalidate()
-{
-    for (auto child : mChildren) {
-        child->Invalidate();
-    }
-}*/
 
 void Scene::AddChildren(Image &aImg)
 {

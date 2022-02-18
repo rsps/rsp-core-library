@@ -11,23 +11,23 @@ namespace rsp::graphics
 
 class InputCreator
 {
-  private:
-    // std::ifstream touchDriver;
-    rsp::posix::FileIO touchDriver;
-
-    InputLine inputLine;
-
-    Input input;
-
-    void ReadType();
-    void ReadBody();
-
   public:
     InputCreator();
     ~InputCreator();
 
     bool HasNewInputs();
     const Input &GetInput();
+
+  private:
+    // std::ifstream touchDriver;
+    rsp::posix::FileIO touchDriver{};
+
+    InputLine inputLine{};
+
+    Input input{};
+
+    void readType();
+    void readBody();
 };
 
 } // namespace rsp::graphics

@@ -11,10 +11,11 @@ struct InputLine {
     struct timeval time;
     uint16_t type;
     uint16_t code;
-    uint32_t value;
+    int32_t  value;
 } __attribute__((packed));
 
 enum class InputType {
+    None,
     Press,
     Drag,
     Lift
@@ -23,16 +24,16 @@ enum class InputType {
 class Input
 {
   public:
-    InputType type;
-    uint32_t x = 0;
-    uint32_t y = 0;
+    InputType type = InputType::None;
+    int x = 0;
+    int y = 0;
 
-    Input()
-    {
-    }
-    ~Input()
-    {
-    }
+//    Input()
+//    {
+//    }
+//    ~Input()
+//    {
+//    }
 };
 } // namespace rsp::graphics
 #endif // INPUT_H
