@@ -19,16 +19,17 @@ class TouchArea
     bool IsHit(const Point &aPoint) const;
     // Register callback method for an Image or simply a Control?
     void RegisterOnPressed(std::function<void(Control::States)> aFunc);
-    void RegisterOnClicked(std::function<void()> aFunc);
+    void RegisterOnClicked(std::function<void(std::string)> aFunc, std::string aClickedInfo);
 
     TouchArea &operator=(const TouchArea &) = default;
 
     std::function<void(Control::States)> mPressed = [](Control::States) {};
-    std::function<void()> mClicked = [](void) {};
+    std::function<void(std::string)> mClicked = [](std::string) {};
 
     Rect mTouchArea;
     Point mCurrentPress{0, 0};
     Point mOriginalPress{0, 0};
+    std::string mClickedInfo = "";
 };
 
 } // namespace rsp::graphics

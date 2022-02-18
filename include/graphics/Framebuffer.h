@@ -3,7 +3,7 @@
 
 #include <linux/fb.h>
 
-#include "graphics/BufferedCanvas.h"
+#include "graphics/primitives/BufferedCanvas.h"
 #include "graphics/primitives/Canvas.h"
 
 namespace rsp::graphics

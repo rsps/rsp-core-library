@@ -35,7 +35,7 @@ void TouchArea::ProcessInput(Input &aInput)
         std::cout << "TouchArea Setting normal state" << std::endl;
         mPressed(Control::States::normal);
         if (IsHit(mCurrentPress) && IsHit(mOriginalPress)) {
-            mClicked();
+            mClicked(mClickedInfo);
         }
         // Will this return true for IsHit on things outside the scene?
         mCurrentPress = Point(-1, -1);
@@ -58,8 +58,9 @@ void TouchArea::RegisterOnPressed(std::function<void(Control::States)> aFunc)
 {
     mPressed = aFunc;
 }
-void TouchArea::RegisterOnClicked(std::function<void()> aFunc)
+void TouchArea::RegisterOnClicked(std::function<void(std::string)> aFunc, std::string aClickedInfo)
 {
+    mClickedInfo = aClickedInfo;
     mClicked = aFunc;
 }
 } // namespace rsp::graphics

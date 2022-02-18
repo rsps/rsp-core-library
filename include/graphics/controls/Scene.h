@@ -18,9 +18,8 @@ class Scene : public Control
     void ProcessInput(Input &aInput);
     void AddArea(TouchArea &aArea);
     void Render(Canvas &aCanvas) override;
-    // void Invalidate() override;
 
-    void AddChildren(Image &aImg);
+    void AddChildren(Control &aCtrl);
 
     std::vector<TouchArea *> mTouchables;
 };

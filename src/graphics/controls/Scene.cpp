@@ -36,16 +36,9 @@ void Scene::Render(Canvas &aCanvas)
     }
 }
 
-/*void Scene::Invalidate()
+void Scene::AddChildren(Control &aCtrl)
 {
-    for (auto child : mChildren) {
-        child->Invalidate();
-    }
-}*/
-
-void Scene::AddChildren(Image &aImg)
-{
-    mChildren.push_back(&aImg);
+    mChildren.push_back(&aCtrl);
 }
 
 void Scene::AddArea(TouchArea &aArea)

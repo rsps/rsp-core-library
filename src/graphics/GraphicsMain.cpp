@@ -15,8 +15,8 @@
 namespace rsp::graphics
 {
 
-GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInputs, Scene &aScene, Scene &aOtherScene)
-    : mBufferedCanvas(aBufferedCanvas), mInputs(aInputs), mActiveScene(aScene), otherScene(aOtherScene)
+GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader)
+    : mBufferedCanvas(aBufferedCanvas), mInputs(aInputs), mSceneLoader(aSceneLoader), mActiveScene(mSceneLoader.GetFirstScene())
 {
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
@@ -29,16 +29,14 @@ GraphicsMain::~GraphicsMain()
 void GraphicsMain::Run()
 {
     while (!mTerminated) {
-        // new inputs?
+        // New inputs?
         while (mInputs.HasNewInputs()) {
             inputCache.push_back(mInputs.GetInput());
-            // Input input = mInputs.GetInput();
-            PrintInput(inputCache.back());
-            // PrintInput(input); // Temp
-            // invalidate stuff
+            PrintInput(inputCache.back()); // Temp
+            // Invalidate stuff
             mActiveScene.ProcessInput(inputCache.back());
-            // mActiveScene.ProcessInput(input);
             if (inputCache.size() > 5) {
+                // Limit of cached input reached - Force render
                 mActiveScene.Render(mBufferedCanvas);
                 inputCache.clear();
                 mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
@@ -50,12 +48,14 @@ void GraphicsMain::Run()
     }
 }
 
-void GraphicsMain::ChangeScene()
+void GraphicsMain::ChangeScene(std::string aSceneName)
 {
-    Scene temp = mActiveScene;
-    mActiveScene = otherScene;
-    otherScene = temp;
-    otherScene.Invalidate();
+    mActiveScene.Invalidate();
+    mActiveScene = mSceneLoader.GetScene(aSceneName);
+    // Scene temp = mActiveScene;
+    // mActiveScene = otherScene;
+    // otherScene = temp;
+    // otherScene.Invalidate();
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mActiveScene.Render(mBufferedCanvas);
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);

@@ -16,7 +16,7 @@
 
 using namespace rsp::graphics;
 
-class firstScene : public Scene
+/*class firstScene : public Scene
 {
   public:
     firstScene(Rect &aRect)
@@ -91,11 +91,11 @@ class secondScene : public Scene
 
     Image topBtnImg;
     Image botBtnImg;
-};
+};*/
 
 TEST_CASE("Graphics Main Test")
 {
-    /*
+
     MESSAGE("Start");
 
     MESSAGE("Init Framebufer");
@@ -105,8 +105,9 @@ TEST_CASE("Graphics Main Test")
 
     MESSAGE("Making Scene");
     // Make scene
-    firstScene myScene(screenSize);
-    secondScene otherScene(screenSize);
+    SceneLoader scenes;
+    // firstScene myScene(screenSize);
+    // secondScene otherScene(screenSize);
 
     MESSAGE("Init InputCreator");
     // Make InputCreator
@@ -114,13 +115,13 @@ TEST_CASE("Graphics Main Test")
 
     MESSAGE("Init Main");
     // Make GraphicsMain
-    GraphicsMain gMain(fb, ic, myScene, otherScene);
+    GraphicsMain gMain(fb, ic, scenes);
 
     // Bind onClick
-    myScene.topBtn.RegisterOnClicked(std::bind(&GraphicsMain::ChangeScene, &gMain));
-    otherScene.botBtn.RegisterOnClicked(std::bind(&GraphicsMain::ChangeScene, &gMain));
+    // scenes.GetScene("first").
+    // myScene.topBtn.RegisterOnClicked(std::bind(&GraphicsMain::ChangeScene, &gMain));
+    // otherScene.botBtn.RegisterOnClicked(std::bind(&GraphicsMain::ChangeScene, &gMain));
 
     // Run?
     gMain.Run();
-    */
 }

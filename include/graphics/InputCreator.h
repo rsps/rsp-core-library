@@ -12,7 +12,6 @@ namespace rsp::graphics
 class InputCreator
 {
   private:
-    // std::ifstream touchDriver;
     rsp::posix::FileIO touchDriver;
 
     InputLine inputLine;
