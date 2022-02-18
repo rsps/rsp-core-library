@@ -33,6 +33,7 @@ public:
     void Clear() override;
 
 protected:
+    friend JsonString;
     std::vector<std::string> mKeyNames{}; // Vector maintains insertion order.
     std::map<std::string, JsonValue*> mData{};
 

@@ -304,7 +304,7 @@ void* Variant::AsPointer() const
 std::string Variant::typeToText() const
 {
     switch (mType) {
-        default:
+        default: return std::string("Unknown type (") + std::to_string(static_cast<int>(mType)) + ")";
         case Types::Null: return "null";
         case Types::Bool: return "bool";
         case Types::Int: return "int";

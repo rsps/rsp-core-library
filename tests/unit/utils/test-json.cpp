@@ -161,9 +161,18 @@ null }
 
     SUBCASE("Validate") {
         CHECK_THROWS_AS(JsonString(R"(1.23456.7)").GetValue(), const EJsonNumberError &); // Bad number
-        CHECK_THROWS_AS(JsonString(R"(BadString)").GetValue(), const EJsonException &);
-        CHECK_THROWS_AS(JsonString(R"(TRUE)").GetValue(), const EJsonException &);
-        CHECK_THROWS_AS(JsonString(R"({ "BadObject": "Excessive Delimiter",)").GetValue(), const EJsonException &);
+        CHECK_THROWS_AS(JsonString(R"(BadString)").GetValue(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonString(R"("Bad Character \k")").GetValue(), const EJsonFormatError &);
+        CHECK_THROWS_AS(JsonString(R"(TRUE)").GetValue(), const EJsonParseError &);
+        CHECK_NOTHROW(JsonString(R"([   ])").GetValue());
+        CHECK_NOTHROW(JsonString(R"([ null ])").GetValue());
+        CHECK_THROWS_AS(JsonString(R"([ , ])").GetValue(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonString(R"([ "BadArray", "Excessive Delimiter",])").GetValue(), const EJsonParseError &);
+        CHECK_NOTHROW(JsonString(R"({   })").GetValue());
+        CHECK_NOTHROW(JsonString(R"({ "empty":null })").GetValue());
+        CHECK_THROWS_AS(JsonString(R"({ null })").GetValue(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonString(R"({ , })").GetValue(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonString(R"({ "BadObject": "Excessive Delimiter",})").GetValue(), const EJsonParseError &);
     }
 }
 

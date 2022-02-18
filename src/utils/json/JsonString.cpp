@@ -50,11 +50,11 @@ void JsonString::findSubString(const char aToken1, const char aToken2)
     auto it = mIt;
 
     if (it == mEnd) {
-        THROW_WITH_BACKTRACE1(EJsonFormatError, "Substring was only whitespace");
+        THROW_WITH_BACKTRACE1(EJsonParseError, "Substring was only whitespace");
     }
 
     if (*it != aToken1) {
-        THROW_WITH_BACKTRACE1(EJsonFormatError, "Substring start token was not found. " + debug(false, true));
+        THROW_WITH_BACKTRACE1(EJsonParseError, "Substring start token was not found. " + debug(false, true));
     }
     it++;
     mIt = it;
@@ -87,7 +87,7 @@ void JsonString::findSubString(const char aToken1, const char aToken2)
         it++;
     }
 
-    THROW_WITH_BACKTRACE1(EJsonFormatError, "End token was not found. " + aToken2);
+    THROW_WITH_BACKTRACE1(EJsonParseError, "End token was not found. " + aToken2);
 }
 
 void JsonString::push()
@@ -177,7 +177,7 @@ std::string JsonString::getString()
                     break;
 
                 default:
-                    THROW_WITH_BACKTRACE1(EJsonParseError, "String contains illegal escape character. " + debug(false, true));
+                    THROW_WITH_BACKTRACE1(EJsonFormatError, "String contains illegal escape character. " + debug(false, true));
                     break;
             }
         }
@@ -187,9 +187,9 @@ std::string JsonString::getString()
         mIt++;
     }
     mIt = mEnd + 1;
-    JLOG("getString exit: " << debug());
 
     pop();
+    JLOG("getString exit: " << debug());
     return result;
 }
 
@@ -199,20 +199,29 @@ JsonValue* JsonString::getObject()
     findSubString('{', '}');
 
     auto result = new JsonObject();
+    bool element_required = false;
+
+    skipWhiteSpace();
 
     while (mIt != mEnd) {
         auto name = getString();
         skipWhiteSpace();
 //        JLOG("Object Name: " << name << ", next: " << *mIt);
         if (*mIt != ':') {
-            THROW_WITH_BACKTRACE1(EJsonFormatError, "Object key/value delimiter not found." + debug(false, true));
+            THROW_WITH_BACKTRACE1(EJsonParseError, "Object key/value delimiter not found." + debug(false, true));
         }
         mIt++;
         result->Add(name, GetValue());
         skipWhiteSpace();
+        element_required = false;
         if (mIt != mEnd && *mIt == ',') {
+            element_required = true;
             mIt++;
         }
+    }
+    if (element_required) {
+        auto it = (--result->mData.end());
+        THROW_WITH_BACKTRACE1(EJsonParseError, "Excessive key/value delimiter found after " + it->first + ":" + it->second->AsString());
     }
     mIt++;
 
@@ -227,14 +236,22 @@ JsonValue* JsonString::getArray()
     findSubString('[', ']');
 
     auto result = new JsonArray();
+    bool element_required = false;
+
+    skipWhiteSpace();
 
     while (mIt != mEnd) {
         result->Add(GetValue());
         skipWhiteSpace();
-        JLOG("getArray: " << debug());
+//        JLOG("getArray: " << debug());
+        element_required = false;
         if (mIt != mEnd && *mIt == ',') {
+            element_required = true;
             mIt++;
         }
+    }
+    if (element_required) {
+        THROW_WITH_BACKTRACE1(EJsonParseError, std::string("Excessive array delimiter found after ") +  std::string(result->GetCount() ? (*result)[result->GetCount()-1].AsString() : ""));
     }
     mIt++;
     pop();
