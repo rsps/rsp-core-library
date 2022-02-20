@@ -22,11 +22,26 @@
 
 namespace rsp::utils::json {
 
-template <class T>
-class Json : public JsonValue
+class Json
 {
-    T Get() { return static_cast<T>(*this); }
-    void Set(T aValue) { (*this) = aValue; }
+public:
+    Json() : mpValue{nullptr} {}
+    Json(const Json &arOther) : mpValue(arOther.mpValue) {}
+    virtual ~Json();
+
+    Json& operator=(const Json &arOther) { mpValue = arOther.mpValue; return *this; }
+
+    JsonObject& MakeObject();
+    JsonArray& MakeArray();
+
+    void Decode(const std::string &arJson);
+    std::string Encode(bool aPrettyPrint = false) const;
+
+    JsonValue& operator*();
+    JsonValue& operator->();
+
+protected:
+    JsonValue *mpValue;
 };
 
 } /* namespace rsp::utils::json */

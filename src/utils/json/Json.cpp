@@ -14,11 +14,70 @@
 #include <memory>
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
-#include <utils/ExceptionHelper.h>
 #include <utils/json/Json.h>
+#include <utils/json/JsonString.h>
 
 namespace rsp::utils::json {
 
+Json::~Json()
+{
+    if (mpValue) {
+        delete mpValue;
+    }
+}
+
+JsonObject& Json::MakeObject()
+{
+    if (mpValue) {
+        THROW_WITH_BACKTRACE(EInstanceExists);
+    }
+
+    mpValue = new JsonObject();
+    return *static_cast<JsonObject*>(mpValue);
+}
+
+JsonArray& Json::MakeArray()
+{
+    if (mpValue) {
+        THROW_WITH_BACKTRACE(EInstanceExists);
+    }
+
+    mpValue = new JsonArray();
+    return *static_cast<JsonArray*>(mpValue);
+}
+
+void Json::Decode(const std::string &arJson)
+{
+    JsonString js(arJson);
+    mpValue = js.GetValue();
+}
+
+std::string Json::Encode(bool aPrettyPrint) const
+{
+    if (!mpValue) {
+        THROW_WITH_BACKTRACE(ENoInstanceExists);
+    }
+
+    return mpValue->Encode(aPrettyPrint);
+}
+
+JsonValue& Json::operator *()
+{
+    if (!mpValue) {
+        THROW_WITH_BACKTRACE(ENoInstanceExists);
+    }
+
+    return *mpValue;
+}
+
+JsonValue& Json::operator ->()
+{
+    if (!mpValue) {
+        THROW_WITH_BACKTRACE(ENoInstanceExists);
+    }
+
+    return *mpValue;
+}
 
 } /* namespace rsp::utils::json */
 

@@ -11,13 +11,11 @@
 #define INCLUDE_UTILS_JSON_JSONVALUE_H_
 
 #include <utils/Variant.h>
-#include "JsonString.h"
 
 namespace rsp::utils::json {
 
 class JsonObject;
 class JsonArray;
-class JsonString;
 
 enum class JsonTypes : unsigned int { Null, Bool, Number, String, Object, Array };
 
@@ -33,7 +31,7 @@ public:
     JsonValue(const JsonValue&) = delete;
     JsonValue& operator=(const JsonValue&) = delete;
 
-    JsonString Encode(bool aPrettyPrint = false, bool aForceToUCS2 = false);
+    std::string Encode(bool aPrettyPrint = false, bool aForceToUCS2 = false);
 
     JsonTypes GetJsonType() const;
 

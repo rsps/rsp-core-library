@@ -10,6 +10,7 @@
 
 #include <utils/json/Jsonable.h>
 #include <iostream>
+#include <utils/CoreException.h>
 
 namespace rsp::utils {
 
@@ -51,6 +52,10 @@ std::ostream& operator<< (std::ostream& os, const JsonableStreamAttributes aAttr
     return os;
 }
 
+void Jsonable::FromJson(const std::string &)
+{
+    THROW_WITH_BACKTRACE1(NotImplementedException, "Override the FromJson method to populate an object from a JSON string.");
+}
 
 } /* namespace rsp::utils */
 

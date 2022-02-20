@@ -44,6 +44,18 @@ public:
     explicit EJsonUnicodeError() : EJsonException("This Json implementation does not support unicode values greater than U+00FF") {}
 };
 */
+
+class EInstanceExists: public EJsonException {
+public:
+    explicit EInstanceExists() : EJsonException("The Json content have already been created.") {}
+};
+
+class ENoInstanceExists: public EJsonException {
+public:
+    explicit ENoInstanceExists() : EJsonException("The Json content have not been created.") {}
+};
+
+
 } /* namespace rsp::utils::json */
 
 #endif /* INCLUDE_UTILS_JSON_JSONEXCEPTIONS_H_ */

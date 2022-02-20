@@ -13,6 +13,7 @@
 #include <map>
 #include <vector>
 #include "JsonValue.h"
+#include "JsonString.h"
 
 namespace rsp::utils::json {
 

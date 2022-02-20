@@ -25,7 +25,7 @@ JsonValue::~JsonValue()
 }
 
 
-JsonString JsonValue::Encode(bool aPrettyPrint, bool aForceToUCS2)
+std::string JsonValue::Encode(bool aPrettyPrint, bool aForceToUCS2)
 {
     std::stringstream result;
 
@@ -38,7 +38,7 @@ JsonString JsonValue::Encode(bool aPrettyPrint, bool aForceToUCS2)
         toStringStream(result, pf, 0, aForceToUCS2);
     }
 
-    return JsonString(result.str());
+    return result.str();
 }
 
 

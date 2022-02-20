@@ -26,6 +26,7 @@ public:
     virtual ~Jsonable() {}
 
     virtual std::string ToJson(bool aPrettyPrint = true, int aLevel = 0) const = 0;
+    virtual void FromJson(const std::string &arJson);
 
     class JsonStream : public std::stringstream {
     public:
