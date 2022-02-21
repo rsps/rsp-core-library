@@ -42,6 +42,8 @@ public:
     JsonValue& operator*();
     JsonValue* operator->();
 
+    Json& Clear();
+    bool Empty() const { return (!mpValue); }
 protected:
     JsonValue *mpValue;
 };

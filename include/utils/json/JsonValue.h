@@ -16,6 +16,7 @@ namespace rsp::utils::json {
 
 class JsonObject;
 class JsonArray;
+class Json;
 
 enum class JsonTypes : unsigned int { Null, Bool, Number, String, Object, Array };
 
@@ -23,12 +24,12 @@ class JsonValue : public Variant
 {
 public:
     JsonValue() : Variant() {}
+    JsonValue(const JsonValue&);
+    JsonValue(const JsonValue&&);
     // Use template to call inherited constructors
     template<class T>
     JsonValue(T aValue) : Variant(aValue) {}
 
-    JsonValue(const JsonValue&);
-    JsonValue(const JsonValue&&);
     virtual ~JsonValue();
 
     JsonValue& operator=(const JsonValue&);
@@ -37,6 +38,7 @@ public:
     std::string Encode(bool aPrettyPrint = false, bool aForceToUCS2 = false);
 
     JsonTypes GetJsonType() const;
+    std::string GetJsonTypeAsString() const;
 
 // Disable wrong effc++ warning on "return *this;" in template functions. Fixed in GCC 11.
 #pragma GCC diagnostic push
@@ -63,9 +65,9 @@ protected:
 
     friend JsonArray;
     friend JsonObject;
-    std::string jsonTypeToText() const;
-
+    friend Json;
     virtual void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2);
+    virtual JsonValue* clone() const;
 
     static bool mEncodeToUCS2;
 };

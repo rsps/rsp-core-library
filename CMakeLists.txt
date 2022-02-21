@@ -115,7 +115,6 @@ target_link_libraries ("rsp-core-lib-test"
     rsp-core-lib
     Threads::Threads
     Freetype::Freetype
-    ${CMAKE_DL_LIBS}
 )
 #target_link_libraries(demo ${FREETYPE_LIBRARIES})
 

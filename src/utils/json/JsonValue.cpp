@@ -15,21 +15,23 @@
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
 #include <utils/json/JsonExceptions.h>
-#include <utils/Backtrace.h>
-
 
 namespace rsp::utils::json {
 
+//#define JLOG(a) DLOG(a)
+#define JLOG(a)
+
 
 JsonValue::JsonValue(const JsonValue& arOther)
-    : Variant()
+    : Variant(static_cast<const Variant&>(arOther))
 {
-    *this = arOther;
+    JLOG("JsonValue copy constructor");
 }
 
 JsonValue::JsonValue(const JsonValue&& arOther)
+    : Variant(static_cast<const Variant&>(arOther))
 {
-    *this = std::move(arOther);
+    JLOG("JsonValue move constructor");
 }
 
 JsonValue::~JsonValue()
@@ -38,22 +40,23 @@ JsonValue::~JsonValue()
 
 JsonValue& JsonValue::operator=(const JsonValue& arOther)
 {
-    if (arOther.IsArray()) {
-        AsArray() = arOther.AsArray();
-    }
-    else if (arOther.IsObject()) {
-        AsObject() = arOther.AsObject();
-    }
-    else {
-        *this = arOther;
-    }
-
+    JLOG("JsonValue copy assignment");
+    Variant::operator=(static_cast<const Variant&>(arOther));
     return *this;
+}
+
+JsonValue* JsonValue::clone() const
+{
+    JLOG("JsonValue::clone");
+    auto result = new JsonValue();
+    *result = *this;
+    return result;
 }
 
 JsonValue& JsonValue::operator=(const JsonValue&& arOther)
 {
-    *this = std::move(arOther);
+    JLOG("JsonValue move assignment");
+    Variant::operator=(static_cast<const Variant&&>(arOther));
     return *this;
 }
 
@@ -81,7 +84,7 @@ JsonArray& JsonValue::AsArray() const
         return *dynamic_cast<JsonArray*>(const_cast<JsonValue*>(this));
     }
     else {
-        THROW_WITH_BACKTRACE1(EJsonTypeError, "JsonValue of type " + jsonTypeToText() + " cannot be converted to Array");
+        THROW_WITH_BACKTRACE1(EJsonTypeError, "JsonValue of type " + GetJsonTypeAsString() + " cannot be converted to Array");
     }
 }
 
@@ -91,8 +94,7 @@ JsonObject& JsonValue::AsObject() const
         return *dynamic_cast<JsonObject*>(const_cast<JsonValue*>(this));
     }
     else {
-        Backtrace::Print();
-        THROW_WITH_BACKTRACE1(EJsonTypeError, "JsonValue of type " + jsonTypeToText() + " cannot be converted to Object");
+        THROW_WITH_BACKTRACE1(EJsonTypeError, "JsonValue of type " + GetJsonTypeAsString() + " cannot be converted to Object");
     }
 }
 
@@ -167,7 +169,7 @@ void JsonValue::toStringStream(std::stringstream &arResult, PrintFormat &arPf, u
     }
 }
 
-std::string JsonValue::jsonTypeToText() const
+std::string JsonValue::GetJsonTypeAsString() const
 {
     switch (GetJsonType()) {
         case JsonTypes::Array: return "Array";

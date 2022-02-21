@@ -59,6 +59,37 @@ TEST_CASE("Variant")
         CHECK_THROWS_AS(v.AsInt(), const EConversionError&);
         CHECK_THROWS_AS(v.AsDouble(), const EConversionError&);
     }
+
+    SUBCASE("Copy") {
+        v = 42;
+        Variant b(v);
+
+        CHECK(v.AsInt() == b.AsInt());
+
+        v = 44;
+        b = v;
+        CHECK(v.AsInt() == b.AsInt());
+
+        b = 43;
+        CHECK(v.AsInt() != b.AsInt());
+        CHECK(v.AsInt() == 44);
+        CHECK(b.AsInt() == 43);
+    }
+
+    SUBCASE("Move") {
+        v = 42;
+        Variant b(std::move(v));
+
+        CHECK(v.IsNull());
+        CHECK(b.AsInt() == 42);
+
+        Variant c{};
+        c = std::move(b);
+
+        CHECK(b.IsNull());
+        CHECK(c.AsInt() == 42);
+    }
+
 }
 
 

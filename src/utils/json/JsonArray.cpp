@@ -11,7 +11,11 @@
 #include <utils/json/JsonArray.h>
 #include <logging/Logger.h>
 
-using namespace rsp::utils::json;
+namespace rsp::utils::json {
+
+//#define JLOG(a) DLOG(a)
+#define JLOG(a)
+
 
 JsonArray::JsonArray()
 {
@@ -19,9 +23,54 @@ JsonArray::JsonArray()
     mPointer = static_cast<uintptr_t>(JsonTypes::Array);
 }
 
+JsonArray::JsonArray(const JsonArray &arOther)
+    : JsonValue(static_cast<const JsonValue&>(arOther))
+{
+    JLOG("JsonArray copy constructor");
+    for(auto el : arOther.mData) {
+        mData.push_back(el->clone());
+    }
+}
+
+JsonArray::JsonArray(JsonArray &&arOther)
+    : JsonValue(static_cast<JsonValue&>(arOther)),
+      mData(arOther.mData)
+{
+    JLOG("JsonArray move constructor");
+    arOther.mData.clear();
+}
+
 JsonArray::~JsonArray()
 {
     Clear();
+}
+
+JsonArray& JsonArray::operator=(const JsonArray &arOther)
+{
+    JLOG("JsonArray copy assignment");
+    JsonValue::operator=(static_cast<const JsonValue&>(arOther));
+    mData.clear();
+    for(auto el : arOther.mData) {
+        mData.push_back(el->clone());
+    }
+    return *this;
+}
+
+JsonValue* JsonArray::clone() const
+{
+    JLOG("JsonArray::clone");
+    auto result = new JsonArray();
+    *result = *this;
+    return result;
+}
+
+JsonArray& JsonArray::operator=(JsonArray &&arOther)
+{
+    JLOG("JsonArray move assignment");
+    JsonValue::operator=(static_cast<JsonValue&>(arOther));
+    mData = std::move(arOther.mData);
+    arOther.mData.clear();
+    return *this;
 }
 
 std::size_t JsonArray::GetCount() const
@@ -81,6 +130,5 @@ void JsonArray::toStringStream(std::stringstream &arResult, PrintFormat &arPf, u
     arResult << in1 << "]";
 }
 
-
-
+} // rsp::utils::json
 

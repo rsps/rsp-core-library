@@ -177,25 +177,50 @@ null }
 
     SUBCASE("Copy") {
         std::string orig = json_object;
+        StrUtils::Trim(orig);
         JsonValue* p = JsonString(json_object).GetValue();
-        JsonObject dst = p->AsObject();
 
+        JsonObject dst;
+        dst = p->AsObject();
+
+        dst["IntValue"] = 43;
+
+        CHECK(p->IsArray() == dst.IsArray());
+        CHECK(p->IsObject() == dst.IsObject());
+        CHECK(dst.IsObject() == true);
+        CHECK(p->AsObject().GetCount() == dst.GetCount());
+        CHECK(p->GetType() == dst.GetType());
+        CHECK(&p->AsObject() != &dst);
+        CHECK(p->GetJsonTypeAsString() == dst.GetJsonTypeAsString());
+        CHECK(p->AsObject()["IntValue"].AsInt() != dst["IntValue"].AsInt());
+
+        JsonObject dst2(p->AsObject());
+
+        dst["IntValue"] = 42;
         CHECK(p->Encode(true) == dst.Encode(true));
+        CHECK(p->Encode(true) == dst2.Encode(true));
+        CHECK(orig == dst2.Encode(true));
     }
 
     SUBCASE("Move") {
         std::string orig = json_object;
+        StrUtils::Trim(orig);
         JsonValue* p = JsonString(json_object).GetValue();
-        JsonValue dst = std::move(*p);
+        JsonObject dst = std::move(p->AsObject());
 
-        CHECK(p->Encode(true) == dst.Encode(true));
+        CHECK(orig == dst.Encode(true));
+        CHECK(p->IsNull());
+
+        JsonObject dst2(std::move(dst));
+        CHECK(orig == dst2.Encode(true));
+        CHECK(dst.IsNull());
     }
 
     SUBCASE("Interface") {
         Json js;
         js.Decode(json_object);
 
-        auto o = js->AsObject();
+        auto &o = js->AsObject();
 
         CHECK(o.MemberExists("NullValue"));
         CHECK(o["NullValue"].IsNull());
@@ -211,6 +236,19 @@ null }
         CHECK(o["IntValue"].IsNull() == false);
         CHECK(o["IntValue"].GetType() == Variant::Types::Int64);
         CHECK(static_cast<int>(o["IntValue"]) == 42);
+
+        Json js1(js);
+        CHECK(js.Encode() == js1.Encode());
+        js1->AsObject()["IntValue"] = 43;
+
+        CHECK(js1->AsObject()["IntValue"].AsInt() == 43);
+        CHECK(js->AsObject()["IntValue"].AsInt() == 42);
+
+        Json js2(std::move(js));
+        js2->AsObject()["IntValue"] = 43;
+
+        CHECK(js2.Encode() == js1.Encode());
+        CHECK(js.Empty());
     }
 }
 

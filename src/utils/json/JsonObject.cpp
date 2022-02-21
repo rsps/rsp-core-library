@@ -13,6 +13,9 @@
 
 namespace rsp::utils::json {
 
+//#define JLOG(a) DLOG(a)
+#define JLOG(a)
+
 JsonObject::JsonObject()
     : JsonValue()
 {
@@ -20,9 +23,59 @@ JsonObject::JsonObject()
     mPointer = static_cast<uintptr_t>(JsonTypes::Object);
 }
 
+JsonObject::JsonObject(const JsonObject &arOther)
+    : JsonValue(static_cast<const JsonValue&>(arOther))
+{
+    JLOG("JsonObject copy constructor");
+    mKeyNames = arOther.mKeyNames;
+
+    for(auto el : arOther.mData) {
+        mData[el.first] = el.second->clone();
+    }
+}
+
+JsonObject::JsonObject(JsonObject &&arOther)
+    : JsonValue(static_cast<JsonValue&&>(arOther))
+{
+    JLOG("JsonObject move constructor");
+    mKeyNames = std::move(arOther.mKeyNames);
+    mData = std::move(arOther.mData);
+    arOther.mData.clear();
+    arOther.Clear();
+}
+
 JsonObject::~JsonObject()
 {
     Clear();
+}
+
+JsonObject& JsonObject::operator=(const JsonObject &arOther)
+{
+    JLOG("JsonObject copy assignment");
+    JsonValue::operator=(static_cast<const JsonValue&>(arOther));
+    mKeyNames = arOther.mKeyNames;
+    mData.clear();
+    for(auto el : arOther.mData) {
+        mData[el.first] = el.second->clone();
+    }
+    return *this;
+}
+
+JsonValue* JsonObject::clone() const
+{
+    JLOG("JsonObject::clone");
+    return new JsonObject(*this);
+}
+
+JsonObject& JsonObject::operator=(JsonObject &&arOther)
+{
+    JLOG("JsonObject move assignment");
+    JsonValue::operator=(static_cast<JsonValue&&>(arOther));
+    mKeyNames = std::move(arOther.mKeyNames);
+    mData = std::move(arOther.mData);
+    arOther.mData.clear();
+    arOther.Clear();
+    return *this;
 }
 
 std::size_t JsonObject::GetCount() const

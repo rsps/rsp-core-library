@@ -22,43 +22,48 @@ namespace rsp::utils::json {
 Json::Json(const Json &arOther)
     : mpValue{}
 {
-    *this = arOther;
+    if (arOther.mpValue) {
+        mpValue = arOther.mpValue->clone();
+    }
 }
 
 Json::Json(Json &&arOther)
     : mpValue{arOther.mpValue}
 {
     arOther.mpValue = nullptr;
+    arOther.Clear();
 }
 
 Json::~Json()
 {
+    Clear();
+}
+
+Json& Json::Clear()
+{
     if (mpValue) {
         delete mpValue;
+        mpValue = nullptr;
     }
+    return *this;
 }
+
 
 Json& Json::operator=(const Json &arOther)
 {
-    if (arOther.mpValue->IsArray()) {
-        mpValue = new JsonArray();
-        *mpValue = arOther.mpValue->AsArray();
-    }
-    else if (arOther.mpValue->IsObject()) {
-        mpValue = new JsonObject();
-        *mpValue = arOther.mpValue->AsObject();
-    }
-    else {
-        mpValue = new JsonValue();
-        *mpValue = *arOther.mpValue;
+    Clear();
+    if (arOther.mpValue) {
+        mpValue = arOther.mpValue->clone();
     }
     return *this;
 }
 
 Json& Json::operator=(Json &&arOther)
 {
+    Clear();
     mpValue = arOther.mpValue;
     arOther.mpValue = nullptr;
+    arOther.Clear();
     return *this;
 }
 

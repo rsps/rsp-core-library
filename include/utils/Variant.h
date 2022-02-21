@@ -57,6 +57,13 @@ public:
      * \brief Construct an empty Variant (null)
      */
     Variant();
+
+    Variant(const Variant &arOther);
+    Variant(Variant &&arOther);
+
+    Variant& operator=(const Variant &arOther);
+    Variant& operator=(Variant &&arOther);
+
     /**
      * \fn  Variant(...)
      * \brief Constructs a Variant with the given value and type of that value.

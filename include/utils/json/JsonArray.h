@@ -20,7 +20,12 @@ class JsonArray : public JsonValue
 {
 public:
     JsonArray();
+    JsonArray(const JsonArray &arOther);
+    JsonArray(JsonArray &&arOther);
     ~JsonArray() override;
+
+    JsonArray& operator=(const JsonArray &arOther);
+    JsonArray& operator=(JsonArray &&arOther);
 
     std::size_t GetCount() const;
     JsonValue& operator[](unsigned int aIndex);
@@ -34,6 +39,7 @@ protected:
     std::vector<JsonValue*> mData{};
 
     void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) override;
+    JsonValue* clone() const override;
 };
 
 

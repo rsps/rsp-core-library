@@ -10,6 +10,10 @@
 
 #include <cstdio>
 #include <utils/Variant.h>
+#include <logging/Logger.h>
+
+//#define JLOG(a) DLOG(a)
+#define JLOG(a)
 
 namespace rsp::utils {
 
@@ -18,6 +22,43 @@ Variant::Variant()
       mPointer(reinterpret_cast<uintptr_t>(nullptr))
 {
 }
+
+Variant::Variant(const Variant &arOther)
+    : mType(arOther.mType),
+      mPointer(arOther.mPointer),
+      mString(arOther.mString)
+{
+    JLOG("Variant copy constructor");
+}
+
+Variant::Variant(Variant &&arOther)
+    : mType(arOther.mType),
+      mPointer(arOther.mPointer),
+      mString(arOther.mString)
+{
+    JLOG("Variant move constructor");
+    arOther.Clear();
+}
+
+Variant& Variant::operator=(const Variant &arOther)
+{
+    JLOG("Variant copy assignment");
+    mType = arOther.mType;
+    mPointer = arOther.mPointer;
+    mString = arOther.mString;
+    return *this;
+}
+
+Variant& Variant::operator=(Variant &&arOther)
+{
+    JLOG("Variant move assignment");
+    mType = arOther.mType;
+    mPointer = std::move(arOther.mPointer);
+    mString = std::move(arOther.mString);
+    arOther.Clear();
+    return *this;
+}
+
 
 Variant::Variant(bool aValue)
     : mType(Types::Bool),

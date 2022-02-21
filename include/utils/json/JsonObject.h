@@ -21,7 +21,12 @@ class JsonObject : public JsonValue
 {
 public:
     JsonObject();
+    JsonObject(const JsonObject &arOther);
+    JsonObject(JsonObject &&arOther);
     ~JsonObject() override;
+
+    JsonObject& operator=(const JsonObject &arOther);
+    JsonObject& operator=(JsonObject &&arOther);
 
     std::size_t GetCount() const;
     bool MemberExists(const std::string &aName) const;
@@ -40,6 +45,7 @@ protected:
     std::map<std::string, JsonValue*> mData{};
 
     void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) override;
+    JsonValue* clone() const override;
 };
 
 
