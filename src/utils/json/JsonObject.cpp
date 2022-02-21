@@ -11,9 +11,10 @@
 #include <utils/json/JsonExceptions.h>
 #include <logging/Logger.h>
 
-using namespace rsp::utils::json;
+namespace rsp::utils::json {
 
 JsonObject::JsonObject()
+    : JsonValue()
 {
     mType = Types::Pointer;
     mPointer = static_cast<uintptr_t>(JsonTypes::Object);
@@ -107,5 +108,4 @@ void JsonObject::toStringStream(std::stringstream &arResult, PrintFormat &arPf, 
     arResult << in1 << "}";
 }
 
-
-
+} // namespace rsp::utils::json

@@ -19,11 +19,47 @@
 
 namespace rsp::utils::json {
 
+Json::Json(const Json &arOther)
+    : mpValue{}
+{
+    *this = arOther;
+}
+
+Json::Json(Json &&arOther)
+    : mpValue{arOther.mpValue}
+{
+    arOther.mpValue = nullptr;
+}
+
 Json::~Json()
 {
     if (mpValue) {
         delete mpValue;
     }
+}
+
+Json& Json::operator=(const Json &arOther)
+{
+    if (arOther.mpValue->IsArray()) {
+        mpValue = new JsonArray();
+        *mpValue = arOther.mpValue->AsArray();
+    }
+    else if (arOther.mpValue->IsObject()) {
+        mpValue = new JsonObject();
+        *mpValue = arOther.mpValue->AsObject();
+    }
+    else {
+        mpValue = new JsonValue();
+        *mpValue = *arOther.mpValue;
+    }
+    return *this;
+}
+
+Json& Json::operator=(Json &&arOther)
+{
+    mpValue = arOther.mpValue;
+    arOther.mpValue = nullptr;
+    return *this;
 }
 
 JsonObject& Json::MakeObject()
@@ -70,13 +106,13 @@ JsonValue& Json::operator *()
     return *mpValue;
 }
 
-JsonValue& Json::operator ->()
+JsonValue* Json::operator ->()
 {
     if (!mpValue) {
         THROW_WITH_BACKTRACE(ENoInstanceExists);
     }
 
-    return *mpValue;
+    return mpValue;
 }
 
 } /* namespace rsp::utils::json */

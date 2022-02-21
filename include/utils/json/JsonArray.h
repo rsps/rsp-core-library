@@ -28,6 +28,7 @@ public:
     JsonArray& Add(JsonValue* apValue);
     JsonArray& Remove(int aIndex);
     void Clear() override;
+    bool IsArray() const override { return true; }
 
 protected:
     std::vector<JsonValue*> mData{};

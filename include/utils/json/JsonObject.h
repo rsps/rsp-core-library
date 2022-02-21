@@ -32,6 +32,7 @@ public:
     JsonObject& Add(const std::string &aName, JsonValue* apValue);
     JsonObject& Remove(const std::string &aName);
     void Clear() override;
+    bool IsObject() const override { return true; }
 
 protected:
     friend JsonString;

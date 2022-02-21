@@ -26,10 +26,12 @@ class Json
 {
 public:
     Json() : mpValue{nullptr} {}
-    Json(const Json &arOther) : mpValue(arOther.mpValue) {}
+    Json(const Json &arOther);
+    Json(Json &&arOther);
     virtual ~Json();
 
-    Json& operator=(const Json &arOther) { mpValue = arOther.mpValue; return *this; }
+    Json& operator=(const Json &arOther);
+    Json& operator=(Json &&arOther);
 
     JsonObject& MakeObject();
     JsonArray& MakeArray();
@@ -38,7 +40,7 @@ public:
     std::string Encode(bool aPrettyPrint = false) const;
 
     JsonValue& operator*();
-    JsonValue& operator->();
+    JsonValue* operator->();
 
 protected:
     JsonValue *mpValue;

@@ -174,5 +174,43 @@ null }
         CHECK_THROWS_AS(JsonString(R"({ , })").GetValue(), const EJsonParseError &);
         CHECK_THROWS_AS(JsonString(R"({ "BadObject": "Excessive Delimiter",})").GetValue(), const EJsonParseError &);
     }
+
+    SUBCASE("Copy") {
+        std::string orig = json_object;
+        JsonValue* p = JsonString(json_object).GetValue();
+        JsonObject dst = p->AsObject();
+
+        CHECK(p->Encode(true) == dst.Encode(true));
+    }
+
+    SUBCASE("Move") {
+        std::string orig = json_object;
+        JsonValue* p = JsonString(json_object).GetValue();
+        JsonValue dst = std::move(*p);
+
+        CHECK(p->Encode(true) == dst.Encode(true));
+    }
+
+    SUBCASE("Interface") {
+        Json js;
+        js.Decode(json_object);
+
+        auto o = js->AsObject();
+
+        CHECK(o.MemberExists("NullValue"));
+        CHECK(o["NullValue"].IsNull());
+
+        CHECK(o.MemberExists("BooleanValue"));
+        CHECK(o["BooleanValue"].IsNull() == false);
+        CHECK(static_cast<bool>(o["BooleanValue"]) == true);
+
+        CHECK(o.MemberExists("StringValue"));
+        CHECK(o["StringValue"].IsNull() == false);
+
+        CHECK(o.MemberExists("IntValue"));
+        CHECK(o["IntValue"].IsNull() == false);
+        CHECK(o["IntValue"].GetType() == Variant::Types::Int64);
+        CHECK(static_cast<int>(o["IntValue"]) == 42);
+    }
 }
 

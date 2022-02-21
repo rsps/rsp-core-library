@@ -15,13 +15,46 @@
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
 #include <utils/json/JsonExceptions.h>
+#include <utils/Backtrace.h>
 
 
-using namespace rsp::utils::json;
+namespace rsp::utils::json {
 
+
+JsonValue::JsonValue(const JsonValue& arOther)
+    : Variant()
+{
+    *this = arOther;
+}
+
+JsonValue::JsonValue(const JsonValue&& arOther)
+{
+    *this = std::move(arOther);
+}
 
 JsonValue::~JsonValue()
 {
+}
+
+JsonValue& JsonValue::operator=(const JsonValue& arOther)
+{
+    if (arOther.IsArray()) {
+        AsArray() = arOther.AsArray();
+    }
+    else if (arOther.IsObject()) {
+        AsObject() = arOther.AsObject();
+    }
+    else {
+        *this = arOther;
+    }
+
+    return *this;
+}
+
+JsonValue& JsonValue::operator=(const JsonValue&& arOther)
+{
+    *this = std::move(arOther);
+    return *this;
 }
 
 
@@ -58,6 +91,7 @@ JsonObject& JsonValue::AsObject() const
         return *dynamic_cast<JsonObject*>(const_cast<JsonValue*>(this));
     }
     else {
+        Backtrace::Print();
         THROW_WITH_BACKTRACE1(EJsonTypeError, "JsonValue of type " + jsonTypeToText() + " cannot be converted to Object");
     }
 }
@@ -172,6 +206,5 @@ JsonTypes JsonValue::GetJsonType() const
     }
 }
 
-
-
+} // namespace rsp::utils::json
 

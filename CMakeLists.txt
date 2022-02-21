@@ -56,7 +56,7 @@ target_compile_options(rsp-core-lib PRIVATE -pedantic -Wall -Wextra -Wold-style-
     -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
     -Wundef -Wno-unused -Weffc++ -Werror
     -Wshadow
-    -DDEBUG_LOG -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+    -DDEBUG_LOG -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS -rdynamic)
 
 add_subdirectory(src)
 
@@ -106,7 +106,7 @@ target_compile_options(rsp-core-lib-test PRIVATE -pedantic -Wall -Wextra -Wold-s
     -Wredundant-decls -Wsign-conversion -Wsign-promo
     -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
     -Wundef -Wno-unused -Weffc++ -Werror
-    -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+    -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS -rdynamic)
 
 #get_target_property(INCLUDE_DIRS "rsp-core-lib-test" INCLUDE_DIRECTORIES)
 #message(STATUS "IncDirs: ${INCLUDE_DIRS}")
@@ -115,6 +115,7 @@ target_link_libraries ("rsp-core-lib-test"
     rsp-core-lib
     Threads::Threads
     Freetype::Freetype
+    ${CMAKE_DL_LIBS}
 )
 #target_link_libraries(demo ${FREETYPE_LIBRARIES})
 

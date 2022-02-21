@@ -27,9 +27,12 @@ public:
     template<class T>
     JsonValue(T aValue) : Variant(aValue) {}
 
+    JsonValue(const JsonValue&);
+    JsonValue(const JsonValue&&);
     virtual ~JsonValue();
-    JsonValue(const JsonValue&) = delete;
-    JsonValue& operator=(const JsonValue&) = delete;
+
+    JsonValue& operator=(const JsonValue&);
+    JsonValue& operator=(const JsonValue&&);
 
     std::string Encode(bool aPrettyPrint = false, bool aForceToUCS2 = false);
 
@@ -43,6 +46,8 @@ public:
     JsonValue& operator=(T aValue) { Variant::operator=(aValue); return *this; }
 #pragma GCC diagnostic pop
 
+    virtual bool IsArray() const { return false; }
+    virtual bool IsObject() const { return false; }
     JsonArray& AsArray() const;
     JsonObject& AsObject() const;
 
