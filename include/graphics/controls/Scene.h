@@ -4,12 +4,13 @@
 #include "graphics/controls/Control.h"
 #include "graphics/controls/Input.h"
 #include "graphics/controls/TouchArea.h"
+#include "graphics/messaging/Publisher.h"
 #include <vector>
 
 namespace rsp::graphics
 {
 
-class Scene : public Control
+class Scene : public Control, public Publisher
 {
   public:
     Scene(Rect &aRect);

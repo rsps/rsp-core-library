@@ -18,7 +18,7 @@
 
 namespace rsp::graphics
 {
-class FirstScene : public Scene, public Publisher
+class FirstScene : public Scene
 {
   public:
     FirstScene(Rect &aRect)
