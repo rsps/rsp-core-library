@@ -27,10 +27,8 @@ JsonObject::JsonObject(const JsonObject &arOther)
     : JsonValue(static_cast<const JsonValue&>(arOther))
 {
     JLOG("JsonObject copy constructor");
-    mKeyNames = arOther.mKeyNames;
-
-    for(auto el : arOther.mData) {
-        mData[el.first] = el.second->clone();
+    for(auto key : arOther.mData.GetOrderList()) {
+        mData[key] = arOther.mData.at(key)->clone();
     }
 }
 
@@ -38,7 +36,6 @@ JsonObject::JsonObject(JsonObject &&arOther)
     : JsonValue(static_cast<JsonValue&&>(arOther))
 {
     JLOG("JsonObject move constructor");
-    mKeyNames = std::move(arOther.mKeyNames);
     mData = std::move(arOther.mData);
     arOther.mData.clear();
     arOther.Clear();
@@ -53,10 +50,9 @@ JsonObject& JsonObject::operator=(const JsonObject &arOther)
 {
     JLOG("JsonObject copy assignment");
     JsonValue::operator=(static_cast<const JsonValue&>(arOther));
-    mKeyNames = arOther.mKeyNames;
     mData.clear();
-    for(auto el : arOther.mData) {
-        mData[el.first] = el.second->clone();
+    for(auto key : arOther.mData.GetOrderList()) {
+        mData[key] = arOther.mData.at(key)->clone();
     }
     return *this;
 }
@@ -71,7 +67,6 @@ JsonObject& JsonObject::operator=(JsonObject &&arOther)
 {
     JLOG("JsonObject move assignment");
     JsonValue::operator=(static_cast<JsonValue&&>(arOther));
-    mKeyNames = std::move(arOther.mKeyNames);
     mData = std::move(arOther.mData);
     arOther.mData.clear();
     arOther.Clear();
@@ -83,9 +78,9 @@ std::size_t JsonObject::GetCount() const
     return mData.size();
 }
 
-bool JsonObject::MemberExists(const std::string &aName) const
+bool JsonObject::MemberExists(const std::string &arName) const
 {
-    return (mData.find(aName) != mData.end());
+    return (mData.GetMap().count(arName) > 0);
 }
 
 JsonValue& JsonObject::operator [](const char *apName)
@@ -93,46 +88,37 @@ JsonValue& JsonObject::operator [](const char *apName)
     return (*this)[std::string(apName)];
 }
 
-JsonValue& JsonObject::operator [](const std::string &aName)
+JsonValue& JsonObject::operator [](const std::string &arName)
 {
     try {
-        return *(mData.at(aName));
+        return *(mData.at(arName));
     }
     catch (const std::exception &e) {
-        THROW_WITH_BACKTRACE1(EJsonException, "JsonObject: Member \"" + aName + "\" not found. <- " + e.what());
+        THROW_WITH_BACKTRACE1(EJsonException, "JsonObject: Member \"" + arName + "\" not found. <- " + e.what());
     }
 }
 
-JsonObject& JsonObject::Add(const std::string &aName, JsonValue* apValue)
+JsonObject& JsonObject::Add(const std::string &arName, JsonValue* apValue)
 {
     if (apValue == nullptr) {
         return *this;
     }
 
-    DLOG("JsonObject::Add(): \"" << aName << "\": " << apValue->Encode());
-    mKeyNames.push_back(aName);
-    mData[aName] = apValue;
+    DLOG("JsonObject::Add(): \"" << arName << "\": " << apValue->Encode());
+    mData[arName] = apValue;
     return *this;
 }
 
-JsonObject& JsonObject::Remove(const std::string &aName)
+JsonObject& JsonObject::Remove(const std::string &arName)
 {
-    auto it = mData.find(aName);
-    if (it != mData.end()) {
-        mData.erase(it);
-    }
-
-    auto position = std::find(mKeyNames.begin(), mKeyNames.end(), aName);
-    if (position != mKeyNames.end()) {
-        mKeyNames.erase(position);
-    }
+    mData.Remove(arName);
 
     return *this;
 }
 
 void JsonObject::Clear()
 {
-    for (auto el : mData) {
+    for (auto el : mData.GetMap()) {
         delete el.second;
     }
     mData.clear();
@@ -148,9 +134,9 @@ void JsonObject::toStringStream(std::stringstream &arResult, PrintFormat &arPf, 
     arResult << "{" << arPf.nl;
 
     int rest = mData.size();
-    for (auto key : mKeyNames) {
+    for (auto key : mData.GetOrderList()) {
        auto value = mData[key];
-       arResult << in << "\"" << key << "\":" << arPf.sp;
+       arResult << in << "\"" << key.get() << "\":" << arPf.sp;
        value->toStringStream(arResult, arPf, aLevel+1, aForceToUCS2);
        if (--rest == 0) {
            c = "";

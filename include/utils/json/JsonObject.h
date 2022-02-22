@@ -10,8 +10,7 @@
 #ifndef INCLUDE_UTILS_JSON_JSONOBJECT_H_
 #define INCLUDE_UTILS_JSON_JSONOBJECT_H_
 
-#include <map>
-#include <vector>
+#include <utils/InsertOrderedMap.h>
 #include "JsonValue.h"
 #include "JsonString.h"
 
@@ -29,20 +28,19 @@ public:
     JsonObject& operator=(JsonObject &&arOther);
 
     std::size_t GetCount() const;
-    bool MemberExists(const std::string &aName) const;
+    bool MemberExists(const std::string &arName) const;
 
     JsonValue& operator[](const char *apName);
-    JsonValue& operator[](const std::string &aName);
+    JsonValue& operator[](const std::string &arName);
 
-    JsonObject& Add(const std::string &aName, JsonValue* apValue);
-    JsonObject& Remove(const std::string &aName);
+    JsonObject& Add(const std::string &arName, JsonValue* apValue);
+    JsonObject& Remove(const std::string &arName);
     void Clear() override;
     bool IsObject() const override { return true; }
 
 protected:
     friend JsonString;
-    std::vector<std::string> mKeyNames{}; // Vector maintains insertion order.
-    std::map<std::string, JsonValue*> mData{};
+    InsertOrderedMap<std::string, JsonValue*> mData{};
 
     void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) override;
     JsonValue* clone() const override;

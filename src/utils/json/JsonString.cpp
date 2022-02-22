@@ -220,7 +220,7 @@ JsonValue* JsonString::getObject()
         }
     }
     if (element_required) {
-        auto it = (--result->mData.end());
+        auto it = (--result->mData.GetMap().end());
         THROW_WITH_BACKTRACE1(EJsonParseError, "Excessive key/value delimiter found after " + it->first + ":" + it->second->AsString());
     }
     mIt++;
