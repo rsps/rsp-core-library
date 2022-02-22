@@ -27,7 +27,7 @@ void Broker::onPublish(Topic topic, Event &newEvent)
 {
     // foreach sub in multimap for a given key, do->update
     for (auto sub : mSubscriberMap[topic]) {
-        sub->updateCallback(newEvent);
+        sub->handleEvent(newEvent);
     }
 }
 } // namespace rsp::graphics

@@ -9,6 +9,7 @@
  */
 
 #include "graphics/controls/Scene.h"
+#include <functional>
 
 namespace rsp::graphics
 {
@@ -43,6 +44,7 @@ void Scene::AddChildren(Control &aCtrl)
 
 void Scene::AddArea(TouchArea &aArea)
 {
+    aArea.RegisterOnClicked(std::bind(&Scene::publishToBroker, *this, std::placeholders::_1, std::placeholders::_2));
     mTouchables.push_back(&aArea);
 }
 } // namespace rsp::graphics

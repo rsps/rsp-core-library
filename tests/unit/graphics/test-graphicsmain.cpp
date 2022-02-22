@@ -103,9 +103,13 @@ TEST_CASE("Graphics Main Test")
     Framebuffer fb;
     Rect screenSize(Point(0, 0), Point(fb.GetWidth(), fb.GetHeight()));
 
-    MESSAGE("Making Scene");
-    // Make scene
-    SceneLoader scenes;
+    MESSAGE("Making Broker");
+    // Make Broker
+    Broker broker;
+
+    MESSAGE("Making SceneLoader");
+    // Make sceneLoader
+    SceneLoader scenes(broker);
     // firstScene myScene(screenSize);
     // secondScene otherScene(screenSize);
 
@@ -118,6 +122,7 @@ TEST_CASE("Graphics Main Test")
     GraphicsMain gMain(fb, ic, scenes);
 
     // Bind onClick
+    gMain.subscribeToBroker(&broker, Topic::SceneChange);
     // scenes.GetScene("first").
     // myScene.topBtn.RegisterOnClicked(std::bind(&GraphicsMain::ChangeScene, &gMain));
     // otherScene.botBtn.RegisterOnClicked(std::bind(&GraphicsMain::ChangeScene, &gMain));

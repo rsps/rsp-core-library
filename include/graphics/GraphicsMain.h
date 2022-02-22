@@ -3,12 +3,13 @@
 
 #include "graphics/InputCreator.h"
 #include "graphics/SceneLoader.h"
+#include "graphics/messaging/Subscriber.h"
 #include "graphics/primitives/BufferedCanvas.h"
 
 namespace rsp::graphics
 {
 
-class GraphicsMain
+class GraphicsMain : public Subscriber
 {
   public:
     GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader);
@@ -17,6 +18,7 @@ class GraphicsMain
     void Run();
     void Terminate() { mTerminated = true; }
     void ChangeScene(std::string aSceneName);
+    void handleEvent(Event &newEvent) override;
 
   private:
     BufferedCanvas &mBufferedCanvas;

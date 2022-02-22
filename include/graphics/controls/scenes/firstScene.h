@@ -11,8 +11,7 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/Framebuffer.h"
-#include "graphics/GraphicsMain.h"
+#include "graphics/controls/Scene.h"
 #include <functional>
 #include <vector>
 
@@ -37,7 +36,7 @@ class FirstScene : public Scene
         topBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &topBtnImg, std::placeholders::_1));
         botBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &botBtnImg, std::placeholders::_1));
 
-        //  Bind onClicked
+        //  Bind onClicked or set clicked variables
 
         //  Add them to the lists?
         mTouchables.push_back(&topBtn);

@@ -9,6 +9,7 @@
  */
 
 #include "graphics/GraphicsMain.h"
+#include "graphics/messaging/eventTypes/ClickedEvent.h"
 #include <chrono>
 #include <thread>
 
@@ -52,13 +53,14 @@ void GraphicsMain::ChangeScene(std::string aSceneName)
 {
     mActiveScene.Invalidate();
     mActiveScene = mSceneLoader.GetScene(aSceneName);
-    // Scene temp = mActiveScene;
-    // mActiveScene = otherScene;
-    // otherScene = temp;
-    // otherScene.Invalidate();
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mActiveScene.Render(mBufferedCanvas);
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
+}
+
+void GraphicsMain::handleEvent(Event &newEvent)
+{
+    ChangeScene(newEvent.GetAs<ClickedEvent>().mMessage);
 }
 
 // Temp method

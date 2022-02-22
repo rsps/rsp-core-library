@@ -3,6 +3,7 @@
 
 #include "graphics/controls/Image.h"
 #include "graphics/controls/Input.h"
+#include "graphics/messaging/eventTypes/ClickedEvent.h"
 #include "graphics/primitives/Rect.h"
 
 namespace rsp::graphics
@@ -19,17 +20,18 @@ class TouchArea
     bool IsHit(const Point &aPoint) const;
     // Register callback method for an Image or simply a Control?
     void RegisterOnPressed(std::function<void(Control::States)> aFunc);
-    void RegisterOnClicked(std::function<void(std::string)> aFunc, std::string aClickedInfo);
+    void RegisterOnClicked(std::function<void(Topic, ClickedEvent &)> aFunc);
 
     TouchArea &operator=(const TouchArea &) = default;
 
-    std::function<void(Control::States)> mPressed = [](Control::States) {};
-    std::function<void(std::string)> mClicked = [](std::string) {};
+    std::function<void(Control::States)> mPressed{};
+    std::function<void(Topic, ClickedEvent &)> mClicked{};
 
     Rect mTouchArea;
     Point mCurrentPress{0, 0};
     Point mOriginalPress{0, 0};
     std::string mClickedInfo = "";
+    Topic mClickedTopic = Topic::Base;
 };
 
 } // namespace rsp::graphics

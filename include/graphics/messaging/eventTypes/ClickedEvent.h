@@ -8,33 +8,21 @@
  * \author      Simon Glashoff
  */
 
-#ifndef BROKER_H
-#define BROKER_H
-
-#include <iostream>
-#include <map>
-#include <vector>
+#ifndef CLICKEDEVENT_H
+#define CLICKEDEVENT_H
 
 #include "graphics/messaging/Event.h"
-
+#include <string>
 namespace rsp::graphics
 {
 
-class Subscriber;
-class Publisher;
-
-class Broker
+class ClickedEvent : public EventType<ClickedEvent>
 {
   public:
-    virtual ~Broker() {}
-
-    void addSubscriber(Subscriber *ptr, Topic topic);
-    void registerToPublisher(Publisher *ptr);
-    void onPublish(Topic topic, Event &newEvent);
-
-    // protected:
-    std::map<Topic, std::vector<Subscriber *>> mSubscriberMap;
+    ClickedEvent(std::string aMessage) : mMessage(aMessage) {}
+    ~ClickedEvent() {}
+    std::string mMessage;
 };
 } // namespace rsp::graphics
 
-#endif // BROKER_H
+#endif // CLICKEDEVENT_H

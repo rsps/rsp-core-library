@@ -8,7 +8,7 @@ void Subscriber::subscribeToBroker(Broker *ptr, Topic topic)
     ptr->addSubscriber(this, topic);
 }
 
-void Subscriber::updateCallback(Event &newEvent)
+void Subscriber::handleEvent(Event &newEvent)
 {
     std::cout << "Base Sub got callback" << std::endl;
 }

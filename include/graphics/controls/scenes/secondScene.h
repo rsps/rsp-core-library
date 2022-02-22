@@ -11,8 +11,7 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/Framebuffer.h"
-#include "graphics/GraphicsMain.h"
+#include "graphics/controls/Scene.h"
 #include <functional>
 #include <vector>
 

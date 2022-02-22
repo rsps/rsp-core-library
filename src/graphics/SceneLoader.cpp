@@ -14,8 +14,11 @@
 namespace rsp::graphics
 {
 
-SceneLoader::SceneLoader()
+SceneLoader::SceneLoader(Broker &aBroker)
 {
+    for (auto &scene : mSceneMap) {
+        scene.second.registerBroker(&aBroker);
+    }
 }
 
 SceneLoader::~SceneLoader()
