@@ -135,7 +135,7 @@ void JsonObject::toStringStream(std::stringstream &arResult, PrintFormat &arPf, 
 
     int rest = mData.size();
     for (auto key : mData.GetOrderList()) {
-       auto value = mData[key];
+       auto value = mData.at(key.get());
        arResult << in << "\"" << key.get() << "\":" << arPf.sp;
        value->toStringStream(arResult, arPf, aLevel+1, aForceToUCS2);
        if (--rest == 0) {

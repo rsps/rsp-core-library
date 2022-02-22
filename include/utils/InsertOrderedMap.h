@@ -13,8 +13,12 @@
 #include <map>
 #include <vector>
 #include <functional>
+#include <sstream>
+#include "CoreException.h"
 
 namespace rsp::utils {
+
+using namespace std;
 
 /**
  * \class InsertOrderedMap
@@ -30,7 +34,7 @@ namespace rsp::utils {
  * InsertOrderedMap<int, string> map{...};
  *
  * for(auto k : map.GetOrderedList()) {
- *     std::cout << map.at[k] << std::endl;
+ *     std::cout << map.at(k.get()) << std::endl;
  * }
  * \endcode
  *
@@ -64,8 +68,9 @@ public:
     InsertOrderedMap(std::initializer_list<std::pair<const _Key, _Tp>> aList)
         : mMap(aList)
     {
-        for(auto key : mMap) {
-            mInsertionOrder.push_back(key);
+        for(const auto &key : aList) {
+            auto ret = mMap.find(key.first);
+            mInsertionOrder.push_back(std::ref(ret->first));
         }
     }
 
@@ -85,7 +90,7 @@ public:
     {
         auto ret = mMap.try_emplace(aKey);
         if (ret.second) { // Insertion happened
-            mInsertionOrder.push_back(ret.first->first);
+            mInsertionOrder.push_back(std::ref(ret.first->first));
         }
         return ret.first->second;
     }
@@ -97,14 +102,32 @@ public:
      * \return Reference to value
      * \throw std::out_of_range if aKey does not exist
      */
-    _Tp& at(const _Key aKey)
+    _Tp& at(_Key aKey)
     {
-        return mMap.at(aKey);
+        _Tp* result;
+        try {
+            result = &mMap.at(aKey);
+        }
+        catch(const std::exception &e) {
+            std::stringstream ss;
+            ss << "Failed to lookup key (" << aKey << "): " << e.what();
+            THROW_WITH_BACKTRACE1(CoreException, ss.str());
+        }
+        return *result;
     }
 
     const _Tp& at(const _Key aKey) const
     {
-        return mMap.at(aKey);
+        const _Tp* result;
+        try {
+            result = &mMap.at(aKey);
+        }
+        catch(const std::exception &e) {
+            std::stringstream ss;
+            ss << "Failed to lookup key (" << aKey << "): " << e.what();
+            THROW_WITH_BACKTRACE1(CoreException, ss.str());
+        }
+        return *result;
     }
 
     /**
@@ -129,6 +152,12 @@ public:
         return mMap.size();
     }
 
+    /**
+     * Remove a single element from the map.
+     *
+     * \param aKey Key to the element to remove.
+     * \return Reference to this
+     */
     InsertOrderedMap& Remove(const _Key aKey)
     {
         auto it = mMap.find(aKey);
