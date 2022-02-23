@@ -8,10 +8,6 @@ title JSON Classes
 
 namespace rsp {
 
-class UTF8String <<dataType>> {
-    std::string
-}
-
 enum JsonTypes {
     Null
     Bool
@@ -61,12 +57,29 @@ class JsonObject {
     +Clear()
 }
 
-class Json<typename T> {
-    Simple wrapper to cast
-    JsonValue to type T
---
-    Get() : T
-    Set(aValue:T)
+class JsonString {
+    Used to traverse and decoder a JSON formatted string
+    --
+    +GetValue(): JsonValue*
+}
+
+class Json {
+    Gateway class to all JSON operations.
+    Both moveable and copyable.
+    --
+    #mValue: JsonValue
+    --
+    Json()
+    virtual ~Json();
+
+    MakeObject(): JsonObject&
+    MakeArray(): JsonArray&
+
+    Decode(arJson: const std::string&);
+    Encode(aPrettyPrint: bool = false) const: std::string
+
+    Get() const: JsonValue&
+    Clear(): Json&
 }
 
 class EJsonException <<std::runtime_error>> {
@@ -95,22 +108,32 @@ class EJsonTypeError <<Exception>> {
     not be converted to either.
 }
 
-class EJsonUnicodeError <<Exception>> {
-    Thrown if unicode value
-    is greater than U+00FF
+class EInstanceExists <<Exception>> {
+    Thrown if content have already been
+    created in Json object, and either of
+    MakeObject or MakeArray is invoked.
+}
+
+class ENoInstanceExists <<Exception>> {
+    Thrown when trying to get a content
+    reference from an empty Json object.
 }
 
 JsonObject -down[hidden]- EJsonException
 
 EJsonException <|-- EJsonParseError
 EJsonException <|-- EJsonTypeError
-EJsonParseError <|-- EJsonNumberError
-EJsonParseError <|-- EJsonUnicodeError
+EJsonException <|-- EJsonNumberError
+EJsonException <|-- EInstanceExists
+EJsonException <|-- ENoInstanceExists
+
+std::string <|-- JsonString
+JsonString o-- Json
 
 Variant <|-- JsonValue
 JsonValue <|-- JsonArray
 JsonValue <|-- JsonObject
-JsonValue <|-- Json
+JsonValue o-- Json
 JsonArray o-- JsonValue
 JsonObject o-- JsonValue
 

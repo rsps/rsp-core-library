@@ -14,6 +14,10 @@
 
 namespace rsp::utils::json {
 
+/**
+ * \class EJsonException
+ * \brief Base class for all exceptions thrown by the json module.
+ */
 class EJsonException : public rsp::utils::CoreException {
 public:
     explicit EJsonException(const std::string &aMsg) : rsp::utils::CoreException(aMsg) {}
@@ -38,12 +42,6 @@ class EJsonTypeError : public EJsonException {
 public:
     explicit EJsonTypeError(const std::string &aMsg) : EJsonException("Json Type Error: " + aMsg) {}
 };
-/*
-class EJsonUnicodeError : public EJsonException {
-public:
-    explicit EJsonUnicodeError() : EJsonException("This Json implementation does not support unicode values greater than U+00FF") {}
-};
-*/
 
 class EInstanceExists: public EJsonException {
 public:

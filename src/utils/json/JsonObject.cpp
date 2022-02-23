@@ -105,6 +105,7 @@ JsonObject& JsonObject::Add(const std::string &arName, JsonValue* apValue)
     }
 
     DLOG("JsonObject::Add(): \"" << arName << "\": " << apValue->Encode());
+    mData.Remove(arName);
     mData[arName] = apValue;
     return *this;
 }

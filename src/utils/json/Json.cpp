@@ -102,6 +102,15 @@ std::string Json::Encode(bool aPrettyPrint) const
     return mpValue->Encode(aPrettyPrint);
 }
 
+JsonValue& Json::Get() const
+{
+    if (!mpValue) {
+        THROW_WITH_BACKTRACE(ENoInstanceExists);
+    }
+
+    return *mpValue;
+}
+
 JsonValue& Json::operator *()
 {
     if (!mpValue) {

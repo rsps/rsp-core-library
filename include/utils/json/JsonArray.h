@@ -15,10 +15,17 @@
 
 namespace rsp::utils::json {
 
-
+/**
+ * \class JsonArray
+ * \brief Specialized derivative of JsonValue with array implementation
+ */
 class JsonArray : public JsonValue
 {
 public:
+    /**
+     * \fn JsonArray
+     * \brief Construct empty array object
+     */
     JsonArray();
     JsonArray(const JsonArray &arOther);
     JsonArray(JsonArray &&arOther);
@@ -27,12 +34,48 @@ public:
     JsonArray& operator=(const JsonArray &arOther);
     JsonArray& operator=(JsonArray &&arOther);
 
+    /**
+     * \fn std::size_t GetCount() const
+     * \brief Get number of elements in array
+     * \return Integer count of elements
+     */
     std::size_t GetCount() const;
+
+    /**
+     * \fn JsonValue& operator[](unsigned int aIndex)
+     * \brief Operator to access specific elements
+     * \param aIndex Integer index of element in array
+     * \return Reference to array element
+     */
     JsonValue& operator[](unsigned int aIndex);
 
+    /**
+     * \fn JsonArray& Add(JsonValue* apValue)
+     * \brief Add a new element to the array
+     * \param apValue Pointer to JsonValue object to add
+     * \return Reference to this
+     */
     JsonArray& Add(JsonValue* apValue);
+
+    /**
+     * \fn JsonArray& Remove(int aIndex)
+     * \brief Destroy and remove a specified element object from the array.
+     * \param aIndex Integer index of element to remove
+     * \return Reference to this
+     */
     JsonArray& Remove(int aIndex);
+
+    /**
+     * \fn void Clear()
+     * \brief Clears the entire array and destroys all elements.
+     */
     void Clear() override;
+
+    /**
+     * \fn bool IsArray()
+     * \brief Interface override to return true for this object
+     * \return True
+     */
     bool IsArray() const override { return true; }
 
 protected:
