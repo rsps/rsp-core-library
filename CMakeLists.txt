@@ -2,7 +2,10 @@ cmake_minimum_required (VERSION 3.16)
 
 # https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
 
-set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
+if(DEFINED PLATFORM_P05)
+# To build for P05 platform: cmake .. -D PLATFORM_P05=1 [-D RELEASE=1]
+    set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
+endif()
 
 project (rsp-core-lib)
 
@@ -56,7 +59,13 @@ target_compile_options(rsp-core-lib PRIVATE -pedantic -Wall -Wextra -Wold-style-
     -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
     -Wundef -Wno-unused -Weffc++ -Werror
     -Wshadow
-    -DDEBUG_LOG -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+    -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+
+if (DEFINED RELEASE)
+else()
+target_compile_options(rsp-core-lib PRIVATE 
+    -DDEBUG_LOG)
+endif()
 
 add_subdirectory(src)
 

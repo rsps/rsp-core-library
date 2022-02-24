@@ -105,7 +105,7 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
             }
         }
 
-        std::clog << "Adding font " << face->family_name << ", " << face->style_name << " " << static_cast<int>(style) << std::endl;
+        DLOG("Adding font " << face->family_name << ", " << face->style_name << " " << static_cast<int>(style));
         mFontSets[face->family_name][style] = info;
 /*
         std::cout << "num_faces: " << face->num_faces << "\n"
