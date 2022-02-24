@@ -31,6 +31,21 @@ class Singleton
 {
 public:
     /**
+     * \brief Construct a Singleton
+     */
+    Singleton() {}
+
+    /**
+     * \brief Prohibit copy of Singleton
+     */
+    Singleton(Singleton<T> &other) = delete;
+
+    /**
+     * \brief Prohibit singleton assignment.
+     */
+    void operator=(const Singleton &) = delete;
+
+    /**
      * \fn void Create()
      * \brief Generic factory method.
      */
