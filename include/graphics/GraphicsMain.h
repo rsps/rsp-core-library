@@ -24,7 +24,7 @@ class GraphicsMain : public Subscriber
     BufferedCanvas &mBufferedCanvas;
     InputCreator &mInputs;
     SceneLoader &mSceneLoader;
-    Scene &mActiveScene;
+    Scene mActiveScene;
     bool mTerminated = false;
     std::vector<Input> inputCache{};
 

@@ -13,11 +13,15 @@
 
 namespace rsp::graphics
 {
-
-SceneLoader::SceneLoader(Broker &aBroker)
+static Rect screenSize = Rect(0, 0, 480, 800);
+SceneLoader::SceneLoader(Broker &aBroker) : first(screenSize), second(screenSize)
 {
+    mSceneMap = {{"first", first},
+                 {"second", second}};
+
     for (auto &scene : mSceneMap) {
         scene.second.registerBroker(&aBroker);
+        scene.second.BindElementsToBroker();
     }
 }
 
@@ -27,7 +31,11 @@ SceneLoader::~SceneLoader()
 
 Scene &SceneLoader::GetFirstScene()
 {
-    return mSceneMap.begin()->second;
+    try {
+        return mSceneMap.at("first");
+    } catch (const std::out_of_range &e) {
+        throw std::out_of_range(std::string("No main scene found") + ": " + e.what());
+    }
 }
 
 Scene &SceneLoader::GetScene(std::string aSceneName)

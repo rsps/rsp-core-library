@@ -16,83 +16,6 @@
 
 using namespace rsp::graphics;
 
-/*class firstScene : public Scene
-{
-  public:
-    firstScene(Rect &aRect)
-        : Scene(aRect)
-    {
-        // Set member variables values
-        Rect topRect(Point(100, 400), 200, 100);
-        topBtn = TouchArea(topRect);
-        topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
-
-        Rect botRect(Point(100, 600), 200, 100);
-        botBtn = TouchArea(botRect);
-        botBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
-
-        // Bind onPressed
-        topBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &topBtnImg, std::placeholders::_1));
-        botBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &botBtnImg, std::placeholders::_1));
-
-        //  Bind onClicked
-
-        //  Add them to the lists?
-        mTouchables.push_back(&topBtn);
-        mTouchables.push_back(&botBtn);
-        mChildren.push_back(&topBtnImg);
-        mChildren.push_back(&botBtnImg);
-    };
-
-    ~firstScene() {}
-
-    Color background{0x323232}; // color from old main.qml
-
-    TouchArea topBtn;
-    TouchArea botBtn;
-
-    Image topBtnImg;
-    Image botBtnImg;
-};
-class secondScene : public Scene
-{
-  public:
-    secondScene(Rect &aRect)
-        : Scene(aRect)
-    {
-        // Set member variables values
-        Rect topRect(Point(100, 100), 200, 100);
-        topBtn = TouchArea(topRect);
-        topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
-
-        Rect botRect(Point(100, 300), 200, 100);
-        botBtn = TouchArea(botRect);
-        botBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
-
-        // Bind onPressed
-        topBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &topBtnImg, std::placeholders::_1));
-        botBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &botBtnImg, std::placeholders::_1));
-
-        //  Bind onClicked
-
-        //  Add them to the lists?
-        mTouchables.push_back(&topBtn);
-        mTouchables.push_back(&botBtn);
-        mChildren.push_back(&topBtnImg);
-        mChildren.push_back(&botBtnImg);
-    };
-
-    ~secondScene() {}
-
-    Color background{0x232323}; // reverse color from old main.qml
-
-    TouchArea topBtn;
-    TouchArea botBtn;
-
-    Image topBtnImg;
-    Image botBtnImg;
-};*/
-
 TEST_CASE("Graphics Main Test")
 {
 
@@ -123,6 +46,7 @@ TEST_CASE("Graphics Main Test")
 
     // Bind onClick
     gMain.subscribeToBroker(&broker, Topic::SceneChange);
+    std::cout << "Setup complete" << std::endl;
     // scenes.GetScene("first").
     // myScene.topBtn.RegisterOnClicked(std::bind(&GraphicsMain::ChangeScene, &gMain));
     // otherScene.botBtn.RegisterOnClicked(std::bind(&GraphicsMain::ChangeScene, &gMain));

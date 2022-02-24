@@ -11,18 +11,18 @@
 #include <iostream>
 
 #include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <poll.h>
 #include <posix/FileIO.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <utils/ExceptionHelper.h>
 
 namespace rsp::posix
 {
 
-//const std::ios_base::openmode FileIO::cNonBlock = (std::ios_base::openmode)((int)std::_Ios_Openmode::_S_ios_openmode_end + 1);
+// const std::ios_base::openmode FileIO::cNonBlock = (std::ios_base::openmode)((int)std::_Ios_Openmode::_S_ios_openmode_end + 1);
 
 FileIO::FileIO()
     : mHandle(-1)
@@ -51,11 +51,9 @@ void FileIO::Open(const std::string &arFileName, std::ios_base::openmode aMode, 
         if (aPermissions) {
             flags |= O_CREAT;
         }
-    }
-    else if (aMode & std::ios_base::in) {
+    } else if (aMode & std::ios_base::in) {
         flags |= O_RDONLY;
-    }
-    else if (aMode & std::ios_base::out) {
+    } else if (aMode & std::ios_base::out) {
         flags |= O_WRONLY;
         if (aPermissions) {
             flags |= O_CREAT;
@@ -64,9 +62,9 @@ void FileIO::Open(const std::string &arFileName, std::ios_base::openmode aMode, 
     if (aMode & std::ios_base::trunc) {
         flags |= O_TRUNC;
     }
-//    if (aMode & cNonBlock) {
-//        flags |= O_NONBLOCK;
-//    }
+    //    if (aMode & cNonBlock) {
+    //        flags |= O_NONBLOCK;
+    //    }
 
     mFileName = arFileName;
 
@@ -90,16 +88,16 @@ std::size_t FileIO::Seek(std::size_t aOffset, std::ios_base::seekdir aSeekdir)
 {
     int base = 0;
     switch (aSeekdir) {
-        default:
-        case std::ios_base::beg:
-            base = SEEK_SET;
-            break;
-        case std::ios_base::cur:
-            base = SEEK_CUR;
-            break;
-        case std::ios_base::end:
-            base = SEEK_END;
-            break;
+    default:
+    case std::ios_base::beg:
+        base = SEEK_SET;
+        break;
+    case std::ios_base::cur:
+        base = SEEK_CUR;
+        break;
+    case std::ios_base::end:
+        base = SEEK_END;
+        break;
     }
     int ret = lseek(mHandle, static_cast<off_t>(aOffset), base);
     if (ret < 0) {
@@ -148,7 +146,7 @@ void FileIO::PutLine(const std::string &arData)
 {
     std::size_t offset = 0;
     std::size_t remaining = arData.size();
-    char *p = const_cast<char*>(arData.data());
+    char *p = const_cast<char *>(arData.data());
 
     do {
         std::size_t count = Write(p + offset, remaining);
@@ -160,8 +158,8 @@ void FileIO::PutLine(const std::string &arData)
 std::size_t FileIO::GetSize()
 {
     std::size_t current = Seek(0, std::ios_base::cur); // Get current position
-    std::size_t result = Seek(0, std::ios_base::end); // Get last position
-    Seek(current); // Restore position
+    std::size_t result = Seek(0, std::ios_base::end);  // Get last position
+    Seek(current);                                     // Restore position
 
     return result;
 }
@@ -215,4 +213,4 @@ void FileIO::PutContents(const std::string &arData)
     PutLine(arData);
 }
 
-} /* namespace posix */
+} // namespace rsp::posix

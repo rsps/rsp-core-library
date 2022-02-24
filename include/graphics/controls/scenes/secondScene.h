@@ -23,20 +23,21 @@ class SecondScene : public Scene
     SecondScene(Rect &aRect)
         : Scene(aRect)
     {
+        myName = "Second Scene";
         // Set member variables values
         Rect topRect(Point(100, 100), 200, 100);
         topBtn = TouchArea(topRect);
         topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
 
         Rect botRect(Point(100, 300), 200, 100);
-        botBtn = TouchArea(botRect);
+        botBtn = TouchArea(botRect, Topic::SceneChange, "first");
         botBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
 
         // Bind onPressed
         topBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &topBtnImg, std::placeholders::_1));
         botBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &botBtnImg, std::placeholders::_1));
 
-        //  Bind onClicked
+        //  Bind onClicked or set clicked variables || Should be set from Constructor
 
         //  Add them to the lists?
         mTouchables.push_back(&topBtn);

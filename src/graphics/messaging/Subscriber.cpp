@@ -4,6 +4,7 @@ namespace rsp::graphics
 {
 void Subscriber::subscribeToBroker(Broker *ptr, Topic topic)
 {
+    std::cout << "Subscriber " << this << " subscribing to topic: " << (int)topic << std::endl;
     mTopic = topic;
     ptr->addSubscriber(this, topic);
 }

@@ -31,20 +31,16 @@ void Scene::ProcessInput(Input &aInput)
 
 void Scene::Render(Canvas &aCanvas)
 {
-    // std::cout << "Rendering" << std::endl;
     for (auto child : mChildren) {
         child->Render(aCanvas);
     }
 }
 
-void Scene::AddChildren(Control &aCtrl)
+void Scene::BindElementsToBroker()
 {
-    mChildren.push_back(&aCtrl);
+    for (auto touchable : mTouchables) {
+        touchable->RegisterOnClicked(std::bind(&Scene::publishToBroker, *this, std::placeholders::_1, std::placeholders::_2));
+    }
 }
 
-void Scene::AddArea(TouchArea &aArea)
-{
-    aArea.RegisterOnClicked(std::bind(&Scene::publishToBroker, *this, std::placeholders::_1, std::placeholders::_2));
-    mTouchables.push_back(&aArea);
-}
 } // namespace rsp::graphics

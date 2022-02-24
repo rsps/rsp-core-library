@@ -28,10 +28,10 @@ class SceneLoader
     Scene &GetFirstScene();
     Scene &GetScene(std::string aSceneName);
 
-    Rect screenSize = Rect(0, 0, 480, 800);
-    std::unordered_map<std::string, Scene> mSceneMap = {
-        {"first", FirstScene(screenSize)},
-        {"second", SecondScene(screenSize)}};
+    FirstScene first;
+    SecondScene second;
+
+    std::unordered_map<std::string, Scene> mSceneMap;
 };
 
 } // namespace rsp::graphics

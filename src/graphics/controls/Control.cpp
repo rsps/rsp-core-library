@@ -16,7 +16,6 @@ namespace rsp::graphics
 Control::Control(Rect &aRect, Control *aParent)
     : mArea(aRect), mParent(aParent)
 {
-    std::cout << "Constructor of Control" << std::endl;
 }
 
 Control::~Control()
@@ -24,7 +23,6 @@ Control::~Control()
 }
 void Control::SetState(States aState)
 {
-    std::cout << "Control Image setting State" << std::endl;
     if (mState != aState) {
         mState = aState;
         Invalidate();
@@ -33,8 +31,6 @@ void Control::SetState(States aState)
 void Control::Invalidate()
 {
     mIsInvalid = true;
-    std::cout << "Invalidating Ctrl object" << std::endl;
-    std::cout << this << std::endl;
     for (auto child : mChildren) {
         child->Invalidate();
     }

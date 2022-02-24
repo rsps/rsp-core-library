@@ -12,8 +12,8 @@ namespace rsp::graphics
 class TouchArea
 {
   public:
-    TouchArea() : mTouchArea(0, 0, 0, 0){};
-    TouchArea(Rect &aArea);
+    TouchArea() : mTouchArea(0, 0, 0, 0), mClickedTopic(Topic::Base), mclickEvent(""){};
+    TouchArea(Rect &aArea, Topic aClickTopic = Topic::Base, std::string aClickInfo = "");
     ~TouchArea();
 
     void ProcessInput(Input &aInput);
@@ -24,14 +24,14 @@ class TouchArea
 
     TouchArea &operator=(const TouchArea &) = default;
 
-    std::function<void(Control::States)> mPressed{};
-    std::function<void(Topic, ClickedEvent &)> mClicked{};
+    std::function<void(Control::States)> mPressed = [](Control::States) {};
+    std::function<void(Topic, ClickedEvent &)> mClicked = [](Topic, ClickedEvent &) {};
 
     Rect mTouchArea;
     Point mCurrentPress{0, 0};
     Point mOriginalPress{0, 0};
-    std::string mClickedInfo = "";
-    Topic mClickedTopic = Topic::Base;
+    Topic mClickedTopic;
+    ClickedEvent mclickEvent;
 };
 
 } // namespace rsp::graphics

@@ -33,6 +33,8 @@ class Control
     virtual void Render(Canvas &aCanvas) = 0;
     void SetArea(Rect const &aRect);
     Rect &GetArea();
+
+    std::string myName = "Base";
 };
 } // namespace rsp::graphics
 

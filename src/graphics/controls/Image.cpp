@@ -15,7 +15,6 @@ namespace rsp::graphics
 Image::Image(std::string aPressed, std::string aNormal, Rect &aRect)
     : Control(aRect)
 {
-    std::cout << "Constructor of Image" << std::endl;
     mStateMap.insert(std::pair<States, Bitmap>(States::pressed, Bitmap(aPressed)));
     mStateMap.insert(std::pair<States, Bitmap>(States::normal, Bitmap(aNormal)));
 }
@@ -35,10 +34,10 @@ void Image::Render(Canvas &aCanvas)
 
 void Image::HandleCallback(States aState)
 {
+    std::cout << "Image handling Pressed Callback" << std::endl;
     if (aState != mState) {
         mState = aState;
         std::cout << "Invalidating Image object" << std::endl;
-        std::cout << this << std::endl;
         this->Invalidate();
     }
 }

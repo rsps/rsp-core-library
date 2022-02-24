@@ -19,6 +19,8 @@ namespace rsp::graphics
 GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader)
     : mBufferedCanvas(aBufferedCanvas), mInputs(aInputs), mSceneLoader(aSceneLoader), mActiveScene(mSceneLoader.GetFirstScene())
 {
+    std::cout << "G-Main Constructor" << std::endl;
+    std::cout << "Active Scene is: " << mActiveScene.myName << std::endl;
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
 }
@@ -51,8 +53,10 @@ void GraphicsMain::Run()
 
 void GraphicsMain::ChangeScene(std::string aSceneName)
 {
+    std::cout << "Changing Scene from: " << mActiveScene.myName << " To: " << aSceneName << std::endl;
     mActiveScene.Invalidate();
     mActiveScene = mSceneLoader.GetScene(aSceneName);
+    std::cout << "Active Scene is: " << mActiveScene.myName << std::endl;
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mActiveScene.Render(mBufferedCanvas);
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);

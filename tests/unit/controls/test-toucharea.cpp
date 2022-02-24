@@ -196,7 +196,11 @@ TEST_CASE("Input Processing")
     SUBCASE("Clicked Callback")
     {
         // Arrange
-        std::function<void()> clickedReciever = [&](void) { wasCalled = true; };
+        std::function<void(Topic, ClickedEvent &)> clickedReciever = [&](Topic tp, ClickedEvent &event) {
+            wasCalled = true;
+            (void)tp;
+            (void)event;
+        };
         area.RegisterOnClicked(clickedReciever);
 
         SUBCASE("Clicked Callback - Hit-Hit-Input")
