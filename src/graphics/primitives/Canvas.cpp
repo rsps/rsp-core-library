@@ -17,6 +17,10 @@
 #include <sys/mman.h>
 #include <thread>
 #include <unistd.h>
+#include <stdint.h>
+#include <string>
+#include <vector>
+#include <logging/Logger.h>
 
 namespace rsp::graphics
 {
@@ -47,22 +51,20 @@ void Canvas::DrawCircle(const Point &aCenter, int aRadius, const Color &aColor)
 
 void Canvas::DrawLine(const Point &aA, const Point &aB, const Color &aColor)
 {
-    int i, x, y, deltaX, deltaY, absDeltaX, absDeltaY, signumX, signumY, px, py;
-
-    deltaX = aB.mX - aA.mX;
-    deltaY = aB.mY - aA.mY;
-    absDeltaX = abs(deltaX);
-    absDeltaY = abs(deltaY);
-    signumX = (deltaX > 0) ? 1 : -1;
-    signumY = (deltaY > 0) ? 1 : -1;
-    x = absDeltaX >> 1;
-    y = absDeltaY >> 1;
-    px = aA.mX;
-    py = aA.mY;
+    int deltaX = aB.mX - aA.mX;
+    int deltaY = aB.mY - aA.mY;
+    int absDeltaX = abs(deltaX);
+    int absDeltaY = abs(deltaY);
+    int signumX = (deltaX > 0) ? 1 : -1;
+    int signumY = (deltaY > 0) ? 1 : -1;
+    int x = absDeltaX >> 1;
+    int y = absDeltaY >> 1;
+    int px = aA.mX;
+    int py = aA.mY;
 
     SetPixel(aA, aColor);
     if (absDeltaX >= absDeltaY) {
-        for (i = 0; i < absDeltaX; i++) {
+        for (int i = 0; i < absDeltaX; i++) {
             y += absDeltaY;
             if (y >= absDeltaX) {
                 y -= absDeltaX;
@@ -71,8 +73,9 @@ void Canvas::DrawLine(const Point &aA, const Point &aB, const Color &aColor)
             px += signumX;
             SetPixel(Point(px, py), aColor);
         }
-    } else {
-        for (i = 0; i < absDeltaY; i++) {
+    }
+    else {
+        for (int i = 0; i < absDeltaY; i++) {
             x += absDeltaX;
             if (x >= absDeltaY) {
                 x -= absDeltaY;
@@ -84,33 +87,60 @@ void Canvas::DrawLine(const Point &aA, const Point &aB, const Color &aColor)
     }
 }
 
-void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor)
+void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor, bool aFilled)
 {
-    for (int i = aRect.mLeftTop.mX; i <= aRect.mRightBottom.mX; i++) {
-        SetPixel(Point(i, aRect.mLeftTop.mY), aColor);     // top
-        SetPixel(Point(i, aRect.mRightBottom.mY), aColor); // bottom
+    if (aFilled) {
+        for (int y = aRect.mLeftTop.mY; y <= aRect.mRightBottom.mY; y++) {
+            for (int x = aRect.mLeftTop.mX; x <= aRect.mRightBottom.mX; x++) {
+                SetPixel(Point(x, y), aColor);
+            }
+        }
     }
-    for (int i = aRect.mLeftTop.mY; i <= aRect.mRightBottom.mY; i++) {
-        SetPixel(Point(aRect.mLeftTop.mX, i), aColor);     // left
-        SetPixel(Point(aRect.mRightBottom.mX, i), aColor); // right
+    else {
+        for (int i = aRect.mLeftTop.mX; i <= aRect.mRightBottom.mX; i++) {
+            SetPixel(Point(i, aRect.mLeftTop.mY), aColor);     // top
+            SetPixel(Point(i, aRect.mRightBottom.mY), aColor); // bottom
+        }
+        for (int i = aRect.mLeftTop.mY; i <= aRect.mRightBottom.mY; i++) {
+            SetPixel(Point(aRect.mLeftTop.mX, i), aColor);     // left
+            SetPixel(Point(aRect.mRightBottom.mX, i), aColor); // right
+        }
     }
 }
 
 void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
 {
-    std::cout << "Drawing Image" << std::endl;
-    int iter = 0;
+    long unsigned int iter = 0;
     auto pixels = aBitmap.GetPixels();
-    for (size_t h = 0; h < aBitmap.GetHeight(); h++) {
-        for (size_t w = 0; w < aBitmap.GetWidth(); w++) {
+    for (int h = 0; h < aBitmap.GetHeight(); h++) {
+        for (int w = 0; w < aBitmap.GetWidth(); w++) {
             SetPixel(Point(aLeftTop.mX + w, aLeftTop.mY + h), pixels[iter]);
             iter++;
         }
     }
 }
 
-void Canvas::DrawText(const Rect &aRect, const Font &aFont, const char *apText, bool aScaleToFit)
+void Canvas::DrawText(Text &arText)
 {
-    throw rsp::utils::NotImplementedException("Draw Text is not yet implemented");
+    DrawText(arText, arText.GetFont().GetColor());
 }
+
+void Canvas::DrawText(const Text &arText, const Color &arColor)
+{
+    for (auto glyph : arText.GetGlyphs()) {
+//        DLOG("DrawText " << glyph);
+        for (int y = 0; y < glyph.mHeight; y++) {
+            long unsigned int index = static_cast<long unsigned int>(y * glyph.mWidth);
+            for (int x = 0; x < glyph.mWidth; x++) {
+                uint8_t c = glyph.mPixels[index++];
+                auto p = Point(x + glyph.mLeft + arText.GetArea().GetLeft(), y + glyph.mTop + arText.GetArea().GetTop());
+                if (c && arText.GetArea().IsHit(p)) {
+                    SetPixel(p, arColor);
+                }
+            }
+        }
+    }
+}
+
+
 } // namespace rsp::graphics

@@ -153,8 +153,8 @@ public:
     bool WaitForDataReady(int aTimeoutms);
 
 protected:
-    std::string mFileName;
-    int mHandle;
+    std::string mFileName{};
+    int mHandle = -1;
 };
 
 } /* namespace posix */

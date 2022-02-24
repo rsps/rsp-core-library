@@ -12,8 +12,8 @@
 
 namespace rsp::graphics
 {
-TouchArea::TouchArea(Rect &aArea, Image &aImage)
-    : mTouchArea(aArea), mImage(&aImage)
+TouchArea::TouchArea(Rect &aArea)
+    : mTouchArea(aArea)
 {
 }
 TouchArea::~TouchArea()
@@ -23,20 +23,45 @@ void TouchArea::ProcessInput(Input &aInput)
 {
     std::cout << "TouchArea Processing Input" << std::endl;
     switch (aInput.type) {
-    case InputType::Press:
-        std::cout << "TouchArea Setting pressed state" << std::endl;
-        mImage->SetState(Control::States::pressed);
-        break;
-    case InputType::Lift:
-        std::cout << "TouchArea Setting normal state" << std::endl;
-        mImage->SetState(Control::States::normal);
-        break;
-    default:
-        break;
+        case InputType::Press:
+            mCurrentPress = Point(aInput.x, aInput.y);
+            mOriginalPress = Point(aInput.x, aInput.y);
+            if (mPressed && IsHit(mCurrentPress)) {
+                std::cout << "TouchArea Setting pressed state" << std::endl;
+                mPressed(Control::States::pressed);
+            }
+            break;
+        case InputType::Lift:
+            std::cout << "TouchArea Setting normal state" << std::endl;
+            if (mPressed) {
+                mPressed(Control::States::normal);
+            }
+            if (mClicked && IsHit(mCurrentPress) && IsHit(mOriginalPress)) {
+                mClicked();
+            }
+            // Will this return true for IsHit on things outside the scene?
+            mCurrentPress = Point(-1, -1);
+            break;
+        case InputType::Drag:
+            mCurrentPress = Point(aInput.x, aInput.y);
+            if (mPressed && !IsHit(mCurrentPress)) {
+                mPressed(Control::States::dragged);
+            }
+            break;
+        default:
+            break;
     }
 }
 bool TouchArea::IsHit(const Point &aPoint) const
 {
     return mTouchArea.IsHit(aPoint);
+}
+void TouchArea::RegisterOnPressed(std::function<void(Control::States)> aFunc)
+{
+    mPressed = aFunc;
+}
+void TouchArea::RegisterOnClicked(std::function<void()> aFunc)
+{
+    mClicked = aFunc;
 }
 } // namespace rsp::graphics

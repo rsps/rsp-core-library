@@ -12,10 +12,11 @@
 
 namespace rsp::graphics
 {
-Scene::Scene(Rect &aRect)
+Scene::Scene(const Rect &aRect)
     : Control(aRect)
 {
 }
+
 Scene::~Scene()
 {
 }
@@ -23,13 +24,13 @@ Scene::~Scene()
 void Scene::ProcessInput(Input &aInput)
 {
     for (TouchArea *area : mTouchables) {
-        if (area->IsHit(Point(aInput.x, aInput.y))) {
-            area->ProcessInput(aInput);
-        }
+        area->ProcessInput(aInput);
     }
 }
+
 void Scene::Render(Canvas &aCanvas)
 {
+    // std::cout << "Rendering" << std::endl;
     for (auto child : mChildren) {
         child->Render(aCanvas);
     }

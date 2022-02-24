@@ -13,10 +13,10 @@
 
 using namespace rsp::graphics;
 
-uint8_t red = 0x12;
-uint8_t green = 0x34;
-uint8_t blue = 0x56;
-uint8_t alpha = 0x78;
+uint8_t alpha = 0x12;
+uint8_t red = 0x34;
+uint8_t green = 0x56;
+uint8_t blue = 0x78;
 uint32_t colourVal = 0x12345678;
 
 TEST_CASE("Color Contructors")
@@ -125,5 +125,31 @@ TEST_CASE("Color Operators")
 
         // Assert
         CHECK(static_cast<uint32_t>(newColour) == static_cast<uint32_t>(testCol));
+    }
+}
+TEST_CASE("Color Constants")
+{
+    SUBCASE("Red") {
+        Color cl(Color::Red);
+        CHECK(cl.GetAlpha() == 0);
+        CHECK(cl.GetRed() == 0xFF);
+        CHECK(cl.GetGreen() == 0);
+        CHECK(cl.GetBlue() == 0);
+    }
+
+    SUBCASE("Green") {
+        Color cl(Color::Green);
+        CHECK(cl.GetAlpha() == 0);
+        CHECK(cl.GetRed() == 0);
+        CHECK(cl.GetGreen() == 0x80);
+        CHECK(cl.GetBlue() == 0);
+    }
+
+    SUBCASE("Blue") {
+        Color cl(Color::Blue);
+        CHECK(cl.GetAlpha() == 0);
+        CHECK(cl.GetRed() == 0);
+        CHECK(cl.GetGreen() == 0);
+        CHECK(cl.GetBlue() == 0xFF);
     }
 }

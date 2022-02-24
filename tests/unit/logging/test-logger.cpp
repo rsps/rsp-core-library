@@ -1,8 +1,11 @@
-/*
- * test-logger.cpp
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- *  Created on: Feb 22, 2020
- *      Author: Steffen Brummer
+ * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Steffen Brummer
  */
 
 #include <thread>
@@ -16,7 +19,7 @@
 #include <logging/FileLogWriter.h>
 #include <utils/StrUtils.h>
 #include <utils/AnsiEscapeCodes.h>
-#include <utils/RSPCoreExceptions.h>
+#include <utils/CoreException.h>
 
 using namespace rsp;
 using namespace rsp::utils;
@@ -60,7 +63,7 @@ TEST_CASE("Testing the Logger class") {
 
     logging::Logger log(true);
 
-    CHECK_THROWS_AS(logging::LoggerInterface::GetDefault(), const utils::NotsetException &);
+    CHECK_THROWS_AS(logging::LoggerInterface::GetDefault(), const utils::NotSetException &);
     logging::LoggerInterface::SetDefault(log);
 
     log.AddLogWriter(std::make_shared<logging::FileLogWriter>(cFileName, logging::LogLevel::Info));

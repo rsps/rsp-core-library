@@ -2,11 +2,6 @@
 
 namespace rsp::graphics
 {
-void Subscriber::subscribeToBroker(Broker *ptr, Topic topic)
-{
-    mTopic = topic;
-    ptr->addSubscriber(this, topic);
-}
 
 void Subscriber::updateCallback(Event &newEvent)
 {

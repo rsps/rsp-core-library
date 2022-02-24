@@ -23,8 +23,9 @@
 namespace rsp::logging {
 
 // Usage: make CXXFLAGS="-DDEBUG_LOG"
+// Usage: cmake -DCMAKE_CXX_FLAGS="-DDEBUG_LOG" ..
 
-//#define DEBUG_LOG 1
+// #define DEBUG_LOG 1
 
 #ifdef DEBUG_LOG
 #include <iostream>
@@ -56,8 +57,8 @@ class LoggerInterface
 public:
     virtual ~LoggerInterface() {}
 
+    static void SetDefault(LoggerInterface &arLogger);
     static LoggerInterface& GetDefault();
-    static void SetDefault(LoggerInterface& arLogger);
 
     virtual LogStream Emergency() = 0;
     virtual LogStream Alert() = 0;
@@ -77,8 +78,8 @@ public:
 
 protected:
     static LoggerInterface* mpDefaultInstance;
-    std::mutex mMutex;
-    std::vector<std::shared_ptr<LogWriterInterface>> mWriters;
+    std::mutex mMutex{};
+    std::vector<std::shared_ptr<LogWriterInterface>> mWriters{};
 
     friend class LogStreamInterface;
     virtual void write(const LogStreamInterface *apStream, const std::string &arMsg);
@@ -97,14 +98,15 @@ class LogStreamInterface
 {
 public:
     LogStreamInterface(LoggerInterface *apOwner, LogLevel aLevel);
-    LogStreamInterface(const LogStreamInterface & arFrom)
-        : mpOwner(arFrom.mpOwner), mLevel(arFrom.mLevel) {}
-
-    LogStreamInterface& operator=(const LogStreamInterface &arOther);
+    LogStreamInterface(const LogStreamInterface & aFrom)
+        : mpOwner(aFrom.mpOwner), mLevel(aFrom.mLevel) {}
+    virtual ~LogStreamInterface() {}
 
     LogLevel GetLevel() const { return mLevel; }
     void SetLevel(LogLevel aLevel) { mLevel = aLevel; }
 
+    LogStreamInterface& operator= (const LogStreamInterface&) = delete;
+    LogStreamInterface& operator= (const LogStreamInterface&&);
 protected:
     LoggerInterface *mpOwner;
     LogLevel mLevel;
@@ -121,11 +123,10 @@ class LogStream : public LogStreamInterface
 {
 public:
     LogStream(LoggerInterface *apOwner, LogLevel aLevel);
-    LogStream(const LogStream &arFrom) = delete; /* No copy, move is OK */
-    LogStream(LogStream &&arFrom);
+    LogStream(const LogStream &aFrom) = delete; /* No copy, move is OK */
+    LogStream(LogStream &&aFrom);
     ~LogStream();
 
-    LogStream& operator=(const LogStream &arOther) = delete;
     LogStream& operator=(LogStream &&arOther);
 
     template< class type> LogStream& operator<<( type aValue) {
@@ -142,7 +143,7 @@ public:
     void Flush();
 
 protected:
-    std::stringstream mBuffer;
+    std::stringstream mBuffer{};
 };
 
 /**
@@ -158,8 +159,8 @@ public:
     void Lock() { mMutex.lock(); }
 
 protected:
-    std::string mBuffer;
-    std::mutex mMutex;
+    std::string mBuffer{};
+    std::mutex mMutex{};
 
     int overflow(int c) override;
     int sync() override;
@@ -188,6 +189,8 @@ public:
     LogStream Notice() override;
     LogStream Info() override;
     LogStream Debug() override;
+
+    Logger& operator= (const Logger&) = delete;
 
 protected:
     std::streambuf *mpClogBackup;

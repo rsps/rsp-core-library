@@ -11,6 +11,8 @@
 #ifndef POINT_H
 #define POINT_H
 
+#include <ostream>
+
 namespace rsp::graphics
 {
 
@@ -89,6 +91,8 @@ class Point
     int mX;
     int mY;
 };
+
+std::ostream& operator <<(std::ostream &os, const Point &p);
 
 } // namespace rsp::graphics
 #endif // POINT_H

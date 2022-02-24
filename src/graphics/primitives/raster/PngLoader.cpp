@@ -9,8 +9,7 @@
  */
 
 #include <graphics/primitives/raster/PngLoader.h>
-#include <utils/RSPCoreExceptions.h>
-
+#include <utils/CoreException.h>
 #include <cerrno>
 #include <iomanip>
 
@@ -37,7 +36,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
     uint8_t signature[8];
     fread(signature, sizeof(uint8_t), sizeof(signature), file);
     if (!CheckSignature(signature, 8)) {
-        throw RSPCoreException("Signature not matching"); //return;  //Some error, probably just throw exception
+        throw CoreException("Signature not matching"); //return;  //Some error, probably just throw exception
     }
 
     // TODO: Declare structs for data handling
@@ -80,8 +79,8 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
                 //*(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
 
                 //Set important bitmap variables
-                mWidth = pngchunk.ihdr->width;
-                mHeight = pngchunk.ihdr->height;
+                mWidth = static_cast<int>(pngchunk.ihdr->width);
+                mHeight = static_cast<int>(pngchunk.ihdr->height);
 
                 std::cout << "Width       :" << pngchunk.ihdr->width << std::endl;
                 std::cout << "Height      :" << pngchunk.ihdr->height << std::endl;
@@ -91,7 +90,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
                 std::cout << "Filter      :" << +pngchunk.ihdr->filterMethod << std::endl;
                 std::cout << "Interlace   :" << +pngchunk.ihdr->interlaceMethod << std::endl;
 
-                std::cout << "Crc         :" << std::hex << *(uint32_t *)(&pngchunk.data[pngchunk.length]) << std::endl;
+                std::cout << "Crc         :" << std::hex << *reinterpret_cast<uint32_t*>(&pngchunk.data[pngchunk.length]) << std::endl;
                 std::cout << std::dec;
 
                 // TODO Stuff save or use header info
@@ -112,7 +111,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
                 //Maybe, maybe not flip crc
                 //*(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
                 // TODO do something with crc
-                std::cout << "Crc: " << std::hex << *(uint32_t *)(&pngchunk.data[pngchunk.length]) << std::endl;
+                std::cout << "Crc: " << std::hex << *reinterpret_cast<uint32_t*>(&pngchunk.data[pngchunk.length]) << std::endl;
                 std::cout << std::dec;
 
             }
@@ -132,7 +131,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
             std::cout << "Chunk is Non-Critical" << std::endl;
             //Chunk is not critical
             //Seek the chunks length of data plus its crc
-            fseek(file, pngchunk.length + sizeof(uint32_t), SEEK_CUR);
+            fseek(file, static_cast<long int>(pngchunk.length + sizeof(uint32_t)), SEEK_CUR);
             //Read next chunk
         }
         //Clean up memory

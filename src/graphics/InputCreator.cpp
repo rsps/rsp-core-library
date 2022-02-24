@@ -32,14 +32,14 @@ bool InputCreator::HasNewInputs()
 
 const Input &InputCreator::GetInput()
 {
-    ReadType();
+    readType();
     return input;
 }
 
-void InputCreator::ReadType()
+void InputCreator::readType()
 {
     touchDriver.Read(reinterpret_cast<char *>(&inputLine), sizeof(inputLine));
-    if (inputLine.type == EV_ABS && inputLine.code == ABS_MT_TRACKING_ID && inputLine.value == 0xFFFFFFFF) {
+    if (inputLine.type == EV_ABS && inputLine.code == ABS_MT_TRACKING_ID && inputLine.value == -1) {
         input.type = InputType::Lift;
     } else if (inputLine.type == EV_ABS && inputLine.code == ABS_MT_TRACKING_ID) {
         input.type = InputType::Press;
@@ -47,10 +47,10 @@ void InputCreator::ReadType()
                (inputLine.code == ABS_MT_POSITION_X || inputLine.code == ABS_MT_POSITION_Y)) {
         input.type = InputType::Drag;
     }
-    ReadBody();
+    readBody();
 }
 
-void InputCreator::ReadBody()
+void InputCreator::readBody()
 {
     while (inputLine.type != 0) {
         if (inputLine.type == EV_ABS && inputLine.code == ABS_X) {

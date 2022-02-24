@@ -9,12 +9,21 @@
  */
 
 #include <graphics/primitives/Rect.h>
-#include <utils/RSPCoreExceptions.h>
+#include <utils/CoreException.h>
 
 using namespace rsp::utils;
 
 namespace rsp::graphics
 {
+
+std::ostream& operator <<(std::ostream &aStream, const Rect &arRect)
+{
+    aStream << "Top: " << arRect.GetTop() << ", "
+        << "Left: " << arRect.GetLeft() << ", "
+        << "Height: " << arRect.GetHeight() << ", "
+        << "Width: " << arRect.GetWidth();
+    return aStream;
+}
 
 Rect::Rect(int aLeft, int aTop, int aWidth, int aHeight)
     : mLeftTop(aLeft, aTop), mRightBottom(aLeft + aWidth, aTop + aHeight)
@@ -34,10 +43,17 @@ Rect::Rect(const Point &aLeftTop, int aWidth, int aHeight)
     VerifyDimensions();
 }
 
-Rect::Rect(const Rect &aRect)
-    : mLeftTop(aRect.mLeftTop), mRightBottom(aRect.mRightBottom)
+Rect::Rect(const Rect &arRect)
+    : mLeftTop(arRect.mLeftTop), mRightBottom(arRect.mRightBottom)
 {
     VerifyDimensions();
+}
+
+Rect& Rect::operator=(const Rect &arRect)
+{
+    mLeftTop = arRect.mLeftTop;
+    mRightBottom = arRect.mRightBottom;
+    return *this;
 }
 
 int Rect::GetTop() const

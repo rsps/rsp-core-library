@@ -9,14 +9,16 @@ namespace rsp::graphics
 
 class Image : public Control
 {
-  public:
+public:
+    Image() : Control(){};
     Image(std::string aNormal, std::string aPressed, Rect &aRect);
     ~Image();
 
     void Render(Canvas &aCanvas) override;
+    void HandleCallback(States aState);
 
-    Bitmap mNormal;
-    Bitmap mPressed;
+protected:
+    std::map<States, Bitmap> mStateMap{};
 };
 
 } // namespace rsp::graphics

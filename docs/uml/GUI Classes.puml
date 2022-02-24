@@ -170,7 +170,6 @@ class Image {
 }
 Ctrl <|-- Image
 Bitmap *-- Image
-TouchArea --* Image
 
 class Label {
     A control used to draw text and graphics.

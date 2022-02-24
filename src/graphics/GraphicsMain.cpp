@@ -15,10 +15,13 @@
 namespace rsp::graphics
 {
 
-GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInputs, Scene &aScene)
-    : mBufferedCanvas(aBufferedCanvas), mInputs(aInputs), mActiveScene(aScene)
+GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInputs, Scene &aScene, Scene &aOtherScene)
+    : mBufferedCanvas(aBufferedCanvas), mInputs(aInputs), mActiveScene(aScene), otherScene(aOtherScene)
 {
+    mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+    mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
 }
+
 GraphicsMain::~GraphicsMain()
 {
 }
@@ -28,15 +31,34 @@ void GraphicsMain::Run()
     while (!mTerminated) {
         // new inputs?
         while (mInputs.HasNewInputs()) {
-            Input input = mInputs.GetInput();
-            PrintInput(input); // Temp
+            inputCache.push_back(mInputs.GetInput());
+            // Input input = mInputs.GetInput();
+            PrintInput(inputCache.back());
+            // PrintInput(input); // Temp
             // invalidate stuff
-            mActiveScene.ProcessInput(input);
+            mActiveScene.ProcessInput(inputCache.back());
+            // mActiveScene.ProcessInput(input);
+            if (inputCache.size() > 5) {
+                mActiveScene.Render(mBufferedCanvas);
+                inputCache.clear();
+                mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
+            }
         }
         // re-render invalidated things
         mActiveScene.Render(mBufferedCanvas);
         mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy); // Should be if Render returns true
     }
+}
+
+void GraphicsMain::ChangeScene()
+{
+    Scene temp = mActiveScene;
+    mActiveScene = otherScene;
+    otherScene = temp;
+    otherScene.Invalidate();
+    mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+    mActiveScene.Render(mBufferedCanvas);
+    mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
 }
 
 // Temp method

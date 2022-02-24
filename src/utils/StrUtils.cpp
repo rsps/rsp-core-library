@@ -161,15 +161,15 @@ std::string ReduceToCommon(std::vector<std::string> &arList)
     return match;
 }
 
-std::string& ReplaceAll(std::string &aText, const std::string& aFrom, const std::string& aTo)
+std::string& ReplaceAll(std::string &arText, const std::string& aFrom, const std::string& aTo)
 {
     size_t start_pos = 0;
-    while((start_pos = aText.find(aFrom, start_pos)) != std::string::npos) {
-        aText.replace(start_pos, aFrom.length(), aTo);
+    while((start_pos = arText.find(aFrom, start_pos)) != std::string::npos) {
+        arText.replace(start_pos, aFrom.length(), aTo);
         start_pos += aTo.length(); // Handles case where 'to' is a substring of 'from'
     }
 
-    return aText;
+    return arText;
 }
 
 std::string TimeStamp()
