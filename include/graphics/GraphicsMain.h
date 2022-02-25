@@ -29,7 +29,6 @@ class GraphicsMain : public Subscriber
     std::vector<Input> inputCache{};
 
     // Temp
-    // Scene &otherScene;
     void PrintInput(Input aInput);
 };
 } // namespace rsp::graphics

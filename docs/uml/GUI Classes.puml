@@ -151,7 +151,7 @@ class Ctrl {
     +SetArea(arRect: const Rect&)
     +GetArea(): Rect&
 }
-Color *-- Ctrl
+Color *-up- Ctrl
 Rect *-- Ctrl
 
 class Scene {
@@ -182,25 +182,37 @@ class Label {
 Ctrl <|-left- Label
 Font *-- Label
 
-'class Button {
-'    Decents from Label.
-'    Draws a button in different states.
-'    Posts an event when pressed.
-'    Posts an event when dragged.
-'    Posts an event when released.
-'}
-'Label *-- Button
-'TouchArea *-- Button
-'Image *-- Button
+class GraphicsMain{
+    Runs the gui loop, controls the current active scene and changes scenes when needed
+    --
+    -BufferedCanvas &mBufferedCanvas;
+    -InputCreator &mInputs;
+    -SceneLoader &mSceneLoader;
+    -Scene mActiveScene;
+    -bool mTerminated = false;
+    -std::vector<Input> inputCache{};
+    --
+    +GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader);
+    +~GraphicsMain();
 
-'class CheckBox {
-'    A control used to draw a checkbox
-'    in different states.
-'    Posts an event when clicked.
-'}
-'Button <|-- CheckBox
-'Image <|-- CheckBox
+    +void Run();
+    +void Terminate() { mTerminated = true; }
+    +void ChangeScene(std::string aSceneName);
+    +void handleEvent(Event &newEvent) override;
+}
 
+class SceneLoader{
+    Holds all scenes in an unordered maps and gets them by reference
+    --
+    +std::unordered_map<std::string, Scene> mSceneMap;
+    --
+    +SceneLoader(Broker &aBroker);
+    +Scene &GetFirstScene();
+    +Scene &GetScene(std::string aSceneName);
+}
+SceneLoader --* Scene
+GraphicsMain --* SceneLoader
+GraphicsMain --* Canvas
 
 
 }

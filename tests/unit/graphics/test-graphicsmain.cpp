@@ -33,8 +33,6 @@ TEST_CASE("Graphics Main Test")
     MESSAGE("Making SceneLoader");
     // Make sceneLoader
     SceneLoader scenes(broker);
-    // firstScene myScene(screenSize);
-    // secondScene otherScene(screenSize);
 
     MESSAGE("Init InputCreator");
     // Make InputCreator
@@ -44,12 +42,9 @@ TEST_CASE("Graphics Main Test")
     // Make GraphicsMain
     GraphicsMain gMain(fb, ic, scenes);
 
-    // Bind onClick
+    // Subscribe to SceneChange ClickedEvents
     gMain.subscribeToBroker(&broker, Topic::SceneChange);
     std::cout << "Setup complete" << std::endl;
-    // scenes.GetScene("first").
-    // myScene.topBtn.RegisterOnClicked(std::bind(&GraphicsMain::ChangeScene, &gMain));
-    // otherScene.botBtn.RegisterOnClicked(std::bind(&GraphicsMain::ChangeScene, &gMain));
 
     // Run?
     gMain.Run();

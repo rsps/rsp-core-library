@@ -18,7 +18,6 @@ class TouchArea
 
     void ProcessInput(Input &aInput);
     bool IsHit(const Point &aPoint) const;
-    // Register callback method for an Image or simply a Control?
     void RegisterOnPressed(std::function<void(Control::States)> aFunc);
     void RegisterOnClicked(std::function<void(Topic, ClickedEvent &)> aFunc);
 
