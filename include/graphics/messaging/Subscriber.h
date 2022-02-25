@@ -21,8 +21,9 @@ class Subscriber
   public:
     virtual ~Subscriber() {}
 
-    virtual void subscribeToBroker(Broker *ptr, Topic topic);
-    virtual void handleEvent(Event &newEvent);
+    virtual void SubscribeToBroker(Broker *aPtr, Topic aTopic);
+    virtual void UnsubscribeToBroker(Broker *aPtr, Topic aTopic);
+    virtual void HandleEvent(Event &aNewEvent);
 
     // protected:
     Topic mTopic;

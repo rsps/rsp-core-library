@@ -28,9 +28,10 @@ class Broker
   public:
     virtual ~Broker() {}
 
-    void addSubscriber(Subscriber *ptr, Topic topic);
-    void registerToPublisher(Publisher *ptr);
-    void onPublish(Topic topic, Event &newEvent);
+    void Subscribe(Subscriber *aPtr, Topic aTopic);
+    void Unsubscribe(Subscriber *aPtr, Topic aTopic);
+    void RegisterToPublisher(Publisher *aPtr);
+    void OnPublish(Topic aTopic, Event &aNewEvent);
 
     // protected:
     std::map<Topic, std::vector<Subscriber *>> mSubscriberMap;

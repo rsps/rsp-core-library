@@ -11,13 +11,13 @@
 
 namespace rsp::graphics
 {
-void Publisher::registerBroker(Broker *pBroker)
+void Publisher::RegisterBroker(Broker *pBroker)
 {
     mBrokerPtr = pBroker;
 }
 
-void Publisher::publishToBroker(Topic topic, Event &newEvent)
+void Publisher::PublishToBroker(Topic topic, Event &newEvent)
 {
-    mBrokerPtr->onPublish(topic, newEvent);
+    mBrokerPtr->OnPublish(topic, newEvent);
 }
 } // namespace rsp::graphics

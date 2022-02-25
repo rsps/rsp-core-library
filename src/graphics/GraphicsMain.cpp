@@ -62,7 +62,7 @@ void GraphicsMain::ChangeScene(std::string aSceneName)
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
 }
 
-void GraphicsMain::handleEvent(Event &newEvent)
+void GraphicsMain::HandleEvent(Event &newEvent)
 {
     ChangeScene(newEvent.GetAs<ClickedEvent>().mMessage);
 }

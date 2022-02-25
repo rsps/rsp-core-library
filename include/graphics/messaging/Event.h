@@ -24,21 +24,21 @@ enum class Topic {
 class Event
 {
   public:
-    Event(std::size_t aHash) : typeHash(aHash) {}
-    Event() : typeHash(typeid(Event).hash_code()) {}
+    Event(std::size_t aHash) : mTypeHash(aHash) {}
+    Event() : mTypeHash(typeid(Event).hash_code()) {}
     ~Event() {}
 
     template <class T>
     T &GetAs()
     {
-        if (typeid(T).hash_code() != typeHash) {
+        if (typeid(T).hash_code() != mTypeHash) {
             std::cout << "- Is Not Same Type" << std::endl;
             // throw std::bad_alloc();
         }
         return *reinterpret_cast<T *>(this);
     }
 
-    std::size_t typeHash;
+    std::size_t mTypeHash;
 };
 
 template <class T>

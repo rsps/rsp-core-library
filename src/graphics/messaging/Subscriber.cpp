@@ -11,14 +11,19 @@
 
 namespace rsp::graphics
 {
-void Subscriber::subscribeToBroker(Broker *ptr, Topic topic)
+void Subscriber::SubscribeToBroker(Broker *aPtr, Topic aTopic)
 {
-    std::cout << "Subscriber " << this << " subscribing to topic: " << (int)topic << std::endl;
-    mTopic = topic;
-    ptr->addSubscriber(this, topic);
+    std::cout << "Subscriber " << this << " subscribing to topic: " << (int)aTopic << std::endl;
+    mTopic = aTopic;
+    aPtr->Subscribe(this, aTopic);
 }
 
-void Subscriber::handleEvent(Event &newEvent)
+void Subscriber::UnsubscribeToBroker(Broker *aPtr, Topic aTopic)
+{
+    aPtr->Unsubscribe(this, aTopic);
+}
+
+void Subscriber::HandleEvent(Event &aNewEvent)
 {
     std::cout << "Base Sub got callback" << std::endl;
 }

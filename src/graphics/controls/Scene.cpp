@@ -39,7 +39,7 @@ void Scene::Render(Canvas &aCanvas)
 void Scene::BindElementsToBroker()
 {
     for (auto touchable : mTouchables) {
-        touchable->RegisterOnClicked(std::bind(&Scene::publishToBroker, *this, std::placeholders::_1, std::placeholders::_2));
+        touchable->RegisterOnClicked(std::bind(&Scene::PublishToBroker, *this, std::placeholders::_1, std::placeholders::_2));
     }
 }
 

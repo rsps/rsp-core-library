@@ -43,7 +43,7 @@ TEST_CASE("Graphics Main Test")
     GraphicsMain gMain(fb, ic, scenes);
 
     // Subscribe to SceneChange ClickedEvents
-    gMain.subscribeToBroker(&broker, Topic::SceneChange);
+    gMain.SubscribeToBroker(&broker, Topic::SceneChange);
     std::cout << "Setup complete" << std::endl;
 
     // Run?

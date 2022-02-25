@@ -20,7 +20,7 @@ SceneLoader::SceneLoader(Broker &aBroker) : first(screenSize), second(screenSize
                  {"second", second}};
 
     for (auto &scene : mSceneMap) {
-        scene.second.registerBroker(&aBroker);
+        scene.second.RegisterBroker(&aBroker);
         scene.second.BindElementsToBroker();
     }
 }

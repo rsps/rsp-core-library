@@ -24,8 +24,8 @@ class Publisher
     }
     virtual ~Publisher() {}
 
-    virtual void registerBroker(Broker *pBroker);
-    virtual void publishToBroker(Topic topic, Event &newEvent);
+    virtual void RegisterBroker(Broker *apBroker);
+    virtual void PublishToBroker(Topic aTopic, Event &aNewEvent);
 
     // protected:
     Broker *mBrokerPtr;

@@ -27,7 +27,7 @@ class GraphicsMain : public Subscriber
     void Run();
     void Terminate() { mTerminated = true; }
     void ChangeScene(std::string aSceneName);
-    void handleEvent(Event &newEvent) override;
+    void HandleEvent(Event &newEvent) override;
 
   private:
     BufferedCanvas &mBufferedCanvas;

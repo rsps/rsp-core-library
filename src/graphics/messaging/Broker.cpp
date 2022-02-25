@@ -15,28 +15,36 @@
 
 namespace rsp::graphics
 {
-void Broker::addSubscriber(Subscriber *ptr, Topic topic)
+void Broker::Subscribe(Subscriber *aPtr, Topic aTopic)
 {
-    // mSubscriberMap.insert(std::pair<std::string, Subscriber *>(topic, ptr));
-    if (auto iter{mSubscriberMap.find(topic)}; iter == mSubscriberMap.end()) {
+    if (auto iter{mSubscriberMap.find(aTopic)}; iter == mSubscriberMap.end()) {
         // Topic not found
-        mSubscriberMap.insert(std::pair<Topic, std::vector<Subscriber *>>(topic, std::vector<Subscriber *>{ptr}));
+        mSubscriberMap.insert(std::pair<Topic, std::vector<Subscriber *>>(aTopic, std::vector<Subscriber *>{aPtr}));
     } else {
         // Topic found
-        iter->second.push_back(ptr);
+        iter->second.push_back(aPtr);
+    }
+}
+void Broker::Unsubscribe(Subscriber *aPtr, Topic aTopic)
+{
+    auto mapIter{mSubscriberMap.find(aTopic)};
+    for (std::vector<Subscriber *>::iterator vecIter = mapIter->second.begin(); vecIter != mapIter->second.end(); vecIter++) {
+        if (aPtr == *vecIter) {
+            mapIter->second.erase(vecIter);
+        }
     }
 }
 
-void Broker::registerToPublisher(Publisher *ptr)
+void Broker::RegisterToPublisher(Publisher *aPtr)
 {
-    ptr->registerBroker(this);
+    aPtr->RegisterBroker(this);
 }
 
-void Broker::onPublish(Topic topic, Event &newEvent)
+void Broker::OnPublish(Topic aTopic, Event &aNewEvent)
 {
     // foreach sub in multimap for a given key, do->update
-    for (auto sub : mSubscriberMap[topic]) {
-        sub->handleEvent(newEvent);
+    for (auto sub : mSubscriberMap[aTopic]) {
+        sub->HandleEvent(aNewEvent);
     }
 }
 } // namespace rsp::graphics
