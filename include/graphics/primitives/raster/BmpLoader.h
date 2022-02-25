@@ -1,3 +1,12 @@
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Simon Glashoff
+ */
 #ifndef BMPLOADER_H
 #define BMPLOADER_H
 
@@ -32,7 +41,7 @@ class BmpLoader : public ImgLoader
         uint32_t yPixelsPerM;
         uint32_t coloursUsed;
         uint32_t importantColours;
-    } __attribute__((packed)) bmpHeader; //To stop alignment
+    } __attribute__((packed)) bmpHeader; // To stop alignment
 
     uint16_t mBytesPerPixel;
 
@@ -42,4 +51,4 @@ class BmpLoader : public ImgLoader
 };
 
 } // namespace rsp::graphics
-#endif //BMPLOADER_H
+#endif // BMPLOADER_H
