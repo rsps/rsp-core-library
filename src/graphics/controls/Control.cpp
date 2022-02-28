@@ -13,14 +13,15 @@
 namespace rsp::graphics
 {
 
-Control::Control(Rect &aRect, Control *aParent)
-    : mArea(aRect), mParent(aParent)
+Control::Control(const Rect &arRect)
+    : mArea(arRect)
 {
 }
 
 Control::~Control()
 {
 }
+
 void Control::SetState(States aState)
 {
     if (mState != aState) {
@@ -28,17 +29,19 @@ void Control::SetState(States aState)
         Invalidate();
     }
 }
+
 void Control::Invalidate()
 {
+    if (mIsInvalid) {
+        return;
+    }
     mIsInvalid = true;
     for (auto child : mChildren) {
         child->Invalidate();
     }
-}
-
-bool Control::IsInvalid() const
-{
-    return mIsInvalid;
+    if (mTransparent && mpParent) {
+        mpParent->Invalidate();
+    }
 }
 
 } // namespace rsp::graphics

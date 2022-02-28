@@ -11,6 +11,7 @@
 #include <doctest.h>
 #include <graphics/primitives/Point.h>
 #include <graphics/primitives/Rect.h>
+#include <utils/CoreException.h>
 
 #include <iostream>
 

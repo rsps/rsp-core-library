@@ -11,13 +11,10 @@
 
 namespace rsp::messaging
 {
-void Publisher::RegisterBroker(Broker *pBroker)
+
+void Publisher::registerBroker(BrokerBase &arBroker)
 {
-    mBrokerPtr = pBroker;
+    mpBroker = &arBroker;
 }
 
-void Publisher::PublishToBroker(Topic topic, Event &newEvent)
-{
-    mBrokerPtr->OnPublish(topic, newEvent);
-}
-} // namespace rsp::messaging
+} // namespace rsp::graphics

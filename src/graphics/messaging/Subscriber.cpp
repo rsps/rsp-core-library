@@ -11,12 +11,6 @@
 
 namespace rsp::messaging
 {
-void Subscriber::SubscribeToBroker(Broker *aPtr, Topic aTopic)
-{
-    std::cout << "Subscriber " << this << " subscribing to topic: " << (int)aTopic << std::endl;
-    mTopic = aTopic;
-    aPtr->Subscribe(this, aTopic);
-}
 
 void Subscriber::UnsubscribeToBroker(Broker *aPtr, Topic aTopic)
 {

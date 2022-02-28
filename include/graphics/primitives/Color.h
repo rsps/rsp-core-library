@@ -12,7 +12,7 @@
 #define COLOR_H
 
 #include <stdint.h>
-#include "utils/RSPCoreExceptions.h"
+#include <utils/CoreException.h>
 
 namespace rsp::graphics {
 
@@ -27,29 +27,29 @@ namespace rsp::graphics {
 class Color
 {
 public:
+    typedef uint32_t ARGB_t;
+
     /**
-     * Color value type
+     * Predefined basic colors
      */
-    typedef union
-    {
-        uint32_t rgba;
-    #ifdef LITTLE_ENDIAN
-        struct __item_type
-        {
-            uint32_t alpha :8;
-            uint32_t blue :8;
-            uint32_t green :8;
-            uint32_t red :8;
-        } item;
-    #else
-        struct __item_type {
-            uint32_t alpha : 8;
-            uint32_t red : 8;
-            uint32_t green : 8;
-            uint32_t blue : 8;
-        } item;
-    #endif
-    } ColorValue_t;
+    enum :ARGB_t {
+        White   = 0x00FFFFFF,
+        Silver  = 0x00C0C0C0,
+        Grey    = 0x00808080,
+        Black   = 0x00000000,
+        Red     = 0x00FF0000,
+        Maroon  = 0x00800000,
+        Yellow  = 0x00FFFF00,
+        Olive   = 0x00808000,
+        Lime    = 0x0000FF00,
+        Green   = 0x00008000,
+        Aqua    = 0x0000FFFF,
+        Teal    = 0x00008080,
+        Blue    = 0x000000FF,
+        Navy    = 0x00000080,
+        Fuchsia = 0x00FF00FF,
+        Purple  = 0x00800080
+    };
 
     /**
      * Construct with given base colors.
@@ -66,7 +66,7 @@ public:
      *
      * \param aARGB
      */
-    Color(uint32_t aARGB);
+    Color(ARGB_t aARGB);
 
     /**
      * Copy constructor.
@@ -131,7 +131,7 @@ public:
      * Get the ARGB value.
      * \return ARGB
      */
-    operator uint32_t() const;
+    operator ARGB_t() const;
     /**
      * Assign the value from the given Color object.
      *
@@ -140,7 +140,31 @@ public:
     Color& operator=(const Color &aColor);
 
 protected:
-    ColorValue_t mValue;
+    /**
+     * Color value type
+     */
+    typedef union
+    {
+        ARGB_t rgba;
+    #ifdef LITTLE_ENDIAN
+        struct __item_type
+        {
+            uint32_t blue :8;
+            uint32_t green :8;
+            uint32_t red :8;
+            uint32_t alpha :8;
+        } item;
+    #else
+        struct __item_type {
+            uint32_t alpha : 8;
+            uint32_t red : 8;
+            uint32_t green : 8;
+            uint32_t blue : 8;
+        } item;
+    #endif
+    } ColorValue_t;
+
+    ColorValue_t mValue{};
 
 };
 

@@ -14,43 +14,44 @@
 
 using namespace rsp::graphics;
 
-TEST_CASE("TouchArea Contructor")
+TEST_CASE("TouchArea Constructor")
 {
     // Arrange
     std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
 
     srand(ms.count()); // generates random seed val
-    SUBCASE("Constuct with Default Values")
+    SUBCASE("Construct with Default Values")
     {
         // Act
         TouchArea area;
 
         // Assert
-        CHECK(area.mTouchArea.GetHeight() == 0);
-        CHECK(area.mTouchArea.GetWidth() == 0);
+        CHECK(area.GetArea().GetHeight() == 0);
+        CHECK(area.GetArea().GetWidth() == 0);
     }
+
     SUBCASE("Construct From Rect")
     {
         // Arrange
-        int randomLeft = 0 + (rand() % 500 + 1);
-        int randomTop = 0 + (rand() % 500 + 1);
-        int randomWidth = 0 + (rand() % 500 + 1);
-        int randomHeight = 0 + (rand() % 500 + 1);
+        int randomLeft = 1 + (rand() % 500);
+        int randomTop = 1 + (rand() % 500);
+        int randomWidth = 1 + (rand() % 500);
+        int randomHeight = 1 + (rand() % 500);
         Rect myRect(randomLeft, randomTop, randomWidth, randomHeight);
         MESSAGE("Rect Dimensions: "
                 << "\nTop Left: " << myRect.GetTop() << " " << myRect.GetLeft()
                 << "\nBottom Right: " << myRect.GetBottom() << " " << myRect.GetRight());
         // Random point within rect
         // output = min + (rand() % static_cast<int>(max - min + 1))
-        Point insidePoint(myRect.GetLeft() + (rand() % static_cast<int>((myRect.GetLeft() + myRect.GetWidth()) - myRect.GetLeft() + 1)),
-                          myRect.GetTop() + (rand() % static_cast<int>((myRect.GetTop() + myRect.GetHeight()) - myRect.GetTop() + 1)));
+        Point insidePoint(myRect.GetLeft() + (rand() % myRect.GetWidth()),
+                          myRect.GetTop() + (rand() % myRect.GetHeight()));
         // Random point lower than inside
-        Point lowerPoint(0 + (rand() % static_cast<int>(myRect.GetLeft() + 1)),
-                         0 + (rand() % static_cast<int>(myRect.GetTop() + 1)));
+        Point lowerPoint(0 + (rand() % myRect.GetLeft()),
+                         0 + (rand() % myRect.GetTop()));
         // Random point higher than inside
-        Point higherPoint(myRect.GetRight() + (rand() % static_cast<int>((myRect.GetRight() + myRect.GetWidth()) - myRect.GetRight() + 1)),
-                          myRect.GetBottom() + (rand() % static_cast<int>((myRect.GetBottom() + myRect.GetHeight()) - myRect.GetBottom() + 1)));
+        Point higherPoint(myRect.GetRight() + (rand() % myRect.GetWidth()),
+                          myRect.GetBottom() + (rand() % myRect.GetHeight()));
 
         // Act
         TouchArea area(myRect);
@@ -61,6 +62,7 @@ TEST_CASE("TouchArea Contructor")
         CHECK_FALSE(area.IsHit(higherPoint));
     }
 }
+
 TEST_CASE("Input Processing")
 {
     // Arrange
@@ -80,12 +82,12 @@ TEST_CASE("Input Processing")
     SUBCASE("Pressed Callback - Press Hit-Input")
     {
         // Arrange
-        std::function<void(Control::States)> pressedReciever = [&](Control::States aState) {
+        auto pressedReceiver = [&](Control::States aState) noexcept {
             if (aState == Control::States::pressed) {
                 wasCalled = true;
             }
         };
-        area.RegisterOnPressed(pressedReciever);
+        area.RegisterOnPressed(pressedReceiver);
         anInput.type = InputType::Press;
 
         // Act
@@ -97,12 +99,12 @@ TEST_CASE("Input Processing")
         SUBCASE("Pressed Callback - Press Miss-Input")
         {
             // Arrange
-            std::function<void(Control::States)> pressedReciever = [&](Control::States aState) {
+            auto pressedReceiver = [&](Control::States aState) noexcept {
                 if (aState == Control::States::pressed) {
                     wasCalled = false;
                 }
             };
-            area.RegisterOnPressed(pressedReciever);
+            area.RegisterOnPressed(pressedReceiver);
             anInput.x = anInput.x + aRect.GetWidth();
             anInput.y = anInput.y + aRect.GetHeight();
 
@@ -115,15 +117,16 @@ TEST_CASE("Input Processing")
             CHECK(wasCalled);
         }
     }
+
     SUBCASE("Pressed Callback - Lift Hit-Input")
     {
         // Arrange
-        std::function<void(Control::States)> pressedReciever = [&](Control::States aState) {
+        auto pressedReceiver = [&](Control::States aState) noexcept {
             if (aState == Control::States::normal) {
                 wasCalled = true;
             }
         };
-        area.RegisterOnPressed(pressedReciever);
+        area.RegisterOnPressed(pressedReceiver);
         anInput.type = InputType::Lift;
 
         // Act
@@ -135,12 +138,12 @@ TEST_CASE("Input Processing")
         SUBCASE("Pressed Callback - Lift Miss-Input")
         {
             // Arrange
-            std::function<void(Control::States)> pressedReciever = [&](Control::States aState) {
+            auto pressedReceiver = [&](Control::States aState) noexcept {
                 if (aState == Control::States::normal) {
                     wasCalled = false;
                 }
             };
-            area.RegisterOnPressed(pressedReciever);
+            area.RegisterOnPressed(pressedReceiver);
             anInput.x = anInput.x + aRect.GetWidth();
             anInput.y = anInput.y + aRect.GetHeight();
 
@@ -153,15 +156,16 @@ TEST_CASE("Input Processing")
             CHECK_FALSE(wasCalled);
         }
     }
+
     SUBCASE("Pressed Callback - Drag Hit-input")
     {
         // Arrange
-        std::function<void(Control::States)> pressedReciever = [&](Control::States aState) {
+        auto pressedReceiver = [&](Control::States aState) noexcept {
             if (aState == Control::States::normal) {
                 wasCalled = true;
             }
         };
-        area.RegisterOnPressed(pressedReciever);
+        area.RegisterOnPressed(pressedReceiver);
         anInput.type = InputType::Drag;
 
         // Act
@@ -174,12 +178,12 @@ TEST_CASE("Input Processing")
         {
             // Arrange
             wasCalled = false;
-            std::function<void(Control::States)> pressedReciever = [&](Control::States aState) {
-                if (aState == Control::States::normal) {
+            auto pressedReceiver = [&](Control::States aState) noexcept {
+                if (aState == Control::States::dragged) {
                     wasCalled = true;
                 }
             };
-            area.RegisterOnPressed(pressedReciever);
+            area.RegisterOnPressed(pressedReceiver);
             anInput.type = InputType::Drag;
             anInput.x = anInput.x + aRect.GetWidth();
             anInput.y = anInput.y + aRect.GetHeight();
@@ -193,6 +197,7 @@ TEST_CASE("Input Processing")
             CHECK_GT(anInput.y, aRect.GetHeight());
         }
     }
+
     SUBCASE("Clicked Callback")
     {
         // Arrange
@@ -214,6 +219,7 @@ TEST_CASE("Input Processing")
             // Assert
             CHECK(wasCalled);
         }
+
         SUBCASE("Clicked Callback - Miss-Hit-Input")
         {
             // Act
@@ -234,6 +240,7 @@ TEST_CASE("Input Processing")
             // Assert
             CHECK_FALSE(wasCalled);
         }
+
         SUBCASE("Clicked Callback - Hit-Miss-Input")
         {
             // Act
@@ -252,6 +259,7 @@ TEST_CASE("Input Processing")
             // Assert
             CHECK_FALSE(wasCalled);
         }
+
         SUBCASE("Clicked Callback - Miss-Miss-Input")
         {
             // Act

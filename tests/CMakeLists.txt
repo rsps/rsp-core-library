@@ -30,3 +30,6 @@ file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/Green.bmp
 file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/Red.bmp 
     DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
 
+file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/fonts 
+    DESTINATION ${CMAKE_BINARY_DIR}/)
+

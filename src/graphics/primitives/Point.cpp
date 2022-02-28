@@ -9,3 +9,14 @@
  */
 
 #include <graphics/primitives/Point.h>
+
+namespace rsp::graphics
+{
+
+std::ostream& operator <<(std::ostream &os, const Point &p)
+{
+    os << "X: " << p.GetX() << ", Y: " << p.GetY();
+    return os;
+}
+
+}

@@ -1,8 +1,11 @@
-/*
- * test-strutils.cpp
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- *  Created on: Feb 23, 2020
- *      Author: Steffen Brummer
+ * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Steffen Brummer
  */
 
 #include <doctest.h>
@@ -34,4 +37,6 @@ TEST_CASE("Testing StrUtils")
     CHECK(StrUtils::TimeStamp(std::chrono::steady_clock::now()) == StrUtils::TimeStamp(std::chrono::system_clock::now()));
 
     CHECK(StrUtils::TimeStamp(std::chrono::milliseconds(0)) == "1970-01-01 00:00:00.000");
+
+    CHECK(StrUtils::Format("%02.2d-%4.4s", 8, "Long Sentence") == "08-Long");
 }

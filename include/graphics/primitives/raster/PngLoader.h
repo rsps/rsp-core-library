@@ -38,9 +38,10 @@ class PngLoader : public ImgLoader
         uint8_t compressionMethod;
         uint8_t filterMethod;
         uint8_t interlaceMethod;
-    } __attribute__((packed)); // To stop alignment
-    struct PNGChunk {
-        uint32_t length;
+    } __attribute__((packed)); //To stop alignment
+    struct PNGChunk
+    {
+        uint32_t length = 0;
         char type[4];
         union {
             uint8_t *data = nullptr;

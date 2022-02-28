@@ -16,15 +16,17 @@ using namespace rsp::graphics;
 // To have a testable Control, that are not dependent on used types
 class TestControl : public Control
 {
-  public:
-    TestControl() : Control(){};
-    TestControl(Rect &aRect, Control *aParent = nullptr) : Control(aRect, aParent){};
-    ~TestControl(){};
-    void Render(Canvas &aCanvas) override
+public:
+    TestControl() : Control() { mIsInvalid = false; }
+//    TestControl(const Rect &arRect) : Control(arRect){}
+
+    void MakeValid() { mIsInvalid = false; }
+
+    void Render(Canvas &) override
     {
-        (void)aCanvas;
-        return;
+        mIsInvalid = false;
     }
+
 };
 
 TEST_CASE("Control Constructor")
@@ -35,26 +37,58 @@ TEST_CASE("Control Invalidation")
     // Arrange
     TestControl myControl;
 
+    // Assert
+    CHECK(!myControl.IsInvalid());
+
     // Act
     myControl.Invalidate();
 
     // Assert
-    CHECK(myControl.mIsInvalid);
     CHECK(myControl.IsInvalid());
+    myControl.MakeValid();
 
     SUBCASE("Child Invalidation")
     {
         // Arrange
         TestControl childControl;
-        myControl.mChildren.push_back(&childControl);
+        myControl.AddChild(&childControl);
 
         // Act
         myControl.Invalidate();
 
         // Assert
-        CHECK(childControl.mIsInvalid);
         CHECK(childControl.IsInvalid());
     }
+
+    SUBCASE("No Parent Invalidation")
+    {
+        // Arrange
+        TestControl childControl;
+        myControl.AddChild(&childControl);
+
+        // Act
+        childControl.Invalidate();
+
+        // Assert
+        CHECK(!myControl.IsInvalid());
+    }
+
+    SUBCASE("Transparent Parent Invalidation")
+    {
+        // Arrange
+        TestControl childControl;
+        myControl.AddChild(&childControl);
+        childControl.SetTransparent(true);
+
+        CHECK(!myControl.IsInvalid());
+
+        // Act
+        childControl.Invalidate();
+
+        // Assert
+        CHECK(myControl.IsInvalid());
+    }
+
 }
 TEST_CASE("Control States")
 {
@@ -64,7 +98,7 @@ TEST_CASE("Control States")
     SUBCASE("Default State")
     {
         // Act & Assert
-        CHECK(myControl.mState == Control::States::normal);
+        CHECK(myControl.GetState() == Control::States::normal);
     }
     SUBCASE("Change State")
     {
@@ -72,14 +106,15 @@ TEST_CASE("Control States")
         myControl.SetState(Control::States::pressed);
 
         // Assert
-        CHECK(myControl.mState == Control::States::pressed);
+        CHECK(myControl.GetState() == Control::States::pressed);
         CHECK(myControl.IsInvalid());
+        myControl.MakeValid();
 
         SUBCASE("Child Invalidated by Parent State Change")
         {
             // Arrange
             TestControl childControl;
-            myControl.mChildren.push_back(&childControl);
+            myControl.AddChild(&childControl);
 
             // Act
             myControl.SetState(Control::States::normal);

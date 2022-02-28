@@ -2,7 +2,10 @@ cmake_minimum_required (VERSION 3.16)
 
 # https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
 
-set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
+if(DEFINED PLATFORM_P05)
+# To build for P05 platform: cmake .. -D PLATFORM_P05=1 [-D RELEASE=1]
+    set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
+endif()
 
 project (rsp-core-lib)
 
@@ -20,6 +23,7 @@ configure_file (
 set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
+find_package(Freetype REQUIRED)
 
 set (CMAKE_CXX_STANDARD 20)
 
@@ -27,6 +31,8 @@ set (CMAKE_CXX_STANDARD 20)
 # locations on all platforms.
 include(GNUInstallDirs)
 
+#include_directories( ${FREETYPE2_INCLUDE_DIRS} )
+#SET( CMAKE_C_FLAGS "${FREETYPE2_CFLAGS_OTHER}" )
 
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 
@@ -42,11 +48,26 @@ target_include_directories(rsp-core-lib
     PRIVATE
         src
         ${CMAKE_CURRENT_BINARY_DIR}/src
+        ${FREETYPE_INCLUDE_DIRS}
 )
-add_compile_options(-Wall -Wextra -Wold-style-cast -pedantic -Werror)
+
+target_compile_options(rsp-core-lib PRIVATE -pedantic -Wall -Wextra -Wold-style-cast
+    -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization
+    -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations
+    -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual
+    -Wredundant-decls -Wsign-conversion -Wsign-promo
+    -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
+    -Wundef -Wno-unused -Weffc++ -Werror
+    -Wshadow
+    -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+
+if (DEFINED RELEASE)
+else()
+target_compile_options(rsp-core-lib PRIVATE 
+    -DDEBUG_LOG)
+endif()
 
 add_subdirectory(src)
-
 
 #--------------------------------------------------------
 # Rules to make tests
@@ -86,6 +107,15 @@ target_include_directories("rsp-core-lib-test"
     PRIVATE
         src
 )
+# Disable shadow warning to silence doctest...
+target_compile_options(rsp-core-lib-test PRIVATE -pedantic -Wall -Wextra -Wold-style-cast
+    -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization
+    -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations
+    -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual
+    -Wredundant-decls -Wsign-conversion -Wsign-promo
+    -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
+    -Wundef -Wno-unused -Weffc++ -Werror
+    -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
 
 #get_target_property(INCLUDE_DIRS "rsp-core-lib-test" INCLUDE_DIRECTORIES)
 #message(STATUS "IncDirs: ${INCLUDE_DIRS}")
@@ -93,6 +123,8 @@ target_include_directories("rsp-core-lib-test"
 target_link_libraries ("rsp-core-lib-test"
     rsp-core-lib
     Threads::Threads
+    Freetype::Freetype
 )
+#target_link_libraries(demo ${FREETYPE_LIBRARIES})
 
 add_test("tests" "rsp-core-lib-test")

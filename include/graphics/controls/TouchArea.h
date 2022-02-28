@@ -28,6 +28,7 @@ class TouchArea
     ~TouchArea();
 
     void ProcessInput(Input &aInput);
+
     bool IsHit(const Point &aPoint) const;
     void RegisterOnPressed(std::function<void(Control::States)> aFunc);
     void RegisterOnClicked(std::function<void(Topic, ClickedEvent &)> aFunc);
@@ -36,8 +37,14 @@ class TouchArea
 
     std::function<void(Control::States)> mPressed = [](Control::States) {};
     std::function<void(Topic, ClickedEvent &)> mClicked = [](Topic, ClickedEvent &) {};
+    TouchArea& SetArea(const Rect &arRect) { mTouchArea = arRect; return *this; }
+    const Rect& GetArea() const { return mTouchArea; }
 
-    Rect mTouchArea;
+protected:
+    std::function<void(Control::States)> mPressed{}; // = [](Control::States) {};
+    std::function<void()> mClicked{}; // = [](void) {};
+
+    Rect mTouchArea{};
     Point mCurrentPress{0, 0};
     Point mOriginalPress{0, 0};
     Topic mClickedTopic;

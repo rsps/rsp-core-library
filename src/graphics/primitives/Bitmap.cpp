@@ -14,7 +14,7 @@
 #include <graphics/primitives/raster/BmpLoader.h>
 #include <graphics/primitives/raster/PngLoader.h>
 
-#include <utils/RSPCoreExceptions.h>
+#include <utils/CoreException.h>
 
 using namespace rsp::utils;
 
@@ -38,17 +38,17 @@ Bitmap::Bitmap(std::string aImgName)
 }
 
 Bitmap::Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerPixel)
-    : Canvas(aHeight, aWidth, aBytesPerPixel), mImagePixels(aWidth * aHeight)
+    : Canvas(aHeight, aWidth, aBytesPerPixel), mImagePixels(static_cast<long unsigned int>(aWidth * aHeight))
 {
     for (int y = 0; y < mHeight; y++) {
         for (int x = 0; x < mWidth; x++) {
-            mImagePixels[x + (y * mWidth)] = *apPixels++;
+            mImagePixels[static_cast<long unsigned int>(x + (y * mWidth))] = *apPixels++;
         }
     }
 }
 
 Bitmap::Bitmap(int aHeight, int aWidth, int aBytesPerPixel)
-    : Canvas(aHeight, aWidth, aBytesPerPixel), mImagePixels(aWidth * aHeight)
+    : Canvas(aHeight, aWidth, aBytesPerPixel), mImagePixels(static_cast<long unsigned int>(aWidth * aHeight))
 {
 }
 
@@ -58,7 +58,7 @@ uint32_t Bitmap::GetPixel(const Point &aPoint, const bool aFront) const
         return 0;
     }
     long location = (mWidth * aPoint.mY) + aPoint.mX;
-    return mImagePixels[location];
+    return mImagePixels[static_cast<long unsigned int>(location)];
 }
 
 std::shared_ptr<ImgLoader> Bitmap::GetRasterLoader(const std::string aFileType)

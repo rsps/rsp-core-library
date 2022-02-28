@@ -21,7 +21,7 @@ namespace rsp::graphics
 class Framebuffer : public BufferedCanvas
 {
   public:
-    Framebuffer();
+    Framebuffer(const char *apDevPath = nullptr);
     virtual ~Framebuffer();
 
     inline void SetPixel(const Point &aPoint, const Color aColor)
@@ -29,21 +29,21 @@ class Framebuffer : public BufferedCanvas
         if (!IsInsideScreen(aPoint)) {
             return;
         }
-        long location = (aPoint.mX + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + aPoint.mY * mFixedInfo.line_length;
+        long location = (aPoint.mX + static_cast<int>(mVariableInfo.xoffset)) * (static_cast<int>(mVariableInfo.bits_per_pixel) / 8) + aPoint.mY * static_cast<int>(mFixedInfo.line_length);
         *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = aColor;
     }
 
     uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
 
-    void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy);
+    void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy, Color aColor = Color::Black);
 
   protected:
     int mFramebufferFile;
     int mTtyFb = 0;
-    struct fb_fix_screeninfo mFixedInfo;
-    struct fb_var_screeninfo mVariableInfo;
+    struct fb_fix_screeninfo mFixedInfo {};
+    struct fb_var_screeninfo mVariableInfo {};
 
-    void clear();
+    void clear(Color aColor);
     void copy();
 };
 

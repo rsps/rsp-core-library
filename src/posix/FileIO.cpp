@@ -166,7 +166,7 @@ std::size_t FileIO::GetSize()
 
 void FileIO::SetSize(std::size_t aSize)
 {
-    int ret = ftruncate(mHandle, aSize);
+    int ret = ftruncate(mHandle, static_cast<long int>(aSize));
     if (ret < 0) {
         THROW_SYSTEM("Error resizing file " + mFileName);
     }
@@ -201,7 +201,7 @@ std::string FileIO::GetContents()
     std::size_t rlen;
 
     while ((rlen = Read(buf, 1024)) > 0) {
-        ss.write(buf, rlen);
+        ss.write(buf, static_cast<long int>(rlen));
     }
 
     return ss.str();
