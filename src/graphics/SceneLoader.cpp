@@ -13,8 +13,8 @@
 
 namespace rsp::graphics
 {
-static Rect screenSize = Rect(0, 0, 480, 800);
-SceneLoader::SceneLoader(Broker &aBroker) : first(screenSize), second(screenSize)
+static Rect sScreenSize = Rect(0, 0, 480, 800);
+SceneLoader::SceneLoader(Broker &aBroker) : first(sScreenSize), second(sScreenSize)
 {
     mSceneMap = {{"first", first},
                  {"second", second}};

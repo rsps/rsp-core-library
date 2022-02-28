@@ -13,6 +13,7 @@
 
 namespace rsp::graphics
 {
+
 Scene::Scene(Rect &aRect)
     : Control(aRect)
 {

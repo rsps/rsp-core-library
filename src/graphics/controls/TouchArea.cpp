@@ -12,13 +12,16 @@
 
 namespace rsp::graphics
 {
+
 TouchArea::TouchArea(Rect &aArea, Topic aClickedTopic, std::string aClickInfo)
     : mTouchArea(aArea), mClickedTopic(aClickedTopic), mclickEvent(aClickInfo)
 {
 }
+
 TouchArea::~TouchArea()
 {
 }
+
 void TouchArea::ProcessInput(Input &aInput)
 {
     std::cout << "TouchArea Processing Input" << std::endl;
@@ -51,14 +54,17 @@ void TouchArea::ProcessInput(Input &aInput)
         break;
     }
 }
+
 bool TouchArea::IsHit(const Point &aPoint) const
 {
     return mTouchArea.IsHit(aPoint);
 }
+
 void TouchArea::RegisterOnPressed(std::function<void(Control::States)> aFunc)
 {
     mPressed = aFunc;
 }
+
 void TouchArea::RegisterOnClicked(std::function<void(Topic, ClickedEvent &)> aFunc)
 {
     mClicked = aFunc;
