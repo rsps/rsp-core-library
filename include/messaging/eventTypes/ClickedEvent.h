@@ -11,9 +11,9 @@
 #ifndef CLICKEDEVENT_H
 #define CLICKEDEVENT_H
 
-#include "graphics/messaging/Event.h"
+#include "messaging/Event.h"
 #include <string>
-namespace rsp::graphics
+namespace rsp::messaging
 {
 
 class ClickedEvent : public EventType<ClickedEvent>
@@ -23,6 +23,6 @@ class ClickedEvent : public EventType<ClickedEvent>
     ~ClickedEvent() {}
     std::string mMessage;
 };
-} // namespace rsp::graphics
+} // namespace rsp::messaging
 
 #endif // CLICKEDEVENT_H

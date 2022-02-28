@@ -12,8 +12,10 @@
 
 #include "graphics/controls/Image.h"
 #include "graphics/controls/Input.h"
-#include "graphics/messaging/eventTypes/ClickedEvent.h"
 #include "graphics/primitives/Rect.h"
+#include "messaging/eventTypes/ClickedEvent.h"
+
+using namespace rsp::messaging;
 
 namespace rsp::graphics
 {

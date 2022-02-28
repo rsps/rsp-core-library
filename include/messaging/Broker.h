@@ -15,9 +15,9 @@
 #include <map>
 #include <vector>
 
-#include "graphics/messaging/Event.h"
+#include "messaging/Event.h"
 
-namespace rsp::graphics
+namespace rsp::messaging
 {
 
 class Subscriber;
@@ -36,6 +36,6 @@ class Broker
     // protected:
     std::map<Topic, std::vector<Subscriber *>> mSubscriberMap;
 };
-} // namespace rsp::graphics
+} // namespace rsp::messaging
 
 #endif // BROKER_H

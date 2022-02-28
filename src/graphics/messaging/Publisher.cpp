@@ -7,9 +7,9 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
-#include "graphics/messaging/Publisher.h"
+#include "messaging/Publisher.h"
 
-namespace rsp::graphics
+namespace rsp::messaging
 {
 void Publisher::RegisterBroker(Broker *pBroker)
 {
@@ -20,4 +20,4 @@ void Publisher::PublishToBroker(Topic topic, Event &newEvent)
 {
     mBrokerPtr->OnPublish(topic, newEvent);
 }
-} // namespace rsp::graphics
+} // namespace rsp::messaging

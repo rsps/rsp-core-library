@@ -7,9 +7,9 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
-#include "graphics/messaging/Subscriber.h"
+#include "messaging/Subscriber.h"
 
-namespace rsp::graphics
+namespace rsp::messaging
 {
 void Subscriber::SubscribeToBroker(Broker *aPtr, Topic aTopic)
 {
@@ -27,4 +27,4 @@ void Subscriber::HandleEvent(Event &aNewEvent)
 {
     std::cout << "Base Sub got callback" << std::endl;
 }
-} // namespace rsp::graphics
+} // namespace rsp::messaging

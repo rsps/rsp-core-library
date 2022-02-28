@@ -14,8 +14,10 @@
 #include "graphics/controls/Control.h"
 #include "graphics/controls/Input.h"
 #include "graphics/controls/TouchArea.h"
-#include "graphics/messaging/Publisher.h"
+#include "messaging/Publisher.h"
 #include <vector>
+
+using namespace rsp::messaging;
 
 namespace rsp::graphics
 {

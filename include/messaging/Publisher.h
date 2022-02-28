@@ -7,27 +7,29 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
+#ifndef PUBLISHER_H
+#define PUBLISHER_H
 
-#ifndef SUBSCRIBER_H
-#define SUBSCRIBER_H
-
-#include "graphics/messaging/Broker.h"
+#include "messaging/Broker.h"
 #include <iostream>
 
-namespace rsp::graphics
+namespace rsp::messaging
 {
-class Subscriber
+class Publisher
 {
   public:
-    virtual ~Subscriber() {}
+    Publisher()
+        : mBrokerPtr(nullptr)
+    {
+    }
+    virtual ~Publisher() {}
 
-    virtual void SubscribeToBroker(Broker *aPtr, Topic aTopic);
-    virtual void UnsubscribeToBroker(Broker *aPtr, Topic aTopic);
-    virtual void HandleEvent(Event &aNewEvent);
+    virtual void RegisterBroker(Broker *apBroker);
+    virtual void PublishToBroker(Topic aTopic, Event &aNewEvent);
 
     // protected:
-    Topic mTopic;
+    Broker *mBrokerPtr;
 };
-} // namespace rsp::graphics
+} // namespace rsp::messaging
 
-#endif // SUBSCRIBER_H
+#endif // PUBLISHER_H

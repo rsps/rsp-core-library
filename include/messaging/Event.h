@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <typeinfo>
 
-namespace rsp::graphics
+namespace rsp::messaging
 {
 enum class Topic {
     Base,
@@ -48,5 +48,5 @@ class EventType : public Event
     EventType() : Event(typeid(T).hash_code()) {}
 };
 
-} // namespace rsp::graphics
+} // namespace rsp::messaging
 #endif // EVENT_H

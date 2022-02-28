@@ -9,7 +9,7 @@
  */
 
 #include "graphics/GraphicsMain.h"
-#include "graphics/messaging/eventTypes/ClickedEvent.h"
+#include "messaging/eventTypes/ClickedEvent.h"
 #include <chrono>
 #include <thread>
 

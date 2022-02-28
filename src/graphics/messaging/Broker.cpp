@@ -9,11 +9,11 @@
  */
 #include <utility>
 
-#include "graphics/messaging/Broker.h"
-#include "graphics/messaging/Publisher.h"
-#include "graphics/messaging/Subscriber.h"
+#include "messaging/Broker.h"
+#include "messaging/Publisher.h"
+#include "messaging/Subscriber.h"
 
-namespace rsp::graphics
+namespace rsp::messaging
 {
 void Broker::Subscribe(Subscriber *aPtr, Topic aTopic)
 {
@@ -47,4 +47,4 @@ void Broker::OnPublish(Topic aTopic, Event &aNewEvent)
         sub->HandleEvent(aNewEvent);
     }
 }
-} // namespace rsp::graphics
+} // namespace rsp::messaging

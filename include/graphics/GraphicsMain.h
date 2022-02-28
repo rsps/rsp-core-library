@@ -12,8 +12,10 @@
 
 #include "graphics/InputCreator.h"
 #include "graphics/SceneLoader.h"
-#include "graphics/messaging/Subscriber.h"
 #include "graphics/primitives/BufferedCanvas.h"
+#include "messaging/Subscriber.h"
+
+using namespace rsp::messaging;
 
 namespace rsp::graphics
 {
