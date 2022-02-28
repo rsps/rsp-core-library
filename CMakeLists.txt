@@ -35,6 +35,11 @@ include(GNUInstallDirs)
 
 add_library("rsp-core-lib" STATIC)
 
+target_link_libraries ("rsp-core-lib"
+    Threads::Threads
+    Freetype::Freetype
+)
+
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
 # paths.
@@ -113,8 +118,6 @@ target_compile_options(rsp-core-lib-test PRIVATE -pedantic -Wall -Wextra -Wold-s
 
 target_link_libraries ("rsp-core-lib-test"
     rsp-core-lib
-    Threads::Threads
-    Freetype::Freetype
 )
 #target_link_libraries(demo ${FREETYPE_LIBRARIES})
 
