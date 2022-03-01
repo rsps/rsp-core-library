@@ -8,8 +8,8 @@ target_sources("rsp-core-lib-test" PRIVATE
 )
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/unit/graphics/testImages 
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/../)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/unit/graphics/fonts 
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/../)
 
