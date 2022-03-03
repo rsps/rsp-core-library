@@ -28,9 +28,6 @@ set (CMAKE_CXX_STANDARD 20)
 # locations on all platforms.
 include(GNUInstallDirs)
 
-#include_directories( ${FREETYPE2_INCLUDE_DIRS} )
-#SET( CMAKE_C_FLAGS "${FREETYPE2_CFLAGS_OTHER}" )
-
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 
 add_library("rsp-core-lib" STATIC)
@@ -103,12 +100,9 @@ target_compile_options(rsp-core-lib-test PRIVATE
     ${GCC_VALIDATION_FLAGS} 
     -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS -rdynamic)
 
-#get_target_property(INCLUDE_DIRS "rsp-core-lib-test" INCLUDE_DIRECTORIES)
-#message(STATUS "IncDirs: ${INCLUDE_DIRS}")
 
 target_link_libraries ("rsp-core-lib-test"
     rsp-core-lib
 )
-#target_link_libraries(demo ${FREETYPE_LIBRARIES})
 
 add_test("tests" "rsp-core-lib-test")
