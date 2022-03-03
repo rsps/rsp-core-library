@@ -20,13 +20,13 @@ namespace rsp::graphics
 class FirstScene : public Scene
 {
   public:
-    FirstScene(Rect &aRect, BrokerBase &arBroker)
+    FirstScene(Rect &aRect, rsp::messaging::BrokerBase &arBroker)
         : Scene(aRect, arBroker)
     {
         // myName = "First Scene";
         //  Set member variables values
         Rect topRect(Point(100, 400), 200, 100);
-        topBtn = TouchArea(topRect, ClickTopic::SceneChange, "second");
+        topBtn = TouchArea(topRect, rsp::messaging::ClickTopic::SceneChange, "second");
         topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
 
         Rect botRect(Point(100, 600), 200, 100);

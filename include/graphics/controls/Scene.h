@@ -17,15 +17,13 @@
 #include "messaging/Publisher.h"
 #include <vector>
 
-using namespace rsp::messaging;
-
 namespace rsp::graphics
 {
 
-class Scene : public Control, public Publisher
+class Scene : public Control, public rsp::messaging::Publisher
 {
   public:
-    Scene(const Rect &aRect, BrokerBase &arBroker);
+    Scene(const Rect &aRect, rsp::messaging::BrokerBase &arBroker);
     virtual ~Scene() {}
 
     void ProcessInput(Input &aInput);

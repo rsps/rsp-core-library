@@ -20,7 +20,7 @@ namespace rsp::graphics
 class SecondScene : public Scene
 {
   public:
-    SecondScene(Rect &aRect, BrokerBase &arBroker)
+    SecondScene(Rect &aRect, rsp::messaging::BrokerBase &arBroker)
         : Scene(aRect, arBroker)
     {
         // myName = "Second Scene";
@@ -30,7 +30,7 @@ class SecondScene : public Scene
         topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
 
         Rect botRect(Point(100, 300), 200, 100);
-        botBtn = TouchArea(botRect, ClickTopic::SceneChange, "first");
+        botBtn = TouchArea(botRect, rsp::messaging::ClickTopic::SceneChange, "first");
         botBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
 
         // Bind onPressed

@@ -47,7 +47,6 @@ class Publisher
     template <typename T>
     void PublishToBroker(T aTopic, Event &arNewEvent)
     {
-        // Undefined during linking
         mrBroker.doPublish(static_cast<int>(aTopic), arNewEvent);
     }
 

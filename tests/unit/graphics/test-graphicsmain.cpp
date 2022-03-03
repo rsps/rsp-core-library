@@ -16,6 +16,7 @@
 #include <vector>
 
 using namespace rsp::graphics;
+using namespace rsp::messaging;
 
 TEST_CASE("Graphics Main Test")
 {
@@ -30,13 +31,13 @@ TEST_CASE("Graphics Main Test")
     Event event;
     // Make Broker
     Broker<ClickTopic> broker;
-    broker.doPublish(0, event);
+    // broker.doPublish(0, event);
 
     MESSAGE("Making SceneLoader");
     // Make sceneLoader
-    // SceneLoader scenes(broker);
+    SceneLoader scenes(broker);
 
-    /*MESSAGE("Init InputCreator");
+    MESSAGE("Init InputCreator");
     // Make InputCreator
     InputCreator ic;
 
@@ -49,5 +50,5 @@ TEST_CASE("Graphics Main Test")
     std::cout << "Setup complete" << std::endl;
 
     // Run?
-    gMain.Run();*/
+    // gMain.Run();
 }

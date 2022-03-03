@@ -11,6 +11,8 @@
 #include "graphics/SceneLoader.h"
 #include <fstream>
 
+using namespace rsp::messaging;
+
 namespace rsp::graphics
 {
 static Rect sScreenSize = Rect(0, 0, 480, 800);

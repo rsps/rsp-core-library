@@ -7,14 +7,9 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
-#include "messaging/Publisher.h"
 
-namespace rsp::messaging
-{
+#include <doctest.h>
 
-void Publisher::RegisterBroker(BrokerBase &arBroker)
+TEST_CASE("Broker")
 {
-    mrBroker = arBroker;
 }
-
-} // namespace rsp::messaging

@@ -9,7 +9,10 @@
  */
 
 #include "graphics/controls/Scene.h"
+#include "messaging/eventTypes/ClickedEvent.h"
 #include <functional>
+
+using namespace rsp::messaging;
 
 namespace rsp::graphics
 {
@@ -36,7 +39,7 @@ void Scene::Render(Canvas &aCanvas)
 void Scene::BindElementsToBroker()
 {
     for (auto touchable : mTouchables) {
-        touchable->RegisterOnClicked(std::bind(&BrokerBase::doPublish, &mrBroker, std::placeholders::_1, std::placeholders::_2));
+        touchable->RegisterOnClicked([&](ClickTopic aTopic, ClickedEvent &aEvent) noexcept { PublishToBroker<ClickTopic>(aTopic, aEvent); });
     }
 }
 

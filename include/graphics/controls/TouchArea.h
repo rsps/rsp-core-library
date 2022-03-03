@@ -15,23 +15,21 @@
 #include "graphics/primitives/Rect.h"
 #include "messaging/eventTypes/ClickedEvent.h"
 
-using namespace rsp::messaging;
-
 namespace rsp::graphics
 {
 
 class TouchArea
 {
   public:
-    TouchArea() : mTouchArea(0, 0, 0, 0), mClickedTopic(ClickTopic::NullTopic), mclickEvent(""){};
-    TouchArea(Rect &aArea, ClickTopic aClickTopic = ClickTopic::NullTopic, std::string aClickInfo = "");
+    TouchArea() : mTouchArea(0, 0, 0, 0), mClickedTopic(rsp::messaging::ClickTopic::NullTopic), mclickEvent(""){};
+    TouchArea(Rect &aArea, rsp::messaging::ClickTopic aClickTopic = rsp::messaging::ClickTopic::NullTopic, std::string aClickInfo = "");
     ~TouchArea();
 
     void ProcessInput(Input &aInput);
 
     bool IsHit(const Point &aPoint) const;
     void RegisterOnPressed(std::function<void(Control::States)> aFunc);
-    void RegisterOnClicked(std::function<void(int, ClickedEvent &)> aFunc);
+    void RegisterOnClicked(std::function<void(rsp::messaging::ClickTopic, rsp::messaging::ClickedEvent &)> aFunc);
 
     TouchArea &operator=(const TouchArea &) = default;
 
@@ -44,13 +42,13 @@ class TouchArea
 
   protected:
     std::function<void(Control::States)> mPressed{};
-    std::function<void(int, ClickedEvent &)> mClicked{};
+    std::function<void(rsp::messaging::ClickTopic, rsp::messaging::ClickedEvent &)> mClicked{};
 
     Rect mTouchArea{};
     Point mCurrentPress{0, 0};
     Point mOriginalPress{0, 0};
-    ClickTopic mClickedTopic;
-    ClickedEvent mclickEvent;
+    rsp::messaging::ClickTopic mClickedTopic;
+    rsp::messaging::ClickedEvent mclickEvent;
 };
 
 } // namespace rsp::graphics

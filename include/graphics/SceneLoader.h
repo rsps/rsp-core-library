@@ -22,7 +22,7 @@ namespace rsp::graphics
 class SceneLoader
 {
   public:
-    SceneLoader(BrokerBase &aBroker);
+    SceneLoader(rsp::messaging::BrokerBase &aBroker);
     ~SceneLoader();
 
     Scene &GetFirstScene();

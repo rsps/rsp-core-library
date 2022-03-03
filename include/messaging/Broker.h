@@ -27,13 +27,12 @@ class BrokerBase
   public:
     virtual ~BrokerBase() {}
 
-    void doPublish(int aTopic, Event &arNewEvent);
-
-  protected:
+    protected:
     std::map<int, std::vector<Subscriber *>> mSubscriberMap{};
 
     friend Publisher;
     friend Subscriber;
+    void doPublish(int aTopic, Event &arNewEvent);
     void addSubscriber(Subscriber &arSubscriber, int aTopic);
     void removeSubscriber(Subscriber &arSubscriber, int aTopic);
 };

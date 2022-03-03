@@ -13,6 +13,8 @@
 #include <chrono>
 #include <thread>
 
+using namespace rsp::messaging;
+
 namespace rsp::graphics
 {
 

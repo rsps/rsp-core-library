@@ -15,12 +15,10 @@
 #include "graphics/SceneLoader.h"
 #include "messaging/Subscriber.h"
 
-using namespace rsp::messaging;
-
 namespace rsp::graphics
 {
 
-class GraphicsMain : public Subscriber
+class GraphicsMain : public rsp::messaging::Subscriber
 {
   public:
     GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader);
@@ -31,7 +29,7 @@ class GraphicsMain : public Subscriber
     void Run();
     void Terminate() { mTerminated = true; }
     void ChangeScene(std::string aSceneName);
-    void HandleEvent(Event &newEvent) override;
+    void HandleEvent(rsp::messaging::Event &newEvent) override;
 
   private:
     BufferedCanvas &mBufferedCanvas;

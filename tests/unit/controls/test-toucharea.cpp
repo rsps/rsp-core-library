@@ -13,6 +13,7 @@
 #include <doctest.h>
 
 using namespace rsp::graphics;
+using namespace rsp::messaging;
 
 TEST_CASE("TouchArea Constructor")
 {
@@ -201,7 +202,7 @@ TEST_CASE("Input Processing")
     SUBCASE("Clicked Callback")
     {
         // Arrange
-        std::function<void(int, ClickedEvent &)> clickedReciever = [&](int tp, ClickedEvent &event) {
+        std::function<void(ClickTopic, ClickedEvent &)> clickedReciever = [&](ClickTopic tp, ClickedEvent &event) noexcept {
             wasCalled = true;
             (void)tp;
             (void)event;
