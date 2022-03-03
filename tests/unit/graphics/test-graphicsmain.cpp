@@ -10,6 +10,7 @@
 
 #include "graphics/Framebuffer.h"
 #include "graphics/GraphicsMain.h"
+#include "messaging/eventTypes/ClickedEvent.h"
 #include <doctest.h>
 #include <functional>
 #include <vector>
@@ -18,7 +19,6 @@ using namespace rsp::graphics;
 
 TEST_CASE("Graphics Main Test")
 {
-
     MESSAGE("Start");
 
     MESSAGE("Init Framebufer");
@@ -27,14 +27,16 @@ TEST_CASE("Graphics Main Test")
     Rect screenSize(Point(0, 0), Point(fb.GetWidth(), fb.GetHeight()));
 
     MESSAGE("Making Broker");
+    Event event;
     // Make Broker
-    Broker broker;
+    Broker<ClickTopic> broker;
+    broker.doPublish(0, event);
 
     MESSAGE("Making SceneLoader");
     // Make sceneLoader
-    SceneLoader scenes(broker);
+    // SceneLoader scenes(broker);
 
-    MESSAGE("Init InputCreator");
+    /*MESSAGE("Init InputCreator");
     // Make InputCreator
     InputCreator ic;
 
@@ -43,9 +45,9 @@ TEST_CASE("Graphics Main Test")
     GraphicsMain gMain(fb, ic, scenes);
 
     // Subscribe to SceneChange ClickedEvents
-    gMain.SubscribeToBroker(&broker, Topic::SceneChange);
+    gMain.SubscribeToBroker<ClickTopic>(broker, ClickTopic::SceneChange);
     std::cout << "Setup complete" << std::endl;
 
     // Run?
-    gMain.Run();
+    gMain.Run();*/
 }

@@ -18,10 +18,6 @@ Control::Control(const Rect &arRect)
 {
 }
 
-Control::~Control()
-{
-}
-
 void Control::SetState(States aState)
 {
     if (mState != aState) {

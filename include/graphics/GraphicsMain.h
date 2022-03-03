@@ -10,9 +10,9 @@
 #ifndef GRAPHICSMAIN_H
 #define GRAPHICSMAIN_H
 
+#include "graphics/BufferedCanvas.h"
 #include "graphics/InputCreator.h"
 #include "graphics/SceneLoader.h"
-#include "graphics/primitives/BufferedCanvas.h"
 #include "messaging/Subscriber.h"
 
 using namespace rsp::messaging;
@@ -24,6 +24,8 @@ class GraphicsMain : public Subscriber
 {
   public:
     GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader);
+    GraphicsMain(const GraphicsMain &) = default;
+    GraphicsMain &operator=(const GraphicsMain &) = default;
     ~GraphicsMain();
 
     void Run();
@@ -35,7 +37,7 @@ class GraphicsMain : public Subscriber
     BufferedCanvas &mBufferedCanvas;
     InputCreator &mInputs;
     SceneLoader &mSceneLoader;
-    Scene mActiveScene;
+    Scene *mActiveScene;
     bool mTerminated = false;
     std::vector<Input> inputCache{};
 

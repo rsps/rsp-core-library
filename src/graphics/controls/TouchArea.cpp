@@ -13,7 +13,7 @@
 namespace rsp::graphics
 {
 
-TouchArea::TouchArea(Rect &aArea, Topic aClickedTopic, std::string aClickInfo)
+TouchArea::TouchArea(Rect &aArea, ClickTopic aClickedTopic, std::string aClickInfo)
     : mTouchArea(aArea), mClickedTopic(aClickedTopic), mclickEvent(aClickInfo)
 {
 }
@@ -39,7 +39,7 @@ void TouchArea::ProcessInput(Input &aInput)
         mPressed(Control::States::normal);
         if (IsHit(mCurrentPress) && IsHit(mOriginalPress)) {
             std::cout << "Calling Clicked Callback" << std::endl;
-            mClicked(mClickedTopic, mclickEvent);
+            mClicked(static_cast<int>(mClickedTopic), mclickEvent);
         }
         // Will this return true for IsHit on things outside the scene?
         mCurrentPress = Point(-1, -1);
@@ -65,7 +65,7 @@ void TouchArea::RegisterOnPressed(std::function<void(Control::States)> aFunc)
     mPressed = aFunc;
 }
 
-void TouchArea::RegisterOnClicked(std::function<void(Topic, ClickedEvent &)> aFunc)
+void TouchArea::RegisterOnClicked(std::function<void(int, ClickedEvent &)> aFunc)
 {
     mClicked = aFunc;
 }

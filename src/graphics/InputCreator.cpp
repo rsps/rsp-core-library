@@ -16,7 +16,6 @@ namespace rsp::graphics
 
 InputCreator::InputCreator()
 {
-    // touchDriver.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     touchDriver.Open("/dev/input/event1", std::ifstream::binary);
 }
 

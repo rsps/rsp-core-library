@@ -23,31 +23,33 @@ namespace rsp::graphics
 class TouchArea
 {
   public:
-    TouchArea() : mTouchArea(0, 0, 0, 0), mClickedTopic(Topic::Base), mclickEvent(""){};
-    TouchArea(Rect &aArea, Topic aClickTopic = Topic::Base, std::string aClickInfo = "");
+    TouchArea() : mTouchArea(0, 0, 0, 0), mClickedTopic(ClickTopic::NullTopic), mclickEvent(""){};
+    TouchArea(Rect &aArea, ClickTopic aClickTopic = ClickTopic::NullTopic, std::string aClickInfo = "");
     ~TouchArea();
 
     void ProcessInput(Input &aInput);
 
     bool IsHit(const Point &aPoint) const;
     void RegisterOnPressed(std::function<void(Control::States)> aFunc);
-    void RegisterOnClicked(std::function<void(Topic, ClickedEvent &)> aFunc);
+    void RegisterOnClicked(std::function<void(int, ClickedEvent &)> aFunc);
 
     TouchArea &operator=(const TouchArea &) = default;
 
-    std::function<void(Control::States)> mPressed = [](Control::States) {};
-    std::function<void(Topic, ClickedEvent &)> mClicked = [](Topic, ClickedEvent &) {};
-    TouchArea& SetArea(const Rect &arRect) { mTouchArea = arRect; return *this; }
-    const Rect& GetArea() const { return mTouchArea; }
+    TouchArea &SetArea(const Rect &arRect)
+    {
+        mTouchArea = arRect;
+        return *this;
+    }
+    const Rect &GetArea() const { return mTouchArea; }
 
-protected:
-    std::function<void(Control::States)> mPressed{}; // = [](Control::States) {};
-    std::function<void()> mClicked{}; // = [](void) {};
+  protected:
+    std::function<void(Control::States)> mPressed{};
+    std::function<void(int, ClickedEvent &)> mClicked{};
 
     Rect mTouchArea{};
     Point mCurrentPress{0, 0};
     Point mOriginalPress{0, 0};
-    Topic mClickedTopic;
+    ClickTopic mClickedTopic;
     ClickedEvent mclickEvent;
 };
 

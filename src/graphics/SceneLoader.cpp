@@ -14,13 +14,13 @@
 namespace rsp::graphics
 {
 static Rect sScreenSize = Rect(0, 0, 480, 800);
-SceneLoader::SceneLoader(Broker &aBroker) : first(sScreenSize), second(sScreenSize)
+SceneLoader::SceneLoader(BrokerBase &aBroker) : first(sScreenSize, aBroker), second(sScreenSize, aBroker)
 {
     mSceneMap = {{"first", first},
                  {"second", second}};
 
     for (auto &scene : mSceneMap) {
-        scene.second.RegisterBroker(&aBroker);
+        // scene.second.RegisterBroker(aBroker); // Deprecated I guess?
         scene.second.BindElementsToBroker();
     }
 }

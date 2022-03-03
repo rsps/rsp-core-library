@@ -22,7 +22,7 @@ namespace rsp::graphics
 class SceneLoader
 {
   public:
-    SceneLoader(Broker &aBroker);
+    SceneLoader(BrokerBase &aBroker);
     ~SceneLoader();
 
     Scene &GetFirstScene();
@@ -31,7 +31,7 @@ class SceneLoader
     FirstScene first;
     SecondScene second;
 
-    std::unordered_map<std::string, Scene> mSceneMap;
+    std::unordered_map<std::string, Scene &> mSceneMap{};
 };
 
 } // namespace rsp::graphics

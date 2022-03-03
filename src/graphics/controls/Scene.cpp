@@ -13,12 +13,9 @@
 
 namespace rsp::graphics
 {
-Scene::Scene(const Rect &aRect)
-    : Control(aRect)
-{
-}
 
-Scene::~Scene()
+Scene::Scene(const Rect &aRect, BrokerBase &arBroker)
+    : Control(aRect), Publisher(arBroker)
 {
 }
 
@@ -39,7 +36,7 @@ void Scene::Render(Canvas &aCanvas)
 void Scene::BindElementsToBroker()
 {
     for (auto touchable : mTouchables) {
-        touchable->RegisterOnClicked(std::bind(&Scene::PublishToBroker, *this, std::placeholders::_1, std::placeholders::_2));
+        touchable->RegisterOnClicked(std::bind(&BrokerBase::doPublish, &mrBroker, std::placeholders::_1, std::placeholders::_2));
     }
 }
 

@@ -1,3 +1,12 @@
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Simon Glashoff
+ */
 #ifndef BROKER_H
 #define BROKER_H
 
@@ -5,37 +14,28 @@
 #include <map>
 #include <vector>
 
-#include "graphics/messaging/Event.h"
+#include "messaging/Event.h"
 
-namespace rsp::graphics
+namespace rsp::messaging
 {
-/*
- * TODO: Enumerated Topic should not be declared here. It would severely limit the usage of the component.
- */
-enum class Topic {
-    Base,
-    Email,
-    SmS,
-    BadTopic
-};
 
 class Subscriber;
 class Publisher;
 
 class BrokerBase
 {
-public:
+  public:
     virtual ~BrokerBase() {}
 
-    void registerPublisher(Publisher &arPublisher); // TODO: Do we need this?
+    void doPublish(int aTopic, Event &arNewEvent);
 
-protected:
-    std::map<int, std::vector<Subscriber *>> mSubscriberMap;
+  protected:
+    std::map<int, std::vector<Subscriber *>> mSubscriberMap{};
 
-    void addSubscriber(Subscriber& arSubscriber, int aTopic);
+    friend Publisher;
     friend Subscriber;
-    void removeSubscriber(Subscriber& arSubscriber, int aTopic);
-    void doPublish(int aTopic, Event& arNewEvent);
+    void addSubscriber(Subscriber &arSubscriber, int aTopic);
+    void removeSubscriber(Subscriber &arSubscriber, int aTopic);
 };
 
 /**
@@ -46,13 +46,13 @@ protected:
 template <typename T>
 class Broker : public BrokerBase
 {
-public:
+  public:
     /**
      * \brief Add a subscriber to the broker
      * \param arSubscriber Reference to the subscriber that is registering
      * \param aTopic Topic to subscribe to
      */
-    void AddSubscriber(Subscriber& arSubscriber, T aTopic)
+    void AddSubscriber(Subscriber &arSubscriber, T aTopic)
     {
         addSubscriber(arSubscriber, static_cast<int>(aTopic));
     }
@@ -65,7 +65,7 @@ public:
      * \param arSubscriber Reference to the subscriber leaving
      * \param aTopic Topic to unsubscribe from
      */
-    void RemoveSubscriber(Subscriber& arSubscriber, T aTopic)
+    void RemoveSubscriber(Subscriber &arSubscriber, T aTopic)
     {
         RemoveSubscriber(arSubscriber, static_cast<int>(aTopic));
     }
@@ -81,6 +81,6 @@ public:
     }
 };
 
-} // namespace rsp::graphics
+} // namespace rsp::messaging
 
 #endif // BROKER_H

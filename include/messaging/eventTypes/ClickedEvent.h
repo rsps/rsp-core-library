@@ -13,13 +13,18 @@
 
 #include "messaging/Event.h"
 #include <string>
+
 namespace rsp::messaging
 {
+enum class ClickTopic {
+    NullTopic,
+    SceneChange
+};
 
 class ClickedEvent : public EventType<ClickedEvent>
 {
   public:
-    ClickedEvent(std::string aMessage) : mMessage(aMessage) {}
+    ClickedEvent(std::string aMessage) : mMessage(aMessage){};
     ~ClickedEvent() {}
     std::string mMessage;
 };

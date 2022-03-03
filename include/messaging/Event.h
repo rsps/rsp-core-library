@@ -7,7 +7,6 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
-
 #ifndef EVENT_H
 #define EVENT_H
 
@@ -16,29 +15,25 @@
 
 namespace rsp::messaging
 {
-enum class Topic {
-    Base,
-    SceneChange
-};
 
 class Event
 {
   public:
-    Event(std::size_t aHash) : mTypeHash(aHash) {}
-    Event() : mTypeHash(typeid(Event).hash_code()) {}
-    ~Event() {}
+    Event(std::size_t aHash) : typeHash(aHash) {}
+    Event() : typeHash(typeid(Event).hash_code()) {}
+    virtual ~Event() {}
 
     template <class T>
     T &GetAs()
     {
-        if (typeid(T).hash_code() != mTypeHash) {
+        if (typeid(T).hash_code() != typeHash) {
             std::cout << "- Is Not Same Type" << std::endl;
             // throw std::bad_alloc();
         }
         return *reinterpret_cast<T *>(this);
     }
 
-    std::size_t mTypeHash;
+    std::size_t typeHash;
 };
 
 template <class T>

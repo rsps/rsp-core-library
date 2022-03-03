@@ -24,15 +24,15 @@ namespace rsp::graphics
 
 class Scene : public Control, public Publisher
 {
-public:
-    Scene(const Rect &aRect);
-    ~Scene();
+  public:
+    Scene(const Rect &aRect, BrokerBase &arBroker);
+    virtual ~Scene() {}
 
     void ProcessInput(Input &aInput);
     void Render(Canvas &aCanvas) override;
     void BindElementsToBroker();
 
-protected:
+  protected:
     std::vector<TouchArea *> mTouchables{};
 };
 

@@ -20,17 +20,17 @@ namespace rsp::graphics
 class SecondScene : public Scene
 {
   public:
-    SecondScene(Rect &aRect)
-        : Scene(aRect)
+    SecondScene(Rect &aRect, BrokerBase &arBroker)
+        : Scene(aRect, arBroker)
     {
-        myName = "Second Scene";
-        // Set member variables values
+        // myName = "Second Scene";
+        //  Set member variables values
         Rect topRect(Point(100, 100), 200, 100);
         topBtn = TouchArea(topRect);
         topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
 
         Rect botRect(Point(100, 300), 200, 100);
-        botBtn = TouchArea(botRect, Topic::SceneChange, "first");
+        botBtn = TouchArea(botRect, ClickTopic::SceneChange, "first");
         botBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
 
         // Bind onPressed
@@ -50,11 +50,11 @@ class SecondScene : public Scene
 
     Color background{0x232323}; // reverse color from old main.qml
 
-    TouchArea topBtn;
-    TouchArea botBtn;
+    TouchArea topBtn{};
+    TouchArea botBtn{};
 
-    Image topBtnImg;
-    Image botBtnImg;
+    Image topBtnImg{};
+    Image botBtnImg{};
 };
 } // namespace rsp::graphics
 #endif // SECONDSCENE_H

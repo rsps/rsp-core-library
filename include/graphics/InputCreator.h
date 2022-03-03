@@ -22,13 +22,11 @@ class InputCreator
 {
   private:
     rsp::posix::FileIO touchDriver{};
-
     InputLine inputLine{};
-
     Input input{};
 
-    void ReadType();
-    void ReadBody();
+    void readType();
+    void readBody();
 
   public:
     InputCreator();
@@ -36,7 +34,6 @@ class InputCreator
 
     bool HasNewInputs();
     const Input &GetInput();
-
 };
 
 } // namespace rsp::graphics

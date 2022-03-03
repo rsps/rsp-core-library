@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
-#include <utility>
 #include <algorithm>
+#include <utility>
 
 #include "messaging/Broker.h"
 #include "messaging/Publisher.h"
@@ -19,16 +19,6 @@ namespace rsp::messaging
 void BrokerBase::addSubscriber(Subscriber &arSubscriber, int aTopic)
 {
     mSubscriberMap[aTopic].push_back(&arSubscriber);
-
-// Very cumbersome solution for the above line:
-//    // mSubscriberMap.insert(std::pair<std::string, Subscriber *>(topic, ptr));
-//    if (auto iter{mSubscriberMap.find(topic)}; iter == mSubscriberMap.end()) {
-//        // Topic not found
-//        mSubscriberMap.insert(std::pair<Topic, std::vector<Subscriber *>>(topic, std::vector<Subscriber *>{ptr}));
-//    } else {
-//        // Topic found
-//        iter->second.push_back(ptr);
-//    }
 }
 
 void BrokerBase::removeSubscriber(Subscriber &arSubscriber, int aTopic)
@@ -43,22 +33,8 @@ void BrokerBase::removeSubscriber(Subscriber &arSubscriber, int aTopic)
         topic_it->second.erase(sub_it);
     }
 }
-void Broker::Unsubscribe(Subscriber *aPtr, Topic aTopic)
-{
-    auto mapIter{mSubscriberMap.find(aTopic)};
-    for (std::vector<Subscriber *>::iterator vecIter = mapIter->second.begin(); vecIter != mapIter->second.end(); vecIter++) {
-        if (aPtr == *vecIter) {
-            mapIter->second.erase(vecIter);
-        }
-    }
-}
 
-void BrokerBase::registerPublisher(Publisher &arPublisher)
-{
-    arPublisher.registerBroker(*this);
-}
-
-void BrokerBase::doPublish(int aTopic, Event &newEvent)
+void BrokerBase::doPublish(int aTopic, Event &arNewEvent)
 {
     auto it = mSubscriberMap.find(aTopic);
     if (it == mSubscriberMap.end()) {
@@ -67,8 +43,8 @@ void BrokerBase::doPublish(int aTopic, Event &newEvent)
 
     // foreach sub in multimap for a given key, do->update
     for (auto sub : it->second) {
-        sub->updateCallback(newEvent);
+        sub->HandleEvent(arNewEvent);
     }
 }
 
-} // namespace rsp::graphics
+} // namespace rsp::messaging

@@ -20,13 +20,13 @@ namespace rsp::graphics
 class FirstScene : public Scene
 {
   public:
-    FirstScene(Rect &aRect)
-        : Scene(aRect)
+    FirstScene(Rect &aRect, BrokerBase &arBroker)
+        : Scene(aRect, arBroker)
     {
-        myName = "First Scene";
-        // Set member variables values
+        // myName = "First Scene";
+        //  Set member variables values
         Rect topRect(Point(100, 400), 200, 100);
-        topBtn = TouchArea(topRect, Topic::SceneChange, "second");
+        topBtn = TouchArea(topRect, ClickTopic::SceneChange, "second");
         topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
 
         Rect botRect(Point(100, 600), 200, 100);
@@ -50,11 +50,11 @@ class FirstScene : public Scene
 
     Color background{0x323232}; // color from old main.qml
 
-    TouchArea topBtn;
-    TouchArea botBtn;
+    TouchArea topBtn{};
+    TouchArea botBtn{};
 
-    Image topBtnImg;
-    Image botBtnImg;
+    Image topBtnImg{};
+    Image botBtnImg{};
 };
 } // namespace rsp::graphics
 #endif // FIRSTSCENE_H

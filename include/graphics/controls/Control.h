@@ -19,7 +19,7 @@ namespace rsp::graphics
 
 class Control
 {
-public:
+  public:
     enum class States : int {
         disabled,
         normal,
@@ -28,12 +28,12 @@ public:
         checked
     };
 
-    Control() {};
+    Control() {}
     Control(const Rect &arRect);
-    virtual ~Control();
+    virtual ~Control() {}
 
     Control(const Control &arOther) = default;
-    Control& operator=(const Control &arOther) = default;
+    Control &operator=(const Control &arOther) = default;
 
     void SetState(States aState);
     States GetState() const { return mState; }
@@ -41,17 +41,26 @@ public:
     void Invalidate();
     bool IsInvalid() const { return mIsInvalid; }
 
-    Control& SetTransparent(bool aValue) { mTransparent = aValue; return *this; }
+    Control &SetTransparent(bool aValue)
+    {
+        mTransparent = aValue;
+        return *this;
+    }
     bool IsTransparent() const { return mTransparent; }
 
     virtual void Render(Canvas &aCanvas) = 0;
 
     void SetArea(const Rect &aRect);
-    const Rect& GetArea() const { return mArea; }
+    const Rect &GetArea() const { return mArea; }
 
-    Control& AddChild(Control *apChild)  { mChildren.push_back(apChild); apChild->mpParent = this; return *this; }
+    Control &AddChild(Control *apChild)
+    {
+        mChildren.push_back(apChild);
+        apChild->mpParent = this;
+        return *this;
+    }
 
-protected:
+  protected:
     Rect mArea{};
     Color mBackground{0};
     bool mTransparent = false;
@@ -59,7 +68,6 @@ protected:
     std::vector<Control *> mChildren{};
     bool mIsInvalid = true;
     States mState = States::normal;
-
 };
 
 } // namespace rsp::graphics

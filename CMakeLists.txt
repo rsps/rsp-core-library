@@ -2,10 +2,10 @@ cmake_minimum_required (VERSION 3.16)
 
 # https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
 
-if(DEFINED PLATFORM_P05)
+#if(DEFINED PLATFORM_P05)
 # To build for P05 platform: cmake .. -D PLATFORM_P05=1 [-D RELEASE=1]
-    set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
-endif()
+#    set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
+#endif()
 
 project (rsp-core-lib)
 
