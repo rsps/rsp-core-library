@@ -24,13 +24,13 @@ TouchArea::~TouchArea()
 {
 }
 
-void TouchArea::ProcessInput(Input &aInput)
+void TouchArea::ProcessInput(Input &arInput)
 {
     std::cout << "TouchArea Processing Input" << std::endl;
-    switch (aInput.type) {
+    switch (arInput.type) {
     case InputType::Press:
-        mCurrentPress = Point(aInput.x, aInput.y);
-        mOriginalPress = Point(aInput.x, aInput.y);
+        mCurrentPress = Point(arInput.x, arInput.y);
+        mOriginalPress = Point(arInput.x, arInput.y);
         if (IsHit(mCurrentPress)) {
             std::cout << "TouchArea Setting pressed state" << std::endl;
             mPressed(Control::States::pressed);
@@ -47,7 +47,7 @@ void TouchArea::ProcessInput(Input &aInput)
         mCurrentPress = Point(-1, -1);
         break;
     case InputType::Drag:
-        mCurrentPress = Point(aInput.x, aInput.y);
+        mCurrentPress = Point(arInput.x, arInput.y);
         if (!IsHit(mCurrentPress)) {
             mPressed(Control::States::normal);
         }
@@ -57,9 +57,9 @@ void TouchArea::ProcessInput(Input &aInput)
     }
 }
 
-bool TouchArea::IsHit(const Point &aPoint) const
+bool TouchArea::IsHit(const Point &arPoint) const
 {
-    return mTouchArea.IsHit(aPoint);
+    return mTouchArea.IsHit(arPoint);
 }
 
 void TouchArea::RegisterOnPressed(std::function<void(Control::States)> aFunc)

@@ -35,7 +35,6 @@ TEST_CASE("Graphics Main Test")
     Event event;
     // Make Broker
     Broker<ClickTopic> broker;
-    // broker.doPublish(0, event);
 
     MESSAGE("Making SceneLoader");
     // Make sceneLoader

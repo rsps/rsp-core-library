@@ -22,17 +22,17 @@ Scene::Scene(const Rect &aRect, BrokerBase &arBroker)
 {
 }
 
-void Scene::ProcessInput(Input &aInput)
+void Scene::ProcessInput(Input &arInput)
 {
     for (TouchArea *area : mTouchables) {
-        area->ProcessInput(aInput);
+        area->ProcessInput(arInput);
     }
 }
 
-void Scene::Render(Canvas &aCanvas)
+void Scene::Render(Canvas &arCanvas)
 {
     for (auto child : mChildren) {
-        child->Render(aCanvas);
+        child->Render(arCanvas);
     }
 }
 

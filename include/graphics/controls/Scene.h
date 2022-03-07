@@ -26,8 +26,21 @@ class Scene : public Control, public rsp::messaging::Publisher
     Scene(const Rect &aRect, rsp::messaging::BrokerBase &arBroker);
     virtual ~Scene() {}
 
-    void ProcessInput(Input &aInput);
-    void Render(Canvas &aCanvas) override;
+    /**
+     * \brief Processes input in all touchable areas within Scene
+     * \param arInput Reference to the input being processed
+     */
+    void ProcessInput(Input &arInput);
+
+    /**
+     * \brief Render all children within Scene
+     * \param arCanvas Reference to the Canvas children will be rendered on
+     */
+    void Render(Canvas &arCanvas) override;
+
+    /**
+     * \brief Register all touchable areas's click callback to the given current Broker
+     */
     void BindElementsToBroker();
 
   protected:

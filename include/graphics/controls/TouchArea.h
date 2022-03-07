@@ -25,23 +25,55 @@ class TouchArea
     TouchArea(Rect &aArea, rsp::messaging::ClickTopic aClickTopic = rsp::messaging::ClickTopic::NullTopic, std::string aClickInfo = "");
     ~TouchArea();
 
-    void ProcessInput(Input &aInput);
+    /**
+     * \brief Processes input for press or click callbacks
+     * \param arInput Reference to the input being processed
+     */
+    void ProcessInput(Input &arInput);
 
-    bool IsHit(const Point &aPoint) const;
+    /**
+     * \brief Checks if a given coordinates is inside the defined Rectangle
+     * \param arPoint Reference to the coordinate
+     * \return True if hit
+     */
+    bool IsHit(const Point &arPoint) const;
+
+    /**
+     * \brief Register a function to be called for pressed events
+     * \param aFunc A function to handle pressed callbacks
+     */
     void RegisterOnPressed(std::function<void(Control::States)> aFunc);
+
+    /**
+     * \brief Register a function to be called for click events
+     * \param aFunc A function to handle clicked callbacks
+     */
     void RegisterOnClicked(std::function<void(rsp::messaging::ClickTopic, rsp::messaging::ClickedEvent &)> aFunc);
 
+    /**
+     * \brief The default =operator
+     * \param arTouchArea A const reference to a TouchArea
+     */
     TouchArea &operator=(const TouchArea &) = default;
 
+    /**
+     * \brief Sets the area of the TouchArea
+     * \param arRect The new rectangle used as the defined area
+     */
     TouchArea &SetArea(const Rect &arRect)
     {
         mTouchArea = arRect;
         return *this;
     }
+
+    /**
+     * \brief Gets the area of the TouchArea
+     * \return A reference to the current defined area as a Rectangle
+     */
     const Rect &GetArea() const { return mTouchArea; }
 
   protected:
-    std::function<void(Control::States)> mPressed = [](Control::States state) noexcept { (void)state; };
+    std::function<void(Control::States)> mPressed{}; //= [](Control::States state) noexcept { (void)state; };
     std::function<void(rsp::messaging::ClickTopic, rsp::messaging::ClickedEvent &)> mClicked{};
 
     Rect mTouchArea{};
