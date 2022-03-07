@@ -13,6 +13,18 @@
 #include <doctest.h>
 
 using namespace rsp::messaging;
+enum testTopic {
+    topicOne,
+    topicTwo
+};
+class TestBroker : public Broker<testTopic>
+{
+  public:
+    std::map<int, std::vector<Subscriber *>> &GetSubscriberMap()
+    {
+        return mSubscriberMap;
+    }
+};
 
 class TestSubOne : public Subscriber
 {
@@ -33,14 +45,47 @@ class TestSubTwo : public Subscriber
     bool isHandled = false;
 };
 
+TEST_CASE("Subscriber Test")
+{
+    // Arrange
+    TestBroker testBroker;
+    TestSubOne testSub;
+    Event testEvent;
+
+    SUBCASE("Subscribe to Broker")
+    {
+        // Act & Assert
+        CHECK_NOTHROW(testSub.SubscribeToBroker(testBroker, testTopic::topicOne););
+        CHECK(testBroker.GetSubscriberMap()[testTopic::topicOne].size() == 1);
+
+        SUBCASE("Recieve Event")
+        {
+            // Act
+            testBroker.Publish(testTopic::topicOne, testEvent);
+
+            // Assert
+            CHECK(testSub.isHandled);
+        }
+        SUBCASE("Unsubscribe to Broker through Broker")
+        {
+            // Act
+            CHECK_NOTHROW(testBroker.RemoveSubscriber(testSub, testTopic::topicOne););
+            CHECK(testBroker.GetSubscriberMap()[testTopic::topicOne].size() == 0);
+            CHECK_NOTHROW(testBroker.Publish(testTopic::topicOne, testEvent););
+
+            // Assert
+            CHECK_FALSE(testSub.isHandled);
+        }
+        /*SUBCASE("Unsubscribe to Broker through Subscriber")
+        {
+
+        }*/
+    }
+}
 TEST_CASE("Publisher Test")
 {
     // Arrange
-    enum testTopic {
-        topicOne,
-        topicTwo
-    };
-    Broker<testTopic> testBroker;
+    TestBroker testBroker;
     TestSubOne testSubOne;
     TestSubTwo testSubTwo;
     testSubOne.SubscribeToBroker(testBroker, testTopic::topicOne);

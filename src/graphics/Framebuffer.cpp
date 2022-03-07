@@ -50,7 +50,7 @@ Framebuffer::Framebuffer(const char *apDevPath)
     mWidth = static_cast<int>(mVariableInfo.xres);
     mHeight = static_cast<int>(mVariableInfo.yres);
     mBytesPerPixel = static_cast<int>(mVariableInfo.bits_per_pixel / 8);
-    std::clog << "Framebuffer opened. Width=" << mWidth << " Height=" << mHeight << " BytesPerPixel=" << mBytesPerPixel << std::endl;
+    // std::clog << "Framebuffer opened. Width=" << mWidth << " Height=" << mHeight << " BytesPerPixel=" << mBytesPerPixel << std::endl;
 
     // set yres_virtual for double buffering
     mVariableInfo.yres_virtual = mVariableInfo.yres * 2;

@@ -13,6 +13,7 @@
 #include "messaging/eventTypes/ClickedEvent.h"
 #include <doctest.h>
 #include <functional>
+#include <posix/FileSystem.h>
 #include <vector>
 
 using namespace rsp::graphics;
@@ -24,7 +25,10 @@ TEST_CASE("Graphics Main Test")
 
     MESSAGE("Init Framebufer");
     // Make framebuffer
-    Framebuffer fb;
+    std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+    Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
+
+    // Get screen size
     Rect screenSize(Point(0, 0), Point(fb.GetWidth(), fb.GetHeight()));
 
     MESSAGE("Making Broker");

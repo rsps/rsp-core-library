@@ -178,9 +178,8 @@ TEST_CASE("Input Processing")
         SUBCASE("Pressed Callback - Drag Miss-input")
         {
             // Arrange
-            wasCalled = false;
             auto pressedReceiver = [&](Control::States aState) noexcept {
-                if (aState == Control::States::dragged) {
+                if (aState == Control::States::normal) {
                     wasCalled = true;
                 }
             };
@@ -212,10 +211,13 @@ TEST_CASE("Input Processing")
         SUBCASE("Clicked Callback - Hit-Hit-Input")
         {
             // Act
+            MESSAGE("Start");
             anInput.type = InputType::Press;
             area.ProcessInput(anInput);
+            MESSAGE("Processed Press");
             anInput.type = InputType::Lift;
             area.ProcessInput(anInput);
+            MESSAGE("Processed Lift");
 
             // Assert
             CHECK(wasCalled);
