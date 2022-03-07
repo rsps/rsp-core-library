@@ -45,7 +45,7 @@ class Subscriber
         arBroker.addSubscriber(*this, mTopic);
     }
 
-    virtual void HandleEvent(Event &arNewEvent) = 0; // TODO: Make this abstract
+    virtual void HandleEvent(Event &arNewEvent) = 0;
 
   protected:
     int mTopic = 0;

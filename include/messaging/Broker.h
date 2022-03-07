@@ -27,7 +27,7 @@ class BrokerBase
   public:
     virtual ~BrokerBase() {}
 
-    protected:
+  protected:
     std::map<int, std::vector<Subscriber *>> mSubscriberMap{};
 
     friend Publisher;
@@ -66,7 +66,7 @@ class Broker : public BrokerBase
      */
     void RemoveSubscriber(Subscriber &arSubscriber, T aTopic)
     {
-        RemoveSubscriber(arSubscriber, static_cast<int>(aTopic));
+        removeSubscriber(arSubscriber, static_cast<int>(aTopic));
     }
 
     /**

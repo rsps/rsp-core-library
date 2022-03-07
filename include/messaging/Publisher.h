@@ -19,8 +19,6 @@ namespace rsp::messaging
 class Publisher
 {
   public:
-    // Publisher() : mrBroker(nullptr) {}
-
     /**
      * \brief Create a publisher for a given broker.
      * \param arBroker Reference to Broker to publish through.
