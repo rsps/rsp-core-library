@@ -33,15 +33,21 @@ void TouchArea::ProcessInput(Input &arInput)
         mOriginalPress = Point(arInput.x, arInput.y);
         if (IsHit(mCurrentPress)) {
             std::cout << "TouchArea Setting pressed state" << std::endl;
-            mPressed(Control::States::pressed);
+            if (mPressed) {
+                mPressed(Control::States::pressed);
+            }
         }
         break;
     case InputType::Lift:
         std::cout << "TouchArea Setting normal state" << std::endl;
-        mPressed(Control::States::normal);
+        if (mPressed) {
+            mPressed(Control::States::normal);
+        }
         if (IsHit(mCurrentPress) && IsHit(mOriginalPress)) {
             std::cout << "Calling Clicked Callback" << std::endl;
-            mClicked(mClickedTopic, mclickEvent);
+            if (mClicked) {
+                mClicked(mClickedTopic, mclickEvent);
+            }
         }
         // Will this return true for IsHit on things outside the scene?
         mCurrentPress = Point(-1, -1);
@@ -49,7 +55,9 @@ void TouchArea::ProcessInput(Input &arInput)
     case InputType::Drag:
         mCurrentPress = Point(arInput.x, arInput.y);
         if (!IsHit(mCurrentPress)) {
-            mPressed(Control::States::normal);
+            if (mPressed) {
+                mPressed(Control::States::normal);
+            }
         }
         break;
     default:

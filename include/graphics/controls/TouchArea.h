@@ -73,7 +73,7 @@ class TouchArea
     const Rect &GetArea() const { return mTouchArea; }
 
   protected:
-    std::function<void(Control::States)> mPressed{}; //= [](Control::States state) noexcept { (void)state; };
+    std::function<void(Control::States)> mPressed{};
     std::function<void(rsp::messaging::ClickTopic, rsp::messaging::ClickedEvent &)> mClicked{};
 
     Rect mTouchArea{};

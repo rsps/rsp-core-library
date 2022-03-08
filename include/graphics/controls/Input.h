@@ -16,13 +16,21 @@
 namespace rsp::graphics
 {
 
+/**
+ * \brief Defines the values given on each line by touch driver
+ *
+ */
 struct InputLine {
     struct timeval time;
     uint16_t type;
     uint16_t code;
-    int32_t  value;
+    int32_t value;
 } __attribute__((packed));
 
+/**
+ * \brief Enum type specifying the different types of input
+ *
+ */
 enum class InputType {
     None,
     Press,
@@ -34,15 +42,8 @@ class Input
 {
   public:
     InputType type = InputType::None;
-    int x = 0;
-    int y = 0;
-
-//    Input()
-//    {
-//    }
-//    ~Input()
-//    {
-//    }
+    int x = 0; /*!< Value of the absolute X coordinate from touch */
+    int y = 0; /*!< Value of the absolute Y coordinate from touch */
 };
 } // namespace rsp::graphics
 #endif // INPUT_H

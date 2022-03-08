@@ -22,7 +22,7 @@ class Bitmap;
 class Framebuffer;
 
 /**
- * Point class
+ * \brief Point class
  *
  * A point is a 2D coordinate (x,y)
  */
@@ -30,7 +30,7 @@ class Point
 {
   public:
     /**
-     * Construct an empty point
+     * \brief Construct an empty point
      */
     inline Point()
         : mX(0), mY(0)
@@ -38,7 +38,7 @@ class Point
     }
 
     /**
-     * Construct a point at aX, aY.
+     * \brief Construct a point at aX, aY.
      *
      * \param aX
      * \param aY
@@ -49,7 +49,7 @@ class Point
     }
 
     /**
-     * Copy constructor
+     * \brief Copy constructor
      *
      * \param aPoint
      */
@@ -59,7 +59,7 @@ class Point
     }
 
     /**
-     * Assignment operator.
+     * \brief Assignment operator.
      *
      * \param aPoint
      * \return self
@@ -71,11 +71,19 @@ class Point
         return *this;
     }
 
+    /**
+     * \brief Gets the value of the X coordinate
+     * \return Integer
+     */
     inline int GetX() const
     {
         return mX;
     }
 
+    /**
+     * \brief Gets the value of the Y coordinate
+     * \return Integer
+     */
     inline int GetY() const
     {
         return mY;
@@ -92,7 +100,7 @@ class Point
     int mY;
 };
 
-std::ostream& operator <<(std::ostream &os, const Point &p);
+std::ostream &operator<<(std::ostream &os, const Point &p);
 
 } // namespace rsp::graphics
 #endif // POINT_H

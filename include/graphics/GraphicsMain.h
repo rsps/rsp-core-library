@@ -26,10 +26,27 @@ class GraphicsMain : public rsp::messaging::Subscriber
     GraphicsMain &operator=(const GraphicsMain &) = default;
     ~GraphicsMain();
 
+    /**
+     * \brief Runs the Gui loop
+     */
     void Run();
+
+    /**
+     * \brief Sets Gui loop to terminate on next loop through
+     */
     void Terminate() { mTerminated = true; }
+
+    /**
+     * \brief Change the current active Scene
+     * \param aSceneName The name of the scene to change to
+     */
     void ChangeScene(std::string aSceneName);
-    void HandleEvent(rsp::messaging::Event &newEvent) override;
+
+    /**
+     * \brief Override Handle for recieving messaging events
+     * \param arNewEvent Reference to the event
+     */
+    void HandleEvent(rsp::messaging::Event &arNewEvent) override;
 
   private:
     BufferedCanvas &mBufferedCanvas;

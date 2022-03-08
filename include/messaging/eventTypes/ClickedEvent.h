@@ -16,6 +16,9 @@
 
 namespace rsp::messaging
 {
+/**
+ * \brief Enum type defining topics for ClickedEvents
+ */
 enum class ClickTopic {
     NullTopic,
     SceneChange
@@ -26,7 +29,8 @@ class ClickedEvent : public EventType<ClickedEvent>
   public:
     ClickedEvent(std::string aMessage) : mMessage(aMessage){};
     ~ClickedEvent() {}
-    std::string mMessage;
+
+    std::string mMessage; /*!< Value of the ClickedEvent */
 };
 } // namespace rsp::messaging
 

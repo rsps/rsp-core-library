@@ -45,6 +45,10 @@ class Subscriber
         arBroker.addSubscriber(*this, mTopic);
     }
 
+    /**
+     * \brief Abstract handle for recieving events
+     * \param arNewEvent A reference to the event to handle
+     */
     virtual void HandleEvent(Event &arNewEvent) = 0;
 
   protected:

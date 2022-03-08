@@ -18,15 +18,24 @@ namespace rsp::graphics
 
 class Image : public Control
 {
-public:
+  public:
     Image() : Control(){};
     Image(std::string aNormal, std::string aPressed, Rect &aRect);
     ~Image();
 
+    /**
+     * \brief Override method for rendering the object
+     * \param aCanvas The canvas the object is rendered on
+     */
     void Render(Canvas &aCanvas) override;
+
+    /**
+     * \brief Handles the callback from a touchable area
+     * \param aCanvas The canvas the object is rendered on
+     */
     void HandleCallback(States aState);
 
-protected:
+  protected:
     std::map<States, Bitmap> mStateMap{};
 };
 

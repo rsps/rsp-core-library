@@ -23,6 +23,10 @@ class Event
     Event() : typeHash(typeid(Event).hash_code()) {}
     virtual ~Event() {}
 
+    /**
+     * \brief Casts the event to the templated type
+     * \return A reference to the object after casting
+     */
     template <class T>
     T &GetAs()
     {

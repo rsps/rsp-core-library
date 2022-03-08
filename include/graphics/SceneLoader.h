@@ -25,7 +25,17 @@ class SceneLoader
     SceneLoader(rsp::messaging::BrokerBase &aBroker);
     ~SceneLoader();
 
+    /**
+     * \brief Gets the initial scene
+     * \return A reference to the scene to be rendered
+     */
     Scene &GetFirstScene();
+
+    /**
+     * \brief Gets the initial scene
+     * \param aSceneName The name of the scene to render
+     * \return A reference to the given scene
+     */
     Scene &GetScene(std::string aSceneName);
 
     FirstScene first;

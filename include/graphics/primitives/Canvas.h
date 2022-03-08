@@ -12,9 +12,9 @@
 #define CANVAS_H
 
 #include "Color.h"
-#include "Text.h"
 #include "Point.h"
 #include "Rect.h"
+#include "Text.h"
 
 namespace rsp::graphics
 {
@@ -33,14 +33,14 @@ class Canvas
     Canvas(int aHeight, int aWidth, int aBytesPerPixel)
         : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel) {}
     /**
-     * Virtual destructor for the abstract class.
+     * \brief Virtual destructor for the abstract class.
      */
     virtual ~Canvas()
     {
     }
 
     /**
-     * Draw a a full or partial eclipse
+     * \brief Draw a a full or partial eclipse
      *
      * \param aCenter
      * \param aRadius1
@@ -51,7 +51,7 @@ class Canvas
      */
     void DrawArc(const Point &arCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &arColor);
     /**
-     * Draw a full circle
+     * \brief Draw a full circle
      *
      * \param aCenter
      * \param aRadius
@@ -60,7 +60,7 @@ class Canvas
     void DrawCircle(const Point &aCenter, int aRadius, const Color &aColor);
 
     /**
-     * Draw a straight line from A to B.
+     * \brief Draw a straight line from A to B.
      *
      * \param aA
      * \param aB
@@ -69,7 +69,7 @@ class Canvas
     void DrawLine(const Point &arA, const Point &arB, const Color &arColor);
 
     /**
-     * Draw a rectangle
+     * \brief Draw a rectangle
      *
      * The rectangle is not rotated in any way, but simply a box with horizontal and vertical sides.
      * If aFilled is set, the entire rectangle is filled with given color.
@@ -81,7 +81,7 @@ class Canvas
     void DrawRectangle(const Rect &arRect, const Color &arColor, bool aFilled = false);
 
     /**
-     * Copies the bitmap content into the canvas.
+     * \brief Copies the bitmap content into the canvas.
      *
      * \param LeftTop
      * \param aBitmap
@@ -89,7 +89,7 @@ class Canvas
     void DrawImage(const Point &arLeftTop, const Bitmap &arBitmap);
 
     /**
-     * Draws the given Text object in the given color on the canvas.
+     * \brief Draws the given Text object in the given color on the canvas.
      *
      * \param aRect
      * \param arColor
@@ -97,14 +97,14 @@ class Canvas
     void DrawText(const Text &arText, const Color &arColor);
 
     /**
-     * Draws the given Text object in the color of the objects own font.
+     * \brief Draws the given Text object in the color of the objects own font.
      *
      * \param arText
      */
     void DrawText(Text &arText);
 
     /**
-     * Get the color value of a single pixel.
+     * \brief Get the color value of a single pixel.
      *
      * It defaults to read the pixel value from the backbuffer.
      *
@@ -114,7 +114,7 @@ class Canvas
     virtual uint32_t GetPixel(const Point &, const bool) const = 0;
 
     /**
-     * Set the color value of a single pixel.
+     * \brief Set the color value of a single pixel.
      *
      * This always writes to the back buffer.
      *
@@ -124,7 +124,7 @@ class Canvas
     virtual inline void SetPixel(const Point &, const Color) = 0;
 
     /**
-     * Get the width of the canvas.
+     * \brief Get the width of the canvas.
      *
      * \return uint32_t
      */
@@ -135,7 +135,7 @@ class Canvas
     }
 
     /**
-     * Get the height of the canvas.
+     * \brief Get the height of the canvas.
      *
      * \return uint32_t
      */
@@ -146,7 +146,7 @@ class Canvas
     }
 
     /**
-     * Get the color depth of the canvas.
+     * \brief Get the color depth of the canvas.
      *
      * \return uint32_t
      */
@@ -157,7 +157,7 @@ class Canvas
     }
 
     /**
-     * Checks if coordinates is inside screens boundary
+     * \brief Checks if coordinates is inside screens boundary
      *
      * \param aPoint
      * \return bool

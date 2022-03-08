@@ -32,7 +32,16 @@ class InputCreator
     InputCreator();
     ~InputCreator();
 
+    /**
+     * \brief Checks if touch driver has new inputs
+     * \return True if there are unread inputs
+     */
     bool HasNewInputs();
+
+    /**
+     * \brief Gets an input from touch driver
+     * \return Reference to the input object
+     */
     const Input &GetInput();
 };
 

@@ -21,24 +21,42 @@ class ImgLoader
 {
   public:
     virtual ~ImgLoader() = default;
+
+    /**
+     * \brief Abstract methos for loading an image into memory as a bitmap
+     * \param aImgName The relative path to the image
+     */
     virtual std::vector<uint32_t> LoadImg(const std::string &aImgName) = 0;
 
+    /**
+     * \brief Get the bitmap of the loaded image
+     * \return A reference to the vector holding the pixel values
+     */
     const std::vector<uint32_t> &GetPixels() const
     {
         return mImagePixels;
     }
 
+    /**
+     * \brief Get the height of the bitmap
+     * \return Value of the height
+     */
     int GetHeight() const
     {
         return mHeight;
     }
+
+    /**
+     * \brief Get the width of the bitmap
+     * \return Value of the width
+     */
     int GetWidth() const
     {
         return mWidth;
     }
 
   protected:
-    std::vector<uint32_t> mImagePixels{ };
+    std::vector<uint32_t> mImagePixels{};
     int mHeight = 0;
     int mWidth = 0;
 };

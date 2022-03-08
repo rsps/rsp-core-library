@@ -34,14 +34,14 @@ class Bitmap : public Canvas
   public:
     static std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> filetypeMap;
     /**
-     * Load bitmap from given file.
+     * \brief Load bitmap from given file.
      *
      * \param aImgName
      */
     Bitmap(std::string aImgName);
 
     /**
-     * Create a bitmap of given pixel data
+     * \brief Create a bitmap of given pixel data
      *
      * \param apPixels
      * \param aHeight
@@ -51,7 +51,7 @@ class Bitmap : public Canvas
     Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerPixel);
 
     /**
-     * Create an empty in memory bitmap
+     * \brief Create an empty in memory bitmap
      *
      * \param aHeight
      * \param aWidth
@@ -71,7 +71,7 @@ class Bitmap : public Canvas
     uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
 
     /**
-     * Get the height of the bitmap.
+     * \brief Get the height of the bitmap.
      *
      * \return uint32_t
      */
@@ -81,7 +81,7 @@ class Bitmap : public Canvas
     }
 
     /**
-     * Get the width of the bitmap.
+     * \brief Get the width of the bitmap.
      *
      * \return uint32_t
      */
@@ -91,7 +91,7 @@ class Bitmap : public Canvas
     }
 
     /**
-     * Get a read only reference to the pixel data.
+     * \brief Get a read only reference to the pixel data.
      *
      * \return const std::vector<uint32_t>&
      */
@@ -102,7 +102,7 @@ class Bitmap : public Canvas
 
   protected:
     std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
-    std::vector<uint32_t> mImagePixels{ }; // Pointer?
+    std::vector<uint32_t> mImagePixels{}; // Pointer?
 };
 
 } // namespace rsp::graphics

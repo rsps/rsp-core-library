@@ -22,13 +22,17 @@ namespace rsp::graphics
 class BmpLoader : public ImgLoader
 {
   public:
+    /**
+     * \brief Loads an image into memory as a bitmap
+     * \param aImgName The relative path to the image
+     */
     std::vector<uint32_t> LoadImg(const std::string &aImgName);
 
   protected:
     struct BitmapInfoHeader {
         uint32_t size;
-        int32_t  width;
-        int32_t  heigth;
+        int32_t width;
+        int32_t heigth;
         uint16_t planes;
         uint16_t bitsPerPixel;
         uint32_t compression;
@@ -37,7 +41,7 @@ class BmpLoader : public ImgLoader
         uint32_t yPixelsPerM;
         uint32_t coloursUsed;
         uint32_t importantColours;
-    } __attribute__((packed)); //To stop alignment
+    } __attribute__((packed)); // To stop alignment
 
     struct ColorCoordinate_t {
         uint32_t X;
@@ -47,8 +51,8 @@ class BmpLoader : public ImgLoader
 
     struct BitmapV4Header {
         uint32_t size;
-        int32_t  width;
-        int32_t  heigth;
+        int32_t width;
+        int32_t heigth;
         uint16_t planes;
         uint16_t bitsPerPixel;
         uint32_t compression;
@@ -68,12 +72,12 @@ class BmpLoader : public ImgLoader
         uint32_t GammaRed;
         uint32_t GammaGreen;
         uint32_t GammaBlue;
-    } __attribute__((packed)); //To stop alignment
+    } __attribute__((packed)); // To stop alignment
 
     struct BitmapV5Header {
         uint32_t size;
-        int32_t  width;
-        int32_t  heigth;
+        int32_t width;
+        int32_t heigth;
         uint16_t planes;
         uint16_t bitsPerPixel;
         uint32_t compression;
@@ -86,7 +90,7 @@ class BmpLoader : public ImgLoader
         uint32_t GreenMask;
         uint32_t BlueMask;
         uint32_t AlphaMask;
-        char     CSType[4];
+        char CSType[4];
         ColorCoordinate_t Red;
         ColorCoordinate_t Green;
         ColorCoordinate_t Blue;
@@ -97,7 +101,7 @@ class BmpLoader : public ImgLoader
         uint32_t ProfileData;
         uint32_t ProfileSize;
         uint32_t Reserved;
-    } __attribute__((packed)); //To stop alignment
+    } __attribute__((packed)); // To stop alignment
 
     struct BmpHeader_t {
         uint16_t signature;
@@ -111,7 +115,7 @@ class BmpLoader : public ImgLoader
         };
     } __attribute__((packed)) mBmpHeader{};
 
-    friend std::ostream& operator <<(std::ostream &os, const BmpLoader::BmpHeader_t &arHeader);
+    friend std::ostream &operator<<(std::ostream &os, const BmpLoader::BmpHeader_t &arHeader);
 
     uint16_t mBytesPerPixel = 0;
 
@@ -120,7 +124,7 @@ class BmpLoader : public ImgLoader
     uint32_t ReadPixel(const std::vector<uint8_t> &aPixelRow, const size_t &aRowPtr);
 };
 
-std::ostream& operator <<(std::ostream &os, const BmpLoader::BmpHeader_t &arHeader);
+std::ostream &operator<<(std::ostream &os, const BmpLoader::BmpHeader_t &arHeader);
 
 } // namespace rsp::graphics
 #endif // BMPLOADER_H
