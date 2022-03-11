@@ -38,6 +38,7 @@ class SceneLoader
      */
     Scene &GetScene(std::string aSceneName);
 
+  protected:
     FirstScene first;
     SecondScene second;
 

@@ -24,7 +24,7 @@ class FirstScene : public Scene
         : Scene(aRect, arBroker)
     {
         // myName = "First Scene";
-        //  Set member variables values
+        // Set member variables values
         Rect topRect(Point(100, 400), 200, 100);
         topBtn = TouchArea(topRect, rsp::messaging::ClickTopic::SceneChange, "second");
         topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
@@ -37,9 +37,9 @@ class FirstScene : public Scene
         topBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &topBtnImg, std::placeholders::_1));
         botBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &botBtnImg, std::placeholders::_1));
 
-        //  Bind onClicked or set clicked variables || Should be set from Constructor
+        // Bind onClicked or set clicked variables || Should be set from Constructor
 
-        //  Add them to the lists?
+        // Add them to the lists?
         mTouchables.push_back(&topBtn);
         mTouchables.push_back(&botBtn);
         mChildren.push_back(&topBtnImg);
