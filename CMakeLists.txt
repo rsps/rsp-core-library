@@ -60,7 +60,7 @@ set (GCC_VALIDATION_FLAGS -pedantic -Wall -Wextra -Wold-style-cast
     -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual
     -Wredundant-decls -Wsign-conversion -Wsign-promo
     -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
-    -Wundef -Wno-unused -Weffc++ -Werror
+    -Wundef -Wno-unused -Weffc++ -Werror -Wformat=2
     CACHE INTERNAL "Flags to let GCC validate code against common weaknesses"
 )
 

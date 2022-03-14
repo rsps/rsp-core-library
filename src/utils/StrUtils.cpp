@@ -15,6 +15,7 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <cstdarg>
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -127,7 +128,7 @@ bool Contains(const std::string &aText, const std::string &aMatch)
 std::vector<std::string> FindMatches(std::string aText, std::vector<std::string> &arList)
 {
     std::vector<std::string> found;
-    for (auto s : arList) {
+    for (std::string &s : arList) {
         if(aText == s.substr(0, aText.length())) {
             found.push_back(s);
         }
@@ -140,7 +141,7 @@ std::string ReduceToCommon(std::vector<std::string> &arList)
 {
     std::string match;
 
-    for (auto &s : arList) {
+    for (std::string &s : arList) {
         if (match.empty()) {
             match = s;
         }
@@ -226,6 +227,28 @@ std::string TimeStamp(std::chrono:: milliseconds aMilliSeconds, TimeFormats aFor
     return TimeStamp(dur, aFormat);
 }
 
+//__attribute__((__format__(__printf__, 1, 0)))
+std::string Format(const char* apFormat, ...)
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+    // Pass on the varargs on to 'vfprintf'.
+    va_list arglist;
+
+    va_start(arglist, apFormat);
+    std::size_t size = static_cast<std::size_t>(vsnprintf(nullptr, 0, apFormat, arglist)) + 1; // Extra space for '\0'
+    if (size > 255) {
+        errno = ENOMEM;
+        THROW_SYSTEM("StrUtils::format buffer to small");
+    }
+    char buffer[256];
+    va_start(arglist, apFormat); // Reset arglist ptr.
+    vsnprintf(buffer, 255, apFormat, arglist);
+
+    va_end(arglist);
+#pragma GCC diagnostic pop
+    return std::string(buffer, size - 1); // We don't want the '\0' inside
+}
 
 
 } /* namespace StrUtils */
