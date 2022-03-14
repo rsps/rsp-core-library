@@ -34,7 +34,9 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
 
     //Read header and verify that it is a png file
     uint8_t signature[8];
-    fread(signature, sizeof(uint8_t), sizeof(signature), file);
+    if (fread(signature, sizeof(signature), 1 , file) != 1) {
+        THROW_SYSTEM("Could not read signature.");
+    }
     if (!CheckSignature(signature, 8)) {
         throw CoreException("Signature not matching"); //return;  //Some error, probably just throw exception
     }
@@ -49,7 +51,9 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
     //Temp loop for testing
     for (size_t i = 0; i < 3; i++) {
         //Read length and type
-        fread(&pngchunk, sizeof(uint8_t), sizeof(pngchunk.length) + sizeof(pngchunk.type), file);
+        if (fread(&pngchunk, sizeof(pngchunk.length) + sizeof(pngchunk.type), 1, file) != 1) {
+            THROW_SYSTEM("Could not read PNG chunk header.");
+        }
         //Flip length
         pngchunk.length = be32toh(pngchunk.length);
 
@@ -69,7 +73,9 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
 
                 //Use length to read the chunks data field
                 //Read chunk and crc into data buffer
-                fread(pngchunk.data, sizeof(uint8_t), pngchunk.length + sizeof(uint32_t), file); // read whole chunk
+                if (fread(pngchunk.data, pngchunk.length + sizeof(uint32_t), 1, file) != 1) { // read whole chunk
+                    THROW_SYSTEM("Could not read PNG chunk data.");
+                }
 
                 //Flip time
                 //Only flip things that are larger than a byte
@@ -104,7 +110,9 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
                 pngchunk.data = new uint8_t[pngchunk.length + sizeof(uint32_t)];
 
                 //Use length to read the chunks data field
-                fread(pngchunk.data, sizeof(uint8_t), pngchunk.length + sizeof(uint32_t), file);
+                if (fread(pngchunk.data, pngchunk.length + sizeof(uint32_t), 1, file) != 1) {
+                    THROW_SYSTEM("Could not read PNG IDAT chunk.");
+                }
 
                 //Decode
 

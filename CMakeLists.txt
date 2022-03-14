@@ -17,6 +17,10 @@ configure_file (
     "${PROJECT_BINARY_DIR}/src/version-def.h"
 )
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()
+
 set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
@@ -63,7 +67,18 @@ set (GCC_VALIDATION_FLAGS -pedantic -Wall -Wextra -Wold-style-cast
 target_compile_options(rsp-core-lib PRIVATE
     ${GCC_VALIDATION_FLAGS} 
     -Wshadow
-    -DDEBUG_LOG -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS -rdynamic)
+    -DDEBUG_LOG -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS -rdynamic
+    )
+
+if (${CMAKE_BUILD_TYPE} EQUAL Debug)
+    target_compile_options(rsp-core-lib PRIVATE
+        -O0 -g3
+    )
+else()
+    target_compile_options(rsp-core-lib PRIVATE
+        -D_FORTIFY_SOURCE=2 -O3
+    )
+endif()
 
 add_subdirectory(src)
 
@@ -98,7 +113,8 @@ target_include_directories("rsp-core-lib-test"
 # Disable shadow warning to silence doctest...
 target_compile_options(rsp-core-lib-test PRIVATE
     ${GCC_VALIDATION_FLAGS} 
-    -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS -rdynamic)
+    -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS -rdynamic
+    )
 
 
 target_link_libraries ("rsp-core-lib-test"
