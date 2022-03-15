@@ -112,7 +112,7 @@ void JsonArray::Clear()
 
 void JsonArray::toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2)
 {
-    std::string in(arPf.indent * (aLevel + 1), ' ');
+    std::string in(static_cast<std::string::size_type>(arPf.indent) * (aLevel + 1), ' ');
     std::string c = ",";
 
     arResult << "[" << arPf.nl;
@@ -126,7 +126,7 @@ void JsonArray::toStringStream(std::stringstream &arResult, PrintFormat &arPf, u
        }
        arResult << c << arPf.nl;
     }
-    std::string in1(arPf.indent * aLevel, ' ');
+    std::string in1(static_cast<std::string::size_type>(arPf.indent) * aLevel, ' ');
     arResult << in1 << "]";
 }
 

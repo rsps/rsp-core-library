@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <time.h>
 #include <utils/ClockCast.h>
 #include <utils/StrUtils.h>
 
@@ -192,24 +193,25 @@ std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats a
     auto t = std::chrono::system_clock::to_time_t(aTime);
 
     std::stringstream ss;
+    std::tm tbuf;
 
 //    2006-01-02T15:04:05.999999Z07:00
 
     switch (aFormat) {
         case TimeFormats::Logging:
-            ss << std::put_time(std::gmtime(&t), "%F %T.") << std::setfill('0') << std::setw(3) << msecs.count();
+            ss << std::put_time(gmtime_r(&t, &tbuf), "%F %T.") << std::setfill('0') << std::setw(3) << msecs.count();
             break;
 
         case TimeFormats::RFC3339:
-            ss << std::put_time(std::gmtime(&t), "%FT%T");
+            ss << std::put_time(gmtime_r(&t, &tbuf), "%FT%T");
             break;
 
         case TimeFormats::RFC3339Milli:
-            ss << std::put_time(std::gmtime(&t), "%FT%T.") << std::setfill('0') << std::setw(3) << msecs.count() << "Z";
+            ss << std::put_time(gmtime_r(&t, &tbuf), "%FT%T.") << std::setfill('0') << std::setw(3) << msecs.count() << "Z";
             break;
 
         default:
-            ss << std::put_time(std::gmtime(&t), "%F %T");
+            ss << std::put_time(gmtime_r(&t, &tbuf), "%F %T");
             break;
     }
 

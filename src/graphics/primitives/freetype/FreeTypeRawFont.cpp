@@ -55,7 +55,7 @@ Glyph::Glyph(void* apFace)
     mTop = arFace->glyph->bitmap_top;
     mLeft = arFace->glyph->bitmap_left;
 
-    mPixels.resize(unsign(mWidth) * unsign(mHeight), 0xFF);
+    mPixels.resize(static_cast<std::vector<uint8_t>::size_type>(unsign(mWidth)) * unsign(mHeight), 0xFF);
     memcpy(mPixels.data(), arFace->glyph->bitmap.buffer, mPixels.size());
 }
 

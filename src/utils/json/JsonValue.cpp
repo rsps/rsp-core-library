@@ -100,7 +100,7 @@ JsonObject& JsonValue::AsObject() const
 
 void JsonValue::toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2)
 {
-    std::string in(arPf.indent * aLevel, ' ');
+    std::string in(static_cast<std::string::size_type>(arPf.indent) * aLevel, ' ');
 
     if (mType == Types::String) {
         std::string s = AsString();
