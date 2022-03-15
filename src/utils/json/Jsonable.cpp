@@ -9,50 +9,11 @@
  */
 
 #include <utils/json/Jsonable.h>
-#include <iostream>
 #include <utils/CoreException.h>
 
-namespace rsp::utils {
+namespace rsp::utils::json {
 
-Jsonable::JsonStream::JsonStream(bool aPrettyPrint, int aLevel)
-    : mRootLevel(-1)
-{
-    if (aPrettyPrint) {
-        mRootLevel = aLevel;
-        mNewLine = "\n";
-        mCommaNewLine = ",\n";
-        mSpace = " ";
-    }
-    else {
-        mCommaNewLine = ",";
-    }
-}
-
-std::ostream& operator<< (std::ostream& os, const JsonableStreamAttributes aAttrib) {
-
-    Jsonable::JsonStream* js = static_cast<Jsonable::JsonStream*>(&os);
-
-    switch (aAttrib) {
-        case JsonableStreamAttributes::cnl:
-            os << js->mCommaNewLine;
-            break;
-        case JsonableStreamAttributes::nl:
-            os << js->mNewLine;
-            break;
-        case JsonableStreamAttributes::sp:
-            os << js->mSpace;
-            break;
-
-        default:
-            if (js->mRootLevel >= 0) {
-                os << std::string( (static_cast<unsigned int>(js->mRootLevel) + static_cast<unsigned int>(aAttrib)) * 4, ' ');
-            }
-            break;
-    }
-    return os;
-}
-
-void Jsonable::FromJson(const std::string &)
+void Jsonable::FromJson(const JsonValue &arJson)
 {
     THROW_WITH_BACKTRACE1(NotImplementedException, "Override the FromJson method to populate an object from a JSON string.");
 }

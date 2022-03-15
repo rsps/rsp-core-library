@@ -11,14 +11,9 @@
 #ifndef INCLUDE_UTILS_JSON_JSONABLE_H_
 #define INCLUDE_UTILS_JSON_JSONABLE_H_
 
-#include <string>
-#include <sstream>
+#include "JsonValue.h"
 
-namespace rsp::utils {
-
-enum class JsonableStreamAttributes { in0, in1, in2, in3, in4, in5, in6, in7, in8, in9, cnl, nl, sp };
-
-std::ostream& operator<< (std::ostream& os, const JsonableStreamAttributes aAttrib);
+namespace rsp::utils::json {
 
 /**
  * \class Jsonable
@@ -30,43 +25,16 @@ public:
     virtual ~Jsonable() {}
 
     /**
-     * \fn abstract, std::string ToJson(bool aPrettyPrint = true, int aLevel = 0) const
-     * \brief Interface to get object content as a JSON formatted string
-     * \param aPrettyPrint Set for human readable format
-     * \param aLevel Starting indentation level, only relevant if aPrettyPrint is set.
+     * \brief Interface to get object content as a JSON item.
      * \return JSON formatted string
      */
-    virtual std::string ToJson(bool aPrettyPrint = true, int aLevel = 0) const = 0;
+    virtual JsonValue* ToJson() const = 0;
 
     /**
-     * \fn void FromJson(const std::string &arJson)
-     * \brief Interface to populate object content with content from JSON formatted string
-     * \param arJson JSON formatted string
+     * \brief Interface to populate object content with content from a JSON item
+     * \param arJson Reference to JsonValue object
      */
-    virtual void FromJson(const std::string &arJson);
-
-    /**
-     * \class JsonStream
-     * \brief Stringstream derivative to help with json formatting streams in human readable format
-     */
-    class JsonStream : public std::stringstream {
-    public:
-        /**
-         * \fn JsonStream(bool aPrettyPrint, int aLevel)
-         * \brief Contructs a stream object
-         *
-         * \param aPrettyPrint Set to format output in human readable format
-         * \param aLevel Starting indentation level.
-         */
-        JsonStream(bool aPrettyPrint, int aLevel);
-
-    protected:
-        friend std::ostream& operator<< (std::ostream& os, const JsonableStreamAttributes aAttrib);
-        int mRootLevel;
-        std::string mCommaNewLine{};
-        std::string mNewLine{};
-        std::string mSpace{};
-    };
+    virtual void FromJson(const JsonValue &arJson);
 };
 
 
