@@ -11,6 +11,7 @@
 #include <string>
 #include <doctest.h>
 #include <utils/StructElement.h>
+#include <linux/input.h>
 
 using namespace rsp::utils;
 

@@ -65,10 +65,6 @@ public:
 #define THROW_WITH_BACKTRACE2(EXCEPTION, ARG1, ARG2) throw rsp::utils::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2)
 #define THROW_WITH_BACKTRACE3(EXCEPTION, ARG1, ARG2, ARG3) throw rsp::utils::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2, ARG3)
 
-// The CATCH macro does not work in all cases.
-//#define CATCH_WITH_BACKTRACE(EXCEPTION, EXCEPT_NAME) catch(const rsp::backtraced_exception< EXCEPTION >& EXCEPT_NAME)
-
-//#define RETHROW_WITH_BACKTRACE(EXCEPT_NAME) throw rsp::backtraced_exception< std::decay< decltype(EXCEPT_NAME) >::type >(EXCEPT_NAME, __FILE__, __LINE__)
 #define RETHROW_WITH_BACKTRACE(aMsg, aOriginalException) THROW_WITH_BACKTRACE1(std::decay< decltype(aOriginalException) >::type, (std::string(aMsg) + " <- " + aOriginalException.what()).c_str())
 
 

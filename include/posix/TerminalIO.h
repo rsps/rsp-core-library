@@ -131,6 +131,7 @@ protected:
     struct termios mCurrentTermios{};
 
     EscapeCodes escString2Code(const char *apEscStr);
+    void handleTabulator(int &tab_count, std::string &line, unsigned int &cursor);
 #endif
 };
 

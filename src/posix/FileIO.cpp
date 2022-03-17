@@ -22,8 +22,6 @@
 namespace rsp::posix
 {
 
-//const std::ios_base::openmode FileIO::cNonBlock = (std::ios_base::openmode)((int)std::_Ios_Openmode::_S_ios_openmode_end + 1);
-
 FileIO::FileIO()
     : mHandle(-1)
 {
@@ -64,9 +62,9 @@ void FileIO::Open(const std::string &arFileName, std::ios_base::openmode aMode, 
     if (aMode & std::ios_base::trunc) {
         flags |= O_TRUNC;
     }
-//    if (aMode & cNonBlock) {
-//        flags |= O_NONBLOCK;
-//    }
+    if (aMode & cNonBlock) {
+        flags |= O_NONBLOCK;
+    }
 
     mFileName = arFileName;
 

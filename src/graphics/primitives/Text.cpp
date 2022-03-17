@@ -61,7 +61,6 @@ void Text::scaleToFit()
 
         mGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
         auto r = CalcBoundingRect(mGlyphs);
-//        DLOG("scaleToFit Bounding Rect: " << r);
 
         done = 0;
         if ((r.GetWidth() < w_limit) || (r.GetWidth() > mArea.GetWidth())) {
@@ -89,7 +88,7 @@ Rect Text::CalcBoundingRect(const std::vector<Glyph> &arGlyphs)
     int h = 0;
     int line_count = 1;
     int line_width = 0;
-    for (auto glyph : arGlyphs) {
+    for (const Glyph &glyph : arGlyphs) {
         switch (glyph.mSymbolUnicode) {
             case '\n':
                 line_count++;
@@ -110,7 +109,6 @@ Rect Text::CalcBoundingRect(const std::vector<Glyph> &arGlyphs)
         line_width = w;
     }
 
-//    DLOG("Line Width: " << line_width << " Line Height: " << h  << " Line Count: " << line_count);
     return Rect(0, 0, line_width, (h * line_count) + ((line_count - 1) * mLineSpacing));
 
 }
@@ -160,7 +158,7 @@ void Text::alignGlyphs()
             hoffset = (mArea.GetWidth()- r.GetWidth());
             break;
     }
-    for (auto &glyph : mGlyphs) {
+    for (Glyph &glyph : mGlyphs) {
         glyph.mTop += voffset;
         glyph.mLeft += hoffset;
     }
