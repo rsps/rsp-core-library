@@ -21,11 +21,17 @@ namespace rsp::graphics
  *
  */
 struct InputLine {
-    struct timeval time;
+    uint32_t stime; /*!< Seconds since Epoch */
+    int32_t mtime;  /*!< Signed count of microseconds */
     uint16_t type;
     uint16_t code;
     int32_t value;
 } __attribute__((packed));
+
+/**
+ * \brief Streaming operator to stream InputLine
+ */
+std::ostream &operator<<(std::ostream &os, const InputLine &arInputLine);
 
 /**
  * \brief Enum type specifying the different types of input

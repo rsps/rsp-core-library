@@ -19,7 +19,7 @@
 using namespace rsp::graphics;
 using namespace rsp::messaging;
 
-TEST_CASE("Graphics Main Test")
+/*TEST_CASE("Graphics Main Test")
 {
     MESSAGE("Start");
 
@@ -54,4 +54,4 @@ TEST_CASE("Graphics Main Test")
 
     // Run?
     // gMain.Run();
-}
+}*/

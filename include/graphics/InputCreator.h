@@ -29,7 +29,7 @@ class InputCreator
     void readBody();
 
   public:
-    InputCreator();
+    InputCreator(std::string aPath = "/dev/input/event1");
     ~InputCreator();
 
     /**

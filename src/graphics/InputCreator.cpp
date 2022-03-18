@@ -13,10 +13,19 @@
 
 namespace rsp::graphics
 {
-
-InputCreator::InputCreator()
+std::ostream &operator<<(std::ostream &os, const InputLine &arInputLine)
 {
-    touchDriver.Open("/dev/input/event1", std::ifstream::binary);
+    os << " Input Seconds: " << arInputLine.stime << "\n"
+       << " Input Microsec: " << arInputLine.mtime << "\n"
+       << " Input Type: " << arInputLine.type << "\n"
+       << " Input Code: " << arInputLine.code << "\n"
+       << " Input Value: " << arInputLine.value;
+    return os;
+}
+
+InputCreator::InputCreator(std::string aPath)
+{
+    touchDriver.Open(aPath, std::ifstream::binary);
 }
 
 InputCreator::~InputCreator()
@@ -26,7 +35,8 @@ InputCreator::~InputCreator()
 
 bool InputCreator::HasNewInputs()
 {
-    return touchDriver.WaitForDataReady(50);
+    // return touchDriver.WaitForDataReady(50);
+    return !touchDriver.IsEOF();
 }
 
 const Input &InputCreator::GetInput()
@@ -37,7 +47,18 @@ const Input &InputCreator::GetInput()
 
 void InputCreator::readType()
 {
-    touchDriver.Read(reinterpret_cast<char *>(&inputLine), sizeof(inputLine));
+    // Temp
+    std::cout << "Reading type" << std::endl;
+    std::cout << std::dec << "Size of inputLine " << sizeof(InputLine) << std::endl;
+
+    touchDriver.Read(reinterpret_cast<char *>(&inputLine), sizeof(InputLine));
+
+    // Temp
+    /*for (uint i = 0; i < sizeof(InputLine); i++) {
+        std::cout << std::hex << static_cast<int>(reinterpret_cast<uint8_t *>(&inputLine)[i]) << std::endl;
+    }*/
+    std::cout << std::hex << inputLine << std::endl;
+
     if (inputLine.type == EV_ABS && inputLine.code == ABS_MT_TRACKING_ID && inputLine.value == -1) {
         input.type = InputType::Lift;
     } else if (inputLine.type == EV_ABS && inputLine.code == ABS_MT_TRACKING_ID) {
@@ -51,6 +72,7 @@ void InputCreator::readType()
 
 void InputCreator::readBody()
 {
+    std::cout << "Reading body" << std::endl;
     while (inputLine.type != 0) {
         if (inputLine.type == EV_ABS && inputLine.code == ABS_X) {
             input.x = inputLine.value;

@@ -29,6 +29,8 @@ file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/Green.bmp
     DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
 file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/Red.bmp 
     DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
+file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/testImages/touchTest.bin 
+    DESTINATION ${CMAKE_BINARY_DIR}/testImages/)
 
 file(COPY ${CMAKE_SOURCE_DIR}/tests/unit/graphics/fonts 
     DESTINATION ${CMAKE_BINARY_DIR}/)
