@@ -47,17 +47,13 @@ const Input &InputCreator::GetInput()
 
 void InputCreator::readType()
 {
-    // Temp
-    std::cout << "Reading type" << std::endl;
-    std::cout << std::dec << "Size of inputLine " << sizeof(InputLine) << std::endl;
-
     touchDriver.Read(reinterpret_cast<char *>(&inputLine), sizeof(InputLine));
+    if (inputLine.code == 0x2f) {
+        touchDriver.Read(reinterpret_cast<char *>(&inputLine), sizeof(InputLine));
+    }
 
-    // Temp
-    /*for (uint i = 0; i < sizeof(InputLine); i++) {
-        std::cout << std::hex << static_cast<int>(reinterpret_cast<uint8_t *>(&inputLine)[i]) << std::endl;
-    }*/
     std::cout << std::hex << inputLine << std::endl;
+    std::cout << std::endl;
 
     if (inputLine.type == EV_ABS && inputLine.code == ABS_MT_TRACKING_ID && inputLine.value == -1) {
         input.type = InputType::Lift;
@@ -72,7 +68,6 @@ void InputCreator::readType()
 
 void InputCreator::readBody()
 {
-    std::cout << "Reading body" << std::endl;
     while (inputLine.type != 0) {
         if (inputLine.type == EV_ABS && inputLine.code == ABS_X) {
             input.x = inputLine.value;

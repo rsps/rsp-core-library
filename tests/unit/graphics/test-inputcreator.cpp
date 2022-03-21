@@ -10,6 +10,7 @@
 
 #include "graphics/InputCreator.h"
 #include <doctest.h>
+#include <vector>
 
 using namespace rsp::graphics;
 void PrintInput(Input aInput);
@@ -31,12 +32,43 @@ void PrintInput(Input aInput)
 
 TEST_CASE("InputCreator Test")
 {
+    // Arrange
+    std::vector<InputType> inputs = {
+        InputType::Press,
+        InputType::Lift,
+        InputType::Press,
+        InputType::Press,
+        InputType::Lift,
+        InputType::Lift,
+        InputType::Press,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Drag,
+        InputType::Lift};
+    uint counter = 0;
     InputCreator inputCreator("testImages/touchTest.bin");
 
-    PrintInput(inputCreator.GetInput());
-
+    // Act
     while (inputCreator.HasNewInputs()) {
-        std::cout << "Has new input" << std::endl;
-        PrintInput(inputCreator.GetInput());
+        // Assert
+        CHECK(inputCreator.GetInput().type == inputs[counter]);
+        counter++;
     }
 }
