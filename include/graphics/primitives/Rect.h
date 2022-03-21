@@ -177,9 +177,11 @@ class Rect
      */
     bool IsHit(const Point &aPoint) const;
     /**
-     * \brief Verifies the dimensions of the rectangle by asserting if height and width are below zero
+     * \brief Verifies the dimensions of the rectangle by checking if height and width are above zero
+     *
+     * \return True of height and width are above zero
      */
-    void VerifyDimensions() const;
+    bool VerifyDimensions() const;
 
   protected:
     // Allow friends to access members for speed optimizations.
