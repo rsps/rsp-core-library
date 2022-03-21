@@ -127,12 +127,10 @@ bool Rect::IsHit(const Point &arPoint) const
     return !(arPoint.mX < mLeftTop.mX || arPoint.mY < mLeftTop.mY || arPoint.mY >= mRightBottom.mY || arPoint.mX >= mRightBottom.mX);
 }
 
-bool Rect::VerifyDimensions() const
+void Rect::VerifyDimensions() const
 {
     ASSERT(GetWidth() >= 0);
     ASSERT(GetHeight() >= 0);
-
-    return false;
 }
 
 }
