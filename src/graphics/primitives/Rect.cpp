@@ -51,8 +51,10 @@ Rect::Rect(const Rect &arRect)
 
 Rect& Rect::operator=(const Rect &arRect)
 {
-    mLeftTop = arRect.mLeftTop;
-    mRightBottom = arRect.mRightBottom;
+    if (&arRect != this) {
+        mLeftTop = arRect.mLeftTop;
+        mRightBottom = arRect.mRightBottom;
+    }
     return *this;
 }
 
@@ -134,12 +136,10 @@ bool Rect::IsHit(const Point &aPoint) const
     return false;
 }
 
-bool Rect::VerifyDimensions() const
+void Rect::VerifyDimensions() const
 {
     ASSERT(GetWidth() < 0);
     ASSERT(GetHeight() < 0);
-
-    return false;
 }
 
 } // namespace rsp::graphics
