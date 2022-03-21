@@ -31,8 +31,7 @@ class Event
     T &GetAs()
     {
         if (typeid(T).hash_code() != typeHash) {
-            std::cout << "- Is Not Same Type" << std::endl;
-            // throw std::bad_alloc();
+            throw std::bad_alloc();
         }
         return *reinterpret_cast<T *>(this);
     }

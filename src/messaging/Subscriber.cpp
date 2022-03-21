@@ -11,8 +11,4 @@
 
 namespace rsp::messaging
 {
-/*void Subscriber::HandleEvent(Event &newEvent)
-{
-    std::cout << "Base Sub got callback" << std::endl;
-}*/
 } // namespace rsp::messaging

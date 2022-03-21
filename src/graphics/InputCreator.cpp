@@ -35,7 +35,6 @@ InputCreator::~InputCreator()
 
 bool InputCreator::HasNewInputs()
 {
-    // return touchDriver.WaitForDataReady(50);
     return !touchDriver.IsEOF();
 }
 
@@ -51,9 +50,6 @@ void InputCreator::readType()
     if (inputLine.code == 0x2f) {
         touchDriver.Read(reinterpret_cast<char *>(&inputLine), sizeof(InputLine));
     }
-
-    std::cout << std::hex << inputLine << std::endl;
-    std::cout << std::endl;
 
     if (inputLine.type == EV_ABS && inputLine.code == ABS_MT_TRACKING_ID && inputLine.value == -1) {
         input.type = InputType::Lift;

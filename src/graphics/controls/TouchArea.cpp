@@ -26,25 +26,21 @@ TouchArea::~TouchArea()
 
 void TouchArea::ProcessInput(Input &arInput)
 {
-    std::cout << "TouchArea Processing Input" << std::endl;
     switch (arInput.type) {
     case InputType::Press:
         mCurrentPress = Point(arInput.x, arInput.y);
         mOriginalPress = Point(arInput.x, arInput.y);
         if (IsHit(mCurrentPress)) {
-            std::cout << "TouchArea Setting pressed state" << std::endl;
             if (mPressed) {
                 mPressed(Control::States::pressed);
             }
         }
         break;
     case InputType::Lift:
-        std::cout << "TouchArea Setting normal state" << std::endl;
         if (mPressed) {
             mPressed(Control::States::normal);
         }
         if (IsHit(mCurrentPress) && IsHit(mOriginalPress)) {
-            std::cout << "Calling Clicked Callback" << std::endl;
             if (mClicked) {
                 mClicked(mClickedTopic, mclickEvent);
             }

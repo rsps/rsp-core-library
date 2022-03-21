@@ -148,7 +148,6 @@ void Framebuffer::clear(Color aColor)
 {
     long x, y;
     // draw to back buffer
-    //     std::cout << "Clearing buffer" << std::endl;
     for (y = 0; y < mVariableInfo.yres; y++) {
         for (x = 0; x < mVariableInfo.xres; x++) {
             long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;

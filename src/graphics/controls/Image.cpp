@@ -27,17 +27,14 @@ void Image::Render(Canvas &aCanvas)
     if (!mIsInvalid) {
         return;
     }
-    std::cout << "Rendering Img" << std::endl;
     aCanvas.DrawImage(mArea.GetTopLeft(), mStateMap.at(mState));
     mIsInvalid = false;
 }
 
 void Image::HandleCallback(States aState)
 {
-    std::cout << "Image handling Pressed Callback" << std::endl;
     if (aState != mState) {
         mState = aState;
-        std::cout << "Invalidating Image object" << std::endl;
         this->Invalidate();
     }
 }

@@ -21,7 +21,6 @@ namespace rsp::graphics
 GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader)
     : mBufferedCanvas(aBufferedCanvas), mInputs(aInputs), mSceneLoader(aSceneLoader), mActiveScene(&mSceneLoader.GetFirstScene())
 {
-    std::cout << "G-Main Constructor" << std::endl;
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
 }

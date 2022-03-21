@@ -13,22 +13,6 @@
 #include <vector>
 
 using namespace rsp::graphics;
-void PrintInput(Input aInput);
-void PrintInput(Input aInput)
-{
-    if (aInput.type == InputType::Press) {
-        std::cout << std::dec << "New Press" << std::endl;
-        std::cout << "X: " << aInput.x << " Y: " << aInput.y << std::endl;
-    }
-    if (aInput.type == InputType::Drag) {
-        std::cout << "New Drag" << std::endl;
-        std::cout << "X: " << aInput.x << " Y: " << aInput.y << std::endl;
-    }
-    if (aInput.type == InputType::Lift) {
-        std::cout << "New Lift" << std::endl;
-    }
-    std::cout << std::endl;
-}
 
 TEST_CASE("InputCreator Test")
 {
