@@ -51,8 +51,10 @@ Rect::Rect(const Rect &aRect)
 
 Rect& Rect::operator=(const Rect &aRect)
 {
-    mLeftTop = aRect.mLeftTop;
-    mRightBottom = aRect.mRightBottom;
+    if (&aRect != this) {
+        mLeftTop = aRect.mLeftTop;
+        mRightBottom = aRect.mRightBottom;
+    }
     return *this;
 }
 
