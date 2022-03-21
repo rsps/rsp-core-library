@@ -89,20 +89,18 @@ Rect Text::CalcBoundingRect(const std::vector<Glyph> &arGlyphs)
     int line_count = 1;
     int line_width = 0;
     for (const Glyph &glyph : arGlyphs) {
-        switch (glyph.mSymbolUnicode) {
-            case '\n':
-                line_count++;
-                if (w > line_width) {
-                    line_width = w;
-                }
-                w = 0;
-                break;
-            default:
-                w += glyph.mWidth;
-                if (h < glyph.mHeight) {
-                    h = glyph.mHeight;
-                }
-                break;
+        if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
+            line_count++;
+            if (w > line_width) {
+                line_width = w;
+            }
+            w = 0;
+        }
+        else {
+            w += glyph.mWidth;
+            if (h < glyph.mHeight) {
+                h = glyph.mHeight;
+            }
         }
     }
     if (w > line_width) {

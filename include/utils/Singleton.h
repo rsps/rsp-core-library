@@ -12,6 +12,9 @@
 #ifndef INCLUDE_UTILS_SINGLETON_H_
 #define INCLUDE_UTILS_SINGLETON_H_
 
+#ifdef MT
+#include <mutex>
+#endif
 #include <utils/CoreException.h>
 
 namespace rsp::utils {
@@ -50,6 +53,9 @@ public:
      * \brief Generic factory method.
      */
     static void Create() {
+#ifdef MT
+        std::lock_guard<std::mutex> lock(mMutex);
+#endif
         if (mpInstance) {
             THROW_WITH_BACKTRACE(ESingletonViolation);
         }
@@ -67,6 +73,9 @@ public:
      * \param aObject
      */
     static void Set(T* apObject) {
+#ifdef MT
+        std::lock_guard<std::mutex> lock(mMutex);
+#endif
         if (mpInstance && mOwnsInstance) {
             THROW_WITH_BACKTRACE(ESingletonViolation);
         }
@@ -91,6 +100,9 @@ public:
      * \brief Call this to destroy a self owned instance. Useful during unit testing.
      */
     static void Destroy() {
+#ifdef MT
+        std::lock_guard<std::mutex> lock(mMutex);
+#endif
         if (mpInstance && mOwnsInstance) {
             delete mpInstance;
             mpInstance = nullptr;
@@ -99,6 +111,9 @@ public:
     }
 
 private:
+#ifdef MT
+    static std::mutex mMutex;
+#endif
     static T* mpInstance;
     static bool mOwnsInstance;
 };

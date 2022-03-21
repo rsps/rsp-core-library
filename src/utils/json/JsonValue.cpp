@@ -41,7 +41,9 @@ JsonValue::~JsonValue()
 JsonValue& JsonValue::operator=(const JsonValue& arOther)
 {
     JLOG("JsonValue copy assignment");
-    Variant::operator=(static_cast<const Variant&>(arOther));
+    if (&arOther != this) {
+        Variant::operator=(static_cast<const Variant&>(arOther));
+    }
     return *this;
 }
 
@@ -56,7 +58,9 @@ JsonValue* JsonValue::clone() const
 JsonValue& JsonValue::operator=(const JsonValue&& arOther)
 {
     JLOG("JsonValue move assignment");
-    Variant::operator=(static_cast<const Variant&&>(arOther));
+    if (&arOther != this) {
+        Variant::operator=(static_cast<const Variant&&>(arOther));
+    }
     return *this;
 }
 
@@ -104,7 +108,8 @@ void JsonValue::toStringStream(std::stringstream &arResult, PrintFormat &arPf, u
 
     if (mType == Types::String) {
         std::string s = AsString();
-        for (std::size_t i = 0 ; i < s.length() ; i++) {
+        std::size_t i = 0;
+        while (i < s.length()) {
             auto c = s[i];
             switch (c) {
                 case '\"':
@@ -157,6 +162,7 @@ void JsonValue::toStringStream(std::stringstream &arResult, PrintFormat &arPf, u
                     }
                     break;
             }
+            i++;
         }
         arResult << "\"" << s << "\"";
 //        DLOG("toStringSteam: " << s);
