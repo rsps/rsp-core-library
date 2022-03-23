@@ -15,7 +15,7 @@ using namespace rsp::messaging;
 namespace rsp::graphics
 {
 
-TouchArea::TouchArea(Rect &aArea, ClickTopic aClickedTopic, std::string aClickInfo)
+TouchArea::TouchArea(Rect &aArea, ClickTopics aClickedTopic, std::string aClickInfo)
     : mTouchArea(aArea), mClickedTopic(aClickedTopic), mclickEvent(aClickInfo)
 {
 }
@@ -71,7 +71,7 @@ void TouchArea::RegisterOnPressed(std::function<void(Control::States)> aFunc)
     mPressed = aFunc;
 }
 
-void TouchArea::RegisterOnClicked(std::function<void(ClickTopic, ClickedEvent &)> aFunc)
+void TouchArea::RegisterOnClicked(std::function<void(ClickTopics, ClickedEvent &)> aFunc)
 {
     mClicked = aFunc;
 }

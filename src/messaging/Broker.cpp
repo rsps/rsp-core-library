@@ -10,18 +10,18 @@
 #include <algorithm>
 #include <utility>
 
-#include "messaging/Broker.h"
-#include "messaging/Publisher.h"
-#include "messaging/Subscriber.h"
+#include <messaging/Broker.h>
+#include <messaging/Publisher.h>
+#include <messaging/Subscriber.h>
 
 namespace rsp::messaging
 {
-void BrokerBase::addSubscriber(Subscriber &arSubscriber, int aTopic)
+void BrokerBase::subscribe(SubscriberBase &arSubscriber, int aTopic)
 {
     mSubscriberMap[aTopic].push_back(&arSubscriber);
 }
 
-void BrokerBase::removeSubscriber(Subscriber &arSubscriber, int aTopic)
+void BrokerBase::unsubscribe(SubscriberBase &arSubscriber, int aTopic)
 {
     auto topic_it = mSubscriberMap.find(aTopic);
     if (topic_it == mSubscriberMap.end()) {
@@ -31,6 +31,16 @@ void BrokerBase::removeSubscriber(Subscriber &arSubscriber, int aTopic)
     auto sub_it = std::find(topic_it->second.begin(), topic_it->second.end(), &arSubscriber);
     if (sub_it != topic_it->second.end()) {
         topic_it->second.erase(sub_it);
+    }
+}
+
+void BrokerBase::removeSubscriber(SubscriberBase &arSubscriber)
+{
+    for (auto &pair : mSubscriberMap) {
+        auto sub_it = std::find(pair.second.begin(), pair.second.end(), &arSubscriber);
+        if (sub_it != pair.second.end()) {
+            pair.second.erase(sub_it);
+        }
     }
 }
 

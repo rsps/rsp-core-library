@@ -20,12 +20,12 @@ using namespace rsp::messaging;
 class TestScene : public Scene
 {
   public:
-    TestScene(Rect &aRect, rsp::messaging::BrokerBase &arBroker)
+    TestScene(Rect &aRect, rsp::messaging::Broker<rsp::messaging::ClickTopics> &arBroker)
         : Scene(aRect, arBroker)
     {
         // Set member variables values
         Rect topRect(Point(100, 400), 200, 100);
-        topArea = TouchArea(topRect, rsp::messaging::ClickTopic::NullTopic, "");
+        topArea = TouchArea(topRect, rsp::messaging::ClickTopics::NullTopic, "");
         topImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
 
         Rect botRect(Point(100, 600), 200, 100);
@@ -62,9 +62,15 @@ class TestScene : public Scene
     Image topImg{};
     Image botImg{};
 };
-class TestSub : public Subscriber
+
+class TestSub : public Subscriber<ClickTopics>
 {
   public:
+    TestSub(Broker<ClickTopics>& arBroker)
+        : Subscriber<ClickTopics>(arBroker)
+    {
+    }
+
     void HandleEvent(Event &arNewEvent) override
     {
         calledCount++;
@@ -77,7 +83,7 @@ TEST_CASE("Scene Test")
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
     Rect screenSize = Rect(0, 0, 480, 800);
-    Broker<ClickTopic> testBroker;
+    Broker<ClickTopics> testBroker;
     TestScene testScene(screenSize, testBroker);
     Input anInput;
     Point insideTopPoint(testScene.topArea.GetArea().GetLeft() + (rand() % testScene.topArea.GetArea().GetWidth()),
@@ -139,8 +145,8 @@ TEST_CASE("Scene Test")
     SUBCASE("Scene Bind click Callbacks")
     {
         // Arrange
-        TestSub sub;
-        sub.SubscribeToBroker(testBroker, ClickTopic::NullTopic);
+        TestSub sub(testBroker);
+        sub.Subscribe(ClickTopics::NullTopic);
         anInput.x = insideTopPoint.GetX();
         anInput.y = insideTopPoint.GetY();
 

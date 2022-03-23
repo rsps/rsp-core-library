@@ -19,8 +19,7 @@
 namespace rsp::messaging
 {
 
-class Subscriber;
-class Publisher;
+class SubscriberBase;
 
 class BrokerBase
 {
@@ -28,14 +27,16 @@ class BrokerBase
     virtual ~BrokerBase() {}
 
   protected:
-    std::map<int, std::vector<Subscriber *>> mSubscriberMap{};
+    std::map<int, std::vector<SubscriberBase *>> mSubscriberMap{};
 
-    friend Publisher;
-    friend Subscriber;
     void doPublish(int aTopic, Event &arNewEvent);
-    void addSubscriber(Subscriber &arSubscriber, int aTopic);
-    void removeSubscriber(Subscriber &arSubscriber, int aTopic);
+    void subscribe(SubscriberBase &arSubscriber, int aTopic);
+    void unsubscribe(SubscriberBase &arSubscriber, int aTopic);
+    void removeSubscriber(SubscriberBase &arSubscriber);
 };
+
+template <typename T>
+class Subscriber;
 
 /**
  * \class Broker<T>
@@ -51,9 +52,9 @@ class Broker : public BrokerBase
      * \param arSubscriber Reference to the subscriber that is registering
      * \param aTopic Topic to subscribe to
      */
-    void AddSubscriber(Subscriber &arSubscriber, T aTopic)
+    void Subscribe(Subscriber<T> &arSubscriber, T aTopic)
     {
-        addSubscriber(arSubscriber, static_cast<int>(aTopic));
+        subscribe(arSubscriber, static_cast<int>(aTopic));
     }
 
     /**
@@ -64,9 +65,18 @@ class Broker : public BrokerBase
      * \param arSubscriber Reference to the subscriber leaving
      * \param aTopic Topic to unsubscribe from
      */
-    void RemoveSubscriber(Subscriber &arSubscriber, T aTopic)
+    void Unsubscribe(Subscriber<T> &arSubscriber, T aTopic)
     {
-        removeSubscriber(arSubscriber, static_cast<int>(aTopic));
+        unsubscribe(arSubscriber, aTopic);
+    }
+
+    /**
+     * \brief Remove all subscriptions from the given subscriber from this broker
+     * \param arSubscriber Reference to the subscriber leaving
+     */
+    void RemoveSubscriber(Subscriber<T> &arSubscriber)
+    {
+        removeSubscriber(arSubscriber);
     }
 
     /**

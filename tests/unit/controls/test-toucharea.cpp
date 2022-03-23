@@ -201,7 +201,7 @@ TEST_CASE("Input Processing")
     SUBCASE("Clicked Callback")
     {
         // Arrange
-        std::function<void(ClickTopic, ClickedEvent &)> clickedReciever = [&](ClickTopic tp, ClickedEvent &event) noexcept {
+        std::function<void(ClickTopics, ClickedEvent &)> clickedReciever = [&](ClickTopics tp, ClickedEvent &event) noexcept {
             wasCalled = true;
             (void)tp;
             (void)event;

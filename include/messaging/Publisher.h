@@ -10,22 +10,26 @@
 #ifndef PUBLISHER_H
 #define PUBLISHER_H
 
-#include "messaging/Broker.h"
+#include "Broker.h"
 #include <iostream>
 
 namespace rsp::messaging
 {
 
+template< typename T >
 class Publisher
 {
-  public:
+public:
     /**
      * \brief Create a publisher for a given broker.
      * \param arBroker Reference to Broker to publish through.
      */
-    Publisher(BrokerBase &arBroker) : mrBroker(arBroker) {}
-    Publisher(const Publisher &) = delete;
-    Publisher &operator=(const Publisher &) = delete;
+    Publisher(Broker<T> &arBroker)
+        : mrBroker(arBroker)
+    {
+    }
+    Publisher(const Publisher&) = delete;
+    Publisher& operator=(const Publisher&) = delete;
 
     virtual ~Publisher() {}
 
@@ -33,8 +37,12 @@ class Publisher
      * \brief Register a broker with this publisher
      * \param arBroker Reference to Broker
      * \deprecated
+     *
+     * This does not work as one would expect. The reference is not set, the arBroker content
+     * is copied into original broker given in constructor.
+     * A reference in C++ is an alias for the original object, not a pointer.
      */
-    void RegisterBroker(BrokerBase &arBroker);
+//    void RegisterBroker(BrokerBase &arBroker);
 
     /**
      * \brief Publish the given enumerated topic through the registered broker.
@@ -42,21 +50,15 @@ class Publisher
      * \param aTopic Topic to publish to
      * \param arNewEvent Event to publish
      */
-    template <typename T>
     void PublishToBroker(T aTopic, Event &arNewEvent)
     {
-        mrBroker.doPublish(static_cast<int>(aTopic), arNewEvent);
+        mrBroker.Publish(aTopic, arNewEvent);
     }
 
-  protected:
-    /*
-     * TODO:
-     * By removing registerBroker and only using new constructor, the following
-     * can be changed to:
-     * BrokerBase &mrBroker;
-     */
-    BrokerBase &mrBroker;
+protected:
+    Broker<T> &mrBroker;
 };
+
 } // namespace rsp::messaging
 
 #endif // PUBLISHER_H

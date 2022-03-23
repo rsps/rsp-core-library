@@ -11,19 +11,20 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "graphics/controls/Control.h"
-#include "graphics/controls/Input.h"
-#include "graphics/controls/TouchArea.h"
-#include "messaging/Publisher.h"
+#include "Control.h"
+#include "Input.h"
+#include "TouchArea.h"
+#include <messaging/Publisher.h>
+#include <messaging/eventTypes/ClickedEvent.h>
 #include <vector>
 
 namespace rsp::graphics
 {
 
-class Scene : public Control, public rsp::messaging::Publisher
+class Scene : public Control, public rsp::messaging::Publisher<rsp::messaging::ClickTopics>
 {
   public:
-    Scene(const Rect &aRect, rsp::messaging::BrokerBase &arBroker);
+    Scene(const Rect &aRect, rsp::messaging::Broker<rsp::messaging::ClickTopics> &arBroker);
     virtual ~Scene() {}
 
     /**
@@ -48,4 +49,5 @@ class Scene : public Control, public rsp::messaging::Publisher
 };
 
 } // namespace rsp::graphics
+
 #endif // SCENE_H

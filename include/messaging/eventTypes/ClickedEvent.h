@@ -19,7 +19,7 @@ namespace rsp::messaging
 /**
  * \brief Enum type defining topics for ClickedEvents
  */
-enum class ClickTopic {
+enum class ClickTopics {
     NullTopic,
     SceneChange
 };

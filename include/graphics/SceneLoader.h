@@ -11,9 +11,9 @@
 #ifndef SCENELOADER_H
 #define SCENELOADER_H
 
-#include "graphics/controls/Scene.h"
-#include "graphics/controls/scenes/firstScene.h"
-#include "graphics/controls/scenes/secondScene.h"
+#include <graphics/controls/Scene.h>
+#include <graphics/controls/scenes/firstScene.h>
+#include <graphics/controls/scenes/secondScene.h>
 #include <map>
 
 namespace rsp::graphics
@@ -22,7 +22,7 @@ namespace rsp::graphics
 class SceneLoader
 {
   public:
-    SceneLoader(rsp::messaging::BrokerBase &aBroker);
+    SceneLoader(rsp::messaging::Broker<rsp::messaging::ClickTopics> &aBroker);
     ~SceneLoader();
 
     /**

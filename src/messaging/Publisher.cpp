@@ -12,9 +12,4 @@
 namespace rsp::messaging
 {
 
-void Publisher::RegisterBroker(BrokerBase &arBroker)
-{
-    mrBroker = arBroker;
-}
-
 } // namespace rsp::messaging

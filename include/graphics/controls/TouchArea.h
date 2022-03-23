@@ -21,8 +21,8 @@ namespace rsp::graphics
 class TouchArea
 {
   public:
-    TouchArea() : mTouchArea(0, 0, 0, 0), mClickedTopic(rsp::messaging::ClickTopic::NullTopic), mclickEvent(""){};
-    TouchArea(Rect &aArea, rsp::messaging::ClickTopic aClickTopic = rsp::messaging::ClickTopic::NullTopic, std::string aClickInfo = "");
+    TouchArea() : mTouchArea(0, 0, 0, 0), mClickedTopic(rsp::messaging::ClickTopics::NullTopic), mclickEvent(""){};
+    TouchArea(Rect &aArea, rsp::messaging::ClickTopics aClickTopic = rsp::messaging::ClickTopics::NullTopic, std::string aClickInfo = "");
     ~TouchArea();
 
     /**
@@ -48,7 +48,7 @@ class TouchArea
      * \brief Register a function to be called for click events
      * \param aFunc A function to handle clicked callbacks
      */
-    void RegisterOnClicked(std::function<void(rsp::messaging::ClickTopic, rsp::messaging::ClickedEvent &)> aFunc);
+    void RegisterOnClicked(std::function<void(rsp::messaging::ClickTopics, rsp::messaging::ClickedEvent &)> aFunc);
 
     /**
      * \brief The default =operator
@@ -74,12 +74,12 @@ class TouchArea
 
   protected:
     std::function<void(Control::States)> mPressed{};
-    std::function<void(rsp::messaging::ClickTopic, rsp::messaging::ClickedEvent &)> mClicked{};
+    std::function<void(rsp::messaging::ClickTopics, rsp::messaging::ClickedEvent &)> mClicked{};
 
     Rect mTouchArea{};
     Point mCurrentPress{0, 0};
     Point mOriginalPress{0, 0};
-    rsp::messaging::ClickTopic mClickedTopic;
+    rsp::messaging::ClickTopics mClickedTopic;
     rsp::messaging::ClickedEvent mclickEvent;
 };
 

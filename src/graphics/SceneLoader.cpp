@@ -15,8 +15,11 @@ using namespace rsp::messaging;
 
 namespace rsp::graphics
 {
-static Rect sScreenSize = Rect(0, 0, 480, 800);
-SceneLoader::SceneLoader(BrokerBase &aBroker) : first(sScreenSize, aBroker), second(sScreenSize, aBroker)
+static const Rect sScreenSize = Rect(0, 0, 480, 800);
+
+SceneLoader::SceneLoader(Broker<ClickTopics> &aBroker)
+    : first(sScreenSize, aBroker),
+      second(sScreenSize, aBroker)
 {
     mSceneMap = {{"first", first},
                  {"second", second}};

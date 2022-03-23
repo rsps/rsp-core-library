@@ -9,7 +9,6 @@
  */
 
 #include "graphics/GraphicsMain.h"
-#include "messaging/eventTypes/ClickedEvent.h"
 #include <chrono>
 #include <thread>
 
@@ -18,8 +17,12 @@ using namespace rsp::messaging;
 namespace rsp::graphics
 {
 
-GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader)
-    : mBufferedCanvas(aBufferedCanvas), mInputs(aInputs), mSceneLoader(aSceneLoader), mActiveScene(&mSceneLoader.GetFirstScene())
+GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader, Broker<ClickTopics>& arBroker)
+    : Subscriber<ClickTopics>(arBroker),
+      mBufferedCanvas(aBufferedCanvas),
+      mInputs(aInputs),
+      mSceneLoader(aSceneLoader),
+      mActiveScene(&mSceneLoader.GetFirstScene())
 {
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);

@@ -13,15 +13,17 @@
 #include "graphics/BufferedCanvas.h"
 #include "graphics/InputCreator.h"
 #include "graphics/SceneLoader.h"
-#include "messaging/Subscriber.h"
+#include <messaging/Subscriber.h>
+#include <messaging/Broker.h>
+#include <messaging/eventTypes/ClickedEvent.h>
 
 namespace rsp::graphics
 {
 
-class GraphicsMain : public rsp::messaging::Subscriber
+class GraphicsMain : public rsp::messaging::Subscriber<rsp::messaging::ClickTopics>
 {
   public:
-    GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader);
+    GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader, rsp::messaging::Broker<rsp::messaging::ClickTopics>& arBroker);
     GraphicsMain(const GraphicsMain &) = default;
     GraphicsMain &operator=(const GraphicsMain &) = default;
     ~GraphicsMain();
@@ -59,5 +61,7 @@ class GraphicsMain : public rsp::messaging::Subscriber
     // Temp
     void PrintInput(Input aInput);
 };
+
 } // namespace rsp::graphics
+
 #endif // GRAPHICSMAIN_H

@@ -20,24 +20,44 @@ enum testTopic {
 class TestBroker : public Broker<testTopic>
 {
   public:
-    std::map<int, std::vector<Subscriber *>> &GetSubscriberMap()
+    const char* GetName() { return __FUNCTION__; }
+    std::map<int, std::vector<SubscriberBase *>>& GetSubscriberMap()
     {
         return mSubscriberMap;
     }
 };
 
-class TestSubOne : public Subscriber
+enum OtherTopic { other1, other2, other3 };
+class OtherBroker : public Broker<OtherTopic>
 {
-  public:
+public:
+    const char* GetName() { return __FUNCTION__; }
+    std::map<int, std::vector<SubscriberBase *>>& GetSubscriberMap()
+    {
+        return mSubscriberMap;
+    }
+};
+
+class TestSubOne : public Subscriber<testTopic>
+{
+public:
+    TestSubOne(Broker<testTopic>& arBroker)
+        : Subscriber<testTopic>(arBroker)
+    {
+    }
     void HandleEvent(Event &arNewEvent)
     {
         isHandled = true;
     }
     bool isHandled = false;
 };
-class TestSubTwo : public Subscriber
+class TestSubTwo : public Subscriber<testTopic>
 {
-  public:
+public:
+    TestSubTwo(Broker<testTopic>& arBroker)
+        : Subscriber<testTopic>(arBroker)
+    {
+    }
     void HandleEvent(Event &arNewEvent)
     {
         isHandled = true;
@@ -49,16 +69,18 @@ TEST_CASE("Subscriber Test")
 {
     // Arrange
     TestBroker testBroker;
-    TestSubOne testSub;
+    TestSubOne testSub(testBroker);
     Event testEvent;
 
     SUBCASE("Subscribe to Broker")
     {
         // Act & Assert
-        CHECK_NOTHROW(testSub.SubscribeToBroker(testBroker, testTopic::topicOne););
+        CHECK_NOTHROW(testSub.Subscribe(testTopic::topicOne));
+        CHECK_NOTHROW(testSub.Subscribe(testTopic::topicTwo));
         CHECK(testBroker.GetSubscriberMap()[testTopic::topicOne].size() == 1);
+        CHECK(testBroker.GetSubscriberMap()[testTopic::topicTwo].size() == 1);
 
-        SUBCASE("Recieve Event")
+        SUBCASE("Receive Event")
         {
             // Act
             testBroker.Publish(testTopic::topicOne, testEvent);
@@ -69,34 +91,61 @@ TEST_CASE("Subscriber Test")
         SUBCASE("Unsubscribe to Broker through Broker")
         {
             // Act
-            CHECK_NOTHROW(testBroker.RemoveSubscriber(testSub, testTopic::topicOne););
+            CHECK_NOTHROW(testBroker.Unsubscribe(testSub, testTopic::topicOne));
             CHECK(testBroker.GetSubscriberMap()[testTopic::topicOne].size() == 0);
-            CHECK_NOTHROW(testBroker.Publish(testTopic::topicOne, testEvent););
+            CHECK_NOTHROW(testBroker.Publish(testTopic::topicOne, testEvent));
 
             // Assert
             CHECK_FALSE(testSub.isHandled);
-        }
-        /*SUBCASE("Unsubscribe to Broker through Subscriber")
-        {
 
-        }*/
+            CHECK_NOTHROW(testBroker.Publish(testTopic::topicTwo, testEvent));
+            CHECK(testSub.isHandled);
+        }
+
+        SUBCASE("Unsubscribe to Broker through Subscriber")
+        {
+            CHECK_NOTHROW(testSub.Unsubscribe(testTopic::topicOne));
+            CHECK(testBroker.GetSubscriberMap()[testTopic::topicOne].size() == 0);
+            CHECK_NOTHROW(testBroker.Publish(testTopic::topicOne, testEvent));
+            CHECK_FALSE(testSub.isHandled);
+
+            CHECK_NOTHROW(testBroker.Publish(testTopic::topicTwo, testEvent));
+            CHECK(testSub.isHandled);
+        }
+
+        SUBCASE("Unsubscribe all on destroy")
+        {
+            {
+                TestSubTwo two(testBroker);
+                CHECK_NOTHROW(two.Subscribe(testTopic::topicOne));
+                CHECK_NOTHROW(two.Subscribe(testTopic::topicTwo));
+
+                CHECK(testBroker.GetSubscriberMap()[testTopic::topicOne].size() == 2);
+                CHECK(testBroker.GetSubscriberMap()[testTopic::topicTwo].size() == 2);
+
+                CHECK_NOTHROW(testBroker.Publish(testTopic::topicOne, testEvent));
+                CHECK(two.isHandled);
+            }
+            CHECK(testBroker.GetSubscriberMap()[testTopic::topicOne].size() == 1);
+            CHECK(testBroker.GetSubscriberMap()[testTopic::topicTwo].size() == 1);
+        }
     }
 }
 TEST_CASE("Publisher Test")
 {
     // Arrange
     TestBroker testBroker;
-    TestSubOne testSubOne;
-    TestSubTwo testSubTwo;
-    testSubOne.SubscribeToBroker(testBroker, testTopic::topicOne);
-    testSubTwo.SubscribeToBroker(testBroker, testTopic::topicTwo);
-    Publisher myPub(testBroker);
+    TestSubOne testSubOne(testBroker);
+    TestSubTwo testSubTwo(testBroker);
+    testSubOne.Subscribe(testTopic::topicOne);
+    testSubTwo.Subscribe(testTopic::topicTwo);
+    Publisher<testTopic> myPub(testBroker);
     Event testEvent;
 
     SUBCASE("Publish with correctly templated call")
     {
         // Act
-        myPub.PublishToBroker<testTopic>(testTopic::topicOne, testEvent);
+        myPub.PublishToBroker(testTopic::topicOne, testEvent);
 
         // Assert
         CHECK(testSubOne.isHandled);
@@ -104,6 +153,14 @@ TEST_CASE("Publisher Test")
     }
 
     // Is this the wanted behavior?
+    /*
+     * No, the PublishToBroker silently casts the wrongTopic into something acceptable by BrokerBase
+     * thereby hiding the error, which may result in a valid event or an event with no subscribers.
+     *
+     * By calling directly through the broker, the error is detected at compile time:
+     * testBroker.Publish(wrongTopic::wrongOne, testEvent);
+     */
+
     SUBCASE("Publish with incorrectly templated call")
     {
         // Arrange
@@ -113,10 +170,21 @@ TEST_CASE("Publisher Test")
         };
 
         // Act
-        myPub.PublishToBroker<wrongTopic>(wrongTopic::wrongOne, testEvent);
+//        myPub.PublishToBroker(wrongTopic::wrongOne, testEvent);
 
         // Assert
-        CHECK(testSubOne.isHandled);
+        CHECK_FALSE(testSubOne.isHandled);
+        CHECK_FALSE(testSubTwo.isHandled);
+    }
+
+    SUBCASE("Broker exchange") {
+        OtherBroker otherBroker;
+        // The following will not compile. Compile time type safety is working.
+//        myPub.RegisterBroker(otherBroker);
+
+//        myPub.PublishToBroker(OtherTopic::other1, testEvent);
+
+        CHECK_FALSE(testSubOne.isHandled);
         CHECK_FALSE(testSubTwo.isHandled);
     }
 }

@@ -10,22 +10,33 @@
 #ifndef SUBSCRIBER_H
 #define SUBSCRIBER_H
 
-#include "messaging/Broker.h"
+#include "Broker.h"
 #include <iostream>
 
 namespace rsp::messaging
 {
 
-class Subscriber
+class SubscriberBase
+{
+public:
+    virtual ~SubscriberBase() {}
+
+    /**
+     * \brief Abstract handle for receiving events
+     * \param arNewEvent A reference to the event to handle
+     */
+    virtual void HandleEvent(Event &arNewEvent) = 0;
+};
+
+template <typename T>
+class Subscriber : public SubscriberBase
 {
   public:
-    Subscriber() {}
+    Subscriber(Broker<T> &arBroker) : mrBroker(arBroker) {}
     virtual ~Subscriber()
     {
         // Here we MUST unsubscribe from the broker, since our address is no longer valid.
-        if (mpBroker) {
-            mpBroker->removeSubscriber(*this, mTopic);
-        }
+        mrBroker.RemoveSubscriber(*this);
     }
 
     /**
@@ -37,23 +48,18 @@ class Subscriber
     Subscriber &operator=(const Subscriber &) = delete;
     Subscriber &operator=(const Subscriber &&) = delete;
 
-    template <typename T>
-    void SubscribeToBroker(BrokerBase &arBroker, T aTopic)
+    void Subscribe(T aTopic)
     {
-        mTopic = static_cast<int>(aTopic);
-        mpBroker = &arBroker;
-        arBroker.addSubscriber(*this, mTopic);
+        mrBroker.Subscribe(*this, aTopic);
     }
 
-    /**
-     * \brief Abstract handle for recieving events
-     * \param arNewEvent A reference to the event to handle
-     */
-    virtual void HandleEvent(Event &arNewEvent) = 0;
+    void Unsubscribe(T aTopic)
+    {
+        mrBroker.Unsubscribe(*this, aTopic);
+    }
 
   protected:
-    int mTopic = 0;
-    BrokerBase *mpBroker = nullptr;
+    Broker<T> &mrBroker;
 };
 } // namespace rsp::messaging
 

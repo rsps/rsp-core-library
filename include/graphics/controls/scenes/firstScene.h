@@ -1,6 +1,3 @@
-#ifndef FIRSTSCENE_H
-#define FIRSTSCENE_H
-
 /*!
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,7 +8,10 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/controls/Scene.h"
+#ifndef FIRSTSCENE_H
+#define FIRSTSCENE_H
+
+#include <graphics/controls/Scene.h>
 #include <functional>
 #include <vector>
 
@@ -20,13 +20,13 @@ namespace rsp::graphics
 class FirstScene : public Scene
 {
   public:
-    FirstScene(Rect &aRect, rsp::messaging::BrokerBase &arBroker)
-        : Scene(aRect, arBroker)
+    FirstScene(const Rect &arRect, rsp::messaging::Broker<rsp::messaging::ClickTopics> &arBroker)
+        : Scene(arRect, arBroker)
     {
         // myName = "First Scene";
         // Set member variables values
         Rect topRect(Point(100, 400), 200, 100);
-        topBtn = TouchArea(topRect, rsp::messaging::ClickTopic::SceneChange, "second");
+        topBtn = TouchArea(topRect, rsp::messaging::ClickTopics::SceneChange, "second");
         topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
 
         Rect botRect(Point(100, 600), 200, 100);
@@ -56,5 +56,7 @@ class FirstScene : public Scene
     Image topBtnImg{};
     Image botBtnImg{};
 };
+
 } // namespace rsp::graphics
+
 #endif // FIRSTSCENE_H

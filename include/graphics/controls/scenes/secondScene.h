@@ -1,6 +1,3 @@
-#ifndef SECONDSCENE_H
-#define SECONDSCENE_H
-
 /*!
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,8 +7,10 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
+#ifndef SECONDSCENE_H
+#define SECONDSCENE_H
 
-#include "graphics/controls/Scene.h"
+#include <graphics/controls/Scene.h>
 #include <functional>
 #include <vector>
 
@@ -20,8 +19,8 @@ namespace rsp::graphics
 class SecondScene : public Scene
 {
   public:
-    SecondScene(Rect &aRect, rsp::messaging::BrokerBase &arBroker)
-        : Scene(aRect, arBroker)
+    SecondScene(const Rect &arRect, rsp::messaging::Broker<rsp::messaging::ClickTopics> &arBroker)
+        : Scene(arRect, arBroker)
     {
         // myName = "Second Scene";
         //  Set member variables values
@@ -30,7 +29,7 @@ class SecondScene : public Scene
         topBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
 
         Rect botRect(Point(100, 300), 200, 100);
-        botBtn = TouchArea(botRect, rsp::messaging::ClickTopic::SceneChange, "first");
+        botBtn = TouchArea(botRect, rsp::messaging::ClickTopics::SceneChange, "first");
         botBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
 
         // Bind onPressed

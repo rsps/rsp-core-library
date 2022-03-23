@@ -8,8 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/controls/Scene.h"
-#include "messaging/eventTypes/ClickedEvent.h"
+#include <graphics/controls/Scene.h>
 #include <functional>
 
 using namespace rsp::messaging;
@@ -17,8 +16,9 @@ using namespace rsp::messaging;
 namespace rsp::graphics
 {
 
-Scene::Scene(const Rect &aRect, BrokerBase &arBroker)
-    : Control(aRect), Publisher(arBroker)
+Scene::Scene(const Rect &aRect, Broker<ClickTopics> &arBroker)
+    : Control(aRect),
+      Publisher(arBroker)
 {
 }
 
@@ -39,7 +39,7 @@ void Scene::Render(Canvas &arCanvas)
 void Scene::BindElementsToBroker()
 {
     for (auto touchable : mTouchables) {
-        touchable->RegisterOnClicked([&](ClickTopic aTopic, ClickedEvent &aEvent) noexcept { PublishToBroker<ClickTopic>(aTopic, aEvent); });
+        touchable->RegisterOnClicked([&](ClickTopics aTopic, ClickedEvent &aEvent) noexcept { PublishToBroker(aTopic, aEvent); });
     }
 }
 
