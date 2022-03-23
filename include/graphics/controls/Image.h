@@ -10,8 +10,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include "graphics/controls/Control.h"
-#include "graphics/primitives/Bitmap.h"
+#include <graphics/primitives/Bitmap.h>
+#include "Control.h"
 
 namespace rsp::graphics
 {
@@ -20,14 +20,14 @@ class Image : public Control
 {
   public:
     Image() : Control(){};
-    Image(std::string aNormal, std::string aPressed, Rect &aRect);
+    Image(std::string aNormal, std::string aPressed, Rect &arRect);
     ~Image();
 
     /**
      * \brief Override method for rendering the object
      * \param aCanvas The canvas the object is rendered on
      */
-    void Render(Canvas &aCanvas) override;
+    void Render(Canvas &arCanvas) override;
 
     /**
      * \brief Handles the callback from a touchable area

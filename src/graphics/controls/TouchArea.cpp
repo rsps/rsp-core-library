@@ -16,7 +16,7 @@ namespace rsp::graphics
 {
 
 TouchArea::TouchArea(Rect &aArea, ClickTopics aClickedTopic, std::string aClickInfo)
-    : mTouchArea(aArea), mClickedTopic(aClickedTopic), mclickEvent(aClickInfo)
+    : mTouchArea(aArea), mClickedTopic(aClickedTopic), mClickEvent(aClickInfo)
 {
 }
 
@@ -42,7 +42,7 @@ void TouchArea::ProcessInput(Input &arInput)
         }
         if (IsHit(mCurrentPress) && IsHit(mOriginalPress)) {
             if (mClicked) {
-                mClicked(mClickedTopic, mclickEvent);
+                mClicked(mClickedTopic, mClickEvent);
             }
         }
         // Will this return true for IsHit on things outside the scene?

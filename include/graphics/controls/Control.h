@@ -65,7 +65,7 @@ class Control
      * \param aValue Boolean determining the object transparent or not
      * \return A reference to the object
      */
-    Control &SetTransparent(bool aValue)
+    Control& SetTransparent(bool aValue)
     {
         mTransparent = aValue;
         return *this;
@@ -81,35 +81,30 @@ class Control
      * \brief Abstract method for rendering the object
      * \param aCanvas The canvas the object is rendered on
      */
-    virtual void Render(Canvas &aCanvas) = 0;
+    virtual void Render(Canvas &arCanvas) = 0;
 
     /**
      * \brief Sets the area of the object as a rectangle
      * \param aRect A reference to the rectangle to define the objects area
      */
-    void SetArea(const Rect &aRect);
+    void SetArea(const Rect &arRect);
 
     /**
      * \brief Gets the area of the object as a rectangle
      * \return A reference to the rectangle defining the objects area
      */
-    const Rect &GetArea() const { return mArea; }
+    const Rect& GetArea() const { return mArea; }
 
     /**
      * \brief Adds a child to the vector of child control pointer objects
      * \param apChild A pointer to the child
      * \return A reference to this object
      */
-    Control &AddChild(Control *apChild)
-    {
-        mChildren.push_back(apChild);
-        apChild->mpParent = this;
-        return *this;
-    }
+    Control& AddChild(Control *apChild);
 
   protected:
     Rect mArea{};
-    Color mBackground{0};
+    Color mBackground{ Color::Black };
     bool mTransparent = false;
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};

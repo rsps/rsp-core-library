@@ -72,6 +72,26 @@ class Point
     }
 
     /**
+     * \brief Equal to operator
+     * \param aPoint
+     * \return True if equal
+     */
+    inline bool operator==(const Point &aPoint)
+    {
+        return (mX == aPoint.mX) && (mY == aPoint.mY);
+    }
+
+    /**
+     * \brief Not equal to operator
+     * \param aPoint
+     * \return True if not equal
+     */
+    inline bool operator!=(const Point &aPoint)
+    {
+        return (mX != aPoint.mX) || (mY != aPoint.mY);
+    }
+
+    /**
      * \brief Gets the value of the X coordinate
      * \return Integer
      */

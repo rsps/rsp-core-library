@@ -72,6 +72,26 @@ class Rect
     Rect &operator=(const Rect &arRect);
 
     /**
+     * \brief Equal to operator
+     * \param arRect
+     * \return True if equal
+     */
+    inline bool operator==(const Rect &arRect)
+    {
+        return (mLeftTop == arRect.mLeftTop) && (mRightBottom == arRect.mRightBottom);
+    }
+
+    /**
+     * \brief Not equal to operator
+     * \param arRect
+     * \return True if not equal
+     */
+    inline bool operator!=(const Rect &arRect)
+    {
+        return (mLeftTop != arRect.mLeftTop) || (mRightBottom != arRect.mRightBottom);
+    }
+
+    /**
      * \brief Get the top value
      *
      * \return int

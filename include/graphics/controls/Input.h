@@ -51,5 +51,7 @@ class Input
     int x = 0; /*!< Value of the absolute X coordinate from touch */
     int y = 0; /*!< Value of the absolute Y coordinate from touch */
 };
+
 } // namespace rsp::graphics
+
 #endif // INPUT_H

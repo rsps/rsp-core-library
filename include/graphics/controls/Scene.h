@@ -24,7 +24,7 @@ namespace rsp::graphics
 class Scene : public Control, public rsp::messaging::Publisher<rsp::messaging::ClickTopics>
 {
   public:
-    Scene(const Rect &aRect, rsp::messaging::Broker<rsp::messaging::ClickTopics> &arBroker);
+    Scene(const Rect &arRect, rsp::messaging::Broker<rsp::messaging::ClickTopics> &arBroker);
     virtual ~Scene() {}
 
     /**

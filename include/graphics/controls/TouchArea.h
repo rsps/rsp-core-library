@@ -21,8 +21,8 @@ namespace rsp::graphics
 class TouchArea
 {
   public:
-    TouchArea() : mTouchArea(0, 0, 0, 0), mClickedTopic(rsp::messaging::ClickTopics::NullTopic), mclickEvent(""){};
-    TouchArea(Rect &aArea, rsp::messaging::ClickTopics aClickTopic = rsp::messaging::ClickTopics::NullTopic, std::string aClickInfo = "");
+    TouchArea() : mTouchArea(0, 0, 0, 0), mClickedTopic(rsp::messaging::ClickTopics::NullTopic), mClickEvent(""){};
+    TouchArea(Rect &arArea, rsp::messaging::ClickTopics aClickTopic = rsp::messaging::ClickTopics::NullTopic, std::string aClickInfo = "");
     ~TouchArea();
 
     /**
@@ -80,7 +80,7 @@ class TouchArea
     Point mCurrentPress{0, 0};
     Point mOriginalPress{0, 0};
     rsp::messaging::ClickTopics mClickedTopic;
-    rsp::messaging::ClickedEvent mclickEvent;
+    rsp::messaging::ClickedEvent mClickEvent;
 };
 
 } // namespace rsp::graphics

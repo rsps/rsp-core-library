@@ -7,7 +7,6 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
-
 #ifndef FIRSTSCENE_H
 #define FIRSTSCENE_H
 
@@ -15,11 +14,11 @@
 #include <functional>
 #include <vector>
 
-namespace rsp::graphics
-{
+namespace rsp::graphics {
+    
 class FirstScene : public Scene
 {
-  public:
+public:
     FirstScene(const Rect &arRect, rsp::messaging::Broker<rsp::messaging::ClickTopics> &arBroker)
         : Scene(arRect, arBroker)
     {

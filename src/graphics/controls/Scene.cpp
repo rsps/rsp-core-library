@@ -16,8 +16,8 @@ using namespace rsp::messaging;
 namespace rsp::graphics
 {
 
-Scene::Scene(const Rect &aRect, Broker<ClickTopics> &arBroker)
-    : Control(aRect),
+Scene::Scene(const Rect &arRect, Broker<ClickTopics> &arBroker)
+    : Control(arRect),
       Publisher(arBroker)
 {
 }
@@ -31,14 +31,14 @@ void Scene::ProcessInput(Input &arInput)
 
 void Scene::Render(Canvas &arCanvas)
 {
-    for (auto child : mChildren) {
+    for (Control* child : mChildren) {
         child->Render(arCanvas);
     }
 }
 
 void Scene::BindElementsToBroker()
 {
-    for (auto touchable : mTouchables) {
+    for (TouchArea* touchable : mTouchables) {
         touchable->RegisterOnClicked([&](ClickTopics aTopic, ClickedEvent &aEvent) noexcept { PublishToBroker(aTopic, aEvent); });
     }
 }

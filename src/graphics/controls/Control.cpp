@@ -32,12 +32,33 @@ void Control::Invalidate()
         return;
     }
     mIsInvalid = true;
-    for (auto child : mChildren) {
+    for (Control* child : mChildren) {
         child->Invalidate();
     }
     if (mTransparent && mpParent) {
         mpParent->Invalidate();
     }
+}
+
+void Control::SetArea(const Rect &arRect)
+{
+    if (mArea != arRect) {
+        mArea = arRect;
+        Invalidate();
+        if (mpParent) {
+            // Force repaint of parent, this is resizing
+            mpParent->Invalidate();
+        }
+    }
+}
+
+Control& Control::AddChild(Control *apChild)
+{
+    if (apChild) {
+        mChildren.push_back(apChild);
+        apChild->mpParent = this;
+    }
+    return *this;
 }
 
 } // namespace rsp::graphics

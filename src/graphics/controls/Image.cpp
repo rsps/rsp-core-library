@@ -12,8 +12,8 @@
 
 namespace rsp::graphics
 {
-Image::Image(std::string aPressed, std::string aNormal, Rect &aRect)
-    : Control(aRect)
+Image::Image(std::string aPressed, std::string aNormal, Rect &arRect)
+    : Control(arRect)
 {
     mStateMap.insert(std::pair<States, Bitmap>(States::pressed, Bitmap(aPressed)));
     mStateMap.insert(std::pair<States, Bitmap>(States::normal, Bitmap(aNormal)));
@@ -22,12 +22,12 @@ Image::~Image()
 {
 }
 
-void Image::Render(Canvas &aCanvas)
+void Image::Render(Canvas &arCanvas)
 {
     if (!mIsInvalid) {
         return;
     }
-    aCanvas.DrawImage(mArea.GetTopLeft(), mStateMap.at(mState));
+    arCanvas.DrawImage(mArea.GetTopLeft(), mStateMap.at(mState));
     mIsInvalid = false;
 }
 
@@ -35,7 +35,8 @@ void Image::HandleCallback(States aState)
 {
     if (aState != mState) {
         mState = aState;
-        this->Invalidate();
+        Invalidate();
     }
 }
+
 } // namespace rsp::graphics
