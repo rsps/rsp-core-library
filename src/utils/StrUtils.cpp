@@ -15,11 +15,13 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <cstdarg>
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <time.h>
+#include <utils/ClockCast.h>
 #include <utils/StrUtils.h>
-#include <utils/clock_cast.h>
 
 namespace rsp::utils::StrUtils {
 
@@ -127,7 +129,7 @@ bool Contains(const std::string &aText, const std::string &aMatch)
 std::vector<std::string> FindMatches(std::string aText, std::vector<std::string> &arList)
 {
     std::vector<std::string> found;
-    for (auto s : arList) {
+    for (std::string &s : arList) {
         if(aText == s.substr(0, aText.length())) {
             found.push_back(s);
         }
@@ -140,7 +142,7 @@ std::string ReduceToCommon(std::vector<std::string> &arList)
 {
     std::string match;
 
-    for (auto &s : arList) {
+    for (std::string &s : arList) {
         if (match.empty()) {
             match = s;
         }
@@ -191,24 +193,25 @@ std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats a
     auto t = std::chrono::system_clock::to_time_t(aTime);
 
     std::stringstream ss;
+    std::tm tbuf;
 
 //    2006-01-02T15:04:05.999999Z07:00
 
     switch (aFormat) {
         case TimeFormats::Logging:
-            ss << std::put_time(std::gmtime(&t), "%F %T.") << std::setfill('0') << std::setw(3) << msecs.count();
+            ss << std::put_time(gmtime_r(&t, &tbuf), "%F %T.") << std::setfill('0') << std::setw(3) << msecs.count();
             break;
 
         case TimeFormats::RFC3339:
-            ss << std::put_time(std::gmtime(&t), "%FT%T");
+            ss << std::put_time(gmtime_r(&t, &tbuf), "%FT%T");
             break;
 
         case TimeFormats::RFC3339Milli:
-            ss << std::put_time(std::gmtime(&t), "%FT%T.") << std::setfill('0') << std::setw(3) << msecs.count() << "Z";
+            ss << std::put_time(gmtime_r(&t, &tbuf), "%FT%T.") << std::setfill('0') << std::setw(3) << msecs.count() << "Z";
             break;
 
         default:
-            ss << std::put_time(std::gmtime(&t), "%F %T");
+            ss << std::put_time(gmtime_r(&t, &tbuf), "%F %T");
             break;
     }
 
@@ -217,7 +220,7 @@ std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats a
 
 std::string TimeStamp(std::chrono::steady_clock::time_point aTime, TimeFormats aFormat)
 {
-    return TimeStamp(rsp::utils::clock_cast<std::chrono::system_clock::time_point>(aTime), aFormat);
+    return TimeStamp(rsp::utils::ClockCast<std::chrono::system_clock::time_point>(aTime), aFormat);
 }
 
 std::string TimeStamp(std::chrono:: milliseconds aMilliSeconds, TimeFormats aFormat)
@@ -226,6 +229,28 @@ std::string TimeStamp(std::chrono:: milliseconds aMilliSeconds, TimeFormats aFor
     return TimeStamp(dur, aFormat);
 }
 
+//__attribute__((__format__(__printf__, 1, 0)))
+std::string Format(const char* apFormat, ...)
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+    // Pass on the varargs on to 'vfprintf'.
+    va_list arglist;
+
+    va_start(arglist, apFormat);
+    std::size_t size = static_cast<std::size_t>(vsnprintf(nullptr, 0, apFormat, arglist)) + 1; // Extra space for '\0'
+    if (size > 255) {
+        errno = ENOMEM;
+        THROW_SYSTEM("StrUtils::format buffer to small");
+    }
+    char buffer[256];
+    va_start(arglist, apFormat); // Reset arglist ptr.
+    vsnprintf(buffer, 255, apFormat, arglist);
+
+    va_end(arglist);
+#pragma GCC diagnostic pop
+    return std::string(buffer, size - 1); // We don't want the '\0' inside
+}
 
 
 } /* namespace StrUtils */

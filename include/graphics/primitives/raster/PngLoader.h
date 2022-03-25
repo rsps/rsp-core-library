@@ -24,8 +24,6 @@ public:
     std::vector<uint32_t> LoadImg(const std::string &aImgName);
 
 protected:
-    //struct IDAT {
-    //} __attribute__((packed));  //To stop alignment;
     struct PLTE
     {
     } __attribute__((packed)); //To stop alignment;
@@ -53,7 +51,7 @@ protected:
             struct PLTE *plte;
             struct IEND *iend;
         };
-        //uint32_t crc; //Always just at the end of the pointer
+        // A CRC value of type uint32_t is always appended to the chunk
     } __attribute__((packed)); //To stop alignment
 
     uint8_t mPngSignature[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };

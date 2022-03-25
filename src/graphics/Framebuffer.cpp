@@ -67,7 +67,7 @@ Framebuffer::Framebuffer(const char *apDevPath)
     }
 
     // calculate size of screen
-    long screensize = mVariableInfo.yres * mFixedInfo.line_length;
+    unsigned long screensize = static_cast<unsigned long>(mVariableInfo.yres) * mFixedInfo.line_length;
 
     mpFrontBuffer = static_cast<uint8_t *>(mmap(0, static_cast<size_t>(screensize * 2), PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
     if (mpFrontBuffer == reinterpret_cast<uint8_t *>(-1)) /*MAP_FAILED*/ {

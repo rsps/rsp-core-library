@@ -175,7 +175,7 @@ class Rect
      */
     bool IsHit(const Point &arPoint) const;
 
-    bool VerifyDimensions() const;
+    void VerifyDimensions() const;
 
   protected:
     // Allow friends to access members for speed optimizations.

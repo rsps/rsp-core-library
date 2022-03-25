@@ -79,7 +79,7 @@ EscString ec::cursor::EraseLineMoveToCol1 = ESC("2K") ESC("G");
 
 EscString ec::cursor::SetPosition(int aPos)
 {
-    static char command[13];
+    static char command[15];
     /* Command is the control command to the terminal */
     sprintf(command, ESC("%dG"), aPos);
     return command;

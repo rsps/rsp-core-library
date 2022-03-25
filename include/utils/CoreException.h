@@ -9,8 +9,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef RSPCOREEXCEPTIONS_H
-#define RSPCOREEXCEPTIONS_H
+#ifndef RSPCOREEXCEPTION_H
+#define RSPCOREEXCEPTION_H
 
 #include <exception>
 #include <stdexcept>
@@ -26,6 +26,11 @@ class CoreException : public std::runtime_error
     explicit CoreException(const char *aMsg)
         : std::runtime_error(""),
           mMsg(aMsg)
+    {
+    }
+    CoreException(const std::string &arMsg)
+        : std::runtime_error(""),
+          mMsg(arMsg)
     {
     }
 
@@ -67,13 +72,33 @@ class AssertException : public CoreException
 
 #ifndef NDEBUG
 #define ASSERT(a)                  \
-    if (a) {                       \
-        throw rsp::utils::AssertException(#a); \
+    if (!(a)) {                       \
+        THROW_WITH_BACKTRACE1(rsp::utils::AssertException, #a); \
     }
 #else
 #define ASSERT(a)
 #endif
 
-}
+class ApplicationException : public CoreException {
+public:
+    explicit ApplicationException(const char* aMsg) : CoreException(aMsg) {}
+};
 
-#endif // RSPCOREEXCEPTIONS_H
+class ESingletonViolation: public ApplicationException {
+public:
+    explicit ESingletonViolation() : ApplicationException("Singleton object already exist") {}
+};
+
+class ENoInstance: public ApplicationException {
+public:
+    explicit ENoInstance() : ApplicationException("Singleton object has not been created") {}
+};
+
+class EMissingArgument : public std::invalid_argument {
+public:
+    explicit EMissingArgument() : std::invalid_argument("Missing argument") {}
+};
+
+} /* namespace rsp::utils */
+
+#endif // RSPCOREEXCEPTION_H

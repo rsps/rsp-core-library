@@ -12,6 +12,7 @@
 #include <sstream>
 #include <map>
 #include <logging/Logger.h>
+#include <thread>
 #include <utils/CoreException.h>
 
 namespace rsp::logging {
@@ -50,7 +51,7 @@ void LoggerInterface::write(const LogStreamInterface *apStream, const std::strin
     LogLevel current_level = apStream->GetLevel();
     std::lock_guard<std::mutex> lock(mMutex);
 
-    for (auto w : mWriters) {
+    for (std::shared_ptr<LogWriterInterface> &w : mWriters) {
         w->Write(arMsg, current_level);
     }
 }
@@ -64,8 +65,10 @@ LogStreamInterface::LogStreamInterface(LoggerInterface *apOwner, LogLevel aLevel
 
 LogStreamInterface& LogStreamInterface::operator=(const LogStreamInterface &&arOther)
 {
-    mpOwner = arOther.mpOwner;
-    mLevel = arOther.mLevel;
+    if (&arOther != this) {
+        mpOwner = arOther.mpOwner;
+        mLevel = arOther.mLevel;
+    }
     return *this;
 }
 
@@ -101,9 +104,11 @@ LogStream::LogStream(LogStream &&arFrom)
 
 LogStream& LogStream::operator=(LogStream &&arOther)
 {
-    mpOwner = arOther.mpOwner;
-    mLevel = arOther.mLevel;
-    mBuffer = std::move(arOther.mBuffer);
+    if (&arOther != this) {
+        mpOwner = arOther.mpOwner;
+        mLevel = arOther.mLevel;
+        mBuffer = std::move(arOther.mBuffer);
+    }
     return *this;
 }
 
@@ -143,18 +148,17 @@ int OutStreamBuf::overflow(int c)
 int OutStreamBuf::sync()
 {
     if (mMutex.try_lock()) {
-//        std::cerr << "OutStreamBuf mutex was not locked!!! " << std::this_thread::get_id() << std::endl;
+        DLOG("OutStreamBuf mutex was not locked!!! " << std::this_thread::get_id());
     }
 
     int l = mBuffer.length();
     if (l > 0) {
-//        rsp::Backtrace::Print();
-//        std::cout << "Message: (" << l << ") " << mBuffer << std::endl;
+        DLOG("Message: (" << l << ") " << mBuffer);
         ownerWrite(mBuffer);
         mBuffer = ""; //.erase();
     }
     mMutex.unlock();
-//    std::cout << "Unlocked by " << std::this_thread::get_id() << std::endl;
+    DLOG("Unlocked by " << std::this_thread::get_id());
     return 0;
 }
 
@@ -163,7 +167,7 @@ std::ostream& operator <<(std::ostream &arOs, LogLevel aLevel)
     OutStreamBuf *stream = static_cast<OutStreamBuf *>(arOs.rdbuf());
 
     stream->Lock();
-//    std::cout << "Locked by " << std::this_thread::get_id() << std::endl;
+    DLOG("Locked by " << std::this_thread::get_id());
     stream->SetLevel(aLevel);
 
     return arOs;

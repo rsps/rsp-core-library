@@ -130,7 +130,6 @@ class Canvas
      */
     int GetWidth() const
     {
-        // return mVariableInfo.xres;
         return mWidth;
     }
 
@@ -141,7 +140,6 @@ class Canvas
      */
     int GetHeight() const
     {
-        // return mVariableInfo.yres;
         return mHeight;
     }
 
@@ -152,7 +150,6 @@ class Canvas
      */
     int GetColorDepth() const
     {
-        // return mVariableInfo.bits_per_pixel;
         return mBytesPerPixel;
     }
 

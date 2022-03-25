@@ -166,20 +166,7 @@ std::string TimeStamp(std::chrono::milliseconds aMilliSeconds, TimeFormats aForm
  * @param args Optional arguments
  * @return std::string formatted with snprintf
  */
-template< typename ... Args >
-std::string Format(const std::string &arFormat, Args ... args)
-{
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-    std::size_t size = static_cast<std::size_t>(snprintf(nullptr, 0, arFormat.c_str(), args ...)) + 1; // Extra space for '\0'
-    if (size <= 0) {
-        throw std::runtime_error("Error during formatting.");
-    }
-    std::unique_ptr<char[]> buf(new char[size]);
-    snprintf(buf.get(), size, arFormat.c_str(), args ...);
-#pragma GCC diagnostic pop
-    return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
-}
+std::string Format(const char* apFormat, ...) __attribute__((__format__(__printf__, 1, 0)));
 
 }
 
