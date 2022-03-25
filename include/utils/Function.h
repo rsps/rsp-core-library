@@ -16,82 +16,132 @@
 
 namespace rsp::utils {
 
-template<typename Res, typename... ArgTypes>
-class Function<Res(ArgTypes...)> : std::function<Res(ArgTypes...)>
+template<typename Res, typename ... ArgTypes>
+class Function;
+
+
+template<typename Res, typename ... ArgTypes>
+class Function<Res(ArgTypes...)> : private std::function<Res(ArgTypes...)>
 {
-    struct WrapperBase {
+private:
+    struct WrapperBase
+    {
         std::atomic_int refcount;
 
-        virtual Res Execute(ArgTypes... args) = 0;
+        virtual Res Execute(ArgTypes ... args) = 0;
 
-        WrapperBase() { refcount = 1; }
-        virtual ~WrapperBase() {}
+        WrapperBase()
+            : refcount(1)
+        {
+        }
+        virtual ~WrapperBase()
+        {
+        }
     };
 
-    template <class F>
-    struct Wrapper : WrapperBase {
+    template<class F>
+    struct Wrapper: WrapperBase
+    {
         F fn;
-        virtual Res Execute(ArgTypes... args) { return fn(args...); }
+        virtual Res Execute(ArgTypes ... args)
+        {
+            return fn(args...);
+        }
 
-        Wrapper(F&& fn) : fn(pick(fn)) {}
+        Wrapper(F &&fn)
+            : fn(std::move(fn))
+        {
+        }
     };
 
     WrapperBase *ptr = nullptr;
 
-    static void Free(WrapperBase *ptr) {
-        if(ptr && --ptr->refcount == 0)
-            delete ptr;
+    static void Free(WrapperBase *aPtr)
+    {
+        if (aPtr && --aPtr->refcount == 0)
+            delete aPtr;
     }
 
-    void Copy(const Function& a) {
-        ptr = a.ptr;
-        if(ptr)
+    void Copy(const Function &arOther)
+    {
+        ptr = arOther.ptr;
+        if (ptr)
             ptr->refcount++;
     }
 
-    void Pick(Function&& src) {
-        ptr = src.ptr;
-        src.ptr = nullptr;
+public:
+    Function()
+    {
     }
 
-public:
-    Function()                                 { }
+    template<class F> Function(F fn)
+    {
+        ptr = new Wrapper<F>(std::move(fn));
+    }
 
-    template <class F> Function(F fn)          { ptr = new Wrapper<F>(std::move(fn)); }
+    ~Function()
+    {
+        Free(ptr);
+    }
 
-    ~Function()                                { Free(ptr); }
+    Function(const Function &arOther)
+    {
+        Copy(arOther);
+    }
 
-    Function(const Function& src)              { Copy(src); }
-    Function& operator=(const Function& src)   { auto b = ptr; Copy(src); Free(b); return *this; }
+    Function& operator=(const Function &arOther)
+    {
+        if (&arOther != this) {
+            auto b = ptr;
+            Copy(arOther);
+            Free(b);
+        }
+        return *this;
+    }
 
-    Function(Function&& src)                   { Pick(std::move(src)); }
-    Function& operator=(Function&& src)        { if(&src != this) { Free(ptr); ptr = src.ptr; src.ptr = nullptr; } return *this; }
+    Function(Function &&arOther)
+    {
+        if (&arOther != this) {
+            ptr = arOther.ptr;
+            arOther.ptr = nullptr;
+        }
+    }
 
-    Function Proxy() const                     { return [=] (ArgTypes... args) { return (*this)(args...); }; }
+    Function& operator=(Function &&arOther)
+    {
+        if (&arOther != this) {
+            Free(ptr);
+            ptr = arOther.ptr;
+            arOther.ptr = nullptr;
+        }
+        return *this;
+    }
 
-    Res operator()(ArgTypes... args) const     { return ptr ? ptr->Execute(args...) : Res(); }
+    Res operator()(ArgTypes ... args) const
+    {
+        return ptr ? ptr->Execute(args...) : Res();
+    }
 
-    operator bool() const                      { return (ptr != nullptr); }
-    void Clear()                               { Free(ptr); ptr = nullptr; }
+    operator bool() const
+    {
+        return (ptr != nullptr);
+    }
 
-
-    friend Function Proxy(const Function& a)   { return a.Proxy(); }
-    friend void Swap(Function& a, Function& b) { UPP::Swap(a.ptr, b.ptr); }
+    void Clear()
+    {
+        Free(ptr);
+        ptr = nullptr;
+    }
 };
 
-template <typename... ArgTypes>
-using Event = Function<void (ArgTypes...)>;
-
-template <typename... ArgTypes>
-using Gate = Function<bool (ArgTypes...)>;
-
-template <class Ptr, class Class, class Res, class... ArgTypes>
-Function<Res (ArgTypes...)> MemFn(Ptr object, Res (Class::*method)(ArgTypes...))
+template<class Ptr, class Class, class Res, class ... ArgTypes>
+Function<Res(ArgTypes...)> Method(Ptr object, Res (Class::*method)(ArgTypes...))
 {
-    return [=](ArgTypes... args) { return (object->*method)(args...); };
+    return [=](ArgTypes ... args)
+    {
+        return (object->*method)(args...);
+    };
 }
-
-#define THISFN(x)   MemFn(this, &CLASSNAME::x)
 
 } // namespace rsp::utils
 
