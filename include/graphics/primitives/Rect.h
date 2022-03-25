@@ -199,9 +199,9 @@ class Rect
     /**
      * \brief Verifies the dimensions of the rectangle by checking if height and width are above zero
      *
-     * \return True of height and width are above zero
+     * \throws AssertException
      */
-    bool VerifyDimensions() const;
+    void VerifyDimensions();
 
   protected:
     // Allow friends to access members for speed optimizations.

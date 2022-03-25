@@ -51,8 +51,10 @@ Rect::Rect(const Rect &arRect)
 
 Rect& Rect::operator=(const Rect &arRect)
 {
-    mLeftTop = arRect.mLeftTop;
-    mRightBottom = arRect.mRightBottom;
+    if (&arRect != this) {
+        mLeftTop = arRect.mLeftTop;
+        mRightBottom = arRect.mRightBottom;
+    }
     return *this;
 }
 
@@ -107,8 +109,12 @@ int Rect::GetWidth() const
 
 void Rect::SetWidth(int aWidth)
 {
-    ASSERT(aWidth < 0);
-    mRightBottom.mX = mLeftTop.mX + aWidth;
+    if (aWidth >= 0) {
+        mRightBottom.mX = mLeftTop.mX + aWidth;
+    }
+    else {
+        mLeftTop.mX = mRightBottom.mX + aWidth;
+    }
 }
 
 int Rect::GetHeight() const
@@ -118,8 +124,12 @@ int Rect::GetHeight() const
 
 void Rect::SetHeight(int aHeight)
 {
-    ASSERT(aHeight < 0);
-    mRightBottom.mY = mLeftTop.mY + aHeight;
+    if (aHeight >= 0) {
+        mRightBottom.mY = mLeftTop.mY + aHeight;
+    }
+    else {
+        mLeftTop.mY = mRightBottom.mY + aHeight;
+    }
 }
 
 bool Rect::IsHit(const Point &aPoint) const
@@ -134,12 +144,12 @@ bool Rect::IsHit(const Point &aPoint) const
     return false;
 }
 
-bool Rect::VerifyDimensions() const
+void Rect::VerifyDimensions()
 {
-    ASSERT(GetWidth() < 0);
-    ASSERT(GetHeight() < 0);
-
-    return false;
+    if (    (mRightBottom.mY < mLeftTop.mY)
+        ||  (mRightBottom.mX < mLeftTop.mX)) {
+        THROW_WITH_BACKTRACE1(rsp::utils::AssertException, "Rect size is negative");
+    }
 }
 
 } // namespace rsp::graphics
