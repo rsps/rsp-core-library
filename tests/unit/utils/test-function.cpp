@@ -45,9 +45,14 @@ TEST_CASE("Functions") {
 
     CHECK(my_func(42, 2.0) == 84);
 
-    Function<int(int, double)> bind_func = std::bind(&TestClass::TestMethod, &o, 2, std::placeholders::_1);
-//    CHECK(bind_func(2.2) == 4);
-    CHECK(bind_func(21, 2.9) == 42);
+    Function<int(double)> bind_func1 = std::bind(&TestClass::TestMethod, &o, 2, std::placeholders::_1);
+    CHECK(bind_func1(2.2) == 4);
+
+    Function<int(int)> bind_func2 = std::bind(&TestClass::TestMethod, &o, std::placeholders::_1, 4.9);
+    CHECK(bind_func2(2) == 9);
+
+    Function<int(void)> bind_func3 = std::bind(&TestClass::TestMethod, &o, 3, 2.2);
+    CHECK(bind_func3() == 6);
 }
 
 
