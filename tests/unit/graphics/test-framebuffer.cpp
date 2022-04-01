@@ -269,7 +269,7 @@ TEST_CASE("Framebuffer Drawing Primitives")
         SUBCASE("Spill large imgage into screen")
         {
             // Arrange
-            Point topLeft(-100, -100);
+            topLeft = {-100, -100};
 
             // Act
             fb.DrawImage(topLeft, largeImgMap);

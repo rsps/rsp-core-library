@@ -13,6 +13,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <time.h>
 #include <doctest.h>
 #include <logging/Logger.h>
 #include <logging/ConsoleLogWriter.h>
@@ -83,9 +84,8 @@ TEST_CASE("Testing the Logger class") {
 
     std::clog << LogLevel::Critical << "Critical to std::clog" << std::endl;
 
+    log.Emergency() << "Sleeping for 1 second" << std::flush;
     auto end = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
-    auto tend = std::chrono::system_clock::to_time_t(end);
-    log.Emergency() << "Sleeping until " << std::ctime(&tend) << std::flush;
 
     std::thread t([&]() {
         for (int i=0; i < 12 ; i++) {
@@ -137,10 +137,10 @@ TEST_CASE("Testing the Logger class") {
     CHECK(StrUtils::StartsWith(mConsoleErrorBuffer[1], std::string(AnsiEscapeCodes::ec::fg::Red) + "Critical to std::clog") == true);
 
     std::getline(fin, line);
-    CHECK(StrUtils::Contains(line, "(emergency) Sleeping until") == true);
-    CHECK(StrUtils::StartsWith(mConsoleErrorBuffer[2], std::string(AnsiEscapeCodes::ec::fg::Red) + "Sleeping until") == true);
+    CHECK(StrUtils::Contains(line, "(emergency) Sleeping for 1 second") == true);
+    CHECK(StrUtils::StartsWith(mConsoleErrorBuffer[2], std::string(AnsiEscapeCodes::ec::fg::Red) + "Sleeping for 1 second") == true);
 
-    for (int i = 0 ; i < 22 ; i++) {
+    for (int i = 0 ; i < 21 ; i++) {
         std::getline(fin, line);
         CHECK(StrUtils::Contains(line, "] (info) Writing from ") == true);
     }

@@ -52,7 +52,7 @@ Font::Font(const std::string &arFontName, Styles aStyle)
 #ifdef USE_FREETYPE
     mpImpl = std::make_unique<FreeTypeRawFont>(arFontName, 0);
 #endif
-    ASSERT(!mpImpl);
+    ASSERT(mpImpl);
 }
 
 Font::~Font()

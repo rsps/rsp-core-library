@@ -14,8 +14,7 @@
 
 using namespace rsp::utils;
 
-namespace rsp::graphics
-{
+namespace rsp::graphics {
 
 FreeTypeLibrary::FreeTypeLibrary(void)
 {
@@ -30,7 +29,7 @@ FreeTypeLibrary::~FreeTypeLibrary(void)
     FT_Done_FreeType(mFtLib);
 }
 
-FreeTypeLibrary &FreeTypeLibrary::Get()
+FreeTypeLibrary& FreeTypeLibrary::Get()
 {
     static FreeTypeLibrary instance;
     return instance;
@@ -50,7 +49,6 @@ FT_Face FreeTypeLibrary::CreateFontFace(const std::string &arFontName, Font::Sty
         if (inner == mFontSets[arFontName].end()) {
             std::clog << "Font named " << arFontName << " has no style " << static_cast<int>(aStyle) << " installed." << std::endl;
             aStyle = Font::Styles::Normal;
-            //            THROW_WITH_BACKTRACE1(FontException,  rsp::utils::StrUtils::Format("Font named %s has no style %d installed.", arFontName.c_str(), static_cast<int>(aStyle)));
         }
     }
 
@@ -96,33 +94,37 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
             if (face->style_flags & FT_STYLE_FLAG_ITALIC) {
                 style = Font::Styles::Italic;
             }
-        } else if (StrUtils::StartsWith(face->style_name, "Bold")) {
+        }
+        else if (StrUtils::StartsWith(face->style_name, "Bold")) {
             if (face->style_flags & FT_STYLE_FLAG_ITALIC) {
                 style = Font::Styles::BoldItalic;
-            } else {
+            }
+            else {
                 style = Font::Styles::Bold;
             }
         }
 
-        DLOG("Adding font " << face->family_name << ", " << face->style_name << " " << static_cast<int>(style));
+        std::clog << "Adding font " << face->family_name << ", " << face->style_name << " " << static_cast<int>(style) << std::endl;
         mFontSets[face->family_name][style] = info;
-        /*
-                std::cout << "num_faces: " << face->num_faces << "\n"
-                    << "face_index: " << (face->face_index & 0xFFFF) << ", style:" << (face->face_index >> 16) << "\n"
-                    << "face_flags: " << std::hex << face->face_flags << std::dec << "\n"
-                    << "style_flags: " << std::hex << face->style_flags << std::dec << "\n"
-                    << "num_glyphs: " << std::hex << face->num_glyphs << std::dec << "\n"
-                    << "family_name: " << std::hex << face->family_name << std::dec << "\n"
-                    << "style_name: " << std::hex << face->style_name << std::dec << "\n"
-                    << "num_fixed_sizes: " << face->num_fixed_sizes << "\n"
-                    << "available_sizes: " << face->available_sizes << "\n"
-                    << "num_charmaps: " << face->num_charmaps << "\n"
-                    << "charmaps: " << face->charmaps << "\n";
-        */
+
+#ifdef DEBUG_FONTS
+        std::cout << "num_faces: " << face->num_faces << "\n"
+            << "face_index: " << (face->face_index & 0xFFFF) << ", style:" << (face->face_index >> 16) << "\n"
+            << "face_flags: " << std::hex << face->face_flags << std::dec << "\n"
+            << "style_flags: " << std::hex << face->style_flags << std::dec << "\n"
+            << "num_glyphs: " << std::hex << face->num_glyphs << std::dec << "\n"
+            << "family_name: " << std::hex << face->family_name << std::dec << "\n"
+            << "style_name: " << std::hex << face->style_name << std::dec << "\n"
+            << "num_fixed_sizes: " << face->num_fixed_sizes << "\n"
+            << "available_sizes: " << face->available_sizes << "\n"
+            << "num_charmaps: " << face->num_charmaps << "\n"
+            << "charmaps: " << face->charmaps << "\n";
+#endif
         FT_Long num_instances = face->style_flags >> 16;
 
-        if (instance_idx < num_instances)
+        if (instance_idx < num_instances) {
             instance_idx++;
+        }
         else {
             face_idx++;
             instance_idx = 0;

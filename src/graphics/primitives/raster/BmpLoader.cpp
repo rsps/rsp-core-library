@@ -13,58 +13,60 @@
 #include <algorithm>
 //#include <cerrno>
 #include <fstream>
-#include <graphics/primitives/Color.h>
 #include <iostream>
+#include <graphics/primitives/Color.h>
+#include <logging/Logger.h>
 
 namespace rsp::graphics
 {
 
-std::ostream &operator<<(std::ostream &os, const BmpLoader::BmpHeader_t &arHeader)
+std::ostream& operator <<(std::ostream &os, const BmpLoader::BmpHeader_t &arHeader)
 {
     os << "BMP Header: \n"
-       << "Signature: " << static_cast<char>(arHeader.signature & 0xFF) << static_cast<char>(arHeader.signature >> 8) << "\n"
-       << "File Size: " << arHeader.fileSize << "\n"
-       << "reserved: " << arHeader.reserved << "\n"
-       << "Data Offset: " << arHeader.dataOffset << "\n"
-       << "Size: " << arHeader.v1.size << "\n"
-       << "Width: " << arHeader.v1.width << "\n"
-       << "Heigth: " << arHeader.v1.heigth << "\n"
-       << "Planes: " << arHeader.v1.planes << "\n"
-       << "Bits Per Pixel: " << arHeader.v1.bitsPerPixel << "\n"
-       << "Compression: " << arHeader.v1.compression << "\n"
-       << "Image Size: " << arHeader.v1.imageSize << "\n"
-       << "xPixelsPerM: " << arHeader.v1.xPixelsPerM << "\n"
-       << "yPixelsPerM: " << arHeader.v1.yPixelsPerM << "\n"
-       << "Colors Used: " << arHeader.v1.coloursUsed << "\n"
-       << "Important Colors: " << arHeader.v1.importantColours << "\n";
+        << "Signature: " << static_cast<char>(arHeader.signature & 0xFF) << static_cast<char>(arHeader.signature >> 8) << "\n"
+        << "File Size: " << arHeader.fileSize << "\n"
+        << "reserved: " << arHeader.reserved << "\n"
+        << "Data Offset: " << arHeader.dataOffset << "\n"
+        <<  "Size: " << arHeader.v1.size << "\n"
+        << "Width: " << arHeader.v1.width << "\n"
+        << "Heigth: " << arHeader.v1.heigth << "\n"
+        << "Planes: " << arHeader.v1.planes << "\n"
+        << "Bits Per Pixel: " << arHeader.v1.bitsPerPixel << "\n"
+        << "Compression: " << arHeader.v1.compression << "\n"
+        << "Image Size: "  << arHeader.v1.imageSize << "\n"
+        << "xPixelsPerM: " << arHeader.v1.xPixelsPerM << "\n"
+        << "yPixelsPerM: " << arHeader.v1.yPixelsPerM << "\n"
+        << "Colors Used: " << arHeader.v1.coloursUsed << "\n"
+        << "Important Colors: " << arHeader.v1.importantColours << "\n";
 
     if (arHeader.v1.size == sizeof(BmpLoader::BitmapV5Header)) {
         os
-            << "RedMask: " << std::hex << arHeader.v5.RedMask << "\n"
-            << "GreenMask: " << arHeader.v5.GreenMask << "\n"
-            << "BlueMask: " << arHeader.v5.BlueMask << "\n"
-            << "AlphaMask: " << arHeader.v5.AlphaMask << std::dec << "\n"
-            << "CSType: " << arHeader.v5.CSType << "\n"
-            << "RedX: " << arHeader.v5.Red.X << "\n"
-            << "RedY: " << arHeader.v5.Red.Y << "\n"
-            << "RedZ: " << arHeader.v5.Red.Z << "\n"
-            << "GreenX: " << arHeader.v5.Green.X << "\n"
-            << "GreenY: " << arHeader.v5.Green.Y << "\n"
-            << "GreenZ: " << arHeader.v5.Green.Z << "\n"
-            << "BlueX: " << arHeader.v5.Blue.X << "\n"
-            << "BlueY: " << arHeader.v5.Blue.Y << "\n"
-            << "BlueZ: " << arHeader.v5.Blue.Z << "\n"
-            << "GammaRed: " << arHeader.v5.GammaRed << "\n"
-            << "GammaGreen: " << arHeader.v5.GammaGreen << "\n"
-            << "GammaBlue: " << arHeader.v5.GammaBlue << "\n"
-            << "Intent: " << arHeader.v5.Intent << "\n"
-            << "ProfileData: " << arHeader.v5.ProfileData << "\n"
-            << "ProfileSize: " << arHeader.v5.ProfileSize << "\n"
-            << "Reserved: " << arHeader.v5.Reserved << "\n";
+        << "RedMask: " << std::hex << arHeader.v5.RedMask << "\n"
+        << "GreenMask: " << arHeader.v5.GreenMask << "\n"
+        << "BlueMask: " << arHeader.v5.BlueMask << "\n"
+        << "AlphaMask: " << arHeader.v5.AlphaMask << std::dec << "\n"
+        << "CSType: " << arHeader.v5.CSType << "\n"
+        << "RedX: " << arHeader.v5.Red.X << "\n"
+        << "RedY: " << arHeader.v5.Red.Y << "\n"
+        << "RedZ: " << arHeader.v5.Red.Z << "\n"
+        << "GreenX: " << arHeader.v5.Green.X << "\n"
+        << "GreenY: " << arHeader.v5.Green.Y << "\n"
+        << "GreenZ: " << arHeader.v5.Green.Z << "\n"
+        << "BlueX: " << arHeader.v5.Blue.X << "\n"
+        << "BlueY: " << arHeader.v5.Blue.Y << "\n"
+        << "BlueZ: " << arHeader.v5.Blue.Z << "\n"
+        << "GammaRed: " << arHeader.v5.GammaRed << "\n"
+        << "GammaGreen: " << arHeader.v5.GammaGreen << "\n"
+        << "GammaBlue: " << arHeader.v5.GammaBlue << "\n"
+        << "Intent: " << arHeader.v5.Intent << "\n"
+        << "ProfileData: " << arHeader.v5.ProfileData << "\n"
+        << "ProfileSize: " << arHeader.v5.ProfileSize << "\n"
+        << "Reserved: " << arHeader.v5.Reserved << "\n";
     }
 
     return os;
 }
+
 
 std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
 {
@@ -98,6 +100,8 @@ void BmpLoader::ReadHeader(std::ifstream &aFile)
     // Read the 54 byte header
     aFile.read(reinterpret_cast<char *>(&mBmpHeader), sizeof(mBmpHeader));
 
+    DLOG(mBmpHeader);
+
     mWidth = mBmpHeader.v1.width;
     mHeight = mBmpHeader.v1.heigth;
 
@@ -111,6 +115,7 @@ void BmpLoader::ReadData(std::ifstream &aFile)
 {
     // Figure out amount to read per row
     int paddedRowSize = (mBmpHeader.v1.width * mBytesPerPixel + 3) & (~3);
+    DLOG("Padded Row size: " << paddedRowSize);
 
     // Initialize containers for reading
     std::vector<uint8_t> pixelRow;
@@ -139,7 +144,8 @@ uint32_t BmpLoader::ReadPixel(const std::vector<uint8_t> &aPixelRow, const size_
         pixel.SetGreen(aPixelRow[aRowPtr + 2]);
         pixel.SetBlue(aPixelRow[aRowPtr + 1]);
         pixel.SetAlpha(aPixelRow[aRowPtr + 0]);
-    } else {
+    }
+    else {
         for (size_t i = 0; i < mBytesPerPixel; i++) {
             pixel = static_cast<uint32_t>(pixel) | ((static_cast<uint32_t>(aPixelRow[aRowPtr + i])) << (8 * i));
         }

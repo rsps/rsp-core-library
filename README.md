@@ -31,6 +31,7 @@ To build the library and accompanied test, simply go into the build directory an
 ```
 cd build
 cmake ..
+make
 ```
 Tests can now be executed with `./rsp-core-lib-test` or simply `ctest`
 

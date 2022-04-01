@@ -55,7 +55,7 @@ Glyph::Glyph(void* apFace)
     mTop = arFace->glyph->bitmap_top;
     mLeft = arFace->glyph->bitmap_left;
 
-    mPixels.resize(unsign(mWidth) * unsign(mHeight), 0xFF);
+    mPixels.resize(static_cast<std::vector<uint8_t>::size_type>(unsign(mWidth)) * unsign(mHeight), 0xFF);
     memcpy(mPixels.data(), arFace->glyph->bitmap.buffer, mPixels.size());
 }
 
@@ -79,8 +79,8 @@ std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aL
     int line_height = 0;
 
     std::vector<Glyph> result;
-    for (auto s : unicode) {
-        result.push_back(getSymbol(s, mStyle));
+    for (char32_t c : unicode) {
+        result.push_back(getSymbol(c, mStyle));
         line_height = std::max(line_height, result.back().mHeight);
         auto rs = result.size();
         if (rs > 1) {
@@ -89,7 +89,6 @@ std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aL
             // Space ' ' has no width, add width of next character to space character
             if (result[rs - 2].mWidth == 0) {
                 result[rs - 2].mWidth = mSizePx;
-//                result[rs - 2].mWidth = result[rs - 1].mWidth;
             }
         }
     }
@@ -98,18 +97,15 @@ std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aL
 
     int top = line_height;
     int left = 0;
-    for (auto &glyph : result) {
-        switch (glyph.mSymbolUnicode) {
-            case '\n':
-                top += line_height + aLineSpacing;
-                left = 0;
-                break;
-
-            default:
-                glyph.mTop += top - glyph.mHeight - glyph.mTop;
-                glyph.mLeft += left;
-                left += glyph.mWidth;
-                break;
+    for (Glyph &glyph : result) {
+        if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
+            top += line_height + aLineSpacing;
+            left = 0;
+        }
+        else {
+            glyph.mTop += top - glyph.mHeight - glyph.mTop;
+            glyph.mLeft += left;
+            left += glyph.mWidth;
         }
     }
     return result;

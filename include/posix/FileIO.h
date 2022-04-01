@@ -27,8 +27,8 @@ namespace rsp::posix
  */
 class FileIO
 {
-  public:
-    //    const std::ios_base::openmode cNonBlock
+public:
+    static constexpr std::ios_base::openmode cNonBlock = static_cast<std::ios_base::openmode>(static_cast<int>(std::_Ios_Openmode::_S_ios_openmode_end + 1));
 
     /**
      * Construct a FileIO object, open/create file if given as argument.

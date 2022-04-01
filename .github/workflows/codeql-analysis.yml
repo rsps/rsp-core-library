@@ -2,10 +2,10 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ main, utilities, SceneChanging ]
+    branches: [ main, utilities, development ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ main, utilities, SceneChanging ]
+    branches: [ main, utilities, development ]
   schedule:
     - cron: '23 19 * * 1'
 
@@ -32,7 +32,7 @@ jobs:
       uses: github/codeql-action/init@v1
       with:
         languages: ${{ matrix.language }}
-        queries: security-extended
+        queries: security-and-quality
 
 
     - name: Autobuild

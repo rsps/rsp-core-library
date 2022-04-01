@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \copyright   Copyright 2022 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
@@ -18,19 +18,20 @@
 namespace rsp::graphics
 {
 
-class PngLoader : public ImgLoader
+class PngLoader: public ImgLoader
 {
-  public:
+public:
     std::vector<uint32_t> LoadImg(const std::string &aImgName);
 
-  protected:
-    // struct IDAT {
-    // } __attribute__((packed));  //To stop alignment;
-    struct PLTE {
-    } __attribute__((packed)); // To stop alignment;
-    struct IEND {
-    } __attribute__((packed)); // To stop alignment;
-    struct IHDR {
+protected:
+    struct PLTE
+    {
+    } __attribute__((packed)); //To stop alignment;
+    struct IEND
+    {
+    } __attribute__((packed)); //To stop alignment;
+    struct IHDR
+    {
         uint32_t width;
         uint32_t height;
         uint8_t bitDepth;
@@ -43,14 +44,15 @@ class PngLoader : public ImgLoader
     {
         uint32_t length = 0;
         char type[4];
-        union {
+        union
+        {
             uint8_t *data = nullptr;
             struct IHDR *ihdr;
             struct PLTE *plte;
             struct IEND *iend;
         };
-        // uint32_t crc; //Always just at the end of the pointer
-    } __attribute__((packed)); // To stop alignment
+        // A CRC value of type uint32_t is always appended to the chunk
+    } __attribute__((packed)); //To stop alignment
 
     uint8_t mPngSignature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 

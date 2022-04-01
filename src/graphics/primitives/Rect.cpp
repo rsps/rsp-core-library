@@ -65,7 +65,7 @@ int Rect::GetTop() const
 
 void Rect::SetTop(int aTopValue)
 {
-    ASSERT(aTopValue > mRightBottom.mY);
+    ASSERT(aTopValue <= mRightBottom.mY);
     mLeftTop.mY = aTopValue;
 }
 
@@ -76,7 +76,7 @@ int Rect::GetBottom() const
 
 void Rect::SetBottom(int aBotValue)
 {
-    ASSERT(aBotValue < mLeftTop.mY);
+    ASSERT(aBotValue >= mLeftTop.mY);
     mRightBottom.mY = aBotValue;
 }
 
@@ -87,7 +87,7 @@ int Rect::GetLeft() const
 
 void Rect::SetLeft(int aLeftValue)
 {
-    ASSERT(aLeftValue > mRightBottom.mX);
+    ASSERT(aLeftValue <= mRightBottom.mX);
     mLeftTop.mX = aLeftValue;
 }
 
@@ -98,7 +98,7 @@ int Rect::GetRight() const
 
 void Rect::SetRight(int aRightValue)
 {
-    ASSERT(aRightValue < mLeftTop.mX);
+    ASSERT(aRightValue >= mLeftTop.mX);
     mRightBottom.mX = aRightValue;
 }
 

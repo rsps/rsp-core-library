@@ -34,7 +34,9 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
 
     //Read header and verify that it is a png file
     uint8_t signature[8];
-    fread(signature, sizeof(uint8_t), sizeof(signature), file);
+    if (fread(signature, sizeof(signature), 1 , file) != 1) {
+        THROW_SYSTEM("Could not read signature.");
+    }
     if (!CheckSignature(signature, 8)) {
         throw CoreException("Signature not matching"); //return;  //Some error, probably just throw exception
     }
@@ -43,20 +45,20 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
     PNGChunk pngchunk;
 
     //-- Chunk reading loop begins here --
-    //while (std::strcmp(pngchunk.type, "IEND") != 0) {
-    //}
 
     //Temp loop for testing
     for (size_t i = 0; i < 3; i++) {
         //Read length and type
-        fread(&pngchunk, sizeof(uint8_t), sizeof(pngchunk.length) + sizeof(pngchunk.type), file);
+        if (fread(&pngchunk, sizeof(pngchunk.length) + sizeof(pngchunk.type), 1, file) != 1) {
+            THROW_SYSTEM("Could not read PNG chunk header.");
+        }
         //Flip length
         pngchunk.length = be32toh(pngchunk.length);
 
         std::cout << "Type: " << pngchunk.type << std::endl;
         std::cout << "Length: " << pngchunk.length << std::endl;
 
-        //If ciritcal chunk
+        //If critcal chunk
         if (std::isupper(pngchunk.type[0])) {
             std::cout << "Chunk is Critical" << std::endl;
             //Chunk is critical
@@ -69,14 +71,17 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
 
                 //Use length to read the chunks data field
                 //Read chunk and crc into data buffer
-                fread(pngchunk.data, sizeof(uint8_t), pngchunk.length + sizeof(uint32_t), file); // read whole chunk
+                if (fread(pngchunk.data, pngchunk.length + sizeof(uint32_t), 1, file) != 1) { // read whole chunk
+                    THROW_SYSTEM("Could not read PNG chunk data.");
+                }
 
                 //Flip time
                 //Only flip things that are larger than a byte
                 pngchunk.ihdr->width = be32toh(pngchunk.ihdr->width);
                 pngchunk.ihdr->height = be32toh(pngchunk.ihdr->height);
-                //Maybe, maybe not flip crc
-                //*(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
+                /* TODO: Maybe, maybe not flip crc
+                 * (uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
+                 */
 
                 //Set important bitmap variables
                 mWidth = static_cast<int>(pngchunk.ihdr->width);
@@ -104,13 +109,16 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
                 pngchunk.data = new uint8_t[pngchunk.length + sizeof(uint32_t)];
 
                 //Use length to read the chunks data field
-                fread(pngchunk.data, sizeof(uint8_t), pngchunk.length + sizeof(uint32_t), file);
+                if (fread(pngchunk.data, pngchunk.length + sizeof(uint32_t), 1, file) != 1) {
+                    THROW_SYSTEM("Could not read PNG IDAT chunk.");
+                }
 
                 //Decode
 
-                //Maybe, maybe not flip crc
-                //*(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
-                // TODO do something with crc
+                /* TODO: Maybe, maybe not flip crc
+                 *(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
+                 * TODO do something with crc
+                 */
                 std::cout << "Crc: " << std::hex << *reinterpret_cast<uint32_t*>(&pngchunk.data[pngchunk.length]) << std::endl;
                 std::cout << std::dec;
 
@@ -136,7 +144,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
         }
         //Clean up memory
         if (pngchunk.data != nullptr) {
-            delete pngchunk.data;
+            delete[] pngchunk.data;
             pngchunk.data = nullptr;
         }
         std::cout << std::endl;
