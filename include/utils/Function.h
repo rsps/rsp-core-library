@@ -48,25 +48,27 @@ private:
             return fn(args...);
         }
 
-        Wrapper(F &&fn)
-            : fn(std::move(fn))
+        Wrapper(F &&aFn)
+            : fn(std::move(aFn))
         {
         }
     };
 
     WrapperBase *ptr = nullptr;
 
-    static void Free(WrapperBase *aPtr)
+    static void _free(WrapperBase *aPtr)
     {
-        if (aPtr && --aPtr->refcount == 0)
+        if (aPtr && --aPtr->refcount == 0) {
             delete aPtr;
+        }
     }
 
-    void Copy(const Function &arOther)
+    void _copy(const Function &arOther)
     {
         ptr = arOther.ptr;
-        if (ptr)
+        if (ptr) {
             ptr->refcount++;
+        }
     }
 
 public:
@@ -81,20 +83,20 @@ public:
 
     ~Function()
     {
-        Free(ptr);
+        _free(ptr);
     }
 
-    Function(const Function &arOther)
+    Function(const Function &arOther) : std::function<Res(ArgTypes...)>(arOther)
     {
-        Copy(arOther);
+        _copy(arOther);
     }
 
     Function& operator=(const Function &arOther)
     {
         if (&arOther != this) {
             auto b = ptr;
-            Copy(arOther);
-            Free(b);
+            _copy(arOther);
+            _free(b);
         }
         return *this;
     }
@@ -110,7 +112,7 @@ public:
     Function& operator=(Function &&arOther)
     {
         if (&arOther != this) {
-            Free(ptr);
+            _free(ptr);
             ptr = arOther.ptr;
             arOther.ptr = nullptr;
         }
@@ -129,7 +131,7 @@ public:
 
     void Clear()
     {
-        Free(ptr);
+        _free(ptr);
         ptr = nullptr;
     }
 };

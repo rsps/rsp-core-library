@@ -16,16 +16,16 @@ using namespace rsp::messaging;
 namespace rsp::graphics
 {
 
-Scene::Scene(const Rect &arRect, Broker<ClickTopics> &arBroker)
+Scene::Scene(const Rect &arRect, const std::string &arName)
     : Control(arRect),
-      Publisher(arBroker)
+      mName(arName)
 {
 }
 
 void Scene::ProcessInput(Input &arInput)
 {
-    for (TouchArea *area : mTouchables) {
-        area->ProcessInput(arInput);
+    for (TouchArea &area : mTouchables) {
+        area.ProcessInput(arInput);
     }
 }
 
@@ -36,11 +36,9 @@ void Scene::Render(Canvas &arCanvas)
     }
 }
 
-void Scene::BindElementsToBroker()
+TouchArea& Scene::makeTouchArea(const Rect &arRect)
 {
-    for (TouchArea* touchable : mTouchables) {
-        touchable->RegisterOnClicked([&](ClickTopics aTopic, ClickedEvent &aEvent) noexcept { PublishToBroker(aTopic, aEvent); });
-    }
+    return mTouchables.emplace_back(arRect);
 }
 
 } // namespace rsp::graphics

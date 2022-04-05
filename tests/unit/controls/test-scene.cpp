@@ -13,55 +13,25 @@
 #include "messaging/Subscriber.h"
 #include "posix/FileSystem.h"
 #include <doctest.h>
+#include <graphics/controls/SceneMap.h>
+#include "scenes/FirstScene.h"
+#include "scenes/SecondScene.h"
 
 using namespace rsp::graphics;
 using namespace rsp::messaging;
 
-class TestScene : public Scene
+class Scenes : public SceneMap
 {
-  public:
-    TestScene(Rect &aRect, rsp::messaging::Broker<rsp::messaging::ClickTopics> &arBroker)
-        : Scene(aRect, arBroker)
-    {
-        // Set member variables values
-        Rect topRect(Point(100, 400), 200, 100);
-        topArea = TouchArea(topRect, rsp::messaging::ClickTopics::NullTopic, "");
-        topImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
-
-        Rect botRect(Point(100, 600), 200, 100);
-        botArea = TouchArea(botRect);
-        botImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
-
-        // Bind onPressed
-        topArea.RegisterOnPressed(std::bind(&Image::HandleCallback, &topImg, std::placeholders::_1));
-        botArea.RegisterOnPressed(std::bind(&Image::HandleCallback, &botImg, std::placeholders::_1));
-
-        // Add them to the lists
-        mTouchables.push_back(&topArea);
-        mTouchables.push_back(&botArea);
-        mChildren.push_back(&topImg);
-        mChildren.push_back(&botImg);
-    };
-
-    ~TestScene() {}
-
-    std::vector<TouchArea *> &GetTouchables()
-    {
-        return mTouchables;
-    }
-    std::vector<Control *> &GetImages()
-    {
-        return mChildren;
+public:
+    Scenes() : SceneMap() {
+        MakeScene<rsp::graphics::FirstScene>();
+        MakeScene<rsp::graphics::SecondScene>();
     }
 
-    Color background{0x323232}; // color from old main.qml
-
-    TouchArea topArea{};
-    TouchArea botArea{};
-
-    Image topImg{};
-    Image botImg{};
+    rsp::graphics::FirstScene& First() { return *reinterpret_cast<rsp::graphics::FirstScene*>(&operator[]("FirstScene")); }
+    rsp::graphics::SecondScene& Second() { return *reinterpret_cast<rsp::graphics::SecondScene*>(&operator[]("SecondScene")); }
 };
+
 
 class TestSub : public Subscriber<ClickTopics>
 {
@@ -77,25 +47,33 @@ class TestSub : public Subscriber<ClickTopics>
     }
     int calledCount = 0;
 };
+
+
 TEST_CASE("Scene Test")
 {
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
-    Rect screenSize = Rect(0, 0, 480, 800);
-    Broker<ClickTopics> testBroker;
-    TestScene testScene(screenSize, testBroker);
+
+    Scenes scenes;
     Input anInput;
-    Point insideTopPoint(testScene.topArea.GetArea().GetLeft() + (rand() % testScene.topArea.GetArea().GetWidth()),
-                         testScene.topArea.GetArea().GetTop() + (rand() % testScene.topArea.GetArea().GetHeight()));
-    Point insideBotPoint(testScene.botArea.GetArea().GetLeft() + (rand() % testScene.botArea.GetArea().GetWidth()),
-                         testScene.botArea.GetArea().GetTop() + (rand() % testScene.botArea.GetArea().GetHeight()));
+    int click_count = 0;
+
+    scenes.Second().Whenclicked() = [&click_count]() { click_count++; };
+
+    Rect tr = scenes.Second().GetTopArea().GetArea();
+    Point insideTopPoint(tr.GetLeft() + (rand() % tr.GetWidth()),
+                         tr.GetTop() + (rand() % tr.GetHeight()));
+
+    Rect br = scenes.Second().GetBotArea().GetArea();
+    Point insideBotPoint(br.GetLeft() + (rand() % br.GetWidth()),
+                         br.GetTop() + (rand() % br.GetHeight()));
 
     SUBCASE("Scene Process Input")
     {
         // Arrange
         anInput.type = InputType::Press;
-        testScene.Render(fb);
+        scenes.Second().Render(fb);
 
         SUBCASE("Process input for Top elements")
         {
@@ -106,11 +84,11 @@ TEST_CASE("Scene Test")
             MESSAGE("Input y:" << anInput.y);
 
             // Act
-            testScene.ProcessInput(anInput);
+            scenes.Second().ProcessInput(anInput);
 
             // Assert
-            CHECK(testScene.topImg.IsInvalid());
-            CHECK_FALSE(testScene.botImg.IsInvalid());
+            CHECK(scenes.Second().GetTopImg().IsInvalid());
+            CHECK_FALSE(scenes.Second().GetBotImg().IsInvalid());
         }
         SUBCASE("Process input for Bot elements")
         {
@@ -119,27 +97,27 @@ TEST_CASE("Scene Test")
             anInput.y = insideBotPoint.GetY();
 
             // Act
-            testScene.ProcessInput(anInput);
+            scenes.Second().ProcessInput(anInput);
 
             // Assert
-            CHECK(testScene.botImg.IsInvalid());
-            CHECK_FALSE(testScene.topImg.IsInvalid());
+            CHECK(scenes.Second().GetBotImg().IsInvalid());
+            CHECK_FALSE(scenes.Second().GetTopImg().IsInvalid());
         }
     }
     SUBCASE("Scene Render Elements")
     {
         // Arrange
-
-        for (auto image : testScene.GetImages()) {
-            image->Invalidate();
-        }
+        scenes.Second().GetTopImg().Invalidate();
+        scenes.Second().GetBotImg().Invalidate();
+        CHECK(scenes.Second().GetTopImg().IsInvalid());
+        CHECK(scenes.Second().GetBotImg().IsInvalid());
 
         // Act
-        testScene.Render(fb);
+        scenes.Second().Render(fb);
 
         // Assert
-        CHECK_FALSE(testScene.topImg.IsInvalid());
-        CHECK_FALSE(testScene.botImg.IsInvalid());
+        CHECK_FALSE(scenes.Second().GetTopImg().IsInvalid());
+        CHECK_FALSE(scenes.Second().GetBotImg().IsInvalid());
     }
 
     SUBCASE("Scene Bind click Callbacks")

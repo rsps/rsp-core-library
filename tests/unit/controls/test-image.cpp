@@ -49,30 +49,4 @@ TEST_CASE("Image Test")
             CHECK(fb.GetPixel(insidePoint) != red);
         }
     }
-    SUBCASE("Handle Callback Image Test")
-    {
-        // Arrange
-        testImage.Render(fb);
-        // Act & Assert
-        CHECK_FALSE(testImage.IsInvalid());
-
-        SUBCASE("Callback new State")
-        {
-            // Act
-            testImage.HandleCallback(Control::States::pressed);
-
-            // Assert
-            CHECK(testImage.GetState() == Control::States::pressed);
-            CHECK(testImage.IsInvalid());
-        }
-        SUBCASE("Callback current State")
-        {
-            // Act
-            testImage.HandleCallback(Control::States::normal);
-
-            // Assert
-            CHECK(testImage.GetState() == Control::States::normal);
-            CHECK_FALSE(testImage.IsInvalid());
-        }
-    }
 }

@@ -6,6 +6,7 @@
  * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
+ * \author      Steffen Brummer
  */
 #ifndef SECONDSCENE_H
 #define SECONDSCENE_H
@@ -17,8 +18,10 @@ namespace rsp::graphics
 class SecondScene : public Scene480x800
 {
 public:
+    using Clicked_t = rsp::utils::Function<void(void)>;
+
     SecondScene() //, rsp::messaging::Broker<rsp::messaging::ClickTopics> &arBroker)
-        : Scene480x800()
+        : Scene480x800("SecondScene")
     {
         // myName = "Second Scene";
         //  Set member variables values
@@ -33,24 +36,30 @@ public:
         TouchArea& bot_btn = makeTouchArea(botRect);
         bot_btn.GetOnPress() = [this](const Point &arPoint) { mBotBtnImg.SetState(Control::States::pressed); };
         bot_btn.GetOnLift() = [this](const Point &arPoint) { mBotBtnImg.SetState(Control::States::normal); };
-        bot_btn.GetOnClick() = [this](const Point &arPoint) { ; };
-
-//        botBtn = TouchArea(botRect, rsp::messaging::ClickTopics::SceneChange, "first");
-
-        // Bind onPressed
-//        botBtn.RegisterOnPressed(std::bind(&Image::HandleCallback, &mBotBtnImg, std::placeholders::_1));
-
-        //  Bind onClicked or set clicked variables || Should be set from Constructor
+        bot_btn.GetOnClick() = std::bind(&SecondScene::doClick, this, std::placeholders::_1);
 
         //  Add them to the lists?
         AddChild(&mTopBtnImg);
         AddChild(&mBotBtnImg);
     };
 
+    TouchArea& GetTopArea() { return mTouchables[0]; }
+    TouchArea& GetBotArea() { return mTouchables[1]; }
+
+    Clicked_t& Whenclicked() { return mWhenClicked; }
+
+    Image& GetTopImg() { return mTopBtnImg;};
+    Image& GetBotImg() { return mBotBtnImg;};
 
 protected:
     Image mTopBtnImg{};
     Image mBotBtnImg{};
+    Clicked_t mWhenClicked{};
+
+    void doClick(const Point &arPoint) {
+        mWhenClicked();
+    }
 };
+
 } // namespace rsp::graphics
 #endif // SECONDSCENE_H

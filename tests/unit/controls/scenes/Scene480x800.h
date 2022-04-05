@@ -19,7 +19,7 @@ namespace rsp::graphics {
 class Scene480x800 : public Scene
 {
 public:
-    Scene480x800(): Scene({0, 0, 480, 800}) {}
+    Scene480x800(const std::string &arName): Scene({0, 0, 480, 800}, arName) {}
 };
 
 } // namespace rsp::graphics

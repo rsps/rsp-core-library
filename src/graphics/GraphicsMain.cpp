@@ -17,15 +17,15 @@ using namespace rsp::messaging;
 namespace rsp::graphics
 {
 
-GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader, Broker<ClickTopics>& arBroker)
+GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInputs, SceneMap &arScenes, Broker<ClickTopics>& arBroker)
     : Subscriber<ClickTopics>(arBroker),
       mBufferedCanvas(aBufferedCanvas),
       mInputs(aInputs),
-      mSceneLoader(aSceneLoader),
-      mActiveScene(&mSceneLoader.GetFirstScene())
+      mrScenes(arScenes),
+      mActiveScene(&mrScenes.FirstScene())
 {
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-    mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
+    mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
 }
 
 GraphicsMain::~GraphicsMain()
@@ -57,7 +57,7 @@ void GraphicsMain::Run()
 void GraphicsMain::ChangeScene(std::string aSceneName)
 {
     mActiveScene->Invalidate();
-    mActiveScene = &mSceneLoader.GetScene(aSceneName);
+    mActiveScene = &mrScenes[aSceneName];
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mActiveScene->Render(mBufferedCanvas);
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);

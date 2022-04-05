@@ -31,12 +31,4 @@ void Image::Render(Canvas &arCanvas)
     mIsInvalid = false;
 }
 
-void Image::HandleCallback(States aState)
-{
-    if (aState != mState) {
-        mState = aState;
-        Invalidate();
-    }
-}
-
 } // namespace rsp::graphics

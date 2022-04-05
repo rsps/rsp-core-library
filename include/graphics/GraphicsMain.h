@@ -12,7 +12,7 @@
 
 #include "graphics/BufferedCanvas.h"
 #include "graphics/InputCreator.h"
-#include "graphics/SceneLoader.h"
+#include <graphics/controls/SceneMap.h>
 #include <messaging/Subscriber.h>
 #include <messaging/Broker.h>
 #include <messaging/eventTypes/ClickedEvent.h>
@@ -23,7 +23,7 @@ namespace rsp::graphics
 class GraphicsMain : public rsp::messaging::Subscriber<rsp::messaging::ClickTopics>
 {
   public:
-    GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader, rsp::messaging::Broker<rsp::messaging::ClickTopics>& arBroker);
+    GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, SceneMap &arScenes, rsp::messaging::Broker<rsp::messaging::ClickTopics>& arBroker);
     GraphicsMain(const GraphicsMain &) = default;
     GraphicsMain &operator=(const GraphicsMain &) = default;
     ~GraphicsMain();
@@ -45,7 +45,7 @@ class GraphicsMain : public rsp::messaging::Subscriber<rsp::messaging::ClickTopi
     void ChangeScene(std::string aSceneName);
 
     /**
-     * \brief Override Handle for recieving messaging events
+     * \brief Override Handle for receiving messaging events
      * \param arNewEvent Reference to the event
      */
     void HandleEvent(rsp::messaging::Event &arNewEvent) override;
@@ -53,10 +53,10 @@ class GraphicsMain : public rsp::messaging::Subscriber<rsp::messaging::ClickTopi
   private:
     BufferedCanvas &mBufferedCanvas;
     InputCreator &mInputs;
-    SceneLoader &mSceneLoader;
-    Scene *mActiveScene;
     bool mTerminated = false;
     std::vector<Input> inputCache{};
+    SceneMap &mrScenes;
+    Scene *mActiveScene;
 
     // Temp
     void PrintInput(Input aInput);

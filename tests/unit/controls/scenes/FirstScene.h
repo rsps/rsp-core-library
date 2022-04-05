@@ -17,8 +17,8 @@ namespace rsp::graphics {
 class FirstScene : public Scene480x800
 {
 public:
-    FirstScene(const Rect &arRect)
-        : Scene(arRect)
+    FirstScene()
+        : Scene480x800("FirstScene")
     {
         // myName = "First Scene";
         // Set member variables values

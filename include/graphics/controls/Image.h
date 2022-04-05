@@ -29,12 +29,6 @@ class Image : public Control
      */
     void Render(Canvas &arCanvas) override;
 
-    /**
-     * \brief Handles the callback from a touchable area
-     * \param aCanvas The canvas the object is rendered on
-     */
-    void HandleCallback(States aState);
-
   protected:
     std::map<States, Bitmap> mStateMap{};
 };

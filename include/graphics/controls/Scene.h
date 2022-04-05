@@ -14,18 +14,23 @@
 #include "Control.h"
 #include "Input.h"
 #include "TouchArea.h"
-#include <messaging/Publisher.h>
-#include <messaging/eventTypes/ClickedEvent.h>
 #include <vector>
 
 namespace rsp::graphics
 {
 
-class Scene : public Control, public rsp::messaging::Publisher<rsp::messaging::ClickTopics>
+class Scene : public Control
 {
   public:
-    Scene(const Rect &arRect, rsp::messaging::Broker<rsp::messaging::ClickTopics> &arBroker);
+    Scene(const Rect &arRect, const std::string &arName);
     virtual ~Scene() {}
+
+    /**
+     * \brief Get the name of the specific scene.
+     *
+     * \return string with name of scene
+     */
+    const std::string& GetName() { return mName; }
 
     /**
      * \brief Processes input in all touchable areas within Scene
@@ -39,13 +44,11 @@ class Scene : public Control, public rsp::messaging::Publisher<rsp::messaging::C
      */
     void Render(Canvas &arCanvas) override;
 
-    /**
-     * \brief Register all touchable areas's click callback to the given current Broker
-     */
-    void BindElementsToBroker();
-
   protected:
-    std::vector<TouchArea *> mTouchables{};
+    std::string mName;
+    std::vector<TouchArea> mTouchables{};
+
+    TouchArea& makeTouchArea(const Rect &arRect);
 };
 
 } // namespace rsp::graphics

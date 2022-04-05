@@ -10,19 +10,23 @@
 #ifndef TOUCHAREA_H
 #define TOUCHAREA_H
 
-#include "graphics/controls/Image.h"
-#include "graphics/controls/Input.h"
-#include "graphics/primitives/Rect.h"
-#include "messaging/eventTypes/ClickedEvent.h"
+#include "Image.h"
+#include "Input.h"
+#include <graphics/primitives/Rect.h>
+#include <messaging/eventTypes/ClickedEvent.h>
+#include <utils/Function.h>
 
 namespace rsp::graphics
 {
 
+class Scene;
+
 class TouchArea
 {
   public:
-    TouchArea() : mTouchArea(0, 0, 0, 0), mClickedTopic(rsp::messaging::ClickTopics::NullTopic), mClickEvent(""){};
-    TouchArea(Rect &arArea, rsp::messaging::ClickTopics aClickTopic = rsp::messaging::ClickTopics::NullTopic, std::string aClickInfo = "");
+    using TouchCallback_t = rsp::utils::Function<void(const Point&)>;
+
+    TouchArea(const Rect &arArea);
     ~TouchArea();
 
     /**
@@ -37,18 +41,6 @@ class TouchArea
      * \return True if hit
      */
     bool IsHit(const Point &arPoint) const;
-
-    /**
-     * \brief Register a function to be called for pressed events
-     * \param aFunc A function to handle pressed callbacks
-     */
-    void RegisterOnPressed(std::function<void(Control::States)> aFunc);
-
-    /**
-     * \brief Register a function to be called for click events
-     * \param aFunc A function to handle clicked callbacks
-     */
-    void RegisterOnClicked(std::function<void(rsp::messaging::ClickTopics, rsp::messaging::ClickedEvent &)> aFunc);
 
     /**
      * \brief The default =operator
@@ -72,15 +64,43 @@ class TouchArea
      */
     const Rect &GetArea() const { return mTouchArea; }
 
+    /**
+     * \brief OnPress callback reference
+     *
+     * \return Reference to callback object
+     */
+    TouchCallback_t& GetOnPress() { return mOnPress; }
+
+    /**
+     * \brief OnMove callback reference
+     *
+     * \return Reference to callback object
+     */
+    TouchCallback_t& GetOnMove() { return mOnMove; }
+
+    /**
+     * \brief OnLift callback reference
+     *
+     * \return Reference to callback object
+     */
+    TouchCallback_t& GetOnLift() { return mOnLift; }
+
+    /**
+     * \brief OnClick callback reference
+     *
+     * \return Reference to callback object
+     */
+    TouchCallback_t& GetOnClick() { return mOnClick; }
+
   protected:
-    std::function<void(Control::States)> mPressed{};
-    std::function<void(rsp::messaging::ClickTopics, rsp::messaging::ClickedEvent &)> mClicked{};
+    TouchCallback_t mOnPress{};
+    TouchCallback_t mOnMove{};
+    TouchCallback_t mOnLift{};
+    TouchCallback_t mOnClick{};
 
     Rect mTouchArea{};
-    Point mCurrentPress{0, 0};
-    Point mOriginalPress{0, 0};
-    rsp::messaging::ClickTopics mClickedTopic;
-    rsp::messaging::ClickedEvent mClickEvent;
+    Point mCurrentPress{};
+    Point mOriginalPress{};
 };
 
 } // namespace rsp::graphics
