@@ -26,8 +26,11 @@ class TouchArea
   public:
     using TouchCallback_t = rsp::utils::Function<void(const Point&)>;
 
-    TouchArea(const Rect &arArea);
+    TouchArea();
     ~TouchArea();
+
+    TouchArea(const TouchArea&) = default;
+    TouchArea(TouchArea&&) = default;
 
     /**
      * \brief Processes input for press or click callbacks
@@ -43,26 +46,30 @@ class TouchArea
     bool IsHit(const Point &arPoint) const;
 
     /**
-     * \brief The default =operator
+     * \brief Assignment operator
      * \param arTouchArea A const reference to a TouchArea
+     * \return Reference to this TouchArea
      */
     TouchArea &operator=(const TouchArea &) = default;
+
+    /**
+     * \brief Move operator
+     * \param arTouchArea A const reference to a TouchArea
+     * \return Reference to this TouchArea
+     */
+    TouchArea &operator=(TouchArea &&) = default;
 
     /**
      * \brief Sets the area of the TouchArea
      * \param arRect The new rectangle used as the defined area
      */
-    TouchArea &SetArea(const Rect &arRect)
-    {
-        mTouchArea = arRect;
-        return *this;
-    }
+    TouchArea& SetArea(const Rect &arRect);
 
     /**
      * \brief Gets the area of the TouchArea
      * \return A reference to the current defined area as a Rectangle
      */
-    const Rect &GetArea() const { return mTouchArea; }
+    const Rect& GetArea() const { return mTouchArea; }
 
     /**
      * \brief OnPress callback reference

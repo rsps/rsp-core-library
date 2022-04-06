@@ -11,6 +11,7 @@
 #include "graphics/Framebuffer.h"
 #include "graphics/controls/Scene.h"
 #include "messaging/Subscriber.h"
+#include "messaging/Publisher.h"
 #include "posix/FileSystem.h"
 #include <doctest.h>
 #include <graphics/controls/SceneMap.h>
@@ -23,7 +24,10 @@ using namespace rsp::messaging;
 class Scenes : public SceneMap
 {
 public:
-    Scenes() : SceneMap() {
+    Scenes()
+        : SceneMap()
+    {
+        std::cout << "Creating Scenes" << std::endl;
         MakeScene<rsp::graphics::FirstScene>();
         MakeScene<rsp::graphics::SecondScene>();
     }
@@ -43,9 +47,13 @@ class TestSub : public Subscriber<ClickTopics>
 
     void HandleEvent(Event &arNewEvent) override
     {
+        auto event = arNewEvent.GetAs<rsp::messaging::ClickedEvent>();
+
+        message = event.mMessage;
         calledCount++;
     }
     int calledCount = 0;
+    std::string message{};
 };
 
 
@@ -55,19 +63,20 @@ TEST_CASE("Scene Test")
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
 
+    MESSAGE("step1");
     Scenes scenes;
+    MESSAGE("step2");
     Input anInput;
-    int click_count = 0;
-
-    scenes.Second().Whenclicked() = [&click_count]() { click_count++; };
 
     Rect tr = scenes.Second().GetTopArea().GetArea();
     Point insideTopPoint(tr.GetLeft() + (rand() % tr.GetWidth()),
                          tr.GetTop() + (rand() % tr.GetHeight()));
+    MESSAGE("step3");
 
     Rect br = scenes.Second().GetBotArea().GetArea();
     Point insideBotPoint(br.GetLeft() + (rand() % br.GetWidth()),
                          br.GetTop() + (rand() % br.GetHeight()));
+    MESSAGE("step4");
 
     SUBCASE("Scene Process Input")
     {
@@ -122,20 +131,27 @@ TEST_CASE("Scene Test")
 
     SUBCASE("Scene Bind click Callbacks")
     {
+        Broker<ClickTopics> broker;
+        Publisher<ClickTopics> publisher(broker);
+        scenes.Second().Whenclicked() = [&publisher]() {
+            rsp::messaging::ClickedEvent event("Button was clicked.");
+            publisher.PublishToBroker(ClickTopics::SceneChange, event);
+        };
+
         // Arrange
-        TestSub sub(testBroker);
-        sub.Subscribe(ClickTopics::NullTopic);
+        TestSub sub(broker);
+        sub.Subscribe(ClickTopics::SceneChange);
         anInput.x = insideTopPoint.GetX();
         anInput.y = insideTopPoint.GetY();
 
         // Act
-        testScene.BindElementsToBroker();
         anInput.type = InputType::Press;
-        testScene.ProcessInput(anInput);
+        scenes.Second().ProcessInput(anInput);
         anInput.type = InputType::Lift;
-        testScene.ProcessInput(anInput);
+        scenes.Second().ProcessInput(anInput);
 
         // Assert
         CHECK(sub.calledCount == 1);
+        CHECK(sub.message == "Button was clicked.");
     }
 }

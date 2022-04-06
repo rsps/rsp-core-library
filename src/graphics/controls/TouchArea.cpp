@@ -15,13 +15,20 @@ using namespace rsp::messaging;
 namespace rsp::graphics
 {
 
-TouchArea::TouchArea(const Rect &arArea)
-    : mTouchArea(arArea)
+TouchArea::TouchArea()
 {
+    std::cout << "TouchArea Construct" << std::endl;
 }
 
 TouchArea::~TouchArea()
 {
+}
+
+TouchArea& TouchArea::SetArea(const Rect &arRect)
+{
+    std::cout << "TouchArea SetArea" << std::endl;
+    mTouchArea = arRect;
+    return *this;
 }
 
 void TouchArea::ProcessInput(Input &arInput)

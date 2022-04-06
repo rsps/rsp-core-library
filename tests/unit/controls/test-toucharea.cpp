@@ -55,7 +55,8 @@ TEST_CASE("TouchArea Constructor")
                           myRect.GetBottom() + (rand() % myRect.GetHeight()));
 
         // Act
-        TouchArea area(myRect);
+        TouchArea area;
+        area.SetArea(myRect);
 
         // Assert
         CHECK(area.IsHit(insidePoint));
@@ -67,9 +68,14 @@ TEST_CASE("TouchArea Constructor")
 TEST_CASE("Input Processing")
 {
     // Arrange
-    bool wasCalled = false;
+    int hit_count = 0;
+    bool pressed = false;
+    bool moved = false;
+    bool lifted = false;
+    bool clicked = false;
     Rect aRect(0, 0, 200, 200);
-    TouchArea area(aRect);
+    TouchArea area;
+    area.SetArea(aRect);
     Input anInput;
     // output = min + (rand() % static_cast<int>(max - min + 1))
     anInput.x = 1 + (rand() % static_cast<int>(aRect.GetWidth() - 1 + 1));
@@ -80,34 +86,51 @@ TEST_CASE("Input Processing")
     CHECK_GT(anInput.x, 0);
     CHECK_GT(anInput.y, 0);
 
+    area.GetOnPress() = [&](const Point &arPoint) noexcept {
+        if (aRect.IsHit(arPoint)) {
+            hit_count++;
+        }
+        pressed = true;
+    };
+    area.GetOnMove() = [&](const Point &arPoint) noexcept {
+        if (aRect.IsHit(arPoint)) {
+            hit_count++;
+        }
+        moved = true;
+    };
+    area.GetOnLift() = [&](const Point &arPoint) noexcept {
+        if (aRect.IsHit(arPoint)) {
+            hit_count++;
+        }
+        lifted = true;
+    };
+    area.GetOnClick() = [&](const Point &arPoint) noexcept {
+        if (aRect.IsHit(arPoint)) {
+            hit_count++;
+        }
+        clicked = true;
+    };
+
     SUBCASE("Pressed Callback - Press Hit-Input")
     {
         // Arrange
-        auto pressedReceiver = [&](Control::States aState) noexcept {
-            if (aState == Control::States::pressed) {
-                wasCalled = true;
-            }
-        };
-        area.RegisterOnPressed(pressedReceiver);
         anInput.type = InputType::Press;
+
+        CHECK_FALSE(pressed);
 
         // Act
         area.ProcessInput(anInput);
 
         // Assert
-        CHECK(wasCalled);
+        CHECK(hit_count == 1);
+        CHECK(pressed);
 
         SUBCASE("Pressed Callback - Press Miss-Input")
         {
             // Arrange
-            auto pressedReceiver = [&](Control::States aState) noexcept {
-                if (aState == Control::States::pressed) {
-                    wasCalled = false;
-                }
-            };
-            area.RegisterOnPressed(pressedReceiver);
             anInput.x = anInput.x + aRect.GetWidth();
             anInput.y = anInput.y + aRect.GetHeight();
+            pressed = false;
 
             // Act
             area.ProcessInput(anInput);
@@ -115,38 +138,29 @@ TEST_CASE("Input Processing")
             // Assert
             CHECK_GT(anInput.x, aRect.GetWidth());
             CHECK_GT(anInput.y, aRect.GetHeight());
-            CHECK(wasCalled);
+            CHECK(hit_count == 1);
+            CHECK_FALSE(pressed);
         }
     }
 
     SUBCASE("Pressed Callback - Lift Hit-Input")
     {
         // Arrange
-        auto pressedReceiver = [&](Control::States aState) noexcept {
-            if (aState == Control::States::normal) {
-                wasCalled = true;
-            }
-        };
-        area.RegisterOnPressed(pressedReceiver);
         anInput.type = InputType::Lift;
 
         // Act
         area.ProcessInput(anInput);
 
         // Assert
-        CHECK(wasCalled);
+        CHECK(hit_count == 2);
+        CHECK(lifted);
 
         SUBCASE("Pressed Callback - Lift Miss-Input")
         {
             // Arrange
-            auto pressedReceiver = [&](Control::States aState) noexcept {
-                if (aState == Control::States::normal) {
-                    wasCalled = false;
-                }
-            };
-            area.RegisterOnPressed(pressedReceiver);
             anInput.x = anInput.x + aRect.GetWidth();
             anInput.y = anInput.y + aRect.GetHeight();
+            lifted = false;
 
             // Act
             area.ProcessInput(anInput);
@@ -154,60 +168,44 @@ TEST_CASE("Input Processing")
             // Assert
             CHECK_GT(anInput.x, aRect.GetWidth());
             CHECK_GT(anInput.y, aRect.GetHeight());
-            CHECK_FALSE(wasCalled);
+            CHECK(hit_count == 2);
+            CHECK_FALSE(lifted);
         }
     }
 
     SUBCASE("Pressed Callback - Drag Hit-input")
     {
         // Arrange
-        auto pressedReceiver = [&](Control::States aState) noexcept {
-            if (aState == Control::States::normal) {
-                wasCalled = true;
-            }
-        };
-        area.RegisterOnPressed(pressedReceiver);
         anInput.type = InputType::Drag;
 
         // Act
         area.ProcessInput(anInput);
 
         // Assert
-        CHECK_FALSE(wasCalled);
+        CHECK(hit_count == 2);
+        CHECK(moved);
 
         SUBCASE("Pressed Callback - Drag Miss-input")
         {
             // Arrange
-            auto pressedReceiver = [&](Control::States aState) noexcept {
-                if (aState == Control::States::normal) {
-                    wasCalled = true;
-                }
-            };
-            area.RegisterOnPressed(pressedReceiver);
             anInput.type = InputType::Drag;
             anInput.x = anInput.x + aRect.GetWidth();
             anInput.y = anInput.y + aRect.GetHeight();
+            moved = false;
 
             // Act
             area.ProcessInput(anInput);
 
             // Assert
-            CHECK(wasCalled);
             CHECK_GT(anInput.x, aRect.GetWidth());
             CHECK_GT(anInput.y, aRect.GetHeight());
+            CHECK(hit_count == 2);
+            CHECK(moved);
         }
     }
 
     SUBCASE("Clicked Callback")
     {
-        // Arrange
-        std::function<void(ClickTopics, ClickedEvent &)> clickedReciever = [&](ClickTopics tp, ClickedEvent &event) noexcept {
-            wasCalled = true;
-            (void)tp;
-            (void)event;
-        };
-        area.RegisterOnClicked(clickedReciever);
-
         SUBCASE("Clicked Callback - Hit-Hit-Input")
         {
             // Act
@@ -220,7 +218,11 @@ TEST_CASE("Input Processing")
             MESSAGE("Processed Lift");
 
             // Assert
-            CHECK(wasCalled);
+            CHECK(hit_count == 2);
+            CHECK(pressed);
+            CHECK_FALSE(moved);
+            CHECK(lifted);
+            CHECK(clicked);
         }
 
         SUBCASE("Clicked Callback - Miss-Hit-Input")
@@ -241,7 +243,11 @@ TEST_CASE("Input Processing")
             area.ProcessInput(anInput);
 
             // Assert
-            CHECK_FALSE(wasCalled);
+            CHECK(hit_count == 2);
+            CHECK_FALSE(pressed);
+            CHECK(moved);
+            CHECK(lifted);
+            CHECK_FALSE(clicked);
         }
 
         SUBCASE("Clicked Callback - Hit-Miss-Input")
@@ -260,7 +266,11 @@ TEST_CASE("Input Processing")
             area.ProcessInput(anInput);
 
             // Assert
-            CHECK_FALSE(wasCalled);
+            CHECK(hit_count == 1);
+            CHECK(pressed);
+            CHECK_FALSE(moved);
+            CHECK_FALSE(lifted);
+            CHECK_FALSE(clicked);
         }
 
         SUBCASE("Clicked Callback - Miss-Miss-Input")
@@ -276,7 +286,11 @@ TEST_CASE("Input Processing")
             area.ProcessInput(anInput);
 
             // Assert
-            CHECK_FALSE(wasCalled);
+            CHECK(hit_count == 0);
+            CHECK_FALSE(pressed);
+            CHECK_FALSE(moved);
+            CHECK_FALSE(lifted);
+            CHECK_FALSE(clicked);
         }
     }
 }

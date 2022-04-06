@@ -38,7 +38,7 @@ void Scene::Render(Canvas &arCanvas)
 
 TouchArea& Scene::makeTouchArea(const Rect &arRect)
 {
-    return mTouchables.emplace_back(arRect);
+    return mTouchables.emplace_back().SetArea(arRect);
 }
 
 } // namespace rsp::graphics

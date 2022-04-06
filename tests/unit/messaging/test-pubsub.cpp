@@ -159,8 +159,10 @@ TEST_CASE("Publisher Test")
      *
      * By calling directly through the broker, the error is detected at compile time:
      * testBroker.Publish(wrongTopic::wrongOne, testEvent);
+     *
+     * Fixed by turning Publisher into template class, to allow check for topic type.
+     * Now the commented out code will not compile.
      */
-
     SUBCASE("Publish with incorrectly templated call")
     {
         // Arrange
