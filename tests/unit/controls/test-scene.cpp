@@ -27,7 +27,6 @@ public:
     Scenes()
         : SceneMap()
     {
-        std::cout << "Creating Scenes" << std::endl;
         MakeScene<rsp::graphics::FirstScene>();
         MakeScene<rsp::graphics::SecondScene>();
     }
@@ -63,20 +62,16 @@ TEST_CASE("Scene Test")
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
 
-    MESSAGE("step1");
     Scenes scenes;
-    MESSAGE("step2");
     Input anInput;
 
     Rect tr = scenes.Second().GetTopArea().GetArea();
     Point insideTopPoint(tr.GetLeft() + (rand() % tr.GetWidth()),
                          tr.GetTop() + (rand() % tr.GetHeight()));
-    MESSAGE("step3");
 
     Rect br = scenes.Second().GetBotArea().GetArea();
     Point insideBotPoint(br.GetLeft() + (rand() % br.GetWidth()),
                          br.GetTop() + (rand() % br.GetHeight()));
-    MESSAGE("step4");
 
     SUBCASE("Scene Process Input")
     {
@@ -133,7 +128,9 @@ TEST_CASE("Scene Test")
     {
         Broker<ClickTopics> broker;
         Publisher<ClickTopics> publisher(broker);
-        scenes.Second().Whenclicked() = [&publisher]() {
+        bool clicked = false;
+        scenes.Second().Whenclicked() = [&publisher, &clicked]() {
+            clicked = true;
             rsp::messaging::ClickedEvent event("Button was clicked.");
             publisher.PublishToBroker(ClickTopics::SceneChange, event);
         };
@@ -141,8 +138,8 @@ TEST_CASE("Scene Test")
         // Arrange
         TestSub sub(broker);
         sub.Subscribe(ClickTopics::SceneChange);
-        anInput.x = insideTopPoint.GetX();
-        anInput.y = insideTopPoint.GetY();
+        anInput.x = insideBotPoint.GetX();
+        anInput.y = insideBotPoint.GetY();
 
         // Act
         anInput.type = InputType::Press;
@@ -150,7 +147,8 @@ TEST_CASE("Scene Test")
         anInput.type = InputType::Lift;
         scenes.Second().ProcessInput(anInput);
 
-        // Assert
+         // Assert
+        CHECK(clicked);
         CHECK(sub.calledCount == 1);
         CHECK(sub.message == "Button was clicked.");
     }

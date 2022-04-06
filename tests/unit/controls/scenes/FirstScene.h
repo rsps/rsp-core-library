@@ -20,20 +20,17 @@ public:
     FirstScene()
         : Scene480x800("FirstScene")
     {
-        std::cout << "FirstScene" << std::endl;
-        // myName = "First Scene";
-        // Set member variables values
+        mTouchables.reserve(2);
+
         Rect topRect(100, 400, 200, 100);
         mTopBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
         TouchArea& top_btn = makeTouchArea(topRect);
         top_btn.GetOnPress() = [this](const Point &arPoint) { mTopBtnImg.SetState(Control::States::pressed); };
         top_btn.GetOnLift() = [this](const Point &arPoint) { mTopBtnImg.SetState(Control::States::normal); };
 
-        std::cout << "FirstScene 1" << std::endl;
         Rect botRect(100, 600, 200, 100);
         mBotBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
         TouchArea& bot_btn = makeTouchArea(botRect);
-        std::cout << "FirstScene 2" << std::endl;
         bot_btn.GetOnPress() = [this](const Point &arPoint) { mBotBtnImg.SetState(Control::States::pressed); };
         bot_btn.GetOnLift() = [this](const Point &arPoint) { mBotBtnImg.SetState(Control::States::normal); };
 
@@ -41,7 +38,6 @@ public:
         // Add them to the lists?
         AddChild(&mTopBtnImg);
         AddChild(&mBotBtnImg);
-        std::cout << "FirstScene exit" << std::endl;
     };
 
 protected:

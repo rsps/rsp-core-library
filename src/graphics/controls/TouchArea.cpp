@@ -12,21 +12,58 @@
 
 using namespace rsp::messaging;
 
-namespace rsp::graphics
-{
+namespace rsp::graphics {
 
 TouchArea::TouchArea()
 {
-    std::cout << "TouchArea Construct" << std::endl;
 }
 
 TouchArea::~TouchArea()
 {
 }
 
+TouchArea::TouchArea(const TouchArea &arOther)
+{
+    operator=(arOther);
+}
+
+TouchArea::TouchArea(TouchArea &&arOther)
+{
+    *this = std::move(arOther);
+}
+
+TouchArea& TouchArea::operator =(const TouchArea &arOther)
+{
+    if (this != &arOther) {
+        mOnPress = arOther.mOnPress;
+        mOnMove = arOther.mOnMove;
+        mOnLift = arOther.mOnLift;
+        mOnClick = arOther.mOnClick;
+
+        mTouchArea = arOther.mTouchArea;
+        mCurrentPress = arOther.mCurrentPress;
+        mOriginalPress = arOther.mOriginalPress;
+    }
+    return *this;
+}
+
+TouchArea& TouchArea::operator =(TouchArea &&arOther)
+{
+    if (this != &arOther) {
+        mOnPress = std::move(arOther.mOnPress);
+        mOnMove = std::move(arOther.mOnMove);
+        mOnLift = std::move(arOther.mOnLift);
+        mOnClick = std::move(arOther.mOnClick);
+
+        mTouchArea = std::move(arOther.mTouchArea);
+        mCurrentPress = std::move(arOther.mCurrentPress);
+        mOriginalPress = std::move(arOther.mOriginalPress);
+    }
+    return *this;
+}
+
 TouchArea& TouchArea::SetArea(const Rect &arRect)
 {
-    std::cout << "TouchArea SetArea" << std::endl;
     mTouchArea = arRect;
     return *this;
 }

@@ -33,7 +33,6 @@ public:
 
     template<class T>
     Scene& MakeScene() {
-        std::cout << "Creating Scene" << std::endl;
         return add(new T());
     }
 

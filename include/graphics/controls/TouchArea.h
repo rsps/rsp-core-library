@@ -29,8 +29,8 @@ class TouchArea
     TouchArea();
     ~TouchArea();
 
-    TouchArea(const TouchArea&) = default;
-    TouchArea(TouchArea&&) = default;
+    TouchArea(const TouchArea&);
+    TouchArea(TouchArea&&);
 
     /**
      * \brief Processes input for press or click callbacks
@@ -50,14 +50,14 @@ class TouchArea
      * \param arTouchArea A const reference to a TouchArea
      * \return Reference to this TouchArea
      */
-    TouchArea &operator=(const TouchArea &) = default;
+    TouchArea &operator=(const TouchArea &);
 
     /**
      * \brief Move operator
      * \param arTouchArea A const reference to a TouchArea
      * \return Reference to this TouchArea
      */
-    TouchArea &operator=(TouchArea &&) = default;
+    TouchArea &operator=(TouchArea &&);
 
     /**
      * \brief Sets the area of the TouchArea
