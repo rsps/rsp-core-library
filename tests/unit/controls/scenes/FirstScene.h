@@ -10,6 +10,7 @@
 #ifndef FIRSTSCENE_H
 #define FIRSTSCENE_H
 
+#include <graphics/controls/Image.h>
 #include "Scene480x800.h"
 
 namespace rsp::graphics {

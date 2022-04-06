@@ -8,12 +8,11 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/controls/TouchArea.h"
+#include <graphics/controls/TouchArea.h>
 #include <chrono>
 #include <doctest.h>
 
 using namespace rsp::graphics;
-using namespace rsp::messaging;
 
 TEST_CASE("TouchArea Constructor")
 {
@@ -73,11 +72,11 @@ TEST_CASE("Input Processing")
     bool moved = false;
     bool lifted = false;
     bool clicked = false;
-    Rect aRect(0, 0, 200, 200);
+    Rect aRect(10, 10, 200, 200);
     TouchArea area;
     area.SetArea(aRect);
     Input anInput;
-    // output = min + (rand() % static_cast<int>(max - min + 1))
+
     anInput.x = 1 + (rand() % static_cast<int>(aRect.GetWidth() - 1 + 1));
     anInput.y = 1 + (rand() % static_cast<int>(aRect.GetHeight() - 1 + 1));
 

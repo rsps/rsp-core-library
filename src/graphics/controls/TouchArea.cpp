@@ -10,8 +10,6 @@
 
 #include "graphics/controls/TouchArea.h"
 
-using namespace rsp::messaging;
-
 namespace rsp::graphics {
 
 TouchArea::TouchArea()
@@ -80,9 +78,11 @@ void TouchArea::ProcessInput(Input &arInput)
             break;
 
         case InputType::Lift:
-            mOnLift(mOriginalPress);
-            if (IsHit(mCurrentPress) && IsHit(mOriginalPress)) {
-                mOnClick(mCurrentPress);
+            if (IsHit(mOriginalPress)) {
+                mOnLift(mOriginalPress);
+                if (IsHit(mCurrentPress)) {
+                    mOnClick(mCurrentPress);
+                }
             }
             break;
 

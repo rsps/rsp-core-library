@@ -11,6 +11,7 @@
 #ifndef SECONDSCENE_H
 #define SECONDSCENE_H
 
+#include <graphics/controls/Image.h>
 #include "Scene480x800.h"
 
 namespace rsp::graphics

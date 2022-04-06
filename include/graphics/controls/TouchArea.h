@@ -10,10 +10,8 @@
 #ifndef TOUCHAREA_H
 #define TOUCHAREA_H
 
-#include "Image.h"
 #include "Input.h"
 #include <graphics/primitives/Rect.h>
-#include <messaging/eventTypes/ClickedEvent.h>
 #include <utils/Function.h>
 
 namespace rsp::graphics

@@ -11,8 +11,6 @@
 #include <graphics/controls/Scene.h>
 #include <functional>
 
-using namespace rsp::messaging;
-
 namespace rsp::graphics
 {
 

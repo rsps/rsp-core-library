@@ -135,9 +135,9 @@ void Rect::SetHeight(int aHeight)
 bool Rect::IsHit(const Point &aPoint) const
 {
     // Only works with non-rotated rectangles
-    if (aPoint.GetX() > mLeftTop.GetX() &&
+    if (aPoint.GetX() >= mLeftTop.GetX() &&
         aPoint.GetX() < mRightBottom.GetX() &&
-        aPoint.GetY() > mLeftTop.GetY() &&
+        aPoint.GetY() >= mLeftTop.GetY() &&
         aPoint.GetY() < mRightBottom.GetY())
         return true;
 

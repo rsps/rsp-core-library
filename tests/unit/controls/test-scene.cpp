@@ -8,11 +8,12 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/Framebuffer.h"
-#include "graphics/controls/Scene.h"
-#include "messaging/Subscriber.h"
-#include "messaging/Publisher.h"
-#include "posix/FileSystem.h"
+#include <graphics/Framebuffer.h>
+#include <graphics/controls/Scene.h>
+#include <messaging/Subscriber.h>
+#include <messaging/Publisher.h>
+#include <posix/FileSystem.h>
+#include <messaging/eventTypes/ClickedEvent.h>
 #include <doctest.h>
 #include <graphics/controls/SceneMap.h>
 #include "scenes/FirstScene.h"
