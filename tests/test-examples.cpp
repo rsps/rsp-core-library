@@ -13,6 +13,7 @@
 #include <utils/StopWatch.h>
 #include <stdexcept>
 #include <sstream>
+#include <vector>
 
 using namespace rsp::graphics;
 
@@ -24,6 +25,7 @@ using namespace rsp::graphics;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wparentheses"
+#pragma GCC diagnostic ignored "-Wcatch-value"
 
 static std::stringstream sout{};
 
@@ -227,9 +229,68 @@ public:
     }
 };
 
+class Car {
+public:
+    Car(const std::string arModel) : mModel(arModel) {
+        sout << "Constructor\n";
+    }
+
+    Car(const Car &ob){
+        sout << "Copy Constructor\n";
+    }
+
+    Car(const Car &&ob){
+        sout << "Move Constructor\n";
+    }
+
+    Car& operator=(const Car &arOther){
+        sout << "Copy Assignment\n";
+        if (this != &arOther) {
+            mModel = arOther.mModel;
+        }
+        return *this;
+    }
+
+    Car& operator=(Car &&arOther){
+        sout << "Move Assignment\n";
+        if (this != &arOther) {
+            mModel = std::move(arOther.mModel);
+        }
+        return *this;
+    }
+
+    Car function(Car ob){
+        //do something...
+        return ob;
+    }
+
+    static Car Forward(Car a){
+        return a;
+    }
+
+protected:
+    std::string mModel{};
+};
+
+class Throws {
+public:
+    static void Integer() {
+        throw 42;
+    }
+    static void String() {
+        throw "42";
+    }
+    static void StdString() {
+        throw std::string("42");
+    }
+    static void Exception() {
+        throw std::runtime_error("42");
+    }
+};
+
 TEST_CASE("Examples")
 {
-    sout.clear();
+    sout.str("");
 
     SUBCASE("Operator precedence") {
         CHECK_EQ(Average(1, 2), 1.5);
@@ -307,7 +368,6 @@ TEST_CASE("Examples")
     SUBCASE("Constructor / New operator precedence") {
         auto *book = new Book();
         delete book;
-        MESSAGE(sout);
         CHECK_EQ(sout.str(), "Overloaded new operator\nConstructor\nDestructor\nOverloaded delete operator\n");
     }
 
@@ -324,6 +384,59 @@ TEST_CASE("Examples")
         CHECK_EQ(sout.str(), "0 default\n123 \n123 John\n");
     }
 
+    SUBCASE("Move constructor") {
+        Car obj1 = Car::Forward(Car("BMW")); // move-assignment from rvalue temporary
+        Car obj2 = obj1.function(obj1);
+
+        CHECK_EQ(sout.str(), "Constructor\n"
+            "Move Constructor\n"
+            "Copy Constructor\n"
+            "Move Constructor\n");
+    }
+
+    SUBCASE("Move constructor vector") {
+        std::vector<Car> cars;
+        cars.reserve(2);
+        cars.push_back(Car("FIAT"));
+        cars.emplace_back("VW");
+
+        CHECK_EQ(sout.str(), "Constructor\n"
+            "Move Constructor\n"
+            "Constructor\n");
+    }
+
+    SUBCASE("Move assignment") {
+        Car o1("Hyundai");
+        Car o2("Tata");
+        o1 = o2;
+        o2 = Car("Toyota");
+
+        CHECK_EQ(sout.str(), "Constructor\n"
+            "Constructor\n"
+            "Copy Assignment\n"
+            "Constructor\n"
+            "Move Assignment\n");
+    }
+
+    SUBCASE("Exceptions") {
+        CHECK_THROWS_AS(Throws::Integer(), const int&);
+        CHECK_THROWS_AS(Throws::String(), const char*);
+        CHECK_THROWS_AS(Throws::StdString(), const std::string&);
+        CHECK_THROWS_AS(Throws::Exception(), const std::exception&);
+
+        try {
+            throw std::runtime_error("42");
+        }
+        catch(std::runtime_error e) {
+            CHECK_EQ(std::string(e.what()), "42");
+        }
+        try {
+            throw std::runtime_error("42");
+        }
+        catch(const std::exception &e) {
+            CHECK_EQ(std::string(e.what()), "42");
+        }
+    }
 }
 
 #pragma GCC diagnostic pop
