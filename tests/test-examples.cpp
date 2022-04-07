@@ -25,6 +25,8 @@ using namespace rsp::graphics;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wparentheses"
 
+static std::stringstream sout{};
+
 /**
  * \brief Get average of the two arguments
  * \param integer a
@@ -37,7 +39,7 @@ static double Average(int a, int b)
 }
 
 /**
- * \brief Test if value if within given limits
+ * \brief Test if value is within given limits
  * \param low low limit
  * \param high high limit
  * \param value Value to test
@@ -153,10 +155,7 @@ class Base
 public:
     virtual ~Base() {method();}
     void baseMethod() {method();}
-
-    static std::stringstream sout;
 };
-std::stringstream Base::sout{};
 
 class A : public Base
 {
@@ -176,66 +175,155 @@ protected:
     mutable int mA;
 };
 
+class Book{
+public:
+    Book(){
+        sout << "Constructor" << std::endl;
+    }
+
+    //Overloaded new operator
+    void* operator new(size_t size){
+        sout << "Overloaded new operator" << std::endl;
+        return malloc(size);
+    }
+    //overloaded delete operator
+    void operator delete(void* ptr){
+        sout << "Overloaded delete operator" << std::endl;
+        free(ptr);
+    }
+    ~Book(){
+        sout << "Destructor" << std::endl;
+    }
+};
+
+class Employee
+{
+    int mId;
+    std::string mName{};
+public:
+    //Empty Constructor
+    Employee()
+        : mId(0),
+          mName("default")
+    {
+    }
+
+    //Overloaded constructor with int parameter
+    Employee(int aId)
+        : mId(aId)
+    {
+    }
+
+    //Overloaded constructor with a int parameter and a string
+    Employee(int aId, const std::string &arName)
+        : mId(aId),
+          mName(arName)
+    {
+    }
+
+    void display()
+    {
+        sout << mId << " " << mName << std::endl;
+    }
+};
 
 TEST_CASE("Examples")
 {
-    rsp::utils::StopWatch sw;
+    sout.clear();
 
-    CHECK_EQ(Average(1, 2), 1.5);
-
-    CHECK_EQ(25u - 50, 4294967271);
-
-    CHECK_FALSE(IsDerivedFrom<TouchArea, Control>());
-    CHECK(IsDerivedFrom<Image, Control>());
-
-    CHECK(IsSameClass<Control, Control>());
-    CHECK_FALSE(IsSameClass<Control, TouchArea>());
-
-    int a[] = {2, 1, 5, 9, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    int b[sizeof(a) / sizeof(int)];
-
-    sw.Reset();
-    for (int i = 0 ; i < 100000 ; ++i) {
-        F::Simple(a, b, sizeof(a) / sizeof(int));
+    SUBCASE("Operator precedence") {
+        CHECK_EQ(Average(1, 2), 1.5);
+        CHECK_EQ(25u - 50, 4294967271);
     }
-    MESSAGE("Timed to " << sw.Elapsed<std::chrono::milliseconds>() << "ms");
-    CHECK_EQ(b[0], 45);
-    CHECK_EQ(b[1], 90);
-    CHECK_EQ(b[2], 18);
-    CHECK_EQ(b[3], 10);
 
-    sw.Reset();
-    for (int i = 0 ; i < 100000 ; ++i) {
-        F::Complex(a, b, sizeof(a) / sizeof(int));
+    SUBCASE("IsDerivedFrom template") {
+        CHECK_FALSE(IsDerivedFrom<TouchArea, Control>());
+        CHECK(IsDerivedFrom<Image, Control>());
     }
-    MESSAGE("Timed to " << sw.Elapsed<std::chrono::milliseconds>() << "ms");
-    CHECK_EQ(b[0], 45);
-    CHECK_EQ(b[1], 90);
-    CHECK_EQ(b[2], 18);
-    CHECK_EQ(b[3], 10);
 
-    int arr[] = {1, 2, 3, 4, 5, 6, 7};
-    CHECK_EQ(UglyArrayIndexing(arr, sizeof(arr) / sizeof(int)), 8);
+    SUBCASE("IsSame template") {
+        CHECK(IsSameClass<Control, Control>());
+        CHECK_FALSE(IsSameClass<Control, TouchArea>());
+    }
 
-    Base* base = new A;
-    base->baseMethod();
-    delete base;
-    CHECK_EQ(Base::sout.str(), "from A\nfrom A\nfrom Base\n");
+    SUBCASE("Array products") {
+        rsp::utils::StopWatch sw;
+        int a[] = {2, 1, 5, 9, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        int b[sizeof(a) / sizeof(int)];
 
-    unsigned char half_limit = 150;
-    for (unsigned char i = 0; i < 2 * half_limit; ++i) {
-        // Trick loop: 2 * half_limit = 300, because 2 is type int.
-//        MESSAGE(static_cast<int>(i));
-        if (static_cast<int>(i) == 255) {
-            break;
+        sw.Reset();
+        for (int i = 0 ; i < 100000 ; ++i) {
+            F::Simple(a, b, sizeof(a) / sizeof(int));
+        }
+        MESSAGE("Timed to " << sw.Elapsed<std::chrono::milliseconds>() << "ms");
+        CHECK_EQ(b[0], 45);
+        CHECK_EQ(b[1], 90);
+        CHECK_EQ(b[2], 18);
+        CHECK_EQ(b[3], 10);
+
+        sw.Reset();
+        for (int i = 0 ; i < 100000 ; ++i) {
+            F::Complex(a, b, sizeof(a) / sizeof(int));
+        }
+        MESSAGE("Timed to " << sw.Elapsed<std::chrono::milliseconds>() << "ms");
+        CHECK_EQ(b[0], 45);
+        CHECK_EQ(b[1], 90);
+        CHECK_EQ(b[2], 18);
+        CHECK_EQ(b[3], 10);
+    }
+
+    SUBCASE("Ugly Indexing") {
+        int arr[] = {1, 2, 3, 4, 5, 6, 7};
+        CHECK_EQ(UglyArrayIndexing(arr, sizeof(arr) / sizeof(int)), 8);
+    }
+
+    SUBCASE("Polymorph method calling") {
+        Base* base = new A;
+        base->baseMethod();
+        delete base;
+        CHECK_EQ(sout.str(), "from A\nfrom A\nfrom Base\n");
+    }
+
+    SUBCASE("Unsigned char overrun trick question") {
+        unsigned char half_limit = 150;
+        for (unsigned char i = 0; i < 2 * half_limit; ++i) {
+            // Trick loop: 2 * half_limit = 300, because 2 is type int.
+            if (static_cast<int>(i) == 255) {
+                break;
+            }
         }
     }
 
-    ConstMutable cm;
-    cm.Allowed(3);
-    CHECK(cm == 3);
+    SUBCASE("Change member from const method") {
+        ConstMutable cm;
+        cm.Allowed(3);
+        CHECK(cm == 3);
+    }
 
-    CHECK(InRange(3, 5, 6));
+    SUBCASE("Value is in range") {
+        CHECK(InRange(3, 5, 6));
+    }
+
+    SUBCASE("Constructor / New operator precedence") {
+        auto *book = new Book();
+        delete book;
+        MESSAGE(sout);
+        CHECK_EQ(sout.str(), "Overloaded new operator\nConstructor\nDestructor\nOverloaded delete operator\n");
+    }
+
+    SUBCASE("Constructor overloading") {
+        Employee e1;
+        e1.display();
+
+        Employee e2(123);
+        e2.display();
+
+        Employee e3(123,"John");
+        e3.display();
+
+        CHECK_EQ(sout.str(), "0 default\n123 \n123 John\n");
+    }
+
 }
 
 #pragma GCC diagnostic pop
