@@ -288,6 +288,31 @@ public:
     }
 };
 
+class MyValue {
+public:
+    MyValue() : mValue(0) {}
+    MyValue(int aValue) : mValue(aValue) {}
+
+    bool operator<(const MyValue &arOther) const {
+        return mValue < arOther.mValue;
+    }
+
+    bool operator<(int aValue) const {
+        return mValue < aValue;
+    }
+
+    operator int() const { return mValue; }
+
+protected:
+    int mValue;
+};
+
+std::ostream& operator<<(std::ostream& os, const MyValue& a);
+
+std::ostream& operator<<(std::ostream& os, const MyValue& a) {
+    return os << int(a);
+}
+
 TEST_CASE("Examples")
 {
     sout.str("");
@@ -436,6 +461,21 @@ TEST_CASE("Examples")
         catch(const std::exception &e) {
             CHECK_EQ(std::string(e.what()), "42");
         }
+    }
+
+    SUBCASE("Operators") {
+        MyValue a;
+        MyValue b(42);
+        sout << b << a;
+
+        CHECK(0 == a);
+        CHECK(42 == b);
+        CHECK(a < b);
+        CHECK_FALSE(b < a);
+        CHECK_FALSE(b < 42);
+        CHECK(b < 43);
+        CHECK(b > 5);
+        CHECK_EQ(sout.str(), "420");
     }
 }
 
