@@ -80,8 +80,9 @@ class Control
     /**
      * \brief Abstract method for rendering the object
      * \param aCanvas The canvas the object is rendered on
+     * \return bool True if anything was rendered
      */
-    virtual void Render(Canvas &arCanvas) = 0;
+    virtual bool Render(Canvas &arCanvas);
 
     /**
      * \brief Sets the area of the object as a rectangle

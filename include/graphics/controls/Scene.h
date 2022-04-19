@@ -38,12 +38,6 @@ class Scene : public Control
      */
     void ProcessInput(Input &arInput);
 
-    /**
-     * \brief Render all children within Scene
-     * \param arCanvas Reference to the Canvas children will be rendered on
-     */
-    void Render(Canvas &arCanvas) override;
-
   protected:
     std::string mName;
     std::vector<TouchArea> mTouchables{};

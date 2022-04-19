@@ -21,8 +21,7 @@ GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInput
     : Subscriber<ClickTopics>(arBroker),
       mBufferedCanvas(aBufferedCanvas),
       mInputs(aInputs),
-      mrScenes(arScenes),
-      mActiveScene(&mrScenes.FirstScene())
+      mrScenes(arScenes)
 {
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
@@ -40,10 +39,10 @@ void GraphicsMain::Run()
             inputCache.push_back(mInputs.GetInput());
             PrintInput(inputCache.back()); // Temp
             // Invalidate stuff
-            mActiveScene->ProcessInput(inputCache.back());
+            mrScenes.ActiveScene().ProcessInput(inputCache.back());
             if (inputCache.size() > 5) {
                 // Limit of cached input reached - Force render
-                mActiveScene->Render(mBufferedCanvas);
+                mrScenes.ActiveScene().Render(mBufferedCanvas);
                 inputCache.clear();
                 mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
             }

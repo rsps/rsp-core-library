@@ -9,10 +9,18 @@
  */
 
 #include "graphics/InputCreator.h"
+#include <utils/CoreException.h>
 #include <linux/input.h>
 
 namespace rsp::graphics
 {
+
+class NoInputData : public rsp::utils::CoreException
+{
+public:
+    NoInputData() : rsp::utils::CoreException("Touch input queue empty") {};
+};
+
 std::ostream &operator<<(std::ostream &os, const InputLine &arInputLine)
 {
     os << " Input Seconds: " << arInputLine.stime << "\n"
@@ -40,15 +48,28 @@ bool InputCreator::HasNewInputs()
 
 const Input &InputCreator::GetInput()
 {
-    readType();
+    try {
+        readType();
+    }
+    catch(const NoInputData &e) {
+        input.type = InputType::None;
+    }
     return input;
+}
+
+void InputCreator::readLine()
+{
+    std::size_t len = touchDriver.Read(reinterpret_cast<char *>(&inputLine), sizeof(InputLine));
+    if (len != sizeof(InputLine)) {
+        throw NoInputData();
+    }
 }
 
 void InputCreator::readType()
 {
-    touchDriver.Read(reinterpret_cast<char *>(&inputLine), sizeof(InputLine));
-    if (inputLine.code == 0x2f) {
-        touchDriver.Read(reinterpret_cast<char *>(&inputLine), sizeof(InputLine));
+    readLine();
+    if (inputLine.code == ABS_MT_SLOT) {
+        readLine();
     }
 
     if (inputLine.type == EV_ABS && inputLine.code == ABS_MT_TRACKING_ID && inputLine.value == -1) {
@@ -64,14 +85,14 @@ void InputCreator::readType()
 
 void InputCreator::readBody()
 {
-    while (inputLine.type != 0) {
+    while (inputLine.type != EV_SYN) {
         if (inputLine.type == EV_ABS && inputLine.code == ABS_X) {
             input.x = inputLine.value;
         }
         if (inputLine.type == EV_ABS && inputLine.code == ABS_Y) {
             input.y = inputLine.value;
         }
-        touchDriver.Read(reinterpret_cast<char *>(&inputLine), sizeof(inputLine));
+        readLine();
     }
 }
 } // namespace rsp::graphics

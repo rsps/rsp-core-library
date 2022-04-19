@@ -24,6 +24,12 @@ public:
     SceneNotFound(const std::string &arName) : rsp::utils::CoreException("Scene " + arName + " does not exist") {};
 };
 
+class ActiveSceneNotSet : public rsp::utils::CoreException
+{
+public:
+    ActiveSceneNotSet() : rsp::utils::CoreException("No scene has been set activate") {};
+};
+
 
 class SceneMap
 {
@@ -38,10 +44,12 @@ public:
 
     Scene& operator[](const std::string &arName);
 
-    Scene& FirstScene();
+    void SetActiveScene(const std::string &arName);
+    Scene& ActiveScene();
 
 protected:
     std::unordered_map<std::string, Scene *> mScenes{};
+    Scene *mpActiveScene = nullptr;
 
     Scene& add(Scene *apScene);
 };

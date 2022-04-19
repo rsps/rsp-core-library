@@ -61,4 +61,25 @@ Control& Control::AddChild(Control *apChild)
     return *this;
 }
 
+bool Control::Render(Canvas &arCanvas)
+{
+    bool result = mIsInvalid;
+
+    if (mIsInvalid) {
+        mIsInvalid = false;
+
+        if (!mTransparent) {
+            arCanvas.DrawRectangle(mArea, mBackground, true);
+        }
+    }
+
+    for (Control* child : mChildren) {
+        if (child->Render(arCanvas)) {
+            result = true;
+        }
+    }
+
+    return result;
+}
+
 } // namespace rsp::graphics

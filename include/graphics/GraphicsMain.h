@@ -53,10 +53,9 @@ class GraphicsMain : public rsp::messaging::Subscriber<rsp::messaging::ClickTopi
   private:
     BufferedCanvas &mBufferedCanvas;
     InputCreator &mInputs;
+    SceneMap &mrScenes;
     bool mTerminated = false;
     std::vector<Input> inputCache{};
-    SceneMap &mrScenes;
-    Scene *mActiveScene;
 
     // Temp
     void PrintInput(Input aInput);

@@ -27,6 +27,7 @@ class InputCreator
 
     void readType();
     void readBody();
+    void readLine();
 
   public:
     InputCreator(std::string aPath = "/dev/input/event1");

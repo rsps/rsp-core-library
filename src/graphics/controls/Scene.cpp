@@ -27,13 +27,6 @@ void Scene::ProcessInput(Input &arInput)
     }
 }
 
-void Scene::Render(Canvas &arCanvas)
-{
-    for (Control* child : mChildren) {
-        child->Render(arCanvas);
-    }
-}
-
 TouchArea& Scene::makeTouchArea(const Rect &arRect)
 {
     return mTouchables.emplace_back().SetArea(arRect);

@@ -22,6 +22,7 @@ SceneMap::~SceneMap()
     for(auto &pair : mScenes) {
         delete pair.second;
     }
+    mScenes.clear();
 }
 
 Scene& SceneMap::operator [](const std::string &arName)
@@ -34,18 +35,26 @@ Scene& SceneMap::operator [](const std::string &arName)
     }
 }
 
-Scene& SceneMap::FirstScene()
+Scene& SceneMap::ActiveScene()
 {
-    if (mScenes.empty()) {
-        THROW_WITH_BACKTRACE1(SceneNotFound, "FirstScene");
+    if (!mpActiveScene) {
+        THROW_WITH_BACKTRACE(ActiveSceneNotSet);
     }
 
-    return *(mScenes.begin()->second);
+    return *mpActiveScene;
+}
+
+void SceneMap::SetActiveScene(const std::string &arName)
+{
+    mpActiveScene = nullptr;
+
+    mpActiveScene = &(operator[](arName));
 }
 
 Scene& SceneMap::add(Scene *apScene)
 {
     mScenes[apScene->GetName()] = apScene;
+
     return *apScene;
 }
 
