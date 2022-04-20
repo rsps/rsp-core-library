@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/InputCreator.h"
+#include <graphics/TouchParser.h>
 #include <utils/CoreException.h>
 #include <linux/input.h>
 
@@ -21,31 +21,44 @@ public:
     NoInputData() : rsp::utils::CoreException("Touch input queue empty") {};
 };
 
-std::ostream& operator<<(std::ostream &os, const RawTouchEvent &arTouchEvent)
+std::ostream& operator<<(std::ostream &os, const RawTouchEvent &arRTE)
 {
-    os << "Raw Touch Event: " << arTouchEvent.stime << "." << arTouchEvent.mtime << "\n"
-       << "  Type:  " << arTouchEvent.type << "\n"
-       << "  Code:  " << arTouchEvent.code << "\n"
-       << "  Value: " << arTouchEvent.value;
+    os << "Raw Touch Event: " << arRTE.stime << "." << arRTE.mtime << "\n"
+       << "  Type:  " << arRTE.type << "\n"
+       << "  Code:  " << arRTE.code << "\n"
+       << "  Value: " << arRTE.value;
     return os;
 }
 
+std::ostream &operator<<(std::ostream &os, const TouchEvent &arTE)
+{
+    const char* const cTypeNames[] = {
+        "None",
+        "Press",
+        "Drag",
+        "Lift"
+    };
 
-InputCreator::InputCreator(const std::string &arPath)
+    os << "Touch Event: " << cTypeNames[static_cast<int>(arTE.mType)] << " " << arTE.mPoint;
+
+    return os;
+}
+
+TouchParser::TouchParser(const std::string &arPath)
 {
     mTouchDevice.Open(arPath, std::ifstream::binary);
 }
 
-InputCreator::~InputCreator()
+TouchParser::~TouchParser()
 {
     mTouchDevice.Close();
 }
 
-bool InputCreator::Poll(Input &arInput)
+bool TouchParser::Poll(TouchEvent &arInput)
 {
     try {
-        arInput.type = readType();
-        if (arInput.type != InputType::None) {
+        arInput.mType = readType();
+        if (arInput.mType != TouchEvent::Types::None) {
             readBody(arInput);
             return true;
         }
@@ -55,7 +68,7 @@ bool InputCreator::Poll(Input &arInput)
     return false;
 }
 
-void InputCreator::readRawTouchEvent()
+void TouchParser::readRawTouchEvent()
 {
     std::size_t len = mTouchDevice.Read(reinterpret_cast<char *>(&mRawTouchEvent), sizeof(RawTouchEvent));
     if (len != sizeof(RawTouchEvent)) {
@@ -63,7 +76,7 @@ void InputCreator::readRawTouchEvent()
     }
 }
 
-InputType InputCreator::readType()
+TouchEvent::Types TouchParser::readType()
 {
     readRawTouchEvent();
     if (mRawTouchEvent.code == ABS_MT_SLOT) {
@@ -74,29 +87,29 @@ InputType InputCreator::readType()
     if (mRawTouchEvent.type == EV_ABS) {
         if (mRawTouchEvent.code == ABS_MT_TRACKING_ID) {
             if (mRawTouchEvent.value == -1) {
-                return InputType::Lift;
+                return TouchEvent::Types::Lift;
             }
             else {
-                return InputType::Press;
+                return TouchEvent::Types::Press;
             }
         } else if (mRawTouchEvent.code == ABS_MT_POSITION_X || mRawTouchEvent.code == ABS_MT_POSITION_Y) {
-            return InputType::Drag;
+            return TouchEvent::Types::Drag;
         }
     }
 
-    return InputType::None;
+    return TouchEvent::Types::None;
 }
 
-void InputCreator::readBody(Input &arInput)
+void TouchParser::readBody(TouchEvent &arInput)
 {
     while (mRawTouchEvent.type != EV_SYN) {
 
         if (mRawTouchEvent.type == EV_ABS) {
             if (mRawTouchEvent.code == ABS_X) {
-                arInput.x = mRawTouchEvent.value;
+                arInput.mPoint.SetX(mRawTouchEvent.value);
             }
             else if (mRawTouchEvent.code == ABS_Y) {
-                arInput.y = mRawTouchEvent.value;
+                arInput.mPoint.SetY(mRawTouchEvent.value);
             }
         }
         readRawTouchEvent();

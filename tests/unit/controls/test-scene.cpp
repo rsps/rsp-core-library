@@ -15,27 +15,10 @@
 #include <posix/FileSystem.h>
 #include <messaging/eventTypes/ClickedEvent.h>
 #include <doctest.h>
-#include <graphics/controls/SceneMap.h>
-#include "scenes/FirstScene.h"
-#include "scenes/SecondScene.h"
+#include "scenes/Scenes.h"
 
 using namespace rsp::graphics;
 using namespace rsp::messaging;
-
-class Scenes : public SceneMap
-{
-public:
-    Scenes()
-        : SceneMap()
-    {
-        MakeScene<rsp::graphics::FirstScene>();
-        MakeScene<rsp::graphics::SecondScene>();
-    }
-
-    rsp::graphics::FirstScene& First() { return *reinterpret_cast<rsp::graphics::FirstScene*>(&operator[]("FirstScene")); }
-    rsp::graphics::SecondScene& Second() { return *reinterpret_cast<rsp::graphics::SecondScene*>(&operator[]("SecondScene")); }
-};
-
 
 class TestSub : public Subscriber<ClickTopics>
 {
@@ -64,7 +47,7 @@ TEST_CASE("Scene Test")
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
 
     Scenes scenes;
-    Input anInput;
+    TouchEvent event;
 
     Rect tr = scenes.Second().GetTopArea().GetArea();
     Point insideTopPoint(tr.GetLeft() + (rand() % tr.GetWidth()),
@@ -77,19 +60,17 @@ TEST_CASE("Scene Test")
     SUBCASE("Scene Process Input")
     {
         // Arrange
-        anInput.type = InputType::Press;
+        event.mType = TouchEvent::Types::Press;
         scenes.Second().Render(fb);
 
         SUBCASE("Process input for Top elements")
         {
             // Arrange
-            anInput.x = insideTopPoint.GetX();
-            anInput.y = insideTopPoint.GetY();
-            MESSAGE("Input x:" << anInput.x);
-            MESSAGE("Input y:" << anInput.y);
+            event.mPoint = insideTopPoint;
+            MESSAGE("Event Point:" << event.mPoint);
 
             // Act
-            scenes.Second().ProcessInput(anInput);
+            scenes.Second().ProcessInput(event);
 
             // Assert
             CHECK(scenes.Second().GetTopImg().IsInvalid());
@@ -98,11 +79,10 @@ TEST_CASE("Scene Test")
         SUBCASE("Process input for Bot elements")
         {
             // Arrange
-            anInput.x = insideBotPoint.GetX();
-            anInput.y = insideBotPoint.GetY();
+            event.mPoint = insideBotPoint;
 
             // Act
-            scenes.Second().ProcessInput(anInput);
+            scenes.Second().ProcessInput(event);
 
             // Assert
             CHECK(scenes.Second().GetBotImg().IsInvalid());
@@ -139,14 +119,13 @@ TEST_CASE("Scene Test")
         // Arrange
         TestSub sub(broker);
         sub.Subscribe(ClickTopics::SceneChange);
-        anInput.x = insideBotPoint.GetX();
-        anInput.y = insideBotPoint.GetY();
+        event.mPoint = insideBotPoint;
 
         // Act
-        anInput.type = InputType::Press;
-        scenes.Second().ProcessInput(anInput);
-        anInput.type = InputType::Lift;
-        scenes.Second().ProcessInput(anInput);
+        event.mType = TouchEvent::Types::Press;
+        scenes.Second().ProcessInput(event);
+        event.mType = TouchEvent::Types::Lift;
+        scenes.Second().ProcessInput(event);
 
          // Assert
         CHECK(clicked);

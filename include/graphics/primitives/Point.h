@@ -64,10 +64,38 @@ class Point
      * \param aPoint
      * \return self
      */
-    inline Point &operator=(const Point &aPoint)
+    inline Point &operator=(const Point &arPoint)
     {
-        mX = aPoint.mX;
-        mY = aPoint.mY;
+        if (&arPoint != this) {
+            mX = arPoint.mX;
+            mY = arPoint.mY;
+        }
+        return *this;
+    }
+
+    /**
+     * \brief Add the values from other point to this
+     *
+     * \param arPoint
+     * \return self
+     */
+    inline Point operator+=(const Point &arPoint)
+    {
+        mX += arPoint.mX;
+        mY += arPoint.mY;
+        return *this;
+    }
+
+    /**
+     * \brief Subtract the values from other point from this
+     *
+     * \param arPoint
+     * \return self
+     */
+    inline Point& operator-=(const Point &arPoint)
+    {
+        mX -= arPoint.mX;
+        mY -= arPoint.mY;
         return *this;
     }
 
@@ -101,12 +129,30 @@ class Point
     }
 
     /**
+     * \brief Set the value of the X coordinate
+     * \param aValue
+     */
+    inline void SetX(int aValue)
+    {
+        mX = aValue;
+    }
+
+    /**
      * \brief Gets the value of the Y coordinate
      * \return Integer
      */
     inline int GetY() const
     {
         return mY;
+    }
+
+    /**
+     * \brief Set the value of the Y coordinate
+     * \param aValue
+     */
+    inline void SetY(int aValue)
+    {
+        mY = aValue;
     }
 
   protected:

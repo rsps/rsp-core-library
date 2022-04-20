@@ -11,8 +11,8 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include <graphics/TouchEvent.h>
 #include "Control.h"
-#include "Input.h"
 #include "TouchArea.h"
 #include <vector>
 
@@ -36,7 +36,7 @@ class Scene : public Control
      * \brief Processes input in all touchable areas within Scene
      * \param arInput Reference to the input being processed
      */
-    void ProcessInput(Input &arInput);
+    void ProcessInput(TouchEvent &arInput);
 
   protected:
     std::string mName;

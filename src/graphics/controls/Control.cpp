@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/controls/Control.h"
+#include <graphics/controls/Control.h>
 
 namespace rsp::graphics
 {
@@ -66,11 +66,7 @@ bool Control::Render(Canvas &arCanvas)
     bool result = mIsInvalid;
 
     if (mIsInvalid) {
-        mIsInvalid = false;
-
-        if (!mTransparent) {
-            arCanvas.DrawRectangle(mArea, mBackground, true);
-        }
+        paint(arCanvas);
     }
 
     for (Control* child : mChildren) {
@@ -79,7 +75,16 @@ bool Control::Render(Canvas &arCanvas)
         }
     }
 
+    mIsInvalid = false;
+
     return result;
+}
+
+void Control::paint(Canvas &arCanvas)
+{
+    if (!mTransparent) {
+        arCanvas.DrawRectangle(mArea, mBackground, true);
+    }
 }
 
 } // namespace rsp::graphics

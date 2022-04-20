@@ -35,12 +35,15 @@ class SceneMap
 {
 public:
     SceneMap();
+    SceneMap(const SceneMap&) = default;
     virtual ~SceneMap();
 
     template<class T>
     Scene& MakeScene() {
         return add(new T());
     }
+
+    SceneMap& operator=(const SceneMap&) = default;
 
     Scene& operator[](const std::string &arName);
 

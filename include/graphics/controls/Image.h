@@ -23,14 +23,10 @@ class Image : public Control
     Image(std::string aNormal, std::string aPressed, Rect &arRect);
     ~Image();
 
-    /**
-     * \brief Override method for rendering the object
-     * \param aCanvas The canvas the object is rendered on
-     */
-    void Render(Canvas &arCanvas) override;
-
   protected:
     std::map<States, Bitmap> mStateMap{};
+
+    void paint(Canvas &arCanvas) override;
 };
 
 } // namespace rsp::graphics

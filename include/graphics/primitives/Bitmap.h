@@ -38,7 +38,7 @@ class Bitmap : public Canvas
      *
      * \param aImgName
      */
-    Bitmap(std::string aImgName);
+    Bitmap(const std::string &arImgName);
 
     /**
      * \brief Create a bitmap of given pixel data

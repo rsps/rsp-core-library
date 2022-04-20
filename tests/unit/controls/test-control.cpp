@@ -21,12 +21,6 @@ public:
 //    TestControl(const Rect &arRect) : Control(arRect){}
 
     void MakeValid() { mIsInvalid = false; }
-
-    void Render(Canvas &) override
-    {
-        mIsInvalid = false;
-    }
-
 };
 
 TEST_CASE("Control Constructor")

@@ -11,8 +11,8 @@
 #define GRAPHICSMAIN_H
 
 #include "graphics/BufferedCanvas.h"
-#include "graphics/InputCreator.h"
 #include <graphics/controls/SceneMap.h>
+#include <graphics/TouchParser.h>
 #include <messaging/Subscriber.h>
 #include <messaging/Broker.h>
 #include <messaging/eventTypes/ClickedEvent.h>
@@ -20,10 +20,10 @@
 namespace rsp::graphics
 {
 
-class GraphicsMain : public rsp::messaging::Subscriber<rsp::messaging::ClickTopics>
+class GraphicsMain
 {
   public:
-    GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, SceneMap &arScenes, rsp::messaging::Broker<rsp::messaging::ClickTopics>& arBroker);
+    GraphicsMain(BufferedCanvas &aCanvas, TouchParser &aInputs, SceneMap &arScenes);
     GraphicsMain(const GraphicsMain &) = default;
     GraphicsMain &operator=(const GraphicsMain &) = default;
     ~GraphicsMain();
@@ -42,23 +42,14 @@ class GraphicsMain : public rsp::messaging::Subscriber<rsp::messaging::ClickTopi
      * \brief Change the current active Scene
      * \param aSceneName The name of the scene to change to
      */
-    void ChangeScene(std::string aSceneName);
-
-    /**
-     * \brief Override Handle for receiving messaging events
-     * \param arNewEvent Reference to the event
-     */
-    void HandleEvent(rsp::messaging::Event &arNewEvent) override;
+    void ChangeScene(const std::string arName) { mNextScene = arName; }
 
   private:
-    BufferedCanvas &mBufferedCanvas;
-    InputCreator &mInputs;
+    BufferedCanvas &mrBufferedCanvas;
+    TouchParser &mrTouchParser;
     SceneMap &mrScenes;
     bool mTerminated = false;
-    std::vector<Input> inputCache{};
-
-    // Temp
-    void PrintInput(Input aInput);
+    std::string mNextScene{};
 };
 
 } // namespace rsp::graphics

@@ -8,22 +8,16 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/Framebuffer.h"
-#include "graphics/GraphicsMain.h"
-#include "messaging/eventTypes/ClickedEvent.h"
 #include <doctest.h>
-#include <functional>
 #include <posix/FileSystem.h>
-#include <vector>
+#include <graphics/Framebuffer.h>
+#include <graphics/GraphicsMain.h>
+#include "../unit/controls/scenes/Scenes.h"
 
 using namespace rsp::graphics;
-using namespace rsp::messaging;
 
-/*TEST_CASE("Graphics Main Test")
+TEST_CASE("Graphics Main Test")
 {
-    MESSAGE("Start");
-
-    MESSAGE("Init Framebufer");
     // Make framebuffer
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
@@ -31,27 +25,19 @@ using namespace rsp::messaging;
     // Get screen size
     Rect screenSize(Point(0, 0), Point(fb.GetWidth(), fb.GetHeight()));
 
-    MESSAGE("Making Broker");
-    Event event;
-    // Make Broker
-    Broker<ClickTopic> broker;
+    // Make scenes
+    Scenes scenes;
 
-    MESSAGE("Making SceneLoader");
-    // Make sceneLoader
-    SceneLoader scenes(broker);
+    // Make TouchParser
+    TouchParser tp("testImages/touchTest.bin");
 
-    MESSAGE("Init InputCreator");
-    // Make InputCreator
-    InputCreator ic;
+    GraphicsMain gfx(fb, tp, scenes);
 
-    MESSAGE("Init Main");
-    // Make GraphicsMain
-    GraphicsMain gMain(fb, ic, scenes);
+    gfx.ChangeScene("SecondScene");
 
-    // Subscribe to SceneChange ClickedEvents
-    gMain.SubscribeToBroker<ClickTopic>(broker, ClickTopic::SceneChange);
-    std::cout << "Setup complete" << std::endl;
+    scenes.Second().Whenclicked() = [&gfx]() {
+        gfx.Terminate();
+    };
 
-    // Run?
-    // gMain.Run();
-}*/
+    gfx.Run();
+}

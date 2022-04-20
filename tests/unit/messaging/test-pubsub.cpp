@@ -8,8 +8,9 @@
  * \author      Simon Glashoff
  */
 
-#include "messaging/Publisher.h"
-#include "messaging/Subscriber.h"
+#include <messaging/Publisher.h>
+#include <messaging/Subscriber.h>
+#include <messaging/eventTypes/ClickedEvent.h>
 #include <doctest.h>
 
 using namespace rsp::messaging;
@@ -48,8 +49,10 @@ public:
     void HandleEvent(Event &arNewEvent)
     {
         isHandled = true;
+        mMessage = arNewEvent.GetAs<ClickedEvent>().mMessage;
     }
     bool isHandled = false;
+    std::string mMessage{};
 };
 class TestSubTwo : public Subscriber<testTopic>
 {
@@ -61,8 +64,10 @@ public:
     void HandleEvent(Event &arNewEvent)
     {
         isHandled = true;
+        mMessage = arNewEvent.GetAs<ClickedEvent>().mMessage;
     }
     bool isHandled = false;
+    std::string mMessage{};
 };
 
 TEST_CASE("Subscriber Test")
@@ -70,7 +75,7 @@ TEST_CASE("Subscriber Test")
     // Arrange
     TestBroker testBroker;
     TestSubOne testSub(testBroker);
-    Event testEvent;
+    ClickedEvent testEvent("MyEvent");
 
     SUBCASE("Subscribe to Broker")
     {
@@ -87,6 +92,7 @@ TEST_CASE("Subscriber Test")
 
             // Assert
             CHECK(testSub.isHandled);
+            CHECK_EQ(testSub.mMessage, "MyEvent");
         }
         SUBCASE("Unsubscribe to Broker through Broker")
         {
@@ -100,6 +106,7 @@ TEST_CASE("Subscriber Test")
 
             CHECK_NOTHROW(testBroker.Publish(testTopic::topicTwo, testEvent));
             CHECK(testSub.isHandled);
+            CHECK_EQ(testSub.mMessage, "MyEvent");
         }
 
         SUBCASE("Unsubscribe to Broker through Subscriber")
@@ -111,6 +118,7 @@ TEST_CASE("Subscriber Test")
 
             CHECK_NOTHROW(testBroker.Publish(testTopic::topicTwo, testEvent));
             CHECK(testSub.isHandled);
+            CHECK_EQ(testSub.mMessage, "MyEvent");
         }
 
         SUBCASE("Unsubscribe all on destroy")
@@ -125,6 +133,7 @@ TEST_CASE("Subscriber Test")
 
                 CHECK_NOTHROW(testBroker.Publish(testTopic::topicOne, testEvent));
                 CHECK(two.isHandled);
+                CHECK_EQ(two.mMessage, "MyEvent");
             }
             CHECK(testBroker.GetSubscriberMap()[testTopic::topicOne].size() == 1);
             CHECK(testBroker.GetSubscriberMap()[testTopic::topicTwo].size() == 1);
@@ -140,7 +149,7 @@ TEST_CASE("Publisher Test")
     testSubOne.Subscribe(testTopic::topicOne);
     testSubTwo.Subscribe(testTopic::topicTwo);
     Publisher<testTopic> myPub(testBroker);
-    Event testEvent;
+    ClickedEvent testEvent("MyPublishedEvent");
 
     SUBCASE("Publish with correctly templated call")
     {
@@ -149,6 +158,7 @@ TEST_CASE("Publisher Test")
 
         // Assert
         CHECK(testSubOne.isHandled);
+        CHECK_EQ(testSubOne.mMessage, "MyPublishedEvent");
         CHECK_FALSE(testSubTwo.isHandled);
     }
 

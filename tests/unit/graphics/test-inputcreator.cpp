@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/InputCreator.h"
 #include <doctest.h>
+#include <graphics/TouchParser.h>
 #include <vector>
 
 using namespace rsp::graphics;
@@ -17,42 +17,44 @@ using namespace rsp::graphics;
 TEST_CASE("InputCreator Test")
 {
     // Arrange
-    std::vector<InputType> inputs = {
-        InputType::Press,
-        InputType::Lift,
-        InputType::Press,
-        InputType::Press,
-        InputType::Lift,
-        InputType::Lift,
-        InputType::Press,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Drag,
-        InputType::Lift};
+    std::vector<TouchEvent::Types> inputs = {
+        TouchEvent::Types::Press,
+        TouchEvent::Types::Lift,
+        TouchEvent::Types::Press,
+        TouchEvent::Types::Press,
+        TouchEvent::Types::Lift,
+        TouchEvent::Types::Lift,
+        TouchEvent::Types::Press,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Drag,
+        TouchEvent::Types::Lift};
     uint counter = 0;
-    InputCreator inputCreator("testImages/touchTest.bin");
+    TouchParser tp("testImages/touchTest.bin");
 
     // Act
-    while (inputCreator.HasNewInputs()) {
+    TouchEvent event;
+
+    while (tp.Poll(event)) {
         // Assert
-        CHECK(inputCreator.GetInput().type == inputs[counter]);
+        CHECK(event.mType == inputs[counter]);
         counter++;
     }
 }

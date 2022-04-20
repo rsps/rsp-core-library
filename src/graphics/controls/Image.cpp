@@ -12,6 +12,7 @@
 
 namespace rsp::graphics
 {
+
 Image::Image(std::string aPressed, std::string aNormal, Rect &arRect)
     : Control(arRect)
 {
@@ -22,13 +23,9 @@ Image::~Image()
 {
 }
 
-void Image::Render(Canvas &arCanvas)
+void Image::paint(Canvas &arCanvas)
 {
-    if (!mIsInvalid) {
-        return;
-    }
     arCanvas.DrawImage(mArea.GetTopLeft(), mStateMap.at(mState));
-    mIsInvalid = false;
 }
 
 } // namespace rsp::graphics

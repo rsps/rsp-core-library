@@ -20,7 +20,7 @@ Scene::Scene(const Rect &arRect, const std::string &arName)
 {
 }
 
-void Scene::ProcessInput(Input &arInput)
+void Scene::ProcessInput(TouchEvent &arInput)
 {
     for (TouchArea &area : mTouchables) {
         area.ProcessInput(arInput);

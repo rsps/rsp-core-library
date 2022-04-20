@@ -12,6 +12,7 @@
 
 #include <type_traits>
 #include <typeinfo>
+#include <utils/ExceptionHelper.h>
 
 namespace rsp::messaging
 {
@@ -20,7 +21,7 @@ class Event
 {
   public:
     Event(std::size_t aHash) : mTypeHash(aHash) {}
-    Event() : mTypeHash(typeid(Event).hash_code()) {}
+//    Event() : mTypeHash(typeid(Event).hash_code()) {}
     virtual ~Event() {}
 
     /**
@@ -31,7 +32,7 @@ class Event
     T &GetAs()
     {
         if (typeid(T).hash_code() != mTypeHash) {
-            throw std::bad_alloc();
+            THROW_WITH_BACKTRACE(std::bad_alloc);
         }
         return *reinterpret_cast<T *>(this);
     }

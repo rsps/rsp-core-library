@@ -14,13 +14,19 @@
 
 using namespace rsp::graphics;
 
-TEST_CASE("TouchArea Constructor")
+static void Randomize()
 {
-    // Arrange
     std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
 
     srand(ms.count()); // generates random seed val
+}
+
+
+TEST_CASE("TouchArea Constructor")
+{
+    Randomize();
+
     SUBCASE("Construct with Default Values")
     {
         // Act
@@ -34,14 +40,12 @@ TEST_CASE("TouchArea Constructor")
     SUBCASE("Construct From Rect")
     {
         // Arrange
-        int randomLeft = 1 + (rand() % 500);
+        int randomLeft = 1 + (rand() % 100);
         int randomTop = 1 + (rand() % 500);
-        int randomWidth = 1 + (rand() % 500);
-        int randomHeight = 1 + (rand() % 500);
+        int randomWidth = 1 + (rand() % 300);
+        int randomHeight = 1 + (rand() % 300);
         Rect myRect(randomLeft, randomTop, randomWidth, randomHeight);
-        MESSAGE("Rect Dimensions: "
-                << "\nTop Left: " << myRect.GetTop() << " " << myRect.GetLeft()
-                << "\nBottom Right: " << myRect.GetBottom() << " " << myRect.GetRight());
+        MESSAGE("Rect Dimensions: " << myRect);
         // Random point within rect
         // output = min + (rand() % static_cast<int>(max - min + 1))
         Point insidePoint(myRect.GetLeft() + (rand() % myRect.GetWidth()),
@@ -66,6 +70,8 @@ TEST_CASE("TouchArea Constructor")
 
 TEST_CASE("Input Processing")
 {
+    Randomize();
+
     // Arrange
     int hit_count = 0;
     bool pressed = false;
@@ -75,50 +81,40 @@ TEST_CASE("Input Processing")
     Rect aRect(10, 10, 200, 200);
     TouchArea area;
     area.SetArea(aRect);
-    Input anInput;
+    TouchEvent event;
 
-    anInput.x = 1 + (rand() % static_cast<int>(aRect.GetWidth() - 1 + 1));
-    anInput.y = 1 + (rand() % static_cast<int>(aRect.GetHeight() - 1 + 1));
+    event.mPoint = Point(aRect.GetLeft() + (rand() % static_cast<int>(aRect.GetWidth() - 1)),
+                         aRect.GetTop() + (rand() % static_cast<int>(aRect.GetHeight() - 1)));
 
-    CHECK_LT(anInput.x, aRect.GetWidth());
-    CHECK_LT(anInput.y, aRect.GetHeight());
-    CHECK_GT(anInput.x, 0);
-    CHECK_GT(anInput.y, 0);
+    MESSAGE("Touch Point: " << event.mPoint);
+    CHECK(aRect.IsHit(event.mPoint));
 
     area.GetOnPress() = [&](const Point &arPoint) noexcept {
-        if (aRect.IsHit(arPoint)) {
-            hit_count++;
-        }
+        hit_count++;
         pressed = true;
     };
     area.GetOnMove() = [&](const Point &arPoint) noexcept {
-        if (aRect.IsHit(arPoint)) {
-            hit_count++;
-        }
+        hit_count++;
         moved = true;
     };
     area.GetOnLift() = [&](const Point &arPoint) noexcept {
-        if (aRect.IsHit(arPoint)) {
-            hit_count++;
-        }
+        hit_count++;
         lifted = true;
     };
     area.GetOnClick() = [&](const Point &arPoint) noexcept {
-        if (aRect.IsHit(arPoint)) {
-            hit_count++;
-        }
+        hit_count++;
         clicked = true;
     };
 
     SUBCASE("Pressed Callback - Press Hit-Input")
     {
         // Arrange
-        anInput.type = InputType::Press;
+        event.mType = TouchEvent::Types::Press;
 
         CHECK_FALSE(pressed);
 
         // Act
-        area.ProcessInput(anInput);
+        area.ProcessInput(event);
 
         // Assert
         CHECK(hit_count == 1);
@@ -127,77 +123,75 @@ TEST_CASE("Input Processing")
         SUBCASE("Pressed Callback - Press Miss-Input")
         {
             // Arrange
-            anInput.x = anInput.x + aRect.GetWidth();
-            anInput.y = anInput.y + aRect.GetHeight();
+            event.mType = TouchEvent::Types::Press;
+            event.mPoint += aRect.GetBottomRight();
             pressed = false;
 
             // Act
-            area.ProcessInput(anInput);
+            area.ProcessInput(event);
 
             // Assert
-            CHECK_GT(anInput.x, aRect.GetWidth());
-            CHECK_GT(anInput.y, aRect.GetHeight());
+            CHECK_FALSE(aRect.IsHit(event.mPoint));
             CHECK(hit_count == 1);
             CHECK_FALSE(pressed);
         }
-    }
 
-    SUBCASE("Pressed Callback - Lift Hit-Input")
-    {
-        // Arrange
-        anInput.type = InputType::Lift;
+        SUBCASE("Pressed Callback - Lift Hit-Input")
+        {
+            // Arrange
+            event.mType = TouchEvent::Types::Lift;
 
-        // Act
-        area.ProcessInput(anInput);
+            // Act
+            area.ProcessInput(event);
 
-        // Assert
-        CHECK(hit_count == 2);
-        CHECK(lifted);
+            // Assert
+            CHECK(hit_count == 3);
+            CHECK(lifted);
+            CHECK(clicked);
+        }
 
         SUBCASE("Pressed Callback - Lift Miss-Input")
         {
             // Arrange
-            anInput.x = anInput.x + aRect.GetWidth();
-            anInput.y = anInput.y + aRect.GetHeight();
+            event.mType = TouchEvent::Types::Lift;
+            event.mPoint += aRect.GetBottomRight();
             lifted = false;
 
             // Act
-            area.ProcessInput(anInput);
+            area.ProcessInput(event);
 
             // Assert
-            CHECK_GT(anInput.x, aRect.GetWidth());
-            CHECK_GT(anInput.y, aRect.GetHeight());
+            CHECK_FALSE(aRect.IsHit(event.mPoint));
             CHECK(hit_count == 2);
-            CHECK_FALSE(lifted);
+            CHECK(lifted);
+            CHECK_FALSE(clicked);
         }
-    }
 
-    SUBCASE("Pressed Callback - Drag Hit-input")
-    {
-        // Arrange
-        anInput.type = InputType::Drag;
+        SUBCASE("Pressed Callback - Drag Hit-input")
+        {
+            // Arrange
+            event.mType = TouchEvent::Types::Drag;
 
-        // Act
-        area.ProcessInput(anInput);
+            // Act
+            area.ProcessInput(event);
 
-        // Assert
-        CHECK(hit_count == 2);
-        CHECK(moved);
+            // Assert
+            CHECK(hit_count == 2);
+            CHECK(moved);
+        }
 
         SUBCASE("Pressed Callback - Drag Miss-input")
         {
             // Arrange
-            anInput.type = InputType::Drag;
-            anInput.x = anInput.x + aRect.GetWidth();
-            anInput.y = anInput.y + aRect.GetHeight();
+            event.mType = TouchEvent::Types::Drag;
+            event.mPoint += aRect.GetBottomRight();
             moved = false;
 
             // Act
-            area.ProcessInput(anInput);
+            area.ProcessInput(event);
 
             // Assert
-            CHECK_GT(anInput.x, aRect.GetWidth());
-            CHECK_GT(anInput.y, aRect.GetHeight());
+            CHECK_FALSE(aRect.IsHit(event.mPoint));
             CHECK(hit_count == 2);
             CHECK(moved);
         }
@@ -209,15 +203,15 @@ TEST_CASE("Input Processing")
         {
             // Act
             MESSAGE("Start");
-            anInput.type = InputType::Press;
-            area.ProcessInput(anInput);
+            event.mType = TouchEvent::Types::Press;
+            area.ProcessInput(event);
             MESSAGE("Processed Press");
-            anInput.type = InputType::Lift;
-            area.ProcessInput(anInput);
+            event.mType = TouchEvent::Types::Lift;
+            area.ProcessInput(event);
             MESSAGE("Processed Lift");
 
             // Assert
-            CHECK(hit_count == 2);
+            CHECK(hit_count == 3);
             CHECK(pressed);
             CHECK_FALSE(moved);
             CHECK(lifted);
@@ -228,24 +222,22 @@ TEST_CASE("Input Processing")
         {
             // Act
             // Miss with press
-            anInput.type = InputType::Press;
-            anInput.x = anInput.x + aRect.GetWidth();
-            anInput.y = anInput.y + aRect.GetHeight();
-            area.ProcessInput(anInput);
+            event.mType = TouchEvent::Types::Press;
+            event.mPoint += aRect.GetBottomRight();
+            area.ProcessInput(event);
             // Drag into rect area
-            anInput.type = InputType::Drag;
-            anInput.x = anInput.x - aRect.GetWidth();
-            anInput.y = anInput.y - aRect.GetHeight();
-            area.ProcessInput(anInput);
+            event.mType = TouchEvent::Types::Drag;
+            event.mPoint -= aRect.GetBottomRight();
+            area.ProcessInput(event);
             // Do a lift
-            anInput.type = InputType::Lift;
-            area.ProcessInput(anInput);
+            event.mType = TouchEvent::Types::Lift;
+            area.ProcessInput(event);
 
             // Assert
-            CHECK(hit_count == 2);
+            CHECK(hit_count == 0);
             CHECK_FALSE(pressed);
-            CHECK(moved);
-            CHECK(lifted);
+            CHECK_FALSE(moved);
+            CHECK_FALSE(lifted);
             CHECK_FALSE(clicked);
         }
 
@@ -253,22 +245,21 @@ TEST_CASE("Input Processing")
         {
             // Act
             // Hit with press
-            anInput.type = InputType::Press;
-            area.ProcessInput(anInput);
+            event.mType = TouchEvent::Types::Press;
+            area.ProcessInput(event);
             // Drag out of rect area
-            anInput.type = InputType::Drag;
-            anInput.x = anInput.x + aRect.GetWidth();
-            anInput.y = anInput.y + aRect.GetHeight();
-            area.ProcessInput(anInput);
+            event.mType = TouchEvent::Types::Drag;
+            event.mPoint += aRect.GetBottomRight();
+            area.ProcessInput(event);
             // Do a lift
-            anInput.type = InputType::Lift;
-            area.ProcessInput(anInput);
+            event.mType = TouchEvent::Types::Lift;
+            area.ProcessInput(event);
 
             // Assert
-            CHECK(hit_count == 1);
+            CHECK(hit_count == 3);
             CHECK(pressed);
-            CHECK_FALSE(moved);
-            CHECK_FALSE(lifted);
+            CHECK(moved);
+            CHECK(lifted);
             CHECK_FALSE(clicked);
         }
 
@@ -276,13 +267,12 @@ TEST_CASE("Input Processing")
         {
             // Act
             // Miss with press
-            anInput.type = InputType::Press;
-            anInput.x = anInput.x + aRect.GetWidth();
-            anInput.y = anInput.y + aRect.GetHeight();
-            area.ProcessInput(anInput);
+            event.mType = TouchEvent::Types::Press;
+            event.mPoint += aRect.GetBottomRight();
+            area.ProcessInput(event);
             // Do a lift
-            anInput.type = InputType::Lift;
-            area.ProcessInput(anInput);
+            event.mType = TouchEvent::Types::Lift;
+            area.ProcessInput(event);
 
             // Assert
             CHECK(hit_count == 0);

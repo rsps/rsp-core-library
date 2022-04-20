@@ -10,8 +10,9 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include "graphics/primitives/Color.h"
-#include "graphics/primitives/Rect.h"
+#include <graphics/primitives/Canvas.h>
+#include <graphics/primitives/Color.h>
+#include <graphics/primitives/Rect.h>
 #include <vector>
 
 namespace rsp::graphics
@@ -111,6 +112,8 @@ class Control
     std::vector<Control *> mChildren{};
     bool mIsInvalid = true;
     States mState = States::normal;
+
+    virtual void paint(Canvas &arCanvas);
 };
 
 } // namespace rsp::graphics

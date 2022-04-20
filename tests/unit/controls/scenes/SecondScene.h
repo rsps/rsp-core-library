@@ -26,13 +26,13 @@ public:
     {
         // myName = "Second Scene";
         //  Set member variables values
-        Rect topRect(Point(100, 100), 200, 100);
+        Rect topRect(100, 150, 200, 100);
         mTopBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
         TouchArea& top_btn = makeTouchArea(topRect);
         top_btn.GetOnPress() = [this](const Point &arPoint) { mTopBtnImg.SetState(Control::States::pressed); };
         top_btn.GetOnLift() = [this](const Point &arPoint) { mTopBtnImg.SetState(Control::States::normal); };
 
-        Rect botRect(Point(100, 300), 200, 100);
+        Rect botRect(100, 300, 200, 100);
         mBotBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
         TouchArea& bot_btn = makeTouchArea(botRect);
         bot_btn.GetOnPress() = [this](const Point &arPoint) { mBotBtnImg.SetState(Control::States::pressed); };

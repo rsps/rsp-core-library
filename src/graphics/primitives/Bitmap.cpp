@@ -25,10 +25,10 @@ std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> Bit
     {".bmp", std::function<std::shared_ptr<ImgLoader>()>([]() { return std::make_shared<BmpLoader>(); })},
     {".png", std::function<std::shared_ptr<ImgLoader>()>([]() { return std::make_shared<PngLoader>(); })}};
 
-Bitmap::Bitmap(std::string aImgName)
+Bitmap::Bitmap(const std::string &arImgName)
     : Canvas()
 {
-    std::filesystem::path filename(aImgName);
+    std::filesystem::path filename(arImgName);
 
     auto loader = GetRasterLoader(filename.extension());
     // Get raw data

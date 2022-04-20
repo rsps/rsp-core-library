@@ -10,8 +10,8 @@
 #ifndef TOUCHAREA_H
 #define TOUCHAREA_H
 
-#include "Input.h"
 #include <graphics/primitives/Rect.h>
+#include <graphics/TouchEvent.h>
 #include <utils/Function.h>
 
 namespace rsp::graphics
@@ -34,7 +34,7 @@ class TouchArea
      * \brief Processes input for press or click callbacks
      * \param arInput Reference to the input being processed
      */
-    void ProcessInput(Input &arInput);
+    void ProcessInput(TouchEvent &arInput);
 
     /**
      * \brief Checks if a given coordinates is inside the defined Rectangle

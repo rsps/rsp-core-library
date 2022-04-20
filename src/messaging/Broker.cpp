@@ -52,7 +52,7 @@ void BrokerBase::doPublish(int aTopic, Event &arNewEvent)
     }
 
     // foreach sub in multimap for a given key, do->update
-    for (auto sub : it->second) {
+    for (SubscriberBase* sub : it->second) {
         sub->HandleEvent(arNewEvent);
     }
 }

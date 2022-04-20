@@ -10,27 +10,31 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include <iostream>
+#include <graphics/primitives/Point.h>
+
 namespace rsp::graphics
 {
 
-/**
- * \brief Enum type specifying the different types of input
- *
- */
-enum class InputType {
-    None,
-    Press,
-    Drag,
-    Lift
-};
-
-class Input
+class TouchEvent
 {
   public:
-    InputType type = InputType::None;
-    int x = 0; /*!< Value of the absolute X coordinate from touch */
-    int y = 0; /*!< Value of the absolute Y coordinate from touch */
+    /**
+     * \brief Enum type specifying the different types of touch events
+     *
+     */
+    enum class Types {
+        None,
+        Press,
+        Drag,
+        Lift
+    };
+
+    Types mType = Types::None;
+    Point mPoint{};  /* Value of the absolute X coordinate from touch */
 };
+
+std::ostream &operator<<(std::ostream &os, const TouchEvent &arTouchEvent);
 
 } // namespace rsp::graphics
 

@@ -17,14 +17,13 @@ using namespace rsp::messaging;
 namespace rsp::graphics
 {
 
-GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, InputCreator &aInputs, SceneMap &arScenes, Broker<ClickTopics>& arBroker)
-    : Subscriber<ClickTopics>(arBroker),
-      mBufferedCanvas(aBufferedCanvas),
-      mInputs(aInputs),
+GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, TouchParser &aInputs, SceneMap &arScenes)
+    : mrBufferedCanvas(aBufferedCanvas),
+      mrTouchParser(aInputs),
       mrScenes(arScenes)
 {
-    mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-    mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+    mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+    mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
 }
 
 GraphicsMain::~GraphicsMain()
@@ -33,53 +32,27 @@ GraphicsMain::~GraphicsMain()
 
 void GraphicsMain::Run()
 {
+    TouchEvent event;
+
     while (!mTerminated) {
-        // New inputs?
-        while (mInputs.HasNewInputs()) {
-            inputCache.push_back(mInputs.GetInput());
-            PrintInput(inputCache.back()); // Temp
-            // Invalidate stuff
-            mrScenes.ActiveScene().ProcessInput(inputCache.back());
-            if (inputCache.size() > 5) {
-                // Limit of cached input reached - Force render
-                mrScenes.ActiveScene().Render(mBufferedCanvas);
-                inputCache.clear();
-                mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
-            }
+        if (!mNextScene.empty()) {
+            mrScenes.SetActiveScene(mNextScene);
+            mrScenes.ActiveScene().Invalidate();
+            mNextScene = "";
         }
-        // re-render invalidated things
-        mActiveScene->Render(mBufferedCanvas);
-        mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy); // Should be if Render returns true
+
+        // New inputs?
+        if (mrTouchParser.Poll(event)) {
+            std::cout << event << std::endl;
+            mrScenes.ActiveScene().ProcessInput(event);
+        }
+
+        // Render invalidated things
+        if (mrScenes.ActiveScene().Render(mrBufferedCanvas)) {
+            mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy); // Should be if Render returns true
+        }
     }
 }
 
-void GraphicsMain::ChangeScene(std::string aSceneName)
-{
-    mActiveScene->Invalidate();
-    mActiveScene = &mrScenes[aSceneName];
-    mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-    mActiveScene->Render(mBufferedCanvas);
-    mBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
-}
 
-void GraphicsMain::HandleEvent(Event &newEvent)
-{
-    ChangeScene(newEvent.GetAs<ClickedEvent>().mMessage);
-}
-
-// Temp method
-void GraphicsMain::PrintInput(Input aInput)
-{
-    if (aInput.type == InputType::Press) {
-        std::cout << "New Press" << std::endl;
-        std::cout << "X: " << aInput.x << " Y: " << aInput.y << std::endl;
-    }
-    if (aInput.type == InputType::Drag) {
-        std::cout << "New Drag" << std::endl;
-        std::cout << "X: " << aInput.x << " Y: " << aInput.y << std::endl;
-    }
-    if (aInput.type == InputType::Lift) {
-        std::cout << "New Lift" << std::endl;
-    }
-}
 } // namespace rsp::graphics

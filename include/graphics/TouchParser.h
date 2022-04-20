@@ -7,10 +7,10 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
-#ifndef INPUTCREATOR_H
-#define INPUTCREATOR_H
+#ifndef TOUCHPARSER_H
+#define TOUCHPARSER_H
 
-#include "graphics/controls/Input.h"
+#include <graphics/TouchEvent.h>
 #include "posix/FileIO.h"
 #include <fstream>
 #include <iostream>
@@ -31,31 +31,40 @@ struct RawTouchEvent {
 } __attribute__((packed));
 
 /**
- * \brief Streaming operator to stream InputLine
+ * \brief Streaming operator to stream RawTouchEvent
  */
 std::ostream &operator<<(std::ostream &os, const RawTouchEvent &arTouchEvent);
 
-class InputCreator
+
+/**
+ * \class TouchParser
+ * \brief Read and parse input events from kernel device.
+ *
+ * A polling interface is implemented, since the device handle will always
+ * flag readable to select or epoll. Reading the value could then return
+ * 0 bytes if empty, so this could be done in one read operation.
+ */
+class TouchParser
 {
 public:
-    InputCreator(const std::string &arPath = "/dev/input/event1");
-    ~InputCreator();
+    TouchParser(const std::string &arPath = "/dev/input/event1");
+    ~TouchParser();
 
     /**
      * \brief Parse input from touch driver
      * \param Reference to the touch event object to be populated
-     * \return bool True if event is ready
+     * \return bool True if the event is successfully filled
      */
-    bool Poll(Input &arInput);
+    bool Poll(TouchEvent &arInput);
 
 protected:
     rsp::posix::FileIO mTouchDevice{};
     RawTouchEvent mRawTouchEvent{};
 
-    InputType readType();
-    void readBody(Input &arInput);
+    TouchEvent::Types readType();
+    void readBody(TouchEvent &arInput);
     void readRawTouchEvent();
 };
 
 } // namespace rsp::graphics
-#endif // INPUTCREATOR_H
+#endif // TOUCHPARSER_H

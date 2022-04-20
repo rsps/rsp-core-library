@@ -66,29 +66,32 @@ TouchArea& TouchArea::SetArea(const Rect &arRect)
     return *this;
 }
 
-void TouchArea::ProcessInput(Input &arInput)
+void TouchArea::ProcessInput(TouchEvent &arInput)
 {
-    switch (arInput.type) {
-        case InputType::Press:
-            mCurrentPress = Point(arInput.x, arInput.y);
-            mOriginalPress = Point(arInput.x, arInput.y);
+    switch (arInput.mType) {
+        case TouchEvent::Types::Press:
+            mCurrentPress = arInput.mPoint;
+            mOriginalPress = arInput.mPoint;
             if (IsHit(mCurrentPress)) {
                 mOnPress(mCurrentPress);
             }
             break;
 
-        case InputType::Lift:
+        case TouchEvent::Types::Lift:
             if (IsHit(mOriginalPress)) {
-                mOnLift(mOriginalPress);
+                mCurrentPress = arInput.mPoint;
+                mOnLift(mCurrentPress);
                 if (IsHit(mCurrentPress)) {
                     mOnClick(mCurrentPress);
                 }
             }
             break;
 
-        case InputType::Drag:
-            mCurrentPress = Point(arInput.x, arInput.y);
-            mOnMove(mCurrentPress);
+        case TouchEvent::Types::Drag:
+            if (IsHit(mOriginalPress)) {
+                mCurrentPress = arInput.mPoint;
+                mOnMove(mCurrentPress);
+            }
             break;
 
         default:
