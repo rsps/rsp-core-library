@@ -18,32 +18,43 @@
 namespace rsp::graphics
 {
 
+/**
+ * \brief Defines the values given on each line by touch driver
+ *
+ */
+struct RawTouchEvent {
+    uint32_t stime; /*!< Seconds since Epoch */
+    int32_t mtime;  /*!< Signed count of microseconds */
+    uint16_t type;
+    uint16_t code;
+    int32_t value;
+} __attribute__((packed));
+
+/**
+ * \brief Streaming operator to stream InputLine
+ */
+std::ostream &operator<<(std::ostream &os, const RawTouchEvent &arTouchEvent);
+
 class InputCreator
 {
-  private:
-    rsp::posix::FileIO touchDriver{};
-    InputLine inputLine{};
-    Input input{};
-
-    void readType();
-    void readBody();
-    void readLine();
-
-  public:
-    InputCreator(std::string aPath = "/dev/input/event1");
+public:
+    InputCreator(const std::string &arPath = "/dev/input/event1");
     ~InputCreator();
 
     /**
-     * \brief Checks if touch driver has new inputs
-     * \return True if there are unread inputs
+     * \brief Parse input from touch driver
+     * \param Reference to the touch event object to be populated
+     * \return bool True if event is ready
      */
-    bool HasNewInputs();
+    bool Poll(Input &arInput);
 
-    /**
-     * \brief Gets an input from touch driver
-     * \return Reference to the input object
-     */
-    const Input &GetInput();
+protected:
+    rsp::posix::FileIO mTouchDevice{};
+    RawTouchEvent mRawTouchEvent{};
+
+    InputType readType();
+    void readBody(Input &arInput);
+    void readRawTouchEvent();
 };
 
 } // namespace rsp::graphics

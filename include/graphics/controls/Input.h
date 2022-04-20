@@ -10,28 +10,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include <iostream>
-#include <linux/input.h>
-
 namespace rsp::graphics
 {
-
-/**
- * \brief Defines the values given on each line by touch driver
- *
- */
-struct InputLine {
-    uint32_t stime; /*!< Seconds since Epoch */
-    int32_t mtime;  /*!< Signed count of microseconds */
-    uint16_t type;
-    uint16_t code;
-    int32_t value;
-} __attribute__((packed));
-
-/**
- * \brief Streaming operator to stream InputLine
- */
-std::ostream &operator<<(std::ostream &os, const InputLine &arInputLine);
 
 /**
  * \brief Enum type specifying the different types of input

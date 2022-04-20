@@ -21,78 +21,85 @@ public:
     NoInputData() : rsp::utils::CoreException("Touch input queue empty") {};
 };
 
-std::ostream &operator<<(std::ostream &os, const InputLine &arInputLine)
+std::ostream& operator<<(std::ostream &os, const RawTouchEvent &arTouchEvent)
 {
-    os << " Input Seconds: " << arInputLine.stime << "\n"
-       << " Input Microsec: " << arInputLine.mtime << "\n"
-       << " Input Type: " << arInputLine.type << "\n"
-       << " Input Code: " << arInputLine.code << "\n"
-       << " Input Value: " << arInputLine.value;
+    os << "Raw Touch Event: " << arTouchEvent.stime << "." << arTouchEvent.mtime << "\n"
+       << "  Type:  " << arTouchEvent.type << "\n"
+       << "  Code:  " << arTouchEvent.code << "\n"
+       << "  Value: " << arTouchEvent.value;
     return os;
 }
 
-InputCreator::InputCreator(std::string aPath)
+
+InputCreator::InputCreator(const std::string &arPath)
 {
-    touchDriver.Open(aPath, std::ifstream::binary);
+    mTouchDevice.Open(arPath, std::ifstream::binary);
 }
 
 InputCreator::~InputCreator()
 {
-    touchDriver.Close();
+    mTouchDevice.Close();
 }
 
-bool InputCreator::HasNewInputs()
-{
-    return !touchDriver.IsEOF();
-}
-
-const Input &InputCreator::GetInput()
+bool InputCreator::Poll(Input &arInput)
 {
     try {
-        readType();
+        arInput.type = readType();
+        if (arInput.type != InputType::None) {
+            readBody(arInput);
+            return true;
+        }
     }
     catch(const NoInputData &e) {
-        input.type = InputType::None;
     }
-    return input;
+    return false;
 }
 
-void InputCreator::readLine()
+void InputCreator::readRawTouchEvent()
 {
-    std::size_t len = touchDriver.Read(reinterpret_cast<char *>(&inputLine), sizeof(InputLine));
-    if (len != sizeof(InputLine)) {
+    std::size_t len = mTouchDevice.Read(reinterpret_cast<char *>(&mRawTouchEvent), sizeof(RawTouchEvent));
+    if (len != sizeof(RawTouchEvent)) {
         throw NoInputData();
     }
 }
 
-void InputCreator::readType()
+InputType InputCreator::readType()
 {
-    readLine();
-    if (inputLine.code == ABS_MT_SLOT) {
-        readLine();
+    readRawTouchEvent();
+    if (mRawTouchEvent.code == ABS_MT_SLOT) {
+        // New touch detected on multi-touch panel
+        readRawTouchEvent();
     }
 
-    if (inputLine.type == EV_ABS && inputLine.code == ABS_MT_TRACKING_ID && inputLine.value == -1) {
-        input.type = InputType::Lift;
-    } else if (inputLine.type == EV_ABS && inputLine.code == ABS_MT_TRACKING_ID) {
-        input.type = InputType::Press;
-    } else if (inputLine.type == EV_ABS &&
-               (inputLine.code == ABS_MT_POSITION_X || inputLine.code == ABS_MT_POSITION_Y)) {
-        input.type = InputType::Drag;
+    if (mRawTouchEvent.type == EV_ABS) {
+        if (mRawTouchEvent.code == ABS_MT_TRACKING_ID) {
+            if (mRawTouchEvent.value == -1) {
+                return InputType::Lift;
+            }
+            else {
+                return InputType::Press;
+            }
+        } else if (mRawTouchEvent.code == ABS_MT_POSITION_X || mRawTouchEvent.code == ABS_MT_POSITION_Y) {
+            return InputType::Drag;
+        }
     }
-    readBody();
+
+    return InputType::None;
 }
 
-void InputCreator::readBody()
+void InputCreator::readBody(Input &arInput)
 {
-    while (inputLine.type != EV_SYN) {
-        if (inputLine.type == EV_ABS && inputLine.code == ABS_X) {
-            input.x = inputLine.value;
+    while (mRawTouchEvent.type != EV_SYN) {
+
+        if (mRawTouchEvent.type == EV_ABS) {
+            if (mRawTouchEvent.code == ABS_X) {
+                arInput.x = mRawTouchEvent.value;
+            }
+            else if (mRawTouchEvent.code == ABS_Y) {
+                arInput.y = mRawTouchEvent.value;
+            }
         }
-        if (inputLine.type == EV_ABS && inputLine.code == ABS_Y) {
-            input.y = inputLine.value;
-        }
-        readLine();
+        readRawTouchEvent();
     }
 }
 } // namespace rsp::graphics
