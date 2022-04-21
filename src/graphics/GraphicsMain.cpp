@@ -57,7 +57,7 @@ void GraphicsMain::Run(int aMaxFPS)
 
         // Render invalidated things
         if (mrScenes.ActiveScene().Render(mrBufferedCanvas)) {
-            mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy); // Should be if Render returns true
+            mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
         }
 
         int64_t delay = std::max(0l, frame_time - sw.Elapsed<std::chrono::milliseconds>());
