@@ -6,7 +6,12 @@
  * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
+ * \author      Steffen Brummer
  */
+
+#ifndef GFX_FPS
+    #define GFX_FPS 100
+#endif
 
 #include <doctest.h>
 #include <posix/FileSystem.h>
@@ -39,5 +44,9 @@ TEST_CASE("Graphics Main Test")
         gfx.Terminate();
     };
 
-    gfx.Run();
+    gfx.Run(GFX_FPS);
+
+    const uint32_t cGreenColor = 0x24b40b;
+    CHECK(fb.GetPixel(scenes.Second().GetTopImg().GetArea().GetTopLeft()) == cGreenColor);
+    CHECK(fb.GetPixel(scenes.Second().GetTopImg().GetArea().GetTopLeft()) == cGreenColor);
 }

@@ -32,7 +32,7 @@ public:
         top_btn.GetOnPress() = [this](const Point &arPoint) { mTopBtnImg.SetState(Control::States::pressed); };
         top_btn.GetOnLift() = [this](const Point &arPoint) { mTopBtnImg.SetState(Control::States::normal); };
 
-        Rect botRect(100, 300, 200, 100);
+        Rect botRect(100, 300, 300, 100);
         mBotBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
         TouchArea& bot_btn = makeTouchArea(botRect);
         bot_btn.GetOnPress() = [this](const Point &arPoint) { mBotBtnImg.SetState(Control::States::pressed); };

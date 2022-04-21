@@ -61,11 +61,13 @@ target_compile_options(rsp-core-lib PRIVATE -pedantic -Wall -Wextra -Wold-style-
     -Wshadow
     -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
 
-#if (DEFINED RELEASE)
-#else()
-#target_compile_options(rsp-core-lib PRIVATE 
-#    -DDEBUG_LOG)
-#endif()
+OPTION(RELEASE "Set to turn off debug output" OFF) # Disabled by default. Usage: cmake -DRELEASE=ON ..
+
+if (RELEASE)
+else()
+target_compile_options(rsp-core-lib PRIVATE 
+    -DDEBUG_LOG)
+endif()
 
 add_subdirectory(src)
 
@@ -116,6 +118,12 @@ target_compile_options(rsp-core-lib-test PRIVATE -pedantic -Wall -Wextra -Wold-s
     -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
     -Wundef -Wno-unused -Weffc++ -Werror
     -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+
+if (RELEASE)
+else()
+target_compile_options(rsp-core-lib-test PRIVATE 
+    -DGFX_FPS=10)
+endif()
 
 #get_target_property(INCLUDE_DIRS "rsp-core-lib-test" INCLUDE_DIRECTORIES)
 #message(STATUS "IncDirs: ${INCLUDE_DIRS}")

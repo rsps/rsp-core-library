@@ -29,9 +29,10 @@ class GraphicsMain
     ~GraphicsMain();
 
     /**
-     * \brief Runs the Gui loop
+     * \brief Runs the Gui loop. The overall CPU usage can be reduced by setting a lower frame rate.
+     * \param Maximum allowed frames per second on the GUI.
      */
-    void Run();
+    void Run(int aMaxFPS = 30);
 
     /**
      * \brief Sets Gui loop to terminate on next loop through

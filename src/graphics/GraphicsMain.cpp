@@ -8,9 +8,12 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/GraphicsMain.h"
+#include <graphics/GraphicsMain.h>
 #include <chrono>
 #include <thread>
+#include <utils/StopWatch.h>
+#include <algorithm>
+#include <logging/Logger.h>
 
 using namespace rsp::messaging;
 
@@ -30,11 +33,16 @@ GraphicsMain::~GraphicsMain()
 {
 }
 
-void GraphicsMain::Run()
+void GraphicsMain::Run(int aMaxFPS)
 {
     TouchEvent event;
+    rsp::utils::StopWatch sw;
+
+    int64_t frame_time = 1000 / aMaxFPS;
 
     while (!mTerminated) {
+        sw.Reset();
+
         if (!mNextScene.empty()) {
             mrScenes.SetActiveScene(mNextScene);
             mrScenes.ActiveScene().Invalidate();
@@ -43,7 +51,7 @@ void GraphicsMain::Run()
 
         // New inputs?
         if (mrTouchParser.Poll(event)) {
-            std::cout << event << std::endl;
+            DLOG(event);
             mrScenes.ActiveScene().ProcessInput(event);
         }
 
@@ -51,6 +59,9 @@ void GraphicsMain::Run()
         if (mrScenes.ActiveScene().Render(mrBufferedCanvas)) {
             mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy); // Should be if Render returns true
         }
+
+        int64_t delay = std::max(0l, frame_time - sw.Elapsed<std::chrono::milliseconds>());
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     }
 }
 
