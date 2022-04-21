@@ -42,7 +42,9 @@ std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph)
 
 void Font::RegisterFont(const char *apFileName)
 {
+#ifdef USE_FREETYPE
     FreeTypeLibrary::Get().RegisterFont(apFileName);
+#endif
 }
 
 
@@ -51,6 +53,7 @@ Font::Font(const std::string &arFontName, Styles aStyle)
 {
 #ifdef USE_FREETYPE
     mpImpl = std::make_unique<FreeTypeRawFont>(arFontName, 0);
+    SetStyle(aStyle);
 #endif
     ASSERT(mpImpl);
 }

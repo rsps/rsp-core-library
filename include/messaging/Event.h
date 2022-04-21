@@ -21,7 +21,6 @@ class Event
 {
   public:
     Event(std::size_t aHash) : mTypeHash(aHash) {}
-//    Event() : mTypeHash(typeid(Event).hash_code()) {}
     virtual ~Event() {}
 
     /**

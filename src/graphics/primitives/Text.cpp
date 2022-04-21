@@ -82,7 +82,7 @@ void Text::scaleToFit()
     alignGlyphs();
 }
 
-Rect Text::CalcBoundingRect(const std::vector<Glyph> &arGlyphs)
+Rect Text::CalcBoundingRect(const std::vector<Glyph> &arGlyphs) const
 {
     int w = 0;
     int h = 0;

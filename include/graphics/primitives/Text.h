@@ -62,6 +62,8 @@ public:
     virtual ~Text() {};
 
 
+    operator std::string() const { return mValue; }
+
     /**
      * Getter for the string content
      *
@@ -183,7 +185,7 @@ public:
      * \param arGlyphs
      * \return Rect
      */
-    Rect CalcBoundingRect(const std::vector<Glyph> &arGlyphs);
+    Rect CalcBoundingRect(const std::vector<Glyph> &arGlyphs) const;
 
 protected:
     Font mFont;

@@ -2,48 +2,72 @@
 
 title GUI Classes
 
-namespace rsp {
+namespace rsp::graphics {
 
 class Point {
     A simple class with properties\nfor a 2D coordinate.
     --
-    +x: uint16_t
-    +y: uint16_t
+    +mX: integer
+    +mY: integer
     --
+    +Point()
     +Point(aX: int, aY: int)
-    +Point(arPoint: const Point&)
+    +Point(arPoint: constant Point&)
+    +operator=(arPoint: constant Point&): Point&
+    +operator+=(arPoint: constant Point&): Point&
+    +operator-=(arPoint: constant Point&): Point&
+    +operator==(arPoint: constant Point&): boolean
+    +operator!=(arPoint: constant Point&): boolean
+    +GetX(): integer
+    +SetX(aValue: integer)
+    +GetY(): integer
+    +SetY(aValue: integer)
 }
 
 class Rect {
     A class with two Point properties.
     --
-    #mTopLeft: Point
-    #mBottomRight: Point
+    #mLeftTop: Point
+    #mRightBottom: Point
     --
-    +Rect(aTop: int, aLeft: int, aWidth: int, aHeight: int)
-    +Rect(arTopLeft: const Point&, aWidth: int, aHeight: int)
-    +Rect(arTopLeft: const Point&, arBottomRigth: const Point&)
-    +Rect(arRect: const Rect&)
-    +TopLeft(): Point&
-    +BottomRight(): Point&
-    +GetWidth(): int
-    +SetWidth(aValue: int)
-    +GetHeight(): int
-    +void SetHeight(aValue: int)
-    +bool IsHit(arPoint: const Point&)
+    +Rect()
+    +Rect(aTop: integer, aLeft: integer, aWidth: integer, aHeight: integer)
+    +Rect(arTopLeft: const Point&, aWidth: integer, aHeight: integer)
+    +Rect(arTopLeft: constant Point&, arBottomRight: constant Point&)
+    +Rect(arRect: constant Rect&)
+    +operator=(const Rect &arRect): Rect&
+    +operator==(const Rect &arRect): bool
+    +operator!=(const Rect &arRect): bool
+
+    +GetTop(): integer
+    +SetTop(aValue: integer)
+    +GetBottom(): integer
+    +SetBottom(aBotValue: integer)
+    +GetLeft(): integer
+    +SetLeft(aLeftValue: integer)
+    +GetRight(): integer
+    +SetRight(aRightValue: integer)
+
+    +GetTopLeft(): Point&
+    +GetBottomRight(): Point&
+    +GetWidth(): integer
+    +SetWidth(aValue: integer)
+    +GetHeight(): integer
+    +SetHeight(aValue: integer)
+    +IsHit(arPoint: constant Point&): boolean 
 }
 Point *-- Rect
 
 class Color {
-    Class with uint32_t property for RGB
-    and Alpha channel color information.
+    Class with uint32_t property for ARGB
+    color information.
     The alpha channel is used for opacity.
     Not all platforms support alpha blending.
     --
-    #mColor: uint32_t
+    #mValue: ARGB_t
     --
     +Color(aRed: uint8_t, aGreen: uint8_t, aBlue: uint8_t, aAlpha: uint8_t)
-    +Color(aARGB: uint32_t)
+    +Color(aARGB: ARGB_t)
     +Color(arColor: const Color&)
     +GetRed(): uint8_t
     +SetRed(aValue: uint8_t)
@@ -53,38 +77,48 @@ class Color {
     +SetBlue(aValue: uint8_t)
     +GetAlpha(): uint8_t
     +SetAlpha(aValue: uint8_t)
-    +operator uint32_t(): uint32_t
-    +operator =(arColor: const Color&)
+    +operator ARGB_t(): uint32_t
+    +operator=(arColor: const Color&): Color&
 }
-
-enum FontStyle {
-    Normal
-    Bold
-    Italic
-}
-
-class Font {
-    When used on Linux, the GUI library can
-    use the FreeType2 library to render fonts.
-    --
-    #mFontName: string
-    #mStyle: FontStyle
-    #mColor: Color
-    #mSize: int
-    --
-    +Font(arName: const string&)
-}
-FontStyle *-- Font
-Color *--- Font
 
 class Bitmap {
     Class to handle raster images.
     Can load bmp and png files through
     filesystem and do some basic
     manipulation like resize/stretch.
+    --
+    +Bitmap(arImgName: const std::string&)
+    +Bitmap(apPixels: const uint32_t*, aHeight: integer, aWidth: integer, aBytesPerPixel:integer)
+    +Bitmap(aHeight: integer, aWidth: integer, aBytesPerPixel: integer)
+    +SetPixel(arPoint: const Point&, aColor: Color)
+    +GetPixel(arPoint: const Point&, aFront: boolean = false): uint32_t
+    +GetHeight(): integer
+    +GetWidth(): integer
+    +GetPixels(): const std::vector<uint32_t>&
 }
 
-enum SwapOperations
+abstract Canvas {
+    All drawing operations are performed on a Canvas.
+    Descendants can implement in memory canvas, Linux
+    Framebuffer canvas or even a DirectX Canvas.
+    --
+    +DrawArc(arCenter: const Point&, aRadius1: integer, aRadius2: integer, aStartAngle: integer, aSweepAngle: integer, arColor: constant Color&)
+    +DrawCircle(arCenter: constant Point&, aRadius: integer, arColor: constant Color&)
+    +DrawLine(arA: constant Point&, arB: constant Point&, aColor: Color)
+    +DrawRectangle(arRect: constant Rect&, arColor: constant Color&, aFilled: boolean = false)
+    +DrawImage(arTopLeft: constant Point&, arBitmap: constant Bitmap&)
+    +DrawText(arText: constant Text&, arColor: constant Color&)
+    +DrawText(arText: Text&)
+    +{abstract}GetPixel(arPoint: const Point&, aFront: constant boolean = false): uint32_t
+    +{abstract}SetPixel(arPoint: const Point&, aColor: constant Color)
+    +GetWidth(): integer
+    +GetHeight(): integer
+    +GetColorDepth(): integer
+    +IsInsideScreen(arPoint: constant Point&): boolean
+}
+Canvas <|-- Bitmap
+
+enum BufferedCanvas::SwapOperations
 {
     When swapping buffers these values can control
     the baseline content of the new buffer.
@@ -94,33 +128,17 @@ enum SwapOperations
     Clear // The new buffer is filled with the background color
 }
 
-abstract Canvas {
-    All drawing operations are performed on a Canvas.
-    Descendants can implement in memory canvas, Linux
-    Framebuffer canvas or even a DirectX Canvas.
-    --
-    +{abstract}DrawDot(arPoint: const Point&, aColor: Color)
-    +{abstract}DrawArc(arCenter: const Point&, aRadius1: int, aRadius2: int, aStartAngle: int, aSweepAngle: int, aColor: Color)
-    +{abstract}DrawCircle(arCenter: const Point&, aRadius: int, aColor: Color)
-    +{abstract}DrawLine(arA: const Point&, arB: const Point&, aColor: Color)
-    +{abstract}DrawRectangle(arRect: const Rect&, aColor: Color)
-    +{abstract}DrawImage(arTopLeft: const Point&, arBitmap: const Bitmap&)
-    +{abstract}DrawText(arRect: const Rect&, arFont: const Font&, arText: const string&, aScaleToFit: bool)
-    +{abstract}GetPixel(arPoint: const Point&, aFront: const bool = false) const : uint32_t
-    +{abstract}SetPixel(arPoint: const Point&, aColor: const Color)
-}
-Canvas <|-- Bitmap
-
-abstract BufferedCanvas {
-    +{abstract} SwapBuffers(aOperation: SwapOperations);
+interface BufferedCanvas {
+    +{abstract}SwapBuffers(aOperation: SwapOperations);
 }
 
-SwapOperations ... BufferedCanvas
+BufferedCanvas::SwapOperations ... BufferedCanvas
 Canvas <|-- BufferedCanvas
 
-class FrameBufferCanvas {
+class FrameBuffer {
+    +Framebuffer(apDevicePath: const char* = nullptr)
 }
-BufferedCanvas <|-- FrameBufferCanvas
+BufferedCanvas <|-- FrameBuffer
 
 class TouchArea {
     #mTouchArea: Rect
@@ -130,19 +148,19 @@ class TouchArea {
 }
 Rect *-- TouchArea
 
-class Ctrl {
+class Control {
     The base GUI element. All other elements
-    decent from the Ctrl class.
-    Ctrl objects contains a boolean "invalidated"
+    decent from the Control class.
+    Control objects contains a boolean "invalidated"
     property, this is flagged in case the object needs
-    rendering. Setter functions can invalidate a Ctrl
+    rendering. Setter functions can invalidate a Control
     object.
     --
     #mBackground: Color
     #mTransparent: bool
     #mArea: Rect
-    #mpParent: Ctrl*
-    #mChildren: std::vector<Ctrl*>
+    #mpParent: Control*
+    #mChildren: std::vector<Control*>
     --
     +Invalidate()
     +IsInvalid() const: bool
@@ -151,8 +169,8 @@ class Ctrl {
     +SetArea(arRect: const Rect&)
     +GetArea(): Rect&
 }
-Color *-up- Ctrl
-Rect *-- Ctrl
+Color *-up- Control
+Rect *-- Control
 
 class Scene {
     Each fullscreen view must decent from Scene.
@@ -161,14 +179,14 @@ class Scene {
     --
     +ProcessInput(arInput: Input&)
 }
-Ctrl <|-- Scene 
+Control <|-- Scene 
 
 class Image {
     A control to draw bitmap images.
     --
     #mBitmap: Bitmap
 }
-Ctrl <|-- Image
+Control <|-- Image
 Bitmap *-- Image
 
 class Label {
@@ -179,8 +197,8 @@ class Label {
     --
     +SetCaption(arCaption: const string&)
 }
-Ctrl <|-left- Label
-Font *-- Label
+Control <|-- Label
+Text *-- Label
 
 class GraphicsMain{
     Runs the gui loop, controls the current active scene and changes scenes when needed

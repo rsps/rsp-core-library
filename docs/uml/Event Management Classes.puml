@@ -2,61 +2,73 @@
 
 title Event Management Classes
 
-namespace rsp{
-    class Event{
-        Template class and the Base event used by Broker and wrapped by EventType
+namespace rsp::messaging {
+
+    class Event {
+        Base class for events used by Broker
         --
-        +size_t typeHash
+        +mTypeHash: size_t
         --
-        +Event(size_t aHash)
-        +Event()
-        +T &GetAs()
+        +Event(aHash: size_t)
+        +GetAs<class T>(): T&
     }
 
-    class EventType{
-        Wraps Event, inherit this for a type cast safe Event
-        --
-        EventType()
-    }
-    EventType -up-|> Event
-
-    enum Topic {
-        Defines the different topics there can be published and subscribed to
-        --
-        Base // The base topic
+    class EventType<class T> {
+        Inheritance helper used to add type
+        safety to general base Event type.
     }
 
-    abstract class Publisher {
-        Abstract class to inherit from for publishing to a broker
+    Event <|-- EventType
+
+    class Publisher<typename T> {
+        @OBSOLETED@
+        Template class to publish specfic topics to a broker.
+        This is a worthless wrapper around Broker<T>.Publish()
         --
-        Topic mTopic
+        #mrBroker: Broker<T>&
         --
-        +virtual void registerBroker(Broker *pBroker)
-        +virtual void publishToBroker(Topic topic, Event &newEvent)
+        +Publisher(arBroker: Broker<T>&)
+        +PublishToBroker(aTopic: T, arNewEvent: Event&)
     }
 
-    abstract class Subscriber {
-        Abstract class to inherit from for subscribing to events from a given broker
+    class SubscriberBase {
+        Abstract interface for subscriber classes
         --
-        #int mData
-        #std::string mTopic
-        --
-        +virtual void subscribeToBroker(Broker *ptr, Topic topic)
-        +virtual void updateCallback(Event &newEvent)
+        +{abstract}HandleEvent(arNewEvent: Event&)
     }
 
-    class Broker {
-        A meesage broker for publishing and subcribing to topics
+    class Subscriber<typename T> {
+        A template for specializing a subscriber to specific topics
         --
-        +std::map<Topic, std::vector<Subscriber *>> mSubscriberMap;
+        #mrBroker: Broker<T>&
         --
-        +virtual void addSubscriber(Subscriber *ptr, Topic topic)
-        +virtual void registerToPublisher(Publisher *ptr)
-        +virtual void onPublish(Topic topic, Event &newEvent)
+        +Subscriber(arBroker: Broker<T>&)
+        +Subscribe(aTopic: T)
+        +Unsubscribe(aTopic: T)
     }
 
-    Broker --* Subscriber
-    Publisher --* Broker
+    SubscriberBase <|-- Subscriber
+
+    class BrokerBase {
+        A message broker for publishing and subscribing to topics
+        --
+        #mSubscriberMap: std::map<Topic, std::vector<SubscriberBase*>>
+        --
+    }
+
+    class Broker<typename T> {
+        A template for specializing a broker to specific topics
+        --
+        +Subscribe(arSubscriber: Subscriber<T>&, aTopic: T)
+        +Unsubscribe(arSubscriber: Subscriber<T>&, aTopic: T)
+        +RemoveSubscriber(arSubscriber: Subscriber<T>&)
+        +Publish(aTopic: T, arNewEvent: Event&)
+    }
+
+    BrokerBase <|-- Broker
+    
+    Broker -[hidden]down- Publisher
+    Subscriber -[hidden]down- Event
 }
 
 @enduml

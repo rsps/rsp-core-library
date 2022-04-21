@@ -1,0 +1,88 @@
+@startuml
+
+title GUI Font Classes
+
+namespace rsp::graphics {
+
+class FontRawInterface {
+    virtual ~FontRawInterface() {};
+
+    virtual std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing) = 0;
+    virtual std::string GetFamilyName() const = 0;
+    virtual void SetSize(int aWidthPx, int aHeightPx) = 0;
+
+    int GetSize() const { return mSizePx; }
+
+    virtual void SetStyle(Font::Styles aStyle) { mStyle = aStyle; }
+    Font::Styles GetStyle() const { return mStyle; }
+}
+
+enum Font::Styles {
+    Normal
+    Italic
+    Bold
+    BoldItalic
+}
+
+class Font {
+    When used on Linux, the GUI library can
+    use the FreeType2 library to render fonts.
+    --
+    #mColor: Color
+    #mpImpl: std::unique_ptr<FontRawInterface>
+    --
+    +{static}RegisterFont(apFileName: const char*)
+    +Font(arName: constant string&, aStyle: Styles)
+    +MakeGlyphs(arText: constant std::string&, aLineSpacing: integer = 0): std::vector<Glyph>
+    +GetFamilyName(): string
+    +SetSize(aSizePx: integer): Font&
+    +{abstract}SetSize(aWidthPx: integer, aHeightPx: integer): Font&
+    +GetSize(): integer
+    +SetColor(arColor: constant Color&): Font&
+    +GetColor(): Color
+    +SetStyle(aStyle: Styles): Font&
+    +GetStyle(): Styles
+}
+Font::Styles *-- Font
+Color *-- Font
+
+enum Text::HAlign {
+    Left
+    Center
+    Right
+}
+
+enum Text::VAlign {
+    Top
+    Center
+    Bottom
+}
+
+class Text {
+    +Text(arFontName: const std::string&);
+    +Text(arFontName: const std::string&, arText: const std::string&);
+    +operator std::string(): string
+    +GetValue(): string
+    +SetValue(arValue: const std::string&): Text&
+    +GetArea(): const Rect&
+    +SetArea(arRect: const Rect&): Text&
+    +GetFont(): Font&
+    +GetScaleToFit(): boolean
+    +SetScaleToFit(aValue: boolean = true): Text&
+    +GetLineSpacing(): integer
+    +SetLineSpacing(aSpacing: integer): Text&
+    +GetLineCount(): integer
+    +GetVAlignment(): VAlign
+    +SetVAlignment(aVAlign: VAlign): Text&
+    +GetHAlignment(): HAlign
+    +SetHAlignment(aHAlign: HAlign): Text&
+    +Reload(): Text&
+    +GetGlyphs(): constant std::vector<Glyph>&
+    +CalcBoundingRect(arGlyphs: constant std::vector<Glyph>&): Rect
+}
+
+Font *--- Text
+Text::VAlign o-- Text
+Text::HAlign o-- Text
+
+@enduml

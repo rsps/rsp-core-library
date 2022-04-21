@@ -32,7 +32,6 @@ namespace rsp::graphics
 class Bitmap : public Canvas
 {
   public:
-    static std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> filetypeMap;
     /**
      * \brief Load bitmap from given file.
      *
@@ -101,6 +100,7 @@ class Bitmap : public Canvas
     }
 
   protected:
+    static std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> msFiletypeMap;
     std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
     std::vector<uint32_t> mImagePixels{}; // Pointer?
 };

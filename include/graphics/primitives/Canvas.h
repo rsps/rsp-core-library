@@ -57,7 +57,7 @@ class Canvas
      * \param aRadius
      * \param aColor
      */
-    void DrawCircle(const Point &aCenter, int aRadius, const Color &aColor);
+    void DrawCircle(const Point &arCenter, int aRadius, const Color &arColor);
 
     /**
      * \brief Draw a straight line from A to B.
@@ -111,7 +111,7 @@ class Canvas
      * \param Point aPoint
      * \param bool aFront Set to read pixel from frontbuffer
      */
-    virtual uint32_t GetPixel(const Point &, const bool) const = 0;
+    virtual uint32_t GetPixel(const Point& arPoint, bool aFront) const = 0;
 
     /**
      * \brief Set the color value of a single pixel.
@@ -121,7 +121,7 @@ class Canvas
      * \param aPoint
      * \param aColor
      */
-    virtual inline void SetPixel(const Point &, const Color) = 0;
+    virtual inline void SetPixel(const Point& arPoint, const Color &arColor) = 0;
 
     /**
      * \brief Get the width of the canvas.

@@ -79,7 +79,7 @@ class Point
      * \param arPoint
      * \return self
      */
-    inline Point operator+=(const Point &arPoint)
+    inline Point& operator+=(const Point &arPoint)
     {
         mX += arPoint.mX;
         mY += arPoint.mY;

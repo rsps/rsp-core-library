@@ -21,7 +21,7 @@ using namespace rsp::utils;
 namespace rsp::graphics
 {
 
-std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> Bitmap::filetypeMap = {
+std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> Bitmap::msFiletypeMap = {
     {".bmp", std::function<std::shared_ptr<ImgLoader>()>([]() { return std::make_shared<BmpLoader>(); })},
     {".png", std::function<std::shared_ptr<ImgLoader>()>([]() { return std::make_shared<PngLoader>(); })}};
 
@@ -64,7 +64,7 @@ uint32_t Bitmap::GetPixel(const Point &aPoint, const bool aFront) const
 std::shared_ptr<ImgLoader> Bitmap::GetRasterLoader(const std::string aFileType)
 {
     try {
-        return filetypeMap.at(aFileType)();
+        return msFiletypeMap.at(aFileType)();
     } catch (const std::out_of_range &e) {
         throw std::out_of_range(std::string("Filetype loader not found") + ": " + e.what());
     }
