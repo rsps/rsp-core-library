@@ -21,7 +21,7 @@ class SecondScene : public Scene480x800
 public:
     using Clicked_t = rsp::utils::Function<void(void)>;
 
-    SecondScene() //, rsp::messaging::Broker<rsp::messaging::ClickTopics> &arBroker)
+    SecondScene()
         : Scene480x800("SecondScene")
     {
         // myName = "Second Scene";

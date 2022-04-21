@@ -9,8 +9,8 @@
  */
 
 
-#ifndef TESTS_UNIT_CONTROLS_SCENES_SCENE480X800_H_
-#define TESTS_UNIT_CONTROLS_SCENES_SCENE480X800_H_
+#ifndef TESTS_HELPERS_SCENES_SCENE480X800_H_
+#define TESTS_HELPERS_SCENES_SCENE480X800_H_
 
 #include <graphics/controls/Scene.h>
 
@@ -24,4 +24,4 @@ public:
 
 } // namespace rsp::graphics
 
-#endif /* TESTS_UNIT_CONTROLS_SCENES_SCENE480X800_H_ */
+#endif /* TESTS_HELPERS_SCENES_SCENE480X800_H_ */

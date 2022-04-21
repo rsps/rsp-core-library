@@ -13,9 +13,10 @@
 #include <messaging/Subscriber.h>
 #include <messaging/Publisher.h>
 #include <posix/FileSystem.h>
-#include <messaging/eventTypes/ClickedEvent.h>
 #include <doctest.h>
-#include "scenes/Scenes.h"
+
+#include "../../helpers/eventTypes/ClickedEvent.h"
+#include "../../helpers/scenes/Scenes.h"
 
 using namespace rsp::graphics;
 using namespace rsp::messaging;

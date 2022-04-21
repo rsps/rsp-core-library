@@ -8,10 +8,11 @@
  * \author      Steffen Brummer
  */
 
-#ifndef TESTS_UNIT_CONTROLS_SCENES_SCENES_H_
-#define TESTS_UNIT_CONTROLS_SCENES_SCENES_H_
+#ifndef TESTS_HELPERS_SCENES_SCENES_H_
+#define TESTS_HELPERS_SCENES_SCENES_H_
 
 #include <graphics/controls/SceneMap.h>
+
 #include "FirstScene.h"
 #include "SecondScene.h"
 
@@ -31,4 +32,4 @@ public:
 };
 
 
-#endif /* TESTS_UNIT_CONTROLS_SCENES_SCENES_H_ */
+#endif /* TESTS_HELPERS_SCENES_SCENES_H_ */

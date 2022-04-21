@@ -17,7 +17,7 @@
 #include <posix/FileSystem.h>
 #include <graphics/Framebuffer.h>
 #include <graphics/GraphicsMain.h>
-#include "../unit/controls/scenes/Scenes.h"
+#include "../helpers/scenes/Scenes.h"
 
 using namespace rsp::graphics;
 

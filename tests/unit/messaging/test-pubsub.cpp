@@ -10,8 +10,8 @@
 
 #include <messaging/Publisher.h>
 #include <messaging/Subscriber.h>
-#include <messaging/eventTypes/ClickedEvent.h>
 #include <doctest.h>
+#include "../../helpers/eventTypes/ClickedEvent.h"
 
 using namespace rsp::messaging;
 enum testTopic {

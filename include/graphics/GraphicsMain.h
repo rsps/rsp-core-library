@@ -15,7 +15,6 @@
 #include <graphics/TouchParser.h>
 #include <messaging/Subscriber.h>
 #include <messaging/Broker.h>
-#include <messaging/eventTypes/ClickedEvent.h>
 
 namespace rsp::graphics
 {
