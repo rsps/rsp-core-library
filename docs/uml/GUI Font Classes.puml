@@ -1,20 +1,43 @@
 @startuml
 
-title GUI Font Classes
+skinparam stereotypeCBackgroundColor<<Exception>> Red
+
+title GUI Font & Text Classes
 
 namespace rsp::graphics {
 
+class FontException <<Exception>> {
+    Versatile base exception type that can be
+    thrown by a Font driver implementation.
+}
+
 class FontRawInterface {
-    virtual ~FontRawInterface() {};
+    Interface for font driver implementations.
+    --
+    +{abstract}MakeGlyphs(arText: const std::string&, aLineSpacing: integer): std::vector<Glyph>
+    +{abstract}GetFamilyName(): string
+    +{abstract}SetSize(aWidthPx: integer, aHeightPx: integer) = 0;
+    +GetSize(): integer
+    +{abstract}SetStyle(aStyle: Font::Styles)
+    +GetStyle(): Font::Styles
+}
 
-    virtual std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing) = 0;
-    virtual std::string GetFamilyName() const = 0;
-    virtual void SetSize(int aWidthPx, int aHeightPx) = 0;
-
-    int GetSize() const { return mSizePx; }
-
-    virtual void SetStyle(Font::Styles aStyle) { mStyle = aStyle; }
-    Font::Styles GetStyle() const { return mStyle; }
+class Glyph {
+    Data object with 8-bit pixel
+    intensity values for a single
+    unicode symbol.
+    The pixel values can be used as
+    alpha channel value for a given
+    color.
+    --
+    +Glyph()
+    +Glyph(apFace: void*)
+    +mPixels: std::vector<uint8_t>
+    +mSymbolUnicode: uint32_t = 0
+    +mTop: integer = 0
+    +mLeft: integer = 0
+    +mWidth: integer = 0
+    +mHeight: integer = 0
 }
 
 enum Font::Styles {
@@ -43,8 +66,9 @@ class Font {
     +SetStyle(aStyle: Styles): Font&
     +GetStyle(): Styles
 }
-Font::Styles *-- Font
-Color *-- Font
+FontRawInterface *-- Font
+Glyph o-- Font
+Font::Styles o--- Font
 
 enum Text::HAlign {
     Left

@@ -20,9 +20,9 @@ using namespace rsp::messaging;
 namespace rsp::graphics
 {
 
-GraphicsMain::GraphicsMain(BufferedCanvas &aBufferedCanvas, TouchParser &aInputs, SceneMap &arScenes)
-    : mrBufferedCanvas(aBufferedCanvas),
-      mrTouchParser(aInputs),
+GraphicsMain::GraphicsMain(BufferedCanvas &arBufferedCanvas, TouchParser &arTouchParser, SceneMap &arScenes)
+    : mrBufferedCanvas(arBufferedCanvas),
+      mrTouchParser(arTouchParser),
       mrScenes(arScenes)
 {
     mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
@@ -43,6 +43,7 @@ void GraphicsMain::Run(int aMaxFPS)
     while (!mTerminated) {
         sw.Reset();
 
+        // New scene requested?
         if (!mNextScene.empty()) {
             mrScenes.SetActiveScene(mNextScene);
             mrScenes.ActiveScene().Invalidate();

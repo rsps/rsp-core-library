@@ -29,13 +29,13 @@ class Framebuffer : public BufferedCanvas
      * \param aPoint Reference to the coordinate for the pixel to be set
      * \param aColor Reference to the color the pixel is set to
      */
-    inline void SetPixel(const Point &aPoint, const Color aColor)
+    inline void SetPixel(const Point &arPoint, const Color &arColor) override
     {
-        if (!IsInsideScreen(aPoint)) {
+        if (!IsInsideScreen(arPoint)) {
             return;
         }
-        long location = (aPoint.mX + static_cast<int>(mVariableInfo.xoffset)) * (static_cast<int>(mVariableInfo.bits_per_pixel) / 8) + aPoint.mY * static_cast<int>(mFixedInfo.line_length);
-        *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = aColor;
+        long location = (arPoint.mX + static_cast<int>(mVariableInfo.xoffset)) * (static_cast<int>(mVariableInfo.bits_per_pixel) / 8) + arPoint.mY * static_cast<int>(mFixedInfo.line_length);
+        *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = arColor;
     }
 
     /**

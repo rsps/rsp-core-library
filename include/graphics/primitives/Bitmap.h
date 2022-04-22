@@ -58,13 +58,13 @@ class Bitmap : public Canvas
      */
     Bitmap(int aHeight, int aWidth, int aBytesPerPixel);
 
-    inline void SetPixel(const Point &aPoint, const Color aColor)
+    inline void SetPixel(const Point &arPoint, const Color &arColor) override
     {
-        if (!IsInsideScreen(aPoint)) {
+        if (!IsInsideScreen(arPoint)) {
             return;
         }
-        uint32_t location = static_cast<uint32_t>((mWidth * aPoint.mY) + aPoint.mX);
-        mImagePixels[location] = aColor;
+        uint32_t location = static_cast<uint32_t>((mWidth * arPoint.mY) + arPoint.mX);
+        mImagePixels[location] = arColor;
     }
 
     uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;

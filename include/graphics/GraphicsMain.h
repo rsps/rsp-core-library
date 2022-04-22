@@ -21,8 +21,8 @@ namespace rsp::graphics
 
 class GraphicsMain
 {
-  public:
-    GraphicsMain(BufferedCanvas &aCanvas, TouchParser &aInputs, SceneMap &arScenes);
+public:
+    GraphicsMain(BufferedCanvas &arCanvas, TouchParser &arTouchParser, SceneMap &arScenes);
     GraphicsMain(const GraphicsMain &) = default;
     GraphicsMain &operator=(const GraphicsMain &) = default;
     ~GraphicsMain();
@@ -42,9 +42,9 @@ class GraphicsMain
      * \brief Change the current active Scene
      * \param aSceneName The name of the scene to change to
      */
-    void ChangeScene(const std::string arName) { mNextScene = arName; }
+    void ChangeScene(const std::string &arName) { mNextScene = arName; }
 
-  private:
+protected:
     BufferedCanvas &mrBufferedCanvas;
     TouchParser &mrTouchParser;
     SceneMap &mrScenes;

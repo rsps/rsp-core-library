@@ -1,5 +1,7 @@
 @startuml
 
+title GUI Touch Event Classes
+
 namespace rsp::graphics {
 
     enum TouchEvent::Types {

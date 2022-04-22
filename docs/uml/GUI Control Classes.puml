@@ -1,0 +1,71 @@
+@startuml
+
+
+title GUI Control Classes
+
+namespace rsp::graphics {
+
+class Control {
+    The base GUI element. All other elements
+    decent from the Control class.
+    Control objects contains a boolean "invalidated"
+    property, this is flagged in case the object needs
+    rendering. Setter functions can invalidate a Control
+    object.
+    --
+    #mBackground: Color
+    #mTransparent: bool
+    #mArea: Rect
+    #mpParent: Control*
+    #mChildren: std::vector<Control*>
+    --
+    +Invalidate()
+    +IsInvalid() const: bool
+    +IsTransparent() const: bool
+    +Render(arCanvas: Canvas&)
+    +SetArea(arRect: const Rect&)
+    +GetArea(): Rect&
+}
+Color *-- Control
+Rect *-- Control
+
+class Scene {
+    Each fullscreen view must decent from Scene.
+    --
+    #mTouchables: std::vector<TouchArea*>
+    --
+    +ProcessInput(arInput: Input&)
+}
+Control <|-- Scene 
+
+class Image {
+    A control to draw bitmap images.
+    --
+    #mBitmap: Bitmap
+}
+Control <|-- Image
+Bitmap *-- Image
+
+class Label {
+    A control used to draw text and graphics.
+    --
+    #mText: Text
+    --
+    +SetString(arString: const string&)
+    +GetText(): Text&
+}
+Control <|-- Label
+Text *-- Label
+
+class TouchArea {
+    #mTouchArea: Rect
+    --
+    +ProcessInput(arInput: Input&): bool
+    +IsHit(arPoint: const Point&) const: bool
+}
+Rect *-- TouchArea
+TouchArea *-- Scene
+
+}
+
+@enduml

@@ -1,6 +1,8 @@
 @startuml
 
-title GUI Classes
+skinparam stereotypeCBackgroundColor<<Exception>> Red
+
+title GUI Primitive Classes
 
 namespace rsp::graphics {
 
@@ -83,17 +85,12 @@ class Color {
 
 class Bitmap {
     Class to handle raster images.
-    Can load bmp and png files through
-    filesystem and do some basic
-    manipulation like resize/stretch.
+    Can load 24/32-bit bmp files through
+    filesystem.
     --
     +Bitmap(arImgName: const std::string&)
-    +Bitmap(apPixels: const uint32_t*, aHeight: integer, aWidth: integer, aBytesPerPixel:integer)
+    +Bitmap(apPixels: const uint32_t*, aHeight: integer, aWidth: integer, aBytesPerPixel: integer)
     +Bitmap(aHeight: integer, aWidth: integer, aBytesPerPixel: integer)
-    +SetPixel(arPoint: const Point&, aColor: Color)
-    +GetPixel(arPoint: const Point&, aFront: boolean = false): uint32_t
-    +GetHeight(): integer
-    +GetWidth(): integer
     +GetPixels(): const std::vector<uint32_t>&
 }
 
@@ -132,107 +129,59 @@ interface BufferedCanvas {
     +{abstract}SwapBuffers(aOperation: SwapOperations);
 }
 
-BufferedCanvas::SwapOperations ... BufferedCanvas
-Canvas <|-- BufferedCanvas
+BufferedCanvas::SwapOperations o-- BufferedCanvas
+Canvas <|--- BufferedCanvas
 
 class FrameBuffer {
     +Framebuffer(apDevicePath: const char* = nullptr)
 }
 BufferedCanvas <|-- FrameBuffer
 
-class TouchArea {
-    #mTouchArea: Rect
+class GraphicsMain {
+    Runs a gui loop that reads touch inputs and initiates rendering of the active scene.
     --
-    +ProcessInput(arInput: Input&): bool
-    +IsHit(arPoint: const Point&) const: bool
-}
-Rect *-- TouchArea
-
-class Control {
-    The base GUI element. All other elements
-    decent from the Control class.
-    Control objects contains a boolean "invalidated"
-    property, this is flagged in case the object needs
-    rendering. Setter functions can invalidate a Control
-    object.
+    #mrBufferedCanvas: BufferedCanvas&
+    #mrTouchParser: TouchParser&
+    #mrScenes: SceneMap&
+    #mTerminated: boolean = false;
+    #mNextScene: string
     --
-    #mBackground: Color
-    #mTransparent: bool
-    #mArea: Rect
-    #mpParent: Control*
-    #mChildren: std::vector<Control*>
-    --
-    +Invalidate()
-    +IsInvalid() const: bool
-    +IsTransparent() const: bool
-    +Render(arCanvas: Canvas&)
-    +SetArea(arRect: const Rect&)
-    +GetArea(): Rect&
-}
-Color *-up- Control
-Rect *-- Control
-
-class Scene {
-    Each fullscreen view must decent from Scene.
-    --
-    #mTouchables: std::vector<TouchArea*>
-    --
-    +ProcessInput(arInput: Input&)
-}
-Control <|-- Scene 
-
-class Image {
-    A control to draw bitmap images.
-    --
-    #mBitmap: Bitmap
-}
-Control <|-- Image
-Bitmap *-- Image
-
-class Label {
-    A control used to draw text and graphics.
-    --
-    #mCaption: string
-    #mFont: Font
-    --
-    +SetCaption(arCaption: const string&)
-}
-Control <|-- Label
-Text *-- Label
-
-class GraphicsMain{
-    Runs the gui loop, controls the current active scene and changes scenes when needed
-    --
-    -BufferedCanvas &mBufferedCanvas;
-    -InputCreator &mInputs;
-    -SceneLoader &mSceneLoader;
-    -Scene mActiveScene;
-    -bool mTerminated = false;
-    -std::vector<Input> inputCache{};
-    --
-    +GraphicsMain(BufferedCanvas &aCanvas, InputCreator &aInputs, SceneLoader &aSceneLoader);
-    +~GraphicsMain();
-
-    +void Run();
-    +void Terminate() { mTerminated = true; }
-    +void ChangeScene(std::string aSceneName);
-    +void handleEvent(Event &newEvent) override;
+    +GraphicsMain(arCanvas: BufferedCanvas&, arTouchParser: TouchParser&, arScenes: SceneMap&)
+    +Run()
+    +Terminate()
+    +ChangeScene(arName: const std::string&)
 }
 
-class SceneLoader{
-    Holds all scenes in an unordered maps and gets them by reference
-    --
-    +std::unordered_map<std::string, Scene> mSceneMap;
-    --
-    +SceneLoader(Broker &aBroker);
-    +Scene &GetFirstScene();
-    +Scene &GetScene(std::string aSceneName);
+class CoreException <<exception>>
+class SceneNotFound <<exception>> {
+    Thrown if named scene
+    does not exists
 }
-SceneLoader --* Scene
-GraphicsMain --* SceneLoader
-GraphicsMain --* Canvas
+class ActiveSceneNotSet <<exception>> {
+    Thrown if no scene has
+    been activated
+}
 
+CoreException <|-- SceneNotFound
+CoreException <|-- ActiveSceneNotSet
 
+class SceneMap{
+    Holds all scenes, with named lookup and gets them by reference
+    --
+    #mScenes: std::unordered_map<std::string, Scene*>
+    #mpActiveScene: Scene* = nullptr
+    --
+    +MakeScene<class T>(): Scene&
+    +operator[](arName: const std::string&): Scene&
+    +SetActiveScene(arName: const std::string&);
+    +ActiveScene(): Scene&
+}
+Scene *-- SceneMap
+SceneMap o-- GraphicsMain 
+BufferedCanvas o--- GraphicsMain
+TouchParser o-- GraphicsMain
+Rect -[hidden]down- Canvas
+GraphicsMain -[hidden]down- CoreException
 }
 
 @enduml
