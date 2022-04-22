@@ -2,10 +2,15 @@ cmake_minimum_required (VERSION 3.16)
 
 # https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
 
-#if(DEFINED PLATFORM_P05)
-# To build for P05 platform: cmake .. -D PLATFORM_P05=1 [-D RELEASE=1]
-#set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
-#endif()
+# Usage: cmake [-DRELEASE_BUILD=ON] [-DPLATFORM_P05=ON] [FREETYPE_FONTS=OFF] ..
+
+OPTION(RELEASE_BUILD "Set to turn off debug output" OFF) # Disabled by default.
+OPTION(PLATFORM_P05 "Set to build for P05 ARM platform" OFF) # Disabled by default.
+OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
+
+if(PLATFORM_P05)
+    set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
+endif()
 
 project (rsp-core-lib)
 
@@ -23,7 +28,6 @@ configure_file (
 set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
-find_package(Freetype REQUIRED)
 
 set (CMAKE_CXX_STANDARD 20)
 
@@ -38,6 +42,11 @@ include(GNUInstallDirs)
 
 add_library("rsp-core-lib" STATIC)
 
+if (FREETYPE_FONTS)
+find_package(Freetype REQUIRED)
+set(FREETYPE_BUILD_OPTIONS -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+endif()
+
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
 # paths.
@@ -51,21 +60,23 @@ target_include_directories(rsp-core-lib
         ${FREETYPE_INCLUDE_DIRS}
 )
 
-target_compile_options(rsp-core-lib PRIVATE -pedantic -Wall -Wextra -Wold-style-cast
+set(GOOD_COMPILER_OPTIONS -pedantic -Wall -Wextra -Wold-style-cast
     -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization
     -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations
     -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual
     -Wredundant-decls -Wsign-conversion -Wsign-promo
     -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
     -Wundef -Wno-unused -Weffc++ -Werror
+)
+
+target_compile_options(rsp-core-lib PRIVATE
+    ${GOOD_COMPILER_OPTIONS}
     -Wshadow
-    -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+    ${FREETYPE_BUILD_OPTIONS}
+)
 
-OPTION(RELEASE "Set to turn off debug output" OFF) # Disabled by default. Usage: cmake -DRELEASE=ON ..
-
-if (RELEASE)
-else()
-target_compile_options(rsp-core-lib PRIVATE 
+if (NOT RELEASE_BUILD)
+target_compile_options(rsp-core-lib PRIVATE
     -DDEBUG_LOG)
 endif()
 
@@ -110,17 +121,12 @@ target_include_directories("rsp-core-lib-test"
         src
 )
 # Disable shadow warning to silence doctest...
-target_compile_options(rsp-core-lib-test PRIVATE -pedantic -Wall -Wextra -Wold-style-cast
-    -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization
-    -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations
-    -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual
-    -Wredundant-decls -Wsign-conversion -Wsign-promo
-    -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
-    -Wundef -Wno-unused -Weffc++ -Werror
-    -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+target_compile_options(rsp-core-lib-test PRIVATE
+    ${GOOD_COMPILER_OPTIONS}
+    ${FREETYPE_BUILD_OPTIONS}
+)
 
-if (RELEASE)
-else()
+if (NOT RELEASE_BUILD)
 target_compile_options(rsp-core-lib-test PRIVATE 
     -DGFX_FPS=10)
 endif()
