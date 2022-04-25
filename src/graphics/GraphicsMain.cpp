@@ -48,10 +48,7 @@ void GraphicsMain::Run(int aMaxFPS)
             mrScenes.SetActiveScene(mNextScene);
             mrScenes.ActiveScene().Invalidate();
             mNextScene = "";
-            // Flush touch input queue.
-            while(mrTouchParser.Poll(event)) {
-                continue;
-            }
+            mrTouchParser.Flush(); // New scene should not inherit un-handled touch events...
         }
 
         // New inputs?

@@ -57,6 +57,11 @@ public:
      */
     bool Poll(TouchEvent &arInput);
 
+    /**
+     * \brief Flush the input buffer for remaining raw touch events
+     */
+    void Flush();
+
 protected:
     rsp::posix::FileIO mTouchDevice{};
     RawTouchEvent mRawTouchEvent{};

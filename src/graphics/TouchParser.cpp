@@ -115,4 +115,13 @@ void TouchParser::readBody(TouchEvent &arInput)
         readRawTouchEvent();
     }
 }
+
+void TouchParser::Flush()
+{
+    TouchEvent dummy;
+    while(Poll(dummy)) {
+        continue;
+    }
+}
+
 } // namespace rsp::graphics
