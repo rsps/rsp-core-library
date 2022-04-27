@@ -1,0 +1,51 @@
+@startuml
+
+title GUI Touch Event Classes
+
+namespace rsp::graphics {
+
+    enum TouchEvent::Types {
+        Types associated
+        with TouchEvent
+        --
+        +None
+        +Press
+        +Drag
+        +Lift
+    }
+
+    class TouchEvent{
+        Simple data class defining
+        structure of an event
+        --
+        +mType: Types 
+        +mPoint: Point
+    }
+    
+    TouchEvent::Types o-- TouchEvent
+
+    class RawTouchEvent {
+        Data struct that matches the
+        touch driver output format.
+        --
+        +stime: uint32_t
+        +mtime: int32_t
+        +type: uint16_t
+        +code: uint16_t
+        +value: uint32_t
+    }
+
+    class TouchParser{
+        Read touch driver and publishes events based on driver input
+        --
+        #mTouchDevice: FileIO
+        #mRawTouchEvent: RawTouchEvent
+        --
+        +TouchParser(arPath: const std::string&)
+        +Poll(arInput: TouchEvent&): bool
+    }
+
+    RawTouchEvent *-- TouchParser
+}
+
+@enduml

@@ -2,7 +2,15 @@ cmake_minimum_required (VERSION 3.16)
 
 # https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
 
-#set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
+# Usage: cmake [-DRELEASE_BUILD=ON] [-DPLATFORM_P05=ON] [FREETYPE_FONTS=OFF] ..
+
+OPTION(RELEASE_BUILD "Set to turn off debug output" OFF) # Disabled by default.
+OPTION(PLATFORM_P05 "Set to build for P05 ARM platform" OFF) # Disabled by default.
+OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
+
+if(PLATFORM_P05)
+    set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
+endif()
 
 project (rsp-core-lib)
 
@@ -17,14 +25,9 @@ configure_file (
     "${PROJECT_BINARY_DIR}/src/version-def.h"
 )
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Debug)
-endif()
-
 set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
-find_package(Freetype REQUIRED)
 
 set (CMAKE_CXX_STANDARD 20)
 
@@ -32,14 +35,17 @@ set (CMAKE_CXX_STANDARD 20)
 # locations on all platforms.
 include(GNUInstallDirs)
 
+#include_directories( ${FREETYPE2_INCLUDE_DIRS} )
+#SET( CMAKE_C_FLAGS "${FREETYPE2_CFLAGS_OTHER}" )
+
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 
 add_library("rsp-core-lib" STATIC)
 
-target_link_libraries ("rsp-core-lib"
-    Threads::Threads
-    Freetype::Freetype
-)
+if (FREETYPE_FONTS)
+find_package(Freetype REQUIRED)
+set(FREETYPE_BUILD_OPTIONS -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+endif()
 
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
@@ -54,30 +60,24 @@ target_include_directories(rsp-core-lib
         ${FREETYPE_INCLUDE_DIRS}
 )
 
-set (GCC_VALIDATION_FLAGS -pedantic -Wall -Wextra -Wold-style-cast
+set(GOOD_COMPILER_OPTIONS -pedantic -Wall -Wextra -Wold-style-cast
     -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization
     -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations
     -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual
     -Wredundant-decls -Wsign-conversion -Wsign-promo
     -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
-    -Wundef -Wno-unused -Weffc++ -Werror -Wformat=2
-    CACHE INTERNAL "Flags to let GCC validate code against common weaknesses"
+    -Wundef -Wno-unused -Weffc++ -Werror
 )
 
 target_compile_options(rsp-core-lib PRIVATE
-    ${GCC_VALIDATION_FLAGS} 
+    ${GOOD_COMPILER_OPTIONS}
     -Wshadow
-    -DDEBUG_LOG -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS -rdynamic
-    )
+    ${FREETYPE_BUILD_OPTIONS}
+)
 
-if (${CMAKE_BUILD_TYPE} EQUAL Debug)
-    target_compile_options(rsp-core-lib PRIVATE
-        -O0 -g3
-    )
-else()
-    target_compile_options(rsp-core-lib PRIVATE
-        -D_FORTIFY_SOURCE=2 -O3
-    )
+if (NOT RELEASE_BUILD)
+target_compile_options(rsp-core-lib PRIVATE
+    -DDEBUG_LOG)
 endif()
 
 add_subdirectory(src)
@@ -86,39 +86,59 @@ add_subdirectory(src)
 # Rules to make tests
 #-----------------------
 
-enable_testing()
-
 # Include external projects Doctest from github.
-include(FetchContent)   
+ 
+include(ExternalProject)
 find_package(Git REQUIRED)
 
-FetchContent_Declare(
-    DocTest
-    GIT_REPOSITORY "https://github.com/onqtam/doctest"
+ExternalProject_Add(
+    Doctest
+    
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/ext-libs/doctest"
+    GIT_REPOSITORY https://github.com/onqtam/doctest.git
     GIT_TAG "2.4.6"
-)
+    TIMEOUT 10
 
-FetchContent_MakeAvailable(DocTest)
+    UPDATE_COMMAND ${GIT_EXECUTABLE} checkout ${GIT_TAG}
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+    LOG_DOWNLOAD ON
+)
+ExternalProject_Get_Property(Doctest source_dir)
+set(DOCTEST_INCLUDE_DIR ${source_dir}/doctest CACHE INTERNAL "Path to include folder for doctest")
+
+enable_testing()
 
 add_executable("rsp-core-lib-test")
 add_subdirectory(tests)
-add_dependencies("rsp-core-lib-test" doctest)
+add_dependencies("rsp-core-lib-test" Doctest)
 target_include_directories("rsp-core-lib-test"
     PUBLIC
-        ${doctest_SOURCE_DIR}/doctest
+        ${DOCTEST_INCLUDE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE
         src
 )
 # Disable shadow warning to silence doctest...
 target_compile_options(rsp-core-lib-test PRIVATE
-    ${GCC_VALIDATION_FLAGS} 
-    -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS -rdynamic
-    )
+    ${GOOD_COMPILER_OPTIONS}
+    ${FREETYPE_BUILD_OPTIONS}
+)
 
+if (NOT RELEASE_BUILD)
+target_compile_options(rsp-core-lib-test PRIVATE 
+    -DGFX_FPS=10)
+endif()
+
+#get_target_property(INCLUDE_DIRS "rsp-core-lib-test" INCLUDE_DIRECTORIES)
+#message(STATUS "IncDirs: ${INCLUDE_DIRS}")
 
 target_link_libraries ("rsp-core-lib-test"
     rsp-core-lib
+    Threads::Threads
+    Freetype::Freetype
 )
+#target_link_libraries(demo ${FREETYPE_LIBRARIES})
 
 add_test("tests" "rsp-core-lib-test")

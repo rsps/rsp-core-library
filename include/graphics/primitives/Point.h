@@ -22,7 +22,7 @@ class Bitmap;
 class Framebuffer;
 
 /**
- * Point class
+ * \brief Point class
  *
  * A point is a 2D coordinate (x,y)
  */
@@ -30,7 +30,7 @@ class Point
 {
   public:
     /**
-     * Construct an empty point
+     * \brief Construct an empty point
      */
     inline Point()
         : mX(0), mY(0)
@@ -38,7 +38,7 @@ class Point
     }
 
     /**
-     * Construct a point at aX, aY.
+     * \brief Construct a point at aX, aY.
      *
      * \param aX
      * \param aY
@@ -49,7 +49,7 @@ class Point
     }
 
     /**
-     * Copy constructor
+     * \brief Copy constructor
      *
      * \param aPoint
      */
@@ -59,26 +59,100 @@ class Point
     }
 
     /**
-     * Assignment operator.
+     * \brief Assignment operator.
      *
      * \param aPoint
      * \return self
      */
-    inline Point &operator=(const Point &aPoint)
+    inline Point &operator=(const Point &arPoint)
     {
-        mX = aPoint.mX;
-        mY = aPoint.mY;
+        if (&arPoint != this) {
+            mX = arPoint.mX;
+            mY = arPoint.mY;
+        }
         return *this;
     }
 
+    /**
+     * \brief Add the values from other point to this
+     *
+     * \param arPoint
+     * \return self
+     */
+    inline Point& operator+=(const Point &arPoint)
+    {
+        mX += arPoint.mX;
+        mY += arPoint.mY;
+        return *this;
+    }
+
+    /**
+     * \brief Subtract the values from other point from this
+     *
+     * \param arPoint
+     * \return self
+     */
+    inline Point& operator-=(const Point &arPoint)
+    {
+        mX -= arPoint.mX;
+        mY -= arPoint.mY;
+        return *this;
+    }
+
+    /**
+     * \brief Equal to operator
+     * \param aPoint
+     * \return True if equal
+     */
+    inline bool operator==(const Point &aPoint)
+    {
+        return (mX == aPoint.mX) && (mY == aPoint.mY);
+    }
+
+    /**
+     * \brief Not equal to operator
+     * \param aPoint
+     * \return True if not equal
+     */
+    inline bool operator!=(const Point &aPoint)
+    {
+        return (mX != aPoint.mX) || (mY != aPoint.mY);
+    }
+
+    /**
+     * \brief Gets the value of the X coordinate
+     * \return Integer
+     */
     inline int GetX() const
     {
         return mX;
     }
 
+    /**
+     * \brief Set the value of the X coordinate
+     * \param aValue
+     */
+    inline void SetX(int aValue)
+    {
+        mX = aValue;
+    }
+
+    /**
+     * \brief Gets the value of the Y coordinate
+     * \return Integer
+     */
     inline int GetY() const
     {
         return mY;
+    }
+
+    /**
+     * \brief Set the value of the Y coordinate
+     * \param aValue
+     */
+    inline void SetY(int aValue)
+    {
+        mY = aValue;
     }
 
   protected:
@@ -92,7 +166,7 @@ class Point
     int mY;
 };
 
-std::ostream& operator <<(std::ostream &os, const Point &p);
+std::ostream &operator<<(std::ostream &os, const Point &p);
 
 } // namespace rsp::graphics
 #endif // POINT_H

@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * \copyright   Copyright 2022 RSP Systems A/S. All rights reserved.
+ * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
@@ -32,16 +32,15 @@ namespace rsp::graphics
 class Bitmap : public Canvas
 {
   public:
-    static std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> filetypeMap;
     /**
-     * Load bitmap from given file.
+     * \brief Load bitmap from given file.
      *
      * \param aImgName
      */
-    Bitmap(std::string aImgName);
+    Bitmap(const std::string &arImgName);
 
     /**
-     * Create a bitmap of given pixel data
+     * \brief Create a bitmap of given pixel data
      *
      * \param apPixels
      * \param aHeight
@@ -51,7 +50,7 @@ class Bitmap : public Canvas
     Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerPixel);
 
     /**
-     * Create an empty in memory bitmap
+     * \brief Create an empty in memory bitmap
      *
      * \param aHeight
      * \param aWidth
@@ -59,19 +58,19 @@ class Bitmap : public Canvas
      */
     Bitmap(int aHeight, int aWidth, int aBytesPerPixel);
 
-    inline void SetPixel(const Point &aPoint, const Color aColor)
+    inline void SetPixel(const Point &arPoint, const Color &arColor) override
     {
-        if (!IsInsideScreen(aPoint)) {
+        if (!IsInsideScreen(arPoint)) {
             return;
         }
-        uint32_t location = static_cast<uint32_t>((mWidth * aPoint.mY) + aPoint.mX);
-        mImagePixels[location] = aColor;
+        uint32_t location = static_cast<uint32_t>((mWidth * arPoint.mY) + arPoint.mX);
+        mImagePixels[location] = arColor;
     }
 
     uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
 
     /**
-     * Get the height of the bitmap.
+     * \brief Get the height of the bitmap.
      *
      * \return uint32_t
      */
@@ -81,7 +80,7 @@ class Bitmap : public Canvas
     }
 
     /**
-     * Get the width of the bitmap.
+     * \brief Get the width of the bitmap.
      *
      * \return uint32_t
      */
@@ -91,7 +90,7 @@ class Bitmap : public Canvas
     }
 
     /**
-     * Get a read only reference to the pixel data.
+     * \brief Get a read only reference to the pixel data.
      *
      * \return const std::vector<uint32_t>&
      */
@@ -101,8 +100,9 @@ class Bitmap : public Canvas
     }
 
   protected:
+    static std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> msFiletypeMap;
     std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
-    std::vector<uint32_t> mImagePixels{ }; // Pointer?
+    std::vector<uint32_t> mImagePixels{}; // Pointer?
 };
 
 } // namespace rsp::graphics

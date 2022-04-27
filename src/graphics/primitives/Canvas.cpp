@@ -32,7 +32,6 @@ void Canvas::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStar
 void Canvas::DrawCircle(const Point &aCenter, int aRadius, const Color &aColor)
 {
     int error = -aRadius;
-    // int x = aRadius;
     int y = 0;
 
     while (aRadius >= y) {
@@ -127,8 +126,7 @@ void Canvas::DrawText(Text &arText)
 
 void Canvas::DrawText(const Text &arText, const Color &arColor)
 {
-    for (auto glyph : arText.GetGlyphs()) {
-//        DLOG("DrawText " << glyph);
+    for (const Glyph &glyph : arText.GetGlyphs()) {
         for (int y = 0; y < glyph.mHeight; y++) {
             long unsigned int index = static_cast<long unsigned int>(y * glyph.mWidth);
             for (int x = 0; x < glyph.mWidth; x++) {

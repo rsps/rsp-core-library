@@ -35,6 +35,8 @@ public:
     JsonString(const std::string &arJson);
     JsonString(const JsonString &arJson);
 
+    JsonString& operator=(const JsonString &arJson);
+
     /**
      * Decode a value object from the content. The result can be a complex hierarchy of value objects.
      * \return JsonValue*

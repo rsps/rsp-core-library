@@ -43,16 +43,18 @@ Rect::Rect(const Point &aLeftTop, int aWidth, int aHeight)
     VerifyDimensions();
 }
 
-Rect::Rect(const Rect &aRect)
-    : mLeftTop(aRect.mLeftTop), mRightBottom(aRect.mRightBottom)
+Rect::Rect(const Rect &arRect)
+    : mLeftTop(arRect.mLeftTop), mRightBottom(arRect.mRightBottom)
 {
     VerifyDimensions();
 }
 
-Rect& Rect::operator=(const Rect &aRect)
+Rect& Rect::operator=(const Rect &arRect)
 {
-    mLeftTop = aRect.mLeftTop;
-    mRightBottom = aRect.mRightBottom;
+    if (&arRect != this) {
+        mLeftTop = arRect.mLeftTop;
+        mRightBottom = arRect.mRightBottom;
+    }
     return *this;
 }
 
@@ -107,8 +109,12 @@ int Rect::GetWidth() const
 
 void Rect::SetWidth(int aWidth)
 {
-    ASSERT(aWidth >= 0);
-    mRightBottom.mX = mLeftTop.mX + aWidth;
+    if (aWidth >= 0) {
+        mRightBottom.mX = mLeftTop.mX + aWidth;
+    }
+    else {
+        mLeftTop.mX = mRightBottom.mX + aWidth;
+    }
 }
 
 int Rect::GetHeight() const
@@ -118,21 +124,32 @@ int Rect::GetHeight() const
 
 void Rect::SetHeight(int aHeight)
 {
-    ASSERT(aHeight >= 0);
-    mRightBottom.mY = mLeftTop.mY + aHeight;
+    if (aHeight >= 0) {
+        mRightBottom.mY = mLeftTop.mY + aHeight;
+    }
+    else {
+        mLeftTop.mY = mRightBottom.mY + aHeight;
+    }
 }
 
-bool Rect::IsHit(const Point &arPoint) const
+bool Rect::IsHit(const Point &aPoint) const
 {
-    return !(arPoint.mX < mLeftTop.mX || arPoint.mY < mLeftTop.mY || arPoint.mY >= mRightBottom.mY || arPoint.mX >= mRightBottom.mX);
-}
-
-bool Rect::VerifyDimensions() const
-{
-    ASSERT(GetWidth() >= 0);
-    ASSERT(GetHeight() >= 0);
+    // Only works with non-rotated rectangles
+    if (aPoint.GetX() >= mLeftTop.GetX() &&
+        aPoint.GetX() < mRightBottom.GetX() &&
+        aPoint.GetY() >= mLeftTop.GetY() &&
+        aPoint.GetY() < mRightBottom.GetY())
+        return true;
 
     return false;
 }
 
+void Rect::VerifyDimensions()
+{
+    if (    (mRightBottom.mY < mLeftTop.mY)
+        ||  (mRightBottom.mX < mLeftTop.mX)) {
+        THROW_WITH_BACKTRACE1(rsp::utils::AssertException, "Rect size is negative");
+    }
 }
+
+} // namespace rsp::graphics

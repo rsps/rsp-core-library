@@ -25,8 +25,6 @@ namespace rsp::logging {
 // Usage: make CXXFLAGS="-DDEBUG_LOG"
 // Usage: cmake -DCMAKE_CXX_FLAGS="-DDEBUG_LOG" ..
 
-// #define DEBUG_LOG 1
-
 #ifdef DEBUG_LOG
 #include <iostream>
 

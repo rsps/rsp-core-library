@@ -8,9 +8,10 @@
  * \author      Steffen Brummer
  */
 
+#include "TestApplication.h"
+
 #include <logging/FileLogWriter.h>
 #include <application/Console.h>
-#include "TestApplication.h"
 
 using namespace rsp::application;
 using namespace rsp::logging;

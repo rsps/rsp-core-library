@@ -1,0 +1,74 @@
+@startuml
+
+title Event Management Classes
+
+namespace rsp::messaging {
+
+    class Event {
+        Base class for events used by Broker
+        --
+        +mTypeHash: size_t
+        --
+        +Event(aHash: size_t)
+        +GetAs<class T>(): T&
+    }
+
+    class EventType<class T> {
+        Inheritance helper used to add type
+        safety to general base Event type.
+    }
+
+    Event <|-- EventType
+
+    class Publisher<typename T> {
+        @OBSOLETED@
+        Template class to publish specfic topics to a broker.
+        This is a worthless wrapper around Broker<T>.Publish()
+        --
+        #mrBroker: Broker<T>&
+        --
+        +Publisher(arBroker: Broker<T>&)
+        +PublishToBroker(aTopic: T, arNewEvent: Event&)
+    }
+
+    class SubscriberBase {
+        Abstract interface for subscriber classes
+        --
+        +{abstract}HandleEvent(arNewEvent: Event&)
+    }
+
+    class Subscriber<typename T> {
+        A template for specializing a subscriber to specific topics
+        --
+        #mrBroker: Broker<T>&
+        --
+        +Subscriber(arBroker: Broker<T>&)
+        +Subscribe(aTopic: T)
+        +Unsubscribe(aTopic: T)
+    }
+
+    SubscriberBase <|-- Subscriber
+
+    class BrokerBase {
+        A message broker for publishing and subscribing to topics
+        --
+        #mSubscriberMap: std::map<Topic, std::vector<SubscriberBase*>>
+        --
+    }
+
+    class Broker<typename T> {
+        A template for specializing a broker to specific topics
+        --
+        +Subscribe(arSubscriber: Subscriber<T>&, aTopic: T)
+        +Unsubscribe(arSubscriber: Subscriber<T>&, aTopic: T)
+        +RemoveSubscriber(arSubscriber: Subscriber<T>&)
+        +Publish(aTopic: T, arNewEvent: Event&)
+    }
+
+    BrokerBase <|-- Broker
+    
+    Broker -[hidden]down- Publisher
+    Subscriber -[hidden]down- Event
+}
+
+@enduml

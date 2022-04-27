@@ -45,8 +45,6 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
     PNGChunk pngchunk;
 
     //-- Chunk reading loop begins here --
-    //while (std::strcmp(pngchunk.type, "IEND") != 0) {
-    //}
 
     //Temp loop for testing
     for (size_t i = 0; i < 3; i++) {
@@ -60,7 +58,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
         std::cout << "Type: " << pngchunk.type << std::endl;
         std::cout << "Length: " << pngchunk.length << std::endl;
 
-        //If ciritcal chunk
+        //If critcal chunk
         if (std::isupper(pngchunk.type[0])) {
             std::cout << "Chunk is Critical" << std::endl;
             //Chunk is critical
@@ -81,8 +79,9 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
                 //Only flip things that are larger than a byte
                 pngchunk.ihdr->width = be32toh(pngchunk.ihdr->width);
                 pngchunk.ihdr->height = be32toh(pngchunk.ihdr->height);
-                //Maybe, maybe not flip crc
-                //*(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
+                /* TODO: Maybe, maybe not flip crc
+                 * (uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
+                 */
 
                 //Set important bitmap variables
                 mWidth = static_cast<int>(pngchunk.ihdr->width);
@@ -116,9 +115,10 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
 
                 //Decode
 
-                //Maybe, maybe not flip crc
-                //*(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
-                // TODO do something with crc
+                /* TODO: Maybe, maybe not flip crc
+                 *(uint32_t*)(&pngchunk.data[pngchunk.length]) = be32toh(*(uint32_t*)(&pngchunk.data[pngchunk.length]));
+                 * TODO do something with crc
+                 */
                 std::cout << "Crc: " << std::hex << *reinterpret_cast<uint32_t*>(&pngchunk.data[pngchunk.length]) << std::endl;
                 std::cout << std::dec;
 
@@ -144,7 +144,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
         }
         //Clean up memory
         if (pngchunk.data != nullptr) {
-            delete pngchunk.data;
+            delete[] pngchunk.data;
             pngchunk.data = nullptr;
         }
         std::cout << std::endl;

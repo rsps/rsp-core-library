@@ -14,7 +14,8 @@
 #include <application/CommandLine.h>
 #include <utils/StrUtils.h>
 #include <utils/CoreException.h>
-#include "../../TestApplication.h"
+
+#include "../../helpers/TestApplication.h"
 
 using namespace rsp::application;
 

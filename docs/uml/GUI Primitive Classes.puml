@@ -1,0 +1,188 @@
+@startuml
+
+skinparam stereotypeCBackgroundColor<<Exception>> Red
+
+title GUI Primitive Classes
+
+namespace rsp::graphics {
+
+class Point {
+    A simple class with properties\nfor a 2D coordinate.
+    --
+    +mX: integer
+    +mY: integer
+    --
+    +Point()
+    +Point(aX: int, aY: int)
+    +Point(arPoint: constant Point&)
+    +operator=(arPoint: constant Point&): Point&
+    +operator+=(arPoint: constant Point&): Point&
+    +operator-=(arPoint: constant Point&): Point&
+    +operator==(arPoint: constant Point&): boolean
+    +operator!=(arPoint: constant Point&): boolean
+    +GetX(): integer
+    +SetX(aValue: integer)
+    +GetY(): integer
+    +SetY(aValue: integer)
+}
+
+class Rect {
+    A class with two Point properties.
+    --
+    #mLeftTop: Point
+    #mRightBottom: Point
+    --
+    +Rect()
+    +Rect(aTop: integer, aLeft: integer, aWidth: integer, aHeight: integer)
+    +Rect(arTopLeft: const Point&, aWidth: integer, aHeight: integer)
+    +Rect(arTopLeft: constant Point&, arBottomRight: constant Point&)
+    +Rect(arRect: constant Rect&)
+    +operator=(const Rect &arRect): Rect&
+    +operator==(const Rect &arRect): bool
+    +operator!=(const Rect &arRect): bool
+
+    +GetTop(): integer
+    +SetTop(aValue: integer)
+    +GetBottom(): integer
+    +SetBottom(aBotValue: integer)
+    +GetLeft(): integer
+    +SetLeft(aLeftValue: integer)
+    +GetRight(): integer
+    +SetRight(aRightValue: integer)
+
+    +GetTopLeft(): Point&
+    +GetBottomRight(): Point&
+    +GetWidth(): integer
+    +SetWidth(aValue: integer)
+    +GetHeight(): integer
+    +SetHeight(aValue: integer)
+    +IsHit(arPoint: constant Point&): boolean 
+}
+Point *-- Rect
+
+class Color {
+    Class with uint32_t property for ARGB
+    color information.
+    The alpha channel is used for opacity.
+    Not all platforms support alpha blending.
+    --
+    #mValue: ARGB_t
+    --
+    +Color(aRed: uint8_t, aGreen: uint8_t, aBlue: uint8_t, aAlpha: uint8_t)
+    +Color(aARGB: ARGB_t)
+    +Color(arColor: const Color&)
+    +GetRed(): uint8_t
+    +SetRed(aValue: uint8_t)
+    +GetGreen(): uint8_t
+    +SetGreen(aValue: uint8_t)
+    +GetBlue(): uint8_t
+    +SetBlue(aValue: uint8_t)
+    +GetAlpha(): uint8_t
+    +SetAlpha(aValue: uint8_t)
+    +operator ARGB_t(): uint32_t
+    +operator=(arColor: const Color&): Color&
+}
+
+class Bitmap {
+    Class to handle raster images.
+    Can load 24/32-bit bmp files through
+    filesystem.
+    --
+    +Bitmap(arImgName: const std::string&)
+    +Bitmap(apPixels: const uint32_t*, aHeight: integer, aWidth: integer, aBytesPerPixel: integer)
+    +Bitmap(aHeight: integer, aWidth: integer, aBytesPerPixel: integer)
+    +GetPixels(): const std::vector<uint32_t>&
+}
+
+abstract Canvas {
+    All drawing operations are performed on a Canvas.
+    Descendants can implement in memory canvas, Linux
+    Framebuffer canvas or even a DirectX Canvas.
+    --
+    +DrawArc(arCenter: const Point&, aRadius1: integer, aRadius2: integer, aStartAngle: integer, aSweepAngle: integer, arColor: constant Color&)
+    +DrawCircle(arCenter: constant Point&, aRadius: integer, arColor: constant Color&)
+    +DrawLine(arA: constant Point&, arB: constant Point&, aColor: Color)
+    +DrawRectangle(arRect: constant Rect&, arColor: constant Color&, aFilled: boolean = false)
+    +DrawImage(arTopLeft: constant Point&, arBitmap: constant Bitmap&)
+    +DrawText(arText: constant Text&, arColor: constant Color&)
+    +DrawText(arText: Text&)
+    +{abstract}GetPixel(arPoint: const Point&, aFront: constant boolean = false): uint32_t
+    +{abstract}SetPixel(arPoint: const Point&, aColor: constant Color)
+    +GetWidth(): integer
+    +GetHeight(): integer
+    +GetColorDepth(): integer
+    +IsInsideScreen(arPoint: constant Point&): boolean
+}
+Canvas <|-- Bitmap
+
+enum BufferedCanvas::SwapOperations
+{
+    When swapping buffers these values can control
+    the baseline content of the new buffer.
+    --
+    NoOp // No initialization of the buffer is performed
+    Copy  // The current view content is copied int new buffer
+    Clear // The new buffer is filled with the background color
+}
+
+interface BufferedCanvas {
+    +{abstract}SwapBuffers(aOperation: SwapOperations);
+}
+
+BufferedCanvas::SwapOperations o-- BufferedCanvas
+Canvas <|--- BufferedCanvas
+
+class FrameBuffer {
+    +Framebuffer(apDevicePath: const char* = nullptr)
+}
+BufferedCanvas <|-- FrameBuffer
+
+class GraphicsMain {
+    Runs a gui loop that reads touch inputs and initiates rendering of the active scene.
+    --
+    #mrBufferedCanvas: BufferedCanvas&
+    #mrTouchParser: TouchParser&
+    #mrScenes: SceneMap&
+    #mTerminated: boolean = false;
+    #mNextScene: string
+    --
+    +GraphicsMain(arCanvas: BufferedCanvas&, arTouchParser: TouchParser&, arScenes: SceneMap&)
+    +Run()
+    +Terminate()
+    +ChangeScene(arName: const std::string&)
+}
+
+class CoreException <<exception>>
+class SceneNotFound <<exception>> {
+    Thrown if named scene
+    does not exists
+}
+class ActiveSceneNotSet <<exception>> {
+    Thrown if no scene has
+    been activated
+}
+
+CoreException <|-- SceneNotFound
+CoreException <|-- ActiveSceneNotSet
+
+class SceneMap{
+    Holds all scenes, with named lookup and gets them by reference
+    --
+    #mScenes: std::unordered_map<std::string, Scene*>
+    #mpActiveScene: Scene* = nullptr
+    --
+    +MakeScene<class T>(): Scene&
+    +operator[](arName: const std::string&): Scene&
+    +SetActiveScene(arName: const std::string&);
+    +ActiveScene(): Scene&
+}
+Scene *-- SceneMap
+SceneMap o-- GraphicsMain 
+BufferedCanvas o--- GraphicsMain
+TouchParser o-- GraphicsMain
+Rect -[hidden]down- Canvas
+GraphicsMain -[hidden]down- CoreException
+}
+
+@enduml
+

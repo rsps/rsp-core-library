@@ -12,7 +12,7 @@
 #include <utils/Variant.h>
 #include <logging/Logger.h>
 
-//#define JLOG(a) DLOG(a)
+// # define JLOG(a) DLOG(a)
 #define JLOG(a)
 
 namespace rsp::utils {
@@ -42,20 +42,24 @@ Variant::Variant(Variant &&arOther)
 
 Variant& Variant::operator=(const Variant &arOther)
 {
-    JLOG("Variant copy assignment");
-    mType = arOther.mType;
-    mPointer = arOther.mPointer;
-    mString = arOther.mString;
+    if (&arOther != this) {
+        JLOG("Variant copy assignment");
+        mType = arOther.mType;
+        mPointer = arOther.mPointer;
+        mString = arOther.mString;
+    }
     return *this;
 }
 
 Variant& Variant::operator=(Variant &&arOther)
 {
-    JLOG("Variant move assignment");
-    mType = arOther.mType;
-    mPointer = std::move(arOther.mPointer);
-    mString = std::move(arOther.mString);
-    arOther.Clear();
+    if (&arOther != this) {
+        JLOG("Variant move assignment");
+        mType = arOther.mType;
+        mPointer = std::move(arOther.mPointer);
+        mString = std::move(arOther.mString);
+        arOther.Clear();
+    }
     return *this;
 }
 

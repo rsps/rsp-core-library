@@ -39,6 +39,12 @@ class BufferedCanvas : public Canvas
         Copy,
         Clear
     };
+
+    /**
+     * \brief Abstract method for swapping back and front buffers
+     ** \param aSwapOp The type of swap operations to be executed, default is copy
+     * \param aColor In case of Clear operation a color is needed, default is black
+     */
     virtual void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy, Color aColor = Color::Black) = 0;
 
   protected:

@@ -11,8 +11,6 @@
 #ifndef RECT_H
 #define RECT_H
 
-#include <ostream>
-#include <utils/CoreException.h>
 #include "Point.h"
 
 namespace rsp::graphics
@@ -30,11 +28,9 @@ class Framebuffer;
 class Rect
 {
   public:
-
-    Rect() {}
-
+    Rect() : mLeftTop(0, 0), mRightBottom(0, 0){};
     /**
-     * Constructs a Rect from coordinate and size.
+     * \brief Constructs a Rect from coordinate and size.
      *
      * \param aLeft
      * \param aTop
@@ -44,7 +40,7 @@ class Rect
     Rect(int aLeft, int aTop, int aWidth, int aHeight);
 
     /**
-     * Construct a Rect from two points.
+     * \brief Construct a Rect from two points.
      *
      * \param aLeftTop
      * \param aRightBottom
@@ -52,7 +48,7 @@ class Rect
     Rect(const Point &aLeftTop, const Point &aRightBottom);
 
     /**
-     * Construct a Rect from origin point and size.
+     * \brief Construct a Rect from origin point and size.
      *
      * \param aLeftTop
      * \param aWidth
@@ -61,68 +57,94 @@ class Rect
     Rect(const Point &aLeftTop, int aWidth, int aHeight);
 
     /**
-     * Copy constructor.
+     * \brief Copy constructor.
      *
      * \param aRect
      */
     Rect(const Rect &aRect);
 
-    Rect& operator=(const Rect &aRect);
+    /**
+     * \brief Assignment operator
+     *
+     * \param arRect
+     * \return
+     */
+    Rect &operator=(const Rect &arRect);
 
     /**
-     * Get the top value
+     * \brief Equal to operator
+     * \param arRect
+     * \return True if equal
+     */
+    inline bool operator==(const Rect &arRect)
+    {
+        return (mLeftTop == arRect.mLeftTop) && (mRightBottom == arRect.mRightBottom);
+    }
+
+    /**
+     * \brief Not equal to operator
+     * \param arRect
+     * \return True if not equal
+     */
+    inline bool operator!=(const Rect &arRect)
+    {
+        return (mLeftTop != arRect.mLeftTop) || (mRightBottom != arRect.mRightBottom);
+    }
+
+    /**
+     * \brief Get the top value
      *
      * \return int
      */
     int GetTop() const;
     /**
-     * Set the top value of the Rect.
+     * \brief Set the top value of the Rect.
      *
      * \param aTopValue
      */
     void SetTop(int aTopValue);
 
     /**
-     * Get the bottom value
+     * \brief Get the bottom value
      *
      * \return int
      */
     int GetBottom() const;
     /**
-     * Set the bottom value of the Rect.
+     * \brief Set the bottom value of the Rect.
      *
      * \param aBotValue
      */
     void SetBottom(int aBotValue);
 
     /**
-     * Get the left value
+     * \brief Get the left value
      *
      * \return int
      */
     int GetLeft() const;
     /**
-     * Set the left value of the Rect.
+     * \brief Set the left value of the Rect.
      *
      * \param aLeftValue
      */
     void SetLeft(int aLeftValue);
 
     /**
-     * Get the right value.
+     * \brief Get the right value.
      *
      * \return int
      */
     int GetRight() const;
     /**
-     * Set the right value of the Rect.
+     * \brief Set the right value of the Rect.
      *
      * \param aRightValue
      */
     void SetRight(int aRightValue);
 
     /**
-     * Get the top left coordinate.
+     * \brief Get the top left coordinate.
      *
      * \return Point
      */
@@ -132,7 +154,7 @@ class Rect
     }
 
     /**
-     * Get the bottom right coordinate.
+     * \brief Get the bottom right coordinate.
      *
      * \return Point
      */
@@ -142,51 +164,56 @@ class Rect
     }
 
     /**
-     * Get the width of the Rect.
+     * \brief Get the width of the Rect.
      *
      * \return int
      */
     int GetWidth() const;
     /**
-     * Set the width of the Rect.
+     * \brief Set the width of the Rect.
      *
      * \param aWidth
      */
     void SetWidth(int aWidth);
 
     /**
-     * Get the height of the Rect.
+     * \brief Get the height of the Rect.
      *
      * \return int
      */
     int GetHeight() const;
     /**
-     * Set the height of the Rect.
+     * \brief Set the height of the Rect.
      *
      * \param aHeight
      */
     void SetHeight(int aHeight);
 
     /**
-     * Determines if a point is inside area covered by the Rect.
+     * \brief Determines if a point is inside area covered by the Rect.
      *
      * \param aPoint
      * \return bool
      */
-    bool IsHit(const Point &arPoint) const;
-
-    bool VerifyDimensions() const;
+    bool IsHit(const Point &aPoint) const;
+    /**
+     * \brief Verifies the dimensions of the rectangle by checking if height and width are above zero
+     *
+     * \throws AssertException
+     */
+    void VerifyDimensions();
 
   protected:
     // Allow friends to access members for speed optimizations.
     friend Canvas;
     friend Framebuffer;
 
-    Point mLeftTop{};
-    Point mRightBottom{};
+    Point mLeftTop;
+    Point mRightBottom;
 };
 
-std::ostream& operator <<(std::ostream &aStream, const Rect &arRect);
+std::ostream &operator<<(std::ostream &aStream, const Rect &arRect);
 
 } // namespace rsp::graphics
+
 #endif // RECT_H

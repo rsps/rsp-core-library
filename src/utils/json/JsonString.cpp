@@ -36,6 +36,16 @@ JsonString::JsonString(const JsonString &arJson)
 //    JLOG("JsonString Copied: " << std::distance(begin(), mIt) << ", " << getLength());
 }
 
+JsonString& JsonString::operator=(const JsonString &arJson)
+{
+    if (&arJson != this) {
+        std::string::operator=(arJson);
+        mIt = begin();
+        mEnd = end();
+    }
+    return *this;
+}
+
 /**
  * Traverse the string to locate start and end of a substring.
  *
@@ -127,8 +137,6 @@ std::string JsonString::getString()
     std::string result;
 
     while (mIt != mEnd) {
-        unsigned int c = static_cast<unsigned int>(*mIt);
-
         if (*mIt == '\\') {
             mIt++;
             switch (*mIt) {
@@ -259,6 +267,12 @@ JsonValue* JsonString::getArray()
     return result;
 }
 
+/*
+ * Parse the JSON content and extract it as a number,
+ * stored in one of three supported native types.
+ *
+ * Exceptions are thrown if content has illegal number formatting.
+ */
 JsonValue* JsonString::getNumber()
 {
     JLOG("getNumber: " << debug(false, true));

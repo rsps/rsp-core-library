@@ -64,8 +64,6 @@ std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph);
 /**
  * \class Font
  * \brief Class for fonts and their properties.
- *
- * TODO: Font::Styles support is not implemented.
  */
 class Font
 {

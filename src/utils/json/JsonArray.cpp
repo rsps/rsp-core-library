@@ -13,7 +13,7 @@
 
 namespace rsp::utils::json {
 
-//#define JLOG(a) DLOG(a)
+// # define JLOG(a) DLOG(a)
 #define JLOG(a)
 
 
@@ -27,7 +27,7 @@ JsonArray::JsonArray(const JsonArray &arOther)
     : JsonValue(static_cast<const JsonValue&>(arOther))
 {
     JLOG("JsonArray copy constructor");
-    for(auto el : arOther.mData) {
+    for(JsonValue* el : arOther.mData) {
         mData.push_back(el->clone());
     }
 }
@@ -42,16 +42,20 @@ JsonArray::JsonArray(JsonArray &&arOther)
 
 JsonArray::~JsonArray()
 {
-    Clear();
+    for (auto el : mData) {
+        delete el;
+    }
 }
 
 JsonArray& JsonArray::operator=(const JsonArray &arOther)
 {
-    JLOG("JsonArray copy assignment");
-    JsonValue::operator=(static_cast<const JsonValue&>(arOther));
-    mData.clear();
-    for(auto el : arOther.mData) {
-        mData.push_back(el->clone());
+    if (&arOther != this) {
+        JLOG("JsonArray copy assignment");
+        JsonValue::operator=(static_cast<const JsonValue&>(arOther));
+        mData.clear();
+        for(JsonValue* el : arOther.mData) {
+            mData.push_back(el->clone());
+        }
     }
     return *this;
 }
@@ -66,10 +70,12 @@ JsonValue* JsonArray::clone() const
 
 JsonArray& JsonArray::operator=(JsonArray &&arOther)
 {
-    JLOG("JsonArray move assignment");
-    JsonValue::operator=(static_cast<JsonValue&>(arOther));
-    mData = std::move(arOther.mData);
-    arOther.mData.clear();
+    if (&arOther != this) {
+        JLOG("JsonArray move assignment");
+        JsonValue::operator=(static_cast<JsonValue&>(arOther));
+        mData = std::move(arOther.mData);
+        arOther.mData.clear();
+    }
     return *this;
 }
 
@@ -118,7 +124,7 @@ void JsonArray::toStringStream(std::stringstream &arResult, PrintFormat &arPf, u
     arResult << "[" << arPf.nl;
 
     int rest = mData.size();
-    for (auto el : mData) {
+    for (JsonValue* el : mData) {
        arResult << in;
        el->toStringStream(arResult, arPf, aLevel+1, aForceToUCS2);
        if (--rest == 0) {

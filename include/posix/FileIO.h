@@ -12,9 +12,9 @@
 #define SRC_POSIX_FILEIO_H_
 
 #include <chrono>
-#include <string>
-#include <sstream>
 #include <fstream>
+#include <sstream>
+#include <string>
 
 namespace rsp::posix
 {
@@ -28,7 +28,7 @@ namespace rsp::posix
 class FileIO
 {
 public:
-//    const std::ios_base::openmode cNonBlock
+    static constexpr std::ios_base::openmode cNonBlock = static_cast<std::ios_base::openmode>(static_cast<int>(std::_Ios_Openmode::_S_ios_openmode_end + 1));
 
     /**
      * Construct a FileIO object, open/create file if given as argument.
@@ -61,6 +61,13 @@ public:
     {
         return (mHandle >= 0);
     }
+
+    /**
+     * Check if end of file.
+     *
+     * \return True if at end of file.
+     */
+    bool IsEOF();
 
     /**
      * Move the cursor to the given position.
@@ -152,11 +159,11 @@ public:
      */
     bool WaitForDataReady(int aTimeoutms);
 
-protected:
+  protected:
     std::string mFileName{};
     int mHandle = -1;
 };
 
-} /* namespace posix */
+} // namespace rsp::posix
 
 #endif /* SRC_POSIX_FILEIO_H_ */

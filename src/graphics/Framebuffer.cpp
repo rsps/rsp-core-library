@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/Framebuffer.h>
+#include "graphics/Framebuffer.h"
 
 #include <chrono>
 #include <cstring>
@@ -50,7 +50,7 @@ Framebuffer::Framebuffer(const char *apDevPath)
     mWidth = static_cast<int>(mVariableInfo.xres);
     mHeight = static_cast<int>(mVariableInfo.yres);
     mBytesPerPixel = static_cast<int>(mVariableInfo.bits_per_pixel / 8);
-    std::clog << "Framebuffer opened. Width=" << mWidth << " Height=" << mHeight << " BytesPerPixel=" << mBytesPerPixel << std::endl;
+    // std::clog << "Framebuffer opened. Width=" << mWidth << " Height=" << mHeight << " BytesPerPixel=" << mBytesPerPixel << std::endl;
 
     // set yres_virtual for double buffering
     mVariableInfo.yres_virtual = mVariableInfo.yres * 2;
@@ -148,7 +148,6 @@ void Framebuffer::clear(Color aColor)
 {
     long x, y;
     // draw to back buffer
-    //     std::cout << "Clearing buffer" << std::endl;
     for (y = 0; y < mVariableInfo.yres; y++) {
         for (x = 0; x < mVariableInfo.xres; x++) {
             long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;

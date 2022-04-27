@@ -1,0 +1,112 @@
+@startuml
+
+skinparam stereotypeCBackgroundColor<<Exception>> Red
+
+title GUI Font & Text Classes
+
+namespace rsp::graphics {
+
+class FontException <<Exception>> {
+    Versatile base exception type that can be
+    thrown by a Font driver implementation.
+}
+
+class FontRawInterface {
+    Interface for font driver implementations.
+    --
+    +{abstract}MakeGlyphs(arText: const std::string&, aLineSpacing: integer): std::vector<Glyph>
+    +{abstract}GetFamilyName(): string
+    +{abstract}SetSize(aWidthPx: integer, aHeightPx: integer) = 0;
+    +GetSize(): integer
+    +{abstract}SetStyle(aStyle: Font::Styles)
+    +GetStyle(): Font::Styles
+}
+
+class Glyph {
+    Data object with 8-bit pixel
+    intensity values for a single
+    unicode symbol.
+    The pixel values can be used as
+    alpha channel value for a given
+    color.
+    --
+    +Glyph()
+    +Glyph(apFace: void*)
+    +mPixels: std::vector<uint8_t>
+    +mSymbolUnicode: uint32_t = 0
+    +mTop: integer = 0
+    +mLeft: integer = 0
+    +mWidth: integer = 0
+    +mHeight: integer = 0
+}
+
+enum Font::Styles {
+    Normal
+    Italic
+    Bold
+    BoldItalic
+}
+
+class Font {
+    When used on Linux, the GUI library can
+    use the FreeType2 library to render fonts.
+    --
+    #mColor: Color
+    #mpImpl: std::unique_ptr<FontRawInterface>
+    --
+    +{static}RegisterFont(apFileName: const char*)
+    +Font(arName: constant string&, aStyle: Styles)
+    +MakeGlyphs(arText: constant std::string&, aLineSpacing: integer = 0): std::vector<Glyph>
+    +GetFamilyName(): string
+    +SetSize(aSizePx: integer): Font&
+    +{abstract}SetSize(aWidthPx: integer, aHeightPx: integer): Font&
+    +GetSize(): integer
+    +SetColor(arColor: constant Color&): Font&
+    +GetColor(): Color
+    +SetStyle(aStyle: Styles): Font&
+    +GetStyle(): Styles
+}
+FontRawInterface *-- Font
+Glyph o-- Font
+Font::Styles o--- Font
+
+enum Text::HAlign {
+    Left
+    Center
+    Right
+}
+
+enum Text::VAlign {
+    Top
+    Center
+    Bottom
+}
+
+class Text {
+    +Text(arFontName: const std::string&);
+    +Text(arFontName: const std::string&, arText: const std::string&);
+    +operator std::string(): string
+    +GetValue(): string
+    +SetValue(arValue: const std::string&): Text&
+    +GetArea(): const Rect&
+    +SetArea(arRect: const Rect&): Text&
+    +GetFont(): Font&
+    +GetScaleToFit(): boolean
+    +SetScaleToFit(aValue: boolean = true): Text&
+    +GetLineSpacing(): integer
+    +SetLineSpacing(aSpacing: integer): Text&
+    +GetLineCount(): integer
+    +GetVAlignment(): VAlign
+    +SetVAlignment(aVAlign: VAlign): Text&
+    +GetHAlignment(): HAlign
+    +SetHAlignment(aHAlign: HAlign): Text&
+    +Reload(): Text&
+    +GetGlyphs(): constant std::vector<Glyph>&
+    +CalcBoundingRect(arGlyphs: constant std::vector<Glyph>&): Rect
+}
+
+Font *--- Text
+Text::VAlign o-- Text
+Text::HAlign o-- Text
+
+@enduml

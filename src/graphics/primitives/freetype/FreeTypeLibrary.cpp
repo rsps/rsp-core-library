@@ -9,8 +9,8 @@
  */
 
 #include "FreeTypeLibrary.h"
-#include <utils/StrUtils.h>
 #include <logging/Logger.h>
+#include <utils/StrUtils.h>
 
 using namespace rsp::utils;
 
@@ -39,9 +39,9 @@ FT_Face FreeTypeLibrary::CreateFontFace(const std::string &arFontName, Font::Sty
 {
     DLOG("Creating font " << arFontName << " with style " << static_cast<int>(aStyle));
 
-    auto it = mFontSets. find(arFontName);
+    auto it = mFontSets.find(arFontName);
     if (it == mFontSets.end()) {
-        THROW_WITH_BACKTRACE1(FontException,  StrUtils::Format("Font named %s is not installed.", arFontName.c_str()));
+        THROW_WITH_BACKTRACE1(FontException, StrUtils::Format("Font named %s is not installed.", arFontName.c_str()));
     }
 
     if (aStyle != Font::Styles::Normal) {
@@ -49,7 +49,6 @@ FT_Face FreeTypeLibrary::CreateFontFace(const std::string &arFontName, Font::Sty
         if (inner == mFontSets[arFontName].end()) {
             std::clog << "Font named " << arFontName << " has no style " << static_cast<int>(aStyle) << " installed." << std::endl;
             aStyle = Font::Styles::Normal;
-//            THROW_WITH_BACKTRACE1(FontException,  rsp::utils::StrUtils::Format("Font named %s has no style %d installed.", arFontName.c_str(), static_cast<int>(aStyle)));
         }
     }
 
@@ -79,7 +78,7 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
             FT_Done_Face(face);
         }
 
-        FT_Long id = ( instance_idx << 16 ) + face_idx;
+        FT_Long id = (instance_idx << 16) + face_idx;
 
         FT_Error error = FT_New_Face(mFtLib, arFileName.c_str(), id, &face);
 
@@ -107,7 +106,8 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
 
         std::clog << "Adding font " << face->family_name << ", " << face->style_name << " " << static_cast<int>(style) << std::endl;
         mFontSets[face->family_name][style] = info;
-/*
+
+#ifdef DEBUG_FONTS
         std::cout << "num_faces: " << face->num_faces << "\n"
             << "face_index: " << (face->face_index & 0xFFFF) << ", style:" << (face->face_index >> 16) << "\n"
             << "face_flags: " << std::hex << face->face_flags << std::dec << "\n"
@@ -119,23 +119,21 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
             << "available_sizes: " << face->available_sizes << "\n"
             << "num_charmaps: " << face->num_charmaps << "\n"
             << "charmaps: " << face->charmaps << "\n";
-*/
+#endif
         FT_Long num_instances = face->style_flags >> 16;
 
-        if ( instance_idx < num_instances )
+        if (instance_idx < num_instances) {
             instance_idx++;
-        else
-        {
+        }
+        else {
             face_idx++;
             instance_idx = 0;
         }
-    }
-    while(face_idx < face->num_faces);
+    } while (face_idx < face->num_faces);
 
     if (face) {
         FT_Done_Face(face);
     }
 }
 
-}
-
+} // namespace rsp::graphics

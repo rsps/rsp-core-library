@@ -129,14 +129,6 @@ void Console::write(const std::string &arMsg, TextColor aColor)
     }
 }
 
-//void Console::writeToDisplay(const std::string &arMsg)
-//{
-//    if (mPrintToDisplay) {
-//        mDisplay << arMsg;
-//        mDisplay.flush();
-//    }
-//}
-
 void ConsoleLogStreams::Error(const std::string &arMsg)
 {
     Console::Error() << arMsg;

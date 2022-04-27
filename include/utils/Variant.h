@@ -86,9 +86,6 @@ public:
      */
     virtual ~Variant();
 
-//    Variant(const Variant&);
-//    Variant& operator=(const Variant&);
-
     /**
      * \fn bool IsNull()const
      * \brief Returns true if the content is null, not set or empty.

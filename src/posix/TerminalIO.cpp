@@ -14,6 +14,7 @@
 #include <iostream>
 #include <cstring>
 #include <algorithm>
+#include <ostream>
 #include <utils/AnsiEscapeCodes.h>
 #include <utils/StrUtils.h>
 
@@ -32,8 +33,8 @@ TerminalIO::TerminalIO()
 }
 
 TerminalIO::TerminalIO(const std::string &arPreset)
+    : TerminalIO()
 {
-    TerminalIO();
     mPreset = arPreset;
 }
 
@@ -122,6 +123,9 @@ char TerminalIO::GetChar(EscapeCodes &arEscCode)
  *
  * The terminal is simulated, with history and cursor controlled by ASCII escape commands.
  * @see https://en.wikipedia.org/wiki/ANSI_escape_code
+ *
+ * The terminal supports auto-completion or suggestions via
+ * dictionary lookup on double tabulator press.
  *
  * @returns string with input command line.
  */
@@ -218,42 +222,8 @@ std::string TerminalIO::GetLine()
                 break;
 
             case EscapeCodes::Tabulator:
-            {
-                std::vector<std::string> matches = StrUtils::FindMatches(line, mDictionary);
-
-                if (++tab_count == 2) {
-                    tab_count = 0;
-
-                    if (matches.empty() ||
-                       (matches.size() == 1 && matches[0] == line)) {
-                        break;
-                    }
-
-                    int n = std::count(line.begin(), line.end(), ' ');
-
-                    Console::Info() << std::endl;
-                    for (auto s : matches) {
-                        if (std::count(s.begin(), s.end(), ' ') == n) {
-                            Console::HighLightInfo() << s << std::endl;
-                        }
-                    }
-                    break;
-                }
-
-                std::string common = StrUtils::ReduceToCommon(matches);
-
-                if (common.length() > line.length()) {
-                    line = common;
-                    if (matches[0] == line && matches.size() > 1) {
-                        line += ' ';
-                    }
-                    else {
-                        tab_count = 0;
-                    }
-                    cursor = line.length();
-                }
+                handleTabulator(tab_count, line, cursor);
                 break;
-            }
 
             case EscapeCodes::Esc:
                 line.clear();
@@ -301,6 +271,55 @@ std::string TerminalIO::GetLine()
     }
 
     return line;
+}
+
+void TerminalIO::handleTabulator(int &arTabCount, std::string &arLine, unsigned int &arCursor)
+{
+    std::vector<std::string> matches = StrUtils::FindMatches(arLine, mDictionary);
+
+    if (++arTabCount == 2) {
+        arTabCount = 0;
+
+        if (matches.empty() ||
+           (matches.size() == 1 && matches[0] == arLine)) {
+            return;
+        }
+
+        int n = 0;
+        for (auto c : arLine) {
+            if (c == ' ') {
+                n++;
+            }
+        }
+
+        Console::Info() << std::endl;
+        for (std::string &s : matches) {
+            int count = 0;
+            for (auto c : s) {
+                if (c == ' ') {
+                    count++;
+                }
+            }
+
+            if (count == n) {
+                Console::HighLightInfo() << s << std::endl;
+            }
+        }
+        return;
+    }
+
+    std::string common = StrUtils::ReduceToCommon(matches);
+
+    if (common.length() > arLine.length()) {
+        arLine = common;
+        if (matches[0] == arLine && matches.size() > 1) {
+            arLine += ' ';
+        }
+        else {
+            arTabCount = 0;
+        }
+        arCursor = arLine.length();
+    }
 }
 
 TerminalIO::EscapeCodes TerminalIO::escString2Code(const char *apEscStr)

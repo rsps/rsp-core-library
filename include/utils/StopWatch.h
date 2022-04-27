@@ -40,7 +40,7 @@ public:
      * \fn int64_t Elapsed()
      * \brief Templated lapse time lookup, template type gives the resolution of the output.
      *
-     * \tparam T E.g. std::chrono::millisecond, std::chrono::nanoseconds, std::chrono::hours
+     * \tparam T E.g. std::chrono::milliseconds, std::chrono::nanoseconds, std::chrono::hours
      * \return Integer count of elapsed time in given resolution.
      */
     template<typename T>

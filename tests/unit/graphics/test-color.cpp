@@ -13,53 +13,53 @@
 
 using namespace rsp::graphics;
 
-uint8_t alpha = 0x12;
-uint8_t red = 0x34;
-uint8_t green = 0x56;
-uint8_t blue = 0x78;
-uint32_t colourVal = 0x12345678;
+constexpr uint8_t cAlpha = 0x12;
+constexpr uint8_t cRed = 0x34;
+constexpr uint8_t cGreen = 0x56;
+constexpr uint8_t cBlue = 0x78;
+constexpr uint32_t cColorVal = 0x12345678;
 
 TEST_CASE("Color Contructors")
 {
     SUBCASE("Separate values contructor")
     {
         // Arrange & Act
-        Color col(red, green, blue, alpha);
+        Color col(cRed, cGreen, cBlue, cAlpha);
 
         // Assert
-        CHECK(col.GetAlpha() == alpha);
-        CHECK(col.GetRed() == red);
-        CHECK(col.GetGreen() == green);
-        CHECK(col.GetBlue() == blue);
+        CHECK(col.GetAlpha() == cAlpha);
+        CHECK(col.GetRed() == cRed);
+        CHECK(col.GetGreen() == cGreen);
+        CHECK(col.GetBlue() == cBlue);
     }
     SUBCASE("Single value contructor")
     {
         // Arrange & Act
-        Color col(colourVal);
+        Color col(cColorVal);
 
         // Assert
-        CHECK(col.GetAlpha() == alpha);
-        CHECK(col.GetRed() == red);
-        CHECK(col.GetGreen() == green);
-        CHECK(col.GetBlue() == blue);
+        CHECK(col.GetAlpha() == cAlpha);
+        CHECK(col.GetRed() == cRed);
+        CHECK(col.GetGreen() == cGreen);
+        CHECK(col.GetBlue() == cBlue);
     }
     SUBCASE("Copy contructor")
     {
         // Arrange & Act
-        Color testCol(colourVal);
+        Color testCol(cColorVal);
         Color col(testCol);
 
         // Assert
-        CHECK(col.GetAlpha() == alpha);
-        CHECK(col.GetRed() == red);
-        CHECK(col.GetGreen() == green);
-        CHECK(col.GetBlue() == blue);
+        CHECK(col.GetAlpha() == cAlpha);
+        CHECK(col.GetRed() == cRed);
+        CHECK(col.GetGreen() == cGreen);
+        CHECK(col.GetBlue() == cBlue);
     }
 }
 TEST_CASE("Color Sets")
 {
     // Arrange
-    Color testCol(colourVal);
+    Color testCol(cColorVal);
     uint8_t newCol = 0x55;
     SUBCASE("Set Alpha")
     {
@@ -68,9 +68,9 @@ TEST_CASE("Color Sets")
 
         // Assert only wanted part has changed
         CHECK(testCol.GetAlpha() == newCol);
-        CHECK(testCol.GetRed() == red);
-        CHECK(testCol.GetGreen() == green);
-        CHECK(testCol.GetBlue() == blue);
+        CHECK(testCol.GetRed() == cRed);
+        CHECK(testCol.GetGreen() == cGreen);
+        CHECK(testCol.GetBlue() == cBlue);
     }
     SUBCASE("Set Red")
     {
@@ -79,9 +79,9 @@ TEST_CASE("Color Sets")
 
         // Assert only wanted part has changed
         CHECK(testCol.GetRed() == newCol);
-        CHECK(testCol.GetGreen() == green);
-        CHECK(testCol.GetBlue() == blue);
-        CHECK(testCol.GetAlpha() == alpha);
+        CHECK(testCol.GetGreen() == cGreen);
+        CHECK(testCol.GetBlue() == cBlue);
+        CHECK(testCol.GetAlpha() == cAlpha);
     }
     SUBCASE("Set Green")
     {
@@ -90,9 +90,9 @@ TEST_CASE("Color Sets")
 
         // Assert only wanted part has changed
         CHECK(testCol.GetGreen() == newCol);
-        CHECK(testCol.GetRed() == red);
-        CHECK(testCol.GetBlue() == blue);
-        CHECK(testCol.GetAlpha() == alpha);
+        CHECK(testCol.GetRed() == cRed);
+        CHECK(testCol.GetBlue() == cBlue);
+        CHECK(testCol.GetAlpha() == cAlpha);
     }
     SUBCASE("Set Blue")
     {
@@ -101,22 +101,22 @@ TEST_CASE("Color Sets")
 
         // Assert only wanted part has changed
         CHECK(testCol.GetBlue() == newCol);
-        CHECK(testCol.GetRed() == red);
-        CHECK(testCol.GetGreen() == green);
-        CHECK(testCol.GetAlpha() == alpha);
+        CHECK(testCol.GetRed() == cRed);
+        CHECK(testCol.GetGreen() == cGreen);
+        CHECK(testCol.GetAlpha() == cAlpha);
     }
 }
 TEST_CASE("Color Operators")
 {
     // Arrange
-    Color testCol(colourVal);
+    Color testCol(cColorVal);
     SUBCASE("uint32 Conversion")
     {
         // Act
         uint32_t newUint32 = testCol;
 
         // Assert
-        CHECK(newUint32 == colourVal);
+        CHECK(newUint32 == cColorVal);
     }
     SUBCASE("= Operator")
     {
