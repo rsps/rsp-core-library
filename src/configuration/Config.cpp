@@ -8,19 +8,52 @@
  * \author      Steffen Brummer
  */
 
-#include <configuration/ConfigLoader.h>
+#include <configuration/Config.h>
+#include <utils/SignedData.h>
+#include <posix/FileIO.h>
+
+using namespace rsp::utils;
+using namespace rsp::posix;
 
 namespace rsp::config {
 
-ConfigLoader::ConfigLoader()
+ConfigBase::ConfigBase(std::uint8_t *apData, std::size_t aDataSize)
+    : mpData(apData),
+      mDataSize(aDataSize)
 {
-    // TODO Auto-generated constructor stub
-
 }
 
-ConfigLoader::~ConfigLoader()
+void ConfigBase::Load(const std::string &arFileName, std::string_view aSecret)
 {
-    // TODO Auto-generated destructor stub
+    SignedData sd(aSecret);
+    sd.Verify(arFileName);
+
+    FileIO fin(arFileName, std::ios_base::in);
+
+    std::size_t len = fin.Read(mpData.get(), mDataSize);
+
+    if (len != mDataSize) {
+        // TODO: Handle different versions of the data structure.
+        THROW_WITH_BACKTRACE2(EConfigSizeMismatch, mDataSize, len);
+    }
+}
+
+void ConfigBase::Save(const std::string &arFileName, std::string_view aSecret)
+{
+    validate();
+
+    SignedData sd(aSecret);
+    MessageDigest sign = sd.GetSignature(mpData.get(), mDataSize);
+
+    FileIO fout(arFileName, std::ios_base::out);
+
+    if (fout.Write(mpData.get(), mDataSize) != mDataSize) {
+        THROW_WITH_BACKTRACE(EConfigWrite);
+    }
+
+    if (fout.Write(sign.data(), sign.size()) != sign.size()) {
+        THROW_WITH_BACKTRACE(EConfigWrite);
+    }
 }
 
 } /* namespace rsp::config */

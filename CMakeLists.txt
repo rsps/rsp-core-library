@@ -2,11 +2,12 @@ cmake_minimum_required (VERSION 3.16)
 
 # https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
 
-# Usage: cmake [-DRELEASE_BUILD=ON] [-DPLATFORM_P05=ON] [FREETYPE_FONTS=OFF] ..
+# Usage: cmake [-DRELEASE_BUILD=ON] [-DPLATFORM_P05=ON] [FREETYPE_FONTS=OFF] [-DOPENSSL_CRYPTO=OFF] ..
 
 OPTION(RELEASE_BUILD "Set to turn off debug output" OFF) # Disabled by default.
 OPTION(PLATFORM_P05 "Set to build for P05 ARM platform" OFF) # Disabled by default.
 OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
+OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
 
 if(PLATFORM_P05)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
@@ -35,16 +36,19 @@ set (CMAKE_CXX_STANDARD 20)
 # locations on all platforms.
 include(GNUInstallDirs)
 
-#include_directories( ${FREETYPE2_INCLUDE_DIRS} )
-#SET( CMAKE_C_FLAGS "${FREETYPE2_CFLAGS_OTHER}" )
-
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 
 add_library("rsp-core-lib" STATIC)
 
 if (FREETYPE_FONTS)
-find_package(Freetype REQUIRED)
-set(FREETYPE_BUILD_OPTIONS -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+    find_package(Freetype REQUIRED)
+    set(FREETYPE_BUILD_OPTIONS -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+    set(FONT_LIB Freetype::Freetype)
+endif()
+
+if (OPENSSL_CRYPTO)
+    find_package(OpenSSL REQUIRED)
+    set(CRYPTO_LIB OpenSSL::Crypto)
 endif()
 
 # Define headers for this library. PUBLIC headers are used for
@@ -137,7 +141,8 @@ endif()
 target_link_libraries ("rsp-core-lib-test"
     rsp-core-lib
     Threads::Threads
-    Freetype::Freetype
+    ${FONT_LIB}
+    ${CRYPTO_LIB}
 )
 #target_link_libraries(demo ${FREETYPE_LIBRARIES})
 

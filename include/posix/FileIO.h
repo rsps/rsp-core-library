@@ -63,13 +63,6 @@ public:
     }
 
     /**
-     * Check if end of file.
-     *
-     * \return True if at end of file.
-     */
-    bool IsEOF();
-
-    /**
      * Move the cursor to the given position.
      *
      * \param aOffset
@@ -82,7 +75,7 @@ public:
      * Read an amount of bytes into the buffer.
      *
      * \param aBuffer
-     * \param aNumberOfBytesToRead
+     * \param aNumberOfBytesToRead Can be zero if no more bytes are currently available
      * \return
      */
     std::size_t Read(void *apBuffer, std::size_t aNumberOfBytesToRead);

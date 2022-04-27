@@ -84,17 +84,6 @@ void FileIO::Close()
     }
 }
 
-bool FileIO::IsEOF()
-{
-    char buf[1];
-    int ret = Read(buf, 1);
-    if (ret != 0) {
-        lseek(mHandle, lseek(mHandle, 0, SEEK_CUR) - 1, SEEK_SET);
-        return false;
-    }
-    return true;
-}
-
 std::size_t FileIO::Seek(std::size_t aOffset, std::ios_base::seekdir aSeekdir)
 {
     int base = 0;
