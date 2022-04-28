@@ -75,19 +75,33 @@ public:
      * Read an amount of bytes into the buffer.
      *
      * \param aBuffer
-     * \param aNumberOfBytesToRead Can be zero if no more bytes are currently available
-     * \return
+     * \param aNumberOfBytesToRead
+     * \return Number of bytes read. Can be zero if no more bytes are currently available
      */
     std::size_t Read(void *apBuffer, std::size_t aNumberOfBytesToRead);
+
+    /**
+     * \brief Read exact amount of bytes into buffer
+     * \param apBuffer
+     * \param aNumberOfBytesToRead
+     */
+    void ExactRead(void *apBuffer, std::size_t aNumberOfBytesToRead);
 
     /**
      * Write an amount of bytes from the buffer to the file.
      *
      * \param aBuffer
      * \param aNumberOfBytesToWrite
-     * \return
+     * \return Number of bytes written.
      */
     std::size_t Write(const void *apBuffer, std::size_t aNumberOfBytesToWrite);
+
+    /**
+     * \brief Write an exact amount of bytes from the buffer to the file.
+     * \param apBuffer
+     * \param aNumberOfBytesToWrite
+     */
+    void ExactWrite(const void *apBuffer, std::size_t aNumberOfBytesToWrite);
 
     /**
      * Get the rest of the current line.
