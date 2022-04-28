@@ -18,43 +18,5 @@ using namespace rsp::security;
 
 namespace rsp::config {
 
-ConfigBase::ConfigBase(std::uint8_t *apData, std::size_t aDataSize)
-    : mpData(apData),
-      mDataSize(aDataSize)
-{
-}
-
-void ConfigBase::Load(const std::string &arFileName, std::string_view aSecret)
-{
-    SignedData sd(aSecret);
-    sd.Verify(arFileName);
-
-    FileIO fin(arFileName, std::ios_base::in);
-
-    std::size_t len = fin.Read(mpData.get(), mDataSize);
-
-    if (len != mDataSize) {
-        // TODO: Handle different versions of the data structure.
-        THROW_WITH_BACKTRACE2(EConfigSizeMismatch, mDataSize, len);
-    }
-}
-
-void ConfigBase::Save(const std::string &arFileName, std::string_view aSecret)
-{
-    validate();
-
-    SignedData sd(aSecret);
-    MessageDigest sign = sd.GetSignature(mpData.get(), mDataSize);
-
-    FileIO fout(arFileName, std::ios_base::out);
-
-    if (fout.Write(mpData.get(), mDataSize) != mDataSize) {
-        THROW_WITH_BACKTRACE(EConfigWrite);
-    }
-
-    if (fout.Write(sign.data(), sign.size()) != sign.size()) {
-        THROW_WITH_BACKTRACE(EConfigWrite);
-    }
-}
 
 } /* namespace rsp::config */

@@ -15,62 +15,47 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <security/SecureContainer.h>
+#include <utils/DataContainer.h>
 #include <utils/CoreException.h>
 
 namespace rsp::config {
 
-class EConfigSizeMismatch : public rsp::utils::CoreException
-{
-public:
-    explicit EConfigSizeMismatch(std::size_t aExpected, std::size_t aActual)
-      : CoreException(std::string("Config file size is ") + std::to_string(aActual) + ", it should be " + std::to_string(aExpected))
-    {
-    }
-};
 
-class EConfigValidation : public rsp::utils::CoreException
-{
-public:
-    explicit EConfigValidation(std::string &arMessage)
-      : CoreException(arMessage)
-    {
-    }
-};
-
-class EConfigWrite: public rsp::utils::CoreException
-{
-public:
-    explicit EConfigWrite()
-      : CoreException("Fatal error writing config data to file")
-    {
-    }
-};
-
-class ConfigBase : public rsp::json::Jsonable
-{
-public:
-    ConfigBase(std::uint8_t *apData, std::size_t aDataSize);
-    virtual ~ConfigBase() {};
-
-    void Load(const std::string &arFileName, std::string_view aSecret);
-    void Save(const std::string &arFileName, std::string_view aSecret);
-
-    virtual void validate() = 0;
-
-protected:
-    std::unique_ptr<std::uint8_t> mpData;
-    std::size_t mDataSize;
-};
+//class EConfigSizeMismatch : public rsp::utils::CoreException
+//{
+//public:
+//    explicit EConfigSizeMismatch(std::size_t aExpected, std::size_t aActual)
+//      : CoreException(std::string("Config file size is ") + std::to_string(aActual) + ", it should be " + std::to_string(aExpected))
+//    {
+//    }
+//};
+//
+//class EConfigValidation : public rsp::utils::CoreException
+//{
+//public:
+//    explicit EConfigValidation(std::string &arMessage)
+//      : CoreException(arMessage)
+//    {
+//    }
+//};
+//
+//class EConfigWrite: public rsp::utils::CoreException
+//{
+//public:
+//    explicit EConfigWrite()
+//      : CoreException("Fatal error writing config data to file")
+//    {
+//    }
+//};
 
 template <typename T>
-class ConfigType: public ConfigBase
+class Config : public rsp::utils::DataContainer<T, rsp::utils::ContainerHeaderExtended, rsp::security::SecureContainer>, public rsp::json::Jsonable
 {
 public:
-    ConfigType() : ConfigBase(&mData, sizeof(mData)) {}
 
-    const T& Get() const { return mData; }
 protected:
-    T mData;
+    virtual void validate() = 0;
 };
 
 
