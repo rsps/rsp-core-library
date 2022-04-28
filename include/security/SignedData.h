@@ -7,16 +7,16 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_UTILS_SIGNEDDATA_H_
-#define INCLUDE_UTILS_SIGNEDDATA_H_
+#ifndef INCLUDE_SECURITY_SIGNEDDATA_H_
+#define INCLUDE_SECURITY_SIGNEDDATA_H_
 
+#include <security/Sha3.h>
 #include <array>
 #include <string>
 #include <string_view>
 #include <utils/CoreException.h>
-#include <utils/Sha3.h>
 
-namespace rsp::utils
+namespace rsp::security
 {
 
 class EInvalidSignature : public rsp::utils::CoreException
@@ -57,4 +57,4 @@ protected:
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_SIGNEDDATA_H_ */
+#endif /* INCLUDE_SECURITY_SIGNEDDATA_H_ */

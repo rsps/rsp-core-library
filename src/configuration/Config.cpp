@@ -9,11 +9,12 @@
  */
 
 #include <configuration/Config.h>
-#include <utils/SignedData.h>
 #include <posix/FileIO.h>
+#include <security/SignedData.h>
 
 using namespace rsp::utils;
 using namespace rsp::posix;
+using namespace rsp::security;
 
 namespace rsp::config {
 

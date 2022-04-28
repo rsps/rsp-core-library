@@ -10,9 +10,9 @@
 
 #include <cstring>
 #include <posix/FileIO.h>
-#include <utils/SignedData.h>
+#include <security/SignedData.h>
 
-namespace rsp::utils {
+namespace rsp::security {
 
 
 SignedData::SignedData(std::string_view aSecret)

@@ -8,15 +8,15 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_SHA3_H_
-#define INCLUDE_UTILS_SHA3_H_
+#ifndef INCLUDE_SECURITY_SHA3_H_
+#define INCLUDE_SECURITY_SHA3_H_
 
 #include <cstdint>
 #include <array>
 #include <memory>
 #include <string_view>
 
-namespace rsp::utils
+namespace rsp::security
 {
 
 class MessageDigest : public std::array<uint8_t, 256/8> {};
@@ -45,4 +45,4 @@ protected:
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_SHA3_H_ */
+#endif /* INCLUDE_SECURITY_SHA3_H_ */

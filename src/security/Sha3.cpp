@@ -9,13 +9,13 @@
  */
 
 #include <iomanip>
-#include <utils/Sha3.h>
 #include <utils/CoreException.h>
 
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
+#include <security/Sha3.h>
 
-namespace rsp::utils {
+namespace rsp::security {
 
 class OpenSSLSha3 : public DigestImpl
 {
