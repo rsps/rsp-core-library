@@ -7,12 +7,12 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_UTILS_JSON_JSONVALUE_H_
-#define INCLUDE_UTILS_JSON_JSONVALUE_H_
+#ifndef INCLUDE_JSON_JSONVALUE_H_
+#define INCLUDE_JSON_JSONVALUE_H_
 
 #include <utils/Variant.h>
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 class JsonObject;
 class JsonArray;
@@ -24,7 +24,7 @@ enum class JsonTypes : unsigned int { Null, Bool, Number, String, Object, Array 
  * \class JsonValue
  * \brief Class to hold all JSON value types
  */
-class JsonValue : public Variant
+class JsonValue : public rsp::utils::Variant
 {
 public:
     /**
@@ -118,6 +118,6 @@ protected:
 };
 
 
-} /* namespace rsp::utils::json */
+} /* namespace rsp::json */
 
-#endif /* INCLUDE_UTILS_JSON_JSONVALUE_H_ */
+#endif /* INCLUDE_JSON_JSONVALUE_H_ */

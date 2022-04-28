@@ -7,11 +7,11 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <utils/json/JsonObject.h>
-#include <utils/json/JsonExceptions.h>
+#include <json/JsonExceptions.h>
+#include <json/JsonObject.h>
 #include <logging/Logger.h>
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 //#define JLOG(a) DLOG(a)
 #define JLOG(a)
@@ -148,4 +148,4 @@ void JsonObject::toStringStream(std::stringstream &arResult, PrintFormat &arPf, 
     arResult << in1 << "}";
 }
 
-} // namespace rsp::utils::json
+} // namespace rsp::json

@@ -7,13 +7,13 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_UTILS_JSON_JSONARRAY_H_
-#define INCLUDE_UTILS_JSON_JSONARRAY_H_
+#ifndef INCLUDE_JSON_JSONARRAY_H_
+#define INCLUDE_JSON_JSONARRAY_H_
 
+#include <json/JsonValue.h>
 #include <vector>
-#include "JsonValue.h"
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 /**
  * \class JsonArray
@@ -86,6 +86,6 @@ protected:
 };
 
 
-} /* namespace rsp::utils::json */
+} /* namespace rsp::json */
 
-#endif /* INCLUDE_UTILS_JSON_JSONARRAY_H_ */
+#endif /* INCLUDE_JSON_JSONARRAY_H_ */

@@ -8,14 +8,14 @@
  * \author      Steffen Brummer
  */
 
+#include <json/JsonArray.h>
+#include <json/JsonExceptions.h>
+#include <json/JsonObject.h>
+#include <json/JsonString.h>
 #include <sstream>
-#include <utils/json/JsonString.h>
-#include <utils/json/JsonExceptions.h>
-#include <utils/json/JsonObject.h>
-#include <utils/json/JsonArray.h>
 #include <logging/Logger.h>
 
-using namespace rsp::utils::json;
+using namespace rsp::json;
 
 //#define JLOG(a) DLOG(a)
 #define JLOG(a)

@@ -8,15 +8,15 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_JSON_JSON_H_
-#define INCLUDE_UTILS_JSON_JSON_H_
+#ifndef INCLUDE_JSON_JSON_H_
+#define INCLUDE_JSON_JSON_H_
 
-#include "JsonExceptions.h"
-#include "JsonValue.h"
-#include "JsonArray.h"
-#include "JsonObject.h"
+#include <json/JsonArray.h>
+#include <json/JsonExceptions.h>
+#include <json/JsonObject.h>
+#include <json/JsonValue.h>
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 /**
  * \class Json
@@ -117,6 +117,6 @@ protected:
     JsonValue *mpValue;
 };
 
-} /* namespace rsp::utils::json */
+} /* namespace rsp::json */
 
-#endif /* INCLUDE_UTILS_JSON_JSON_H_ */
+#endif /* INCLUDE_JSON_JSON_H_ */

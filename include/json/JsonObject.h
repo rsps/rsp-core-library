@@ -7,14 +7,14 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_UTILS_JSON_JSONOBJECT_H_
-#define INCLUDE_UTILS_JSON_JSONOBJECT_H_
+#ifndef INCLUDE_JSON_JSONOBJECT_H_
+#define INCLUDE_JSON_JSONOBJECT_H_
 
+#include <json/JsonString.h>
+#include <json/JsonValue.h>
 #include <utils/InsertOrderedMap.h>
-#include "JsonValue.h"
-#include "JsonString.h"
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 /**
  * \class JsonObject
@@ -92,13 +92,13 @@ public:
 
 protected:
     friend JsonString;
-    InsertOrderedMap<std::string, JsonValue*> mData{};
+    rsp::utils::InsertOrderedMap<std::string, JsonValue*> mData{};
 
     void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) override;
     JsonValue* clone() const override;
 };
 
 
-} /* namespace rsp::utils::json */
+} /* namespace rsp::json */
 
-#endif /* INCLUDE_UTILS_JSON_JSONOBJECT_H_ */
+#endif /* INCLUDE_JSON_JSONOBJECT_H_ */

@@ -7,12 +7,12 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_UTILS_JSON_JSONEXCEPTIONS_H_
-#define INCLUDE_UTILS_JSON_JSONEXCEPTIONS_H_
+#ifndef INCLUDE_JSON_JSONEXCEPTIONS_H_
+#define INCLUDE_JSON_JSONEXCEPTIONS_H_
 
 #include <utils/CoreException.h>
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 /**
  * \class EJsonException
@@ -54,6 +54,6 @@ public:
 };
 
 
-} /* namespace rsp::utils::json */
+} /* namespace rsp::json */
 
-#endif /* INCLUDE_UTILS_JSON_JSONEXCEPTIONS_H_ */
+#endif /* INCLUDE_JSON_JSONEXCEPTIONS_H_ */

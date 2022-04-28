@@ -11,10 +11,10 @@
 #ifndef INCLUDE_CONFIGURATION_CONFIG_H_
 #define INCLUDE_CONFIGURATION_CONFIG_H_
 
+#include <json/Jsonable.h>
 #include <memory>
 #include <string>
 #include <string_view>
-#include <utils/json/Jsonable.h>
 #include <utils/CoreException.h>
 
 namespace rsp::config {
@@ -46,7 +46,7 @@ public:
     }
 };
 
-class ConfigBase : public rsp::utils::json::Jsonable
+class ConfigBase : public rsp::json::Jsonable
 {
 public:
     ConfigBase(std::uint8_t *apData, std::size_t aDataSize);

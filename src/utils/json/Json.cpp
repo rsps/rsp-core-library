@@ -9,15 +9,15 @@
  */
 
 
+#include <json/Json.h>
+#include <json/JsonString.h>
 #include <cstdlib>
 #include <algorithm>
 #include <memory>
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
-#include <utils/json/Json.h>
-#include <utils/json/JsonString.h>
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 Json::Json(const Json &arOther)
     : mpValue{}
@@ -129,5 +129,5 @@ JsonValue* Json::operator ->()
     return mpValue;
 }
 
-} /* namespace rsp::utils::json */
+} /* namespace rsp::json */
 

@@ -8,15 +8,15 @@
  * \author      Steffen Brummer
  */
 
+#include <json/JsonArray.h>
+#include <json/JsonExceptions.h>
+#include <json/JsonObject.h>
+#include <json/JsonValue.h>
 #include <iomanip>
-#include <utils/json/JsonValue.h>
-#include <utils/json/JsonArray.h>
-#include <utils/json/JsonObject.h>
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
-#include <utils/json/JsonExceptions.h>
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 //#define JLOG(a) DLOG(a)
 #define JLOG(a)
@@ -214,5 +214,5 @@ JsonTypes JsonValue::GetJsonType() const
     }
 }
 
-} // namespace rsp::utils::json
+} // namespace rsp::json
 

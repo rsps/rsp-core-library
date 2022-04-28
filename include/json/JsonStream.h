@@ -8,13 +8,13 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_JSON_JSONSTREAM_H_
-#define INCLUDE_UTILS_JSON_JSONSTREAM_H_
+#ifndef INCLUDE_JSON_JSONSTREAM_H_
+#define INCLUDE_JSON_JSONSTREAM_H_
 
 #include <string>
 #include <sstream>
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 /**
  * \class JsonStream
@@ -43,6 +43,6 @@ protected:
 std::ostream& operator<< (std::ostream& os, const JsonStream::Attributes aAttrib);
 
 
-} // namespace rsp::utils::json
+} // namespace rsp::json
 
-#endif /* INCLUDE_UTILS_JSON_JSONSTREAM_H_ */
+#endif /* INCLUDE_JSON_JSONSTREAM_H_ */

@@ -8,10 +8,10 @@
  * \author      Steffen Brummer
  */
 
-#include <utils/json/JsonArray.h>
+#include <json/JsonArray.h>
 #include <logging/Logger.h>
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 // # define JLOG(a) DLOG(a)
 #define JLOG(a)
@@ -136,5 +136,5 @@ void JsonArray::toStringStream(std::stringstream &arResult, PrintFormat &arPf, u
     arResult << in1 << "]";
 }
 
-} // rsp::utils::json
+} // rsp::json
 

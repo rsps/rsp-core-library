@@ -8,12 +8,12 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_JSON_JSONABLE_H_
-#define INCLUDE_UTILS_JSON_JSONABLE_H_
+#ifndef INCLUDE_JSON_JSONABLE_H_
+#define INCLUDE_JSON_JSONABLE_H_
 
-#include "JsonValue.h"
+#include <json/JsonValue.h>
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 /**
  * \class Jsonable
@@ -40,4 +40,4 @@ public:
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_JSON_JSONABLE_H_ */
+#endif /* INCLUDE_JSON_JSONABLE_H_ */

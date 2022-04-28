@@ -8,14 +8,14 @@
  * \author      Steffen Brummer
  */
 
+#include <json/Json.h>
 #include "doctest.h"
 #include <iostream>
 #include <utils/StrUtils.h>
 #include <utils/InRange.h>
-#include <utils/json/Json.h>
 
 using namespace rsp::utils;
-using namespace rsp::utils::json;
+using namespace rsp::json;
 
 TEST_CASE("Json") {
 

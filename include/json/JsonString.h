@@ -9,14 +9,14 @@
  */
 
 
-#ifndef INCLUDE_UTILS_JSON_JSONSTRING_H_
-#define INCLUDE_UTILS_JSON_JSONSTRING_H_
+#ifndef INCLUDE_JSON_JSONSTRING_H_
+#define INCLUDE_JSON_JSONSTRING_H_
 
+#include <json/JsonValue.h>
 #include <string>
 #include <vector>
-#include "JsonValue.h"
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 class JsonValue;
 
@@ -63,6 +63,6 @@ protected:
     std::string debug(bool aIncludeText = false, bool aIncludeSubstr = false);
 };
 
-} /* rsp::utils::json */
+} /* rsp::json */
 
-#endif /* INCLUDE_UTILS_JSON_JSONSTRING_H_ */
+#endif /* INCLUDE_JSON_JSONSTRING_H_ */

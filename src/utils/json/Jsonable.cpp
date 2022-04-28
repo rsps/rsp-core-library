@@ -8,14 +8,14 @@
  * \author      Steffen Brummer
  */
 
-#include <utils/json/Jsonable.h>
+#include <json/Jsonable.h>
 #include <utils/CoreException.h>
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 void Jsonable::FromJson(const JsonValue &arJson)
 {
-    THROW_WITH_BACKTRACE1(NotImplementedException, "Override the FromJson method to populate an object from a JSON string.");
+    THROW_WITH_BACKTRACE1(rsp::utils::NotImplementedException, "Override the FromJson method to populate an object from a JSON string.");
 }
 
 } /* namespace rsp::utils */

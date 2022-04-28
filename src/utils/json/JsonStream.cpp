@@ -7,9 +7,9 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <utils/json/JsonStream.h>
+#include <json/JsonStream.h>
 
-namespace rsp::utils::json {
+namespace rsp::json {
 
 JsonStream::JsonStream(bool aPrettyPrint, int aLevel)
     : mRootLevel(-1)
@@ -50,6 +50,6 @@ std::ostream& operator<< (std::ostream& os, const JsonStream::Attributes aAttrib
 }
 
 
-} // namespace rsp::utils::json
+} // namespace rsp::json
 
 
