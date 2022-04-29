@@ -14,6 +14,7 @@
 #include <memory>
 #include <posix/FileIO.h>
 #include "CoreException.h"
+#include "EnumFlags.h"
 
 namespace rsp::utils {
 
@@ -39,36 +40,12 @@ public:
  * \brief Flag definitions for data storage containers.
  */
 enum class ContainerFlags_t : std::uint8_t {
-    SimpleContainer   = 0x00,/**< SimpleContainer */
-    ExtendedContainer = 0x01,/**< ExtendedContainer */
-    Signed            = 0x02,/**< Signed */
-    Encrypted         = 0x04 /**< Encrypted */
+    None              = 0x00,
+    ExtendedContainer = 0x01,
+    Signed            = 0x02,
+    Encrypted         = 0x04
 };
 
-template <typename enumT=ContainerFlags_t>
-enumT operator|(enumT lhs, enumT rhs) {
-    return static_cast<enumT>(
-        static_cast<std::underlying_type_t<enumT>>(lhs) |
-        static_cast<std::underlying_type_t<enumT>>(rhs)
-    );
-}
-
-ContainerFlags_t operator&(ContainerFlags_t lhs, ContainerFlags_t rhs);
-
-ContainerFlags_t operator&(ContainerFlags_t lhs, ContainerFlags_t rhs) {
-    return static_cast<ContainerFlags_t>(
-        static_cast<std::underlying_type_t<ContainerFlags_t>>(lhs) &
-        static_cast<std::underlying_type_t<ContainerFlags_t>>(rhs)
-    );
-}
-
-//template <typename enumT=ContainerFlags_t>
-//enumT operator&(enumT lhs, enumT rhs) {
-//    return static_cast<enumT>(
-//        static_cast<std::underlying_type_t<enumT>>(lhs) &
-//        static_cast<std::underlying_type_t<enumT>>(rhs)
-//    );
-//}
 
 /**
  * Placeholder type for any signature up to 512 bits.
@@ -83,16 +60,19 @@ using Signature_t = std::uint8_t[64];
 struct ContainerHeader
 {
     const std::uint8_t HeaderSize;
-    ContainerFlags_t Flags;
+    EnumFlags<ContainerFlags_t> Flags;
     const std::uint8_t  ContainerVersion;
     std::uint8_t PayloadVersion = 0;
     std::uint32_t PayloadSize = 0;
 
-    ContainerHeader(std::uint8_t aSize = sizeof(ContainerHeader), ContainerFlags_t aFlags = ContainerFlags_t::SimpleContainer, std::uint8_t aVersion = 1)
+    ContainerHeader(std::uint8_t aSize = sizeof(ContainerHeader), ContainerFlags_t aFlags = ContainerFlags_t::None, std::uint8_t aVersion = 1)
         : HeaderSize(aSize),
           Flags(aFlags),
           ContainerVersion(aVersion)
     {
+        if (Flags & ContainerFlags_t::Encrypted) {
+            std::cout << "Encrypted";
+        }
     }
 } __attribute__((packed)); // 8 bytes
 
