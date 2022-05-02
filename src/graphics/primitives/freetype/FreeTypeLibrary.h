@@ -11,6 +11,8 @@
 #ifndef INCLUDE_GRAPHICS_PRIMITIVES_FREETYPE_FREETYPELIBRARY_H_
 #define INCLUDE_GRAPHICS_PRIMITIVES_FREETYPE_FREETYPELIBRARY_H_
 
+#ifdef USE_FREETYPE
+
 #include <string>
 #include <map>
 #include <graphics/primitives/Font.h>
@@ -56,5 +58,7 @@ private:
 };
 
 }
+
+#endif /* USE_FREETYPE */
 
 #endif /* INCLUDE_GRAPHICS_PRIMITIVES_FREETYPE_FREETYPELIBRARY_H_ */

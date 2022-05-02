@@ -10,11 +10,11 @@
 
 #include <memory>
 #include <security/Aes.h>
-#include <security/Sha3.h>
 #include <utils/CoreException.h>
 
 #include <openssl/evp.h>
 #include <openssl/rand.h>
+#include <security/Sha.h>
 
 using namespace rsp::utils;
 
@@ -88,7 +88,7 @@ void Aes::Decrypt(const std::string &arCryptText, std::string &arPlainText)
 
 void Aes::randomize(std::uint8_t *apBuffer, int aLen, std::string_view aSeed)
 {
-    Sha3 sha(aSeed);
+    Sha sha(aSeed);
     sha.Update(static_cast<uint8_t*>(aSeed.data()), aSeed.size());
     auto md = sha.Get();
 

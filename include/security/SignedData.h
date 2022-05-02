@@ -10,7 +10,7 @@
 #ifndef INCLUDE_SECURITY_SIGNEDDATA_H_
 #define INCLUDE_SECURITY_SIGNEDDATA_H_
 
-#include <security/Sha3.h>
+#include <security/Sha.h>
 #include <array>
 #include <string>
 #include <string_view>
@@ -52,7 +52,7 @@ public:
     }
 
 protected:
-    Sha3 mSha;
+    Sha mSha;
 };
 
 } /* namespace rsp::utils */

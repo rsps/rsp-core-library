@@ -11,7 +11,7 @@
 #include <climits>
 #include <security/Aes.h>
 #include <security/SecureContainer.h>
-#include <security/Sha3.h>
+#include <security/Sha.h>
 
 using namespace rsp::utils;
 
@@ -20,7 +20,7 @@ namespace rsp::security
 
 bool SecureContainer::getSignature(Signature_t &arSignature, std::string_view aSecret)
 {
-    Sha3 sha(aSecret);
+    Sha sha(aSecret, HashAlgorithms::Sha256);
     sha.Update(mpData.get(), mDataSize);
     MessageDigest md = sha.Get();
 
@@ -34,7 +34,7 @@ bool SecureContainer::getSignature(Signature_t &arSignature, std::string_view aS
 
 bool SecureContainer::checkSignature(std::string_view aSecret)
 {
-    Sha3 sha(aSecret);
+    Sha sha(aSecret, HashAlgorithms::Sha256);
     sha.Update(mpData.get(), mDataSize);
     MessageDigest md = sha.Get();
 

@@ -8,29 +8,30 @@
  * \author      Steffen Brummer
  */
 
-#include <iomanip>
-#include <security/Sha.h>
+#include <security/Encrypt.h>
 
 namespace rsp::security {
 
-
-std::ostream& operator<<(std::ostream& os, const MessageDigest &arMD)
+Encrypt::Encrypt()
 {
-    os << std::hex << std::setw(2);
-    for (auto c : arMD) {
-        os << static_cast<int>(c);
-    }
-    return os << std::dec;
+
 }
 
-Sha::Sha(std::string_view aSecret, HashAlgorithms aAlgorithm)
-    : mPimpl(DigestImpl::Create(aSecret, aAlgorithm))
+Encrypt::~Encrypt()
 {
 }
 
-Sha::~Sha()
+void Encrypt::Init(std::string_view aIvSeed, std::string_view aSecret)
 {
 }
 
-} /* namespace rsp::utils */
+std::vector<unsigned char, std::allocator<unsigned char> > Encrypt::Finalize()
+{
+    return mCryptData;
+}
 
+void Encrypt::Update(const uint8_t *apData, std::size_t aSize)
+{
+}
+
+} /* namespace rsp::security */

@@ -8,6 +8,8 @@
  * \author      Steffen Brummer
  */
 
+#ifdef USE_FREETYPE
+
 #include "FreeTypeLibrary.h"
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
@@ -137,3 +139,5 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
 }
 
 } // namespace rsp::graphics
+
+#endif /* USE_FREETYPE */

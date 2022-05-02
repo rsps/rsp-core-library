@@ -48,6 +48,7 @@ endif()
 
 if (OPENSSL_CRYPTO)
     find_package(OpenSSL REQUIRED)
+    set(OPENSSL_BUILD_OPTIONS -DUSE_OPENSSL)
     set(CRYPTO_LIB OpenSSL::Crypto)
 endif()
 
@@ -77,6 +78,7 @@ target_compile_options(rsp-core-lib PRIVATE
     ${GOOD_COMPILER_OPTIONS}
     -Wshadow
     ${FREETYPE_BUILD_OPTIONS}
+    ${OPENSSL_BUILD_OPTIONS}
 )
 
 if (NOT RELEASE_BUILD)
@@ -128,6 +130,7 @@ target_include_directories("rsp-core-lib-test"
 target_compile_options(rsp-core-lib-test PRIVATE
     ${GOOD_COMPILER_OPTIONS}
     ${FREETYPE_BUILD_OPTIONS}
+    ${OPENSSL_BUILD_OPTIONS}
 )
 
 if (NOT RELEASE_BUILD)

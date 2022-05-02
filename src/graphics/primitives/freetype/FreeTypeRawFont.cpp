@@ -8,6 +8,8 @@
  * \author      Steffen Brummer
  */
 
+#ifdef USE_FREETYPE
+
 #include "FreeTypeRawFont.h"
 #include <graphics/primitives/Font.h>
 #include <logging/Logger.h>
@@ -228,4 +230,5 @@ std::u32string FreeTypeRawFont::stringToU32(const std::string &arText) const
 
 }
 
+#endif /* USE_FREETYPE */
 

@@ -10,6 +10,8 @@
 #ifndef SRC_GRAPHICS_PRIMITIVES_FREETYPE_FREETYPERAWFONT_H_
 #define SRC_GRAPHICS_PRIMITIVES_FREETYPE_FREETYPERAWFONT_H_
 
+#ifdef USE_FREETYPE
+
 #include <map>
 #include <string>
 #include <graphics/primitives/FontRawInterface.h>
@@ -47,5 +49,7 @@ protected:
 
 }
 
+#endif /* USE_FREETYPE */
 
 #endif /* SRC_GRAPHICS_PRIMITIVES_FREETYPE_FREETYPERAWFONT_H_ */
+

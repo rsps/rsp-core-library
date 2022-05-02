@@ -16,7 +16,7 @@ namespace rsp::security {
 
 
 SignedData::SignedData(std::string_view aSecret)
-    : mSha(aSecret)
+    : mSha(aSecret, HashAlgorithms::Sha256)
 {
 }
 
