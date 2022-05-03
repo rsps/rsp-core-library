@@ -12,9 +12,8 @@
 
 namespace rsp::security {
 
-Encrypt::Encrypt()
+Encrypt::Encrypt(std::string_view aIvSeed, std::string_view aSecret)
 {
-
 }
 
 Encrypt::~Encrypt()

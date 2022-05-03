@@ -15,6 +15,12 @@
 
 namespace rsp::security {
 
+enum class HashAlgorithms {
+    Sha1,
+    Sha256,
+    Sha3
+};
+
 class CryptBase
 {
 public:

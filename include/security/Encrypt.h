@@ -20,8 +20,10 @@ namespace rsp::security {
 class Encrypt: public CryptBase
 {
 public:
-    Encrypt();
+    Encrypt() {};
+    Encrypt(std::string_view aIvSeed, std::string_view aSecret);
     virtual ~Encrypt();
+
     void Init(std::string_view aIvSeed, std::string_view aSecret) override;
     std::vector<unsigned char, std::allocator<unsigned char> > Finalize() override;
     void Update(const uint8_t *apData, std::size_t aSize) override;
