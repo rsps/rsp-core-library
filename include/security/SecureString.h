@@ -16,8 +16,7 @@
 
 namespace rsp::security {
 
-using SecureString = std::basic_string<char, std::char_traits<char>, SecureAllocator<char> >;
-
+typedef std::basic_string<char, std::char_traits<char>, SecureAllocator<char>> SecureString;
 
 } /* namespace rsp::security */
 
