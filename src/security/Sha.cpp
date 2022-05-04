@@ -8,20 +8,9 @@
  * \author      Steffen Brummer
  */
 
-#include <iomanip>
 #include <security/Sha.h>
 
 namespace rsp::security {
-
-
-std::ostream& operator<<(std::ostream& os, const MessageDigest &arMD)
-{
-    os << std::hex << std::setw(2);
-    for (auto c : arMD) {
-        os << static_cast<int>(c);
-    }
-    return os << std::dec;
-}
 
 Sha::Sha(std::string_view aSecret, HashAlgorithms aAlgorithm)
     : mPimpl(DigestImpl::Create(aSecret, aAlgorithm))

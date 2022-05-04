@@ -22,7 +22,7 @@ SignedData::SignedData(std::string_view aSecret)
 
 void SignedData::Verify(const uint8_t *apData, std::size_t aSize)
 {
-    MessageDigest sgn;
+    SecureBuffer sgn;
     std::size_t sign_offset = aSize - sgn.size();
     sgn = GetSignature(apData, sign_offset);
     if (std::memcmp(&sgn, &apData[sign_offset], sgn.size())) {
@@ -32,12 +32,12 @@ void SignedData::Verify(const uint8_t *apData, std::size_t aSize)
 
 void SignedData::Verify(const std::string &arFileName)
 {
-    MessageDigest sgn = GetSignature(arFileName, true);
+    SecureBuffer sgn = GetSignature(arFileName, true);
 
     rsp::posix::FileIO file(arFileName, std::ios_base::in);
     file.Seek(0 - sgn.size(), std::ios_base::end);
 
-    MessageDigest md;
+    SecureBuffer md;
     file.Read(md.data(), md.size());
 
     if (sgn != md) {
@@ -45,19 +45,19 @@ void SignedData::Verify(const std::string &arFileName)
     }
 }
 
-MessageDigest SignedData::GetSignature(const uint8_t *apData, std::size_t aSize)
+SecureBuffer SignedData::GetSignature(const uint8_t *apData, std::size_t aSize)
 {
     mSha.Update(apData, aSize);
     return mSha.Get();
 }
 
-MessageDigest SignedData::GetSignature(const std::string &arFileName, bool aExcludeDigest)
+SecureBuffer SignedData::GetSignature(const std::string &arFileName, bool aExcludeDigest)
 {
     rsp::posix::FileIO file(arFileName, std::ios_base::in);
     std::size_t aLimit = file.GetSize();
 
     if(aExcludeDigest) {
-        MessageDigest md;
+        SecureBuffer md;
         aLimit -= md.size();
     }
 

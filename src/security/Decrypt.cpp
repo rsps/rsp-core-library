@@ -8,17 +8,22 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SECURESTRING_H_
-#define INCLUDE_SECURITY_SECURESTRING_H_
-
-#include <string>
-#include "SecureAllocator.h"
+#include <security/Decrypt.h>
 
 namespace rsp::security {
 
-using SecureString = std::basic_string<char, std::char_traits<char>, SecureAllocator<char> >;
+Decrypt::Decrypt(std::string_view aIvSeed, std::string_view aSecret)
+    : CryptBase(CipherTypes::AES_128_CBC)
+{
+    Init(aIvSeed, aSecret);
+}
 
+void Decrypt::Init(std::string_view aIvSeed, std::string_view aSecret)
+{
+    if (!pImpl) {
+        pImpl = MakePimpl(mCipherType);
+    }
+    pImpl->Init(aIvSeed, aSecret);
+}
 
 } /* namespace rsp::security */
-
-#endif /* INCLUDE_SECURITY_SECURESTRING_H_ */

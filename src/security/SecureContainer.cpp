@@ -22,7 +22,7 @@ bool SecureContainer::getSignature(Signature_t &arSignature, std::string_view aS
 {
     Sha sha(aSecret, HashAlgorithms::Sha256);
     sha.Update(mpData.get(), mDataSize);
-    MessageDigest md = sha.Get();
+    SecureBuffer md = sha.Get();
 
     int i = 0;
     for(auto b : md) {
@@ -36,7 +36,7 @@ bool SecureContainer::checkSignature(std::string_view aSecret)
 {
     Sha sha(aSecret, HashAlgorithms::Sha256);
     sha.Update(mpData.get(), mDataSize);
-    MessageDigest md = sha.Get();
+    SecureBuffer md = sha.Get();
 
     auto &signature = getHeaderAs<rsp::utils::ContainerHeaderExtended>()->Signature;
     bool result = true;

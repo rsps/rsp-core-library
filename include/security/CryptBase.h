@@ -12,22 +12,41 @@
 
 #include <string_view>
 #include <vector>
+#include <utils/CoreException.h>
+#include "SecureBuffer.h"
 
 namespace rsp::security {
 
-enum class HashAlgorithms {
-    Sha1,
-    Sha256,
-    Sha3
+enum class CipherTypes {
+    AES_128_CBC,
+    AES_128_GCM,
+    AES_192_CBC,
+    AES_192_GCM,
+    AES_256_CBC,
+    AES_256_GCM
 };
 
 class CryptBase
 {
 public:
+    CryptBase(CipherTypes aCipher) : mCipherType(aCipher) {}
     virtual ~CryptBase() {}
     virtual void Init(std::string_view aIvSeed, std::string_view aSecret) = 0;
     virtual void Update(const std::uint8_t *apData, std::size_t aSize) = 0;
-    virtual std::vector<std::uint8_t> Finalize() = 0;
+    virtual SecureBuffer Finalize() = 0;
+
+protected:
+    CipherTypes mCipherType;
+};
+
+
+class CryptException: public rsp::utils::CoreException
+{
+public:
+    explicit CryptException(const char *aMsg)
+        : CoreException(aMsg)
+    {
+    }
 };
 
 } // namespace rsp::security

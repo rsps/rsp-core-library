@@ -59,9 +59,9 @@ public:
         HMAC_Update(mpCtx, apBuffer, aSize);
     }
 
-    MessageDigest Finalize() override
+    SecureBuffer Finalize() override
     {
-        MessageDigest result;
+        SecureBuffer result;
         unsigned int len;
 
         result.resize(HMAC_size(mpCtx));

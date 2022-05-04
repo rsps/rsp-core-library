@@ -11,16 +11,13 @@
 #ifndef INCLUDE_SECURITY_SHA_H_
 #define INCLUDE_SECURITY_SHA_H_
 
+#include <security/SecureBuffer.h>
 #include <cstdint>
 #include <vector>
 #include <memory>
 #include <string_view>
 
 namespace rsp::security {
-
-using MessageDigest = std::vector<uint8_t>;
-
-std::ostream& operator<<(std::ostream& os, const MessageDigest &arMD);
 
 enum class HashAlgorithms {
     Sha1,
@@ -32,7 +29,7 @@ struct DigestImpl {
     static DigestImpl* Create(std::string_view aSecret, HashAlgorithms aAlgorithm);
     virtual ~DigestImpl() {};
     virtual void Update(const uint8_t *apBuffer, std::size_t aSize) = 0;
-    virtual MessageDigest Finalize() = 0;
+    virtual SecureBuffer Finalize() = 0;
 };
 
 class Sha
@@ -42,7 +39,7 @@ public:
     ~Sha();
 
     void Update(const uint8_t *apBuffer, std::size_t aSize) { mPimpl->Update(apBuffer, aSize); }
-    MessageDigest Get() { return mPimpl->Finalize(); }
+    SecureBuffer Get() { return mPimpl->Finalize(); }
 
 protected:
     std::unique_ptr<DigestImpl> mPimpl;

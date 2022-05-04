@@ -42,11 +42,11 @@ public:
         Verify(static_cast<uint8_t*>(&arData), sizeof(arData));
     }
 
-    MessageDigest GetSignature(const uint8_t* apData, std::size_t aSize);
-    MessageDigest GetSignature(const std::string &arFileName, bool aExcludeDigest = false);
+    SecureBuffer GetSignature(const uint8_t* apData, std::size_t aSize);
+    SecureBuffer GetSignature(const std::string &arFileName, bool aExcludeDigest = false);
 
     template <typename T>
-    MessageDigest Sign(const T &arData)
+    SecureBuffer Sign(const T &arData)
     {
         return GetSignature(static_cast<uint8_t*>(&arData), sizeof(arData));
     }

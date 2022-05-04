@@ -8,17 +8,20 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SECURESTRING_H_
-#define INCLUDE_SECURITY_SECURESTRING_H_
-
-#include <string>
-#include "SecureAllocator.h"
+#include <iomanip>
+#include <security/SecureBuffer.h>
 
 namespace rsp::security {
 
-using SecureString = std::basic_string<char, std::char_traits<char>, SecureAllocator<char> >;
+std::ostream& operator<<(std::ostream& os, const SecureBuffer &arBuffer)
+{
+    os << std::hex << std::setw(2) << std::setfill('0');
+    for (auto c : arBuffer) {
+        os << static_cast<int>(c);
+    }
+    return os << std::dec;
+}
+
+} // rsp::security
 
 
-} /* namespace rsp::security */
-
-#endif /* INCLUDE_SECURITY_SECURESTRING_H_ */

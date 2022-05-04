@@ -13,24 +13,17 @@
 namespace rsp::security {
 
 Encrypt::Encrypt(std::string_view aIvSeed, std::string_view aSecret)
+    : CryptBase(CipherTypes::AES_128_CBC)
 {
-}
-
-Encrypt::~Encrypt()
-{
+    Init(aIvSeed, aSecret);
 }
 
 void Encrypt::Init(std::string_view aIvSeed, std::string_view aSecret)
 {
-}
-
-std::vector<unsigned char, std::allocator<unsigned char> > Encrypt::Finalize()
-{
-    return mCryptData;
-}
-
-void Encrypt::Update(const uint8_t *apData, std::size_t aSize)
-{
+    if (!pImpl) {
+        pImpl = MakePimpl(mCipherType);
+    }
+    pImpl->Init(aIvSeed, aSecret);
 }
 
 } /* namespace rsp::security */

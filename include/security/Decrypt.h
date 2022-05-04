@@ -8,19 +8,18 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_ENCRYPT_H_
-#define INCLUDE_SECURITY_ENCRYPT_H_
+#ifndef INCLUDE_SECURITY_DECRYPT_H_
+#define INCLUDE_SECURITY_DECRYPT_H_
 
-#include <string>
-#include <memory>
 #include <security/CryptBase.h>
 
-namespace rsp::security {
+namespace rsp::security
+{
 
-class Encrypt: public CryptBase
+class Decrypt: public CryptBase
 {
 public:
-    Encrypt(std::string_view aIvSeed, std::string_view aSecret);
+    Decrypt(std::string_view aIvSeed, std::string_view aSecret);
 
     void Init(std::string_view aIvSeed, std::string_view aSecret) override;
     SecureBuffer Finalize() override { return pImpl->Finalize(); }
@@ -34,4 +33,4 @@ protected:
 
 } /* namespace rsp::security */
 
-#endif /* INCLUDE_SECURITY_ENCRYPT_H_ */
+#endif /* INCLUDE_SECURITY_DECRYPT_H_ */
