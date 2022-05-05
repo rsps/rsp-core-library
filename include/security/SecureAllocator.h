@@ -25,10 +25,13 @@ struct SecureAllocator: public std::allocator<T>
 public:
     using std::allocator<T>::allocator;
 
-    void deallocate(T* p, std::size_t n) {
-
-        std::cout << "Deallocating..." << std::endl;
+    void cleanse(T* p, std::size_t n) {
+//        std::cout << "Cleansing " << n << " bytes" << std::endl;
         std::memset(p, 0, n * sizeof(T));
+    }
+
+    void deallocate(T* p, std::size_t n) {
+        cleanse(p, n);
         std::allocator<T>::deallocate(p, n);
     }
 };

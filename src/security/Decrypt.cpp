@@ -12,10 +12,9 @@
 
 namespace rsp::security {
 
-Decrypt::Decrypt(std::string_view aIvSeed, std::string_view aSecret)
+Decrypt::Decrypt()
     : CryptBase(CipherTypes::AES_128_CBC)
 {
-    Init(aIvSeed, aSecret);
 }
 
 void Decrypt::Init(std::string_view aIvSeed, std::string_view aSecret)

@@ -8,21 +8,22 @@
  * \author      Steffen Brummer
  */
 
-#include <security/Encrypt.h>
+#include <doctest.h>
+#include <utils/DataContainer.h>
 
-namespace rsp::security {
+using namespace rsp::utils;
 
-Encrypt::Encrypt()
-    : CryptBase(CipherTypes::AES_128_CBC)
+struct MyData {
+    int Integer = 0;
+    float Float = 0.0f;
+    char String[10];
+};
+
+TEST_CASE("Data Container")
 {
+    DataContainer<MyData> dc;
+
+
 }
 
-void Encrypt::Init(std::string_view aIvSeed, std::string_view aSecret)
-{
-    if (!pImpl) {
-        pImpl = MakePimpl(mCipherType);
-    }
-    pImpl->Init(aIvSeed, aSecret);
-}
 
-} /* namespace rsp::security */

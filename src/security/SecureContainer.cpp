@@ -53,7 +53,7 @@ bool SecureContainer::checkSignature(std::string_view aSecret)
 
 void SecureContainer::readFrom(rsp::posix::FileIO &arFile)
 {
-    if (mpHeader.get()->Flags & ContainerFlags_t::Encrypted) {
+    if (mpHeader.get()->Flags & ContainerFlags::Encrypted) {
         // TODO: Fix all this...
         std::string encrypted;
         encrypted.resize(mDataSize);
@@ -77,7 +77,7 @@ void SecureContainer::readFrom(rsp::posix::FileIO &arFile)
 
 void SecureContainer::writeTo(rsp::posix::FileIO &arFile)
 {
-    if (mpHeader.get()->Flags & ContainerFlags_t::Encrypted) {
+    if (mpHeader.get()->Flags & ContainerFlags::Encrypted) {
     }
     else {
         arFile.ExactWrite(mpData.get(), mDataSize);

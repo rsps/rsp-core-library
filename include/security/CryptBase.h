@@ -31,12 +31,14 @@ class CryptBase
 public:
     CryptBase(CipherTypes aCipher) : mCipherType(aCipher) {}
     virtual ~CryptBase() {}
+
     virtual void Init(std::string_view aIvSeed, std::string_view aSecret) = 0;
     virtual void Update(const std::uint8_t *apData, std::size_t aSize) = 0;
     virtual SecureBuffer Finalize() = 0;
 
 protected:
     CipherTypes mCipherType;
+    std::unique_ptr<CryptBase> pImpl{};
 };
 
 

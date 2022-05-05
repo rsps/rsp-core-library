@@ -7,42 +7,35 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include "doctest.h"
+#include <doctest.h>
 #include <security/SecureBuffer.h>
 #include <security/SecureString.h>
 
 using namespace rsp::security;
-
 
 TEST_CASE("Secure Buffers")
 {
 
     SUBCASE("String")
     {
-        const char* cTestStr = "Hello World";
         const char* p;
 
         {
-            SecureString s;
+            SecureString s("Hello World");
 
-            s.resize(10);
-            char v = '0';
-            for(auto &b : s) {
-                b = v++;
-            }
-//            CHECK_EQ(s, cTestStr);
+            CHECK_EQ(s, "Hello World");
 
             MESSAGE(s);
 
             p = s.data();
 
-            CHECK_EQ(p[0], '0');
-            CHECK_EQ(p[3], '3');
-            CHECK_EQ(p[6], '6');
+            CHECK_EQ(p[0], 'H');
+            CHECK_EQ(p[3], 'l');
+            CHECK_EQ(p[6], 'W');
         }
-        CHECK_NE(p[0], '0');
-        CHECK_NE(p[3], '3');
-        CHECK_NE(p[6], '6');
+        CHECK_NE(p[0], 'H');
+        CHECK_NE(p[3], 'l');
+        CHECK_NE(p[6], 'W');
     }
 
     SUBCASE("Buffer")
@@ -62,7 +55,6 @@ TEST_CASE("Secure Buffers")
             CHECK_EQ(sb[0], 42);
             CHECK_EQ(sb[9], 51);
             CHECK_EQ(*sb.data(), 42);
-            CHECK_EQ(*p, 42);
             CHECK_EQ(p[0], 42);
             CHECK_EQ(p[9], 51);
         }

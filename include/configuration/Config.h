@@ -22,33 +22,6 @@
 namespace rsp::config {
 
 
-//class EConfigSizeMismatch : public rsp::utils::CoreException
-//{
-//public:
-//    explicit EConfigSizeMismatch(std::size_t aExpected, std::size_t aActual)
-//      : CoreException(std::string("Config file size is ") + std::to_string(aActual) + ", it should be " + std::to_string(aExpected))
-//    {
-//    }
-//};
-//
-//class EConfigValidation : public rsp::utils::CoreException
-//{
-//public:
-//    explicit EConfigValidation(std::string &arMessage)
-//      : CoreException(arMessage)
-//    {
-//    }
-//};
-//
-//class EConfigWrite: public rsp::utils::CoreException
-//{
-//public:
-//    explicit EConfigWrite()
-//      : CoreException("Fatal error writing config data to file")
-//    {
-//    }
-//};
-
 template <typename T>
 class Config : public rsp::utils::DataContainer<T, rsp::utils::ContainerHeaderExtended, rsp::security::SecureContainer>, public rsp::json::Jsonable
 {

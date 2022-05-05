@@ -42,7 +42,7 @@ void DataContainerBase::Load(const std::string &arFileName, std::string_view aSe
 
 void DataContainerBase::Save(const std::string &arFileName, std::string_view aSecret)
 {
-    if ((mpHeader.get()->Flags & ContainerFlags_t::Signed) && (mpHeader.get()->Flags & ContainerFlags_t::ExtendedContainer)) {
+    if ((mpHeader.get()->Flags & ContainerFlags::Signed) && (mpHeader.get()->Flags & ContainerFlags::ExtendedContainer)) {
         getSignature(getHeaderAs<ContainerHeaderExtended>()->Signature, aSecret);
     }
 

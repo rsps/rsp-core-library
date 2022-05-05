@@ -39,7 +39,7 @@ public:
 /**
  * \brief Flag definitions for data storage containers.
  */
-enum class ContainerFlags_t : std::uint8_t {
+enum class ContainerFlags : std::uint8_t {
     None              = 0x00,
     ExtendedContainer = 0x01,
     Signed            = 0x02,
@@ -60,17 +60,17 @@ using Signature_t = std::uint8_t[64];
 struct ContainerHeader
 {
     const std::uint8_t HeaderSize;
-    EnumFlags<ContainerFlags_t> Flags;
+    EnumFlags<ContainerFlags> Flags;
     const std::uint8_t  ContainerVersion;
     std::uint8_t PayloadVersion = 0;
     std::uint32_t PayloadSize = 0;
 
-    ContainerHeader(std::uint8_t aSize = sizeof(ContainerHeader), ContainerFlags_t aFlags = ContainerFlags_t::None, std::uint8_t aVersion = 1)
+    ContainerHeader(std::uint8_t aSize = sizeof(ContainerHeader), ContainerFlags aFlags = ContainerFlags::None, std::uint8_t aVersion = 1)
         : HeaderSize(aSize),
           Flags(aFlags),
           ContainerVersion(aVersion)
     {
-        if (Flags & ContainerFlags_t::Encrypted) {
+        if (Flags & ContainerFlags::Encrypted) {
             std::cout << "Encrypted";
         }
     }
@@ -86,7 +86,7 @@ struct ContainerHeaderExtended : public ContainerHeader
     Signature_t  Signature{};
 
     ContainerHeaderExtended()
-        : ContainerHeader(sizeof(ContainerHeaderExtended), ContainerFlags_t::ExtendedContainer)
+        : ContainerHeader(sizeof(ContainerHeaderExtended), ContainerFlags::ExtendedContainer)
     {
     }
 } __attribute__((packed)); // 72 bytes

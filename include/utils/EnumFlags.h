@@ -15,6 +15,8 @@
 #include <cstdint>
 #include <type_traits>
 
+namespace rsp::utils {
+
 
 template<typename T, typename = typename std::enable_if<std::is_enum<T>::value, T>::type>
 class EnumFlags
@@ -23,7 +25,11 @@ class EnumFlags
 public:
     using utype = std::underlying_type<T>::type;
 
-    constexpr EnumFlags(T aValue) : mValue(aValue) {}
+    constexpr EnumFlags() : mValue(static_cast<T>(0)) {}
+
+    template <typename N>
+    constexpr EnumFlags(N aValue) : mValue(static_cast<T>(aValue)) {}
+
 
     constexpr operator T() const
     {
@@ -98,6 +104,6 @@ constexpr T operator|(T lhs, T rhs)
         static_cast<typename std::underlying_type<T>::type>(rhs));
 }
 
-
+} // namespace rsp::utils
 
 #endif /* INCLUDE_UTILS_ENUMFLAGS_H_ */

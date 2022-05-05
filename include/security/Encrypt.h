@@ -20,15 +20,13 @@ namespace rsp::security {
 class Encrypt: public CryptBase
 {
 public:
-    Encrypt(std::string_view aIvSeed, std::string_view aSecret);
+    Encrypt();
 
     void Init(std::string_view aIvSeed, std::string_view aSecret) override;
     SecureBuffer Finalize() override { return pImpl->Finalize(); }
     void Update(const uint8_t *apData, std::size_t aSize) override { pImpl->Update(apData, aSize); }
 
 protected:
-    std::unique_ptr<CryptBase> pImpl{};
-
     static std::unique_ptr<CryptBase> MakePimpl(CipherTypes aCipher);
 };
 

@@ -19,7 +19,7 @@ namespace rsp::security
 class Decrypt: public CryptBase
 {
 public:
-    Decrypt(std::string_view aIvSeed, std::string_view aSecret);
+    Decrypt();
 
     void Init(std::string_view aIvSeed, std::string_view aSecret) override;
     SecureBuffer Finalize() override { return pImpl->Finalize(); }

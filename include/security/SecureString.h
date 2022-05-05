@@ -16,7 +16,19 @@
 
 namespace rsp::security {
 
-typedef std::basic_string<char, std::char_traits<char>, SecureAllocator<char>> SecureString;
+class SecureString : public std::basic_string<char, std::char_traits<char>, SecureAllocator<char>>
+{
+public:
+    using std::basic_string<char, std::char_traits<char>, SecureAllocator<char>>::basic_string;
+
+    ~SecureString()
+    {
+        auto n = size();
+        if (n < 16) {
+            get_allocator().cleanse(data(), n);
+        }
+    }
+};
 
 } /* namespace rsp::security */
 
