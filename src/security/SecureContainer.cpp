@@ -9,9 +9,10 @@
  */
 
 #include <climits>
-#include <security/Aes.h>
 #include <security/SecureContainer.h>
 #include <security/Sha.h>
+#include <security/Encrypt.h>
+#include <security/Decrypt.h>
 
 using namespace rsp::utils;
 
@@ -54,15 +55,18 @@ bool SecureContainer::checkSignature(std::string_view aSecret)
 void SecureContainer::readPayloadFrom(rsp::posix::FileIO &arFile)
 {
     if (mpHeader->Flags & ContainerFlags::Encrypted) {
-        // TODO: Fix all this...
-        std::string encrypted;
-        encrypted.resize(mDataSize);
-        std::size_t len = arFile.Read(encrypted.data(), INT_MAX); // Read rest of file
+        auto *header = getHeaderAs<ContainerHeaderExtended>();
+        SecureBuffer encrypted;
+        encrypted.resize(header->PayloadSize);
+        std::size_t len = arFile.Read(encrypted.data(), encrypted.size());
 
-        std::string plain;
-        Aes aes("iv", "key");
-        aes.Decrypt(encrypted, plain);
-        std::size_t i = 0;
+        Decrypt d;
+        d.Init("iv", "key");
+        d.Update(encrypted.data(), encrypted.size());
+        SecureBuffer sb = d.Finalize();
+
+        std::size_t sz = std::min(sb.size(), mDataSize);
+
         for(auto c : plain) {
             mpData[i++] = static_cast<uint8_t>(c);
             if (i == mDataSize) {
