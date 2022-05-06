@@ -23,8 +23,8 @@ public:
 private:
     bool getSignature(rsp::utils::Signature_t &arSignature, std::string_view aSecret) override;
     bool checkSignature(std::string_view aSecret) override;
-    void readFrom(rsp::posix::FileIO &arFile) override;
-    void writeTo(rsp::posix::FileIO &arFile) override;
+    void readPayloadFrom(rsp::posix::FileIO &arFile) override;
+    void writePayloadTo(rsp::posix::FileIO &arFile) override;
 };
 
 } /* namespace rsp::security */

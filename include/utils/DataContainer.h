@@ -18,23 +18,38 @@
 
 namespace rsp::utils {
 
-class EInvalidSignature : public CoreException
+struct EInvalidSignature : public CoreException
 {
-public:
     explicit EInvalidSignature(const std::string &arFileName)
       : CoreException("Invalid signature in file " + arFileName)
     {
     }
 };
 
-class EInvalidHeader : public CoreException
+struct EInvalidCRC : public CoreException
 {
-public:
+    explicit EInvalidCRC(const std::string &arFileName)
+      : CoreException("Invalid CRC in file " + arFileName)
+    {
+    }
+};
+
+struct EInvalidHeader : public CoreException
+{
     explicit EInvalidHeader(const std::string &arFileName)
       : CoreException("Invalid header in file " + arFileName)
     {
     }
 };
+
+struct ESizeDiffersInAssignment : public CoreException
+{
+    explicit ESizeDiffersInAssignment()
+      : CoreException("Copy assignment of DataContainers is not same size")
+    {
+    }
+};
+
 
 /**
  * \brief Flag definitions for data storage containers.
@@ -59,22 +74,16 @@ using Signature_t = std::uint8_t[64];
  */
 struct ContainerHeader
 {
-    const std::uint8_t HeaderSize;
+    std::uint8_t Size;
     EnumFlags<ContainerFlags> Flags;
-    const std::uint8_t  ContainerVersion;
+    std::uint8_t  Version;
     std::uint8_t PayloadVersion = 0;
+    std::uint32_t PayloadCRC = 0;
     std::uint32_t PayloadSize = 0;
 
-    ContainerHeader(std::uint8_t aSize = sizeof(ContainerHeader), ContainerFlags aFlags = ContainerFlags::None, std::uint8_t aVersion = 1)
-        : HeaderSize(aSize),
-          Flags(aFlags),
-          ContainerVersion(aVersion)
-    {
-        if (Flags & ContainerFlags::Encrypted) {
-            std::cout << "Encrypted";
-        }
-    }
-} __attribute__((packed)); // 8 bytes
+    ContainerHeader(std::uint8_t aSize = sizeof(ContainerHeader), ContainerFlags aFlags = ContainerFlags::None, std::uint8_t aVersion = 1);
+    ContainerHeader& operator=(const ContainerHeader&) = default;
+} __attribute__((packed)); // 12 bytes
 
 /**
  * \brief Header definition for signed data containers.
@@ -89,7 +98,8 @@ struct ContainerHeaderExtended : public ContainerHeader
         : ContainerHeader(sizeof(ContainerHeaderExtended), ContainerFlags::ExtendedContainer)
     {
     }
-} __attribute__((packed)); // 72 bytes
+    ContainerHeaderExtended& operator=(const ContainerHeaderExtended&) = default;
+} __attribute__((packed)); // 76 bytes
 
 
 /**
@@ -99,24 +109,30 @@ class DataContainerBase
 {
 public:
     DataContainerBase(ContainerHeader *apHeader, std::uint8_t *apData, std::size_t aDataSize);
+    DataContainerBase(const DataContainerBase &arOther) = delete;
+    DataContainerBase(const DataContainerBase &&arOther) = delete;
     virtual ~DataContainerBase() {};
+
+    DataContainerBase& operator=(const DataContainerBase &arOther);
+    DataContainerBase& operator=(const DataContainerBase &&arOther) = delete;
 
     void Load(const std::string &arFileName, std::string_view aSecret = "");
     void Save(const std::string &arFileName, std::string_view aSecret = "");
 
 protected:
-    std::unique_ptr<ContainerHeader> mpHeader;
-    std::unique_ptr<std::uint8_t> mpData;
-    std::size_t mDataSize;
+    ContainerHeader* mpHeader;
+    std::uint8_t* mpData;
+    std::uint32_t mDataSize;
 
     template <class T>
-    T* getHeaderAs() { return static_cast<T*>(mpHeader.get()); }
+    T* getHeaderAs() { return reinterpret_cast<T*>(mpHeader); }
 
 private:
     virtual bool checkSignature(std::string_view aSecret) { return true; }
     virtual bool getSignature(Signature_t &arSignature, std::string_view aSecret) { return true; }
-    virtual void readFrom(rsp::posix::FileIO &arFile);
-    virtual void writeTo(rsp::posix::FileIO &arFile);
+    virtual void readPayloadFrom(rsp::posix::FileIO &arFile);
+    virtual void writePayloadTo(rsp::posix::FileIO &arFile);
+    virtual std::uint32_t calcCRC() const;
 };
 
 /**
@@ -128,10 +144,13 @@ template <class D, class H = ContainerHeader, class B = DataContainerBase>
 class DataContainer: public B
 {
 public:
-    DataContainer() : B(&mHeader, &mData, sizeof(mData)) {}
+    DataContainer() : B(&mHeader, reinterpret_cast<std::uint8_t*>(&mData), sizeof(mData)) {}
 
+    H& GetHeader() { return mHeader; }
+    D& Get() { return mData; }
     const H& GetHeader() const { return mHeader; }
     const D& Get() const { return mData; }
+    operator D() const { return mData; }
 protected:
     H mHeader{};
     D mData{};

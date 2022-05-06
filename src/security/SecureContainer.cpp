@@ -21,7 +21,7 @@ namespace rsp::security
 bool SecureContainer::getSignature(Signature_t &arSignature, std::string_view aSecret)
 {
     Sha sha(aSecret, HashAlgorithms::Sha256);
-    sha.Update(mpData.get(), mDataSize);
+    sha.Update(mpData, mDataSize);
     SecureBuffer md = sha.Get();
 
     int i = 0;
@@ -35,7 +35,7 @@ bool SecureContainer::getSignature(Signature_t &arSignature, std::string_view aS
 bool SecureContainer::checkSignature(std::string_view aSecret)
 {
     Sha sha(aSecret, HashAlgorithms::Sha256);
-    sha.Update(mpData.get(), mDataSize);
+    sha.Update(mpData, mDataSize);
     SecureBuffer md = sha.Get();
 
     auto &signature = getHeaderAs<rsp::utils::ContainerHeaderExtended>()->Signature;
@@ -51,9 +51,9 @@ bool SecureContainer::checkSignature(std::string_view aSecret)
     return result;
 }
 
-void SecureContainer::readFrom(rsp::posix::FileIO &arFile)
+void SecureContainer::readPayloadFrom(rsp::posix::FileIO &arFile)
 {
-    if (mpHeader.get()->Flags & ContainerFlags::Encrypted) {
+    if (mpHeader->Flags & ContainerFlags::Encrypted) {
         // TODO: Fix all this...
         std::string encrypted;
         encrypted.resize(mDataSize);
@@ -64,23 +64,23 @@ void SecureContainer::readFrom(rsp::posix::FileIO &arFile)
         aes.Decrypt(encrypted, plain);
         std::size_t i = 0;
         for(auto c : plain) {
-            mpData.get()[i++] = static_cast<uint8_t>(c);
+            mpData[i++] = static_cast<uint8_t>(c);
             if (i == mDataSize) {
                 break;
             }
         }
     }
     else {
-        arFile.ExactRead(mpData.get(), mDataSize);
+        arFile.ExactRead(mpData, mDataSize);
     }
 }
 
-void SecureContainer::writeTo(rsp::posix::FileIO &arFile)
+void SecureContainer::writePayloadTo(rsp::posix::FileIO &arFile)
 {
-    if (mpHeader.get()->Flags & ContainerFlags::Encrypted) {
+    if (mpHeader->Flags & ContainerFlags::Encrypted) {
     }
     else {
-        arFile.ExactWrite(mpData.get(), mDataSize);
+        arFile.ExactWrite(mpData, mDataSize);
     }
 }
 
