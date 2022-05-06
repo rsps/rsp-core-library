@@ -21,6 +21,17 @@ class SecureString : public std::basic_string<char, std::char_traits<char>, Secu
 public:
     using std::basic_string<char, std::char_traits<char>, SecureAllocator<char>>::basic_string;
 
+    /**
+     * \fn  ~SecureString()
+     * \brief Custom destructor that clear memory for short strings
+     *
+     * Because of "C++ small string optimization" std::basic_string does not allocate
+     * memory for strings smaller than 16 bytes, so SecureAllocator is never invoked.
+     * In case of a short string we call the cleanse method directly from this
+     * destructor.
+     *
+     * \see https://tc-imba.github.io/posts/cpp-sso
+     */
     ~SecureString()
     {
         auto n = size();
