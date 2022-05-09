@@ -45,8 +45,8 @@ protected:
 class CryptException: public rsp::utils::CoreException
 {
 public:
-    explicit CryptException(const char *aMsg)
-        : CoreException(aMsg)
+    explicit CryptException(const char *aMsg, const char *aErr)
+        : CoreException(std::string(aMsg) + ": " + std::string(aErr))
     {
     }
 };

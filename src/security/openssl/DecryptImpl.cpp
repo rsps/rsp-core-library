@@ -27,7 +27,7 @@ struct OpenSSLDecrypt : public OpenSSLCryptBase
 
         int rc = EVP_DecryptInit_ex(mCtx.get(), getCipher(), NULL, mKey, mIv);
         if (rc != 1) {
-            THROW_WITH_BACKTRACE1(CryptException, "EVP_EncryptInit_ex failed");
+            THROW_WITH_BACKTRACE2(CryptException, "EVP_DecryptInit_ex failed", ERR_error_string(static_cast<unsigned int>(rc), nullptr));
         }
     }
 
@@ -38,7 +38,7 @@ struct OpenSSLDecrypt : public OpenSSLCryptBase
 
         int rc = EVP_DecryptUpdate(mCtx.get(), mData.current(), &out_len, apData, static_cast<int>(aSize));
         if (rc != 1) {
-            THROW_WITH_BACKTRACE1(CryptException, "EVP_EncryptUpdate failed");
+            THROW_WITH_BACKTRACE2(CryptException, "EVP_DecryptUpdate failed", ERR_error_string(static_cast<unsigned int>(rc), nullptr));
         }
         mData.moveOffset(out_len);
     }
@@ -50,13 +50,13 @@ struct OpenSSLDecrypt : public OpenSSLCryptBase
 
         int rc = EVP_DecryptFinal_ex(mCtx.get(), mData.current(), &out_len);
         if (rc != 1) {
-            THROW_WITH_BACKTRACE1(CryptException, "EVP_EncryptFinal_ex failed");
+            THROW_WITH_BACKTRACE2(CryptException, "EVP_DecryptFinal_ex failed", ERR_error_string(static_cast<unsigned int>(rc), nullptr));
         }
 
         mData.moveOffset(out_len);
 
         // Set cipher text size now that we know it
-        mData.shrink_to_fit();
+        mData.shrinkToOffset();
 
         return mData;
     }

@@ -15,9 +15,10 @@ namespace rsp::security {
 
 std::ostream& operator<<(std::ostream& os, const SecureBuffer &arBuffer)
 {
-    os << std::hex << std::setw(2) << std::setfill('0');
+    os << std::hex << std::setfill('0');
     for (auto c : arBuffer) {
-        os << static_cast<int>(c);
+//        os << "[" << std::setw(2) << static_cast<int>(c) << "] " << c << "\n";
+        os << std::setw(2) << static_cast<int>(c);
     }
     return os << std::dec;
 }

@@ -8,6 +8,8 @@
  * \author      Steffen Brummer
  */
 
+#include <iostream>
+#include <iomanip>
 #include <algorithm>
 #include <cstring>
 #include <utils/DataContainer.h>
@@ -16,6 +18,36 @@
 using namespace rsp::posix;
 
 namespace rsp::utils {
+
+std::ostream& operator<<(std::ostream& os, const ContainerHeader &arHeader)
+{
+    os <<
+        "Size:           " << static_cast<int>(arHeader.Size) << "\n"
+        "Flags:          0x" << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(arHeader.Flags) << std::dec << "\n"
+        "Version:        " << static_cast<int>(arHeader.Version) << "\n"
+        "PayloadVersion: " << static_cast<int>(arHeader.PayloadVersion) << "\n"
+        "PayloadCRC:     0x" << std::hex << std::setfill('0') << std::setw(8) << arHeader.PayloadCRC << std::dec << "\n"
+        "PayloadSize:    " << arHeader.PayloadSize;
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const ContainerHeaderExtended &arHeader)
+{
+    os << *static_cast<const ContainerHeader*>(&arHeader) << "\n";
+    os << "Signature:      " << arHeader.Signature;
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Signature_t &arBuffer)
+{
+    os << std::hex << std::setfill('0');
+    for (auto c : arBuffer) {
+        os << std::setw(2) << static_cast<int>(c);
+    }
+    return os << std::dec;
+}
+
+
 
 DataContainerBase::DataContainerBase(ContainerHeader *apHeader, std::uint8_t *apData, std::size_t aDataSize)
     : mpHeader(apHeader),
@@ -54,8 +86,8 @@ void DataContainerBase::Save(const std::string &arFileName, std::string_view aSe
 {
     mpHeader->PayloadCRC = calcCRC();
 
-    if ((mpHeader->Flags & ContainerFlags::Signed) && (mpHeader->Flags & ContainerFlags::ExtendedContainer)) {
-        getSignature(getHeaderAs<ContainerHeaderExtended>()->Signature, aSecret);
+    if ((mpHeader->Flags & ContainerFlags::Signed) && (mpHeader->Flags & ContainerFlags::Extended)) {
+        getSignature(getExtHeader().Signature, aSecret);
     }
 
     mpHeader->PayloadSize = mDataSize;
@@ -64,7 +96,10 @@ void DataContainerBase::Save(const std::string &arFileName, std::string_view aSe
 
     fout.ExactWrite(mpHeader, mpHeader->Size);
 
-    writePayloadTo(fout);
+    if (writePayloadTo(fout)) {
+        fout.Seek(0);
+        fout.ExactWrite(mpHeader, mpHeader->Size);
+    }
 }
 
 void DataContainerBase::readPayloadFrom(rsp::posix::FileIO &arFile)
@@ -72,9 +107,10 @@ void DataContainerBase::readPayloadFrom(rsp::posix::FileIO &arFile)
     arFile.ExactRead(mpData, std::min(mDataSize, mpHeader->PayloadSize));
 }
 
-void DataContainerBase::writePayloadTo(rsp::posix::FileIO &arFile)
+bool DataContainerBase::writePayloadTo(rsp::posix::FileIO &arFile)
 {
     arFile.ExactWrite(mpData, mDataSize);
+    return false;
 }
 
 std::uint32_t DataContainerBase::calcCRC() const
@@ -85,7 +121,7 @@ std::uint32_t DataContainerBase::calcCRC() const
 DataContainerBase& DataContainerBase::operator=(const DataContainerBase &arOther)
 {
     if (&arOther != this) {
-        if (mpHeader->Flags & arOther.mpHeader->Flags & ContainerFlags::ExtendedContainer) {
+        if (mpHeader->Flags & arOther.mpHeader->Flags & ContainerFlags::Extended) {
             *reinterpret_cast<ContainerHeaderExtended*>(mpHeader) = *reinterpret_cast<ContainerHeaderExtended*>(arOther.mpHeader);
         }
         else {

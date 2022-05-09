@@ -12,10 +12,10 @@
 #define INCLUDE_CONFIGURATION_CONFIG_H_
 
 #include <json/Jsonable.h>
+#include <security/SecureContainerBase.h>
 #include <memory>
 #include <string>
 #include <string_view>
-#include <security/SecureContainer.h>
 #include <utils/DataContainer.h>
 #include <utils/CoreException.h>
 
@@ -23,7 +23,7 @@ namespace rsp::config {
 
 
 template <typename T>
-class Config : public rsp::utils::DataContainer<T, rsp::utils::ContainerHeaderExtended, rsp::security::SecureContainer>, public rsp::json::Jsonable
+class Config : public rsp::utils::DataContainer<T, rsp::utils::ContainerHeaderExtended, rsp::security::SecureContainerBase>, public rsp::json::Jsonable
 {
 public:
 

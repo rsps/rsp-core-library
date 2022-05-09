@@ -15,8 +15,10 @@
 #include <memory>
 #include <openssl/evp.h>
 #include <openssl/crypto.h>
+#include <openssl/err.h>
 #include <security/SecureBuffer.h>
 #include <security/Sha.h>
+#include <utils/DataContainer.h>
 
 namespace rsp::security {
 
@@ -26,18 +28,26 @@ public:
 
     std::uint8_t* current()
     {
-        return data() + size();
+        return data() + mOffset;
     }
 
     void grow(std::size_t aSize)
     {
-        reserve(size() + aSize + EVP_MAX_BLOCK_LENGTH);
+        resize(size() + aSize + EVP_MAX_BLOCK_LENGTH);
     }
 
     void moveOffset(int aLength)
     {
-        resize(size() + static_cast<std::size_t>(aLength));
+        mOffset += static_cast<std::size_t>(aLength);
     }
+
+    void shrinkToOffset()
+    {
+        resize(mOffset);
+    }
+
+protected:
+    std::size_t mOffset = 0;
 };
 
 class OpenSSLCryptBase : public CryptBase
@@ -58,12 +68,13 @@ public:
     }
 
 protected:
+    constexpr std::size_t getKeySize() const { return EVP_MAX_IV_LENGTH; }
     BlockBuffer mData{};
-    std::uint8_t mIv[EVP_MAX_IV_LENGTH];
-    std::uint8_t mKey[EVP_MAX_KEY_LENGTH];
+    rsp::utils::Signature_t mIv;
+    rsp::utils::Signature_t mKey;
     EvpCipherCtxPtr mCtx;
 
-    void generateKey(std::uint8_t *apBuffer, int aLen, std::string_view aSeed)
+    void generateKey(rsp::utils::Signature_t &arBuffer, int aLen, std::string_view aSeed)
     {
         Sha sha(aSeed, HashAlgorithms::Sha256);
         sha.Update(reinterpret_cast<const uint8_t*>(aSeed.data()), aSeed.size());
@@ -71,7 +82,7 @@ protected:
 
         int i = 0;
         for(auto b : md) {
-            apBuffer[i++] = b;
+            arBuffer[i++] = b;
             if (i == aLen) {
                 break;
             }

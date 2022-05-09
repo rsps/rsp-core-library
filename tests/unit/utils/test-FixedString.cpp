@@ -12,6 +12,8 @@
 #include <cstring>
 #include <utils/FixedString.h>
 
+using namespace rsp::utils;
+
 TEST_CASE("Fixed String")
 {
     const char *p = "Hello World";

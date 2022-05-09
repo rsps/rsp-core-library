@@ -66,7 +66,7 @@ public:
 
         result.resize(HMAC_size(mpCtx));
         HMAC_Final(mpCtx, result.data(), &len);
-        ASSERT(len != result.size());
+        ASSERT(len == result.size());
 
         return result;
     }

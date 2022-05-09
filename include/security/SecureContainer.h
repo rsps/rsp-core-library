@@ -16,16 +16,31 @@
 namespace rsp::security
 {
 
-class SecureContainer: public rsp::utils::DataContainerBase
+class SecureContainerBase: public rsp::utils::DataContainerBase
 {
 public:
+    using rsp::utils::DataContainerBase::DataContainerBase;
 
 private:
     bool getSignature(rsp::utils::Signature_t &arSignature, std::string_view aSecret) override;
     bool checkSignature(std::string_view aSecret) override;
     void readPayloadFrom(rsp::posix::FileIO &arFile) override;
-    void writePayloadTo(rsp::posix::FileIO &arFile) override;
+    bool writePayloadTo(rsp::posix::FileIO &arFile) override;
 };
+
+template <class D>
+class SecureContainer : public rsp::utils::DataContainer<D, rsp::utils::ContainerHeaderExtended, SecureContainerBase>
+{
+public:
+    using rsp::utils::DataContainer<D, rsp::utils::ContainerHeaderExtended, SecureContainerBase>::GetHeader;
+
+    SecureContainer()
+        : rsp::utils::DataContainer<D, rsp::utils::ContainerHeaderExtended, SecureContainerBase>()
+    {
+        GetHeader().Flags |= rsp::utils::ContainerFlags::Encrypted | rsp::utils::ContainerFlags::Signed;
+    }
+};
+
 
 } /* namespace rsp::security */
 

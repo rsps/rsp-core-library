@@ -22,12 +22,12 @@ struct OpenSSLEncrypt : public OpenSSLCryptBase
 
     void Init(std::string_view aIvSeed, std::string_view aSecret) override
     {
-        generateKey(mIv, sizeof(mIv), aIvSeed);
-        generateKey(mKey, sizeof(mKey), aSecret);
+        generateKey(mIv, getKeySize(), aIvSeed);
+        generateKey(mKey, getKeySize(), aSecret);
 
         int rc = EVP_EncryptInit_ex(mCtx.get(), getCipher(), NULL, mKey, mIv);
         if (rc != 1) {
-            THROW_WITH_BACKTRACE1(CryptException, "EVP_EncryptInit_ex failed");
+            THROW_WITH_BACKTRACE2(CryptException, "EVP_EncryptInit_ex failed", ERR_error_string(static_cast<unsigned int>(rc), nullptr));
         }
     }
 
@@ -38,7 +38,7 @@ struct OpenSSLEncrypt : public OpenSSLCryptBase
 
         int rc = EVP_EncryptUpdate(mCtx.get(), mData.current(), &out_len, apData, static_cast<int>(aSize));
         if (rc != 1) {
-            THROW_WITH_BACKTRACE1(CryptException, "EVP_EncryptUpdate failed");
+            THROW_WITH_BACKTRACE2(CryptException, "EVP_EncryptUpdate failed", ERR_error_string(static_cast<unsigned int>(rc), nullptr));
         }
         mData.moveOffset(out_len);
     }
@@ -50,13 +50,13 @@ struct OpenSSLEncrypt : public OpenSSLCryptBase
 
         int rc = EVP_EncryptFinal_ex(mCtx.get(), mData.current(), &out_len);
         if (rc != 1) {
-            THROW_WITH_BACKTRACE1(CryptException, "EVP_EncryptFinal_ex failed");
+            THROW_WITH_BACKTRACE2(CryptException, "EVP_EncryptFinal_ex failed", ERR_error_string(static_cast<unsigned int>(rc), nullptr));
         }
 
         mData.moveOffset(out_len);
 
         // Set cipher text size now that we know it
-        mData.shrink_to_fit();
+        mData.shrinkToOffset();
 
         return mData;
     }

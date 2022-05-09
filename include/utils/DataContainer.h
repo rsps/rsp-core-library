@@ -55,10 +55,10 @@ struct ESizeDiffersInAssignment : public CoreException
  * \brief Flag definitions for data storage containers.
  */
 enum class ContainerFlags : std::uint8_t {
-    None              = 0x00,
-    ExtendedContainer = 0x01,
-    Signed            = 0x02,
-    Encrypted         = 0x04
+    None        = 0x00,
+    Extended    = 0x01,
+    Signed      = 0x02,
+    Encrypted   = 0x04
 };
 
 
@@ -95,11 +95,15 @@ struct ContainerHeaderExtended : public ContainerHeader
     Signature_t  Signature{};
 
     ContainerHeaderExtended()
-        : ContainerHeader(sizeof(ContainerHeaderExtended), ContainerFlags::ExtendedContainer)
+        : ContainerHeader(sizeof(ContainerHeaderExtended), ContainerFlags::Extended)
     {
     }
     ContainerHeaderExtended& operator=(const ContainerHeaderExtended&) = default;
 } __attribute__((packed)); // 76 bytes
+
+std::ostream& operator<<(std::ostream& os, const ContainerHeader &arHeader);
+std::ostream& operator<<(std::ostream& os, const ContainerHeaderExtended &arHeader);
+std::ostream& operator<<(std::ostream& os, const Signature_t &arBuffer);
 
 
 /**
@@ -124,14 +128,14 @@ protected:
     std::uint8_t* mpData;
     std::uint32_t mDataSize;
 
-    template <class T>
-    T* getHeaderAs() { return reinterpret_cast<T*>(mpHeader); }
+    ContainerHeader& getHeader() { return *mpHeader; }
+    ContainerHeaderExtended& getExtHeader() { return *reinterpret_cast<ContainerHeaderExtended*>(mpHeader); }
 
 private:
     virtual bool checkSignature(std::string_view aSecret) { return true; }
     virtual bool getSignature(Signature_t &arSignature, std::string_view aSecret) { return true; }
     virtual void readPayloadFrom(rsp::posix::FileIO &arFile);
-    virtual void writePayloadTo(rsp::posix::FileIO &arFile);
+    virtual bool writePayloadTo(rsp::posix::FileIO &arFile);
     virtual std::uint32_t calcCRC() const;
 };
 

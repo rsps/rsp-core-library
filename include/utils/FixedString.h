@@ -14,6 +14,8 @@
 #include <string>
 #include <cstring>
 
+namespace rsp::utils {
+
 /**
  * \class FixedString
  * \brief Generic char[N+1] array wrapper with useful string operations.
@@ -43,13 +45,15 @@ public:
 
     FixedString<N>& operator=(const char *apS)
     {
-        std::strncpy(_mStr, apS, sizeof(_mStr) - 1);
+        std::strncpy(_mStr, apS, sizeof(_mStr));
+        _mStr[N] = 0;
         return *this;
     }
 
     FixedString<N>& operator=(const std::string &arOther)
     {
-        std::strncpy(_mStr, arOther.data(), sizeof(_mStr) - 1);
+        std::strncpy(_mStr, arOther.data(), sizeof(_mStr));
+        _mStr[N] = 0;
         return *this;
     }
 
@@ -81,5 +85,7 @@ public:
 private:
     char _mStr[N + 1]; // keep an extra char for null
 };
+
+} // namespace rsp::utils
 
 #endif /* INCLUDE_UTILS_FIXEDSTRING_H_ */
