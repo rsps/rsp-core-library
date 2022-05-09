@@ -65,10 +65,11 @@ void SecureContainer::readPayloadFrom(rsp::posix::FileIO &arFile)
         d.Update(encrypted.data(), encrypted.size());
         SecureBuffer sb = d.Finalize();
 
-        std::size_t sz = std::min(sb.size(), mDataSize);
+        std::size_t sz = (sb.size() < mDataSize) ? sb.size() : mDataSize;
 
-        for(auto c : plain) {
-            mpData[i++] = static_cast<uint8_t>(c);
+        std::size_t i = 0;
+        for(auto b : sb) {
+            mpData[i++] = b;
             if (i == mDataSize) {
                 break;
             }
@@ -82,6 +83,24 @@ void SecureContainer::readPayloadFrom(rsp::posix::FileIO &arFile)
 void SecureContainer::writePayloadTo(rsp::posix::FileIO &arFile)
 {
     if (mpHeader->Flags & ContainerFlags::Encrypted) {
+        auto *header = getHeaderAs<ContainerHeaderExtended>();
+        SecureBuffer plain;
+        plain.resize(mDataSize);
+
+        std::size_t i = 0;
+        for(auto &b : plain) {
+            b = mpData[i++];
+            if (i == mDataSize) {
+                break;
+            }
+        }
+
+        Encrypt e;
+        e.Init("iv", "key");
+        e.Update(plain.data(), plain.size());
+        SecureBuffer sb = e.Finalize();
+
+        arFile.ExactWrite(sb.data(), sb.size());
     }
     else {
         arFile.ExactWrite(mpData, mDataSize);
