@@ -14,6 +14,11 @@ using namespace rsp::network::http;
 
 namespace rsp::network::http::curl {
 
+CurlHttpRequest::CurlHttpRequest() 
+    : resp(*this), opt()
+{
+
+}
 
 void rsp::network::http::curl::CurlHttpRequest::Execute(
     std::function<void(rsp::network::http::IHttpResponse&)> callback)
@@ -22,10 +27,12 @@ void rsp::network::http::curl::CurlHttpRequest::Execute(
 
 IHttpResponse& rsp::network::http::curl::CurlHttpRequest::Execute()
 {
+    return resp;
 }
 
 HttpRequestOptions& rsp::network::http::curl::CurlHttpRequest::GetOptions()
 {
+    return opt;
 }
 
 } // namespace rsp::network::http::curl

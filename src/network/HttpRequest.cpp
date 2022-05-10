@@ -1,6 +1,6 @@
-#include <curl/curl.h>
-#include <network/HttpRequest.h>
+
 #include "curl/CurlHttpRequest.h"
+#include <network/HttpRequest.h>
 #include <iostream>
 
 namespace rsp::network::http {
