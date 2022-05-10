@@ -13,7 +13,7 @@ TEST_CASE("asdasd")
     CHECK_EQ(true, true);
     std::cout << "test 1" << std::endl;
     //Logger::GetDefault().Info() << "asd" << std::endl;
-    HttpRequest asd;
-    
+    HttpRequest request;
+
     CHECK_EQ(true, false);
 }

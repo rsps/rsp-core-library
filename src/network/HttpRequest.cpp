@@ -5,23 +5,22 @@
 
 namespace rsp::network::http {
 
-
-
-HttpRequest::HttpRequest() 
-    : mResponse(*this)
-    , mPimpl(new curl::CurlHttpRequest())
+HttpRequest::HttpRequest()
+    : mResponse(*this),
+      mPimpl(new curl::CurlHttpRequest())
 {
-    
+
 }
 
-IHttpResponse& HttpRequest::Execute()  {
+IHttpResponse& HttpRequest::Execute()
+{
     return mResponse;
 }
 
-void HttpRequest::Execute(std::function<void (IHttpResponse&)> callback)  {
+void HttpRequest::Execute(std::function<void(IHttpResponse&)> callback)
+{
 
 }
-
 
 }
 

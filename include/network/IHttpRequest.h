@@ -6,15 +6,19 @@
 #include <network/HttpRequestOptions.h>
 #include <network/IHttpResponse.h>
 
-namespace rsp::network::http {  
+namespace rsp::network::http {
+
 class IHttpResponse;
 
-class IHttpRequest {
-    public:
-        virtual HttpRequestOptions& GetOptions();
-        virtual IHttpResponse& Execute();
-        virtual void Execute(std::function<void (IHttpResponse&)> callback);
-        virtual ~IHttpRequest(){};
+class IHttpRequest
+{
+public:
+    virtual HttpRequestOptions& GetOptions() = 0;
+    virtual IHttpResponse& Execute() = 0;
+    virtual void Execute(std::function<void(IHttpResponse&)> callback) = 0;
+    virtual ~IHttpRequest()
+    {
+    }
 };
 }
 
