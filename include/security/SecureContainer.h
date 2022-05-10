@@ -12,6 +12,7 @@
 #define INCLUDE_SECURITY_SECURECONTAINER_H_
 
 #include <utils/DataContainer.h>
+#include <security/SecureString.h>
 
 namespace rsp::security
 {
@@ -20,6 +21,12 @@ class SecureContainerBase: public rsp::utils::DataContainerBase
 {
 public:
     using rsp::utils::DataContainerBase::DataContainerBase;
+
+    void SetEncryption(SecureString aInitializationVector, SecureString aKey);
+
+protected:
+    SecureBuffer mInitializationVector{};
+    SecureBuffer mKey{};
 
 private:
     bool getSignature(rsp::utils::Signature_t &arSignature, std::string_view aSecret) override;
@@ -37,7 +44,7 @@ public:
     SecureContainer()
         : rsp::utils::DataContainer<D, rsp::utils::ContainerHeaderExtended, SecureContainerBase>()
     {
-        GetHeader().Flags |= rsp::utils::ContainerFlags::Encrypted | rsp::utils::ContainerFlags::Signed;
+        GetHeader().Flags |= rsp::utils::ContainerFlags::Signed;
     }
 };
 
