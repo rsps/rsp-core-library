@@ -1,4 +1,4 @@
-file(GLOB_RECURSE SRC_FILES graphics/*.cpp posix/*.cpp logging/*.cpp utils/*.cpp messaging/*.cpp application/*.cpp)
+file(GLOB_RECURSE SRC_FILES graphics/*.cpp posix/*.cpp logging/*.cpp utils/*.cpp messaging/*.cpp application/*.cpp network/*.cpp)
 target_sources("rsp-core-lib" 
     PRIVATE 
         version.cpp
