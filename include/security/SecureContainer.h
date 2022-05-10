@@ -25,8 +25,8 @@ public:
     void SetEncryption(SecureString aInitializationVector, SecureString aKey);
 
 protected:
-    SecureBuffer mInitializationVector{};
-    SecureBuffer mKey{};
+    SecureString mInitializationVector{};
+    SecureString mKey{};
 
 private:
     bool getSignature(rsp::utils::Signature_t &arSignature, std::string_view aSecret) override;

@@ -68,7 +68,7 @@ void SecureContainerBase::readPayloadFrom(rsp::posix::FileIO &arFile)
         std::cout << "\nEncrypted Data:\n" << encrypted << std::endl;
 
         Decrypt d;
-        d.Init("iv", "key");
+        d.Init(mInitializationVector, mKey);
         d.Update(encrypted.data(), encrypted.size());
         SecureBuffer sb = d.Finalize();
 
@@ -91,11 +91,18 @@ void SecureContainerBase::readPayloadFrom(rsp::posix::FileIO &arFile)
     }
 }
 
+void SecureContainerBase::SetEncryption(SecureString aInitializationVector, SecureString aKey)
+{
+    mInitializationVector = aInitializationVector;
+    mKey = aKey;
+    getExtHeader().Flags |= ContainerFlags::Encrypted;
+}
+
 bool SecureContainerBase::writePayloadTo(rsp::posix::FileIO &arFile)
 {
     if (mpHeader->Flags & ContainerFlags::Encrypted) {
         Encrypt e;
-        e.Init("iv", "key");
+        e.Init(mInitializationVector, mKey);
         e.Update(mpData, mDataSize);
         SecureBuffer sb = e.Finalize();
 
