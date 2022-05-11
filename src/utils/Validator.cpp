@@ -8,27 +8,23 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_CONFIG_H_
-#define INCLUDE_UTILS_CONFIG_H_
-
-#include <json/Jsonable.h>
-#include <security/SecureContainer.h>
 #include <utils/Validator.h>
 
 namespace rsp::utils {
 
 
-template <typename T>
-class Config : public rsp::security::SecureContainer<T>, public rsp::json::Jsonable
+void Validator::NotEmpty(const char *apString)
 {
-public:
-    using rsp::security::SecureContainer<T>::SecureContainer;
+    if (*apString == 0) {
+        THROW_WITH_BACKTRACE(ENotEmpty);
+    }
+}
 
-    virtual void Validate() = 0;
-};
+void Validator::NotEmpty(const std::string &arString)
+{
+    if (arString.empty()) {
+        THROW_WITH_BACKTRACE(ENotEmpty);
+    }
+}
 
-
-} // namespace rsp::config
-
-
-#endif /* INCLUDE_UTILS_CONFIG_H_ */
+} /* namespace rsp::utils */

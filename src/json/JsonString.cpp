@@ -376,11 +376,12 @@ JsonValue* JsonString::getNumber()
                 break;
 
             case 10: // delimiter
+                skipWhiteSpace();
                 if (c == ',' || mIt == mEnd) {
                     skip = 100;
                 }
                 else {
-                    THROW_WITH_BACKTRACE1(EJsonNumberError, "Numeric value has non numeric ending..");
+                    THROW_WITH_BACKTRACE1(EJsonNumberError, std::string("Numeric value has non numeric ending: '") + c + "'");
                 }
                 break;
 

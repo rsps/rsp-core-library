@@ -39,7 +39,7 @@ TEST_CASE("Variant")
 
         v = 42.0f;
         CHECK(v.GetType() == Variant::Types::Float);
-        CHECK(IsInRange(static_cast<float>(v.AsDouble()), 42.0f, 42.0f));
+        CHECK(IsInRange(v.AsFloat(), 42.0f, 42.0f));
         CHECK(v.AsInt() == 42);
         float f = v;
         CHECK(IsInRange(f, 42.0f, 42.0f));

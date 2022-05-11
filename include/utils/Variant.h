@@ -148,6 +148,7 @@ public:
     bool AsBool() const;
     std::int64_t AsInt() const;
     double AsDouble() const;
+    float AsFloat() const { return static_cast<float>(AsDouble()); }
     std::string AsString() const;
     void* AsPointer() const;
 

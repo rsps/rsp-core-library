@@ -11,6 +11,7 @@
 #ifndef INCLUDE_JSON_JSONABLE_H_
 #define INCLUDE_JSON_JSONABLE_H_
 
+#include <memory>
 #include <json/JsonValue.h>
 
 namespace rsp::json {
@@ -28,7 +29,7 @@ public:
      * \brief Interface to get object content as a JSON item.
      * \return JSON formatted string
      */
-    virtual JsonValue* ToJson() const = 0;
+    virtual std::unique_ptr<JsonValue> ToJson() const = 0;
 
     /**
      * \brief Interface to populate object content with content from a JSON item

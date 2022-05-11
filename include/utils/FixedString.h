@@ -57,12 +57,12 @@ public:
         return *this;
     }
 
-    explicit operator const char*()
+    explicit operator const char*() const
     {
         return _mStr;
     }
 
-    operator std::string()
+    operator std::string() const
     {
         return _mStr;
     }
@@ -77,7 +77,7 @@ public:
         return std::strncmp(_mStr, apS, sizeof(_mStr)) == 0;
     }
 
-    std::size_t size()
+    std::size_t size() const
     {
         return std::strlen(_mStr);
     }
