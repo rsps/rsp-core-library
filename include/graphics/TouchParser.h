@@ -48,7 +48,7 @@ class TouchParser
 {
 public:
     TouchParser(const std::string &arPath = "/dev/input/event1");
-    ~TouchParser();
+    virtual ~TouchParser();
 
     /**
      * \brief Parse input from touch driver
@@ -60,7 +60,7 @@ public:
     /**
      * \brief Flush the input buffer for remaining raw touch events
      */
-    void Flush();
+    virtual void Flush();
 
 protected:
     rsp::posix::FileIO mTouchDevice{};

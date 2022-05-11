@@ -21,6 +21,17 @@
 
 using namespace rsp::graphics;
 
+class TestTouchParser : public TouchParser
+{
+public:
+    using TouchParser::TouchParser;
+
+    void Flush() override
+    {
+        MESSAGE("Flushing touch queue.");
+    }
+};
+
 TEST_CASE("Graphics Main Test")
 {
     // Make framebuffer
@@ -34,7 +45,7 @@ TEST_CASE("Graphics Main Test")
     Scenes scenes;
 
     // Make TouchParser
-    TouchParser tp("testImages/touchTest.bin");
+    TestTouchParser tp("testImages/touchTest.bin");
 
     GraphicsMain gfx(fb, tp, scenes);
 
@@ -44,9 +55,11 @@ TEST_CASE("Graphics Main Test")
         gfx.Terminate();
     };
 
+    MESSAGE("Running GFX loop.");
     gfx.Run(GFX_FPS);
 
     const uint32_t cGreenColor = 0x24b40b;
     CHECK(fb.GetPixel(scenes.Second().GetTopImg().GetArea().GetTopLeft()) == cGreenColor);
     CHECK(fb.GetPixel(scenes.Second().GetTopImg().GetArea().GetTopLeft()) == cGreenColor);
 }
+

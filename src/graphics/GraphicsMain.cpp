@@ -41,10 +41,12 @@ void GraphicsMain::Run(int aMaxFPS)
     int64_t frame_time = 1000 / aMaxFPS;
 
     while (!mTerminated) {
+
         sw.Reset();
 
         // New scene requested?
         if (!mNextScene.empty()) {
+            DLOG("New Scene: " << mNextScene);
             mrScenes.SetActiveScene(mNextScene);
             mrScenes.ActiveScene().Invalidate();
             mNextScene = "";
