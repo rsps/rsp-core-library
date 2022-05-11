@@ -20,9 +20,9 @@ namespace rsp::security {
 class Encrypt: public CryptBase
 {
 public:
-    Encrypt();
+    Encrypt(CipherTypes aCipher = CipherTypes::AES_128_CBC);
 
-    void Init(std::string_view aIvSeed, std::string_view aSecret) override;
+    void Init(const SecureBuffer& arIvSeed, const SecureBuffer& arSecret) override;
     SecureBuffer Finalize() override { return pImpl->Finalize(); }
     void Update(const uint8_t *apData, std::size_t aSize) override { pImpl->Update(apData, aSize); }
 

@@ -23,7 +23,7 @@ class EnumFlags
 {
     T mValue;
 public:
-    using utype = std::underlying_type<T>::type;
+    using utype = typename std::underlying_type<T>::type;
 
     constexpr EnumFlags() : mValue(static_cast<T>(0)) {}
 
@@ -38,7 +38,7 @@ public:
 
     constexpr operator utype() const
     {
-        return static_cast<typename std::underlying_type<T>::type>(mValue);
+        return static_cast<utype>(mValue);
     }
 
     constexpr explicit operator bool() const
@@ -76,6 +76,12 @@ public:
         return *this;
     }
 
+    constexpr EnumFlags<T> operator~()
+    {
+        return static_cast<T>(
+            ~static_cast<utype>(mValue));
+    }
+
 } __attribute__((packed));
 
 //template <class T>
@@ -102,6 +108,13 @@ constexpr T operator|(T lhs, T rhs)
     return static_cast<T>(
         static_cast<typename std::underlying_type<T>::type>(lhs) |
         static_cast<typename std::underlying_type<T>::type>(rhs));
+}
+
+template <typename T, typename = typename std::enable_if<std::is_enum<T>::value, T>::type>
+constexpr T operator~(T rhs)
+{
+    return static_cast<T>(
+        ~static_cast<typename std::underlying_type<T>::type>(rhs));
 }
 
 } // namespace rsp::utils

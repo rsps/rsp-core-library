@@ -32,9 +32,11 @@ public:
     CryptBase(CipherTypes aCipher) : mCipherType(aCipher) {}
     virtual ~CryptBase() {}
 
-    virtual void Init(std::string_view aIvSeed, std::string_view aSecret) = 0;
+    virtual void Init(const SecureBuffer& arIvSeed, const SecureBuffer& arSecret) = 0;
     virtual void Update(const std::uint8_t *apData, std::size_t aSize) = 0;
     virtual SecureBuffer Finalize() = 0;
+
+    static SecureBuffer KeyGen(std::string_view aSeed, std::size_t aDesiredKeyLen = 64);
 
 protected:
     CipherTypes mCipherType;

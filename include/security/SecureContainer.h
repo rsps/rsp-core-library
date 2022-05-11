@@ -12,7 +12,7 @@
 #define INCLUDE_SECURITY_SECURECONTAINER_H_
 
 #include <utils/DataContainer.h>
-#include <security/SecureString.h>
+#include <security/SecureBuffer.h>
 
 namespace rsp::security
 {
@@ -22,11 +22,11 @@ class SecureContainerBase: public rsp::utils::DataContainerBase
 public:
     using rsp::utils::DataContainerBase::DataContainerBase;
 
-    void SetEncryption(SecureString aInitializationVector, SecureString aKey);
+    void SetEncryption(SecureBuffer aInitializationVector, SecureBuffer aKey);
 
 protected:
-    SecureString mInitializationVector{};
-    SecureString mKey{};
+    SecureBuffer mInitializationVector{};
+    SecureBuffer mKey{};
 
 private:
     bool getSignature(rsp::utils::Signature_t &arSignature, std::string_view aSecret) override;

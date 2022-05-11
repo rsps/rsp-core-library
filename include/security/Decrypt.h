@@ -19,15 +19,13 @@ namespace rsp::security
 class Decrypt: public CryptBase
 {
 public:
-    Decrypt();
+    Decrypt(CipherTypes aCipher = CipherTypes::AES_128_CBC);
 
-    void Init(std::string_view aIvSeed, std::string_view aSecret) override;
+    void Init(const SecureBuffer& arIvSeed, const SecureBuffer& arSecret) override;
     SecureBuffer Finalize() override { return pImpl->Finalize(); }
     void Update(const uint8_t *apData, std::size_t aSize) override { pImpl->Update(apData, aSize); }
 
 protected:
-    std::unique_ptr<CryptBase> pImpl{};
-
     static std::unique_ptr<CryptBase> MakePimpl(CipherTypes aCipher);
 };
 

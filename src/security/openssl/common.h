@@ -61,33 +61,10 @@ public:
     {
     }
 
-    virtual ~OpenSSLCryptBase()
-    {
-        OPENSSL_cleanse(mKey, sizeof(mKey));
-        OPENSSL_cleanse(mIv, sizeof(mIv));
-    }
-
 protected:
     constexpr std::size_t getKeySize() const { return EVP_MAX_IV_LENGTH; }
     BlockBuffer mData{};
-    rsp::utils::Signature_t mIv;
-    rsp::utils::Signature_t mKey;
     EvpCipherCtxPtr mCtx;
-
-    void generateKey(rsp::utils::Signature_t &arBuffer, int aLen, std::string_view aSeed)
-    {
-        Sha sha(aSeed, HashAlgorithms::Sha256);
-        sha.Update(reinterpret_cast<const uint8_t*>(aSeed.data()), aSeed.size());
-        SecureBuffer md = sha.Get();
-
-        int i = 0;
-        for(auto b : md) {
-            arBuffer[i++] = b;
-            if (i == aLen) {
-                break;
-            }
-        }
-    }
 
     const EVP_CIPHER* getCipher()
     {

@@ -12,7 +12,9 @@
 #define INCLUDE_SECURITY_SECURESTRING_H_
 
 #include <string>
+#include <sstream>
 #include "SecureAllocator.h"
+#include "SecureBuffer.h"
 
 namespace rsp::security {
 
@@ -20,6 +22,18 @@ class SecureString : public std::basic_string<char, std::char_traits<char>, Secu
 {
 public:
     using std::basic_string<char, std::char_traits<char>, SecureAllocator<char>>::basic_string;
+
+    SecureString(const SecureBuffer& arOther)
+        : std::basic_string<char, std::char_traits<char>, SecureAllocator<char>>::basic_string()
+    {
+        assign(arOther.begin(), arOther.end());
+    }
+
+    SecureString(const std::string& arOther)
+        : std::basic_string<char, std::char_traits<char>, SecureAllocator<char>>::basic_string()
+    {
+        assign(arOther);
+    }
 
     /**
      * \fn  ~SecureString()
@@ -38,6 +52,34 @@ public:
         if (n < 16) {
             get_allocator().cleanse(data(), n);
         }
+    }
+
+    operator std::string_view()
+    {
+        return data();
+    }
+
+    SecureString& operator=(const SecureBuffer& arOther)
+    {
+        std::stringstream ss;
+        ss << arOther;
+        assign(ss.str());
+        return *this;
+    }
+
+    bool operator==(const SecureString& arOther)
+    {
+        return compare(arOther) == 0;
+    }
+
+    bool operator==(const std::string& arOther)
+    {
+        return compare(arOther) == 0;
+    }
+
+    bool operator==(const char* apOther)
+    {
+        return compare(apOther) == 0;
     }
 };
 

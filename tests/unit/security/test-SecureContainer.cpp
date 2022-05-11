@@ -8,6 +8,7 @@
  * \author      Steffen Brummer
  */
 #include <doctest.h>
+#include <security/CryptBase.h>
 #include <security/SecureContainer.h>
 #include <utils/DataContainer.h>
 #include <utils/FixedString.h>
@@ -26,6 +27,8 @@ TEST_CASE("Secure Container")
     const char *cPlainText = "The big red fox, jumped over the fence.";
 
     SecureContainer<MyData> sc;
+    CHECK_EQ(sc.GetHeader().Flags, (ContainerFlags::Extended | ContainerFlags::Signed));
+    sc.SetEncryption(CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
 
     SUBCASE("Init")
     {
@@ -66,6 +69,7 @@ TEST_CASE("Secure Container")
         MESSAGE("Loading");
 
         SecureContainer<MyData> dcl;
+        dcl.SetEncryption(CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
 
         CHECK_NOTHROW(dcl.Load(cFileName));
         CHECK_EQ(dcl.GetHeader().Version, 1);

@@ -12,17 +12,17 @@
 
 namespace rsp::security {
 
-Decrypt::Decrypt()
-    : CryptBase(CipherTypes::AES_128_CBC)
+Decrypt::Decrypt(CipherTypes aCipher)
+    : CryptBase(aCipher)
 {
 }
 
-void Decrypt::Init(std::string_view aIvSeed, std::string_view aSecret)
+void Decrypt::Init(const SecureBuffer& arIvSeed, const SecureBuffer& arSecret)
 {
     if (!pImpl) {
         pImpl = MakePimpl(mCipherType);
     }
-    pImpl->Init(aIvSeed, aSecret);
+    pImpl->Init(arIvSeed, arSecret);
 }
 
 } /* namespace rsp::security */

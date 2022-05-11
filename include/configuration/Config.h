@@ -12,7 +12,7 @@
 #define INCLUDE_CONFIGURATION_CONFIG_H_
 
 #include <json/Jsonable.h>
-#include <security/SecureContainerBase.h>
+#include <security/SecureContainer.h>
 #include <memory>
 #include <string>
 #include <string_view>
