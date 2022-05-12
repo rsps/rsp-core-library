@@ -16,6 +16,9 @@
 namespace rsp::security
 {
 
+/**
+ * \brief Specialised crypto class used for decryption.
+ */
 class Decrypt: public CryptBase
 {
 public:

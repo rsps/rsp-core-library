@@ -18,17 +18,28 @@
 
 namespace rsp::security {
 
+/**
+ * \brief A string implementation that clears the memory of its content on destruction.
+ */
 class SecureString : public std::basic_string<char, std::char_traits<char>, SecureAllocator<char>>
 {
 public:
     using std::basic_string<char, std::char_traits<char>, SecureAllocator<char>>::basic_string;
 
+    /**
+     * \brief Construct with contents from a SecureBuffer.
+     * \param arOther SecureBuffer to copy data from
+     */
     SecureString(const SecureBuffer& arOther)
         : std::basic_string<char, std::char_traits<char>, SecureAllocator<char>>::basic_string()
     {
         assign(arOther.begin(), arOther.end());
     }
 
+    /**
+     * \brief Construct with contents from std::string
+     * \param arOther string with contents to copy from
+     */
     SecureString(const std::string& arOther)
         : std::basic_string<char, std::char_traits<char>, SecureAllocator<char>>::basic_string()
     {
@@ -54,11 +65,19 @@ public:
         }
     }
 
+    /**
+     * \brief Return a string_view to the current content.
+     */
     operator std::string_view()
     {
         return data();
     }
 
+    /**
+     * \brief Assignment operator, assign from SecureBuffer
+     * \param arOther SecureBuffer with data to copy
+     * \return Reference to this
+     */
     SecureString& operator=(const SecureBuffer& arOther)
     {
         std::stringstream ss;
@@ -67,16 +86,31 @@ public:
         return *this;
     }
 
+    /**
+     * \brief Equality operator, compares the content of this with another SecureString
+     * \param arOther Other SecureString to compare with
+     * \return
+     */
     bool operator==(const SecureString& arOther)
     {
         return compare(arOther) == 0;
     }
 
+    /**
+     * \brief Equality operator, compares the content of this with a std::string
+     * \param arOther std::string to compare with
+     * \return
+     */
     bool operator==(const std::string& arOther)
     {
         return compare(arOther) == 0;
     }
 
+    /**
+     * \brief Equality operator, compares the content of this with a zero delimited C style string
+     * \param arOther Pointer to C style string to compare with
+     * \return
+     */
     bool operator==(const char* apOther)
     {
         return compare(apOther) == 0;

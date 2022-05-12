@@ -17,11 +17,26 @@
 namespace rsp::security
 {
 
+/**
+ * \brief A secure implementation of a DataContainer.
+ *
+ * The SecureContainer implements HMAC signing and optinal AES encryption of the
+ * contents.
+ */
 class SecureContainerBase: public rsp::utils::DataContainerBase
 {
 public:
     using rsp::utils::DataContainerBase::DataContainerBase;
 
+    /**
+     * \brief Set the AES CBC initialization vector and the key to be used for
+     * encryption and decryption.
+     *
+     * If both values are empty, encryption is disabled.
+     *
+     * \param aInitializationVector The AES initialization vector to use.
+     * \param aKey The key to use for symmetric encryption.
+     */
     void SetEncryption(SecureBuffer aInitializationVector, SecureBuffer aKey);
 
 protected:
@@ -35,6 +50,10 @@ private:
     bool writePayloadTo(rsp::posix::FileIO &arFile) override;
 };
 
+/**
+ * \brief Template to be used for making secure data containers.
+ * \tparam D struct or class defining container content.
+ */
 template <class D>
 class SecureContainer : public rsp::utils::DataContainer<D, rsp::utils::ContainerHeaderExtended, SecureContainerBase>
 {

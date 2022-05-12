@@ -18,6 +18,9 @@
 
 namespace rsp::utils {
 
+/**
+ * \brief Base class for validator exceptions.
+ */
 class ValidatorException : public CoreException
 {
 public:
@@ -45,13 +48,28 @@ public:
     }
 };
 
-
+/**
+ * \brief Simple class with static methods that can be used for data validation.
+ *
+ * Every validator function throws an exception if given value is not valid.
+ */
 class Validator
 {
 public:
+    /**
+     * \brief Test if a string is not empty.
+     * \param apString
+     */
     static void NotEmpty(const char* apString);
     static void NotEmpty(const std::string& arString);
 
+    /**
+     * \brief Test is a given value is within the given range.
+     * \tparam T Type of the value to test
+     * \param aLow Low limit
+     * \param aHigh High limit
+     * \param aValue Value to test
+     */
     template <typename T>
     static void InRange(T aLow, T aHigh, T aValue)
     {

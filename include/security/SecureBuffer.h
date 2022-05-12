@@ -20,24 +20,48 @@ namespace rsp::security {
 
 class SecureBuffer;
 
+/**
+ * \brief Output streaming operator for SecureBuffer
+ * \param os Destination ostream
+ * \param arBuffer SecureBuffer to stream to destination
+ * \return The destination ostream
+ */
 std::ostream& operator<<(std::ostream& os, const SecureBuffer &arBuffer);
 
 
+/**
+ * \brief A secure buffer implementation that clears its memory after use.
+ */
 class SecureBuffer : public std::vector<std::uint8_t, SecureAllocator<std::uint8_t>>
 {
 public:
     using std::vector<std::uint8_t, SecureAllocator<std::uint8_t>>::vector;
 
+    /**
+     * \brief Constructs from pointer to char array
+     * \param apData Pointer to char data
+     * \param aSize Size of data to include
+     */
     SecureBuffer(const char* apData, std::size_t aSize)
     {
         assign(apData, apData + aSize); // pointers are converted to iterators.
     }
 
+    /**
+     * \brief Constructs from pointer to unsigned char array
+     * \param apData Pointer to unsigned char data
+     * \param aSize Size of data to include
+     */
     SecureBuffer(const std::uint8_t* apData, std::size_t aSize)
     {
         assign(apData, apData + aSize); // pointers are converted to iterators.
     }
 
+    /**
+     * \brief Comparator overload, compares with std::string of ASCII hex
+     * \param arOther std::string with ASCII hex to compare content with.
+     * \return bool True if equal
+     */
     bool operator==(const std::string& arOther) const
     {
         std::stringstream ss;
@@ -45,6 +69,11 @@ public:
         return ss.str() == arOther;
     }
 
+    /**
+     * \brief Comparator overload, compares with C style string of ASCII hex
+     * \param apOther Pointer to C style string of ASCII hex to compare content with.
+     * \return bool True if equal
+     */
     bool operator==(const char* apOther) const
     {
         std::stringstream ss;
@@ -52,6 +81,10 @@ public:
         return ss.str() == apOther;
     }
 
+    /**
+     * \brief Format this content to ASCII hex.
+     * \return String with ASCII hex.
+     */
     std::string GetHex() const
     {
         std::stringstream ss;

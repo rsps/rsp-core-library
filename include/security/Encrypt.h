@@ -17,6 +17,10 @@
 
 namespace rsp::security {
 
+/**
+ * \brief Specialised crypto class used for encryption.
+ */
+
 class Encrypt: public CryptBase
 {
 public:

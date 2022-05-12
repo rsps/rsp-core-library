@@ -18,18 +18,30 @@
 
 namespace rsp::security {
 
-
+/**
+ * \brief A template implementation of a secure allocator. Memory is always cleared when freed.
+ * \tparam T The element type to use by the allocator
+ */
 template <typename T>
 struct SecureAllocator: public std::allocator<T>
 {
 public:
     using std::allocator<T>::allocator;
 
+    /**
+     * \brief Helper method to clear a memory range
+     * \param p
+     * \param n
+     */
     void cleanse(T* p, std::size_t n) {
-//        std::cout << "Cleansing " << n << " bytes" << std::endl;
         std::memset(p, 0, n * sizeof(T));
     }
 
+    /**
+     * \brief Override to clear the memory before deallocation.
+     * \param p
+     * \param n
+     */
     void deallocate(T* p, std::size_t n) {
         cleanse(p, n);
         std::allocator<T>::deallocate(p, n);

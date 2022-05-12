@@ -18,34 +18,45 @@
 
 namespace rsp::utils {
 
-struct EInvalidSignature : public CoreException
+/**
+ * \brief Base class for DataContainer exceptions.
+ */
+struct DataContainerException : public CoreException
+{
+    explicit DataContainerException(const std::string &arMsg)
+      : CoreException(arMsg)
+    {
+    }
+};
+
+struct EInvalidSignature : public DataContainerException
 {
     explicit EInvalidSignature(const std::string &arFileName)
-      : CoreException("Invalid signature in file " + arFileName)
+      : DataContainerException("Invalid signature in file " + arFileName)
     {
     }
 };
 
-struct EInvalidCRC : public CoreException
+struct EInvalidCRC : public DataContainerException
 {
     explicit EInvalidCRC(const std::string &arFileName)
-      : CoreException("Invalid CRC in file " + arFileName)
+      : DataContainerException("Invalid CRC in file " + arFileName)
     {
     }
 };
 
-struct EInvalidHeader : public CoreException
+struct EInvalidHeader : public DataContainerException
 {
     explicit EInvalidHeader(const std::string &arFileName)
-      : CoreException("Invalid header in file " + arFileName)
+      : DataContainerException("Invalid header in file " + arFileName)
     {
     }
 };
 
-struct ESizeDiffersInAssignment : public CoreException
+struct ESizeDiffersInAssignment : public DataContainerException
 {
     explicit ESizeDiffersInAssignment()
-      : CoreException("Copy assignment of DataContainers is not same size")
+      : DataContainerException("Copy assignment of DataContainers is not same size")
     {
     }
 };
@@ -70,6 +81,8 @@ using Signature_t = std::uint8_t[64];
  * \brief Header definition for simple data containers.
  *
  * All values are stored in the CPU's native format, so containers might not be portable.
+ *
+ * The simple header holds a CRC32 value of the payload content, used to ensure data integrity.
  */
 struct ContainerHeader
 {
@@ -88,6 +101,9 @@ struct ContainerHeader
  * \brief Header definition for signed data containers.
  *
  * Values are stored in the CPU's native format, so containers might not be portable.
+ *
+ * The extended header adds space for a HMAC signature of the container contents. The HMAC calculation
+ * can be seeded with a secret, to make the data container very resistant to tampering.
  */
 struct ContainerHeaderExtended : public ContainerHeader
 {
@@ -106,7 +122,7 @@ std::ostream& operator<<(std::ostream& os, const Signature_t &arBuffer);
 
 
 /**
- * \brief Generic base class for containers with basic load and save functionality.
+ * \brief Generic base class for high integrity data containers with basic load and save functionality.
  */
 class DataContainerBase
 {
@@ -119,7 +135,25 @@ public:
     DataContainerBase& operator=(const DataContainerBase &arOther);
     DataContainerBase& operator=(const DataContainerBase &&arOther) = delete;
 
+    /**
+     * \brief Load the container contents from the given file
+     *
+     * Several validation checks are automatically performed on the content.
+     *
+     * \param arFileName path to existing container file
+     * \param aSecret Optional secret used for HMAC signature
+     */
     void Load(const std::string &arFileName, std::string_view aSecret = "");
+
+    /**
+     * \brief Save the container contents to the given file. If the file exists it is overwritten.
+     *
+     * CRC of payload is automatically calculated and put into file header.
+     * If the container is of extended type, a signing signature is also calculated on the payload.
+     *
+     * \param arFileName Path to file where content is stored.
+     * \param aSecret Optional secret used for HMAC signature.
+     */
     void Save(const std::string &arFileName, std::string_view aSecret = "");
 
 protected:
@@ -131,28 +165,88 @@ protected:
     ContainerHeaderExtended& getExtHeader() { return *reinterpret_cast<ContainerHeaderExtended*>(mpHeader); }
 
 private:
+    /**
+     * \brief Interface function for verifying the contents signature.
+     *
+     * \param aSecret String with seed for hash calculation.
+     * \return bool True if signature is valid.
+     */
     virtual bool checkSignature(std::string_view aSecret) { return true; }
-    virtual bool getSignature(Signature_t &arSignature, std::string_view aSecret) { return true; }
+
+    /**
+     * \brief Interface function to calculate the content hash value, and fill it into the signature buffer.
+     *
+     * \param arSignature Reference to buffer for signature.
+     * \param aSecret Seed to be used in hash generation.
+     * \return bool True if a signature was calculated.
+     */
+    virtual bool getSignature(Signature_t &arSignature, std::string_view aSecret) { return false; }
+
+    /**
+     * \brief Interface function to read the container content from a file.
+     *
+     * \param arFile Open FileIO object, ready to read content from.
+     */
     virtual void readPayloadFrom(rsp::posix::FileIO &arFile);
+
+    /**
+     * \brief Interface function to write container content to a file.
+     *
+     * \param arFile An open FileIO object, ready to write the content to.
+     * \return bool True if any header data was changed during write. Used if encryption changes the payload size.
+     */
     virtual bool writePayloadTo(rsp::posix::FileIO &arFile);
+
+    /**
+     * \brief Interface function to calculate the CRC32 value of the content.
+     *
+     * The default implementation calculated the CRC32 on the plain data content.
+     *
+     * \return uint32_t CRC32 result
+     */
     virtual std::uint32_t calcCRC() const;
 };
 
 /**
  * \brief Template for data containers. Usage: DataContainer<MyStruct> my_data;
  * \tparam D Data structure to put in container
- * \tparam H
+ * \tparam H Header to be used in container file.
  */
 template <class D, class H = ContainerHeader, class B = DataContainerBase>
 class DataContainer: public B
 {
 public:
+    /**
+     * \brief Specialized constructor, transfers memory addresses to base class for generic handling.
+     */
     DataContainer() : B(&mHeader, reinterpret_cast<std::uint8_t*>(&mData), sizeof(mData)) {}
 
+    /**
+     * \brief Get a reference to the internal header object.
+     * \return Reference to header.
+     */
     H& GetHeader() { return mHeader; }
-    D& Get() { return mData; }
+    /**
+     * \brief Get a const reference to the internal header object.
+     * \return const reference to header
+     */
     const H& GetHeader() const { return mHeader; }
+
+    /**
+     * \brief Get a reference to the internal content object.
+     * \return Reference to content. (struct or class)
+     */
+    D& Get() { return mData; }
+
+    /**
+     * \brief Get a const reference to the internal content object.
+     * \return const reference to content.
+     */
     const D& Get() const { return mData; }
+
+    /**
+     * \brief Operator to return copy of content object
+     */
     operator D() const { return mData; }
 protected:
     H mHeader{};

@@ -33,6 +33,9 @@ class Config : public rsp::security::SecureContainer<T>, public rsp::json::Jsona
 public:
     using rsp::security::SecureContainer<T>::SecureContainer;
 
+    /**
+     * \brief Interface method for content validation.
+     */
     virtual void Validate() = 0;
 };
 
