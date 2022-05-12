@@ -125,6 +125,7 @@ target_include_directories("rsp-core-lib-test"
         ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE
         src
+        tests/helpers
 )
 # Disable shadow warning to silence doctest...
 target_compile_options(rsp-core-lib-test PRIVATE

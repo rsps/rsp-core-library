@@ -8,6 +8,18 @@
  * \author      Steffen Brummer
  */
 
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest.h"
+#include <TestHelpers.h>
 
+int main(int argc, const char** argv)
+{
+    TestHelpers::ParseArguments(argv);
+    doctest::Context context(argc, argv);
+    int test_result = context.run(); // run queries, or run tests unless --no-run
+
+    if(context.shouldExit()) // honor query flags and --exit
+        return test_result;
+
+    return test_result;
+}
