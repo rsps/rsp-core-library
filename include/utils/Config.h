@@ -17,7 +17,16 @@
 
 namespace rsp::utils {
 
-
+/**
+ * \brief Template class for using data struct as configure content
+ * \tparam T struct or class type.
+ *
+ * Usage: Config<MyConfigData> config;
+ *
+ * Implement the Validate method to make runtime validation of the data content.
+ * Implement the Jsonable interface so configuration can be updated from
+ * json network data.
+ */
 template <typename T>
 class Config : public rsp::security::SecureContainer<T>, public rsp::json::Jsonable
 {

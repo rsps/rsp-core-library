@@ -57,8 +57,7 @@ struct ESizeDiffersInAssignment : public CoreException
 enum class ContainerFlags : std::uint8_t {
     None        = 0x00,
     Extended    = 0x01,
-    Signed      = 0x02,
-    Encrypted   = 0x04
+    Encrypted   = 0x02
 };
 
 

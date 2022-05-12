@@ -17,6 +17,7 @@
 #include <logging/Logger.h>
 
 using namespace rsp::utils;
+using namespace rsp::logging;
 
 namespace rsp::security
 {
@@ -41,7 +42,7 @@ bool SecureContainerBase::checkSignature(std::string_view aSecret)
     sha.Update(mpData, mDataSize);
     SecureBuffer md = sha.Get();
 
-    DLOG("In signature: " << md);
+    Logger::GetDefault().Debug() << "In signature: " << md << std::endl;
 
     auto &signature = getExtHeader().Signature;
     bool result = true;
@@ -60,21 +61,21 @@ void SecureContainerBase::readPayloadFrom(rsp::posix::FileIO &arFile)
 {
     if (mpHeader->Flags & ContainerFlags::Encrypted) {
         auto &header = getExtHeader();
-        DLOG("Read Header:\n" << getExtHeader());
+        Logger::GetDefault().Debug() << "Read Header:\n" << getExtHeader() << std::endl;
 
         SecureBuffer encrypted;
         encrypted.resize(header.PayloadSize);
         std::size_t len = arFile.Read(encrypted.data(), encrypted.size());
 
-        DLOG("\nEncrypted Data: (" << encrypted.size() << ")\n" << encrypted);
+        Logger::GetDefault().Debug() << "\nEncrypted Data: (" << encrypted.size() << ")\n" << encrypted << std::endl;
 
-        DLOG ("IV: " << mInitializationVector << ", Key: " << mKey);
+        Logger::GetDefault().Debug() << "IV: " << mInitializationVector << ", Key: " << mKey << std::endl;
         Decrypt d;
         d.Init(mInitializationVector, mKey);
         d.Update(encrypted.data(), encrypted.size());
         SecureBuffer plain = d.Finalize();
 
-        DLOG("\nPlain Data: (" << plain.size() << ")\n" << plain);
+        Logger::GetDefault().Debug() << "\nPlain Data: (" << plain.size() << ")\n" << plain << std::endl;
 
         header.PayloadSize = mDataSize;
 
@@ -109,7 +110,7 @@ void SecureContainerBase::SetEncryption(SecureBuffer aInitializationVector, Secu
 bool SecureContainerBase::writePayloadTo(rsp::posix::FileIO &arFile)
 {
     if (mpHeader->Flags & ContainerFlags::Encrypted) {
-        DLOG("IV: " << mInitializationVector << ", Key: " << mKey);
+        Logger::GetDefault().Debug() << "IV: " << mInitializationVector << ", Key: " << mKey << std::endl;
         Encrypt e;
         e.Init(mInitializationVector, mKey);
         e.Update(mpData, mDataSize);
@@ -117,8 +118,8 @@ bool SecureContainerBase::writePayloadTo(rsp::posix::FileIO &arFile)
 
         getExtHeader().PayloadSize = sb.size();
 
-        DLOG("Write Header:\n" << getExtHeader());
-        DLOG("\nEncrypted Data: (" << sb.size() << ")\n" << sb);
+        Logger::GetDefault().Debug() << "Write Header:\n" << getExtHeader() << std::endl;
+        Logger::GetDefault().Debug() << "\nEncrypted Data: (" << sb.size() << ")\n" << sb << std::endl;
         arFile.ExactWrite(sb.data(), sb.size());
 
         return true;

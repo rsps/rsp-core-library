@@ -14,8 +14,10 @@
 #include <cstring>
 #include <utils/DataContainer.h>
 #include <utils/Crc32.h>
+#include <logging/Logger.h>
 
 using namespace rsp::posix;
+using namespace rsp::logging;
 
 namespace rsp::utils {
 
@@ -64,10 +66,15 @@ void DataContainerBase::Load(const std::string &arFileName, std::string_view aSe
     FileIO fin(arFileName, std::ios_base::in);
 
     auto expected_size = mpHeader->Size;
+    auto expected_flags = mpHeader->Flags;
 
     fin.ExactRead(mpHeader, mpHeader->Size);
 
-    if (mpHeader->Size != expected_size) {
+    if ((mpHeader->Size != expected_size) || (mpHeader->Flags != expected_flags)) {
+        Logger::GetDefault().Error() << "Expected size: " << static_cast<int>(expected_size) << " was " << static_cast<int>(mpHeader->Size) << std::endl;
+        Logger::GetDefault().Error() << "Expected flags: " << static_cast<int>(expected_flags) << " was " << static_cast<int>(mpHeader->Flags) << std::endl;
+        mpHeader->Size = expected_size;
+        mpHeader->Flags = expected_flags;
         THROW_WITH_BACKTRACE1(EInvalidHeader, arFileName);
     }
 
@@ -86,7 +93,7 @@ void DataContainerBase::Save(const std::string &arFileName, std::string_view aSe
 {
     mpHeader->PayloadCRC = calcCRC();
 
-    if ((mpHeader->Flags & ContainerFlags::Signed) && (mpHeader->Flags & ContainerFlags::Extended)) {
+    if (mpHeader->Flags & ContainerFlags::Extended) {
         getSignature(getExtHeader().Signature, aSecret);
     }
 
@@ -140,9 +147,6 @@ ContainerHeader::ContainerHeader(std::uint8_t aSize, ContainerFlags aFlags, std:
       Flags(aFlags),
       Version(aVersion)
 {
-    if (Flags & ContainerFlags::Encrypted) {
-        std::cout << "Encrypted";
-    }
 }
 
 

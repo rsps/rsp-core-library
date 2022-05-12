@@ -68,6 +68,16 @@ public:
             static_cast<utype>(aValue));
     }
 
+    constexpr bool operator==(T aValue)
+    {
+        return static_cast<utype>(mValue) == static_cast<utype>(aValue);
+    }
+
+    constexpr bool operator!=(T aValue)
+    {
+        return static_cast<utype>(mValue) != static_cast<utype>(aValue);
+    }
+
     constexpr EnumFlags<T>& operator|=(T aValue)
     {
         mValue = static_cast<T>(

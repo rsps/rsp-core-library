@@ -44,7 +44,6 @@ public:
     SecureContainer()
         : rsp::utils::DataContainer<D, rsp::utils::ContainerHeaderExtended, SecureContainerBase>()
     {
-        GetHeader().Flags |= rsp::utils::ContainerFlags::Signed;
     }
 };
 
