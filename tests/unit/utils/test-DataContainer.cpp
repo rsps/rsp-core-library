@@ -14,8 +14,10 @@
 #include <utils/DataContainer.h>
 #include <utils/FixedString.h>
 #include <posix/FileSystem.h>
+#include <TestHelpers.h>
 
 using namespace rsp::utils;
+using namespace rsp::logging;
 
 struct MyData {
     int Integer = 42;
@@ -26,6 +28,9 @@ struct MyData {
 TEST_CASE("Data Container")
 {
     const char* cFileName = "DataContainer.bin";
+
+    Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
 
     DataContainer<MyData> dc;
 

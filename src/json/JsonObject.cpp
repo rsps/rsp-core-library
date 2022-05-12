@@ -11,10 +11,11 @@
 #include <json/JsonObject.h>
 #include <logging/Logger.h>
 
+using namespace rsp::logging;
+
 namespace rsp::json {
 
-//#define JLOG(a) DLOG(a)
-#define JLOG(a)
+#define JLOG(a) Logger::GetDefault().Debug() << a << std::endl
 
 JsonObject::JsonObject()
     : JsonValue()
@@ -104,7 +105,7 @@ JsonObject& JsonObject::Add(const std::string &arName, JsonValue* apValue)
         return *this;
     }
 
-    DLOG("JsonObject::Add(): \"" << arName << "\": " << apValue->Encode());
+    Logger::GetDefault().Info() << "JsonObject::Add(): \"" << arName << "\": " << apValue->Encode() << std::endl;
     mData.Remove(arName);
     mData[arName] = apValue;
     return *this;

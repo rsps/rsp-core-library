@@ -15,10 +15,13 @@
 #include <thread>
 #include <utils/CoreException.h>
 
+//#define DEBUG(a) DLOG(a)
+#define DEBUG(a)
+
 namespace rsp::logging {
 
 
-LoggerInterface* LoggerInterface::mpDefaultInstance = nullptr;
+std::shared_ptr<LoggerInterface> LoggerInterface::mpDefaultInstance = nullptr;
 
 
 LoggerInterface::Handle_t LoggerInterface::AddLogWriter(std::shared_ptr<LogWriterInterface> aWriter)
@@ -86,9 +89,9 @@ LoggerInterface& LoggerInterface::GetDefault()
     return *mpDefaultInstance;
 }
 
-void LoggerInterface::SetDefault(LoggerInterface &arLogger)
+void LoggerInterface::SetDefault(LoggerInterface* apLogger)
 {
-    mpDefaultInstance = &arLogger;
+    mpDefaultInstance = std::shared_ptr<LoggerInterface>(apLogger, [](LoggerInterface*){});
 }
 
 LogStream::LogStream(LoggerInterface *apOwner, LogLevel aLevel)
@@ -148,17 +151,17 @@ int OutStreamBuf::overflow(int c)
 int OutStreamBuf::sync()
 {
     if (mMutex.try_lock()) {
-        DLOG("OutStreamBuf mutex was not locked!!! " << std::this_thread::get_id());
+        DEBUG("OutStreamBuf mutex was not locked!!! " << std::this_thread::get_id());
     }
 
     int l = mBuffer.length();
     if (l > 0) {
-        DLOG("Message: (" << l << ") " << mBuffer);
+        DEBUG("Message: (" << l << ") " << mBuffer);
         ownerWrite(mBuffer);
         mBuffer = ""; //.erase();
     }
     mMutex.unlock();
-    DLOG("Unlocked by " << std::this_thread::get_id());
+    DEBUG("Unlocked by " << std::this_thread::get_id());
     return 0;
 }
 
@@ -167,7 +170,7 @@ std::ostream& operator <<(std::ostream &arOs, LogLevel aLevel)
     OutStreamBuf *stream = static_cast<OutStreamBuf *>(arOs.rdbuf());
 
     stream->Lock();
-    DLOG("Locked by " << std::this_thread::get_id());
+    DEBUG("Locked by " << std::this_thread::get_id());
     stream->SetLevel(aLevel);
 
     return arOs;
@@ -175,17 +178,15 @@ std::ostream& operator <<(std::ostream &arOs, LogLevel aLevel)
 
 
 Logger::Logger(bool aCaptureClog)
-    : mpClogBackup(nullptr)
+    : mpClogBackup((!aCaptureClog ? nullptr : std::clog.rdbuf(new OutStreamBuf(this, cDefautLogLevel))), [](std::streambuf*){})
 {
-    if (aCaptureClog) {
-        mpClogBackup = std::clog.rdbuf(new OutStreamBuf(this, cDefautLogLevel));
-    }
 }
 
 Logger::~Logger()
 {
     if (mpClogBackup) {
-        std::clog.rdbuf(mpClogBackup); // Restore backup before delete, to avoid segfault.
+        std::clog.rdbuf(mpClogBackup.get()); // Restore backup before delete, to avoid segfault.
+        mpClogBackup.reset();
     }
 }
 

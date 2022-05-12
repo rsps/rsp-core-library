@@ -17,7 +17,8 @@
 #include <posix/FileSystem.h>
 #include <graphics/Framebuffer.h>
 #include <graphics/GraphicsMain.h>
-#include "../helpers/scenes/Scenes.h"
+#include <scenes/Scenes.h>
+#include <TestHelpers.h>
 
 using namespace rsp::graphics;
 
@@ -34,6 +35,9 @@ public:
 
 TEST_CASE("Graphics Main Test")
 {
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
+
     // Make framebuffer
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());

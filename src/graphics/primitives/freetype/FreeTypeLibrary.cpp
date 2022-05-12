@@ -15,6 +15,7 @@
 #include <utils/StrUtils.h>
 
 using namespace rsp::utils;
+using namespace rsp::logging;
 
 namespace rsp::graphics {
 
@@ -39,7 +40,7 @@ FreeTypeLibrary& FreeTypeLibrary::Get()
 
 FT_Face FreeTypeLibrary::CreateFontFace(const std::string &arFontName, Font::Styles aStyle)
 {
-    DLOG("Creating font " << arFontName << " with style " << static_cast<int>(aStyle));
+    Logger::GetDefault().Info() << "Creating font " << arFontName << " with style " << static_cast<int>(aStyle) << std::endl;
 
     auto it = mFontSets.find(arFontName);
     if (it == mFontSets.end()) {
@@ -106,7 +107,7 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
             }
         }
 
-        std::clog << "Adding font " << face->family_name << ", " << face->style_name << " " << static_cast<int>(style) << std::endl;
+        Logger::GetDefault().Debug() << "Adding font " << face->family_name << ", " << face->style_name << " " << static_cast<int>(style) << std::endl;
         mFontSets[face->family_name][style] = info;
 
 #ifdef DEBUG_FONTS

@@ -12,12 +12,16 @@
 #include <graphics/primitives/Bitmap.h>
 #include <graphics/primitives/Color.h>
 #include <utils/CoreException.h>
+#include <TestHelpers.h>
 
 using namespace rsp::utils;
 using namespace rsp::graphics;
 
 TEST_CASE("Bitmap file loading")
 {
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
+
     SUBCASE("Loading Bmp file")
     {
         // Arrange

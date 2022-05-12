@@ -11,10 +11,12 @@
 #include <json/JsonArray.h>
 #include <logging/Logger.h>
 
+using namespace rsp::logging;
+
 namespace rsp::json {
 
-// # define JLOG(a) DLOG(a)
-#define JLOG(a)
+# define JLOG(a) Logger::GetDefault().Debug() << a << std::endl
+//#define JLOG(a)
 
 
 JsonArray::JsonArray()
@@ -94,7 +96,7 @@ JsonArray& JsonArray::Add(JsonValue* apValue)
     if (apValue == nullptr) {
         return *this;
     }
-    DLOG("JsonArray::Add(): " << apValue->Encode());
+    JLOG("JsonArray::Add(): " << apValue->Encode());
     mData.push_back(apValue);
 
     return *this;

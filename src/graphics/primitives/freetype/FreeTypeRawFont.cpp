@@ -18,6 +18,8 @@
 #include FT_FREETYPE_H
 #include FT_OUTLINE_H
 
+using namespace rsp::logging;
+
 namespace rsp::graphics {
 
 
@@ -127,7 +129,7 @@ void FreeTypeRawFont::SetSize(int aWidthPx, int aHeightPx)
         THROW_WITH_BACKTRACE2(FontException, "FT_Set_Pixel_Sizes() failed", error);
     }
     mSizePx = std::min(aWidthPx, aHeightPx);
-    DLOG("Font.SetSize(" << aWidthPx << ", " << aHeightPx << ") -> " << mSizePx);
+    Logger::GetDefault().Debug() << "Font.SetSize(" << aWidthPx << ", " << aHeightPx << ") -> " << mSizePx;
 }
 
 void FreeTypeRawFont::SetStyle(Font::Styles aStyle)

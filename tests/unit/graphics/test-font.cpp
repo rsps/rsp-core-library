@@ -13,11 +13,15 @@
 #include <graphics/primitives/Rect.h>
 #include <graphics/primitives/Text.h>
 #include <graphics/primitives/freetype/FreeTypeLibrary.h>
+#include <TestHelpers.h>
 
 using namespace rsp::graphics;
 
 TEST_CASE("Font Primitive")
 {
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
+
     const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
     const char* cFontName = "Exo 2";
 

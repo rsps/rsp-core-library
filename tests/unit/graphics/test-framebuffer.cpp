@@ -16,6 +16,7 @@
 #include <filesystem>
 #include <posix/FileSystem.h>
 #include <utils/StopWatch.h>
+#include <TestHelpers.h>
 
 using namespace rsp::graphics;
 
@@ -30,6 +31,9 @@ inline void CheckPixel(const Point &aPoint, const Color &aColour, const Framebuf
 
 TEST_CASE("Framebuffer Drawing Primitives")
 {
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
+
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
 
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());

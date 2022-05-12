@@ -8,15 +8,19 @@
  * \author      Simon Glashoff
  */
 
+#include <doctest.h>
 #include "graphics/Framebuffer.h"
 #include "graphics/controls/Image.h"
 #include "posix/FileSystem.h"
-#include <doctest.h>
+#include <TestHelpers.h>
 
 using namespace rsp::graphics;
 
 TEST_CASE("Image Test")
 {
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
+
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());

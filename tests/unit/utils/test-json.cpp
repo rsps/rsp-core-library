@@ -13,11 +13,15 @@
 #include <iostream>
 #include <utils/StrUtils.h>
 #include <utils/InRange.h>
+#include <TestHelpers.h>
 
 using namespace rsp::utils;
 using namespace rsp::json;
 
 TEST_CASE("Json") {
+
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
 
     JsonString json_object{ R"(
 {

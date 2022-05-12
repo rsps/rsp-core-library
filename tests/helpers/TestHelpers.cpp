@@ -19,6 +19,7 @@ rsp::logging::LogLevel TestHelpers::mLogLevel = rsp::logging::LogLevel::Notice;
 
 void TestHelpers::AddConsoleLogger(Logger& arLogger)
 {
+//    std::cout << "Adding Console logger with level " << ToString(mLogLevel) << std::endl;
     LoggerInterface::SetDefault(&arLogger);
     arLogger.AddLogWriter(std::make_shared<rsp::logging::ConsoleLogWriter>(mLogLevel));
 }
@@ -37,10 +38,10 @@ std::uint8_t TestHelpers::TamperWithFile(const std::string &arFileName, std::siz
 void TestHelpers::ParseArguments(const char **apArgv)
 {
     for(; *apArgv; ++apArgv) {
-        if(strncmp(*apArgv, "-vv", strlen("-vv")) == 0) {
+        if(strncmp(*apArgv, "-vvv", strlen("-vvv")) == 0) {
             mLogLevel = rsp::logging::LogLevel::Debug;
         }
-        else if(strncmp(*apArgv, "-v", strlen("-v")) == 0) {
+        else if(strncmp(*apArgv, "-vv", strlen("-vv")) == 0) {
             mLogLevel = rsp::logging::LogLevel::Info;
         }
     }

@@ -17,6 +17,8 @@
 #include <graphics/primitives/Color.h>
 #include <logging/Logger.h>
 
+using namespace rsp::logging;
+
 namespace rsp::graphics
 {
 
@@ -100,7 +102,7 @@ void BmpLoader::ReadHeader(std::ifstream &aFile)
     // Read the 54 byte header
     aFile.read(reinterpret_cast<char *>(&mBmpHeader), sizeof(mBmpHeader));
 
-    DLOG(mBmpHeader);
+    Logger::GetDefault().Debug() << mBmpHeader;
 
     mWidth = mBmpHeader.v1.width;
     mHeight = mBmpHeader.v1.heigth;
@@ -115,7 +117,7 @@ void BmpLoader::ReadData(std::ifstream &aFile)
 {
     // Figure out amount to read per row
     int paddedRowSize = (mBmpHeader.v1.width * mBytesPerPixel + 3) & (~3);
-    DLOG("Padded Row size: " << paddedRowSize);
+    Logger::GetDefault().Debug() << "Padded Row size: " << paddedRowSize;
 
     // Initialize containers for reading
     std::vector<uint8_t> pixelRow;

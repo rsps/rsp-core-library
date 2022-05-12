@@ -16,6 +16,7 @@
 #include <logging/Logger.h>
 
 using namespace rsp::messaging;
+using namespace rsp::logging;
 
 namespace rsp::graphics
 {
@@ -46,7 +47,7 @@ void GraphicsMain::Run(int aMaxFPS)
 
         // New scene requested?
         if (!mNextScene.empty()) {
-            DLOG("New Scene: " << mNextScene);
+            Logger::GetDefault().Info() << "New Scene: " << mNextScene << std::endl;
             mrScenes.SetActiveScene(mNextScene);
             mrScenes.ActiveScene().Invalidate();
             mNextScene = "";
@@ -55,7 +56,7 @@ void GraphicsMain::Run(int aMaxFPS)
 
         // New inputs?
         if (mrTouchParser.Poll(event)) {
-            DLOG(event);
+            Logger::GetDefault().Debug() << event << std::endl;
             mrScenes.ActiveScene().ProcessInput(event);
         }
 

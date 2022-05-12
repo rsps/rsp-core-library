@@ -53,9 +53,9 @@ class LogStream;
 class LoggerInterface
 {
 public:
-    virtual ~LoggerInterface() {}
+    virtual ~LoggerInterface() { mpDefaultInstance.reset(); }
 
-    static void SetDefault(LoggerInterface &arLogger);
+    static void SetDefault(LoggerInterface* apLogger);
     static LoggerInterface& GetDefault();
 
     virtual LogStream Emergency() = 0;
@@ -75,7 +75,7 @@ public:
     void RemoveLogWriter(Handle_t aHandle);
 
 protected:
-    static LoggerInterface* mpDefaultInstance;
+    static std::shared_ptr<LoggerInterface> mpDefaultInstance;
     std::mutex mMutex{};
     std::vector<std::shared_ptr<LogWriterInterface>> mWriters{};
 
@@ -191,7 +191,9 @@ public:
     Logger& operator= (const Logger&) = delete;
 
 protected:
-    std::streambuf *mpClogBackup;
+    // Use shared_ptr to use compilers default move operations.
+    // It is instantiated with do nothing deallocator in Logger constructor initialization.
+    std::shared_ptr<std::streambuf> mpClogBackup;
 };
 
 } /* namespace logging */

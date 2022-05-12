@@ -12,9 +12,11 @@
 #include <utils/Config.h>
 #include <utils/FixedString.h>
 #include <json/Json.h>
+#include <TestHelpers.h>
 
 using namespace rsp::utils;
 using namespace rsp::json;
+using namespace rsp::logging;
 
 struct ConfigData {
     FixedString<100> ApplicationName{};
@@ -62,16 +64,18 @@ static void TamperWithFile(const std::string& arFileName, std::size_t aOffset, s
     f.ExactWrite(&aValue, sizeof(aValue));
 }
 
-
 TEST_CASE("Config")
 {
     const char* cFileName = "config.bin";
     const char* cShaSeed = "HashSeed";
 
+    Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
+
     MyConfig config;
     config.Get().ApplicationName = "ConfigurationApp";
 
-    CHECK_EQ(config.GetHeader().Flags, (ContainerFlags::Extended | ContainerFlags::Signed));
+    CHECK_EQ(config.GetHeader().Flags, ContainerFlags::Extended);
 
     CHECK_NOTHROW(config.Validate());
 
