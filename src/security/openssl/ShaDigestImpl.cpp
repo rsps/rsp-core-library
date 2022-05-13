@@ -25,7 +25,7 @@ namespace rsp::security {
 class OpenSSLSha : public DigestImpl
 {
 public:
-    OpenSSLSha(std::string_view aSecret, HashAlgorithms aAlgorithm)
+    OpenSSLSha(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
         : mpCtx(HMAC_CTX_new())
     {
         const EVP_MD *algo;
@@ -43,7 +43,7 @@ public:
                 algo = EVP_sha3_256();
                 break;
         }
-        HMAC_Init_ex(mpCtx, aSecret.data(), aSecret.size(), algo, NULL);
+        HMAC_Init_ex(mpCtx, arSecret.data(), arSecret.size(), algo, NULL);
     }
 
     ~OpenSSLSha()
@@ -76,9 +76,9 @@ protected:
 };
 
 // SHA interface factory for OpenSSL
-DigestImpl* DigestImpl::Create(std::string_view aSecret, HashAlgorithms aAlgorithm)
+DigestImpl* DigestImpl::Create(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
 {
-    return new OpenSSLSha(aSecret, aAlgorithm);
+    return new OpenSSLSha(arSecret, aAlgorithm);
 }
 
 

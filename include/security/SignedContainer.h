@@ -8,13 +8,12 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SECURECONTAINER_H_
-#define INCLUDE_SECURITY_SECURECONTAINER_H_
+#ifndef INCLUDE_SECURITY_SIGNEDCONTAINER_H_
+#define INCLUDE_SECURITY_SIGNEDCONTAINER_H_
 
 #include <utils/DataContainer.h>
 #include <security/SecureBuffer.h>
 #include <security/Sha256DataSignature.h>
-#include <security/EncryptedFileDataStorage.h>
 
 namespace rsp::security
 {
@@ -24,13 +23,13 @@ namespace rsp::security
  * \tparam T struct or class defining container content.
  */
 template <class T>
-class SecureContainer : public rsp::utils::DataContainerBase<T, Sha256DataSignature, EncryptedFileDataStorage>
+class SignedContainer : public rsp::utils::DataContainerBase<T, Sha256DataSignature, rsp::utils::FileDataStorage>
 {
 public:
-    SecureContainer(std::string_view aFileName, const SecureBuffer& mrSecret, const SecureBuffer& arInitializationVector, const SecureBuffer& arKey)
+    SignedContainer(std::string_view aFileName, const SecureBuffer& mrSecret)
     {
         this->GetSignature().Init(mrSecret);
-        this->GetStorage().Init(aFileName, arInitializationVector, arKey);
+        this->GetStorage().Init(aFileName);
     }
 };
 
@@ -38,4 +37,6 @@ public:
 } /* namespace rsp::security */
 
 
-#endif /* INCLUDE_SECURITY_SECURECONTAINER_H_ */
+
+
+#endif /* INCLUDE_SECURITY_SIGNEDCONTAINER_H_ */

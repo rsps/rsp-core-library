@@ -31,20 +31,11 @@ TEST_CASE("Secure Container")
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
-    SecureContainer<MyData> sc;
-    CHECK_EQ(sc.GetHeader().Flags, ContainerFlags::Extended);
-    sc.SetEncryption(CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
+    SecureContainer<MyData> sc(cFileName, cShaSeed, CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
 
     SUBCASE("Init")
     {
-        CHECK_EQ(sizeof(sc.GetHeader()), 76);
         CHECK_EQ(sizeof(sc.Get()), sizeof(MyData));
-        CHECK_EQ(sc.GetHeader().Size, 76);
-        CHECK_EQ(sc.GetHeader().Flags, (ContainerFlags::Extended | ContainerFlags::Encrypted));
-        CHECK_EQ(sc.GetHeader().Version, 1);
-        CHECK_EQ(sc.GetHeader().PayloadCRC, 0);
-        CHECK_EQ(sc.GetHeader().PayloadSize, 0);
-
         CHECK_EQ(sc.Get().Integer, 42);
         CHECK_EQ(sc.Get().String, "");
     }
@@ -62,24 +53,16 @@ TEST_CASE("Secure Container")
         CHECK(sc.Get().String == std::string(cPlainText));
         CHECK(sc.Get().String == cPlainText);
 
-        sc.Save(cFileName, cShaSeed);
-        CHECK_EQ(sc.GetHeader().PayloadCRC, 0x1269849B);
-        unsigned int size = sc.GetHeader().PayloadSize;
-        CHECK(size >= sizeof(MyData));
-        CHECK(size <= sizeof(MyData) + 32);
+        CHECK_NOTHROW(sc.Save());
     }
 
     SUBCASE("Load")
     {
         MESSAGE("Loading");
 
-        SecureContainer<MyData> dcl;
-        dcl.SetEncryption(CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
+        SecureContainer<MyData> dcl(cFileName, cShaSeed, CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
 
-        CHECK_NOTHROW(dcl.Load(cFileName, cShaSeed));
-        CHECK_EQ(dcl.GetHeader().Version, 1);
-        CHECK_EQ(dcl.GetHeader().PayloadCRC, 0x1269849B);
-        CHECK_EQ(dcl.GetHeader().PayloadSize, sizeof(MyData));
+        CHECK_NOTHROW(dcl.Load());
 
         MESSAGE("Integer: " << dcl.Get().Integer);
         MESSAGE("String: " << std::string(dcl.Get().String));
@@ -88,43 +71,35 @@ TEST_CASE("Secure Container")
         CHECK(dcl.Get().String == cPlainText);
     }
 
-    SUBCASE("CRC Integrity") {
-        /*
-         * Tamper with container file content
-         */
-        auto old = TestHelpers::TamperWithFile(cFileName, sizeof(sc.GetHeader())+1, 0x55);
-        SecureContainer<MyData> dcl;
-        dcl.SetEncryption(CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
-        CHECK_THROWS_AS(dcl.Load(cFileName, cShaSeed), EInvalidCRC);
+    SUBCASE("Encryption Integrity") {
+        SecureContainer<MyData> dcl(cFileName, cShaSeed, CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
 
-        TestHelpers::TamperWithFile(cFileName, sizeof(sc.GetHeader())+1, old);
-        CHECK_NOTHROW(dcl.Load(cFileName, cShaSeed));
+        MESSAGE("Change encryption bit");
+        /*
+         * Tamper with container file: Change a single bit in encrypted data.
+         */
+        auto bitmask = TestHelpers::TamperWithFile(cFileName, dcl.GetSignature().GetSize() + 3, 0x00);
+        bitmask ^= 0x20;
+        TestHelpers::TamperWithFile(cFileName, dcl.GetSignature().GetSize() + 3, bitmask);
+
+        CHECK_THROWS_AS(dcl.Load(), EInvalidSignature);
+
+        bitmask ^= 0x20;
+        TestHelpers::TamperWithFile(cFileName, dcl.GetSignature().GetSize() + 3, bitmask);
+        CHECK_NOTHROW(dcl.Load());
     }
 
     SUBCASE("Signature Integrity") {
         /*
-         * Tamper with container file: CRC takes precedence, so invalidate signature directly
+         * Tamper with container file: Cryptation takes precedence, so invalidate signature directly
          */
-        auto old = TestHelpers::TamperWithFile(cFileName, 0x10, 0x58);
-        SecureContainer<MyData> dcl;
-        dcl.SetEncryption(CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
-        CHECK_THROWS_AS(dcl.Load(cFileName, cShaSeed), EInvalidSignature);
+        auto old = TestHelpers::TamperWithFile(cFileName, 0x03, 0x58);
+        SecureContainer<MyData> dcl(cFileName, cShaSeed, CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
 
-        TestHelpers::TamperWithFile(cFileName, 0x10, old);
-        CHECK_NOTHROW(dcl.Load(cFileName, cShaSeed));
-    }
+        CHECK_THROWS_AS(dcl.Load(), EInvalidSignature);
 
-    SUBCASE("Header Integrity") {
-        /*
-         * Tamper with container file header: Clear encrypted flag
-         */
-        auto old = TestHelpers::TamperWithFile(cFileName, 0x01, 0x01);
-        SecureContainer<MyData> dcl;
-        dcl.SetEncryption(CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
-        CHECK_THROWS_AS(dcl.Load(cFileName, cShaSeed), EInvalidHeader);
-
-        TestHelpers::TamperWithFile(cFileName, 0x01, old);
-        CHECK_NOTHROW(dcl.Load(cFileName, cShaSeed));
+        TestHelpers::TamperWithFile(cFileName, 0x03, old);
+        CHECK_NOTHROW(dcl.Load());
     }
 
 }

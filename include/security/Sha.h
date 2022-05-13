@@ -32,7 +32,7 @@ enum class HashAlgorithms {
  * \brief Interface class for pimpl design pattern.
  */
 struct DigestImpl {
-    static DigestImpl* Create(std::string_view aSecret, HashAlgorithms aAlgorithm);
+    static DigestImpl* Create(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm);
     virtual ~DigestImpl() {};
     virtual void Update(const uint8_t *apBuffer, std::size_t aSize) = 0;
     virtual SecureBuffer Finalize() = 0;
@@ -49,7 +49,7 @@ public:
      * \param aSecret String used to seed the hash
      * \param aAlgorithm SHA algorithm to use.
      */
-    Sha(std::string_view aSecret, HashAlgorithms aAlgorithm);
+    Sha(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm);
     ~Sha();
 
     /**

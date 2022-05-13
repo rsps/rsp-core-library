@@ -12,8 +12,8 @@
 
 namespace rsp::security {
 
-Sha::Sha(std::string_view aSecret, HashAlgorithms aAlgorithm)
-    : mPimpl(DigestImpl::Create(aSecret, aAlgorithm))
+Sha::Sha(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
+    : mPimpl(DigestImpl::Create(arSecret, aAlgorithm))
 {
 }
 

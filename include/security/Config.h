@@ -8,14 +8,14 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_CONFIG_H_
-#define INCLUDE_UTILS_CONFIG_H_
+#ifndef INCLUDE_SECURITY_CONFIG_H_
+#define INCLUDE_SECURITY_CONFIG_H_
 
 #include <json/Jsonable.h>
-#include <security/SecureContainer.h>
+#include <security/SignedContainer.h>
 #include <utils/Validator.h>
 
-namespace rsp::utils {
+namespace rsp::security {
 
 /**
  * \brief Template class for using data struct as configure content
@@ -28,10 +28,10 @@ namespace rsp::utils {
  * json network data.
  */
 template <typename T>
-class Config : public rsp::security::SecureContainer<T>, public rsp::json::Jsonable
+class Config : public SignedContainer<T>, public rsp::json::Jsonable
 {
 public:
-    using rsp::security::SecureContainer<T>::SecureContainer;
+    using SignedContainer<T>::SignedContainer;
 
     /**
      * \brief Interface method for content validation.
@@ -40,7 +40,7 @@ public:
 };
 
 
-} // namespace rsp::config
+} // namespace rsp::security
 
 
-#endif /* INCLUDE_UTILS_CONFIG_H_ */
+#endif /* INCLUDE_SECURITY_CONFIG_H_ */

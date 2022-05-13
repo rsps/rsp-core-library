@@ -9,14 +9,15 @@
  */
 
 #include <doctest.h>
-#include <utils/Config.h>
 #include <utils/FixedString.h>
 #include <json/Json.h>
+#include <security/Config.h>
 #include <TestHelpers.h>
 
 using namespace rsp::utils;
 using namespace rsp::json;
 using namespace rsp::logging;
+using namespace rsp::security;
 
 struct ConfigData {
     FixedString<100> ApplicationName{};
@@ -28,6 +29,8 @@ struct ConfigData {
 class MyConfig : public Config<ConfigData>
 {
 public:
+    using Config<ConfigData>::Config;
+
     std::unique_ptr<JsonValue> ToJson() const override
     {
         std::unique_ptr<JsonValue> result = std::make_unique<JsonObject>();
@@ -57,25 +60,18 @@ public:
     }
 };
 
-static void TamperWithFile(const std::string& arFileName, std::size_t aOffset, std::uint8_t aValue)
-{
-    rsp::posix::FileIO f(arFileName, std::ios_base::in | std::ios_base::out);
-    f.Seek(aOffset); // Offset to PlacementCount
-    f.ExactWrite(&aValue, sizeof(aValue));
-}
-
 TEST_CASE("Config")
 {
     const char* cFileName = "config.bin";
-    const char* cShaSeed = "HashSeed";
+    const std::string cShaSeed = "HashSeed";
+    SecureBuffer sb_hash(cShaSeed.data(), cShaSeed.size());
 
     Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
-    MyConfig config;
-    config.Get().ApplicationName = "ConfigurationApp";
 
-    CHECK_EQ(config.GetHeader().Flags, ContainerFlags::Extended);
+    MyConfig config(cFileName, sb_hash);
+    config.Get().ApplicationName = "ConfigurationApp";
 
     CHECK_NOTHROW(config.Validate());
 
@@ -96,34 +92,26 @@ TEST_CASE("Config")
 
     SUBCASE("Storage")
     {
-        config.Save(cFileName, cShaSeed);
+        config.Save();
 
         config.Get().ApplicationName = "";
         CHECK_THROWS_AS(config.Validate(), ValidatorException);
 
-        CHECK_NOTHROW(config.Load(cFileName, cShaSeed));
-    }
-
-    SUBCASE("CRC Integrity") {
-        /*
-         * Tamper with config file, increase PlacementCount to 4
-         */
-        TamperWithFile(cFileName, 0xb4, 4);
-        CHECK_THROWS_AS(config.Load(cFileName, cShaSeed), EInvalidCRC);
-
-        TamperWithFile(cFileName, 0xb4, 3);
-        CHECK_NOTHROW(config.Load(cFileName, cShaSeed));
+        CHECK_NOTHROW(config.Load());
     }
 
     SUBCASE("Signature Integrity") {
         /*
-         * Tamper with config file: CRC takes precedence, so invalidate signature directly
+         * Tamper with config file. We change a single bit.
          */
-        TamperWithFile(cFileName, 0x10, 0x58);
-        CHECK_THROWS_AS(config.Load(cFileName, cShaSeed), EInvalidSignature);
+        auto bitmask = TestHelpers::TamperWithFile(cFileName, config.GetSignature().GetSize() + 3, 0);
+        bitmask ^= 0x04;
+        TestHelpers::TamperWithFile(cFileName, config.GetSignature().GetSize() + 3, bitmask);
+        CHECK_THROWS_AS(config.Load(), EInvalidSignature);
 
-        TamperWithFile(cFileName, 0x10, 0x59);
-        CHECK_NOTHROW(config.Load(cFileName, cShaSeed));
+        bitmask ^= 0x04;
+        TestHelpers::TamperWithFile(cFileName, config.GetSignature().GetSize() + 3, bitmask);
+        CHECK_NOTHROW(config.Load());
     }
 
     CHECK_NOTHROW(config.Validate());

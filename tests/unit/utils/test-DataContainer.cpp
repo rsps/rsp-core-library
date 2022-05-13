@@ -15,15 +15,17 @@
 #include <utils/FixedString.h>
 #include <posix/FileSystem.h>
 #include <TestHelpers.h>
+#include <security/SecureBuffer.h>
 
 using namespace rsp::utils;
 using namespace rsp::logging;
 
 struct MyData {
+    float Float = 43.1f;
     int Integer = 42;
-    float Float = 43.0f;
-    FixedString<10> String{};
+    FixedString<10> String{"Hello"};
 };
+
 
 TEST_CASE("Data Container")
 {
@@ -32,21 +34,19 @@ TEST_CASE("Data Container")
     Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
-    DataContainer<MyData> dc;
+    DataContainer<MyData> dc(cFileName);
 
     SUBCASE("Init")
     {
-        CHECK_EQ(sizeof(dc.GetHeader()), 12);
+        CHECK_EQ(sizeof(MyData), 20);
         CHECK_EQ(sizeof(dc.Get()), sizeof(MyData));
-        CHECK_EQ(dc.GetHeader().Size, 12);
-        CHECK_EQ(dc.GetHeader().Flags, ContainerFlags::None);
-        CHECK_EQ(dc.GetHeader().Version, 1);
-        CHECK_EQ(dc.GetHeader().PayloadCRC, 0);
-        CHECK_EQ(dc.GetHeader().PayloadSize, 0);
+
+        MESSAGE(dc.Get().Integer);
+        MESSAGE(dc.Get().Float);
 
         CHECK_EQ(dc.Get().Integer, 42);
-        CHECK_EQ(dc.Get().Float, 43.0);
-        CHECK_EQ(dc.Get().String, "");
+        CHECK_EQ(dc.Get().Float, 43.1f);
+        CHECK_EQ(dc.Get().String, "Hello");
     }
 
     SUBCASE("Save")
@@ -61,52 +61,37 @@ TEST_CASE("Data Container")
         CHECK(dc.Get().String != std::string(p));
         CHECK(dc.Get().String != p);
 
-        dc.Save(cFileName);
-        CHECK_EQ(dc.GetHeader().PayloadCRC, 0xD65B5F49);
-        CHECK_EQ(dc.GetHeader().PayloadSize, sizeof(MyData));
+        CHECK_NOTHROW(dc.Save());
     }
 
     SUBCASE("Load")
     {
-        DataContainer<MyData> dcl;
-
-        CHECK_NOTHROW(dcl.Load(cFileName));
-        CHECK_EQ(dcl.GetHeader().Version, 1);
-        CHECK_EQ(dcl.GetHeader().PayloadCRC, 0xD65B5F49);
-        CHECK_EQ(dcl.GetHeader().PayloadSize, sizeof(MyData));
+        DataContainer<MyData> dcl(cFileName);
+        CHECK_NOTHROW(dcl.Load());
 
         CHECK_EQ(dcl.Get().Integer, 44);
-        CHECK_EQ(dcl.Get().Float, 43.0);
+        CHECK_EQ(dcl.Get().Float, 43.1f);
         CHECK_EQ(dcl.Get().String, "Hello Worl");
     }
 
     SUBCASE("Assignment")
     {
-        DataContainer<MyData> dcl;
-        CHECK_NOTHROW(dcl.Load(cFileName));
+        DataContainer<MyData> dcl(cFileName);
+        CHECK_NOTHROW(dcl.Load());
 
         dc = dcl;
 
-        CHECK_EQ(dc.GetHeader().Version, 1);
-        CHECK_EQ(dc.GetHeader().PayloadCRC, 0xD65B5F49);
-        CHECK_EQ(dc.GetHeader().PayloadSize, sizeof(MyData));
-
         CHECK_EQ(dc.Get().Integer, 44);
-        CHECK_EQ(dc.Get().Float, 43.0);
+        CHECK_EQ(dc.Get().Float, 43.1f);
         CHECK_EQ(dc.Get().String, "Hello Worl");
     }
 
     SUBCASE("Integrity")
     {
-        {
-            rsp::posix::FileIO f(cFileName, std::ios_base::in | std::ios_base::out);
-            f.Seek(14);
-            std::uint8_t b = 42;
-            CHECK_EQ(f.Write(&b, 1), 1);
-        }
+        TestHelpers::TamperWithFile(cFileName, 14, 42);
 
-        DataContainer<MyData> dcl;
-        CHECK_THROWS_AS(dcl.Load(cFileName), EInvalidCRC);
+        DataContainer<MyData> dcl(cFileName);
+        CHECK_THROWS_AS(dcl.Load(), EInvalidSignature);
 
         rsp::posix::FileSystem::DeleteFile(cFileName);
     }

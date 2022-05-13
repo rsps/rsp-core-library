@@ -13,10 +13,10 @@
 
 namespace rsp::security {
 
-SecureBuffer CryptBase::KeyGen(std::string_view aSeed, std::size_t aDesiredKeyLen)
+SecureBuffer CryptBase::KeyGen(const SecureBuffer& arSeed, std::size_t aDesiredKeyLen)
 {
-    Sha sha(aSeed, HashAlgorithms::Sha256);
-    sha.Update(reinterpret_cast<const uint8_t*>(aSeed.data()), aSeed.size());
+    Sha sha(arSeed, HashAlgorithms::Sha256);
+    sha.Update(arSeed.data(), arSeed.size());
     SecureBuffer md = sha.Get();
 
     if (aDesiredKeyLen < md.size()) {

@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <string>
+#include <cstring>
 #include <sstream>
 #include "SecureAllocator.h"
 
@@ -36,6 +37,11 @@ class SecureBuffer : public std::vector<std::uint8_t, SecureAllocator<std::uint8
 {
 public:
     using std::vector<std::uint8_t, SecureAllocator<std::uint8_t>>::vector;
+
+    SecureBuffer(const char* apData)
+    {
+        assign(apData, apData + std::strlen(apData)); // pointers are converted to iterators.
+    }
 
     /**
      * \brief Constructs from pointer to char array

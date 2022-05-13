@@ -68,7 +68,7 @@ public:
      * \param aDesiredKeyLen Length of key in bytes.
      * \return SecureBuffer with new key
      */
-    static SecureBuffer KeyGen(std::string_view aSeed, std::size_t aDesiredKeyLen = 64);
+    static SecureBuffer KeyGen(const SecureBuffer& arSeed, std::size_t aDesiredKeyLen = 64);
 
 protected:
     CipherTypes mCipherType;
