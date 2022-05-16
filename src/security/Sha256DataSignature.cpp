@@ -15,20 +15,20 @@ namespace rsp::security {
 
 void Sha256DataSignature::Init(const SecureBuffer &arSecret)
 {
-    mrSecret = arSecret;
+    mSecret = arSecret;
     mSignature.resize(GetSize());
 }
 
 void Sha256DataSignature::Calc(const rsp::utils::IDataContent &arContent)
 {
-    Sha sha(mrSecret, HashAlgorithms::Sha256);
+    Sha sha(mSecret, HashAlgorithms::Sha256);
     sha.Update(arContent.GetData(), arContent.GetSize());
     mSignature = sha.Get();
 }
 
 void Sha256DataSignature::Verify(const rsp::utils::IDataContent &arContent)
 {
-    Sha sha(mrSecret, HashAlgorithms::Sha256);
+    Sha sha(mSecret, HashAlgorithms::Sha256);
     sha.Update(arContent.GetData(), arContent.GetSize());
     if (mSignature != sha.Get()) {
         THROW_WITH_BACKTRACE(rsp::utils::EInvalidSignature);

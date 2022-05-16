@@ -36,7 +36,7 @@ public:
 
 protected:
     SecureBuffer mSignature{};
-    SecureBuffer mrSecret{};
+    SecureBuffer mSecret{};
 };
 
 } /* namespace rsp::security */
