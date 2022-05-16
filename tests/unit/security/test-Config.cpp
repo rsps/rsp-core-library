@@ -85,7 +85,14 @@ TEST_CASE("Config")
         config.Get().PlacementCount = 7;
         CHECK_THROWS_AS(config.Validate(), ValidatorException);
 
+        json = R"({"ApplicationName":"ConfigurationApp","PlacementCount":"NotANumber","Power":280,"Pi":3.141593,"ExtraValue":1.2345})";
         Json js;
+        js.Decode(json);
+        config.FromJson(js.Get());
+        CHECK_THROWS_AS(config.Validate(), ValidatorException);
+
+        json = R"({"ApplicationName":"ConfigurationApp","PlacementCount":"3","Power":280,"Pi":3.141593,"ExtraValue":1.2345})";
+        js.Clear();
         js.Decode(json);
         config.FromJson(js.Get());
     }
