@@ -1,0 +1,114 @@
+@startuml
+
+skinparam stereotypeCBackgroundColor<<Exception>> Red
+'hide stereotype
+
+title Security Classes
+
+namespace rsp::security {
+
+class SecureAllocator <typename T> {
+    +cleanse(p: T*, n: size_t)
+    +deallocate(p: T*, n: size_t)
+}
+
+class SecureBuffer {
+    +SecureBuffer(apData: const char*)
+    +SecureBuffer(apData: const char*, aSize: size_t)
+    +SecureBuffer(apData: const uint8_t*, aSize: size_t)
+    +operator==(arOther: const string&) const: bool
+    +operator==(apOther: const char*) const: bool
+    +GetHex() const: std::string
+}
+
+
+class SecureString
+{
+    +SecureString(arOther: const SecureBuffer&)
+    +SecureString(arOther: const std::string&)
+    +operator std::string_view(): string_view
+    +operator=(arOther: const SecureBuffer&): SecureString&
+    +operator==(arOther: const SecureString&): bool
+    +operator==(arOther: const std::string&): bool
+    +operator==(apOther: const char*): bool
+}
+
+
+enum HashAlgorithms {
+    +Sha1
+    +Sha256
+    +Sha3
+}
+
+interface DigestImpl {
+    +{static} Create(arSecret: const SecureBuffer&, HashAlgorithms aAlgorithm): DigestImpl*
+    +{abstract} Update(apBuffer: const uint8_t*, aSize: size_t)
+    +{abstract} Finalize(): SecureBuffer
+}
+
+class Sha {
+    #mPimpl: std::unique_ptr<DigestImpl>
+
+    +Sha(arSecret: const SecureBuffer&, aAlgorithm: HashAlgorithms);
+    +Update(apBuffer: const uint8_t *, aSize: size_t)
+    +Get(): SecureBuffer
+}
+
+enum CipherTypes {
+    +AES_128_CBC
+    +AES_128_GCM
+    +AES_192_CBC
+    +AES_192_GCM
+    +AES_256_CBC
+    +AES_256_GCM
+}
+
+abstract CryptBase
+{
+    #mCipherType: CipherTypes
+    #pImpl: unique_ptr<CryptBase>
+
+    +CryptBase(CipherTypes aCipher)
+    +{abstract} Init(arIvSeed: const SecureBuffer&, arSecret: const SecureBuffer&)
+    +{abstract} Update(apData: const std::uint8_t*, aSize: size_t)
+    +{abstract} Finalize(): SecureBuffer
+    +{static} KeyGen(arSeed: const SecureBuffer&, aDesiredKeyLen: size_t = 64): SecureBuffer
+}
+
+class Decrypt {
+    +Decrypt(aCipher: CipherTypes = CipherTypes::AES_128_CBC)
+    +Init(arIvSeed: const SecureBuffer&, arSecret: const SecureBuffer&)
+    +Update(apData: const uint8_t*, aSize: size_t)
+    +Finalize(): SecureBuffer
+    #{static} MakePimpl(CipherTypes aCipher): unique_ptr<CryptBase>
+}
+
+class Encrypt {
+    +Encrypt(aCipher: CipherTypes = CipherTypes::AES_128_CBC)
+    +Init(arIvSeed: const SecureBuffer&, arSecret: const SecureBuffer&)
+    +Update(apData: const uint8_t*, aSize: size_t)
+    +Finalize(): SecureBuffer
+    #{static} MakePimpl(CipherTypes aCipher): unique_ptr<CryptBase>
+}
+
+std.allocator <|-- SecureAllocator
+
+std.vector <|-- SecureBuffer
+SecureAllocator *-- SecureBuffer
+
+std.basic_string <|-- SecureString
+SecureAllocator *-- SecureString
+
+SecureBuffer -down[hidden]- HashAlgorithms
+
+HashAlgorithms -- DigestImpl
+DigestImpl *-- Sha
+
+Sha -down[hidden]- CipherTypes
+CipherTypes *-- CryptBase
+CryptBase <|-- Encrypt
+CryptBase <|-- Decrypt
+
+}
+
+@enduml

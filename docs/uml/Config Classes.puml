@@ -1,0 +1,28 @@
+@startuml
+
+skinparam stereotypeCBackgroundColor<<Exception>> Red
+'hide stereotype
+
+title Config Classes
+
+namespace rsp {
+
+
+namespace security {
+
+class Config <typename T>
+{
+    +{abstract} Validate()
+}
+
+SignedContainer <|-- Config
+
+}
+
+namespace Json {
+    Jsonable <|-- rsp.security.Config
+}
+
+}
+
+@enduml
