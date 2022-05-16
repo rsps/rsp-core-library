@@ -1,4 +1,3 @@
-
 #include "curl/CurlHttpRequest.h"
 #include <network/HttpRequest.h>
 #include <iostream>
@@ -14,8 +13,9 @@ HttpRequest::HttpRequest()
 
 IHttpResponse& HttpRequest::Execute()
 {
-    return mResponse;
+    return mPimpl->Execute();
 }
+
 
 void HttpRequest::Execute(std::function<void(IHttpResponse&)> callback)
 {

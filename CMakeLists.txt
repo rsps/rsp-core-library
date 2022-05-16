@@ -25,6 +25,11 @@ configure_file (
     "${PROJECT_BINARY_DIR}/src/version-def.h"
 )
 
+# Include CURL
+set(CURL_LIBRARY "-lcurl") 
+find_package(CURL REQUIRED) 
+include_directories(${CURL_INCLUDE_DIR})
+
 set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
@@ -138,6 +143,7 @@ target_link_libraries ("rsp-core-lib-test"
     rsp-core-lib
     Threads::Threads
     Freetype::Freetype
+    ${CURL_LIBRARIES}
 )
 #target_link_libraries(demo ${FREETYPE_LIBRARIES})
 

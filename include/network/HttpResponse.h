@@ -19,12 +19,22 @@ public:
         return mStatusCode;
     }
 
+    HttpResponse & SetStatusCode(int const & code) { this->mStatusCode = code; return *this; }
+    const IHttpResponse & SetHeaders(std::map<std::string, std::string>  & headers) override { this->mHeaders = headers; return *this; }
+    HttpResponse & SetBody(std::string const & body) { this->mBody = body; return *this; }
+
+    const std::map<std::string, std::string>& AddHeader(std::string key, std::string value) override {
+        this->mHeaders[key] = value;
+        return this->mHeaders;
+    }
+
+
     const std::map<std::string, std::string>& GetHeaders() const override
     {
         return mHeaders;
     }
 
-    const IHttpRequest& GetRequest() const
+    const IHttpRequest& GetRequest() const override
     {
         return mrRequest;
     }
@@ -34,6 +44,9 @@ public:
         return mBody;
     }
 
+    
+
+    
 protected:
     IHttpRequest &mrRequest;
     int mStatusCode = 0;

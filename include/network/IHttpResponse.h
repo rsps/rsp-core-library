@@ -8,6 +8,8 @@
 
 namespace rsp::network::http {
 
+
+
 class IHttpRequest;
 
 class IHttpResponse
@@ -16,16 +18,21 @@ public:
     virtual int GetStatusCode() const = 0;
 
     virtual const std::map<std::string, std::string>& GetHeaders() const = 0;
-
+    virtual const IHttpResponse& SetHeaders(std::map<std::string, std::string> & headers) = 0;
+    virtual const std::map<std::string, std::string>& AddHeader(std::string key, std::string value) = 0;
+    
     virtual const IHttpRequest& GetRequest() const = 0;
-
     virtual const std::string& GetBody() const = 0;
 
-    virtual ~IHttpResponse()
-    {
-    }
+    virtual ~IHttpResponse() { }
 };
 
+inline std::ostream& operator<<(std::ostream &aStream, IHttpResponse & resp) 
+{
+    for (const auto &[k, v] : resp.GetHeaders() )
+        aStream << ("[" + k + ", " + v + "]\n");
+    return aStream << "\n" << " StatusCode = " << std::to_string(resp.GetStatusCode()) << "\n"; 
+}
 }
 
 #endif

@@ -8,12 +8,25 @@ using namespace rsp::logging;
 
 using namespace rsp::network::http;
 
-TEST_CASE("asdasd")
+TEST_CASE("Network")
 {
-    CHECK_EQ(true, true);
-    std::cout << "test 1" << std::endl;
-    //Logger::GetDefault().Info() << "asd" << std::endl;
-    HttpRequest request;
+    SUBCASE("CurlVersion"){
 
-    CHECK_EQ(true, false);
+    }
+    SUBCASE("Online"){
+
+    }
+    SUBCASE("Google"){
+        HttpRequest request;
+        HttpRequestOptions opt;
+        
+        opt.BaseUrl = "https://google.com";
+        opt.RequestType = HttpRequestType::GET;
+
+        request.SetOptions(opt);
+        
+        std::cout << request.Execute(); 
+    }
+
+    CHECK_EQ(true, true);
 }
