@@ -30,6 +30,9 @@ struct DataContainerException : public CoreException
     }
 };
 
+/**
+ * \brief Predefined exeption thrown on invalid signatures on stored data.
+ */
 struct EInvalidSignature : public DataContainerException
 {
     explicit EInvalidSignature()
@@ -39,29 +42,80 @@ struct EInvalidSignature : public DataContainerException
 };
 
 
+struct IDataContent;
+
 /**
  * \brief Interface for data signature objects
  */
 struct IDataSignature
 {
     virtual ~IDataSignature() {}
+
+    /**
+     * \brief Get size of signature buffer
+     * \return size_t
+     */
     virtual std::size_t GetSize() const = 0;
-    virtual std::uint8_t* Get() = 0;
-    virtual const std::uint8_t* Get() const = 0;
-    virtual void Calc(const std::uint8_t *apData, std::size_t aSize) = 0;
-    virtual void Verify(const std::uint8_t *apData, std::size_t aSize) = 0;
+
+    /**
+     * \brief Get start address of signature buffer
+     * \return uint8_t*
+     */
+    virtual std::uint8_t* GetData() = 0;
+
+    /**
+     * \brief Get const start address of signature buffer
+     * \return const uint8_t*
+     */
+    virtual const std::uint8_t* GetData() const = 0;
+
+    /**
+     * \brief Calculate the signature on the given data. Store the signature in internal buffer.
+     * \param arContent Reference to IDataContent instance
+     */
+    virtual void Calc(const IDataContent &arContent) = 0;
+
+    /**
+     * \brief Verify if the internal signature mathes the one calulcated for the given data.
+     * \param arContent const reference to IDataContent instance
+     */
+    virtual void Verify(const IDataContent &arContent) = 0;
 };
 
 /**
- * \brief Interface for data storage objects
+ * \brief Interface for data storage objects.
+ *
+ * All data storage is a two step operation:
+ *   1. One to read/write the signature part.
+ *   2. Another to read/write the actual data content.
  */
 struct IDataStorage
 {
     virtual ~IDataStorage() {}
-    virtual void ReadSignature(std::uint8_t *apBuffer, std::size_t aSize) = 0;
-    virtual void WriteSignature(std::uint8_t *apBuffer, std::size_t aSize) = 0;
-    virtual void Read(std::uint8_t *apData, std::size_t aSize) = 0;
-    virtual void Write(const std::uint8_t *apData, std::size_t aSize) = 0;
+
+    /**
+     * \brief Read the signature from data store into given buffer
+     * \param arContent Reference to IDataSignature instance
+     */
+    virtual void ReadSignature(IDataSignature &arSignature) = 0;
+
+    /**
+     * \brief Write the signature from given buffer to data store
+     * \param arContent const reference to IDataSignature instance
+     */
+    virtual void WriteSignature(const IDataSignature &arSignature) = 0;
+
+    /**
+     * \brief Read the data content from data store into given buffer
+     * \param arContent Reference to IDataContent instance
+     */
+    virtual void Read(IDataContent &arContent) = 0;
+
+    /**
+     * \brief Write the data content from given buffer to the data store
+     * \param arContent const reference to IDataContent instance
+     */
+    virtual void Write(const IDataContent &arContent) = 0;
 };
 
 /**
@@ -70,13 +124,42 @@ struct IDataStorage
 struct IDataContent
 {
     virtual ~IDataContent() {}
+
+    /**
+     * \brief Get the size of the data content buffer
+     * \return size_t
+     */
     virtual std::size_t GetSize() const = 0;
+
+    /**
+     * \brief Get a pointer to the start address of the content buffer
+     * \return uint8_t*
+     */
     virtual std::uint8_t* GetData() = 0;
+
+    /**
+     * \brief Get a const pointer to the start address of the content buffer
+     * \return const uint8_t*
+     */
     virtual const std::uint8_t* GetData() const = 0;
 };
 
+/**
+ * \brief Streaming operator to hex dump the signature
+ * \param os Output stream
+ * \param arSignature Signature to print
+ * \return output stream
+ */
 std::ostream& operator<<(std::ostream& os, const IDataSignature &arSignature);
+
+/**
+ * \brief Streaming operator to hex dump the content
+ * \param os Output stream
+ * \param arContent Content to print
+ * \return output stream
+ */
 std::ostream& operator<<(std::ostream& os, const IDataContent &arContent);
+
 
 
 /**
@@ -91,11 +174,11 @@ public:
      */
     void Init(std::string_view aSecret);
 
-    std::uint8_t* Get() override { return reinterpret_cast<std::uint8_t*>(&mCRC); }
-    const std::uint8_t* Get() const override { return reinterpret_cast<const std::uint8_t*>(&mCRC); }
+    std::uint8_t* GetData() override { return reinterpret_cast<std::uint8_t*>(&mCRC); }
+    const std::uint8_t* GetData() const override { return reinterpret_cast<const std::uint8_t*>(&mCRC); }
     std::size_t GetSize() const override { return sizeof(std::uint32_t); }
-    void Calc(const uint8_t *apData, std::size_t aSize) override;
-    void Verify(const uint8_t *apData, std::size_t aSize) override;
+    void Calc(const rsp::utils::IDataContent &arContent) override;
+    void Verify(const rsp::utils::IDataContent &arContent) override;
 
 protected:
     std::uint32_t mCRC{0};
@@ -115,10 +198,10 @@ public:
      */
     void Init(std::string_view aFileName);
 
-    void Read(uint8_t *apData, std::size_t aSize) override;
-    void Write(const uint8_t *apData, std::size_t aSize) override;
-    void ReadSignature(uint8_t *apBuffer, std::size_t aSize) override;
-    void WriteSignature(uint8_t *apBuffer, std::size_t aSize) override;
+    void Read(rsp::utils::IDataContent &arContent) override;
+    void Write(const rsp::utils::IDataContent &arContent) override;
+    void ReadSignature(rsp::utils::IDataSignature &arSignature) override;
+    void WriteSignature(const rsp::utils::IDataSignature &arSignature) override;
 
 protected:
     std::string mFileName{};
@@ -143,9 +226,9 @@ public:
      */
     void Load()
     {
-        mStorage.ReadSignature(mSignature.Get(), mSignature.GetSize());
-        mStorage.Read(GetData(), GetSize());
-        mSignature.Verify(GetData(), GetSize());
+        mStorage.ReadSignature(mSignature);
+        mStorage.Read(*this);
+        mSignature.Verify(*this);
     }
 
     /**
@@ -153,9 +236,9 @@ public:
      */
     void Save()
     {
-        this->mSignature.Calc(GetData(), GetSize());
-        mStorage.WriteSignature(mSignature.Get(), mSignature.GetSize());
-        mStorage.Write(GetData(), GetSize());
+        mSignature.Calc(*this);
+        mStorage.WriteSignature(mSignature);
+        mStorage.Write(*this);
     }
 
     /**
@@ -183,16 +266,17 @@ public:
     _STORAGE& GetStorage() { return mStorage; }
 
 
+    /*
+     * IDataContent interface implementation
+     */
     std::size_t GetSize() const override
     {
         return sizeof(mData);
     }
-
     std::uint8_t* GetData() override
     {
         return reinterpret_cast<std::uint8_t*>(&mData);
     }
-
     const std::uint8_t* GetData() const override
     {
         return reinterpret_cast<const std::uint8_t*>(&mData);

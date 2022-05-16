@@ -19,17 +19,17 @@ void Sha256DataSignature::Init(const SecureBuffer &arSecret)
     mSignature.resize(GetSize());
 }
 
-void Sha256DataSignature::Calc(const uint8_t *apData, std::size_t aSize)
+void Sha256DataSignature::Calc(const rsp::utils::IDataContent &arContent)
 {
     Sha sha(mrSecret, HashAlgorithms::Sha256);
-    sha.Update(apData, aSize);
+    sha.Update(arContent.GetData(), arContent.GetSize());
     mSignature = sha.Get();
 }
 
-void Sha256DataSignature::Verify(const uint8_t *apData, std::size_t aSize)
+void Sha256DataSignature::Verify(const rsp::utils::IDataContent &arContent)
 {
     Sha sha(mrSecret, HashAlgorithms::Sha256);
-    sha.Update(apData, aSize);
+    sha.Update(arContent.GetData(), arContent.GetSize());
     if (mSignature != sha.Get()) {
         THROW_WITH_BACKTRACE(rsp::utils::EInvalidSignature);
     }

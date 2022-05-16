@@ -25,15 +25,15 @@ void Crc32DataSignature::Init(std::string_view aSecret)
     mSecret = aSecret;
 }
 
-void Crc32DataSignature::Calc(const uint8_t *apData, std::size_t aSize)
+void Crc32DataSignature::Calc(const rsp::utils::IDataContent &arContent)
 {
-    mCRC = Crc32::Calc(apData, aSize);
+    mCRC = Crc32::Calc(arContent.GetData(), arContent.GetSize());
     mCRC = Crc32::Calc(reinterpret_cast<const std::uint8_t*>(mSecret.data()), mSecret.size(), mCRC);
 }
 
-void Crc32DataSignature::Verify(const uint8_t *apData, std::size_t aSize)
+void Crc32DataSignature::Verify(const rsp::utils::IDataContent &arContent)
 {
-    std::uint32_t value = Crc32::Calc(apData, aSize);
+    std::uint32_t value = Crc32::Calc(arContent.GetData(), arContent.GetSize());
     value = Crc32::Calc(reinterpret_cast<const std::uint8_t*>(mSecret.data()), mSecret.size(), value);
 
     if (value != mCRC) {
@@ -48,26 +48,26 @@ void FileDataStorage::Init(std::string_view aFileName)
     mFileName = aFileName;
 }
 
-void FileDataStorage::Read(uint8_t *apData, std::size_t aSize)
+void FileDataStorage::Read(rsp::utils::IDataContent &arContent)
 {
-    mFile.ExactRead(apData, aSize);
+    mFile.ExactRead(arContent.GetData(), arContent.GetSize());
 }
 
-void FileDataStorage::Write(const uint8_t *apData, std::size_t aSize)
+void FileDataStorage::Write(const rsp::utils::IDataContent &arContent)
 {
-    mFile.ExactWrite(apData, aSize);
+    mFile.ExactWrite(arContent.GetData(), arContent.GetSize());
 }
 
-void FileDataStorage::ReadSignature(uint8_t *apBuffer, std::size_t aSize)
+void FileDataStorage::ReadSignature(rsp::utils::IDataSignature &arSignature)
 {
     mFile.Open(mFileName, std::ios_base::in);
-    mFile.ExactRead(apBuffer, aSize);
+    mFile.ExactRead(arSignature.GetData(), arSignature.GetSize());
 }
 
-void FileDataStorage::WriteSignature(uint8_t *apBuffer, std::size_t aSize)
+void FileDataStorage::WriteSignature(const rsp::utils::IDataSignature &arSignature)
 {
     mFile.Open(mFileName, std::ios_base::out | std::ios_base::trunc, 0600);
-    mFile.ExactWrite(apBuffer, aSize);
+    mFile.ExactWrite(arSignature.GetData(), arSignature.GetSize());
 }
 
 
@@ -76,7 +76,7 @@ std::ostream& operator <<(std::ostream &os, const IDataSignature &arSignature)
 {
     os << std::hex << std::setfill('0');
     for (std::size_t i = 0; i < arSignature.GetSize() ; i++) {
-        os << std::setw(2) << static_cast<int>(arSignature.Get()[i]);
+        os << std::setw(2) << static_cast<int>(arSignature.GetData()[i]);
     }
     return os << std::dec;
 }
@@ -89,5 +89,6 @@ std::ostream& operator <<(std::ostream &os, const IDataContent &arContent)
     }
     return os << std::dec;
 }
+
 
 } /* namespace rsp::utils */

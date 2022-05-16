@@ -29,10 +29,10 @@ public:
     void Init(const SecureBuffer& arSecret);
 
     std::size_t GetSize() const override { return 32; }
-    std::uint8_t* Get() override { return mSignature.data(); }
-    const std::uint8_t* Get() const override { return mSignature.data(); }
-    void Calc(const uint8_t *apData, std::size_t aSize) override;
-    void Verify(const uint8_t *apData, std::size_t aSize) override;
+    std::uint8_t* GetData() override { return mSignature.data(); }
+    const std::uint8_t* GetData() const override { return mSignature.data(); }
+    void Calc(const rsp::utils::IDataContent &arContent) override;
+    void Verify(const rsp::utils::IDataContent &arContent) override;
 
 protected:
     SecureBuffer mSignature{};

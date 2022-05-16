@@ -20,7 +20,7 @@ namespace rsp::security
 {
 
 /**
- * \brief Template to be used for making secure data containers.
+ * \brief Template to be used for making secure data containers with SHA-256 HMAC signatures and AES symmetric key encryption.
  * \tparam T struct or class defining container content.
  */
 template <class T>

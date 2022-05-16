@@ -30,8 +30,8 @@ public:
      */
     void Init(std::string_view aFileName, const SecureBuffer& arInitializationVector, const SecureBuffer& arKey);
 
-    void Read(uint8_t *apData, std::size_t aSize) override;
-    void Write(const uint8_t *apData, std::size_t aSize) override;
+    void Write(const rsp::utils::IDataContent &arContent) override;
+    void Read(rsp::utils::IDataContent &arContent) override;
 
 protected:
     SecureBuffer mIv{};
