@@ -1,6 +1,8 @@
 #include <doctest.h>
 
+#include <network/IHttpRequest.h>
 #include <network/HttpRequest.h>
+#include <network/curl/CurlHttpRequest.h>
 #include <iostream>
 #include <logging/Logger.h>
 

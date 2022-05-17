@@ -1,7 +1,22 @@
+/*
+ * \copyright    Copyright 2022 RSP Systems A/S. All rights reserved.
+ * \license      Mozilla Public License 2.0
+ * \author:      Jesper Madsen
+ * Created Date:  Tuesday, May 17th 2022, 8:49:44 am
+ * 
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * HISTORY:
+ * Date      	By	Comments
+ * ----------	---	----------------------------------------------------------
+ */
+
 #ifndef CURLHTTPREQUEST_H
 #define CURLHTTPREQUEST_H
 
 #include <network/IHttpRequest.h>
+#include <network/HttpRequest.h>
 #include <network/HttpResponse.h>
 #include <network/NetworkException.h>
 #include <curl/curl.h>
@@ -17,17 +32,19 @@ namespace rsp::network::http::curl{
         public:
             CurlHttpRequest();
             void Execute(std::function<void(rsp::network::http::IHttpResponse&)> callback) override;
-            IHttpResponse& Execute() override;
-            HttpRequestOptions& GetOptions() override;
+            IHttpResponse & Execute() override;
+            HttpRequestOptions & GetOptions() override;
             IHttpRequest & SetHeaders(std::map<std::string, std::string>  & headers) override;
-            IHttpRequest& SetOptions(const HttpRequestOptions opt) override;
+            IHttpRequest & SetOptions(const HttpRequestOptions opt) override;
             IHttpRequest & SetBody(std::string const & body) override;
+            constexpr uint minimumCurlVersion() {return 0x072100;}
 
         protected:
             HttpResponse mResponse;
             HttpRequestOptions mRequestOptions;
             static size_t writeFunction(void* ptr, size_t size, size_t nmemb, std::string* data);
             static size_t header_callback(void *data, size_t size, size_t nmemb, void *userdata);
+            
         private:
             void checkVersion();
             // trim from start
@@ -52,3 +69,4 @@ namespace rsp::network::http::curl{
 }
 
 #endif
+

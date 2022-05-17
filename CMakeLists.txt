@@ -27,7 +27,7 @@ configure_file (
 
 # Include CURL
 set(CURL_LIBRARY "-lcurl") 
-find_package(CURL REQUIRED) 
+find_package(CURL 7.33 REQUIRED) 
 include_directories(${CURL_INCLUDE_DIR})
 
 set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
