@@ -92,62 +92,7 @@ add_subdirectory(src)
 # Rules to make tests
 #-----------------------
 
-# Include external projects Doctest from github.
- 
-include(ExternalProject)
-find_package(Git REQUIRED)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-ExternalProject_Add(
-    Doctest
-    
-    SOURCE_DIR "${CMAKE_SOURCE_DIR}/ext-libs/doctest"
-    GIT_REPOSITORY https://github.com/onqtam/doctest.git
-    GIT_TAG "2.4.6"
-    TIMEOUT 10
-
-    UPDATE_COMMAND ${GIT_EXECUTABLE} checkout ${GIT_TAG}
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-    LOG_DOWNLOAD ON
-)
-ExternalProject_Get_Property(Doctest source_dir)
-set(DOCTEST_INCLUDE_DIR ${source_dir}/doctest CACHE INTERNAL "Path to include folder for doctest")
-
-enable_testing()
-
-add_executable("rsp-core-lib-test")
 add_subdirectory(tests)
-add_dependencies("rsp-core-lib-test" Doctest)
-target_include_directories("rsp-core-lib-test"
-    PUBLIC
-        ${DOCTEST_INCLUDE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE
-        src
-        tests/helpers
-)
-# Disable shadow warning to silence doctest...
-target_compile_options(rsp-core-lib-test PRIVATE
-    ${GOOD_COMPILER_OPTIONS}
-    ${FREETYPE_BUILD_OPTIONS}
-    ${OPENSSL_BUILD_OPTIONS}
-)
 
-if (NOT RELEASE_BUILD)
-target_compile_options(rsp-core-lib-test PRIVATE 
-    -DGFX_FPS=10)
-endif()
-
-#get_target_property(INCLUDE_DIRS "rsp-core-lib-test" INCLUDE_DIRECTORIES)
-#message(STATUS "IncDirs: ${INCLUDE_DIRS}")
-
-target_link_libraries ("rsp-core-lib-test"
-    rsp-core-lib
-    Threads::Threads
-    ${FONT_LIB}
-    ${CRYPTO_LIB}
-)
-#target_link_libraries(demo ${FREETYPE_LIBRARIES})
-
-add_test("tests" "rsp-core-lib-test")
