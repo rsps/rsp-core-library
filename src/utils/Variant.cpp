@@ -37,7 +37,7 @@ Variant::Variant(Variant &&arOther)
       mString(arOther.mString)
 {
     JLOG("Variant move constructor");
-    arOther.Clear();
+    arOther.mType = Types::Null;
 }
 
 Variant& Variant::operator=(const Variant &arOther)
@@ -58,7 +58,7 @@ Variant& Variant::operator=(Variant &&arOther)
         mType = arOther.mType;
         mPointer = std::move(arOther.mPointer);
         mString = std::move(arOther.mString);
-        arOther.Clear();
+        arOther.mType = Types::Null;
     }
     return *this;
 }
@@ -90,6 +90,12 @@ Variant::Variant(std::uint64_t aValue)
 
 Variant::Variant(std::uint32_t aValue)
     : mType(Types::Uint32),
+      mInt(aValue)
+{
+}
+
+Variant::Variant(std::uint16_t aValue)
+    : mType(Types::Uint16),
       mInt(aValue)
 {
 }
@@ -159,6 +165,13 @@ Variant& Variant::operator =(std::uint64_t aValue)
 Variant& Variant::operator =(std::uint32_t aValue)
 {
     mType = Types::Uint32;
+    mInt = aValue;
+    return *this;
+}
+
+Variant& Variant::operator =(std::uint16_t aValue)
+{
+    mType = Types::Uint16;
     mInt = aValue;
     return *this;
 }

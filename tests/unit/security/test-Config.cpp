@@ -31,24 +31,24 @@ class MyConfig : public Config<ConfigData>
 public:
     using Config<ConfigData>::Config;
 
-    std::unique_ptr<JsonValue> ToJson() const override
+    JsonValue ToJson() const override
     {
-        std::unique_ptr<JsonValue> result = std::make_unique<JsonObject>();
+        JsonValue result;
 
-        result->AsObject().Add("ApplicationName", new JsonValue(Get().ApplicationName));
-        result->AsObject().Add("PlacementCount", new JsonValue(Get().PlacementCount));
-        result->AsObject().Add("Power", new JsonValue(Get().Power));
-        result->AsObject().Add("Pi", new JsonValue(Get().Pi));
+        result.Add("ApplicationName", Get().ApplicationName);
+        result.Add("PlacementCount", Get().PlacementCount);
+        result.Add("Power", Get().Power);
+        result.Add("Pi", Get().Pi);
 
         return result;
     }
 
     void FromJson(const JsonValue &arJson) override
     {
-        Get().ApplicationName = arJson.AsObject()["ApplicationName"].AsString();
-        Get().PlacementCount = arJson.AsObject()["PlacementCount"];
-        Get().Power = arJson.AsObject()["Power"];
-        Get().Pi = arJson.AsObject()["Pi"];
+        Get().ApplicationName = arJson["ApplicationName"].AsString();
+        Get().PlacementCount = arJson["PlacementCount"];
+        Get().Power = arJson["Power"];
+        Get().Pi = arJson["Pi"];
     }
 
     void Validate() override
@@ -77,7 +77,7 @@ TEST_CASE("Config")
 
     SUBCASE("Json")
     {
-        std::string json = config.ToJson()->Encode();
+        std::string json = config.ToJson().Encode();
 
 //        MESSAGE(json);
         CHECK_EQ(json, R"({"ApplicationName":"ConfigurationApp","PlacementCount":3,"Power":280,"Pi":3.141593})");
@@ -86,15 +86,14 @@ TEST_CASE("Config")
         CHECK_THROWS_AS(config.Validate(), ValidatorException);
 
         json = R"({"ApplicationName":"ConfigurationApp","PlacementCount":"NotANumber","Power":280,"Pi":3.141593,"ExtraValue":1.2345})";
-        Json js;
-        js.Decode(json);
-        config.FromJson(js.Get());
+        auto js = Json::Decode(json);
+        config.FromJson(js);
         CHECK_THROWS_AS(config.Validate(), ValidatorException);
 
         json = R"({"ApplicationName":"ConfigurationApp","PlacementCount":"3","Power":280,"Pi":3.141593,"ExtraValue":1.2345})";
         js.Clear();
-        js.Decode(json);
-        config.FromJson(js.Get());
+        js = js.Decode(json);
+        config.FromJson(js);
     }
 
     SUBCASE("Storage")

@@ -14,11 +14,10 @@
 
 #include <json/JsonValue.h>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace rsp::json {
-
-class JsonValue;
 
 /**
  * \class JsonString
@@ -32,7 +31,7 @@ public:
      *
      * \param std::string
      */
-    JsonString(const std::string &arJson);
+    JsonString(std::string_view aJson);
     JsonString(const JsonString &arJson);
 
     JsonString& operator=(const JsonString &arJson);
@@ -41,7 +40,7 @@ public:
      * Decode a value object from the content. The result can be a complex hierarchy of value objects.
      * \return JsonValue*
      */
-    JsonValue* GetValue();
+    JsonValue GetValue();
 
 protected:
     std::string::iterator mIt; // Current index iterator, this is always moving forward.
@@ -53,9 +52,9 @@ protected:
     void pop();
     void skipWhiteSpace();
     std::string getString();
-    JsonValue* getObject();
-    JsonValue* getArray();
-    JsonValue* getNumber();
+    JsonValue getObject();
+    JsonValue getArray();
+    JsonValue getNumber();
 
     unsigned int getOffset() { return static_cast<unsigned int>(mIt - begin()); };
     unsigned int getLength() { return static_cast<unsigned int>(mEnd - mIt); };

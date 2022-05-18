@@ -29,7 +29,7 @@ public:
      * \brief Interface to get object content as a JSON item.
      * \return JSON formatted string
      */
-    virtual std::unique_ptr<JsonValue> ToJson() const = 0;
+    virtual JsonValue ToJson() const = 0;
 
     /**
      * \brief Interface to populate object content with content from a JSON item
