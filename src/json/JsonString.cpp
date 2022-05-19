@@ -15,8 +15,8 @@
 
 using namespace rsp::json;
 
-#define JLOG(a) DLOG(a)
-//#define JLOG(a)
+//#define JLOG(a) DLOG(a)
+#define JLOG(a)
 
 JsonString::JsonString(std::string_view aJson)
     : std::string(aJson),
@@ -74,7 +74,7 @@ void JsonString::findSubString(const char aToken1, const char aToken2)
             if (indent == 0) {
                 push();
                 mEnd = it;
-                JLOG("findSubString stacked: " << *mIt << ", " << *mEnd);
+                JLOG("findSubString stacked: " << std::string(mIt, mEnd));
                 return;
             }
             else {
@@ -225,14 +225,14 @@ JsonValue JsonString::getObject()
         }
     }
     if (element_required) {
-        auto it = (--result.mMembers.GetMap().end());
-        THROW_WITH_BACKTRACE1(EJsonParseError, "Excessive key/value delimiter found after " + it->first + ":" + it->second.AsString());
+        THROW_WITH_BACKTRACE1(EJsonParseError, "Excessive key/value delimiter found after " + result.mItems.back().mName + ":" + result.mItems.back().AsString());
     }
+    JLOG("Skip next char: " << *mIt);
     mIt++;
 
     pop();
+
     JLOG("getObject exit (" << result << "): " << debug());
-    JLOG("Exit count: " << result.GetCount());
     return result;
 }
 

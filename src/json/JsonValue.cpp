@@ -19,8 +19,8 @@ using namespace rsp::logging;
 
 namespace rsp::json {
 
-#define JLOG(a) DLOG(a)
-//#define JLOG(a)
+//#define JLOG(a) DLOG(a)
+#define JLOG(a)
 
 
 std::ostream& operator<<(std::ostream& os, JsonTypes aType)
@@ -54,16 +54,16 @@ JsonValue::JsonValue(JsonTypes aType)
 
 JsonValue::JsonValue(const JsonValue& arOther)
     : Variant(arOther),
-      mItems(arOther.mItems),
-      mMembers(arOther.mMembers)
+      mName(arOther.mName),
+      mItems(arOther.mItems)
 {
     JLOG("JsonValue copy constructor");
 }
 
 JsonValue::JsonValue(JsonValue&& arOther)
     : Variant(std::move(arOther)),
-      mItems(std::move(arOther.mItems)),
-      mMembers(std::move(arOther.mMembers))
+      mName(std::move(arOther.mName)),
+      mItems(std::move(arOther.mItems))
 {
     JLOG("JsonValue move constructor");
 }
@@ -76,8 +76,8 @@ JsonValue& JsonValue::operator=(const JsonValue& arOther)
 {
     if (&arOther != this) {
         Variant::operator=(arOther);
+        mName = arOther.mName;
         mItems = arOther.mItems;
-        mMembers = arOther.mMembers;
         JLOG("JsonValue copy assignment");
     }
     return *this;
@@ -88,8 +88,8 @@ JsonValue& JsonValue::operator=(JsonValue&& arOther)
 {
     if (&arOther != this) {
         Variant::operator=(std::move(arOther));
+        mName = std::move(arOther.mName);
         mItems = std::move(arOther.mItems);
-        mMembers = std::move(arOther.mMembers);
         JLOG("JsonValue move assignment");
     }
     return *this;
@@ -126,21 +126,31 @@ JsonValue& JsonValue::operator [](std::string_view aKey)
 {
     JLOG("Access member " << aKey);
     forceObject();
-    return mMembers[std::string(aKey)];
+    for (JsonValue &v : mItems) {
+        if (v.mName == aKey) {
+            return v;
+        }
+    }
+    THROW_WITH_BACKTRACE1(EMemberDoesNotExists, std::string(aKey));
 }
 
 const JsonValue& JsonValue::operator [](std::string_view aKey) const
 {
     JLOG("Getting member " << aKey);
     tryObject();
-    return mMembers.at(std::string(aKey));
+    for (const JsonValue &v : mItems) {
+        if (v.mName == aKey) {
+            return v;
+        }
+    }
+    THROW_WITH_BACKTRACE1(EMemberDoesNotExists, std::string(aKey));
 }
 
 JsonValue& JsonValue::operator [](std::size_t aIndex)
 {
     JLOG("Access item " << aIndex);
     forceArray();
-    return mItems[aIndex];
+    return mItems.at(aIndex);
 }
 
 const JsonValue& JsonValue::operator [](std::size_t aIndex) const
@@ -157,10 +167,7 @@ std::size_t JsonValue::GetCount() const
             return 0;
 
         case Types::Pointer:
-            if (mPointer == static_cast<uintptr_t>(JsonTypes::Object)) {
-                return mMembers.size();
-            }
-            if (mPointer == static_cast<uintptr_t>(JsonTypes::Array)) {
+            if ((mPointer == static_cast<uintptr_t>(JsonTypes::Object)) || (mPointer == static_cast<uintptr_t>(JsonTypes::Array))) {
                 return mItems.size();
             }
             THROW_WITH_BACKTRACE1(EJsonTypeError, "Variant of type " + typeToText() + " must be of JsonType Object or Array");
@@ -168,10 +175,24 @@ std::size_t JsonValue::GetCount() const
     }
 }
 
+std::vector<std::string> JsonValue::GetMemberNames() const
+{
+    std::vector<std::string> result;
+    for (const JsonValue &jv : mItems) {
+        result.push_back(jv.mName);
+    }
+    return result;
+}
+
 bool JsonValue::MemberExists(std::string_view aKey) const
 {
     tryObject();
-    return (mMembers.GetMap().count(std::string(aKey)) > 0);
+    for (const JsonValue &v : mItems) {
+        if (v.mName == aKey) {
+            return true;
+        }
+    }
+    return false;
 }
 
 JsonValue& JsonValue::Add(JsonValue aValue)
@@ -186,7 +207,8 @@ JsonValue& JsonValue::Add(std::string_view aKey, JsonValue aValue)
 {
     tryObject();
     Logger::GetDefault().Info() << "JsonObject::Add(): \"" << aKey << "\": " << aValue.Encode() << std::endl;
-    mMembers[std::string(aKey)] = aValue;
+    aValue.mName = aKey;
+    mItems.push_back(aValue);
     return *this;
 }
 
@@ -200,13 +222,19 @@ JsonValue& JsonValue::Remove(int aIndex)
 JsonValue& JsonValue::Remove(std::string_view aKey)
 {
     tryObject();
-    mMembers.Remove(std::string(aKey));
+    auto it = std::find_if(mItems.begin(), mItems.end(), [&aKey](const JsonValue& arValue) {
+        if (arValue.mName == aKey) {
+            return true;
+        }
+        return false;
+    });
+    mItems.erase(it);
     return *this;
 }
 
 void JsonValue::Clear()
 {
-    mMembers.clear();
+    mName.clear();
     mItems.clear();
     mType = Types::Null;
 }
@@ -233,7 +261,7 @@ void JsonValue::forceArray()
         mPointer = static_cast<uintptr_t>(JsonTypes::Array);
         return;
     }
-    tryObject();
+    tryArray();
 }
 
 void JsonValue::forceObject()
@@ -408,10 +436,15 @@ void JsonValue::objectToStringStream(std::stringstream &arResult, PrintFormat &a
 
     arResult << "{" << arPf.nl;
 
-    int rest = mMembers.size();
-    for (auto &key : mMembers.GetOrderList()) {
-       auto &value = mMembers.at(key.get());
-       arResult << in << "\"" << key.get() << "\":" << arPf.sp;
+    JLOG("Members:");
+    for(const JsonValue &value : mItems) {
+        JLOG("  " << value.mName << ": " << value.AsString());
+    }
+
+    int rest = mItems.size();
+    for (const JsonValue &value : mItems) {
+       arResult << in << "\"" << value.mName << "\":" << arPf.sp;
+
        value.toStringStream(arResult, arPf, aLevel+1, aForceToUCS2);
        if (--rest == 0) {
            c = "";

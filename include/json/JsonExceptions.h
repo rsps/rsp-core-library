@@ -53,6 +53,11 @@ public:
     explicit ENoInstanceExists() : EJsonException("The Json content have not been created.") {}
 };
 
+class EMemberDoesNotExists: public EJsonException {
+public:
+    explicit EMemberDoesNotExists(const std::string &arName) : EJsonException("Json object does not have a member named: " + arName) {}
+};
+
 
 } /* namespace rsp::json */
 

@@ -134,6 +134,8 @@ public:
      */
     std::size_t GetCount() const;
 
+    std::vector<std::string> GetMemberNames() const;
+
     /**
      * \brief Check if an object has a member with the specified name
      * \param aKey
@@ -186,8 +188,8 @@ protected:
     };
 
     friend JsonString;
+    std::string mName{}; // Name if this value is an object member
     std::vector<JsonValue> mItems{};
-    rsp::utils::InsertOrderedMap<std::string, JsonValue> mMembers{};
 
     void tryArray() const;
     void tryObject() const;

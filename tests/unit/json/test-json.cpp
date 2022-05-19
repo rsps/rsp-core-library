@@ -107,7 +107,7 @@ null }
 
         CHECK(v.MemberExists("IntValue"));
         CHECK(v["IntValue"].IsNull() == false);
-        CHECK(v["IntValue"].GetType() == Variant::Types::Int64);
+        CHECK(v["IntValue"].GetType() == Variant::Types::Uint64);
         CHECK(static_cast<int>(v["IntValue"]) == 42);
 
         CHECK(v.MemberExists("FloatValue"));
@@ -129,9 +129,8 @@ null }
 
         CHECK(v.MemberExists("ObjectMember"));
         CHECK(v["ObjectMember"].IsNull() == false);
-        CHECK(v["ObjectMember"].GetCount() == 2);
+        CHECK(v["ObjectMember"].GetCount() == 3);
         CHECK_FALSE(static_cast<bool>(v["ObjectMember"]["Boolean"]));
-        CHECK(v["ObjectMember"]["Empty"].IsNull());
         CHECK(v["ObjectMember"]["Empty"].IsNull());
 
         CHECK_THROWS_AS(v["ObjectMember"]["empty"].IsNull(), const EJsonException &);
@@ -140,9 +139,9 @@ null }
         CHECK_FALSE(v["ObjectMember"]["Empty"].IsNull());
         CHECK(IsEqual(static_cast<double>(v["ObjectMember"]["Empty"]), 12.34, 0.00000000001));
 
-        CHECK_EQ(v["ObjectMember"]["NestedObject"]["NestedValue"]["MyValue"], "Cheers");
-        CHECK_NOTHROW(v["ObjectMember"]["NestedObject"]["NestedValue"]["MyValue"] = "Blurp");
-        CHECK_EQ(v["ObjectMember"]["NestedObject"]["NestedValue"]["MyValue"], "Blurp");
+        CHECK_EQ(v["ObjectMember"]["NestedObject"]["NestedValue"].AsString(), "Cheers");
+        CHECK_NOTHROW(v["ObjectMember"]["NestedObject"]["NestedValue"] = "Blurp");
+        CHECK_EQ(v["ObjectMember"]["NestedObject"]["NestedValue"].AsString(), "Blurp");
     }
 
     SUBCASE("Encode Object") {
@@ -240,7 +239,7 @@ null }
 
         CHECK(o.MemberExists("IntValue"));
         CHECK(o["IntValue"].IsNull() == false);
-        CHECK(o["IntValue"].GetType() == Variant::Types::Int64);
+        CHECK(o["IntValue"].GetType() == Variant::Types::Uint64);
         CHECK(static_cast<int>(o["IntValue"]) == 42);
 
         Json js1(o);
@@ -255,6 +254,16 @@ null }
 
         CHECK(js2.Encode() == js1.Encode());
         CHECK(o.IsNull());
+    }
+
+    SUBCASE("No Whitespace") {
+        JsonString json{ R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"}})" };
+
+        auto o = Json::Decode(json);
+        CHECK(o.MemberExists("Member1"));
+        CHECK(o.MemberExists("Member2"));
+        CHECK(o["Member2"].MemberExists("NestedMember"));
+        CHECK_EQ(o["Member2"]["NestedMember"].AsString(), "NestedValue");
     }
 }
 
