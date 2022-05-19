@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
+#include <json/JsonDecoder.h>
 #include <json/JsonExceptions.h>
-#include <json/JsonString.h>
 #include <sstream>
 #include <logging/Logger.h>
 
@@ -18,7 +18,7 @@ using namespace rsp::json;
 //#define JLOG(a) DLOG(a)
 #define JLOG(a)
 
-JsonString::JsonString(std::string_view aJson)
+JsonDecoder::JsonDecoder(std::string_view aJson)
     : std::string(aJson),
       mIt(begin()),
       mEnd(end())
@@ -26,7 +26,7 @@ JsonString::JsonString(std::string_view aJson)
 //    JLOG("JsonString Created: " << std::distance(begin(), mIt) << ", " << getLength());
 }
 
-JsonString::JsonString(const JsonString &arJson)
+JsonDecoder::JsonDecoder(const JsonDecoder &arJson)
     : std::string(arJson),
       mIt(begin()),
       mEnd(end())
@@ -34,7 +34,7 @@ JsonString::JsonString(const JsonString &arJson)
 //    JLOG("JsonString Copied: " << std::distance(begin(), mIt) << ", " << getLength());
 }
 
-JsonString& JsonString::operator=(const JsonString &arJson)
+JsonDecoder& JsonDecoder::operator=(const JsonDecoder &arJson)
 {
     if (&arJson != this) {
         std::string::operator=(arJson);
@@ -50,7 +50,7 @@ JsonString& JsonString::operator=(const JsonString &arJson)
  * \param aToken1
  * \param aToken2
  */
-void JsonString::findSubString(const char aToken1, const char aToken2)
+void JsonDecoder::findSubString(const char aToken1, const char aToken2)
 {
     JLOG("findSubString(" << aToken1 << ", " << aToken2 << "), " << debug());
     skipWhiteSpace();
@@ -96,18 +96,18 @@ void JsonString::findSubString(const char aToken1, const char aToken2)
     THROW_WITH_BACKTRACE1(EJsonParseError, "End token was not found. " + aToken2);
 }
 
-void JsonString::push()
+void JsonDecoder::push()
 {
     mStack.emplace_back(mEnd);
 }
 
-void JsonString::pop()
+void JsonDecoder::pop()
 {
     mEnd = mStack.back();
     mStack.pop_back();
 }
 
-void JsonString::skipWhiteSpace()
+void JsonDecoder::skipWhiteSpace()
 {
     while (mIt != mEnd) {
         switch (*mIt) {
@@ -125,7 +125,7 @@ void JsonString::skipWhiteSpace()
     }
 }
 
-std::string JsonString::getString()
+std::string JsonDecoder::getString()
 {
     JLOG("getString: " << debug(false, true));
     findSubString('"', '"');
@@ -197,7 +197,7 @@ std::string JsonString::getString()
     return result;
 }
 
-JsonValue JsonString::getObject()
+JsonValue JsonDecoder::getObject()
 {
     JLOG("getObject: " << debug(false, true));
     findSubString('{', '}');
@@ -236,7 +236,7 @@ JsonValue JsonString::getObject()
     return result;
 }
 
-JsonValue JsonString::getArray()
+JsonValue JsonDecoder::getArray()
 {
     JLOG("getArray: " << debug(false, true));
     findSubString('[', ']');
@@ -272,7 +272,7 @@ JsonValue JsonString::getArray()
  *
  * Exceptions are thrown if content has illegal number formatting.
  */
-JsonValue JsonString::getNumber()
+JsonValue JsonDecoder::getNumber()
 {
     JLOG("getNumber: " << debug(false, true));
     bool is_float = false;
@@ -412,7 +412,7 @@ JsonValue JsonString::getNumber()
     }
 }
 
-JsonValue JsonString::GetValue()
+JsonValue JsonDecoder::GetValue()
 {
     JLOG("GetValue: " << debug(false, true));
     JsonValue result;
@@ -499,7 +499,7 @@ JsonValue JsonString::GetValue()
     return result;
 }
 
-std::string JsonString::debug(bool aIncludeText, bool aIncludeSubstr)
+std::string JsonDecoder::debug(bool aIncludeText, bool aIncludeSubstr)
 {
     std::stringstream ss;
     if (aIncludeText) {

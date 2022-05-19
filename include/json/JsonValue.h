@@ -16,7 +16,7 @@
 
 namespace rsp::json {
 
-class JsonString;
+class JsonDecoder;
 
 enum class JsonTypes : unsigned int { Null, Bool, Number, String, Object, Array };
 
@@ -93,15 +93,15 @@ public:
      * \brief Check if value content is an array
      * \return True if content is an array
      */
-    virtual bool IsArray() const { return (GetJsonType() == JsonTypes::Array); }
+    bool IsArray() const { return (GetJsonType() == JsonTypes::Array); }
     /**
      * \brief Check if value content is an object
      * \return True if content is an object
      */
-    virtual bool IsObject() const { return (GetJsonType() == JsonTypes::Object); }
+    bool IsObject() const { return (GetJsonType() == JsonTypes::Object); }
 
     /**
-     * \brief Implicit index operators for object members
+     * \brief Index operators for object members
      *
      * \param aKey Name of object member
      * \return Reference to value
@@ -115,7 +115,7 @@ public:
     const JsonValue& operator[](const char* apKey) const { return (*this)[std::string_view(apKey)]; }
 
     /**
-     * \brief Implicit index operator for array members
+     * \brief Index operators for array members
      *
      * \param aIndex Index number
      * \return Reference to value
@@ -134,6 +134,11 @@ public:
      */
     std::size_t GetCount() const;
 
+    /**
+     * \brief Get a list of member names if this is a json object.
+     *
+     * \return Vector of strings
+     */
     std::vector<std::string> GetMemberNames() const;
 
     /**
@@ -187,7 +192,7 @@ protected:
         std::string sp{};
     };
 
-    friend JsonString;
+    friend JsonDecoder;
     std::string mName{}; // Name if this value is an object member
     std::vector<JsonValue> mItems{};
 
@@ -195,11 +200,11 @@ protected:
     void tryObject() const;
     void forceObject();
     void forceArray();
+
     void stringToStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) const;
     void arrayToStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) const;
     void objectToStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) const;
-
-    virtual void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) const;
+    void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) const;
 
     static bool mEncodeToUCS2;
 };

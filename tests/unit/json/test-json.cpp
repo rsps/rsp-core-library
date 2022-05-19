@@ -9,7 +9,8 @@
  */
 
 #include <json/Json.h>
-#include <json/JsonString.h>
+#include <json/JsonDecoder.h>
+
 #include "doctest.h"
 #include <iostream>
 #include <utils/StrUtils.h>
@@ -24,7 +25,7 @@ TEST_CASE("Json") {
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
-    JsonString json_object{ R"(
+    std::string json_object{ R"(
 {
     "NullValue": null,
     "BooleanValue": true,
@@ -62,11 +63,11 @@ TEST_CASE("Json") {
     }
 
     SUBCASE("Create Unicode String") {
-        JsonValue v3 = JsonString("\"My \\u0057orld\"").GetValue();
+        JsonValue v3 = JsonDecoder("\"My \\u0057orld\"").GetValue();
         CHECK(v3.GetType() == JsonValue::Types::String);
         CHECK("My World" == v3.AsString());
 
-        v3 = JsonString("\"Euro sign: \\u20AC\"").GetValue();
+        v3 = JsonDecoder("\"Euro sign: \\u20AC\"").GetValue();
 //            CHECK("Euro sign: €" == "Euro sign: \\u20AC");
         CHECK(v3.GetType() == JsonValue::Types::String);
         CHECK("Euro sign: €" == v3.AsString());
@@ -80,17 +81,17 @@ null }
 )";
         Json v4;
 
-        CHECK_NOTHROW(v4 = JsonString(ws).GetValue());
+        CHECK_NOTHROW(v4 = JsonDecoder(ws).GetValue());
 
         CHECK_EQ(v4.GetJsonType(), JsonTypes::Object);
         CHECK_EQ(v4.GetCount(), 1);
         CHECK(v4["whitespace"].IsNull());
-        MESSAGE(v4.Encode());
+//        MESSAGE(v4.Encode());
     }
 
     SUBCASE("Decode Object") {
         JsonValue v;
-        CHECK_NOTHROW(v = JsonString(json_object).GetValue());
+        CHECK_NOTHROW(v = Json::Decode(json_object));
 
         CHECK(v.GetJsonType() == JsonTypes::Object);
         CHECK(v.GetCount() == 7);
@@ -146,7 +147,7 @@ null }
 
     SUBCASE("Encode Object") {
         std::string orig = json_object;
-        JsonValue v = JsonString(json_object).GetValue();
+        JsonValue v = JsonDecoder(json_object).GetValue();
 
         CHECK(v.GetJsonType() == JsonTypes::Object);
         CHECK(v.GetCount() == 7);
@@ -155,13 +156,13 @@ null }
 
         StrUtils::Trim(result);
         StrUtils::Trim(orig);
-        MESSAGE(result.length());
-        MESSAGE(orig.length());
+//        MESSAGE(result.length());
+//        MESSAGE(orig.length());
         CHECK(result == orig);
 
         // Validate UCS2 code-points in output:
         orig = "\"Euro sign: \\u20ac\"";
-        JsonValue v1 = JsonString(orig).GetValue();
+        JsonValue v1 = JsonDecoder(orig).GetValue();
         CHECK(v1.GetType() == JsonValue::Types::String);
         CHECK("Euro sign: €" == v1.AsString());
         result = v1.Encode(true, true);
@@ -169,25 +170,25 @@ null }
     }
 
     SUBCASE("Validate") {
-        CHECK_THROWS_AS(JsonString(R"(1.23456.7)").GetValue(), const EJsonNumberError &); // Bad number
-        CHECK_THROWS_AS(JsonString(R"(BadString)").GetValue(), const EJsonParseError &);
-        CHECK_THROWS_AS(JsonString(R"("Bad Character \k")").GetValue(), const EJsonFormatError &);
-        CHECK_THROWS_AS(JsonString(R"(TRUE)").GetValue(), const EJsonParseError &);
-        CHECK_NOTHROW(JsonString(R"([   ])").GetValue());
-        CHECK_NOTHROW(JsonString(R"([ null ])").GetValue());
-        CHECK_THROWS_AS(JsonString(R"([ , ])").GetValue(), const EJsonParseError &);
-        CHECK_THROWS_AS(JsonString(R"([ "BadArray", "Excessive Delimiter",])").GetValue(), const EJsonParseError &);
-        CHECK_NOTHROW(JsonString(R"({   })").GetValue());
-        CHECK_NOTHROW(JsonString(R"({ "empty":null })").GetValue());
-        CHECK_THROWS_AS(JsonString(R"({ null })").GetValue(), const EJsonParseError &);
-        CHECK_THROWS_AS(JsonString(R"({ , })").GetValue(), const EJsonParseError &);
-        CHECK_THROWS_AS(JsonString(R"({ "BadObject": "Excessive Delimiter",})").GetValue(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonDecoder(R"(1.23456.7)").GetValue(), const EJsonNumberError &); // Bad number
+        CHECK_THROWS_AS(JsonDecoder(R"(BadString)").GetValue(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonDecoder(R"("Bad Character \k")").GetValue(), const EJsonFormatError &);
+        CHECK_THROWS_AS(JsonDecoder(R"(TRUE)").GetValue(), const EJsonParseError &);
+        CHECK_NOTHROW(JsonDecoder(R"([   ])").GetValue());
+        CHECK_NOTHROW(JsonDecoder(R"([ null ])").GetValue());
+        CHECK_THROWS_AS(JsonDecoder(R"([ , ])").GetValue(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonDecoder(R"([ "BadArray", "Excessive Delimiter",])").GetValue(), const EJsonParseError &);
+        CHECK_NOTHROW(JsonDecoder(R"({   })").GetValue());
+        CHECK_NOTHROW(JsonDecoder(R"({ "empty":null })").GetValue());
+        CHECK_THROWS_AS(JsonDecoder(R"({ null })").GetValue(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonDecoder(R"({ , })").GetValue(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonDecoder(R"({ "BadObject": "Excessive Delimiter",})").GetValue(), const EJsonParseError &);
     }
 
     SUBCASE("Copy") {
         std::string orig = json_object;
         StrUtils::Trim(orig);
-        JsonValue p = JsonString(json_object).GetValue();
+        JsonValue p = JsonValue::Decode(json_object);
 
         JsonValue dst;
         dst = p;
@@ -213,7 +214,7 @@ null }
     SUBCASE("Move") {
         std::string orig = json_object;
         StrUtils::Trim(orig);
-        JsonValue p = JsonString(json_object).GetValue();
+        JsonValue p = JsonDecoder(json_object).GetValue();
         JsonValue dst = std::move(p);
 
         CHECK(orig == dst.Encode(true));
@@ -257,7 +258,7 @@ null }
     }
 
     SUBCASE("No Whitespace") {
-        JsonString json{ R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"}})" };
+        JsonDecoder json{ R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"}})" };
 
         auto o = Json::Decode(json);
         CHECK(o.MemberExists("Member1"));

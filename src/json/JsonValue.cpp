@@ -8,9 +8,9 @@
  * \author      Steffen Brummer
  */
 
+#include <json/JsonDecoder.h>
 #include <json/JsonExceptions.h>
 #include <json/JsonValue.h>
-#include <json/JsonString.h>
 #include <iomanip>
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
@@ -115,7 +115,7 @@ std::string JsonValue::Encode(bool aPrettyPrint, bool aForceToUCS2) const
 
 JsonValue JsonValue::Decode(std::string_view aJson)
 {
-    JsonString js(aJson);
+    JsonDecoder js(aJson);
 
     JsonValue result;
     result = js.GetValue();
@@ -131,7 +131,7 @@ JsonValue& JsonValue::operator [](std::string_view aKey)
             return v;
         }
     }
-    THROW_WITH_BACKTRACE1(EMemberDoesNotExists, std::string(aKey));
+    THROW_WITH_BACKTRACE1(EMemberNotExisting, std::string(aKey));
 }
 
 const JsonValue& JsonValue::operator [](std::string_view aKey) const
@@ -143,7 +143,7 @@ const JsonValue& JsonValue::operator [](std::string_view aKey) const
             return v;
         }
     }
-    THROW_WITH_BACKTRACE1(EMemberDoesNotExists, std::string(aKey));
+    THROW_WITH_BACKTRACE1(EMemberNotExisting, std::string(aKey));
 }
 
 JsonValue& JsonValue::operator [](std::size_t aIndex)
@@ -177,6 +177,7 @@ std::size_t JsonValue::GetCount() const
 
 std::vector<std::string> JsonValue::GetMemberNames() const
 {
+    tryObject();
     std::vector<std::string> result;
     for (const JsonValue &jv : mItems) {
         result.push_back(jv.mName);
@@ -197,7 +198,7 @@ bool JsonValue::MemberExists(std::string_view aKey) const
 
 JsonValue& JsonValue::Add(JsonValue aValue)
 {
-    tryArray();
+    forceArray();
     Logger::GetDefault().Info() << "JsonArray::Add(): \"" << aValue.Encode() << std::endl;
     mItems.emplace_back(aValue);
     return *this;
@@ -205,7 +206,7 @@ JsonValue& JsonValue::Add(JsonValue aValue)
 
 JsonValue& JsonValue::Add(std::string_view aKey, JsonValue aValue)
 {
-    tryObject();
+    forceObject();
     Logger::GetDefault().Info() << "JsonObject::Add(): \"" << aKey << "\": " << aValue.Encode() << std::endl;
     aValue.mName = aKey;
     mItems.push_back(aValue);

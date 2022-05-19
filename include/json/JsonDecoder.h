@@ -9,8 +9,8 @@
  */
 
 
-#ifndef INCLUDE_JSON_JSONSTRING_H_
-#define INCLUDE_JSON_JSONSTRING_H_
+#ifndef INCLUDE_JSON_JSONDECODER_H_
+#define INCLUDE_JSON_JSONDECODER_H_
 
 #include <json/JsonValue.h>
 #include <string>
@@ -23,7 +23,7 @@ namespace rsp::json {
  * \class JsonString
  * \brief String derivative specialized in traversing a Json formatted string.
  */
-class JsonString : public std::string
+class JsonDecoder : public std::string
 {
 public:
     /**
@@ -31,10 +31,10 @@ public:
      *
      * \param std::string
      */
-    JsonString(std::string_view aJson);
-    JsonString(const JsonString &arJson);
+    JsonDecoder(std::string_view aJson);
+    JsonDecoder(const JsonDecoder &arJson);
 
-    JsonString& operator=(const JsonString &arJson);
+    JsonDecoder& operator=(const JsonDecoder &arJson);
 
     /**
      * Decode a value object from the content. The result can be a complex hierarchy of value objects.
@@ -64,4 +64,4 @@ protected:
 
 } /* rsp::json */
 
-#endif /* INCLUDE_JSON_JSONSTRING_H_ */
+#endif /* INCLUDE_JSON_JSONDECODER_H_ */
