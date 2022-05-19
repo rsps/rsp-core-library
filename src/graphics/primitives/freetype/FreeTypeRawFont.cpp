@@ -23,6 +23,12 @@ using namespace rsp::logging;
 namespace rsp::graphics {
 
 
+std::unique_ptr<FontRawInterface> Font::MakePimpl(const std::string &arFontName)
+{
+    return std::make_unique<FreeTypeRawFont>(arFontName);
+}
+
+
 static const char* FreeTypeErrorToString(int aCode)
 {
     #undef FTERRORS_H_

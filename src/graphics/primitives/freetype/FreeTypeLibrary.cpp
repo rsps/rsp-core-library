@@ -13,11 +13,17 @@
 #include "FreeTypeLibrary.h"
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
+#include <graphics/primitives/FontRawInterface.h>
 
 using namespace rsp::utils;
 using namespace rsp::logging;
 
 namespace rsp::graphics {
+
+void FontRawInterface::RegisterFont(std::string_view aFileName)
+{
+    FreeTypeLibrary::Get().RegisterFont(std::string(aFileName));
+}
 
 FreeTypeLibrary::FreeTypeLibrary(void)
 {
