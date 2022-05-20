@@ -52,6 +52,11 @@ if (OPENSSL_CRYPTO)
     set(CRYPTO_LIB OpenSSL::Crypto)
 endif()
 
+target_link_libraries ("rsp-core-lib"
+    ${FONT_LIB}
+    ${CRYPTO_LIB}
+)
+
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
 # paths.

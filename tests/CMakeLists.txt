@@ -24,8 +24,6 @@ target_include_directories("rsp-core-lib-test"
 # Disable shadow warning to silence doctest...
 target_compile_options(rsp-core-lib-test PRIVATE
     ${GOOD_COMPILER_OPTIONS}
-    ${FREETYPE_BUILD_OPTIONS}
-    ${OPENSSL_BUILD_OPTIONS}
 )
 
 if (NOT RELEASE_BUILD)
@@ -39,8 +37,6 @@ endif()
 target_link_libraries ("rsp-core-lib-test"
     rsp-core-lib
     Threads::Threads
-    ${FONT_LIB}
-    ${CRYPTO_LIB}
 )
 #target_link_libraries(demo ${FREETYPE_LIBRARIES})
 
