@@ -57,7 +57,7 @@ endif()
 # paths.
 target_include_directories(rsp-core-lib
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE
         ${PROJECT_BINARY_DIR}/src
@@ -92,7 +92,7 @@ add_subdirectory(src)
 # Rules to make tests
 #-----------------------
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 add_subdirectory(tests)
 

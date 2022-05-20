@@ -16,9 +16,9 @@ add_dependencies("rsp-core-lib-test" doctest)
 target_include_directories("rsp-core-lib-test"
     PUBLIC
         ${doctest_SOURCE_DIR}/doctest
-        ${CMAKE_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/include
     PRIVATE
-        ${CMAKE_SOURCE_DIR}/src
+        ${PROJECT_BINARY_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/helpers
 )
 # Disable shadow warning to silence doctest...
