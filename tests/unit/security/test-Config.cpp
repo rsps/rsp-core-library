@@ -81,18 +81,18 @@ TEST_CASE("Config")
         CHECK_NOTHROW(json = config.ToJson().Encode());
 
 //        MESSAGE(json);
-        CHECK_EQ(json, R"({"ApplicationName":"ConfigurationApp","PlacementCount":3,"Power":280,"Pi":3.141593})");
+        CHECK_EQ(json, R"({"ApplicationName":"ConfigurationApp","PlacementCount":3,"Power":280,"Pi":3.1415926535897931})");
 
         config.Get().PlacementCount = 7;
         CHECK_THROWS_AS(config.Validate(), ValidatorException);
 
-        json = R"({"ApplicationName":"ConfigurationApp","PlacementCount":"NotANumber","Power":280,"Pi":3.141593,"ExtraValue":1.2345})";
+        json = R"({"ApplicationName":"ConfigurationApp","PlacementCount":"NotANumber","Power":280,"Pi":3.1415926535897931,"ExtraValue":1.2345})";
         Json js;
         CHECK_NOTHROW(js = Json::Decode(json));
         CHECK_NOTHROW(config.FromJson(js));
         CHECK_THROWS_AS(config.Validate(), ValidatorException);
 
-        json = R"({"ApplicationName":"ConfigurationApp","PlacementCount":"3","Power":280,"Pi":3.141593,"ExtraValue":1.2345})";
+        json = R"({"ApplicationName":"ConfigurationApp","PlacementCount":"3","Power":280,"Pi":3.1415926535897931,"ExtraValue":1.2345})";
         CHECK_NOTHROW(js.Clear());
         CHECK_NOTHROW(js = js.Decode(json));
         CHECK_NOTHROW(config.FromJson(js));
