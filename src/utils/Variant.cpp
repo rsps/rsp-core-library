@@ -8,6 +8,7 @@
  * \author      Steffen Brummer
  */
 
+#include <sstream>
 #include <cstdio>
 #include <utils/Variant.h>
 #include <logging/Logger.h>
@@ -307,6 +308,18 @@ double Variant::AsDouble() const
     return 0.0f;
 }
 
+
+template <typename T>
+std::string to_string_with_high_precision(const T a_value)
+{
+    const unsigned int digits = std::numeric_limits<T>::max_digits10;
+    std::ostringstream out;
+    out.precision(digits);
+//    out << std::fixed;
+    out << a_value;
+    return out.str();
+}
+
 std::string Variant::AsString() const
 {
     switch (mType) {
@@ -324,7 +337,7 @@ std::string Variant::AsString() const
 
         case Types::Float:
         case Types::Double:
-            return std::to_string(mDouble);
+            return to_string_with_high_precision(mDouble);
 
         case Types::Pointer:
         {
