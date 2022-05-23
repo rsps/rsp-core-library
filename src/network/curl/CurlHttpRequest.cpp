@@ -3,7 +3,7 @@
  * \license      Mozilla Public License 2.0
  * \author:      Jesper Madsen
  * Created Date:  Tuesday, May 17th 2022, 8:49:44 am
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -13,6 +13,9 @@
  */
 
 #include "CurlHttpRequest.h"
+#include <iostream>
+#include <map>
+#include <iterator>
 
 using namespace rsp::network::http;
 using namespace rsp::network::exceptions;
@@ -24,20 +27,18 @@ namespace rsp::network::http::curl
     {
         checkVersion();
     }
-
+    
     size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, std::string *data)
     {
         data->append(static_cast<char *>(ptr), size * nmemb);
         return size * nmemb;
     }
 
-    size_t CurlHttpRequest::header_callback(void *data, size_t size, size_t nmemb, void *userdata)
+    size_t CurlHttpRequest::headerFunction(void *data, size_t size, size_t nmemb, void *userdata)
     {
-
         HttpResponse *r;
         r = reinterpret_cast<HttpResponse *>(userdata);
         std::string header(reinterpret_cast<char *>(data), size * nmemb);
-        std::cout << header << std::endl;
         size_t seperator = header.find_first_of(':');
         if (std::string::npos == seperator)
         {
@@ -62,19 +63,19 @@ namespace rsp::network::http::curl
 
     IHttpRequest &CurlHttpRequest::SetOptions(HttpRequestOptions opts)
     {
-        this->mRequestOptions = opts;
+        mRequestOptions = opts;
         return *this;
     }
 
     IHttpRequest &CurlHttpRequest::SetHeaders(std::map<std::string, std::string> &headers)
     {
-        this->mRequestOptions.Headers = headers;
+        mRequestOptions.Headers = headers;
         return *this;
     }
 
     IHttpRequest &CurlHttpRequest::SetBody(std::string const &body)
     {
-        this->mRequestOptions.Body = body;
+        mRequestOptions.Body = body;
         return *this;
     }
 
@@ -85,21 +86,47 @@ namespace rsp::network::http::curl
     IHttpResponse &CurlHttpRequest::Execute()
     {
         auto curl = curl_easy_init();
+        
         if (curl)
         {
             curl_easy_setopt(curl, CURLOPT_URL, std::string(mRequestOptions.BaseUrl + mRequestOptions.Uri).c_str());
-            curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-            curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 50L);
-            curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+            switch(mRequestOptions.RequestType) {
+                case HttpRequestType::GET:
+                    // code block
+                    break;
+                case HttpRequestType::POST:
+                    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+                    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
+                    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
+                    break;
+                default:
+                    break;
+            }
+            
+            //curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+            //curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 50L);
+            //curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
 
+            //Setup callbacks functions for Response object
             std::string response_string;
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_string);
 
-            curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
+            curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, headerFunction);
             curl_easy_setopt(curl, CURLOPT_HEADERDATA, &mResponse);
 
+            //Set Request headers 
+            curl_slist* headerList = NULL;
+            std::map<std::string, std::string>::const_iterator iter = mRequestOptions.Headers.begin();
+            for (iter; iter != mRequestOptions.Headers.end(); ++iter){
+                std::cout << "req head" << std::endl;
+            }
+            
+
+            //Curl
             curl_easy_perform(curl);
+            
+            //Evaluate
             long response_code;
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
             std::cout << response_string << "\n"
@@ -130,6 +157,12 @@ namespace rsp::network::http::curl
 
 } // namespace rsp::network::http::curl
 
+
+/**
+ * \brief Factory function to decouple depency
+ * 
+ * \return IHttpRequest* 
+ */
 IHttpRequest *rsp::network::http::HttpRequest::MakeRequest()
 {
     return new rsp::network::http::curl::CurlHttpRequest();

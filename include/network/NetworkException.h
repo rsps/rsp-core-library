@@ -1,4 +1,4 @@
-/*
+/**
  * \copyright    Copyright 2022 RSP Systems A/S. All rights reserved.
  * \license      Mozilla Public License 2.0
  * \author:      Jesper Madsen
@@ -20,14 +20,27 @@
 
 namespace rsp::network::exceptions
 {
+    /**
+     * \class NetworkException
+     * 
+     * \brief Base exception for handling network related issues in the rsp::network namespace
+     * 
+     */
     class NetworkException : public rsp::utils::CoreException{
         public:
             explicit NetworkException(const std::string &aMsg) : rsp::utils::CoreException(aMsg) {}
-    };
+    }; // class NetworkException
+
+
+    /**
+     * \class ECurlVersion
+     * 
+     * \brief Exception regarding curl library version
+     * 
+     */
     class ECurlVersion : public NetworkException{
         public:
             explicit ECurlVersion(const std::string &aMsg) : NetworkException(aMsg) {}
-    };
-}
-
-#endif
+    }; // class ECurlVersion
+} // namespace rsp::network::exceptions
+#endif //NETWORKEXCEPTION_H
