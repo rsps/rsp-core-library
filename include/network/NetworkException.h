@@ -42,5 +42,16 @@ namespace rsp::network::exceptions
         public:
             explicit ECurlVersion(const std::string &aMsg) : NetworkException(aMsg) {}
     }; // class ECurlVersion
+
+    /**
+     * \class ERequestOptions
+     * 
+     * \brief Exception regarding Request options
+     * 
+     */
+    class ERequestOptions : public NetworkException{
+        public:
+            explicit ERequestOptions(const std::string &aMsg) : NetworkException(aMsg) {}
+    }; // class ECurlVersion
 } // namespace rsp::network::exceptions
 #endif //NETWORKEXCEPTION_H

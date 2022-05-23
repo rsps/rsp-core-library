@@ -85,8 +85,12 @@ namespace rsp::network::http::curl
 
     IHttpResponse &CurlHttpRequest::Execute()
     {
-        auto curl = curl_easy_init();
+        if(!checkRequestOptions(mRequestOptions)){
+            THROW_WITH_BACKTRACE1(ERequestOptions, "Incorrect request option settings");
+        };
+
         
+        auto curl = curl_easy_init();
         if (curl)
         {
             curl_easy_setopt(curl, CURLOPT_URL, std::string(mRequestOptions.BaseUrl + mRequestOptions.Uri).c_str());
@@ -102,9 +106,13 @@ namespace rsp::network::http::curl
                 default:
                     break;
             }
-            
+
+            //Redirect setup
+            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, _followRedirects);
+            curl_easy_setopt(curl, CURLOPT_MAXREDIRS, _maxRedirects);
+
+            //Progress and keep-alive
             //curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-            //curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 50L);
             //curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
 
             //Setup callbacks functions for Response object
@@ -153,6 +161,13 @@ namespace rsp::network::http::curl
         {
             THROW_WITH_BACKTRACE1(ECurlVersion, "Wrong libcurl version");
         }
+    }
+
+    bool CurlHttpRequest::checkRequestOptions(HttpRequestOptions aOpts){
+        return (
+            aOpts.RequestType == HttpRequestType::NONE &&
+            aOpts.BaseUrl != ""
+        );
     }
 
 } // namespace rsp::network::http::curl

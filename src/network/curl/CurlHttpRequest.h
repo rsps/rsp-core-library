@@ -44,12 +44,14 @@ namespace rsp::network::http::curl
     protected:
         HttpResponse mResponse;
         HttpRequestOptions mRequestOptions;
+        static long const _followRedirects = 1L;
+        static long const _maxRedirects = 50L;
         void checkVersion();
 
     private:
         static size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string *data);
         static size_t headerFunction(void *data, size_t size, size_t nmemb, void *userdata);
-
+        bool checkRequestOptions(HttpRequestOptions aOpts);
         // trim from start
         static inline std::string &ltrim(std::string &s)
         {
@@ -75,6 +77,9 @@ namespace rsp::network::http::curl
         {
             return ltrim(rtrim(s));
         }
+    
+        
+
     };
 }
 
