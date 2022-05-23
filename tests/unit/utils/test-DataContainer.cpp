@@ -95,6 +95,24 @@ TEST_CASE("Data Container")
 
         rsp::posix::FileSystem::DeleteFile(cFileName);
     }
+
+    SUBCASE("Stream")
+    {
+        MyData data {0, 0, ""};
+        CHECK_EQ(data.Integer, 0);
+        CHECK_EQ(data.Float, 0.0f);
+
+        data = dc.Get();
+
+        CHECK_EQ(data.Integer, 42);
+        CHECK_EQ(data.Float, 43.1f);
+        CHECK_EQ(data.String, "Hello");
+
+        data.Integer = 45;
+
+        dc.Get() = data;
+        CHECK_EQ(dc.Get().Integer, 45);
+    }
 }
 
 
