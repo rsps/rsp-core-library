@@ -19,33 +19,39 @@
 #include <string>
 #include <network/IHttpRequest.h>
 
-
 namespace rsp::network::http {
 
-
-
+//Forward declerations
 class IHttpRequest;
 
 class IHttpResponse
 {
 public:
-    virtual int GetStatusCode() const = 0;
-
-    virtual const std::map<std::string, std::string>& GetHeaders() const = 0;
-    virtual const IHttpResponse& SetHeaders(std::map<std::string, std::string> & headers) = 0;
-    virtual const std::map<std::string, std::string>& AddHeader(std::string key, std::string value) = 0;
+    //Headers
+    virtual std::map<std::string, std::string> & GetHeaders() = 0;
+    virtual IHttpResponse & SetHeaders(std::map<std::string, std::string> & headers) = 0;
+    virtual IHttpResponse & AddHeader(std::string key, std::string value) = 0;    
     
-    virtual const IHttpRequest& GetRequest() const = 0;
-    virtual const std::string& GetBody() const = 0;
+    //HTTP response code
+    virtual int GetStatusCode() = 0;
+    virtual IHttpResponse & SetStatusCode(int & arCode) = 0;
+    
+    //Origin request
+    virtual IHttpRequest & GetRequest() = 0;
+    
+    //HTTP response body
+    virtual std::string & GetBody() = 0;
+    virtual IHttpResponse & SetBody(std::string & arBody) = 0;
 
     virtual ~IHttpResponse() { }
 };
 
-inline std::ostream& operator<<(std::ostream &aStream, IHttpResponse & resp) 
+//Operator overloads
+inline std::ostream& operator<<(std::ostream & arStream, IHttpResponse & resp) 
 {
     for (const auto &[k, v] : resp.GetHeaders() )
-        aStream << ("[" + k + ", " + v + "]\n");
-    return aStream << "\n" << " StatusCode = " << std::to_string(resp.GetStatusCode()) << "\n"; 
+        arStream << ("[" + k + ", " + v + "]\n");
+    return arStream << "\n" << " StatusCode = " << std::to_string(resp.GetStatusCode()) << "\n"; 
 }
 }
 

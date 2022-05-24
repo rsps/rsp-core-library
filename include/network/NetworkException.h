@@ -53,5 +53,16 @@ namespace rsp::network::exceptions
         public:
             explicit ERequestOptions(const std::string &aMsg) : NetworkException(aMsg) {}
     }; // class ECurlVersion
+
+        /**
+     * \class ECurlError
+     * 
+     * \brief Exception propogating curl errors
+     * 
+     */
+    class ECurlError : public NetworkException{
+        public:
+            explicit ECurlError(const std::string &aMsg) : NetworkException(aMsg) {}
+    }; // class ECurlVersion
 } // namespace rsp::network::exceptions
 #endif //NETWORKEXCEPTION_H

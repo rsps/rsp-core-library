@@ -33,34 +33,38 @@ namespace rsp::network::http
             : mrRequest(arRequest)
         {
         }
-
-        int GetStatusCode() const override
-        {
-            return mStatusCode;
-        }
-        const IHttpResponse &SetStatusCode(int const &arCode)
-        {
-            mStatusCode = arCode;
-            return *this;
-        }
-        const IHttpResponse &SetHeaders(std::map<std::string, std::string> &arHeaders) override
+        std::map<std::string, std::string> &GetHeaders()  override { return mHeaders; }
+        IHttpResponse & SetHeaders(std::map<std::string, std::string> &arHeaders) override
         {
             mHeaders = arHeaders;
             return *this;
         }
-        const IHttpResponse &SetBody(std::string const &arBody)
+        IHttpResponse & AddHeader(std::string aKey, std::string aValue) override
+        {
+            mHeaders[aKey] = aValue;
+            return *this;
+        }
+        
+
+        int GetStatusCode() override
+        {
+            return mStatusCode;
+        }
+        IHttpResponse & SetStatusCode(int &arCode) override
+        {
+            mStatusCode = arCode;
+            return *this;
+        }
+        IHttpRequest &GetRequest() override { return mrRequest; }
+        
+        
+        std::string &GetBody() override { return mBody; }
+        IHttpResponse & SetBody(std::string &arBody)
         {
             mBody = arBody;
             return *this;
         }
-        const std::map<std::string, std::string> &AddHeader(std::string aKey, std::string aValue) override
-        {
-            mHeaders[aKey] = aValue;
-            return mHeaders;
-        }
-        const std::map<std::string, std::string> &GetHeaders() const override { return mHeaders; }
-        const IHttpRequest &GetRequest() const override { return mrRequest; }
-        const std::string &GetBody() const override { return mBody; }
+        
 
     protected:
         IHttpRequest &mrRequest;

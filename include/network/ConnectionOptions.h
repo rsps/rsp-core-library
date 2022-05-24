@@ -23,8 +23,11 @@ namespace rsp::network::http{
             std::string BaseUrl = "";
             int ConnectionTimeoutMs = 5000;
             int OtherTimeoutMs = 30000;
-            std::string certCaPath = "/";
-            std::string certKeyPath = "/";
+            std::string CertType = "";
+            std::string CertCaPath = "/";
+            std::string CertKeyPath = "/";
+            std::string CertkeyPath = "/";
+            std::string CertPass = "";
     };
 } //namespace rsp::network::http
 

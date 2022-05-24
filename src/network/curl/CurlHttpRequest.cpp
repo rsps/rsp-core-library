@@ -89,31 +89,31 @@ namespace rsp::network::http::curl
             THROW_WITH_BACKTRACE1(ERequestOptions, "Incorrect request option settings");
         };
 
-        
         auto curl = curl_easy_init();
         if (curl)
         {
             curl_easy_setopt(curl, CURLOPT_URL, std::string(mRequestOptions.BaseUrl + mRequestOptions.Uri).c_str());
             switch(mRequestOptions.RequestType) {
                 case HttpRequestType::GET:
-                    // code block
                     break;
                 case HttpRequestType::POST:
                     curl_easy_setopt(curl, CURLOPT_POST, 1L);
-                    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
-                    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
+                    if (mRequestOptions.Body.size() > 0) {
+                        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
+                        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
+                    }
                     break;
                 default:
                     break;
             }
-
-            //Redirect setup
+            
+            //Redirect configuration
             curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, _followRedirects);
             curl_easy_setopt(curl, CURLOPT_MAXREDIRS, _maxRedirects);
 
-            //Progress and keep-alive
-            //curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-            //curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+            //Progress and keep-alive configuration
+            curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+            curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
 
             //Setup callbacks functions for Response object
             std::string response_string;
@@ -124,26 +124,38 @@ namespace rsp::network::http::curl
             curl_easy_setopt(curl, CURLOPT_HEADERDATA, &mResponse);
 
             //Set Request headers 
-            curl_slist* headerList = NULL;
+            std::string header;
+            curl_slist* headers = NULL;
             std::map<std::string, std::string>::const_iterator iter = mRequestOptions.Headers.begin();
             for (iter; iter != mRequestOptions.Headers.end(); ++iter){
-                std::cout << "req head" << std::endl;
+                header = iter->first + ": " + iter->second;
+                headers = curl_slist_append(headers, header.c_str());
+            }
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+            
+            //Set basic auth
+            if(mRequestOptions.BasicAuthUsername.length() > 0) {
+                curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+                curl_easy_setopt(curl, CURLOPT_USERPWD, std::string(mRequestOptions.BasicAuthUsername + ":" + mRequestOptions.BasicAuthPassword).c_str());
+            }
+
+            //Curl and evaluate
+            auto res = curl_easy_perform(curl);
+            if(res != CURLE_OK){
+                THROW_WITH_BACKTRACE1(ECurlError, 
+                    "Curl request failed with errorcode : " + * curl_easy_strerror(res));
+            }else{
+                int64_t resp_code = 0;
+                curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &resp_code);
+                mResponse
+                    .SetBody(response_string)
+                    .SetStatusCode(reinterpret_cast<int &>(resp_code));
             }
             
-
-            //Curl
-            curl_easy_perform(curl);
-            
-            //Evaluate
-            long response_code;
-            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-            std::cout << response_string << "\n"
-                      << response_code << "\n";
-
+            //Cleanup
             curl_easy_cleanup(curl);
             curl_global_cleanup();
             curl = NULL;
-            // mResponse.SetBody(response_string).SetStatusCode(response_code).SetHeaders(header_string);
         }
 
         return mResponse;
@@ -165,7 +177,7 @@ namespace rsp::network::http::curl
 
     bool CurlHttpRequest::checkRequestOptions(HttpRequestOptions aOpts){
         return (
-            aOpts.RequestType == HttpRequestType::NONE &&
+            aOpts.RequestType != HttpRequestType::NONE ||
             aOpts.BaseUrl != ""
         );
     }

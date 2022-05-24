@@ -27,22 +27,15 @@ TEST_CASE("Network")
 
         request.SetOptions(opt);
 
-        auto & test = request.Execute();
-
-        
         IHttpResponse & pResp = request.Execute(); 
         auto headers = pResp.GetHeaders();
+        
+        for (const auto& x : headers) {
+            std::cout << x.first << ": " << x.second << "\n";
+        }
         int code = pResp.GetStatusCode();
-        std::cout << code << std::endl;
+        CHECK_EQ(200,code);
 
-        //HttpResponse dcasted = dynamic_cast<HttpResponse>(request.Execute()); //nope
-        //HttpResponse scasted = static_cast<HttpResponse>(request.Execute()); //also nope
-        //IHttpResponse ireq = request.Execute(); // doesn't work
-        //auto test = request.Execute(); //doesn't work
-        //HttpResponse dumb = (HttpResponse)request.Execute(); //worth a shot
-
-        //std::cout << request.Execute(); //works due to global << overload
-        //CHECK_EQ(200, request.);
     }
 
 }
