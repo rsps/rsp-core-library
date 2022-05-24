@@ -5,39 +5,126 @@ skinparam stereotypeCBackgroundColor<<Exception>> Red
 
 title Network Classes
 
-namespace rsp {
 
-class LibCurlWrapper {
+namespace external_namespace_includes{
+namespace rsp.logging {
+    class Logger  {
+    }
 }
 
-class HttpRequest {
+namespace rsp.json{
+    class Json  {
+    }
 }
 
-class HttpResponse {
+namespace rsp.utils{
+    class Crc32  {
+    }
+    
+    class CoreException <<Exception>> {
+    }
+}
 }
 
-class HttpDownload {
+namespace rsp.network {
+
+
+    namespace rsp.network.exceptions {
+        class HttpException <<Exception>> {
+            Base class for all exceptions 
+            in the network namespace
+        }
+    }
+
+    namespace rsp.network.http {
+        class ConnectionOptions{
+            + string Url = "https://example.com"
+            + uint32_t ConnectTimeOutMs = 5000
+            + uint32_t TimeOutMs = 30000
+            + string CertPath = "/"
+            + string KeyPath = "/"
+        }
+
+        interface IHttpSession  {
+            +GetDefaultOptions() : HttpRequestOptions
+            +MakeRequest() : IHttpRequest&
+            +MakeRequest(options:HttpRequestOptions) : IHttpRequest&
+        }
+        
+        interface IHttpRequest {
+            + GetOptions() : HttpRequestOptions&
+            + Execute() : IHttpResponse&
+            + Execute(callback:function<void(IHttpResponse&)>) : void
+        }
+        
+        enum HttpRequestType {
+            NONE,
+            GET,
+            POST
+        }
+		
+		class HttpRequestOptions {
+			+ map<string, string> Headers
+			+ string Body
+			+ HttpRequestType RequestType = HttpRequestType.NONE
+			+ string BasicAuthUsername
+			+ string BasicAuthPassword
+		}
+
+
+        class HttpSession  {
+            + string Host
+            + string BasePath
+            --
+            + HttpSession(host: string, basepath: string)
+            + MakeRequest(URI: string, type: HttpRequestType=HttpRequestType.Get) : HttpRequest&
+            + MakeRequest(URI: string, type: HttpRequestType=HttpRequestType.Post, body: string) : HttpRequest&
+        }
+
+        interface IHttpResponse{
+            + GetStatusCode() : int
+            + GetHeaders() : map<string, string>
+            + GetRequest() : HttpRequest
+            + GetBody() : string
+        }
+
+        class HttpResponse {
+        }
+        class HttpRequest {
+        }
+
+        namespace rsp.network.http.curl {
+            
+            class CurlHttpRequest{
+
+            }            
+            
+            class LibCurl <<external>> {
+            }
+        }
+    }
 }
 
-class DnsLookup {
-}
 
-class Json <<utils>> {
-}
 
-class Crc32 {
-}
+rsp.network.exceptions.HttpException -up-|> rsp.utils.CoreException
 
-LibCurlWrapper <|-- HttpRequest
-LibCurlWrapper <|-- HttpResponse
-LibCurlWrapper <|-- HttpDownload
-LibCurlWrapper <|-- DnsLookup
+rsp.network.http.HttpRequestOptions -up-|>rsp.network.http.ConnectionOptions 
+rsp.network.http.HttpRequestType --* rsp.network.http.HttpRequestOptions
+rsp.network.http.HttpSession -up-|> rsp.network.http.IHttpSession 
 
-Crc32 *-- HttpDownload
+rsp.network.http.HttpRequestOptions --* rsp.network.http.IHttpSession 
+rsp.network.http.IHttpRequest --* rsp.network.http.IHttpSession
 
-Json *-- HttpRequest
-Json *-- HttpResponse
+rsp.network.http.HttpResponse -up-|> rsp.network.http.IHttpResponse
+rsp.network.http.HttpRequest -up-|> rsp.network.http.IHttpRequest
 
-}
+rsp.network.http.IHttpRequest --o rsp.network.http.HttpSession
+rsp.network.http.HttpRequestOptions --* rsp.network.http.IHttpRequest 
+rsp.network.http.HttpResponse -- rsp.network.http.IHttpRequest
+
+rsp.network.http.curl.CurlHttpRequest --+ rsp.network.http.curl.LibCurl
+rsp.network.http.curl.CurlHttpRequest -up-|> rsp.network.http.IHttpRequest
+rsp.network.http.curl.CurlHttpRequest -up-* rsp.network.http.HttpRequest
 
 @enduml
