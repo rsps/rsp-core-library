@@ -74,7 +74,7 @@ Framebuffer::Framebuffer(const char *apDevPath)
         THROW_SYSTEM("Framebuffer shared memory mapping failed");
     }
 
-    mpBackBuffer = mpFrontBuffer + screensize;
+    mpBackBuffer = mpFrontBuffer + screensize / sizeof(std::uint32_t);
 
     if (mVariableInfo.yoffset > 0) {
         std::uint32_t *tmp = mpFrontBuffer;
@@ -148,14 +148,12 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
 void Framebuffer::clear(Color aColor)
 {
     // draw to back buffer
-    std::cout << "clear" << std::endl;
     for (std::uint32_t y = 0; y < mVariableInfo.yres; y++) {
         for (std::uint32_t x = 0; x < mVariableInfo.xres; x++) {
             std::size_t location = ((x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length) / sizeof(std::uint32_t);
             mpBackBuffer[location] = aColor;
         }
     }
-    std::cout << "clear exit" << std::endl;
 }
 
 void Framebuffer::copy()

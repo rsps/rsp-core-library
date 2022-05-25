@@ -28,7 +28,6 @@ GraphicsMain::GraphicsMain(BufferedCanvas &arBufferedCanvas, TouchParser &arTouc
 {
     mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-    std::cout << "!!" << std::endl;
 }
 
 GraphicsMain::~GraphicsMain()
