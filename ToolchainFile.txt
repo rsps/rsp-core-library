@@ -8,19 +8,25 @@ set (CMAKE_CXX_COMPILER_WORKS 1)
 set (CMAKE_TRY_COMPILE_TARGET_TYPE         STATIC_LIBRARY)
 
 # Path
-set (ARM_TOOLCHAIN_PATH /opt/fslc-framebuffer/3.1/sysroots/x86_64-fslcsdk-linux/usr/bin/arm-fslc-linux-gnueabi/)
-set (CMAKE_SYSROOT /opt/fslc-framebuffer/3.1/sysroots/cortexa7t2hf-neon-fslc-linux-gnueabi/)
+set (ARM_TOOLCHAIN_PATH /opt/arm-buildroot-linux-gnueabihf_sdk-buildroot/)
+set (CMAKE_SYSROOT /opt/arm-buildroot-linux-gnueabihf_sdk-buildroot/arm-buildroot-linux-gnueabihf/sysroot/)
+set (ARM_TOOL_PREFIX ${ARM_TOOLCHAIN_PATH}bin/arm-buildroot-linux-gnueabihf)
+
+#set (INCLUDE_DIRECTORIES ${CMAKE_SYSROOT}usr/include/)
+#set (FREETYPE_LIBRARY ${CMAKE_SYSROOT}/usr/lib/libfreetype.so)
+#set (FREETYPE_INCLUDE_DIRS ${CMAKE_SYSROOT}/usr/include/freetype2/)
+#set (CMAKE_FIND_ROOT_PATH ${CMAKE_SYSROOT})
 
 # Toolchain Binaries
-#set (CMAKE_AR                    ${ARM_TOOLCHAIN_PATH}arm-fslc-linux-gnueabi-ar${CMAKE_EXECUTABLE_SUFFIX})
-#set (CMAKE_ASM_COMPILER          ${ARM_TOOLCHAIN_PATH}arm-fslc-linux-gnueabi-gcc${CMAKE_EXECUTABLE_SUFFIX})
-set (CMAKE_C_COMPILER            ${ARM_TOOLCHAIN_PATH}arm-fslc-linux-gnueabi-gcc${CMAKE_EXECUTABLE_SUFFIX})
-set (CMAKE_CXX_COMPILER          ${ARM_TOOLCHAIN_PATH}arm-fslc-linux-gnueabi-g++${CMAKE_EXECUTABLE_SUFFIX})
-#set (CMAKE_LINKER                ${ARM_TOOLCHAIN_PATH}arm-fslc-linux-gnueabi-ld${CMAKE_EXECUTABLE_SUFFIX})
-#set (CMAKE_OBJCOPY               ${ARM_TOOLCHAIN_PATH}arm-fslc-linux-gnueabi-objcopy${CMAKE_EXECUTABLE_SUFFIX} CACHE INTERNAL "")
-#set (CMAKE_RANLIB                ${ARM_TOOLCHAIN_PATH}arm-fslc-linux-gnueabi-ranlib${CMAKE_EXECUTABLE_SUFFIX} CACHE INTERNAL "")
-#set (CMAKE_SIZE                  ${ARM_TOOLCHAIN_PATH}arm-fslc-linux-gnueabi-size${CMAKE_EXECUTABLE_SUFFIX} CACHE INTERNAL "")
-#set (CMAKE_STRIP                 ${ARM_TOOLCHAIN_PATH}arm-fslc-linux-gnueabi-strip${CMAKE_EXECUTABLE_SUFFIX} CACHE INTERNAL "")
+#set (CMAKE_AR                    ${ARM_TOOL_PREFIX}-ar${CMAKE_EXECUTABLE_SUFFIX})
+#set (CMAKE_ASM_COMPILER          ${ARM_TOOL_PREFIX}-gcc${CMAKE_EXECUTABLE_SUFFIX})
+set (CMAKE_C_COMPILER             ${ARM_TOOL_PREFIX}-gcc${CMAKE_EXECUTABLE_SUFFIX})
+set (CMAKE_CXX_COMPILER           ${ARM_TOOL_PREFIX}-g++${CMAKE_EXECUTABLE_SUFFIX})
+#set (CMAKE_LINKER                ${ARM_TOOL_PREFIX}-ld${CMAKE_EXECUTABLE_SUFFIX})
+#set (CMAKE_OBJCOPY               ${ARM_TOOL_PREFIX}-objcopy${CMAKE_EXECUTABLE_SUFFIX} CACHE INTERNAL "")
+#set (CMAKE_RANLIB                ${ARM_TOOL_PREFIX}-ranlib${CMAKE_EXECUTABLE_SUFFIX} CACHE INTERNAL "")
+#set (CMAKE_SIZE                  ${ARM_TOOL_PREFIX}-size${CMAKE_EXECUTABLE_SUFFIX} CACHE INTERNAL "")
+#set (CMAKE_STRIP                 ${ARM_TOOL_PREFIX}-strip${CMAKE_EXECUTABLE_SUFFIX} CACHE INTERNAL "")
 
 # Linking Flags
 set (CMAKE_C_FLAGS               "-Wno-psabi -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a7 -fdata-sections -ffunction-sections -Wl,--gc-sections -pthread" CACHE INTERNAL "")
