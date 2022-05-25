@@ -154,7 +154,7 @@ int OutStreamBuf::sync()
         DEBUG("OutStreamBuf mutex was not locked!!! " << std::this_thread::get_id());
     }
 
-    int l = mBuffer.length();
+    auto l = mBuffer.length();
     if (l > 0) {
         DEBUG("Message: (" << l << ") " << mBuffer);
         ownerWrite(mBuffer);

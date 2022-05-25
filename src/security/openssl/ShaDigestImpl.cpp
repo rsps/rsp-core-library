@@ -43,7 +43,7 @@ public:
                 algo = EVP_sha3_256();
                 break;
         }
-        HMAC_Init_ex(mpCtx, arSecret.data(), arSecret.size(), algo, NULL);
+        HMAC_Init_ex(mpCtx, arSecret.data(), static_cast<int>(arSecret.size()), algo, NULL);
     }
 
     ~OpenSSLSha()

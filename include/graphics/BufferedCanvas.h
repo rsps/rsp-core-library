@@ -51,8 +51,8 @@ class BufferedCanvas : public Canvas
     virtual void clear(Color aColor) = 0;
     virtual void copy() = 0;
 
-    uint8_t *mpFrontBuffer = nullptr;
-    uint8_t *mpBackBuffer = nullptr;
+    uint32_t *mpFrontBuffer = nullptr;
+    uint32_t *mpBackBuffer = nullptr;
 };
 
 } // namespace rsp::graphics

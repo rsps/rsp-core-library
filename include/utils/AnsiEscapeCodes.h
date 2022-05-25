@@ -111,7 +111,7 @@ public:
         static EscString Right;
         static EscString Left;
         static EscString EraseLineMoveToCol1;
-        static EscString SetPosition(int aPos);
+        static EscString SetPosition(unsigned int aPos);
     };
 
     class arrow

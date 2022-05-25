@@ -34,8 +34,9 @@ class Framebuffer : public BufferedCanvas
         if (!IsInsideScreen(arPoint)) {
             return;
         }
-        long location = (arPoint.mX + static_cast<int>(mVariableInfo.xoffset)) * (static_cast<int>(mVariableInfo.bits_per_pixel) / 8) + arPoint.mY * static_cast<int>(mFixedInfo.line_length);
-        *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = arColor;
+        std::uint32_t location = ((static_cast<std::uint32_t>(arPoint.mX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
+            + static_cast<std::uint32_t>(arPoint.mY) * mFixedInfo.line_length) / sizeof(std::uint32_t);
+        mpBackBuffer[location] = arColor;
     }
 
     /**

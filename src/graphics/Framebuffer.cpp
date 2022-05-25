@@ -67,17 +67,17 @@ Framebuffer::Framebuffer(const char *apDevPath)
     }
 
     // calculate size of screen
-    unsigned long screensize = static_cast<unsigned long>(mVariableInfo.yres) * mFixedInfo.line_length;
+    std::size_t screensize = mVariableInfo.yres * mFixedInfo.line_length;
 
-    mpFrontBuffer = static_cast<uint8_t *>(mmap(0, static_cast<size_t>(screensize * 2), PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
-    if (mpFrontBuffer == reinterpret_cast<uint8_t *>(-1)) /*MAP_FAILED*/ {
+    mpFrontBuffer = static_cast<uint32_t *>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
+    if (mpFrontBuffer == reinterpret_cast<uint32_t *>(-1)) /*MAP_FAILED*/ {
         THROW_SYSTEM("Framebuffer shared memory mapping failed");
     }
 
     mpBackBuffer = mpFrontBuffer + screensize;
 
     if (mVariableInfo.yoffset > 0) {
-        uint8_t *tmp = mpFrontBuffer;
+        std::uint32_t *tmp = mpFrontBuffer;
         mpFrontBuffer = mpBackBuffer;
         mpBackBuffer = tmp;
     }
@@ -112,7 +112,7 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp, Color aColor)
     }
 
     // update pointers
-    uint8_t *tmp = mpFrontBuffer;
+    std::uint32_t *tmp = mpFrontBuffer;
     mpFrontBuffer = mpBackBuffer;
     mpBackBuffer = tmp;
 
@@ -136,34 +136,35 @@ uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
     if (!IsInsideScreen(aPoint)) {
         return 0;
     }
-    long location = (aPoint.mX + static_cast<int>(mVariableInfo.xoffset)) * static_cast<int>(mVariableInfo.bits_per_pixel / 8) + aPoint.mY * static_cast<int>(mFixedInfo.line_length);
+    std::uint32_t location = ((static_cast<std::uint32_t>(aPoint.mX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
+        + (static_cast<std::uint32_t>(aPoint.mY) * mFixedInfo.line_length)) / sizeof(std::uint32_t);
     if (aFront) {
-        return *(reinterpret_cast<uint32_t *>(mpFrontBuffer + location));
+        return mpFrontBuffer[location];
     } else {
-        return *(reinterpret_cast<uint32_t *>(mpBackBuffer + location));
+        return mpBackBuffer[location];
     }
 }
 
 void Framebuffer::clear(Color aColor)
 {
-    long x, y;
     // draw to back buffer
-    for (y = 0; y < mVariableInfo.yres; y++) {
-        for (x = 0; x < mVariableInfo.xres; x++) {
-            long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;
-            *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = aColor;
+    std::cout << "clear" << std::endl;
+    for (std::uint32_t y = 0; y < mVariableInfo.yres; y++) {
+        for (std::uint32_t x = 0; x < mVariableInfo.xres; x++) {
+            std::size_t location = ((x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length) / sizeof(std::uint32_t);
+            mpBackBuffer[location] = aColor;
         }
     }
+    std::cout << "clear exit" << std::endl;
 }
 
 void Framebuffer::copy()
 {
-    long x, y;
     // copy front buffer to back buffer
-    for (y = 0; y < mVariableInfo.yres; y++) {
-        for (x = 0; x < mVariableInfo.xres; x++) {
-            long location = (x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length;
-            *(reinterpret_cast<uint32_t *>(mpBackBuffer + location)) = *(reinterpret_cast<uint32_t *>(mpFrontBuffer + location));
+    for (std::uint32_t y = 0; y < mVariableInfo.yres; y++) {
+        for (std::uint32_t x = 0; x < mVariableInfo.xres; x++) {
+            std::size_t location = ((x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length) / sizeof(std::uint32_t);
+            mpBackBuffer[location] = mpFrontBuffer[location];
         }
     }
 }

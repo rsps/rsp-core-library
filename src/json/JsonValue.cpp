@@ -416,7 +416,7 @@ void JsonValue::arrayToStringStream(std::stringstream &arResult, PrintFormat &ar
 
     arResult << "[" << arPf.nl;
 
-    int rest = mItems.size();
+    auto rest = mItems.size();
     for (const JsonValue& el : mItems) {
        arResult << in;
        el.toStringStream(arResult, arPf, aLevel+1, aForceToUCS2);
@@ -442,7 +442,7 @@ void JsonValue::objectToStringStream(std::stringstream &arResult, PrintFormat &a
         JLOG("  " << value.mName << ": " << value.AsString());
     }
 
-    int rest = mItems.size();
+    auto rest = mItems.size();
     for (const JsonValue &value : mItems) {
        arResult << in << "\"" << value.mName << "\":" << arPf.sp;
 

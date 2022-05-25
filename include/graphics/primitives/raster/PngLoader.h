@@ -46,7 +46,7 @@ protected:
         char type[4];
         union
         {
-            uint8_t *data = nullptr;
+            uint32_t *data = nullptr;
             struct IHDR *ihdr;
             struct PLTE *plte;
             struct IEND *iend;

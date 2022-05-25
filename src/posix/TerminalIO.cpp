@@ -247,7 +247,7 @@ std::string TerminalIO::GetLine()
             std::cout << ch;
             break;
         }
-        std::cout << AnsiEscapeCodes::ec::cursor::SetPosition(cursor + 1 + mPrompt.length()) << std::flush; // Move cursor to correct position
+        std::cout << AnsiEscapeCodes::ec::cursor::SetPosition(cursor + 1u + mPrompt.length()) << std::flush; // Move cursor to correct position
     }
 
     if (mVerbose) {

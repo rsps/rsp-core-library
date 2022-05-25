@@ -67,7 +67,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
                 std::cout << "IHDR chunk recognized" << std::endl;
 
                 //Allocate buffer size of chunk length plus crc
-                pngchunk.data = new uint8_t[pngchunk.length + sizeof(uint32_t)];
+                pngchunk.data = new uint32_t[(pngchunk.length + sizeof(uint32_t)) / sizeof(std::uint32_t)];
 
                 //Use length to read the chunks data field
                 //Read chunk and crc into data buffer
@@ -95,7 +95,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
                 std::cout << "Filter      :" << +pngchunk.ihdr->filterMethod << std::endl;
                 std::cout << "Interlace   :" << +pngchunk.ihdr->interlaceMethod << std::endl;
 
-                std::cout << "Crc         :" << std::hex << *reinterpret_cast<uint32_t*>(&pngchunk.data[pngchunk.length]) << std::endl;
+                std::cout << "Crc         :" << std::hex << &pngchunk.data[pngchunk.length / sizeof(std::uint32_t)] << std::endl;
                 std::cout << std::dec;
 
                 // TODO Stuff save or use header info
@@ -106,7 +106,7 @@ std::vector<uint32_t> PngLoader::LoadImg(const std::string &aImgName)
                 std::cout << "IDAT chunk recognized" << std::endl;
 
                 //Allocate buffer size of chunk length plus crc
-                pngchunk.data = new uint8_t[pngchunk.length + sizeof(uint32_t)];
+                pngchunk.data = new uint32_t[(pngchunk.length + sizeof(uint32_t)) / sizeof(std::uint32_t)];
 
                 //Use length to read the chunks data field
                 if (fread(pngchunk.data, pngchunk.length + sizeof(uint32_t), 1, file) != 1) {

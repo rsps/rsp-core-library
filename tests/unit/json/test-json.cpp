@@ -120,9 +120,9 @@ null }
         CHECK(a.GetCount() == 4);
         CHECK(a.IsNull() == false);
         CHECK_EQ(static_cast<int>(a[static_cast<std::size_t>(0u)]), 32);
-        CHECK(a[1u].AsString() == "string");
+        CHECK(a[1].AsString() == "string");
         CHECK(static_cast<bool>(a[2]));
-        CHECK(a[3u].IsNull());
+        CHECK(a[3].IsNull());
 
         CHECK_EQ(v["ArrayValue"][0].AsInt(), 32);
         CHECK_EQ(v["ArrayValue"][1].AsString(),  "string");

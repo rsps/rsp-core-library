@@ -28,6 +28,7 @@ GraphicsMain::GraphicsMain(BufferedCanvas &arBufferedCanvas, TouchParser &arTouc
 {
     mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+    std::cout << "!!" << std::endl;
 }
 
 GraphicsMain::~GraphicsMain()
@@ -65,7 +66,7 @@ void GraphicsMain::Run(int aMaxFPS)
             mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
         }
 
-        int64_t delay = std::max(0l, frame_time - sw.Elapsed<std::chrono::milliseconds>());
+        int64_t delay = std::max(std::int64_t(0), frame_time - sw.Elapsed<std::chrono::milliseconds>());
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     }
 }

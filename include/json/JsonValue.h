@@ -122,11 +122,11 @@ public:
      */
     JsonValue& operator[](std::size_t aIndex);
     JsonValue& operator[](int aIndex) { return (*this)[static_cast<std::size_t>(aIndex)]; }
-    JsonValue& operator[](unsigned int aIndex) { return (*this)[static_cast<std::size_t>(aIndex)]; }
+//    JsonValue& operator[](unsigned int aIndex) { return (*this)[static_cast<std::size_t>(aIndex)]; }
 
     const JsonValue& operator[](std::size_t aIndex) const;
     const JsonValue& operator[](int aIndex) const { return (*this)[static_cast<std::size_t>(aIndex)]; }
-    const JsonValue& operator[](unsigned int aIndex) const { return (*this)[static_cast<std::size_t>(aIndex)]; }
+//    const JsonValue& operator[](unsigned int aIndex) const { return (*this)[static_cast<std::size_t>(aIndex)]; }
 
     /**
      * \brief Get the number of element in a object or array

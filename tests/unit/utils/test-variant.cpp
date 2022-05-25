@@ -47,7 +47,7 @@ TEST_CASE("Variant")
 
     SUBCASE("Streaming") {
         std::stringstream ss;
-        v = 42ul;
+        v = std::uint64_t(42);
         ss << "Variant = " << v;
 
         CHECK(ss.str() == "Variant = uint64:42");
