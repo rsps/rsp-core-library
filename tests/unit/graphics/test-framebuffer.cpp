@@ -29,7 +29,7 @@ inline void CheckPixel(const Point &aPoint, const Color &aColour, const Framebuf
     }
 }
 
-TEST_CASE("Framebuffer Drawing Primitives")
+TEST_CASE("Framebuffer")
 {
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
