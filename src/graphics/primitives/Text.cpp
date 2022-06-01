@@ -56,7 +56,7 @@ void Text::scaleToFit()
     int attempts = 5;
     int w_limit = mArea.GetWidth() * 90 / 100; // >90%
     int h_limit = mArea.GetHeight() * 90 / 100; // > 90%
-    Logger::GetDefault().Debug() << "scaleToFit w_limit: " << w_limit << " h_limit: " << h_limit;
+    Logger::GetDefault().Debug() << "scaleToFit w_limit: " << w_limit << " h_limit: " << h_limit << std::endl;
 
     do {
         mFont.SetSize(width, height);
@@ -79,7 +79,7 @@ void Text::scaleToFit()
         }
     }
     while( (done != 2) && --attempts);
-    Logger::GetDefault().Debug() << "scaleToFit done: " << done << " attempts: " << attempts;
+    Logger::GetDefault().Debug() << "scaleToFit done: " << done << " attempts: " << attempts << std::endl;
 
     alignGlyphs();
 }
