@@ -10,6 +10,7 @@
 
 #include <doctest.h>
 #include <utils/Thread.h>
+#include <utils/StrUtils.h>
 #include <TestHelpers.h>
 
 using namespace rsp::utils;
@@ -42,13 +43,35 @@ TEST_CASE("Threads")
     }
 
     SUBCASE("Throw") {
-        int count = 0;
         t.GetExecute() = [&](void) {
             throw std::runtime_error("Oh no!");
         };
         CHECK_NOTHROW(t.Start());
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
         CHECK_THROWS_WITH_AS(t.Stop(), "Exception thrown in thread 'MyThread': Oh no!", std::runtime_error);
+    }
+
+    SUBCASE("Throw NoName") {
+        CHECK_NOTHROW(t.SetName(""));
+        CHECK_NOTHROW(t.GetName());
+        CHECK(t.GetName() != "");
+
+        t.GetExecute() = [&](void) {
+            throw std::runtime_error("Oh no!");
+        };
+
+        CHECK_NOTHROW(t.Start());
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        try {
+            t.Stop();
+            FAIL("No exception was thrown");
+        }
+        catch(const std::runtime_error &e) {
+            CHECK(StrUtils::StartsWith(e.what(), "Exception thrown in thread '"));
+        }
+        catch(...) {
+            FAIL("Wrong exception was thrown");
+        }
     }
 
 }

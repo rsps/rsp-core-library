@@ -51,12 +51,35 @@ public:
     Thread(const Thread &) = delete;
     Thread& operator=(const Thread &) = delete;
 
-    const std::string& GetName() { return mName; }
+    /**
+     * \brief Get the name of this thread. If no name have been assigned the thread id is returned.
+     * \return string
+     */
+    std::string GetName();
+
+    /**
+     * \brief Set the thread name.
+     * \param aName Name of this thread
+     * \return self
+     */
     Thread& SetName(std::string_view aName) { mName = aName; return *this; }
 
+    /**
+     * \brief Starts the thread
+     * \return self
+     */
     Thread& Start();
+
+    /**
+     * \brief Stops the thread. If the thread have thrown any exceptions, this method will also throw.
+     * \return self
+     */
     Thread& Stop();
 
+    /**
+     * \brief Callback for running simple method in own thread
+     * \return ThreadCallback_t
+     */
     ThreadCallback_t& GetExecute() { return mWhenExecute; }
 
 protected:
@@ -67,6 +90,10 @@ protected:
     std::exception_ptr mException = nullptr;
 
     void run();
+
+    /**
+     * \brief Override this for specialized threaded object.
+     */
     virtual void execute();
 };
 

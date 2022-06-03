@@ -14,6 +14,18 @@
 namespace rsp::utils {
 
 
+std::string Thread::GetName()
+{
+    if (!mName.empty()) {
+        return mName;
+    }
+
+    std::stringstream ss;
+    ss << mThread.get_id();
+
+    return ss.str();
+}
+
 Thread& Thread::Start()
 {
     mTerminated = false;
@@ -48,7 +60,7 @@ void Thread::run()
             }
         }
         catch (const std::exception &e) {
-            throw ThreadException(mName, e.what());
+            throw ThreadException(GetName(), e.what());
         }
     }
     catch(...) {
