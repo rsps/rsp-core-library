@@ -89,6 +89,10 @@ if (NOT RELEASE_BUILD)
 target_compile_options(rsp-core-lib PRIVATE
     -DDEBUG_LOG
 )
+else()
+target_compile_options(rsp-core-lib PRIVATE
+    -O3 -Wall
+)
 endif()
 
 add_subdirectory(src)
