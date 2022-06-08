@@ -40,7 +40,9 @@ public:
 
     SecureBuffer(const char* apData)
     {
-        assign(apData, apData + std::strlen(apData)); // pointers are converted to iterators.
+        auto b = reinterpret_cast<const std::uint8_t*>(apData);
+        auto e = reinterpret_cast<const std::uint8_t*>(apData + std::strlen(apData));
+        assign(b, e);
     }
 
     /**
@@ -50,7 +52,9 @@ public:
      */
     SecureBuffer(const char* apData, std::size_t aSize)
     {
-        assign(apData, apData + aSize); // pointers are converted to iterators.
+        auto b = reinterpret_cast<const std::uint8_t*>(apData);
+        auto e = reinterpret_cast<const std::uint8_t*>(apData + aSize);
+        assign(b, e);
     }
 
     /**
@@ -60,7 +64,9 @@ public:
      */
     SecureBuffer(const std::uint8_t* apData, std::size_t aSize)
     {
-        assign(apData, apData + aSize); // pointers are converted to iterators.
+        auto b = apData;
+        auto e = (apData + aSize);
+        assign(b, e);
     }
 
     /**

@@ -27,8 +27,11 @@ TEST_CASE("Crypt")
 {
     const std::string cTestStr("How much wood would a woodchuck chuck, if a woodchuck would chuck wood.");
 
-    SecureString iv = "598ef20fc18d54d7";
-    SecureString key = "3167ceee9cb36d05a553fd48752e077e8e2c7edef0c046f7";
+    CHECK_NOTHROW(SecureString iv("598ef20fc18d54d7"));
+    CHECK_NOTHROW(SecureString key("3167ceee9cb36d05a553fd48752e077e8e2c7edef0c046f7"));
+
+    SecureString iv("598ef20fc18d54d7");
+    SecureString key("3167ceee9cb36d05a553fd48752e077e8e2c7edef0c046f7");
     CipherTypes cipher;
     std::string expected_result;
 
@@ -55,6 +58,7 @@ TEST_CASE("Crypt")
         expected_result = "694d7c4691fa769173e87e3523d362b8ad424ea0495551fb99d6e4e3f793446b963161512527249a3081747e92e417aa077fd24c211e2c28d608dcf090ab2851654d0874a931e7e1c4fca364c0f25dac";
     }
 
+    CHECK_NOTHROW(SecureBuffer siv(iv.data(), iv.size()));
     SecureBuffer siv(iv.data(), iv.size());
     SecureBuffer skey(key.data(), key.size());
 
