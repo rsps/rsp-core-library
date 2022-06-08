@@ -178,6 +178,10 @@ protected:
         return std::abs(aVal1 - aVal2) > aMargin;
     }
 
+    bool differs(unsigned int aVal1, unsigned int aVal2, unsigned int aMargin) const {
+        return std::abs(static_cast<int>(aVal1 - aVal2)) > aMargin;
+    }
+
     bool differs(bool aVal1, bool aVal2, bool) const {
         return (aVal1 != aVal2);
     }
