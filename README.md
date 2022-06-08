@@ -36,12 +36,14 @@ sudo apt install libssl-dev libcurl4 libcurl4-openssl-dev libfreetype-dev
 ```
 
 The code is using some C++20 features, so make sure to use a recent compiler to build the project.
-To install GCC-10 on Ubuntu 20.04:
+To install GCC-10 and GCC-11 on Ubuntu 20.04:
 
 ```
-sudo apt install gcc-10 g++-10
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt install gcc-10 g++-10 gcc-11 g++-11
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
+sudo update-alternatives --config gcc
 ```
 
 Also cmake should be at least version 3.18.
