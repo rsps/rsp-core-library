@@ -13,6 +13,9 @@ if(PLATFORM_ARM)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
 endif()
 
+set(CMAKE_C_COMPILER "gcc-11")
+set(CMAKE_CXX_COMPILER "g++-11")
+
 project (rsp-core-lib)
 
 set (LIB_VERSION_MAJOR 0)
