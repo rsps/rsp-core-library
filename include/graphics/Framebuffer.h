@@ -29,22 +29,14 @@ class Framebuffer : public BufferedCanvas
      * \param aPoint Reference to the coordinate for the pixel to be set
      * \param aColor Reference to the color the pixel is set to
      */
-    inline void SetPixel(const Point &arPoint, const Color &arColor) override
-    {
-        if (!IsInsideScreen(arPoint)) {
-            return;
-        }
-        std::uint32_t location = ((static_cast<std::uint32_t>(arPoint.mX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
-            + static_cast<std::uint32_t>(arPoint.mY) * mFixedInfo.line_length) / sizeof(std::uint32_t);
-        mpBackBuffer[location] = arColor;
-    }
+    void SetPixel(const Point &arPoint, const Color &arColor) override;
 
     /**
      * \brief Gets a single pixel to the given Color
      * \param aPoint Reference to the coordinate for the pixel to get
      * \param aFront Gets pixels from the backbuffer by default, set true to read front buffer
      */
-    uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
+    uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const override;
 
     /**
      * \brief Swaps front and back buffers

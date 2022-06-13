@@ -106,6 +106,10 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp, Color aColor)
     } else {
         mVariableInfo.yoffset = 0;
     }
+
+    // Sync to next vblank
+    mVariableInfo.activate = FB_ACTIVATE_VBL;
+
     // Pan to back buffer
     if (ioctl(mFramebufferFile, FBIOPAN_DISPLAY, &mVariableInfo) == -1) {
         std::cout << "ioctl FBIOPAN_DISPLAY failed errno:" << strerror(errno) << std::endl;
@@ -128,6 +132,21 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp, Color aColor)
     case SwapOperations::NoOp:
     default:
         break;
+    }
+}
+
+void Framebuffer::SetPixel(const Point &arPoint, const Color &arColor)
+{
+    if (!IsInsideScreen(arPoint)) {
+        return;
+    }
+    std::uint32_t location = ((static_cast<std::uint32_t>(arPoint.mX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
+        + static_cast<std::uint32_t>(arPoint.mY) * mFixedInfo.line_length) / sizeof(std::uint32_t);
+    if (arColor.GetAlpha() == 255) {
+        mpBackBuffer[location] = arColor;
+    }
+    else {
+        mpBackBuffer[location] = Color::Blend(mpBackBuffer[location], arColor);
     }
 }
 

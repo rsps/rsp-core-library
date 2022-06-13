@@ -437,4 +437,21 @@ TEST_CASE("Framebuffer")
         fb.DrawImage(Point(0,0), testImgMap);
         fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
     }
+
+    SUBCASE("Draw Transparent") {
+        for (std::uint32_t a = 0; a < 256 ; a++) {
+            Color blue(Color::Blue);
+            Color green(Color::Green);
+            Color red(Color::Red);
+            blue.SetAlpha(static_cast<std::uint8_t>(a));
+            green.SetAlpha(static_cast<std::uint8_t>(a));
+            red.SetAlpha(static_cast<std::uint8_t>(a));
+            fb.DrawRectangle(Rect(100,100, 100, 100), blue, true);
+            fb.DrawRectangle(Rect(170,100, 100, 100), green, true);
+            fb.DrawRectangle(Rect(135,170, 100, 100), red, true);
+            fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+    }
+
 }

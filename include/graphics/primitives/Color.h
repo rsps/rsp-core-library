@@ -34,22 +34,22 @@ class Color
      * \brief Predefined basic colors
      */
     enum : ARGB_t {
-        White = 0x00FFFFFF,
-        Silver = 0x00C0C0C0,
-        Grey = 0x00808080,
-        Black = 0x00000000,
-        Red = 0x00FF0000,
-        Maroon = 0x00800000,
-        Yellow = 0x00FFFF00,
-        Olive = 0x00808000,
-        Lime = 0x0000FF00,
-        Green = 0x00008000,
-        Aqua = 0x0000FFFF,
-        Teal = 0x00008080,
-        Blue = 0x000000FF,
-        Navy = 0x00000080,
-        Fuchsia = 0x00FF00FF,
-        Purple = 0x00800080
+        White =   0xFFFFFFFF,
+        Silver =  0xFFC0C0C0,
+        Grey =    0xFF808080,
+        Black =   0xFF000000,
+        Red =     0xFFFF0000,
+        Maroon =  0xFF800000,
+        Yellow =  0xFFFFFF00,
+        Olive =   0xFF808000,
+        Lime =    0xFF00FF00,
+        Green =   0xFF008000,
+        Aqua =    0xFF00FFFF,
+        Teal =    0xFF008080,
+        Blue =    0xFF0000FF,
+        Navy =    0xFF000080,
+        Fuchsia = 0xFFFF00FF,
+        Purple =  0xFF800080
     };
 
     /**
@@ -133,12 +133,23 @@ class Color
      * \return ARGB
      */
     operator ARGB_t() const;
+
     /**
      * \brief Assign the value from the given Color object.
      *
      * \param aValue
      */
     Color &operator=(const Color &aColor);
+
+    /**
+     * \fn Color Blend(Color&, Color&)
+     * \brief Perform alpha blending of the two given colors.
+     *
+     * \param a
+     * \param b
+     * \return Combined color
+     */
+    static Color Blend(Color a, Color b);
 
   protected:
     /**

@@ -126,6 +126,7 @@ void Canvas::DrawText(Text &arText)
 
 void Canvas::DrawText(const Text &arText, const Color &arColor)
 {
+    Color col = arColor;
     for (const Glyph &glyph : arText.GetGlyphs()) {
         for (int y = 0; y < glyph.mHeight; y++) {
             long unsigned int index = static_cast<long unsigned int>(y * glyph.mWidth);
@@ -133,7 +134,8 @@ void Canvas::DrawText(const Text &arText, const Color &arColor)
                 uint8_t c = glyph.mPixels[index++];
                 auto p = Point(x + glyph.mLeft + arText.GetArea().GetLeft(), y + glyph.mTop + arText.GetArea().GetTop());
                 if (c && arText.GetArea().IsHit(p)) {
-                    SetPixel(p, arColor);
+                    col.SetAlpha(c);
+                    SetPixel(p, col);
                 }
             }
         }

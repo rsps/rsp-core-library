@@ -77,7 +77,7 @@ void Color::SetAlpha(uint8_t aValue)
     mValue.item.alpha = aValue;
 }
 
-Color::operator ARGB_t() const
+Color::operator Color::ARGB_t() const
 {
 #ifdef LITTLE_ENDIAN
     return mValue.rgba;
@@ -90,10 +90,58 @@ Color::operator ARGB_t() const
 #endif
 }
 
-Color &Color::operator=(const Color &aColor)
+Color &Color::operator=(const Color &arColor)
 {
-    mValue = aColor.mValue;
+    if (this != &arColor) {
+        mValue = arColor.mValue;
+    }
     return *this;
+}
+
+Color Color::Blend(Color a, Color b)
+{
+    std::uint32_t alpha_b = b.GetAlpha();
+    if (alpha_b == 255) {
+        return b;
+    }
+
+    Color result(b);
+    result.SetAlpha(255);
+
+    std::uint32_t alpha_a = a.GetAlpha();
+    switch(a) {
+        case 0:
+            return result;
+            break;
+
+        case 255:
+            result.SetRed(static_cast<std::uint8_t>( (a.GetRed() + ((alpha_b * b.GetRed()) / 255)) / 2));
+            result.SetGreen(static_cast<std::uint8_t>( (a.GetGreen() + ((alpha_b * b.GetGreen()) / 255)) / 2));
+            result.SetBlue(static_cast<std::uint8_t>( (a.GetBlue() + ((alpha_b * b.GetBlue()) / 255)) / 2));
+            break;
+
+        default:
+            result.SetRed(static_cast<std::uint8_t>( (((alpha_a * a.GetRed()) / 255) + ((alpha_b * b.GetRed()) / 255)) / 2));
+            result.SetGreen(static_cast<std::uint8_t>( (((alpha_a * a.GetGreen()) / 255) + ((alpha_b * b.GetGreen()) / 255)) / 2));
+            result.SetBlue(static_cast<std::uint8_t>( (((alpha_a * a.GetBlue()) / 255) + ((alpha_b * b.GetBlue()) / 255)) / 2));
+            break;
+    }
+
+    return result;
+}
+
+Pixel AlphaBlendPixels(Pixel p1, Pixel p2)
+{
+    static const int AMASK = 0xFF000000;
+    static const int RBMASK = 0x00FF00FF;
+    static const int GMASK = 0x0000FF00;
+    static const int AGMASK = AMASK | GMASK;
+    static const int ONEALPHA = 0x01000000;
+    unsigned int a = (p2 & AMASK) >> 24;
+    unsigned int na = 255 - a;
+    unsigned int rb = ((na * (p1 & RBMASK)) + (a * (p2 & RBMASK))) >> 8;
+    unsigned int ag = (na * ((p1 & AGMASK) >> 8)) + (a * (ONEALPHA | ((p2 & GMASK) >> 8)));
+    return ((rb & RBMASK) | (ag & AGMASK));
 }
 
 }
