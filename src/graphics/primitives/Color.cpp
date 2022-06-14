@@ -98,50 +98,80 @@ Color &Color::operator=(const Color &arColor)
     return *this;
 }
 
-Color Color::Blend(Color a, Color b)
+static std::uint32_t blendPreMulAlpha(std::uint32_t colora, std::uint32_t colorb, std::uint32_t alpha)
 {
-    std::uint32_t alpha_b = b.GetAlpha();
-    if (alpha_b == 255) {
-        return b;
-    }
-
-    Color result(b);
-    result.SetAlpha(255);
-
-    std::uint32_t alpha_a = a.GetAlpha();
-    switch(a) {
-        case 0:
-            return result;
-            break;
-
-        case 255:
-            result.SetRed(static_cast<std::uint8_t>( (a.GetRed() + ((alpha_b * b.GetRed()) / 255)) / 2));
-            result.SetGreen(static_cast<std::uint8_t>( (a.GetGreen() + ((alpha_b * b.GetGreen()) / 255)) / 2));
-            result.SetBlue(static_cast<std::uint8_t>( (a.GetBlue() + ((alpha_b * b.GetBlue()) / 255)) / 2));
-            break;
-
-        default:
-            result.SetRed(static_cast<std::uint8_t>( (((alpha_a * a.GetRed()) / 255) + ((alpha_b * b.GetRed()) / 255)) / 2));
-            result.SetGreen(static_cast<std::uint8_t>( (((alpha_a * a.GetGreen()) / 255) + ((alpha_b * b.GetGreen()) / 255)) / 2));
-            result.SetBlue(static_cast<std::uint8_t>( (((alpha_a * a.GetBlue()) / 255) + ((alpha_b * b.GetBlue()) / 255)) / 2));
-            break;
-    }
-
-    return result;
+    std::uint32_t rb = (colora & 0xFF00FF) + ( (alpha * (colorb & 0xFF00FF)) >> 8 );
+    std::uint32_t g = (colora & 0x00FF00) + ( (alpha * (colorb & 0x00FF00)) >> 8 );
+    return (rb & 0xFF00FF) + (g & 0x00FF00);
 }
 
-Pixel AlphaBlendPixels(Pixel p1, Pixel p2)
+
+static std::uint32_t blendAlpha(std::uint32_t colora, std::uint32_t colorb, std::uint32_t alpha)
 {
-    static const int AMASK = 0xFF000000;
-    static const int RBMASK = 0x00FF00FF;
-    static const int GMASK = 0x0000FF00;
-    static const int AGMASK = AMASK | GMASK;
-    static const int ONEALPHA = 0x01000000;
-    unsigned int a = (p2 & AMASK) >> 24;
+    std::uint32_t rb1 = ((0x100 - alpha) * (colora & 0xFF00FF)) >> 8;
+    std::uint32_t rb2 = (alpha * (colorb & 0xFF00FF)) >> 8;
+    std::uint32_t g1  = ((0x100 - alpha) * (colora & 0x00FF00)) >> 8;
+    std::uint32_t g2  = (alpha * (colorb & 0x00FF00)) >> 8;
+    return ((rb1 | rb2) & 0xFF00FF) + ((g1 | g2) & 0x00FF00);
+}
+
+
+Color Color::Blend(Color a, Color b)
+{
+/*
+    static const unsigned int AMASK = 0xFF000000;
+    static const unsigned int RBMASK = 0x00FF00FF;
+    static const unsigned int GMASK = 0x0000FF00;
+    static const unsigned int AGMASK = AMASK | GMASK;
+    static const unsigned int ONEALPHA = 0x01000000;
+    unsigned int a = (p1 & AMASK) >> 24;
     unsigned int na = 255 - a;
     unsigned int rb = ((na * (p1 & RBMASK)) + (a * (p2 & RBMASK))) >> 8;
     unsigned int ag = (na * ((p1 & AGMASK) >> 8)) + (a * (ONEALPHA | ((p2 & GMASK) >> 8)));
     return ((rb & RBMASK) | (ag & AGMASK));
+*/
+
+//    auto blendSingleColor = [](unsigned int i0, unsigned int i1, unsigned int t) -> std::uint8_t {
+//        unsigned int i = i0 + t * ( ( i1 - i0 ) + 127 ) / 255;
+//        return static_cast<std::uint8_t>(i);
+//    };
+
+//    Color result(blendPreMulAlpha(a, b, b.GetAlpha()));
+    Color result(blendAlpha(a, b, b.GetAlpha()));
+    result.SetAlpha(255);
+    return result;
+
+//    std::uint32_t alpha_b = b.GetAlpha();
+//    if (alpha_b == 255) {
+//        return b;
+//    }
+//
+//    Color result(b);
+//    result.SetAlpha(255);
+//
+//    std::uint32_t alpha_a = a.GetAlpha();
+//    switch(a) {
+//        case 0:
+//            return result;
+//            break;
+//
+//        case 255:
+//            result.SetRed(static_cast<std::uint8_t>( (a.GetRed() + ((alpha_b * b.GetRed()) / 255)) / 2));
+//            result.SetGreen(static_cast<std::uint8_t>( (a.GetGreen() + ((alpha_b * b.GetGreen()) / 255)) / 2));
+//            result.SetBlue(static_cast<std::uint8_t>( (a.GetBlue() + ((alpha_b * b.GetBlue()) / 255)) / 2));
+//            break;
+//
+//        default:
+////            result.SetRed(blendSingleColor(a.GetRed(), b.GetRed(), alpha_a));
+////            result.SetGreen(blendSingleColor(a.GetGreen(), b.GetGreen(), alpha_a));
+////            result.SetBlue(blendSingleColor(a.GetBlue(), b.GetBlue(), alpha_a));
+//            result.SetRed(static_cast<std::uint8_t>( (((alpha_a * a.GetRed()) / 255) + ((alpha_b * b.GetRed()) / 255)) / 2));
+//            result.SetGreen(static_cast<std::uint8_t>( (((alpha_a * a.GetGreen()) / 255) + ((alpha_b * b.GetGreen()) / 255)) / 2));
+//            result.SetBlue(static_cast<std::uint8_t>( (((alpha_a * a.GetBlue()) / 255) + ((alpha_b * b.GetBlue()) / 255)) / 2));
+//            break;
+//    }
+//
+//    return result;
 }
 
 }
