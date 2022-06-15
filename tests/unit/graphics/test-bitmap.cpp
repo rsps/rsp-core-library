@@ -30,26 +30,27 @@ TEST_CASE("Bitmap file loading")
         uint32_t width = 259;
 
         // Act
-        CHECK_NOTHROW(
-            Bitmap bitmap(filepath);
-            Color col(bitmap.GetPixels()[0]);
+        CHECK_NOTHROW(Bitmap bmp(filepath));
+
+        Bitmap bitmap(filepath);
+        Color col(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White));
+
+        // Assert
+        CHECK(bitmap.GetHeight() == height);
+        CHECK(bitmap.GetWidth() == width);
+        CHECK(bitmap.GetPixelData().GetDataSize() == (width * height * 3));
+        CHECK(col == Color::White);
+        SUBCASE("Drawing on loaded Img") {
+            // Arrange
+            Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
+            Point pt(100, 100);
+
+            // Act
+            bitmap.SetPixel(pt, col);
 
             // Assert
-            CHECK(bitmap.GetHeight() == height);
-            CHECK(bitmap.GetWidth() == width);
-            CHECK(bitmap.GetPixels().size() == (width * height));
-            CHECK(col == bitmap.GetPixels()[0]);
-            SUBCASE("Drawing on loaded Img") {
-                // Arrange
-                Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
-                Point pt(100, 100);
-
-                // Act
-                bitmap.SetPixel(pt, col);
-
-                // Assert
-                CHECK(bitmap.GetPixel(pt) == col);
-            });
+            CHECK(bitmap.GetPixel(pt) == col);
+        }
     }
     SUBCASE("Loading another Bmp file")
     {
@@ -59,17 +60,17 @@ TEST_CASE("Bitmap file loading")
         uint32_t width = 480;
 
         // Act
-        CHECK_NOTHROW(
+        CHECK_NOTHROW(Bitmap bmp2(filepath));
 
-            // Arrange
-            Bitmap bitmap2(filepath);
-            Color col2(bitmap2.GetPixels()[0]);
+        // Arrange
+        Bitmap bitmap2(filepath);
+        Color col2(bitmap2.GetPixelData().GetPixelAt(0,0,Color::White));
 
-            // Assert
-            CHECK(bitmap2.GetHeight() == height);
-            CHECK(bitmap2.GetWidth() == width);
-            CHECK(bitmap2.GetPixels().size() == (width * height));
-            CHECK(col2 == bitmap2.GetPixels()[0]););
+        // Assert
+        CHECK(bitmap2.GetHeight() == height);
+        CHECK(bitmap2.GetWidth() == width);
+        CHECK(bitmap2.GetPixelData().GetDataSize() == (width * height * 3));
+        CHECK(col2 == bitmap2.GetPixelData().GetPixelAt(0,0,Color::White));
     }
     SUBCASE("Loading Png file")
     {

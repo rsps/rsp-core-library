@@ -48,6 +48,11 @@ class Point
     {
     }
 
+    Point(unsigned int aX, unsigned int aY) noexcept
+        : mX(static_cast<int>(aX)), mY(static_cast<int>(aY))
+    {
+    }
+
     /**
      * \brief Copy constructor
      *

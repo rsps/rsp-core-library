@@ -38,6 +38,13 @@ public:
     virtual ~FileIO();
 
     /**
+     * Get the name of the current file.
+     *
+     * \return string
+     */
+    const std::string& GetFileName() { return mFileName; }
+
+    /**
      * Opens the given file or create it if aPersmissions are given.
      * Open modes can be in, out and inout.
      *

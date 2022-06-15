@@ -8,14 +8,13 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/primitives/raster/BmpLoader.h>
-
 #include <algorithm>
 //#include <cerrno>
 #include <fstream>
 #include <iostream>
 #include <graphics/primitives/Color.h>
 #include <logging/Logger.h>
+#include "BmpLoader.h"
 
 using namespace rsp::logging;
 
@@ -70,9 +69,9 @@ std::ostream& operator <<(std::ostream &os, const BmpLoader::BmpHeader_t &arHead
 }
 
 
-std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
+void BmpLoader::LoadImg(const std::string &aImgName)
 {
-    mImagePixels.clear();
+    mPixelData.GetData().clear();
 
     std::ifstream file;
 
@@ -82,19 +81,30 @@ std::vector<uint32_t> BmpLoader::LoadImg(const std::string &aImgName)
     ReadHeader(file);
     // TODO: Get Compression and other useful stuff
 
-    // Height can be negative, showing the image is stored from top to bottom
-    bool normallyDrawn = true;
-    if (mBmpHeader.v1.heigth < 0) {
-        normallyDrawn = false;
-    }
     ReadData(file);
 
     file.close();
 
-    if (normallyDrawn) {
-        std::reverse(mImagePixels.begin(), mImagePixels.end());
+    // Height can be negative, showing the image is stored from top to bottom
+    if (mBmpHeader.v1.heigth < 0) {
+        std::reverse(mPixelData.GetData().begin(), mPixelData.GetData().end());
     }
-    return mImagePixels;
+}
+
+PixelData::ColorDepth BmpLoader::bitsPerPixelToColorDepth(unsigned int aBpp)
+{
+    switch (aBpp) {
+        case 1:
+            return PixelData::ColorDepth::Monochrome;
+        case 2:
+        case 4:
+        case 8:
+            return PixelData::ColorDepth::Alpha;
+
+        default:
+            return PixelData::ColorDepth::RGB;
+
+    }
 }
 
 void BmpLoader::ReadHeader(std::ifstream &aFile)
@@ -104,13 +114,12 @@ void BmpLoader::ReadHeader(std::ifstream &aFile)
 
     Logger::GetDefault().Debug() << mBmpHeader;
 
-    mWidth = mBmpHeader.v1.width;
-    mHeight = mBmpHeader.v1.heigth;
-
     mBytesPerPixel = mBmpHeader.v1.bitsPerPixel / 8; // Might be 1 or 4
     if ((mBmpHeader.v1.bitsPerPixel % 8) > 0) {
         mBytesPerPixel = mBytesPerPixel + 1;
     }
+
+    initAfterLoad(static_cast<uint32_t>(mBmpHeader.v1.width), static_cast<uint32_t>(mBmpHeader.v1.heigth), bitsPerPixelToColorDepth(mBmpHeader.v1.bitsPerPixel));
 }
 
 void BmpLoader::ReadData(std::ifstream &aFile)
@@ -130,9 +139,10 @@ void BmpLoader::ReadData(std::ifstream &aFile)
         // Read a Row of pixels with the padding
         aFile.read(reinterpret_cast<char *>(pixelRow.data()), paddedRowSize);
 
+        unsigned int x = 0;
         for (int j = mBmpHeader.v1.width * mBytesPerPixel; j > 0; j -= mBytesPerPixel) {
             uint32_t combined = ReadPixel(pixelRow, static_cast<size_t>(j - mBytesPerPixel));
-            mImagePixels.push_back(combined);
+            mPixelData.SetPixelAt(x++, i, Color(combined));
         }
     }
 }

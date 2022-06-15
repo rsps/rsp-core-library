@@ -30,7 +30,7 @@ class Canvas
   public:
     Canvas()
         : mHeight(0), mWidth(0), mBytesPerPixel(0) {}
-    Canvas(int aHeight, int aWidth, int aBytesPerPixel)
+    Canvas(unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel)
         : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel) {}
     /**
      * \brief Virtual destructor for the abstract class.
@@ -128,7 +128,7 @@ class Canvas
      *
      * \return uint32_t
      */
-    int GetWidth() const
+    unsigned int GetWidth() const
     {
         return mWidth;
     }
@@ -138,7 +138,7 @@ class Canvas
      *
      * \return uint32_t
      */
-    int GetHeight() const
+    unsigned int GetHeight() const
     {
         return mHeight;
     }
@@ -148,7 +148,7 @@ class Canvas
      *
      * \return uint32_t
      */
-    int GetColorDepth() const
+    unsigned int GetColorDepth() const
     {
         return mBytesPerPixel;
     }
@@ -161,15 +161,15 @@ class Canvas
      */
     inline bool IsInsideScreen(const Point &arPoint) const
     {
-        return !(arPoint.mX < 0 || arPoint.mY < 0 || arPoint.mY >= mHeight || arPoint.mX >= mWidth);
+        return !(static_cast<unsigned int>(arPoint.mY) >= mHeight || static_cast<unsigned int>(arPoint.mX) >= mWidth);
     }
 
-  protected:
-    int mHeight;
-    int mWidth;
-    int mBytesPerPixel;
+protected:
+    unsigned int mHeight;
+    unsigned int mWidth;
+    unsigned int mBytesPerPixel;
 
-    inline void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Color &arColor)
+    void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Color &arColor)
     {
         SetPixel(Point(aCenterX + aX, aCenterY + aY), arColor);
         SetPixel(Point(aCenterX - aX, aCenterY + aY), arColor);
@@ -177,7 +177,7 @@ class Canvas
         SetPixel(Point(aCenterX - aX, aCenterY - aY), arColor);
     }
 
-    inline void plot8Points(int aCenterX, int aCenterY, int aX, int aY, const Color &arColor)
+    void plot8Points(int aCenterX, int aCenterY, int aX, int aY, const Color &arColor)
     {
         plot4Points(aCenterX, aCenterY, aX, aY, arColor);
         plot4Points(aCenterX, aCenterY, aY, aX, arColor);

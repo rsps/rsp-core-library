@@ -10,9 +10,9 @@
 #ifndef BMPLOADER_H
 #define BMPLOADER_H
 
+#include <graphics/primitives/raster/ImgLoader.h>
 #include <cstring>
 #include <fstream>
-#include <graphics/primitives/raster/ImgLoader.h>
 #include <iostream>
 #include <vector>
 
@@ -21,14 +21,14 @@ namespace rsp::graphics
 
 class BmpLoader : public ImgLoader
 {
-  public:
+public:
     /**
      * \brief Loads an image into memory as a bitmap
      * \param aImgName The relative path to the image
      */
-    std::vector<uint32_t> LoadImg(const std::string &aImgName);
+    void LoadImg(const std::string &aImgName) override;
 
-  protected:
+protected:
     struct BitmapInfoHeader {
         uint32_t size;
         int32_t width;
@@ -122,6 +122,9 @@ class BmpLoader : public ImgLoader
     void ReadHeader(std::ifstream &arFile);
     void ReadData(std::ifstream &arFile);
     uint32_t ReadPixel(const std::vector<uint8_t> &aPixelRow, const size_t &aRowPtr);
+
+    PixelData::ColorDepth bitsPerPixelToColorDepth(unsigned int aBpp);
+
 };
 
 std::ostream &operator<<(std::ostream &os, const BmpLoader::BmpHeader_t &arHeader);

@@ -109,12 +109,11 @@ void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor, bool aFilled)
 
 void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
 {
-    long unsigned int iter = 0;
-    auto pixels = aBitmap.GetPixels();
-    for (int h = 0; h < aBitmap.GetHeight(); h++) {
-        for (int w = 0; w < aBitmap.GetWidth(); w++) {
-            SetPixel(Point(aLeftTop.mX + w, aLeftTop.mY + h), pixels[iter]);
-            iter++;
+    auto pixels = aBitmap.GetPixelData();
+    for (int h = 0; h < static_cast<int>(aBitmap.GetHeight()); h++) {
+        for (int w = 0; w < static_cast<int>(aBitmap.GetWidth()); w++) {
+            Point p(aLeftTop.mX + w, aLeftTop.mY + h);
+            SetPixel(p, pixels.GetPixelAt(p.mX, p.mY, Color::White));
         }
     }
 }

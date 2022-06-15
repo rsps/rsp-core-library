@@ -29,6 +29,11 @@ inline void CheckPixel(const Point &aPoint, const Color &aColour, const Framebuf
     }
 }
 
+static unsigned int urand()
+{
+    return static_cast<unsigned int>(rand());
+}
+
 TEST_CASE("Framebuffer")
 {
     rsp::logging::Logger logger;
@@ -42,7 +47,7 @@ TEST_CASE("Framebuffer")
         std::chrono::system_clock::now().time_since_epoch());
 
     srand(ms.count()); // generates random seed val
-    Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
+    Color col(urand() % 200 + 56, urand() % 200 + 56, urand() % 200 + 56, 0xff);
 
     SUBCASE("Clear Framebuffer")
     {
@@ -53,8 +58,8 @@ TEST_CASE("Framebuffer")
     SUBCASE("Drawing Lines")
     {
         // Arrange
-        Point pointA(rand() % fb.GetWidth(), rand() % fb.GetHeight());
-        Point pointB(rand() % fb.GetWidth(), rand() % fb.GetHeight());
+        Point pointA(urand() % fb.GetWidth(), urand() % fb.GetHeight());
+        Point pointB(urand() % fb.GetWidth(), urand() % fb.GetHeight());
 
         // Act
         fb.DrawLine(pointA, pointB, col);
@@ -104,11 +109,11 @@ TEST_CASE("Framebuffer")
     {
         // Arrange
         // Generate random values in the LEFT and TOP halves of the screen
-        Point leftTop(rand() % (fb.GetWidth() / 2),
-                      rand() % (fb.GetHeight() / 2));
+        Point leftTop(urand() % (fb.GetWidth() / 2),
+                      urand() % (fb.GetHeight() / 2));
         // Generate random values in the RIGHT and BOTTOM halves of the screen
-        Point rightBottom(rand() % (fb.GetWidth() + 1 - (fb.GetWidth() / 2)) + (fb.GetWidth() / 2),
-                          rand() % (fb.GetHeight() + 1 - (fb.GetHeight() / 2)) + (fb.GetHeight() / 2));
+        Point rightBottom(urand() % (fb.GetWidth() + 1 - (fb.GetWidth() / 2)) + (fb.GetWidth() / 2),
+                          urand() % (fb.GetHeight() + 1 - (fb.GetHeight() / 2)) + (fb.GetHeight() / 2));
         Rect rect(leftTop, rightBottom);
 
         // Act
@@ -134,8 +139,8 @@ TEST_CASE("Framebuffer")
     SUBCASE("Drawing Circles")
     {
         // Arrange
-        Point centerPoint(rand() % fb.GetWidth(), rand() % fb.GetHeight());
-        int radius = rand() % (fb.GetWidth() / 2);
+        Point centerPoint(urand() % fb.GetWidth(), urand() % fb.GetHeight());
+        int radius = static_cast<int>(urand() % (fb.GetWidth() / 2));
 
         // Act
         fb.DrawCircle(centerPoint, radius, col);
@@ -188,11 +193,11 @@ TEST_CASE("Framebuffer")
 
         // Act
         Bitmap testImgMap(testImage);
-        int height = testImgMap.GetHeight();
-        int width = testImgMap.GetWidth();
+        unsigned int height = testImgMap.GetHeight();
+        unsigned int width = testImgMap.GetWidth();
         Point topLeft(0, 0);
-        Point topRight(width - 1, 0);
-        Point botLeft(0, height - 1);
+        Point topRight(width - 1, 0u);
+        Point botLeft(0u, height - 1);
         Point botRight(width - 1, height - 1);
 
         // Assert
@@ -209,7 +214,7 @@ TEST_CASE("Framebuffer")
             // Assert
             CHECK(testImgMap.GetHeight() == height);
             CHECK(testImgMap.GetWidth() == width);
-            CHECK(testImgMap.GetPixels().size() == (width * height));
+            CHECK(testImgMap.GetPixelData().GetDataSize() == (width * height * 3));
 
             fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
         }
@@ -231,8 +236,8 @@ TEST_CASE("Framebuffer")
             fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
 
             // Assert
-            CHECK(testImgMap.GetPixel(Point(width / 2, 0)) == red);
-            CHECK(testImgMap.GetPixel(Point(0, height / 2)) == green);
+            CHECK(testImgMap.GetPixel(Point(width / 2, 0u)) == red);
+            CHECK(testImgMap.GetPixel(Point(0u, height / 2)) == green);
             CHECK(testImgMap.GetPixel(Point(width - 1, height / 2)) == blue);
             CHECK(testImgMap.GetPixel(Point(width / 2, height - 1)) == thisColor);
         }
@@ -240,7 +245,7 @@ TEST_CASE("Framebuffer")
         {
             // Arrange
             Bitmap emptyMap(height, width, 4);
-            Point randomPoint(rand() % emptyMap.GetWidth(), rand() % emptyMap.GetHeight());
+            Point randomPoint(urand() % emptyMap.GetWidth(), urand() % emptyMap.GetHeight());
 
             // Act
             emptyMap.SetPixel(randomPoint, col);
@@ -256,7 +261,7 @@ TEST_CASE("Framebuffer")
     {
         // Arrange
         Point topLeft(0, 0);
-        Point randomPoint(rand() % fb.GetWidth(), rand() % fb.GetHeight());
+        Point randomPoint(urand() % fb.GetWidth(), urand() % fb.GetHeight());
         std::string largeImg = "testImages/largeTestImg.bmp";
         Bitmap largeImgMap(largeImg);
         // Make sure screen is empty
