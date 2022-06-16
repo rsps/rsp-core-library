@@ -12,6 +12,7 @@
 #define INCLUDE_GRAPHICS_PRIMITIVES_PIXELDATA_H_
 
 #include <cstdint>
+#include <filesystem>
 #include <vector>
 #include <graphics/primitives/Color.h>
 #include <utils/CoreException.h>
@@ -65,6 +66,8 @@ public:
     PixelData& SetPixelAt(unsigned int aX, unsigned int aY, Color aColor);
     PixelData& SetPixelAt(int aX, int aY, Color aColor) { return SetPixelAt(static_cast<unsigned int>(aX), static_cast<unsigned int>(aY), aColor); }
 
+    void SaveToCFile(const std::filesystem::path &arFileName);
+
 protected:
     ColorDepth mColorDepth = ColorDepth::RGB;
     unsigned int mWidth = 0;
@@ -75,6 +78,8 @@ protected:
     friend class ImgLoader;
     void initAfterLoad(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth);
 };
+
+std::ostream& operator<<(std::ostream& os, const PixelData::ColorDepth arDepth);
 
 } /* namespace rsp::graphics */
 

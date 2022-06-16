@@ -9,8 +9,29 @@
  */
 
 #include <graphics/primitives/PixelData.h>
+#include <utils/CppObjectFile.h>
 
 namespace rsp::graphics {
+
+std::ostream& operator<<(std::ostream& os, const PixelData::ColorDepth arDepth)
+{
+    switch (arDepth) {
+        case PixelData::ColorDepth::Monochrome:
+            os << "Monochrome";
+            break;
+        case PixelData::ColorDepth::Alpha:
+            os << "Alpha";
+            break;
+        case PixelData::ColorDepth::RGB:
+            os << "RGB";
+            break;
+        default:
+            os << "Unknown";
+            break;
+    }
+    return os;
+}
+
 
 PixelData::PixelData(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth, const std::uint8_t *aData)
     : mColorDepth(aDepth),
@@ -105,7 +126,12 @@ PixelData& PixelData::SetPixelAt(unsigned int aX, unsigned int aY, Color aColor)
     switch (mColorDepth) {
         case ColorDepth::Monochrome:
             offset = (((mWidth + 7) >> 3) * aY) + (aX >> 3);
-            mpData[offset] = (aColor.GetAlpha() > 0) ?(1 << (aX % 8)) : 0;
+            if (aColor.GetAlpha() > 0) {
+                mpData[offset] |= (1 << (aX % 8));
+            }
+            else {
+                mpData[offset] &= ~(1 << (aX % 8));
+            }
             break;
 
         case ColorDepth::Alpha:
@@ -138,6 +164,19 @@ void PixelData::initAfterLoad(unsigned int aWidth, unsigned int aHeight, ColorDe
         mData.resize(sz);
     }
     mpData = mData.data();
+}
+
+void PixelData::SaveToCFile(const std::filesystem::path &arFileName)
+{
+    rsp::utils::CppObjectFile fo(arFileName);
+
+    fo << "static const std::uint8_t c" << fo.Name() << "PixData[] = {\n";
+    fo.Hex(mpData, GetDataSize());
+    fo << "};\n\n";
+
+    fo << "const PixelData c"
+        << fo.Name() << "(" << mWidth << ", " << mHeight << ", PixelData::ColorDepth::"
+        << mColorDepth << ", " << "c" << fo.Name() << "PixData);\n" << std::endl;
 }
 
 } /* namespace rsp::graphics */
