@@ -27,6 +27,8 @@ Bitmap::Bitmap(const std::string &arImgName)
     // Get raw data
     loader->LoadImg(filename);
     mImagePixels = loader->GetPixelData();
+    mWidth = mImagePixels.GetWidth();
+    mHeight = mImagePixels.GetHeight();
 }
 
 Bitmap::Bitmap(const uint32_t *apPixels, unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel)

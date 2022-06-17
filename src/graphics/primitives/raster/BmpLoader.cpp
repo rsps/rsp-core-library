@@ -9,10 +9,7 @@
  */
 
 #include <algorithm>
-//#include <cerrno>
-#include <fstream>
 #include <iostream>
-#include <graphics/primitives/Color.h>
 #include <logging/Logger.h>
 #include "BmpLoader.h"
 
@@ -40,7 +37,7 @@ std::ostream& operator <<(std::ostream &os, const BmpLoader::BmpHeader_t &arHead
         << "Colors Used: " << arHeader.v1.coloursUsed << "\n"
         << "Important Colors: " << arHeader.v1.importantColours << "\n";
 
-    if (arHeader.v1.size == sizeof(BmpLoader::BitmapV5Header)) {
+    if (arHeader.v1.size == sizeof(BmpLoader::BitmapV4Header)) {
         os
         << "RedMask: " << std::hex << arHeader.v5.RedMask << "\n"
         << "GreenMask: " << arHeader.v5.GreenMask << "\n"
@@ -58,7 +55,11 @@ std::ostream& operator <<(std::ostream &os, const BmpLoader::BmpHeader_t &arHead
         << "BlueZ: " << arHeader.v5.Blue.Z << "\n"
         << "GammaRed: " << arHeader.v5.GammaRed << "\n"
         << "GammaGreen: " << arHeader.v5.GammaGreen << "\n"
-        << "GammaBlue: " << arHeader.v5.GammaBlue << "\n"
+        << "GammaBlue: " << arHeader.v5.GammaBlue << "\n";
+    }
+
+    if (arHeader.v1.size == sizeof(BmpLoader::BitmapV5Header)) {
+        os
         << "Intent: " << arHeader.v5.Intent << "\n"
         << "ProfileData: " << arHeader.v5.ProfileData << "\n"
         << "ProfileSize: " << arHeader.v5.ProfileSize << "\n"
@@ -71,24 +72,19 @@ std::ostream& operator <<(std::ostream &os, const BmpLoader::BmpHeader_t &arHead
 
 void BmpLoader::LoadImg(const std::string &aImgName)
 {
+    std::cout << "BmpHeader_t size: " << sizeof(BmpHeader_t) << std::endl;
+    std::cout << "BitmapInfoHeader size: " << sizeof(BitmapInfoHeader) << std::endl;
+    std::cout << "BitmapV4Header size: " << sizeof(BitmapV4Header) << std::endl;
+    std::cout << "BitmapV5Header size: " << sizeof(BitmapV5Header) << std::endl;
+
     mPixelData.GetData().clear();
 
-    std::ifstream file;
-
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    file.open(aImgName, std::ifstream::binary);
+    rsp::posix::FileIO file(aImgName, std::ios::in);
 
     ReadHeader(file);
     // TODO: Get Compression and other useful stuff
 
     ReadData(file);
-
-    file.close();
-
-    // Height can be negative, showing the image is stored from top to bottom
-    if (mBmpHeader.v1.heigth < 0) {
-        std::reverse(mPixelData.GetData().begin(), mPixelData.GetData().end());
-    }
 }
 
 PixelData::ColorDepth BmpLoader::bitsPerPixelToColorDepth(unsigned int aBpp)
@@ -107,59 +103,70 @@ PixelData::ColorDepth BmpLoader::bitsPerPixelToColorDepth(unsigned int aBpp)
     }
 }
 
-void BmpLoader::ReadHeader(std::ifstream &aFile)
+void BmpLoader::ReadHeader(rsp::posix::FileIO &arFile)
 {
     // Read the 54 byte header
-    aFile.read(reinterpret_cast<char *>(&mBmpHeader), sizeof(mBmpHeader));
+    arFile.ExactRead(reinterpret_cast<char *>(&mBmpHeader), sizeof(mBmpHeader));
 
-    Logger::GetDefault().Debug() << mBmpHeader;
+    Logger::GetDefault().Debug() << mBmpHeader << std::endl;;
 
     mBytesPerPixel = mBmpHeader.v1.bitsPerPixel / 8; // Might be 1 or 4
     if ((mBmpHeader.v1.bitsPerPixel % 8) > 0) {
         mBytesPerPixel = mBytesPerPixel + 1;
     }
 
-    initAfterLoad(static_cast<uint32_t>(mBmpHeader.v1.width), static_cast<uint32_t>(mBmpHeader.v1.heigth), bitsPerPixelToColorDepth(mBmpHeader.v1.bitsPerPixel));
+    initAfterLoad(static_cast<uint32_t>(std::abs(mBmpHeader.v1.width)), static_cast<uint32_t>(std::abs(mBmpHeader.v1.heigth)), bitsPerPixelToColorDepth(mBmpHeader.v1.bitsPerPixel));
 }
 
-void BmpLoader::ReadData(std::ifstream &aFile)
+void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
 {
     // Figure out amount to read per row
-    int paddedRowSize = (mBmpHeader.v1.width * mBytesPerPixel + 3) & (~3);
-    Logger::GetDefault().Debug() << "Padded Row size: " << paddedRowSize;
+    std::size_t paddedRowSize = static_cast<std::size_t>((static_cast<std::size_t>(std::abs(mBmpHeader.v1.width)) * mBytesPerPixel + 3u) & static_cast<std::size_t>(~3));
+    Logger::GetDefault().Debug() << "Padded Row size: " << paddedRowSize << std::endl;;
 
-    // Initialize containers for reading
-    std::vector<uint8_t> pixelRow;
-    pixelRow.resize(static_cast<unsigned long int>(paddedRowSize));
+    // Initialize container for reading
+    std::vector<std::uint8_t> pixelRows(paddedRowSize * static_cast<std::size_t>(std::abs(mBmpHeader.v1.heigth)));
+    Logger::GetDefault().Debug() << "Container size: " << pixelRows.size() << std::endl;;
+    //    pixelRows.resize();
 
     // Skip past the offset
-    aFile.seekg(mBmpHeader.dataOffset);
+    arFile.Seek(mBmpHeader.dataOffset);
+    arFile.ExactRead(pixelRows.data(), pixelRows.size());
 
-    for (size_t i = 0; i < abs(mBmpHeader.v1.heigth); i++) {
-        // Read a Row of pixels with the padding
-        aFile.read(reinterpret_cast<char *>(pixelRow.data()), paddedRowSize);
+    // Height can be negative, showing the image is stored from top to bottom
+    std::size_t h = static_cast<std::size_t>(abs(mBmpHeader.v1.heigth));
 
+    std::uint8_t *data = pixelRows.data();
+    unsigned int i = 0;
+    unsigned int inc = 1;
+    if (mBmpHeader.v1.heigth < 0) {
+        i = static_cast<unsigned int>(std::abs(mBmpHeader.v1.heigth));
+        inc = static_cast<unsigned int>(-1);
+    }
+
+    for (unsigned int y = 0; y < h ; y++) {
         unsigned int x = 0;
-        for (int j = mBmpHeader.v1.width * mBytesPerPixel; j > 0; j -= mBytesPerPixel) {
-            uint32_t combined = ReadPixel(pixelRow, static_cast<size_t>(j - mBytesPerPixel));
-            mPixelData.SetPixelAt(x++, i, Color(combined));
+        for (unsigned int j = static_cast<unsigned int>(std::abs(mBmpHeader.v1.width)); j > 0; j--) {
+            Color color(ReadPixel(&data[(i * paddedRowSize) + (j * mBytesPerPixel)]));
+            mPixelData.SetPixelAt(x++, y, color);
         }
+        i += inc;
     }
 }
 
-uint32_t BmpLoader::ReadPixel(const std::vector<uint8_t> &aPixelRow, const size_t &aRowPtr)
+Color BmpLoader::ReadPixel(const uint8_t* apPixelRow)
 {
     Color pixel = 0;
     // Reads other direction than the row loop
     if (mBytesPerPixel == 4) {
-        pixel.SetRed(aPixelRow[aRowPtr + 3]);
-        pixel.SetGreen(aPixelRow[aRowPtr + 2]);
-        pixel.SetBlue(aPixelRow[aRowPtr + 1]);
-        pixel.SetAlpha(aPixelRow[aRowPtr + 0]);
+        pixel.SetRed(apPixelRow[3]);
+        pixel.SetGreen(apPixelRow[2]);
+        pixel.SetBlue(apPixelRow[1]);
+        pixel.SetAlpha(apPixelRow[0]);
     }
     else {
         for (size_t i = 0; i < mBytesPerPixel; i++) {
-            pixel = static_cast<uint32_t>(pixel) | ((static_cast<uint32_t>(aPixelRow[aRowPtr + i])) << (8 * i));
+            pixel = static_cast<uint32_t>(pixel) | ((static_cast<uint32_t>(apPixelRow[i])) << (8 * i));
         }
     }
     return pixel;

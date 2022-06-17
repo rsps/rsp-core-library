@@ -40,6 +40,7 @@ public:
 
     bool operator==(const FourCC &arOther)
     {
+        std::cout << "FourCC compare(" << mValue << ", " << arOther.mValue << ")" << std::endl;
         return mValue == arOther.mValue;
     }
 
@@ -58,13 +59,19 @@ class PngLoader: public ImgLoader
 public:
     struct IHDR
     {
-        uint32_t width;
-        uint32_t height;
-        uint8_t bitDepth;
-        uint8_t colourType;
-        uint8_t compressionMethod;
-        uint8_t filterMethod;
-        uint8_t interlaceMethod;
+        uint32_t Width;
+        uint32_t Height;
+        uint8_t  BitDepth;
+        uint8_t  ColorType;
+        uint8_t  CompressionMethod;
+        uint8_t  FilterMethod;
+        uint8_t  InterlaceMethod;
+    } __attribute__((packed));
+    struct pHYs
+    {
+        uint32_t PixelPerUnitX;
+        uint32_t PixelPerUnitY;
+        uint8_t  UnitSpecifier;
     } __attribute__((packed));
 
     class PngChunk
@@ -94,6 +101,7 @@ public:
 protected:
 
     IHDR mIhdr{};
+    pHYs mPhys{};
 
     void checkSignature(rsp::posix::FileIO &arFile);
     PixelData::ColorDepth getColorDepth();

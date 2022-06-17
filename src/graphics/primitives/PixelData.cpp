@@ -103,6 +103,7 @@ Color PixelData::GetPixelAt(unsigned int aX, unsigned int aY, Color aColor) cons
             THROW_WITH_BACKTRACE(EIllegalColorDepth);
             break;
     }
+    std::cout << "GetPixelAt(" << aX << ", " << aY << ", " << aColor << ") -> " << aColor << " from " << mWidth << ", " << mHeight << ", " << mColorDepth << std::endl;
     return aColor;
 }
 

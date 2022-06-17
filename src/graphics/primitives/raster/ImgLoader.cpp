@@ -24,7 +24,7 @@ std::shared_ptr<ImgLoader> ImgLoader::GetRasterLoader(const std::string aFileTyp
         return std::make_shared<PngLoader>();
     }
     else {
-        THROW_WITH_BACKTRACE1(std::out_of_range, std::string("Raster loader not found. File type: ") + aFileType);
+        THROW_WITH_BACKTRACE1(EUnsupportedFileformat, std::string("Raster loader not found for file type: ") + aFileType);
     }
 }
 

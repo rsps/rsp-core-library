@@ -38,6 +38,15 @@ public:
     }
 };
 
+class EUnsupportedFileformat : public ImgLoaderException
+{
+public:
+    explicit EUnsupportedFileformat(const std::string &arMsg)
+        : ImgLoaderException(arMsg)
+    {
+    }
+};
+
 
 class ImgLoader
 {

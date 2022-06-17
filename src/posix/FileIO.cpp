@@ -126,7 +126,7 @@ void FileIO::ExactRead(void *apBuffer, std::size_t aNumberOfBytesToRead)
     while (len != aNumberOfBytesToRead) {
         if (retries-- == 0) {
             errno = ENODATA;
-            THROW_SYSTEM("Error reading from file " + mFileName);
+            THROW_SYSTEM("Error reading " + std::to_string(aNumberOfBytesToRead) + " bytes from file " + mFileName);
         }
 
         len += Read(&static_cast<uint8_t*>(apBuffer)[len], aNumberOfBytesToRead - len);

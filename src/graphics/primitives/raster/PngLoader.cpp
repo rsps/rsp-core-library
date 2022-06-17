@@ -22,18 +22,22 @@ namespace rsp::graphics
 
 constexpr std::uint32_t fourcc( char const p[5] )
 {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    return (std::uint32_t(p[3]) << 24) | (std::uint32_t(p[2]) << 16) | (std::uint32_t(p[1]) << 8) | std::uint32_t(p[0]);
+#else
     return (std::uint32_t(p[0]) << 24) | (std::uint32_t(p[1]) << 16) | (std::uint32_t(p[2]) << 8) | std::uint32_t(p[3]);
+#endif
 }
 
 std::ostream& operator<<(std::ostream& os, const PngLoader::IHDR &arIhdr)
 {
-    os << "Width:       " << arIhdr.width << "\n"
-       << "Height:      " << arIhdr.height << "\n"
-       << "Bit Depth:   " << arIhdr.bitDepth << "\n"
-       << "Colour Type: " << arIhdr.colourType << "\n"
-       << "Compression: " << arIhdr.compressionMethod << "\n"
-       << "Filter:      " << arIhdr.filterMethod << "\n"
-       << "Interlace:   " << arIhdr.interlaceMethod;
+    os << "Width:       " << arIhdr.Width << "\n"
+       << "Height:      " << arIhdr.Height << "\n"
+       << "Bit Depth:   " << arIhdr.BitDepth << "\n"
+       << "Colour Type: " << arIhdr.ColorType << "\n"
+       << "Compression: " << arIhdr.CompressionMethod << "\n"
+       << "Filter:      " << arIhdr.FilterMethod << "\n"
+       << "Interlace:   " << arIhdr.InterlaceMethod;
 
     return os;
 }
@@ -61,9 +65,9 @@ void PngLoader::LoadImg(const std::string &arImgName)
         switch(chunk.GetType()) {
             case fourcc("IHDR"):
                 mIhdr = chunk.GetHeader();
-                mIhdr.width = be32toh(mIhdr.width);
-                mIhdr.height = be32toh(mIhdr.height);
-                initAfterLoad(mIhdr.width, mIhdr.height, getColorDepth());
+                mIhdr.Width = be32toh(mIhdr.Width);
+                mIhdr.Height = be32toh(mIhdr.Height);
+                initAfterLoad(mIhdr.Width, mIhdr.Height, getColorDepth());
                 break;
 
             case fourcc("IDAT"):
@@ -76,6 +80,10 @@ void PngLoader::LoadImg(const std::string &arImgName)
 
             case fourcc("IEND"):
                 return;
+
+            case fourcc("pHYs"):
+                mPhys = chunk.GetAs<pHYs>();
+                break;
 
             default:
                 Logger::GetDefault().Warning() << "Chunk type '" << chunk.GetType() << "' was ignored" << std::endl;
@@ -105,6 +113,7 @@ bool PngLoader::PngChunk::LoadFrom(rsp::posix::FileIO &arFile)
     if (sz == 0) {
         return false;
     }
+    length = be32toh(length);
 
     arFile.ExactRead(&mType, sizeof(mType));
     mData.resize(length);
@@ -112,11 +121,13 @@ bool PngLoader::PngChunk::LoadFrom(rsp::posix::FileIO &arFile)
 
     std::uint32_t crc_val;
     arFile.ExactRead(&crc_val, sizeof(crc_val));
+    crc_val = be32toh(crc_val);
 
     auto crc = Crc32::Calc(&mType, sizeof(mType));
     crc = Crc32::Calc(mData.data(), mData.size(), crc);
 
     if (crc != crc_val) {
+        std::cout << "CRC: " << std::hex << std::setw(8) << std::setfill('0') << crc << ", VAL: " << crc_val << std::endl;
         THROW_WITH_BACKTRACE1(ECorruptedFile, "Corrupted PNG chunk in " + arFile.GetFileName());
     }
 
@@ -125,9 +136,9 @@ bool PngLoader::PngChunk::LoadFrom(rsp::posix::FileIO &arFile)
 
 PixelData::ColorDepth PngLoader::getColorDepth()
 {
-    switch(mIhdr.colourType) {
+    switch(mIhdr.ColorType) {
         case 0:
-            if (mIhdr.bitDepth == 1) {
+            if (mIhdr.BitDepth == 1) {
                 return PixelData::ColorDepth::Monochrome;
             }
             else {
