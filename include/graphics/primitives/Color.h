@@ -52,6 +52,8 @@ class Color
         Purple =  0xFF800080
     };
 
+    Color() : mValue(White) {}
+
     /**
      * \brief Construct with given base colors.
      *
@@ -74,7 +76,8 @@ class Color
      *
      * \param aColor
      */
-    Color(const Color &aColor);
+    Color(const Color &arColor);
+    Color(const Color &&arColor);
 
     /**
      * \brief Get the red base color value.
@@ -139,7 +142,8 @@ class Color
      *
      * \param aValue
      */
-    Color &operator=(const Color &aColor);
+    Color& operator=(const Color &arColor);
+    Color& operator=(const Color &&arColor);
 
     /**
      * \fn Color Blend(Color&, Color&)
@@ -155,7 +159,7 @@ class Color
     /**
      * \brief Color value type
      */
-    typedef union {
+    union ColorValue_t {
         ARGB_t rgba;
 #ifdef LITTLE_ENDIAN
         struct __item_type {
@@ -172,7 +176,14 @@ class Color
             uint32_t blue : 8;
         } item;
 #endif
-    } ColorValue_t;
+    public:
+        ColorValue_t() : rgba(0) {}
+        ColorValue_t(ARGB_t aValue) : rgba(aValue) {}
+        ColorValue_t(const ColorValue_t& arOther) : rgba(arOther.rgba) {}
+        ColorValue_t(const ColorValue_t&& arOther) : rgba(std::move(arOther.rgba)) {}
+        ColorValue_t& operator=(const ColorValue_t& arOther) { rgba = arOther.rgba; return *this; }
+        ColorValue_t& operator=(const ColorValue_t&& arOther) { rgba = std::move(arOther.rgba); return *this; }
+    };
 
     ColorValue_t mValue{};
 };

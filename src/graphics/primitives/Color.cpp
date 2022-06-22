@@ -32,10 +32,16 @@ Color::Color(ARGB_t aRGBA)
 #endif
 }
 
-Color::Color(const Color &aColor)
-    : mValue(aColor.mValue)
+Color::Color(const Color &arColor)
+    : mValue(arColor.mValue)
 {
 }
+
+Color::Color(const Color &&arColor)
+    : mValue(std::move(arColor.mValue))
+{
+}
+
 
 uint8_t Color::GetRed() const
 {
@@ -98,6 +104,14 @@ Color &Color::operator=(const Color &arColor)
     return *this;
 }
 
+Color& Color::operator =(const Color &&arColor)
+{
+    if (this != &arColor) {
+        mValue = std::move(arColor.mValue);
+    }
+    return *this;
+}
+
 static std::uint32_t blendPreMulAlpha(std::uint32_t colora, std::uint32_t colorb, std::uint32_t alpha)
 {
     std::uint32_t rb = (colora & 0xFF00FF) + ( (alpha * (colorb & 0xFF00FF)) >> 8 );
@@ -140,38 +154,6 @@ Color Color::Blend(Color a, Color b)
     Color result(blendAlpha(a, b, b.GetAlpha()));
     result.SetAlpha(255);
     return result;
-
-//    std::uint32_t alpha_b = b.GetAlpha();
-//    if (alpha_b == 255) {
-//        return b;
-//    }
-//
-//    Color result(b);
-//    result.SetAlpha(255);
-//
-//    std::uint32_t alpha_a = a.GetAlpha();
-//    switch(a) {
-//        case 0:
-//            return result;
-//            break;
-//
-//        case 255:
-//            result.SetRed(static_cast<std::uint8_t>( (a.GetRed() + ((alpha_b * b.GetRed()) / 255)) / 2));
-//            result.SetGreen(static_cast<std::uint8_t>( (a.GetGreen() + ((alpha_b * b.GetGreen()) / 255)) / 2));
-//            result.SetBlue(static_cast<std::uint8_t>( (a.GetBlue() + ((alpha_b * b.GetBlue()) / 255)) / 2));
-//            break;
-//
-//        default:
-////            result.SetRed(blendSingleColor(a.GetRed(), b.GetRed(), alpha_a));
-////            result.SetGreen(blendSingleColor(a.GetGreen(), b.GetGreen(), alpha_a));
-////            result.SetBlue(blendSingleColor(a.GetBlue(), b.GetBlue(), alpha_a));
-//            result.SetRed(static_cast<std::uint8_t>( (((alpha_a * a.GetRed()) / 255) + ((alpha_b * b.GetRed()) / 255)) / 2));
-//            result.SetGreen(static_cast<std::uint8_t>( (((alpha_a * a.GetGreen()) / 255) + ((alpha_b * b.GetGreen()) / 255)) / 2));
-//            result.SetBlue(static_cast<std::uint8_t>( (((alpha_a * a.GetBlue()) / 255) + ((alpha_b * b.GetBlue()) / 255)) / 2));
-//            break;
-//    }
-//
-//    return result;
 }
 
 }

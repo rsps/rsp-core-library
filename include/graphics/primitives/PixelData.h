@@ -16,6 +16,7 @@
 #include <vector>
 #include <graphics/primitives/Color.h>
 #include <utils/CoreException.h>
+#include <logging/Logger.h>
 
 namespace rsp::graphics {
 
@@ -35,8 +36,10 @@ public:
     PixelData(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth);
     PixelData(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth, const std::uint8_t *aData);
 
-    PixelData(const PixelData& arOther) = default;
-    PixelData& operator=(const PixelData& arOther) = default;
+    PixelData(const PixelData& arOther);
+    PixelData(const PixelData&& arOther);
+    PixelData& operator=(const PixelData& arOther);
+    PixelData& operator=(const PixelData&& arOther);
 
     const std::uint8_t* GetData() const { return mpData; }
     std::vector<std::uint8_t>& GetData() { return mData; }

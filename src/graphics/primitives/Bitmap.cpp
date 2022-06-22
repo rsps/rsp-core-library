@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <graphics/primitives/Bitmap.h>
 #include <utils/CoreException.h>
+#include <logging/Logger.h>
 
 using namespace rsp::utils;
 
@@ -48,7 +49,7 @@ Bitmap::Bitmap(unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPer
 {
 }
 
-uint32_t Bitmap::GetPixel(const Point &aPoint, const bool aFront) const
+std::uint32_t Bitmap::GetPixel(const Point &aPoint, const bool aFront) const
 {
     if (!IsInsideScreen(aPoint)) {
         return 0;

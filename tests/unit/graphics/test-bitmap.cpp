@@ -56,12 +56,11 @@ TEST_CASE("Bitmap")
         CHECK(bitmap.GetHeight() == height);
         CHECK(bitmap.GetWidth() == width);
         CHECK_EQ(bitmap.GetPixelData().GetDataSize(), (width * height * 3));
-        std::cout << "Before fail" << std::endl;
         Color col(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White));
-        CHECK_EQ(col, Color(4292918232));
+        CHECK_EQ(col, Color(Color::Black));
         // FFE0ABAD == FFE0BBD8₁
         Color col1(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White));
-        CHECK_EQ(col1, Color(4292918232));
+        CHECK_EQ(col1, Color(0xFF03C1D9));
         // FF46297F == FFE0BBD8
 
         SUBCASE("Drawing on loaded Img") {

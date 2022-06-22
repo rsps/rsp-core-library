@@ -10,6 +10,7 @@
 
 #include <graphics/primitives/PixelData.h>
 #include <utils/CppObjectFile.h>
+#include <logging/Logger.h>
 
 namespace rsp::graphics {
 
@@ -80,31 +81,32 @@ Color PixelData::GetPixelAt(unsigned int aX, unsigned int aY, Color aColor) cons
     if (aX >= mWidth || aY >= mHeight) {
         THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range");
     }
+    Color result(aColor);
     unsigned int offset;
     switch (mColorDepth) {
         case ColorDepth::Monochrome:
             offset = (((mWidth + 7) >> 3) * aY) + (aX >> 3);
-            aColor.SetAlpha( ((mpData[offset] & (1 << (aX % 8))) > 0) ? 255 : 0);
+            result.SetAlpha( ((mpData[offset] & (1 << (aX % 8))) > 0) ? 255 : 0);
             break;
 
         case ColorDepth::Alpha:
             offset = (aY * mWidth) + aX;
-            aColor.SetAlpha(mpData[offset]);
+            result.SetAlpha(mpData[offset]);
             break;
 
         case ColorDepth::RGB:
             offset = ((aY * mWidth) + aX) * 3;
-            aColor.SetRed(mpData[offset + 0]);
-            aColor.SetGreen(mpData[offset + 1]);
-            aColor.SetBlue(mpData[offset + 2]);
+            result.SetRed(mpData[offset + 0]);
+            result.SetGreen(mpData[offset + 1]);
+            result.SetBlue(mpData[offset + 2]);
             break;
 
         default:
             THROW_WITH_BACKTRACE(EIllegalColorDepth);
             break;
     }
-    std::cout << "GetPixelAt(" << aX << ", " << aY << ", " << aColor << ") -> " << aColor << " from " << mWidth << ", " << mHeight << ", " << mColorDepth << std::endl;
-    return aColor;
+//    DUMP(aX << ", " << aY << ", " << aColor, result << " from " << mWidth << ", " << mHeight << ", " << mColorDepth);
+    return result;
 }
 
 PixelData& PixelData::SetPixelAt(unsigned int aX, unsigned int aY, Color aColor)
@@ -123,6 +125,7 @@ PixelData& PixelData::SetPixelAt(unsigned int aX, unsigned int aY, Color aColor)
         mpData = mData.data();
     }
 
+    Color result;
     unsigned int offset;
     switch (mColorDepth) {
         case ColorDepth::Monochrome:
@@ -133,11 +136,15 @@ PixelData& PixelData::SetPixelAt(unsigned int aX, unsigned int aY, Color aColor)
             else {
                 mpData[offset] &= ~(1 << (aX % 8));
             }
+            offset = (((mWidth + 7) >> 3) * aY) + (aX >> 3);
+            result.SetAlpha( ((mpData[offset] & (1 << (aX % 8))) > 0) ? 255 : 0);
             break;
 
         case ColorDepth::Alpha:
             offset = (aY * mWidth) + aX;
             mpData[offset] = aColor.GetAlpha();
+            offset = (aY * mWidth) + aX;
+            result.SetAlpha(mpData[offset]);
             break;
 
         case ColorDepth::RGB:
@@ -145,6 +152,9 @@ PixelData& PixelData::SetPixelAt(unsigned int aX, unsigned int aY, Color aColor)
             mpData[offset + 0] = aColor.GetRed();
             mpData[offset + 1] = aColor.GetGreen();
             mpData[offset + 2] = aColor.GetBlue();
+            result.SetRed(mpData[offset + 0]);
+            result.SetGreen(mpData[offset + 1]);
+            result.SetBlue(mpData[offset + 2]);
             break;
 
         default:
@@ -152,6 +162,48 @@ PixelData& PixelData::SetPixelAt(unsigned int aX, unsigned int aY, Color aColor)
             break;
     }
 
+    return *this;
+}
+
+PixelData::PixelData(const PixelData &arOther)
+{
+    mColorDepth = arOther.mColorDepth;
+    mWidth = arOther.mWidth;
+    mHeight = arOther.mHeight;
+    mData = arOther.mData;
+    mpData = mData.data();
+}
+
+PixelData::PixelData(const PixelData &&arOther)
+{
+    mColorDepth = arOther.mColorDepth;
+    mWidth = arOther.mWidth;
+    mHeight = arOther.mHeight;
+    mData = std::move(arOther.mData);
+    mpData = mData.data();
+}
+
+PixelData& PixelData::operator =(const PixelData &arOther)
+{
+    if (this != &arOther) {
+        mColorDepth = arOther.mColorDepth;
+        mWidth = arOther.mWidth;
+        mHeight = arOther.mHeight;
+        mData = arOther.mData;
+        mpData = mData.data();
+    }
+    return *this;
+}
+
+PixelData& PixelData::operator =(const PixelData &&arOther)
+{
+    if (this != &arOther) {
+        mColorDepth = arOther.mColorDepth;
+        mWidth = arOther.mWidth;
+        mHeight = arOther.mHeight;
+        mData = std::move(arOther.mData);
+        mpData = mData.data();
+    }
     return *this;
 }
 

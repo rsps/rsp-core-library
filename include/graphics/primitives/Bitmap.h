@@ -66,7 +66,7 @@ class Bitmap : public Canvas
         mImagePixels.SetPixelAt(static_cast<unsigned int>(arPoint.GetX()), static_cast<unsigned int>(arPoint.GetY()), arColor);
     }
 
-    uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
+    std::uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
 
     /**
      * \brief Get a read only reference to the pixel data.
