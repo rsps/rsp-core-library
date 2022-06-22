@@ -91,6 +91,20 @@ class Point
         return *this;
     }
 
+    Point operator+(const Point &arPoint) const noexcept
+    {
+        Point result(mX, mY);
+        result += arPoint;
+        return result;
+    }
+
+    Point operator-(const Point &arPoint) const noexcept
+    {
+        Point result(mX, mY);
+        result -= arPoint;
+        return result;
+    }
+
     /**
      * \brief Subtract the values from other point from this
      *
@@ -109,7 +123,7 @@ class Point
      * \param aPoint
      * \return True if equal
      */
-    bool operator==(const Point &aPoint) noexcept
+    bool operator==(const Point &aPoint) const noexcept
     {
         return (mX == aPoint.mX) && (mY == aPoint.mY);
     }

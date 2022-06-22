@@ -169,6 +169,7 @@ Color BmpLoader::ReadPixel(const uint8_t* apPixelRow)
     else {
         for (size_t i = 0; i < mBytesPerPixel; i++) {
             pixel = static_cast<uint32_t>(pixel) | ((static_cast<uint32_t>(apPixelRow[i])) << (8 * i));
+            pixel.SetAlpha(255);
         }
     }
     return pixel;

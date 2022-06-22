@@ -9,6 +9,7 @@
  */
 
 #include <graphics/primitives/Color.h>
+#include <logging/Logger.h>
 
 namespace rsp::graphics {
 
@@ -126,9 +127,29 @@ static std::uint32_t blendAlpha(std::uint32_t colora, std::uint32_t colorb, std:
     std::uint32_t rb2 = (alpha * (colorb & 0xFF00FF)) >> 8;
     std::uint32_t g1  = ((0x100 - alpha) * (colora & 0x00FF00)) >> 8;
     std::uint32_t g2  = (alpha * (colorb & 0x00FF00)) >> 8;
+    DUMP(std::hex << colora << ", " << colorb << ", " << alpha, rb1 << ", " << rb2 << ", " << g1 << ", " << g2);
     return ((rb1 | rb2) & 0xFF00FF) + ((g1 | g2) & 0x00FF00);
 }
 
+static std::uint32_t alphaBlend(std::uint32_t bg, std::uint32_t src)
+{
+    std::uint32_t a = src >> 24;    /* alpha */
+
+    /* If source pixel is transparent, just return the background */
+    if (0 == a)
+      return bg;
+
+    /* alpha blending the source and background colors */
+    std::uint32_t rb = (((src & 0x00ff00ff) * a) + ((bg & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;
+
+    std::uint32_t g  = (((src & 0x0000ff00) * a) + ((bg & 0x0000ff00) * (0xff - a))) & 0x00ff0000;
+
+    std::uint32_t result = (src & 0xff000000) | ((rb | g) >> 8);
+
+    DUMP(std::hex << bg << ", " << src << ", " << a << "; " << rb << ", " << g, result);
+
+    return result;
+}
 
 Color Color::Blend(Color a, Color b)
 {
@@ -151,8 +172,10 @@ Color Color::Blend(Color a, Color b)
 //    };
 
 //    Color result(blendPreMulAlpha(a, b, b.GetAlpha()));
-    Color result(blendAlpha(a, b, b.GetAlpha()));
-    result.SetAlpha(255);
+//    Color result(blendAlpha(a, b, b.GetAlpha()));
+//    result.SetAlpha(255);
+
+    Color result(alphaBlend(a, b));
     return result;
 }
 

@@ -79,7 +79,7 @@ std::size_t PixelData::GetDataSize() const
 Color PixelData::GetPixelAt(unsigned int aX, unsigned int aY, Color aColor) const
 {
     if (aX >= mWidth || aY >= mHeight) {
-        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range");
+        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(mWidth) + "," + std::to_string(aY) + "<" + std::to_string(mHeight) + ")");
     }
     Color result(aColor);
     unsigned int offset;
@@ -112,7 +112,7 @@ Color PixelData::GetPixelAt(unsigned int aX, unsigned int aY, Color aColor) cons
 PixelData& PixelData::SetPixelAt(unsigned int aX, unsigned int aY, Color aColor)
 {
     if (aX >= mWidth || aY >= mHeight) {
-        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range");
+        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(mWidth) + "," + std::to_string(aY) + "<" + std::to_string(mHeight) + ")");
     }
 
     if (mData.size() == 0) {
