@@ -131,6 +131,11 @@ static std::uint32_t blendAlpha(std::uint32_t colora, std::uint32_t colorb, std:
     return ((rb1 | rb2) & 0xFF00FF) + ((g1 | g2) & 0x00FF00);
 }
 
+/*
+ * http://gimpchat.com/viewtopic.php?f=8&t=8405
+ * https://en.wikipedia.org/wiki/Blend_modes
+ * GIMP mode: GIMP_LAYER_MODE_NORMAL
+ */
 static std::uint32_t alphaBlend(std::uint32_t bg, std::uint32_t src)
 {
     std::uint32_t a = src >> 24;    /* alpha */
