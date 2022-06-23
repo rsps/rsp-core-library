@@ -141,15 +141,21 @@ static std::uint32_t alphaBlend(std::uint32_t bg, std::uint32_t src)
     std::uint32_t a = src >> 24;    /* alpha */
 
     /* If source pixel is transparent, just return the background */
-    if (0 == a)
+    if (0 == a) {
       return bg;
+    }
+
+    if (255 == a) {
+        return src;
+    }
 
     /* alpha blending the source and background colors */
     std::uint32_t rb = (((src & 0x00ff00ff) * a) + ((bg & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;
 
     std::uint32_t g  = (((src & 0x0000ff00) * a) + ((bg & 0x0000ff00) * (0xff - a))) & 0x00ff0000;
 
-    std::uint32_t result = (src & 0xff000000) | ((rb | g) >> 8);
+//    std::uint32_t result = (src & 0xff000000) | ((rb | g) >> 8);
+    std::uint32_t result = 0xff000000 | ((rb | g) >> 8);
 
     DUMP(std::hex << bg << ", " << src << ", " << a << "; " << rb << ", " << g, result);
 
