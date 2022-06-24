@@ -48,6 +48,10 @@ public:
         : CoreException(aMsg)
     {
     }
+    NotImplementedException(const std::string &arMsg)
+        : CoreException(arMsg)
+    {
+    }
 };
 
 class NotSetException: public CoreException

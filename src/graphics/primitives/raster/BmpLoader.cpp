@@ -10,7 +10,9 @@
 
 #include <algorithm>
 #include <iostream>
+#include <string>
 #include <logging/Logger.h>
+#include <utils/CoreException.h>
 #include "BmpLoader.h"
 
 using namespace rsp::logging;
@@ -72,22 +74,25 @@ std::ostream& operator <<(std::ostream &os, const BmpLoader::BmpHeader_t &arHead
 
 void BmpLoader::LoadImg(const std::string &aImgName)
 {
-    std::cout << "BmpHeader_t size: " << sizeof(BmpHeader_t) << std::endl;
-    std::cout << "BitmapInfoHeader size: " << sizeof(BitmapInfoHeader) << std::endl;
-    std::cout << "BitmapV4Header size: " << sizeof(BitmapV4Header) << std::endl;
-    std::cout << "BitmapV5Header size: " << sizeof(BitmapV5Header) << std::endl;
+//    std::cout << "BmpHeader_t size: " << sizeof(BmpHeader_t) << std::endl;
+//    std::cout << "BitmapInfoHeader size: " << sizeof(BitmapInfoHeader) << std::endl;
+//    std::cout << "BitmapV4Header size: " << sizeof(BitmapV4Header) << std::endl;
+//    std::cout << "BitmapV5Header size: " << sizeof(BitmapV5Header) << std::endl;
 
     mPixelData.GetData().clear();
 
     rsp::posix::FileIO file(aImgName, std::ios::in);
 
     ReadHeader(file);
-    // TODO: Get Compression and other useful stuff
+
+    if (mBmpHeader.v1.bitsPerPixel <= 8) {
+        ReadPalette(file);
+    }
 
     ReadData(file);
 }
 
-PixelData::ColorDepth BmpLoader::bitsPerPixelToColorDepth(unsigned int aBpp)
+PixelData::ColorDepth BmpLoader::bitsPerPixelToColorDepth(std::uint32_t aBpp)
 {
     switch (aBpp) {
         case 1:
@@ -118,16 +123,30 @@ void BmpLoader::ReadHeader(rsp::posix::FileIO &arFile)
     initAfterLoad(static_cast<uint32_t>(std::abs(mBmpHeader.v1.width)), static_cast<uint32_t>(std::abs(mBmpHeader.v1.heigth)), bitsPerPixelToColorDepth(mBmpHeader.v1.bitsPerPixel));
 }
 
+void BmpLoader::ReadPalette(rsp::posix::FileIO &arFile)
+{
+    mPalette.resize((mBmpHeader.v4.coloursUsed > 0) ? mBmpHeader.v4.coloursUsed : 2^mBmpHeader.v1.bitsPerPixel);
+    arFile.Seek(mBmpHeader.v1.size + 14);
+
+    std::uint8_t data[4];
+    for (Color &color : mPalette) {
+        arFile.ExactRead(data, 4);
+        color.SetBlue(data[0]);
+        color.SetGreen(data[1]);
+        color.SetRed(data[2]);
+        color.SetAlpha(data[3]);
+    }
+}
+
 void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
 {
     // Figure out amount to read per row
-    std::size_t paddedRowSize = static_cast<std::size_t>((static_cast<std::size_t>(std::abs(mBmpHeader.v1.width)) * mBytesPerPixel + 3u) & static_cast<std::size_t>(~3));
-    Logger::GetDefault().Debug() << "Padded Row size: " << paddedRowSize << std::endl;;
+    std::size_t paddedRowSize = static_cast<std::size_t>(((static_cast<std::size_t>(std::abs(mBmpHeader.v1.width) * mBmpHeader.v1.bitsPerPixel) + 7) / 8) + 3u) & static_cast<std::size_t>(~3);
+    Logger::GetDefault().Debug() << "Padded Row size: " << paddedRowSize << std::endl;
 
     // Initialize container for reading
     std::vector<std::uint8_t> pixelRows(paddedRowSize * static_cast<std::size_t>(std::abs(mBmpHeader.v1.heigth)));
-    Logger::GetDefault().Debug() << "Container size: " << pixelRows.size() << std::endl;;
-    //    pixelRows.resize();
+    Logger::GetDefault().Debug() << "Container size: " << pixelRows.size() << std::endl;
 
     // Skip past the offset
     arFile.Seek(mBmpHeader.dataOffset);
@@ -135,43 +154,77 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
 
     // Height can be negative, showing the image is stored from top to bottom
     std::size_t h = static_cast<std::size_t>(abs(mBmpHeader.v1.heigth));
+    std::size_t w = static_cast<std::size_t>(mBmpHeader.v1.width);
 
     std::uint8_t *data = pixelRows.data();
-    unsigned int i = 0;
-    unsigned int inc = 1;
-    if (mBmpHeader.v1.heigth < 0) {
-        i = static_cast<unsigned int>(std::abs(mBmpHeader.v1.heigth));
-        inc = static_cast<unsigned int>(-1);
+    if (mBmpHeader.v1.heigth < 0) { // If height is negative, then image is stored top to bottom.
+        for (std::uint32_t y = 0; y < h ; y++) {
+            for (std::uint32_t x = 0; x < w; x++) {
+                Color color(ReadPixel(data, x, y, paddedRowSize));
+                mPixelData.SetPixelAt(x, y, color);
+            }
+        }
+    }
+    else { // Image is stored from bottom to top
+        for (std::uint32_t y = 0; y < h ; y++) {
+            for (std::uint32_t x = 0; x < w; x++) {
+                Color color(ReadPixel(data, x, h-1-y, paddedRowSize));
+                mPixelData.SetPixelAt(x, y, color);
+            }
+//            std::cout << std::endl;
+        }
     }
 
-    for (unsigned int y = 0; y < h ; y++) {
-        unsigned int x = 0;
-        for (unsigned int j = static_cast<unsigned int>(std::abs(mBmpHeader.v1.width)); j > 0; j--) {
-            Color color(ReadPixel(&data[(i * paddedRowSize) + (j * mBytesPerPixel)]));
-            mPixelData.SetPixelAt(x++, y, color);
-        }
-        i += inc;
-    }
     std::cout << "Loaded " << arFile.GetFileName() << " into PixelData." << std::endl;
     mPixelData.GetPixelAt(0, 0, Color::White);
 }
 
-Color BmpLoader::ReadPixel(const uint8_t* apPixelRow)
+Color BmpLoader::ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::uint32_t aY, std::size_t aPaddedRowSize)
 {
     Color pixel = 0;
-    // Reads other direction than the row loop
-    if (mBytesPerPixel == 4) {
-        pixel.SetRed(apPixelRow[3]);
-        pixel.SetGreen(apPixelRow[2]);
-        pixel.SetBlue(apPixelRow[1]);
-        pixel.SetAlpha(apPixelRow[0]);
-    }
-    else {
-        for (size_t i = 0; i < mBytesPerPixel; i++) {
-            pixel = static_cast<uint32_t>(pixel) | ((static_cast<uint32_t>(apPixelRow[i])) << (8 * i));
+
+    switch (mBmpHeader.v1.bitsPerPixel) {
+        case 1:
+            apPixelData += (aY * aPaddedRowSize) + (aX / 8);
+//            if ((aX % 8) == 0) {
+//                std::cout << std::hex << std::setw(2) << std::setfill('0') << int(*apPixelData) << ' ';
+//            }
+            if (*apPixelData & (0x80 >> (aX % 8))) {
+                pixel = mPalette[1];
+                pixel.SetAlpha(255);
+            }
+            else {
+                pixel = mPalette[0];
+                pixel.SetAlpha(0);
+            }
+            break;
+
+//        case 2:
+//        case 4:
+//        case 8:
+//            break;
+
+        case 24:
+            apPixelData += (aY * aPaddedRowSize) + (aX * 3);
+            pixel.SetRed(apPixelData[2]);
+            pixel.SetGreen(apPixelData[1]);
+            pixel.SetBlue(apPixelData[0]);
             pixel.SetAlpha(255);
-        }
+            break;
+
+        case 32:
+            apPixelData += (aY * aPaddedRowSize) + (aX * 4);
+            pixel.SetRed(apPixelData[3]);
+            pixel.SetGreen(apPixelData[2]);
+            pixel.SetBlue(apPixelData[1]);
+            pixel.SetAlpha(apPixelData[0]);
+            break;
+
+        default:
+            THROW_WITH_BACKTRACE1(rsp::utils::NotImplementedException, "BmpLoader does not support images with a color depth of " + std::to_string(int(mBmpHeader.v1.bitsPerPixel)) + " bpp");
+            break;
     }
+
     return pixel;
 }
 } // namespace rsp::graphics

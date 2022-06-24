@@ -26,7 +26,7 @@ namespace rsp::graphics
 {
 void Canvas::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &aColor)
 {
-    throw rsp::utils::NotImplementedException("");
+    THROW_WITH_BACKTRACE1(rsp::utils::NotImplementedException, "Canvas::DrawArc has not been implemented yet.");
 }
 
 void Canvas::DrawCircle(const Point &aCenter, int aRadius, const Color &aColor)
@@ -107,13 +107,18 @@ void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor, bool aFilled)
     }
 }
 
-void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
+void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap, Color aColor)
 {
+//    Point origin(aLeftTop.GetX(), aLeftTop.GetY() + int(aBitmap.GetHeight()));
+    Point origin(aLeftTop.GetX(), aLeftTop.GetY());
     auto pixels = aBitmap.GetPixelData();
     for (int y = 0; y < static_cast<int>(aBitmap.GetHeight()); y++) {
+        origin.mX = aLeftTop.GetX();
         for (int x = 0; x < static_cast<int>(aBitmap.GetWidth()); x++) {
-            SetPixel(aLeftTop + Point(x, y), pixels.GetPixelAt(x, y, Color::White));
+            SetPixel(origin, pixels.GetPixelAt(x, y, aColor));
+            origin.mX++;
         }
+        origin.mY++;
     }
 }
 

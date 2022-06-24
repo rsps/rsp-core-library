@@ -86,7 +86,7 @@ class Canvas
      * \param LeftTop
      * \param aBitmap
      */
-    void DrawImage(const Point &arLeftTop, const Bitmap &arBitmap);
+    void DrawImage(const Point &arLeftTop, const Bitmap &arBitmap, Color aColor = Color::White);
 
     /**
      * \brief Draws the given Text object in the given color on the canvas.

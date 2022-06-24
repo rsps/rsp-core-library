@@ -113,32 +113,53 @@ Color& Color::operator =(const Color &&arColor)
     return *this;
 }
 
-static std::uint32_t blendPreMulAlpha(std::uint32_t colora, std::uint32_t colorb, std::uint32_t alpha)
-{
-    std::uint32_t rb = (colora & 0xFF00FF) + ( (alpha * (colorb & 0xFF00FF)) >> 8 );
-    std::uint32_t g = (colora & 0x00FF00) + ( (alpha * (colorb & 0x00FF00)) >> 8 );
-    return (rb & 0xFF00FF) + (g & 0x00FF00);
-}
-
-
 static std::uint32_t blendAlpha(std::uint32_t colora, std::uint32_t colorb, std::uint32_t alpha)
 {
     std::uint32_t rb1 = ((0x100 - alpha) * (colora & 0xFF00FF)) >> 8;
     std::uint32_t rb2 = (alpha * (colorb & 0xFF00FF)) >> 8;
     std::uint32_t g1  = ((0x100 - alpha) * (colora & 0x00FF00)) >> 8;
     std::uint32_t g2  = (alpha * (colorb & 0x00FF00)) >> 8;
-    DUMP(std::hex << colora << ", " << colorb << ", " << alpha, rb1 << ", " << rb2 << ", " << g1 << ", " << g2);
-    return ((rb1 | rb2) & 0xFF00FF) + ((g1 | g2) & 0x00FF00);
+    std::uint32_t result = 0xFF000000 + ((rb1 | rb2) & 0xFF00FF) + ((g1 | g2) & 0x00FF00);
+    DUMP(std::hex << colora << ", " << colorb << ", " << alpha, result);
+    return result;
 }
 
+static double color2Double(std::uint8_t col)
+{
+    return (col / 255.0);
+}
+
+static std::uint8_t floatBlendSingle(double aFgAlpha, std::uint8_t aBg, std::uint8_t aFg)
+{
+    double bd = color2Double(aBg);
+    double fd = color2Double(aFg);
+
+    double oa = aFgAlpha + (1 - aFgAlpha);
+    double od = ((fd * aFgAlpha) + (bd - (bd * aFgAlpha))) / oa;
+
+    return std::uint8_t(od * 255);
+}
+
+static Color floatBlend(Color bg, Color fg)
+{
+    Color result(Color::Black);
+    double fg_alpha = color2Double(fg.GetAlpha());
+
+    result.SetRed(floatBlendSingle(fg_alpha, bg.GetRed(), fg.GetRed()));
+    result.SetGreen(floatBlendSingle(fg_alpha, bg.GetGreen(), fg.GetGreen()));
+    result.SetBlue(floatBlendSingle(fg_alpha, bg.GetBlue(), fg.GetBlue()));
+
+    DUMP(std::hex << bg << ", " << fg, std::uint32_t(result));
+    return result;
+}
 /*
  * http://gimpchat.com/viewtopic.php?f=8&t=8405
  * https://en.wikipedia.org/wiki/Blend_modes
  * GIMP mode: GIMP_LAYER_MODE_NORMAL
  */
-static std::uint32_t alphaBlend(std::uint32_t bg, std::uint32_t src)
+static std::uint32_t alphaBlend(std::uint32_t bg, std::uint32_t fg)
 {
-    std::uint32_t a = src >> 24;    /* alpha */
+    std::uint32_t a = fg >> 24;    /* alpha */
 
     /* If source pixel is transparent, just return the background */
     if (0 == a) {
@@ -146,48 +167,32 @@ static std::uint32_t alphaBlend(std::uint32_t bg, std::uint32_t src)
     }
 
     if (255 == a) {
-        return src;
+        return fg;
     }
 
     /* alpha blending the source and background colors */
-    std::uint32_t rb = (((src & 0x00ff00ff) * a) + ((bg & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;
+//    std::uint32_t rb = (((fg & 0x00ff00ff) * a) + ((bg & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;
+    std::uint32_t rb = ((((fg & 0x00ff00ff) * a) + 0x00007F007F) + ((bg & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;
 
-    std::uint32_t g  = (((src & 0x0000ff00) * a) + ((bg & 0x0000ff00) * (0xff - a))) & 0x00ff0000;
+//    std::uint32_t g  = (((fg & 0x0000ff00) * a) + ((bg & 0x0000ff00) * (0xff - a))) & 0x00ff0000;
+    std::uint32_t g  = ((((fg & 0x0000ff00) * a) + 0x00007f00) + ((bg & 0x0000ff00) * (0xff - a))) & 0x00ff0000;
 
 //    std::uint32_t result = (src & 0xff000000) | ((rb | g) >> 8);
     std::uint32_t result = 0xff000000 | ((rb | g) >> 8);
 
-    DUMP(std::hex << bg << ", " << src << ", " << a << "; " << rb << ", " << g, result);
+//    DUMP(std::hex << bg << ", " << fg << ", " << a << "; " << rb << ", " << g, result);
 
     return result;
 }
 
-Color Color::Blend(Color a, Color b)
+Color Color::Blend(Color aBg, Color aFg)
 {
-/*
-    static const unsigned int AMASK = 0xFF000000;
-    static const unsigned int RBMASK = 0x00FF00FF;
-    static const unsigned int GMASK = 0x0000FF00;
-    static const unsigned int AGMASK = AMASK | GMASK;
-    static const unsigned int ONEALPHA = 0x01000000;
-    unsigned int a = (p1 & AMASK) >> 24;
-    unsigned int na = 255 - a;
-    unsigned int rb = ((na * (p1 & RBMASK)) + (a * (p2 & RBMASK))) >> 8;
-    unsigned int ag = (na * ((p1 & AGMASK) >> 8)) + (a * (ONEALPHA | ((p2 & GMASK) >> 8)));
-    return ((rb & RBMASK) | (ag & AGMASK));
-*/
+    Color result1(alphaBlend(aBg, aFg));
+//    Color result2(floatBlend(aBg, aFg));
+//    Color result4 = blendAlpha(aBg, aFg, aFg.GetAlpha());
 
-//    auto blendSingleColor = [](unsigned int i0, unsigned int i1, unsigned int t) -> std::uint8_t {
-//        unsigned int i = i0 + t * ( ( i1 - i0 ) + 127 ) / 255;
-//        return static_cast<std::uint8_t>(i);
-//    };
-
-//    Color result(blendPreMulAlpha(a, b, b.GetAlpha()));
-//    Color result(blendAlpha(a, b, b.GetAlpha()));
-//    result.SetAlpha(255);
-
-    Color result(alphaBlend(a, b));
-    return result;
+//    std::cout << "Result1: " << std::hex << result1 << ", Result2: " << result2 << std::endl;
+    return result1;
 }
 
 }

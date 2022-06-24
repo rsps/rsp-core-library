@@ -132,8 +132,8 @@ TEST_CASE("Color Operators")
         Color c2(Color::Blue);
         CHECK_EQ(Color::Blend(c1, c2), Color(Color::Blue));
 
-        c2.SetAlpha(128);
-        CHECK_EQ(Color::Blend(c1, c2), Color(0xFFC000C0));
+        c2.SetAlpha(127);
+        CHECK_EQ(Color::Blend(c1, c2), Color(0xFF7F007F));
 
         c2.SetAlpha(0);
         CHECK_EQ(Color::Blend(c1, c2), Color(Color::Red));

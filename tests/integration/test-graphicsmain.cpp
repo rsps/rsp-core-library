@@ -59,11 +59,11 @@ TEST_CASE("Graphics Main Test")
         gfx.Terminate();
     };
 
-    MESSAGE("Running GFX loop.");
+    MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
     gfx.Run(GFX_FPS);
 
-    const uint32_t cGreenColor = 0x24b40b;
-    CHECK(fb.GetPixel(scenes.Second().GetTopImg().GetArea().GetTopLeft()) == cGreenColor);
-    CHECK(fb.GetPixel(scenes.Second().GetTopImg().GetArea().GetTopLeft()) == cGreenColor);
+    const uint32_t cGreenColor = 0xFF24b40b;
+    CHECK_EQ(fb.GetPixel(scenes.Second().GetTopImg().GetArea().GetTopLeft()), cGreenColor);
+    CHECK_EQ(fb.GetPixel(scenes.Second().GetBotImg().GetArea().GetTopLeft()), cGreenColor);
 }
 

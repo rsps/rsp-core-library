@@ -30,7 +30,7 @@ TEST_CASE("Image Test")
     SUBCASE("Render Image if Invalid")
     {
         // Arrange
-        Color red(0xc41616);
+        Color red(0xFFc41616);
         Point insidePoint(testRect.GetLeft() + (rand() % testRect.GetWidth()),
                           testRect.GetTop() + (rand() % testRect.GetHeight()));
         testImage.Invalidate();

@@ -56,12 +56,9 @@ TEST_CASE("Bitmap")
         CHECK(bitmap.GetHeight() == height);
         CHECK(bitmap.GetWidth() == width);
         CHECK_EQ(bitmap.GetPixelData().GetDataSize(), (width * height * 3));
-        Color col(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White));
-        CHECK_EQ(col, Color(Color::Black));
-        // FFE0ABAD == FFE0BBD8₁
-        Color col1(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White));
-        CHECK_EQ(col1, Color(0xFF03C1D9));
-        // FF46297F == FFE0BBD8
+        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White), Color(0xFF020A8F));
+        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White), Color(0xFF020A8F));
+        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(55, 111, Color::White), Color(0xFFEAEFE8));
 
         SUBCASE("Drawing on loaded Img") {
             // Arrange
@@ -95,6 +92,28 @@ TEST_CASE("Bitmap")
         CHECK(bitmap2.GetWidth() == width);
         CHECK(bitmap2.GetPixelData().GetDataSize() == (width * height * 3));
         CHECK(col2 == bitmap2.GetPixelData().GetPixelAt(0,0,Color::White));
+    }
+
+    SUBCASE("Monochrome Bmp file")
+    {
+        // Arrange
+        std::string filepath = "testImages/Monochrome.bmp";
+        uint32_t height = 100;
+        uint32_t width = 100;
+
+        // Act
+        CHECK_NOTHROW(Bitmap bmp3(filepath));
+
+        // Arrange
+        Bitmap bitmap3(filepath);
+        Color col3(bitmap3.GetPixelData().GetPixelAt(0,0,Color::White));
+
+        // Assert
+        CHECK(bitmap3.GetHeight() == height);
+        CHECK(bitmap3.GetWidth() == width);
+        CHECK_EQ(bitmap3.GetPixelData().GetDataSize(), (((width + 7) >> 3) * height));
+        CHECK_EQ(bitmap3.GetPixelData().GetPixelAt(0,0,Color::White), Color(0x00FFFFFF));
+        CHECK_EQ(bitmap3.GetPixelData().GetPixelAt(32,50,Color::White), Color(Color::White));
     }
 
     SUBCASE("Loading PNG file")

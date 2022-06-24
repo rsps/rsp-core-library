@@ -48,8 +48,9 @@ TEST_CASE("Framebuffer")
 
     srand(ms.count()); // generates random seed val
     Color col(urand() % 200 + 56, urand() % 200 + 56, urand() % 200 + 56, 0xff);
+    MESSAGE("Color: " << col);
 
-    SUBCASE("Clear Framebuffer")
+    SUBCASE("Clear")
     {
         fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
         fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
@@ -102,7 +103,7 @@ TEST_CASE("Framebuffer")
             CHECK_EQ(fb.GetPixel(pointA, false), col);
             CHECK_EQ(fb.GetPixel(pointB, false), col);
         }
-        // fb.SwapBuffer();
+        fb.SwapBuffer();
     }
 
     SUBCASE("Drawing Rectangles")
@@ -133,7 +134,7 @@ TEST_CASE("Framebuffer")
             // Check right side
             CHECK(col == fb.GetPixel(Point(rightBottom.GetX(), rightBottom.GetY() - i), false));
         }
-        // fb.SwapBuffer();
+        fb.SwapBuffer();
     }
 
     SUBCASE("Drawing Circles")
@@ -167,7 +168,7 @@ TEST_CASE("Framebuffer")
                 error += -radius;
             }
         }
-        // fb.SwapBuffer();
+        fb.SwapBuffer();
     }
 
     SUBCASE("Set/Get pixel outside screen")
@@ -221,10 +222,10 @@ TEST_CASE("Framebuffer")
         SUBCASE("Draw edited image file")
         {
             // Arrange
-            Color red(0xFF0000);
-            Color green(0x00FF00);
-            Color blue(0x0000FF);
-            Color thisColor(0x777777);
+            Color red(Color::Red);
+            Color green(Color::Green);
+            Color blue(Color::Blue);
+            Color thisColor(0xFF777777);
 
             // Act
             CHECK_NOTHROW(testImgMap.DrawLine(topLeft, topRight, red));
@@ -285,10 +286,11 @@ TEST_CASE("Framebuffer")
 
             // Assert
             CHECK(fb.GetPixel(randomPoint) != 0);
+            CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
         }
     }
 
-    SUBCASE("Swapping between two images")
+    SUBCASE("Moving image")
     {
         // Arrange
         Point topLeftPoint(100, 200);
@@ -296,14 +298,32 @@ TEST_CASE("Framebuffer")
         int iterations = 100;
 
         // Act
-        auto begin = std::chrono::high_resolution_clock::now();
+        rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
             CHECK_NOTHROW(fb.DrawImage(Point(topLeftPoint.GetX(), topLeftPoint.GetY() - i), imgSimple));
             CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
         }
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-        int fps = (1000 * iterations / duration);
+        int fps = (1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
+
+        // Assert
+        CHECK(fps > 10);
+        MESSAGE("Fps: " << fps);
+    }
+
+    SUBCASE("Moving monochrome image")
+    {
+        // Arrange
+        Point topLeftPoint(100, 200);
+        Bitmap imgSimple("testImages/Monochrome.bmp");
+        int iterations = 100;
+
+        // Act
+        rsp::utils::StopWatch sw;
+        for (int i = 0; i < iterations; i++) {
+            CHECK_NOTHROW(fb.DrawImage(Point(topLeftPoint.GetX(), topLeftPoint.GetY() - i), imgSimple));
+            CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+        }
+        int fps = (1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
 
         // Assert
         CHECK(fps > 10);
@@ -444,7 +464,7 @@ TEST_CASE("Framebuffer")
     }
 
     SUBCASE("Draw Transparent") {
-        for (std::uint32_t a = 0; a < 128 ; a += 5) {
+        for (std::uint32_t a = 0; a < 200 ; a += 5) {
             Color blue(Color::Blue);
             Color green(Color::Green);
             Color red(Color::Red);
