@@ -56,6 +56,7 @@ TEST_CASE("Color Contructors")
         CHECK(col.GetBlue() == cBlue);
     }
 }
+
 TEST_CASE("Color Sets")
 {
     // Arrange
@@ -106,6 +107,7 @@ TEST_CASE("Color Sets")
         CHECK(testCol.GetAlpha() == cAlpha);
     }
 }
+
 TEST_CASE("Color Operators")
 {
     // Arrange
@@ -126,12 +128,25 @@ TEST_CASE("Color Operators")
         // Assert
         CHECK(static_cast<uint32_t>(newColour) == static_cast<uint32_t>(testCol));
     }
+    SUBCASE("Blend")
+    {
+        Color c1(Color::Red);
+        Color c2(Color::Blue);
+        CHECK_EQ(Color::Blend(c1, c2), Color(Color::Blue));
+
+        c2.SetAlpha(127);
+        CHECK_EQ(Color::Blend(c1, c2), Color(0xFF7F007F));
+
+        c2.SetAlpha(0);
+        CHECK_EQ(Color::Blend(c1, c2), Color(Color::Red));
+    }
 }
+
 TEST_CASE("Color Constants")
 {
     SUBCASE("Red") {
         Color cl(Color::Red);
-        CHECK(cl.GetAlpha() == 0);
+        CHECK(cl.GetAlpha() == 0xFF);
         CHECK(cl.GetRed() == 0xFF);
         CHECK(cl.GetGreen() == 0);
         CHECK(cl.GetBlue() == 0);
@@ -139,7 +154,7 @@ TEST_CASE("Color Constants")
 
     SUBCASE("Green") {
         Color cl(Color::Green);
-        CHECK(cl.GetAlpha() == 0);
+        CHECK(cl.GetAlpha() == 0xFF);
         CHECK(cl.GetRed() == 0);
         CHECK(cl.GetGreen() == 0x80);
         CHECK(cl.GetBlue() == 0);
@@ -147,7 +162,7 @@ TEST_CASE("Color Constants")
 
     SUBCASE("Blue") {
         Color cl(Color::Blue);
-        CHECK(cl.GetAlpha() == 0);
+        CHECK(cl.GetAlpha() == 0xFF);
         CHECK(cl.GetRed() == 0);
         CHECK(cl.GetGreen() == 0);
         CHECK(cl.GetBlue() == 0xFF);

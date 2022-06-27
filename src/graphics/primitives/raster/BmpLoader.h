@@ -12,23 +12,25 @@
 
 #include <cstring>
 #include <fstream>
-#include <graphics/primitives/raster/ImgLoader.h>
 #include <iostream>
 #include <vector>
+#include <graphics/primitives/Color.h>
+#include <graphics/primitives/raster/ImgLoader.h>
+#include <posix/FileIO.h>
 
 namespace rsp::graphics
 {
 
 class BmpLoader : public ImgLoader
 {
-  public:
+public:
     /**
      * \brief Loads an image into memory as a bitmap
      * \param aImgName The relative path to the image
      */
-    std::vector<uint32_t> LoadImg(const std::string &aImgName);
+    void LoadImg(const std::string &aImgName) override;
 
-  protected:
+protected:
     struct BitmapInfoHeader {
         uint32_t size;
         int32_t width;
@@ -41,7 +43,7 @@ class BmpLoader : public ImgLoader
         uint32_t yPixelsPerM;
         uint32_t coloursUsed;
         uint32_t importantColours;
-    } __attribute__((packed)); // To stop alignment
+    } __attribute__((packed)); // Size: 40
 
     struct ColorCoordinate_t {
         uint32_t X;
@@ -72,7 +74,7 @@ class BmpLoader : public ImgLoader
         uint32_t GammaRed;
         uint32_t GammaGreen;
         uint32_t GammaBlue;
-    } __attribute__((packed)); // To stop alignment
+    } __attribute__((packed)); // Size: 108
 
     struct BitmapV5Header {
         uint32_t size;
@@ -101,7 +103,7 @@ class BmpLoader : public ImgLoader
         uint32_t ProfileData;
         uint32_t ProfileSize;
         uint32_t Reserved;
-    } __attribute__((packed)); // To stop alignment
+    } __attribute__((packed)); // Size: 124
 
     struct BmpHeader_t {
         uint16_t signature;
@@ -117,11 +119,16 @@ class BmpLoader : public ImgLoader
 
     friend std::ostream &operator<<(std::ostream &os, const BmpLoader::BmpHeader_t &arHeader);
 
-    uint16_t mBytesPerPixel = 0;
+    std::size_t mBytesPerPixel = 0;
+    std::vector<Color> mPalette{};
 
-    void ReadHeader(std::ifstream &arFile);
-    void ReadData(std::ifstream &arFile);
-    uint32_t ReadPixel(const std::vector<uint8_t> &aPixelRow, const size_t &aRowPtr);
+    void ReadHeader(rsp::posix::FileIO &arFile);
+    void ReadPalette(rsp::posix::FileIO &arFile);
+    void ReadData(rsp::posix::FileIO &arFile);
+    Color ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::uint32_t aY, std::size_t aPaddedRowSize);
+
+    PixelData::ColorDepth bitsPerPixelToColorDepth(std::uint32_t aBpp);
+
 };
 
 std::ostream &operator<<(std::ostream &os, const BmpLoader::BmpHeader_t &arHeader);

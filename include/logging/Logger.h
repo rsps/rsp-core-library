@@ -38,6 +38,13 @@ namespace rsp::logging {
 
 #endif /* DEBUG_LOG */
 
+constexpr const char* stem(std::string_view path)
+{
+    return path.substr(path.find_last_of('/') + 1).data();
+}
+
+#define DUMP(a, b) { std::cout << rsp::logging::stem(__FILE__) << ":" << __LINE__ << " " << __FUNCTION__ << "(" << a << ") -> " << b << std::endl; }
+
 
 class LogStreamInterface;
 class LogStream;

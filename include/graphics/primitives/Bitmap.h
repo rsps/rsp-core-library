@@ -47,7 +47,7 @@ class Bitmap : public Canvas
      * \param aWidth
      * \param aBytesPerPixel
      */
-    Bitmap(const uint32_t *apPixels, int aHeight, int aWidth, int aBytesPerPixel);
+    Bitmap(const uint32_t *apPixels, unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel);
 
     /**
      * \brief Create an empty in memory bitmap
@@ -56,45 +56,24 @@ class Bitmap : public Canvas
      * \param aWidth
      * \param aBytesPerPixel
      */
-    Bitmap(int aHeight, int aWidth, int aBytesPerPixel);
+    Bitmap(unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel);
 
     inline void SetPixel(const Point &arPoint, const Color &arColor) override
     {
         if (!IsInsideScreen(arPoint)) {
             return;
         }
-        uint32_t location = static_cast<uint32_t>((mWidth * arPoint.mY) + arPoint.mX);
-        mImagePixels[location] = arColor;
+        mImagePixels.SetPixelAt(static_cast<unsigned int>(arPoint.GetX()), static_cast<unsigned int>(arPoint.GetY()), arColor);
     }
 
-    uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
-
-    /**
-     * \brief Get the height of the bitmap.
-     *
-     * \return uint32_t
-     */
-    int GetHeight() const
-    {
-        return mHeight;
-    }
-
-    /**
-     * \brief Get the width of the bitmap.
-     *
-     * \return uint32_t
-     */
-    int GetWidth() const
-    {
-        return mWidth;
-    }
+    std::uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
 
     /**
      * \brief Get a read only reference to the pixel data.
      *
      * \return const std::vector<uint32_t>&
      */
-    const std::vector<uint32_t> &GetPixels() const
+    const PixelData& GetPixelData() const
     {
         return mImagePixels;
     }
@@ -102,7 +81,7 @@ class Bitmap : public Canvas
   protected:
     static std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> msFiletypeMap;
     std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
-    std::vector<uint32_t> mImagePixels{}; // Pointer?
+    PixelData mImagePixels{};
 };
 
 } // namespace rsp::graphics

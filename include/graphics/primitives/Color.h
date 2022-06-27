@@ -34,23 +34,25 @@ class Color
      * \brief Predefined basic colors
      */
     enum : ARGB_t {
-        White = 0x00FFFFFF,
-        Silver = 0x00C0C0C0,
-        Grey = 0x00808080,
-        Black = 0x00000000,
-        Red = 0x00FF0000,
-        Maroon = 0x00800000,
-        Yellow = 0x00FFFF00,
-        Olive = 0x00808000,
-        Lime = 0x0000FF00,
-        Green = 0x00008000,
-        Aqua = 0x0000FFFF,
-        Teal = 0x00008080,
-        Blue = 0x000000FF,
-        Navy = 0x00000080,
-        Fuchsia = 0x00FF00FF,
-        Purple = 0x00800080
+        White =   0xFFFFFFFF,
+        Silver =  0xFFC0C0C0,
+        Grey =    0xFF808080,
+        Black =   0xFF000000,
+        Red =     0xFFFF0000,
+        Maroon =  0xFF800000,
+        Yellow =  0xFFFFFF00,
+        Olive =   0xFF808000,
+        Lime =    0xFF00FF00,
+        Green =   0xFF008000,
+        Aqua =    0xFF00FFFF,
+        Teal =    0xFF008080,
+        Blue =    0xFF0000FF,
+        Navy =    0xFF000080,
+        Fuchsia = 0xFFFF00FF,
+        Purple =  0xFF800080
     };
+
+    Color() : mValue(White) {}
 
     /**
      * \brief Construct with given base colors.
@@ -74,7 +76,8 @@ class Color
      *
      * \param aColor
      */
-    Color(const Color &aColor);
+    Color(const Color &arColor);
+    Color(const Color &&arColor);
 
     /**
      * \brief Get the red base color value.
@@ -133,18 +136,30 @@ class Color
      * \return ARGB
      */
     operator ARGB_t() const;
+
     /**
      * \brief Assign the value from the given Color object.
      *
      * \param aValue
      */
-    Color &operator=(const Color &aColor);
+    Color& operator=(const Color &arColor);
+    Color& operator=(const Color &&arColor);
+
+    /**
+     * \fn Color Blend(Color&, Color&)
+     * \brief Perform alpha blending of the two given colors.
+     *
+     * \param a
+     * \param b
+     * \return Combined color
+     */
+    static Color Blend(Color a, Color b);
 
   protected:
     /**
      * \brief Color value type
      */
-    typedef union {
+    union ColorValue_t {
         ARGB_t rgba;
 #ifdef LITTLE_ENDIAN
         struct __item_type {
@@ -161,7 +176,14 @@ class Color
             uint32_t blue : 8;
         } item;
 #endif
-    } ColorValue_t;
+    public:
+        ColorValue_t() : rgba(0) {}
+        ColorValue_t(ARGB_t aValue) : rgba(aValue) {}
+        ColorValue_t(const ColorValue_t& arOther) : rgba(arOther.rgba) {}
+        ColorValue_t(const ColorValue_t&& arOther) : rgba(std::move(arOther.rgba)) {}
+        ColorValue_t& operator=(const ColorValue_t& arOther) { rgba = arOther.rgba; return *this; }
+        ColorValue_t& operator=(const ColorValue_t&& arOther) { rgba = std::move(arOther.rgba); return *this; }
+    };
 
     ColorValue_t mValue{};
 };
