@@ -333,6 +333,7 @@ std::string Variant::AsString() const
         case Types::Int64:
         case Types::Uint64:
         case Types::Uint32:
+        case Types::Uint16:
             return std::to_string(mInt);
 
         case Types::Float:
