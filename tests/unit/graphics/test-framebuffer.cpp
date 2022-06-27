@@ -316,12 +316,20 @@ TEST_CASE("Framebuffer")
         Point topLeftPoint(100, 200);
         Bitmap imgSimple("testImages/Monochrome.bmp");
         int iterations = 100;
+        Color mcl[5] = {
+            Color::White,
+            Color::Blue,
+            Color::Red,
+            Color::Green,
+            Color::Yellow
+        };
 
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
-            CHECK_NOTHROW(fb.DrawImage(Point(topLeftPoint.GetX(), topLeftPoint.GetY() - i), imgSimple));
+            CHECK_NOTHROW(fb.DrawImage(Point(topLeftPoint.GetX(), topLeftPoint.GetY() - i), imgSimple, mcl[(i / 20) % 5]));
             CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+//            std::this_thread::sleep_for(std::chrono::milliseconds(25));
         }
         int fps = (1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
 
@@ -464,10 +472,11 @@ TEST_CASE("Framebuffer")
     }
 
     SUBCASE("Draw Transparent") {
+        Color blue(Color::Blue);
+        Color green(Color::Green);
+        Color red(Color::Red);
+
         for (std::uint32_t a = 0; a < 200 ; a += 5) {
-            Color blue(Color::Blue);
-            Color green(Color::Green);
-            Color red(Color::Red);
             blue.SetAlpha(static_cast<std::uint8_t>(a));
             green.SetAlpha(static_cast<std::uint8_t>(a));
             red.SetAlpha(static_cast<std::uint8_t>(a));
@@ -477,6 +486,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
+        CHECK(fb.GetPixel(Point(185, 185), true) == Color(0xFF0B612D));
     }
 
 }

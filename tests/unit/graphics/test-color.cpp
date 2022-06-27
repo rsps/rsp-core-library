@@ -56,6 +56,7 @@ TEST_CASE("Color Contructors")
         CHECK(col.GetBlue() == cBlue);
     }
 }
+
 TEST_CASE("Color Sets")
 {
     // Arrange
@@ -106,6 +107,7 @@ TEST_CASE("Color Sets")
         CHECK(testCol.GetAlpha() == cAlpha);
     }
 }
+
 TEST_CASE("Color Operators")
 {
     // Arrange
@@ -137,9 +139,9 @@ TEST_CASE("Color Operators")
 
         c2.SetAlpha(0);
         CHECK_EQ(Color::Blend(c1, c2), Color(Color::Red));
+    }
 }
 
-}
 TEST_CASE("Color Constants")
 {
     SUBCASE("Red") {
