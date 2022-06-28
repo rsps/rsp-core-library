@@ -5,11 +5,11 @@ cmake_minimum_required (VERSION 3.16)
 # Usage: cmake [-DRELEASE_BUILD=ON] [-DPLATFORM_P05=ON] [FREETYPE_FONTS=OFF] [-DOPENSSL_CRYPTO=OFF] ..
 
 OPTION(RELEASE_BUILD "Set to turn off debug output" OFF) # Disabled by default.
-OPTION(PLATFORM_ARM "Set to build for ARM platform" OFF) # Disabled by default.
+OPTION(ARC_ARM "Set to cross-compile for ARM CPU" OFF) # Disabled by default.
 OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
 OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
 
-if(PLATFORM_ARM)
+if(ARCH_ARM)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
 endif()
 
