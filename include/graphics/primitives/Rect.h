@@ -38,6 +38,7 @@ class Rect
      * \param aHeight
      */
     Rect(int aLeft, int aTop, int aWidth, int aHeight);
+    Rect(unsigned int aLeft, unsigned int aTop, unsigned int aWidth, unsigned int aHeight);
 
     /**
      * \brief Construct a Rect from two points.

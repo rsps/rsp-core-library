@@ -31,6 +31,13 @@ Rect::Rect(int aLeft, int aTop, int aWidth, int aHeight)
     VerifyDimensions();
 }
 
+Rect::Rect(unsigned int aLeft, unsigned int aTop, unsigned int aWidth, unsigned int aHeight)
+    : mLeftTop(aLeft, aTop), mRightBottom(aLeft + aWidth, aTop + aHeight)
+{
+    VerifyDimensions();
+}
+
+
 Rect::Rect(const Point &aLeftTop, const Point &aBottomRight)
     : mLeftTop(aLeftTop), mRightBottom(aBottomRight)
 {
