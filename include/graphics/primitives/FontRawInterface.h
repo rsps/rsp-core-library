@@ -11,6 +11,7 @@
 #define INCLUDE_GRAPHICS_PRIMITIVES_FONTRAWINTERFACE_H_
 
 #include <string>
+#include <memory>
 #include <graphics/primitives/Font.h>
 
 namespace rsp::graphics {
@@ -22,6 +23,8 @@ namespace rsp::graphics {
 class FontRawInterface
 {
 public:
+    static void RegisterFont(std::string_view aFileName);
+
     virtual ~FontRawInterface() {};
 
     virtual std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing) = 0;

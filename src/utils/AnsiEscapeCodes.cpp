@@ -77,7 +77,7 @@ EscString ec::cursor::Right = ESC("C");
 EscString ec::cursor::Left  = ESC("D");
 EscString ec::cursor::EraseLineMoveToCol1 = ESC("2K") ESC("G");
 
-EscString ec::cursor::SetPosition(int aPos)
+EscString ec::cursor::SetPosition(unsigned int aPos)
 {
     static char command[15];
     /* Command is the control command to the terminal */

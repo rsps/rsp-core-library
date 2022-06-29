@@ -1,0 +1,129 @@
+@startuml
+
+skinparam stereotypeCBackgroundColor<<Exception>> Red
+'hide stereotype
+
+title Data Container Classes
+
+namespace rsp {
+
+namespace utils {
+
+interface IDataSignature {
+    +{abstract} GetSize() const: std::size_t
+    +{abstract} GetData() : std::uint8_t*
+    +{abstract} GetData() const: const std::uint8_t*
+    +{abstract} Calc(arContent: const IDataContent&)
+    +{abstract} Verify(arContent: const IDataContent&)
+}
+
+interface IDataStorage {
+    +{abstract} ReadSignature(arSignature: IDataSignature&)
+    +{abstract} WriteSignature(arSignature: const IDataSignature&)
+    +{abstract} Read(arContent: IDataContent&)
+    +{abstract} Write(arContent: const IDataContent&)
+}
+
+interface IDataContent {
+    +{abstract} GetSize() const: std::size_t
+    +{abstract} GetData() : std::uint8_t*
+    +{abstract} GetData() const: const std::uint8_t*
+}
+
+class Crc32DataSignature {
+    #mCRC: std::uint32_t 
+    #mSecret: std::string_view
+    +Init(aSecret: std::string_view)
+}
+
+class FileDataStorage {
+    #mFileName: std::string
+    #mFile: rsp::posix::FileIO
+    +Init(aFileName: std::string_view)
+}
+
+class DataContainerBase <class _DATA, IDataSignature _SIGNATURE, IDataStorage _STORAGE> {
+    #mSignature: _SIGNATURE
+    #mStorage: _STORAGE
+    #mData: _DATA
+
+    +Load()
+    +Save()
+    +Get(): _DATA&
+    +Get() const: const _DATA&
+    +GetSignature(): _SIGNATURE&
+    +GetStorage(): _STORAGE&
+    
+
+}
+
+class DataContainer <class T> {
+    _STORAGE: FileDataStorage
+    _SIGNATURE: Crc32DataSignature
+    _DATA: T
+}
+
+class CoreException <<Exception>> {
+}
+
+class DataContainerException <<Exception>> {
+}
+
+class EInvalidSignature <<Exception>> {
+}
+
+IDataSignature <|-- Crc32DataSignature
+IDataStorage <|-- FileDataStorage
+IDataContent <|--- DataContainerBase
+IDataStorage *--- DataContainerBase
+IDataSignature *--- DataContainerBase
+
+DataContainerBase <|-- DataContainer
+
+CoreException <|-- DataContainerException
+DataContainerException <|-- EInvalidSignature
+
+DataContainer -left[hidden]- CoreException 
+
+}
+
+namespace security {
+
+class Sha256DataSignature {
+    #mSignature: SecureBuffer
+    #mSecret: SecureBuffer
+    +Init(arSecret: const SecureBuffer&)
+}
+
+class EncryptedFileDataStorage {
+    #mIv: SecureBuffer
+    #mKey: SecureBuffer
+    +Init(aFileName: std::string_view, arInitializationVector: const SecureBuffer&, arKey: const SecureBuffer&)
+}
+
+
+class SignedContainer <class T> {
+    _STORAGE: rsp::utils::FileDataStorage
+    _SIGNATURE: Sha256DataSignature
+    _DATA: T
+}
+
+class SecureContainer <class T> {
+    _STORAGE: EncryptedFileDataStorage
+    _SIGNATURE: Sha256DataSignature
+    _DATA: T
+}
+
+rsp.utils.IDataSignature <|-- Sha256DataSignature
+rsp.utils.IDataStorage <|-- EncryptedFileDataStorage
+
+rsp.utils.DataContainerBase <|-- SecureContainer
+rsp.utils.DataContainerBase <|-- SignedContainer
+
+EncryptedFileDataStorage -down[hidden]- Sha256DataSignature
+Sha256DataSignature -down[hidden]- SignedContainer
+SignedContainer -left[hidden]- SecureContainer
+}
+
+
+@enduml

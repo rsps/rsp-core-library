@@ -17,12 +17,27 @@
 #include <posix/FileSystem.h>
 #include <graphics/Framebuffer.h>
 #include <graphics/GraphicsMain.h>
-#include "../helpers/scenes/Scenes.h"
+#include <scenes/Scenes.h>
+#include <TestHelpers.h>
 
 using namespace rsp::graphics;
 
+class TestTouchParser : public TouchParser
+{
+public:
+    using TouchParser::TouchParser;
+
+    void Flush() override
+    {
+        MESSAGE("Flushing touch queue.");
+    }
+};
+
 TEST_CASE("Graphics Main Test")
 {
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
+
     // Make framebuffer
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
@@ -34,7 +49,7 @@ TEST_CASE("Graphics Main Test")
     Scenes scenes;
 
     // Make TouchParser
-    TouchParser tp("testImages/touchTest.bin");
+    TestTouchParser tp("testImages/touchTest.bin");
 
     GraphicsMain gfx(fb, tp, scenes);
 
@@ -44,9 +59,11 @@ TEST_CASE("Graphics Main Test")
         gfx.Terminate();
     };
 
+    MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
     gfx.Run(GFX_FPS);
 
-    const uint32_t cGreenColor = 0x24b40b;
-    CHECK(fb.GetPixel(scenes.Second().GetTopImg().GetArea().GetTopLeft()) == cGreenColor);
-    CHECK(fb.GetPixel(scenes.Second().GetTopImg().GetArea().GetTopLeft()) == cGreenColor);
+    const uint32_t cGreenColor = 0xFF24b40b;
+    CHECK_EQ(fb.GetPixel(scenes.Second().GetTopImg().GetArea().GetTopLeft()), cGreenColor);
+    CHECK_EQ(fb.GetPixel(scenes.Second().GetBotImg().GetArea().GetTopLeft()), cGreenColor);
 }
+

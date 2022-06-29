@@ -26,7 +26,7 @@ namespace rsp::graphics
 {
 void Canvas::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &aColor)
 {
-    throw rsp::utils::NotImplementedException("");
+    THROW_WITH_BACKTRACE1(rsp::utils::NotImplementedException, "Canvas::DrawArc has not been implemented yet.");
 }
 
 void Canvas::DrawCircle(const Point &aCenter, int aRadius, const Color &aColor)
@@ -107,15 +107,18 @@ void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor, bool aFilled)
     }
 }
 
-void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap)
+void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap, Color aColor)
 {
-    long unsigned int iter = 0;
-    auto pixels = aBitmap.GetPixels();
-    for (int h = 0; h < aBitmap.GetHeight(); h++) {
-        for (int w = 0; w < aBitmap.GetWidth(); w++) {
-            SetPixel(Point(aLeftTop.mX + w, aLeftTop.mY + h), pixels[iter]);
-            iter++;
+//    Point origin(aLeftTop.GetX(), aLeftTop.GetY() + int(aBitmap.GetHeight()));
+    Point origin(aLeftTop.GetX(), aLeftTop.GetY());
+    auto pixels = aBitmap.GetPixelData();
+    for (int y = 0; y < static_cast<int>(aBitmap.GetHeight()); y++) {
+        origin.mX = aLeftTop.GetX();
+        for (int x = 0; x < static_cast<int>(aBitmap.GetWidth()); x++) {
+            SetPixel(origin, pixels.GetPixelAt(x, y, aColor));
+            origin.mX++;
         }
+        origin.mY++;
     }
 }
 
@@ -126,6 +129,7 @@ void Canvas::DrawText(Text &arText)
 
 void Canvas::DrawText(const Text &arText, const Color &arColor)
 {
+    Color col = arColor;
     for (const Glyph &glyph : arText.GetGlyphs()) {
         for (int y = 0; y < glyph.mHeight; y++) {
             long unsigned int index = static_cast<long unsigned int>(y * glyph.mWidth);
@@ -133,7 +137,8 @@ void Canvas::DrawText(const Text &arText, const Color &arColor)
                 uint8_t c = glyph.mPixels[index++];
                 auto p = Point(x + glyph.mLeft + arText.GetArea().GetLeft(), y + glyph.mTop + arText.GetArea().GetTop());
                 if (c && arText.GetArea().IsHit(p)) {
-                    SetPixel(p, arColor);
+                    col.SetAlpha(c);
+                    SetPixel(p, col);
                 }
             }
         }

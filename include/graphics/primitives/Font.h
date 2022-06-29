@@ -162,10 +162,12 @@ public:
 
 protected:
     Color mColor;
-    std::unique_ptr<FontRawInterface> mpImpl{};
+    std::unique_ptr<FontRawInterface> mpImpl;
 
     Font(const Font&) = delete;
     Font& operator=(const Font&) = delete;
+
+    static std::unique_ptr<FontRawInterface> MakePimpl(const std::string &arFontName);
 };
 
 }

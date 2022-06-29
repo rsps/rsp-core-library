@@ -28,14 +28,14 @@ ApplicationBase::ApplicationBase(int argc, const char **argv)
         THROW_WITH_BACKTRACE(ESingletonViolation);
     }
 
-    rsp::logging::LoggerInterface::SetDefault(mLogger);
+    rsp::logging::LoggerInterface::SetDefault(&mLogger);
 
     mpInstance = this;
 }
 
 ApplicationBase::~ApplicationBase()
 {
-    rsp::logging::LoggerInterface::SetDefault(*static_cast<rsp::logging::LoggerInterface*>(nullptr));
+    rsp::logging::LoggerInterface::SetDefault(static_cast<rsp::logging::LoggerInterface*>(nullptr));
 
     mpInstance = nullptr;
 }

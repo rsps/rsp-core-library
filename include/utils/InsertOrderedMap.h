@@ -18,8 +18,6 @@
 
 namespace rsp::utils {
 
-using namespace std;
-
 /**
  * \class InsertOrderedMap
  * \brief Aggregate class that wraps a std::map with key, value pairs, and a vector that maintains the insertion order.

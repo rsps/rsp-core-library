@@ -39,7 +39,7 @@ TEST_CASE("Variant")
 
         v = 42.0f;
         CHECK(v.GetType() == Variant::Types::Float);
-        CHECK(IsInRange(static_cast<float>(v.AsDouble()), 42.0f, 42.0f));
+        CHECK(IsInRange(v.AsFloat(), 42.0f, 42.0f));
         CHECK(v.AsInt() == 42);
         float f = v;
         CHECK(IsInRange(f, 42.0f, 42.0f));
@@ -47,7 +47,7 @@ TEST_CASE("Variant")
 
     SUBCASE("Streaming") {
         std::stringstream ss;
-        v = 42ul;
+        v = std::uint64_t(42);
         ss << "Variant = " << v;
 
         CHECK(ss.str() == "Variant = uint64:42");
@@ -88,6 +88,38 @@ TEST_CASE("Variant")
 
         CHECK(b.IsNull());
         CHECK(c.AsInt() == 42);
+    }
+
+    SUBCASE("String Precision") {
+        v = 830.3468;
+        CHECK_EQ(v.AsString(), "830.34680000000003");
+        Variant r(v.AsString());
+        CHECK_EQ(v.AsDouble(), 830.34680000000003);
+
+        v = -4.47836192e-09;
+        CHECK_EQ(v.AsString(), "-4.4783619199999997e-09");
+        r = v.AsString();
+        CHECK_EQ(v.AsDouble(), -4.4783619199999997e-09);
+
+        v = -3.18854398e-05;
+        CHECK_EQ(v.AsString(), "-3.1885439799999998e-05");
+        r = v.AsString();
+        CHECK_EQ(v.AsDouble(), -3.1885439799999998e-05);
+
+        v = 1.93246008e-01;
+        CHECK_EQ(v.AsString(), "0.193246008");
+        r = v.AsString();
+        CHECK_EQ(v.AsDouble(), 0.193246008);
+
+        v = 8.20831198e+02;
+        CHECK_EQ(v.AsString(), "820.83119799999997");
+        r = v.AsString();
+        CHECK_EQ(v.AsDouble(), 820.83119799999997);
+
+        v = 1.7976931348623157e+308;
+        CHECK_EQ(v.AsString(), "1.7976931348623157e+308");
+        r = v.AsString();
+        CHECK_EQ(v.AsDouble(), 1.7976931348623157e+308);
     }
 
 }

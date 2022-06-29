@@ -68,6 +68,7 @@ void FileIO::Open(const std::string &arFileName, std::ios_base::openmode aMode, 
 
     mFileName = arFileName;
 
+    Close();
     int ret = open(mFileName.c_str(), flags, aPermissions);
     if (ret < 0) {
         THROW_SYSTEM("Error opening file " + mFileName);
@@ -82,17 +83,6 @@ void FileIO::Close()
         close(mHandle);
         mHandle = -1;
     }
-}
-
-bool FileIO::IsEOF()
-{
-    char buf[1];
-    int ret = Read(buf, 1);
-    if (ret != 0) {
-        lseek(mHandle, lseek(mHandle, 0, SEEK_CUR) - 1, SEEK_SET);
-        return false;
-    }
-    return true;
 }
 
 std::size_t FileIO::Seek(std::size_t aOffset, std::ios_base::seekdir aSeekdir)
@@ -128,6 +118,21 @@ std::size_t FileIO::Read(void *apBuffer, std::size_t aNumberOfBytesToRead)
     return static_cast<std::size_t>(ret);
 }
 
+void FileIO::ExactRead(void *apBuffer, std::size_t aNumberOfBytesToRead)
+{
+    std::size_t len = 0;
+    int retries = 3;
+
+    while (len != aNumberOfBytesToRead) {
+        if (retries-- == 0) {
+            errno = ENODATA;
+            THROW_SYSTEM("Error reading " + std::to_string(aNumberOfBytesToRead) + " bytes from file " + mFileName);
+        }
+
+        len += Read(&static_cast<uint8_t*>(apBuffer)[len], aNumberOfBytesToRead - len);
+    }
+}
+
 std::size_t FileIO::Write(const void *apBuffer, std::size_t aNumberOfBytesToWrite)
 {
     int ret = write(mHandle, apBuffer, aNumberOfBytesToWrite);
@@ -136,6 +141,21 @@ std::size_t FileIO::Write(const void *apBuffer, std::size_t aNumberOfBytesToWrit
     }
 
     return static_cast<std::size_t>(ret);
+}
+
+void FileIO::ExactWrite(const void *apBuffer, std::size_t aNumberOfBytesToWrite)
+{
+    std::size_t len = 0;
+    int retries = 3;
+
+    while (len != aNumberOfBytesToWrite) {
+        if (retries-- == 0) {
+            errno = ENOSPC;
+            THROW_SYSTEM("Error reading from file " + mFileName);
+        }
+
+        len += Write(&static_cast<const uint8_t*>(apBuffer)[len], aNumberOfBytesToWrite - len);
+    }
 }
 
 std::string FileIO::GetLine()

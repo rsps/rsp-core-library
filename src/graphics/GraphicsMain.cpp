@@ -16,6 +16,7 @@
 #include <logging/Logger.h>
 
 using namespace rsp::messaging;
+using namespace rsp::logging;
 
 namespace rsp::graphics
 {
@@ -41,10 +42,12 @@ void GraphicsMain::Run(int aMaxFPS)
     int64_t frame_time = 1000 / aMaxFPS;
 
     while (!mTerminated) {
+
         sw.Reset();
 
         // New scene requested?
         if (!mNextScene.empty()) {
+            Logger::GetDefault().Info() << "New Scene: " << mNextScene << std::endl;
             mrScenes.SetActiveScene(mNextScene);
             mrScenes.ActiveScene().Invalidate();
             mNextScene = "";
@@ -53,7 +56,7 @@ void GraphicsMain::Run(int aMaxFPS)
 
         // New inputs?
         if (mrTouchParser.Poll(event)) {
-            DLOG(event);
+            Logger::GetDefault().Debug() << event << std::endl;
             mrScenes.ActiveScene().ProcessInput(event);
         }
 
@@ -62,7 +65,7 @@ void GraphicsMain::Run(int aMaxFPS)
             mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
         }
 
-        int64_t delay = std::max(0l, frame_time - sw.Elapsed<std::chrono::milliseconds>());
+        int64_t delay = std::max(std::int64_t(0), frame_time - sw.Elapsed<std::chrono::milliseconds>());
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     }
 }

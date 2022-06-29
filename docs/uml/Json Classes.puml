@@ -8,6 +8,14 @@ title JSON Classes
 
 namespace rsp {
 
+namespace utils {
+
+class Variant
+
+}
+
+namespace json {
+
 enum JsonTypes {
     Null
     Bool
@@ -17,74 +25,45 @@ enum JsonTypes {
     Array
 }
 
-class Variant
-
 class JsonValue {
-    +{static} Decode(apJson:const char*) : JsonValue*
-    +{static} Decode(arJson:const UTF8String&) : JsonValue*
-    +{static} Decode(arJson:UTF8String&) : JsonValue*
-    +Encode(aPrettyPrint:bool = false) : UTF8String
-
     +JsonValue()
+    +JsonValue(aType: JsonTypes)
     +JsonValue<T>(aValue:T)
-    +virtual ~JsonValue()
+
+    +operator=(const JsonValue&): JsonValue&
+    +operator=(JsonValue&&): JsonValue&
+    +operator<T>=(T aValue): JsonValue&
+
+    +Encode(aPrettyPrint: bool = false, aForceToUCS2: bool = false) const: string
+    +{static} Decode(aJson: string): JsonValue
 
     +GetJsonType() const : JsonTypes
-    +operator<T> =(aValue:T) : JsonValue&
+    +{static} GetJsonTypeAsString(aType: JsonTypes): string
 
-    +AsArray() const : JsonArray&
-    +AsObject() const : JsonObject&
-}
+    +IsArray() const: bool
+    +IsObject() const: bool
+    +operator[](aKey: string): JsonValue&
+    +operator[](aIndex: integer): JsonValue&
+    +GetCount() const: std::size_t
+    +GetMemberNames() const: std::vector<string>
+    +MemberExists(aKey: string) const: bool
+    +Add(aValue: JsonValue): JsonValue&
+    +Add(aKey: string, aValue: JsonValue): JsonValue&
+    +Remove(aIndex: integer): JsonValue&
+    +Remove(aKey: string): JsonValue&
 
-class JsonArray {
-    +GetCount() const : std::size_t
-    +operator[](aIndex:int) : JsonValue&
-
-    +Add(apValue:JsonValue*) : JsonValue&
-    +Remove(aIndex:int) : JsonValue&
     +Clear()
 }
 
-class JsonObject {
-    +GetCount() const : std::size_t
-    +MemberExists(arName:const std::string&) const : bool
-
-    +operator[](apName:const char*) : JsonValue&
-    +operator[](arName:const std::string&) : JsonValue&
-
-    +Add(arName:const std::string&, apValue:JsonValue*) : JsonValue&
-    +Remove(arName:const std::string&) : JsonValue&
-    +Clear()
-}
-
-class JsonString {
-    Used to traverse and decoder a JSON formatted string
+class JsonDecoder {
+    Used to traverse and decode a JSON formatted string
     --
-    +GetValue(): JsonValue*
-}
-
-class Json {
-    Gateway class to all JSON operations.
-    Both moveable and copyable.
-    --
-    #mValue: JsonValue
-    --
-    Json()
-    virtual ~Json();
-
-    MakeObject(): JsonObject&
-    MakeArray(): JsonArray&
-
-    Decode(arJson: const std::string&);
-    Encode(aPrettyPrint: bool = false) const: std::string
-
-    Get() const: JsonValue&
-    Clear(): Json&
+    +JsonDecoder(aJson: string);
+    +GetValue(): JsonValue
 }
 
 class EJsonException <<std::runtime_error>> {
-    Base class for all
-    JSON exceptions
+    Base class for all JSON exceptions
 }
 
 class EJsonParseError <<Exception>> {
@@ -108,34 +87,24 @@ class EJsonTypeError <<Exception>> {
     not be converted to either.
 }
 
-class EInstanceExists <<Exception>> {
-    Thrown if content have already been
-    created in Json object, and either of
-    MakeObject or MakeArray is invoked.
+class EMemberNotExisting <<Exception>> {
+    Thrown when trying to access a
+    non existing member from a
+    JsonValue of type Object.
 }
 
-class ENoInstanceExists <<Exception>> {
-    Thrown when trying to get a content
-    reference from an empty Json object.
-}
-
-JsonObject -down[hidden]- EJsonException
+JsonValue -down[hidden]- EJsonException
 
 EJsonException <|-- EJsonParseError
 EJsonException <|-- EJsonTypeError
 EJsonException <|-- EJsonNumberError
-EJsonException <|-- EInstanceExists
-EJsonException <|-- ENoInstanceExists
+EJsonException <|-- EMemberNotExisting
 
-std::string <|-- JsonString
-JsonString o-- Json
+std::string <|-- JsonDecoder
 
-Variant <|-- JsonValue
-JsonValue <|-- JsonArray
-JsonValue <|-- JsonObject
-JsonValue o-- Json
-JsonArray o-- JsonValue
-JsonObject o-- JsonValue
+rsp.utils.Variant <|-- JsonValue
+JsonDecoder o-- JsonValue
+JsonTypes o-- JsonValue
 
 }
 

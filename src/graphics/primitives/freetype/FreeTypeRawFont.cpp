@@ -8,6 +8,8 @@
  * \author      Steffen Brummer
  */
 
+#ifdef USE_FREETYPE
+
 #include "FreeTypeRawFont.h"
 #include <graphics/primitives/Font.h>
 #include <logging/Logger.h>
@@ -16,7 +18,15 @@
 #include FT_FREETYPE_H
 #include FT_OUTLINE_H
 
+using namespace rsp::logging;
+
 namespace rsp::graphics {
+
+
+std::unique_ptr<FontRawInterface> Font::MakePimpl(const std::string &arFontName)
+{
+    return std::make_unique<FreeTypeRawFont>(arFontName);
+}
 
 
 static const char* FreeTypeErrorToString(int aCode)
@@ -125,7 +135,7 @@ void FreeTypeRawFont::SetSize(int aWidthPx, int aHeightPx)
         THROW_WITH_BACKTRACE2(FontException, "FT_Set_Pixel_Sizes() failed", error);
     }
     mSizePx = std::min(aWidthPx, aHeightPx);
-    DLOG("Font.SetSize(" << aWidthPx << ", " << aHeightPx << ") -> " << mSizePx);
+    Logger::GetDefault().Debug() << "Font.SetSize(" << aWidthPx << ", " << aHeightPx << ") -> " << mSizePx << std::endl;
 }
 
 void FreeTypeRawFont::SetStyle(Font::Styles aStyle)
@@ -228,4 +238,5 @@ std::u32string FreeTypeRawFont::stringToU32(const std::string &arText) const
 
 }
 
+#endif /* USE_FREETYPE */
 

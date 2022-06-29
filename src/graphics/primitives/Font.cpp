@@ -15,10 +15,6 @@
 #include <graphics/primitives/FontRawInterface.h>
 #include <logging/Logger.h>
 
-#ifdef USE_FREETYPE
-    #include "freetype/FreeTypeRawFont.h"
-#endif /* USE_FREETYPE */
-
 namespace rsp::graphics {
 
 
@@ -42,20 +38,15 @@ std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph)
 
 void Font::RegisterFont(const char *apFileName)
 {
-#ifdef USE_FREETYPE
-    FreeTypeLibrary::Get().RegisterFont(apFileName);
-#endif
+    FontRawInterface::RegisterFont(apFileName);
 }
 
 
 Font::Font(const std::string &arFontName, Styles aStyle)
-    : mColor(Color::White)
+    : mColor(Color::White),
+      mpImpl(MakePimpl(arFontName))
 {
-#ifdef USE_FREETYPE
-    mpImpl = std::make_unique<FreeTypeRawFont>(arFontName, 0);
     SetStyle(aStyle);
-#endif
-    ASSERT(mpImpl);
 }
 
 Font::~Font()

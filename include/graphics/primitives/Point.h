@@ -32,7 +32,7 @@ class Point
     /**
      * \brief Construct an empty point
      */
-    inline Point()
+    Point() noexcept
         : mX(0), mY(0)
     {
     }
@@ -43,8 +43,13 @@ class Point
      * \param aX
      * \param aY
      */
-    inline Point(int aX, int aY)
+    Point(int aX, int aY) noexcept
         : mX(aX), mY(aY)
+    {
+    }
+
+    Point(unsigned int aX, unsigned int aY) noexcept
+        : mX(static_cast<int>(aX)), mY(static_cast<int>(aY))
     {
     }
 
@@ -53,7 +58,7 @@ class Point
      *
      * \param aPoint
      */
-    inline Point(const Point &aPoint)
+    Point(const Point &aPoint) noexcept
         : mX(aPoint.mX), mY(aPoint.mY)
     {
     }
@@ -64,7 +69,7 @@ class Point
      * \param aPoint
      * \return self
      */
-    inline Point &operator=(const Point &arPoint)
+    Point &operator=(const Point &arPoint) noexcept
     {
         if (&arPoint != this) {
             mX = arPoint.mX;
@@ -79,11 +84,25 @@ class Point
      * \param arPoint
      * \return self
      */
-    inline Point& operator+=(const Point &arPoint)
+    Point& operator+=(const Point &arPoint) noexcept
     {
         mX += arPoint.mX;
         mY += arPoint.mY;
         return *this;
+    }
+
+    Point operator+(const Point &arPoint) const noexcept
+    {
+        Point result(mX, mY);
+        result += arPoint;
+        return result;
+    }
+
+    Point operator-(const Point &arPoint) const noexcept
+    {
+        Point result(mX, mY);
+        result -= arPoint;
+        return result;
     }
 
     /**
@@ -92,7 +111,7 @@ class Point
      * \param arPoint
      * \return self
      */
-    inline Point& operator-=(const Point &arPoint)
+    Point& operator-=(const Point &arPoint) noexcept
     {
         mX -= arPoint.mX;
         mY -= arPoint.mY;
@@ -104,7 +123,7 @@ class Point
      * \param aPoint
      * \return True if equal
      */
-    inline bool operator==(const Point &aPoint)
+    bool operator==(const Point &aPoint) const noexcept
     {
         return (mX == aPoint.mX) && (mY == aPoint.mY);
     }
@@ -114,7 +133,7 @@ class Point
      * \param aPoint
      * \return True if not equal
      */
-    inline bool operator!=(const Point &aPoint)
+    bool operator!=(const Point &aPoint) noexcept
     {
         return (mX != aPoint.mX) || (mY != aPoint.mY);
     }
@@ -123,7 +142,7 @@ class Point
      * \brief Gets the value of the X coordinate
      * \return Integer
      */
-    inline int GetX() const
+    int GetX() const noexcept
     {
         return mX;
     }
@@ -132,7 +151,7 @@ class Point
      * \brief Set the value of the X coordinate
      * \param aValue
      */
-    inline void SetX(int aValue)
+    void SetX(int aValue) noexcept
     {
         mX = aValue;
     }
@@ -141,7 +160,7 @@ class Point
      * \brief Gets the value of the Y coordinate
      * \return Integer
      */
-    inline int GetY() const
+    int GetY() const noexcept
     {
         return mY;
     }
@@ -150,7 +169,7 @@ class Point
      * \brief Set the value of the Y coordinate
      * \param aValue
      */
-    inline void SetY(int aValue)
+    void SetY(int aValue) noexcept
     {
         mY = aValue;
     }

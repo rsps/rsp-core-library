@@ -38,6 +38,13 @@ public:
     virtual ~FileIO();
 
     /**
+     * Get the name of the current file.
+     *
+     * \return string
+     */
+    const std::string& GetFileName() { return mFileName; }
+
+    /**
      * Opens the given file or create it if aPersmissions are given.
      * Open modes can be in, out and inout.
      *
@@ -63,13 +70,6 @@ public:
     }
 
     /**
-     * Check if end of file.
-     *
-     * \return True if at end of file.
-     */
-    bool IsEOF();
-
-    /**
      * Move the cursor to the given position.
      *
      * \param aOffset
@@ -83,18 +83,32 @@ public:
      *
      * \param aBuffer
      * \param aNumberOfBytesToRead
-     * \return
+     * \return Number of bytes read. Can be zero if no more bytes are currently available
      */
     std::size_t Read(void *apBuffer, std::size_t aNumberOfBytesToRead);
+
+    /**
+     * \brief Read exact amount of bytes into buffer
+     * \param apBuffer
+     * \param aNumberOfBytesToRead
+     */
+    void ExactRead(void *apBuffer, std::size_t aNumberOfBytesToRead);
 
     /**
      * Write an amount of bytes from the buffer to the file.
      *
      * \param aBuffer
      * \param aNumberOfBytesToWrite
-     * \return
+     * \return Number of bytes written.
      */
     std::size_t Write(const void *apBuffer, std::size_t aNumberOfBytesToWrite);
+
+    /**
+     * \brief Write an exact amount of bytes from the buffer to the file.
+     * \param apBuffer
+     * \param aNumberOfBytesToWrite
+     */
+    void ExactWrite(const void *apBuffer, std::size_t aNumberOfBytesToWrite);
 
     /**
      * Get the rest of the current line.

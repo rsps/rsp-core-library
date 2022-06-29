@@ -20,50 +20,52 @@
 namespace rsp::utils
 {
 
-class CoreException : public std::runtime_error
+class CoreException: public std::runtime_error
 {
-  public:
+public:
     explicit CoreException(const char *aMsg)
-        : std::runtime_error(""),
-          mMsg(aMsg)
+        : std::runtime_error(""), mMsg(aMsg)
     {
     }
     CoreException(const std::string &arMsg)
-        : std::runtime_error(""),
-          mMsg(arMsg)
+        : std::runtime_error(""), mMsg(arMsg)
     {
     }
 
-    const char *what() const noexcept override
+    const char* what() const noexcept override
     {
         return mMsg.c_str();
     }
 
-  protected:
+protected:
     std::string mMsg;
 };
 
-class NotImplementedException : public CoreException
+class NotImplementedException: public CoreException
 {
-  public:
+public:
     explicit NotImplementedException(const char *aMsg)
         : CoreException(aMsg)
     {
     }
+    NotImplementedException(const std::string &arMsg)
+        : CoreException(arMsg)
+    {
+    }
 };
 
-class NotSetException : public CoreException
+class NotSetException: public CoreException
 {
-  public:
+public:
     explicit NotSetException(const char *aMsg)
         : CoreException(aMsg)
     {
     }
 };
 
-class AssertException : public CoreException
+class AssertException: public CoreException
 {
-  public:
+public:
     explicit AssertException(const char *aMsg)
         : CoreException(aMsg)
     {
@@ -79,24 +81,40 @@ class AssertException : public CoreException
 #define ASSERT(a)
 #endif
 
-class ApplicationException : public CoreException {
+class ApplicationException: public CoreException
+{
 public:
-    explicit ApplicationException(const char* aMsg) : CoreException(aMsg) {}
+    explicit ApplicationException(const char *aMsg)
+        : CoreException(aMsg)
+    {
+    }
 };
 
-class ESingletonViolation: public ApplicationException {
+class ESingletonViolation: public ApplicationException
+{
 public:
-    explicit ESingletonViolation() : ApplicationException("Singleton object already exist") {}
+    explicit ESingletonViolation()
+        : ApplicationException("Singleton object already exist")
+    {
+    }
 };
 
-class ENoInstance: public ApplicationException {
+class ENoInstance: public ApplicationException
+{
 public:
-    explicit ENoInstance() : ApplicationException("Singleton object has not been created") {}
+    explicit ENoInstance()
+        : ApplicationException("Singleton object has not been created")
+    {
+    }
 };
 
-class EMissingArgument : public std::invalid_argument {
+class EMissingArgument: public std::invalid_argument
+{
 public:
-    explicit EMissingArgument() : std::invalid_argument("Missing argument") {}
+    explicit EMissingArgument()
+        : std::invalid_argument("Missing argument")
+    {
+    }
 };
 
 } /* namespace rsp::utils */

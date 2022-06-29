@@ -8,6 +8,7 @@
  * \author      Steffen Brummer
  */
 
+#include <sstream>
 #include <cstdio>
 #include <utils/Variant.h>
 #include <logging/Logger.h>
@@ -37,7 +38,7 @@ Variant::Variant(Variant &&arOther)
       mString(arOther.mString)
 {
     JLOG("Variant move constructor");
-    arOther.Clear();
+    arOther.mType = Types::Null;
 }
 
 Variant& Variant::operator=(const Variant &arOther)
@@ -58,7 +59,7 @@ Variant& Variant::operator=(Variant &&arOther)
         mType = arOther.mType;
         mPointer = std::move(arOther.mPointer);
         mString = std::move(arOther.mString);
-        arOther.Clear();
+        arOther.mType = Types::Null;
     }
     return *this;
 }
@@ -90,6 +91,12 @@ Variant::Variant(std::uint64_t aValue)
 
 Variant::Variant(std::uint32_t aValue)
     : mType(Types::Uint32),
+      mInt(aValue)
+{
+}
+
+Variant::Variant(std::uint16_t aValue)
+    : mType(Types::Uint16),
       mInt(aValue)
 {
 }
@@ -159,6 +166,13 @@ Variant& Variant::operator =(std::uint64_t aValue)
 Variant& Variant::operator =(std::uint32_t aValue)
 {
     mType = Types::Uint32;
+    mInt = aValue;
+    return *this;
+}
+
+Variant& Variant::operator =(std::uint16_t aValue)
+{
+    mType = Types::Uint16;
     mInt = aValue;
     return *this;
 }
@@ -294,6 +308,18 @@ double Variant::AsDouble() const
     return 0.0f;
 }
 
+
+template <typename T>
+std::string to_string_with_high_precision(const T a_value)
+{
+    const unsigned int digits = std::numeric_limits<T>::max_digits10;
+    std::ostringstream out;
+    out.precision(digits);
+//    out << std::fixed;
+    out << a_value;
+    return out.str();
+}
+
 std::string Variant::AsString() const
 {
     switch (mType) {
@@ -307,11 +333,12 @@ std::string Variant::AsString() const
         case Types::Int64:
         case Types::Uint64:
         case Types::Uint32:
+        case Types::Uint16:
             return std::to_string(mInt);
 
         case Types::Float:
         case Types::Double:
-            return std::to_string(mDouble);
+            return to_string_with_high_precision(mDouble);
 
         case Types::Pointer:
         {

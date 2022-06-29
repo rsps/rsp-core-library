@@ -24,6 +24,31 @@ All source files shall include the following file header:
 ```
 **Note:** To add \license tag to doxygen, please see: https://stackoverflow.com/questions/12353409/doxygen-and-license-copyright-informations
 
+## Prerequisites
+
+The library uses libraries for OpenSSL, Curl and FreeType2 when building to a Linux platform.
+The libraries should be available for the linker to build the program.
+
+To install those libraries on on Debian based systems, execute the following in a terminal:
+
+```
+sudo apt install libssl-dev libcurl4 libcurl4-openssl-dev libfreetype-dev
+```
+
+The code is using some C++20 features, so make sure to use a recent compiler to build the project.
+To install GCC-10 and GCC-11 on Ubuntu 20.04:
+
+```
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt install gcc-10 g++-10 gcc-11 g++-11
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
+sudo update-alternatives --config gcc
+```
+
+Also cmake should be at least version 3.18.
+
+
 ## Build and tests
 
 To build the library and accompanied test, simply go into the build directory and run `cmake ..`:

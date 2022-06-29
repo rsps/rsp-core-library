@@ -12,24 +12,20 @@
 #include <graphics/primitives/Font.h>
 #include <graphics/primitives/Rect.h>
 #include <graphics/primitives/Text.h>
-#include <graphics/primitives/freetype/FreeTypeLibrary.h>
+#include <TestHelpers.h>
 
 using namespace rsp::graphics;
 
 TEST_CASE("Font Primitive")
 {
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
+
     const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
     const char* cFontName = "Exo 2";
 
-    SUBCASE("Load Library") {
-        FreeTypeLibrary::Get();
-        FT_Library ft;
-        CHECK_NOTHROW(ft = FreeTypeLibrary::Get()); // Call operator
-        CHECK(ft);
-    }
-
     SUBCASE("Load Font") {
-        CHECK_NOTHROW(FreeTypeLibrary::Get().RegisterFont(cFontFile));
+        CHECK_NOTHROW(Font::RegisterFont(cFontFile));
     }
 
     SUBCASE("Get Single Symbol Mask") {

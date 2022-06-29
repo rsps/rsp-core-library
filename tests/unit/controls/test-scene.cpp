@@ -15,8 +15,9 @@
 #include <posix/FileSystem.h>
 #include <doctest.h>
 
-#include "../../helpers/eventTypes/ClickedEvent.h"
-#include "../../helpers/scenes/Scenes.h"
+#include <eventTypes/ClickedEvent.h>
+#include <scenes/Scenes.h>
+#include <TestHelpers.h>
 
 using namespace rsp::graphics;
 using namespace rsp::messaging;
@@ -43,6 +44,9 @@ class TestSub : public Subscriber<ClickTopics>
 
 TEST_CASE("Scene Test")
 {
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
+
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());

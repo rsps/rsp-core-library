@@ -8,13 +8,22 @@
  * \author      Steffen Brummer
  */
 
+#ifdef USE_FREETYPE
+
 #include "FreeTypeLibrary.h"
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
+#include <graphics/primitives/FontRawInterface.h>
 
 using namespace rsp::utils;
+using namespace rsp::logging;
 
 namespace rsp::graphics {
+
+void FontRawInterface::RegisterFont(std::string_view aFileName)
+{
+    FreeTypeLibrary::Get().RegisterFont(std::string(aFileName));
+}
 
 FreeTypeLibrary::FreeTypeLibrary(void)
 {
@@ -37,7 +46,7 @@ FreeTypeLibrary& FreeTypeLibrary::Get()
 
 FT_Face FreeTypeLibrary::CreateFontFace(const std::string &arFontName, Font::Styles aStyle)
 {
-    DLOG("Creating font " << arFontName << " with style " << static_cast<int>(aStyle));
+    Logger::GetDefault().Info() << "Creating font " << arFontName << " with style " << static_cast<int>(aStyle) << std::endl;
 
     auto it = mFontSets.find(arFontName);
     if (it == mFontSets.end()) {
@@ -89,13 +98,16 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
         info.Id = id;
         info.StyleName = face->style_name;
         Font::Styles style{};
+        bool ignore = true;
 
         if (face->face_index == 0) {
+            ignore = false;
             if (face->style_flags & FT_STYLE_FLAG_ITALIC) {
                 style = Font::Styles::Italic;
             }
         }
         else if (StrUtils::StartsWith(face->style_name, "Bold")) {
+            ignore = false;
             if (face->style_flags & FT_STYLE_FLAG_ITALIC) {
                 style = Font::Styles::BoldItalic;
             }
@@ -104,8 +116,13 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
             }
         }
 
-        std::clog << "Adding font " << face->family_name << ", " << face->style_name << " " << static_cast<int>(style) << std::endl;
-        mFontSets[face->family_name][style] = info;
+        if (ignore) {
+            Logger::GetDefault().Debug() << "Ignoring font " << face->family_name << ", " << face->style_name << std::endl;
+        }
+        else {
+            Logger::GetDefault().Debug() << "Adding font " << face->family_name << ", " << face->style_name << " " << static_cast<int>(style) << std::endl;
+            mFontSets[face->family_name][style] = info;
+        }
 
 #ifdef DEBUG_FONTS
         std::cout << "num_faces: " << face->num_faces << "\n"
@@ -137,3 +154,5 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
 }
 
 } // namespace rsp::graphics
+
+#endif /* USE_FREETYPE */

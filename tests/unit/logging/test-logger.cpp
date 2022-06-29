@@ -65,7 +65,7 @@ TEST_CASE("Testing the Logger class") {
     logging::Logger log(true);
 
     CHECK_THROWS_AS(logging::LoggerInterface::GetDefault(), const utils::NotSetException &);
-    logging::LoggerInterface::SetDefault(log);
+    logging::LoggerInterface::SetDefault(&log);
 
     log.AddLogWriter(std::make_shared<logging::FileLogWriter>(cFileName, logging::LogLevel::Info));
     log.AddLogWriter(std::make_shared<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors));

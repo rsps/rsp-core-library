@@ -2,15 +2,25 @@ cmake_minimum_required (VERSION 3.16)
 
 # https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
 
-# Usage: cmake [-DRELEASE_BUILD=ON] [-DPLATFORM_P05=ON] [FREETYPE_FONTS=OFF] ..
+# Usage: cmake [-DRELEASE_BUILD=ON] [-DPLATFORM_P05=ON] [FREETYPE_FONTS=OFF] [-DOPENSSL_CRYPTO=OFF] ..
 
 OPTION(RELEASE_BUILD "Set to turn off debug output" OFF) # Disabled by default.
-OPTION(PLATFORM_P05 "Set to build for P05 ARM platform" OFF) # Disabled by default.
+OPTION(ARC_ARM "Set to cross-compile for ARM CPU" OFF) # Disabled by default.
 OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
+OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
+OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
 
-if(PLATFORM_P05)
+if(ARCH_ARM)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
 endif()
+
+#set(CMAKE_C_COMPILER "gcc-11")
+#set(CMAKE_CXX_COMPILER "g++-11")
+
+find_program(GCC_TOOL NAMES g++-latest g++-HEAD g++-11)
+execute_process(COMMAND ${GCC_TOOL} --version OUTPUT_VARIABLE GCC_TOOL_VERSION ERROR_VARIABLE GCC_TOOL_VERSION)
+string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" GCC_TOOL_VERSION "${GCC_TOOL_VERSION}")
+message(STATUS "🔖 GCC ${GCC_TOOL_VERSION} (${GCC_TOOL})")
 
 project (rsp-core-lib)
 
@@ -25,10 +35,6 @@ configure_file (
     "${PROJECT_BINARY_DIR}/src/version-def.h"
 )
 
-# Include CURL
-set(CURL_LIBRARY "-lcurl") 
-find_package(CURL 7.33 REQUIRED) 
-include_directories(${CURL_INCLUDE_DIR})
 
 set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set (THREADS_PREFER_PTHREAD_FLAG TRUE)
@@ -40,29 +46,47 @@ set (CMAKE_CXX_STANDARD 20)
 # locations on all platforms.
 include(GNUInstallDirs)
 
-#include_directories( ${FREETYPE2_INCLUDE_DIRS} )
-#SET( CMAKE_C_FLAGS "${FREETYPE2_CFLAGS_OTHER}" )
-
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 
 add_library("rsp-core-lib" STATIC)
 
 if (FREETYPE_FONTS)
-find_package(Freetype REQUIRED)
-set(FREETYPE_BUILD_OPTIONS -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+    find_package(Freetype REQUIRED)
+    set(FREETYPE_BUILD_OPTIONS -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+    set(FONT_LIB Freetype::Freetype)
 endif()
+
+if (NET_LIBCURL)
+#    set(CURL_LIBRARY "-lcurl") 
+    find_package(CURL 7.33 REQUIRED)
+    set(LIBCURL_BUILD_OPTIONS -DUSE_CURL)
+    set(NETWORK_LIB CURL::libcurl)
+#    include_directories(${CURL_INCLUDE_DIR})
+endif()
+
+if (OPENSSL_CRYPTO)
+    find_package(OpenSSL REQUIRED)
+    set(OPENSSL_BUILD_OPTIONS -DUSE_OPENSSL)
+    set(CRYPTO_LIB OpenSSL::Crypto)
+endif()
+
+target_link_libraries ("rsp-core-lib"
+    ${FONT_LIB}
+    ${CRYPTO_LIB}
+    ${NETWORK_LIB}
+)
 
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
 # paths.
 target_include_directories(rsp-core-lib
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE
-        src
-        ${CMAKE_CURRENT_BINARY_DIR}/src
+        ${PROJECT_BINARY_DIR}/src
         ${FREETYPE_INCLUDE_DIRS}
+        ${CURL_INCLUDE_DIRS}
 )
 
 set(GOOD_COMPILER_OPTIONS -pedantic -Wall -Wextra -Wold-style-cast
@@ -78,11 +102,18 @@ target_compile_options(rsp-core-lib PRIVATE
     ${GOOD_COMPILER_OPTIONS}
     -Wshadow
     ${FREETYPE_BUILD_OPTIONS}
+    ${OPENSSL_BUILD_OPTIONS}
+    ${LIBCURL_BUILD_OPTIONS}
 )
 
 if (NOT RELEASE_BUILD)
 target_compile_options(rsp-core-lib PRIVATE
-    -DDEBUG_LOG)
+    -DDEBUG_LOG
+)
+else()
+target_compile_options(rsp-core-lib PRIVATE
+    -O3 -Wall
+)
 endif()
 
 add_subdirectory(src)
@@ -91,60 +122,7 @@ add_subdirectory(src)
 # Rules to make tests
 #-----------------------
 
-# Include external projects Doctest from github.
- 
-include(ExternalProject)
-find_package(Git REQUIRED)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-ExternalProject_Add(
-    Doctest
-    
-    SOURCE_DIR "${CMAKE_SOURCE_DIR}/ext-libs/doctest"
-    GIT_REPOSITORY https://github.com/onqtam/doctest.git
-    GIT_TAG "2.4.6"
-    TIMEOUT 10
-
-    UPDATE_COMMAND ${GIT_EXECUTABLE} checkout ${GIT_TAG}
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-    LOG_DOWNLOAD ON
-)
-ExternalProject_Get_Property(Doctest source_dir)
-set(DOCTEST_INCLUDE_DIR ${source_dir}/doctest CACHE INTERNAL "Path to include folder for doctest")
-
-enable_testing()
-
-add_executable("rsp-core-lib-test")
 add_subdirectory(tests)
-add_dependencies("rsp-core-lib-test" Doctest)
-target_include_directories("rsp-core-lib-test"
-    PUBLIC
-        ${DOCTEST_INCLUDE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE
-        src
-)
-# Disable shadow warning to silence doctest...
-target_compile_options(rsp-core-lib-test PRIVATE
-    ${GOOD_COMPILER_OPTIONS}
-    ${FREETYPE_BUILD_OPTIONS}
-)
 
-if (NOT RELEASE_BUILD)
-target_compile_options(rsp-core-lib-test PRIVATE 
-    -DGFX_FPS=10)
-endif()
-
-#get_target_property(INCLUDE_DIRS "rsp-core-lib-test" INCLUDE_DIRECTORIES)
-#message(STATUS "IncDirs: ${INCLUDE_DIRS}")
-
-target_link_libraries ("rsp-core-lib-test"
-    rsp-core-lib
-    Threads::Threads
-    Freetype::Freetype
-    ${CURL_LIBRARIES}
-)
-#target_link_libraries(demo ${FREETYPE_LIBRARIES})
-
-add_test("tests" "rsp-core-lib-test")

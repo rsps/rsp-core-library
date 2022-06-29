@@ -50,7 +50,7 @@ public:
      * \enum Types
      * \brief Type declaration used for each native type.
      */
-    enum class Types {Null, Bool, Int, Int64, Uint64, Uint32, Float, Double, Pointer, String};
+    enum class Types {Null, Bool, Int, Int64, Uint64, Uint32, Uint16, Float, Double, Pointer, String};
 
     /**
      * \fn  Variant()
@@ -75,6 +75,7 @@ public:
     Variant(std::int64_t aValue);
     Variant(std::uint64_t aValue);
     Variant(std::uint32_t aValue);
+    Variant(std::uint16_t aValue);
     Variant(float aValue);
     Variant(double aValue);
     Variant(void* apValue);
@@ -115,6 +116,7 @@ public:
     operator std::int64_t() const      { return AsInt(); }
     operator std::uint64_t() const     { return static_cast<std::uint64_t>(AsInt()); }
     operator std::uint32_t() const     { return static_cast<std::uint32_t>(AsInt()); }
+    operator std::uint16_t() const     { return static_cast<std::uint16_t>(AsInt()); }
     operator float() const             { return static_cast<float>(AsDouble()); }
     operator double() const            { return AsDouble(); }
     operator void*() const             { return AsPointer(); }
@@ -133,6 +135,7 @@ public:
     Variant& operator =(std::int64_t aValue);
     Variant& operator =(std::uint64_t aValue);
     Variant& operator =(std::uint32_t aValue);
+    Variant& operator =(std::uint16_t aValue);
     Variant& operator =(float aValue);
     Variant& operator =(double aValue);
     Variant& operator =(void* apValue);
@@ -148,6 +151,7 @@ public:
     bool AsBool() const;
     std::int64_t AsInt() const;
     double AsDouble() const;
+    float AsFloat() const { return static_cast<float>(AsDouble()); }
     std::string AsString() const;
     void* AsPointer() const;
 
