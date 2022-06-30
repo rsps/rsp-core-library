@@ -1,32 +1,27 @@
-/*
+/**
  * \copyright    Copyright 2022 RSP Systems A/S. All rights reserved.
  * \license      Mozilla Public License 2.0
  * \author:      Jesper Madsen
- * Created Date:  Tuesday, May 17th 2022, 8:49:44 am
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- * HISTORY:
- * Date      	By	Comments
- * ----------	---	----------------------------------------------------------
  */
 
-#include "CurlHttpRequest.h"
 #include <iostream>
 #include <map>
 #include <iterator>
+#include "CurlHttpRequest.h"
+#include "Exceptions.h"
 
-using namespace rsp::network::http;
-using namespace rsp::network::exceptions;
+using namespace rsp::network;
 
-namespace rsp::network::http::curl
+namespace rsp::network::curl
 {
 
 CurlHttpRequest::CurlHttpRequest()
     : mResponse(*this), mRequestOptions()
 {
-    checkVersion();
 }
 
 size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, std::string *data)
@@ -85,21 +80,17 @@ IHttpResponse& CurlHttpRequest::Execute()
 {
     checkRequestOptions(mRequestOptions);
 
-    auto curl = curl_easy_init();
-    if (!curl) {
-        THROW_WITH_BACKTRACE1(ECurlError, "Curl initialization failed.");
-    }
+    setCurlOption(CURLOPT_URL, std::string(mRequestOptions.BaseUrl + mRequestOptions.Uri).c_str());
 
-    curl_easy_setopt(curl, CURLOPT_URL, std::string(mRequestOptions.BaseUrl + mRequestOptions.Uri).c_str());
     switch (mRequestOptions.RequestType) {
         case HttpRequestType::GET:
             break;
 
         case HttpRequestType::POST:
-            curl_easy_setopt(curl, CURLOPT_POST, 1L);
+            setCurlOption(CURLOPT_POST, 1L);
             if (mRequestOptions.Body.size() > 0) {
-                curl_easy_setopt(curl, CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
-                curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
+                setCurlOption(CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
+                setCurlOption(CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
             }
             break;
 
@@ -108,20 +99,20 @@ IHttpResponse& CurlHttpRequest::Execute()
     }
 
     //Redirect configuration
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, _followRedirects);
-    curl_easy_setopt(curl, CURLOPT_MAXREDIRS, _maxRedirects);
+    setCurlOption(CURLOPT_FOLLOWLOCATION, _followRedirects);
+    setCurlOption(CURLOPT_MAXREDIRS, _maxRedirects);
 
     //Progress and keep-alive configuration
-    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-    curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+    setCurlOption(CURLOPT_NOPROGRESS, 1L);
+    setCurlOption(CURLOPT_TCP_KEEPALIVE, 1L);
 
     //Setup callbacks functions for Response object
     std::string response_string;
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_string);
+    setCurlOption(CURLOPT_WRITEFUNCTION, writeFunction);
+    setCurlOption(CURLOPT_WRITEDATA, &response_string);
 
-    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, headerFunction);
-    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &mResponse);
+    setCurlOption(CURLOPT_HEADERFUNCTION, headerFunction);
+    setCurlOption(CURLOPT_HEADERDATA, &mResponse);
 
     //Set Request headers
     std::string header;
@@ -131,29 +122,24 @@ IHttpResponse& CurlHttpRequest::Execute()
         header = iter->first + ": " + iter->second;
         headers = curl_slist_append(headers, header.c_str());
     }
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    setCurlOption(CURLOPT_HTTPHEADER, headers);
 
     //Set basic auth
     if (mRequestOptions.BasicAuthUsername.length() > 0) {
-        curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_easy_setopt(curl, CURLOPT_USERPWD,
+        setCurlOption(CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        setCurlOption(CURLOPT_USERPWD,
             std::string(mRequestOptions.BasicAuthUsername + ":" + mRequestOptions.BasicAuthPassword).c_str());
     }
 
     //Curl and evaluate
-    auto res = curl_easy_perform(curl);
+    auto res = curl_easy_perform(mpCurl);
     if (res != CURLE_OK) {
-        THROW_WITH_BACKTRACE1(ECurlError, "Curl request failed with errorcode : " + *curl_easy_strerror(res));
-    }
-    else {
-        int64_t resp_code = 0;
-        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &resp_code);
-        mResponse.SetBody(response_string).SetStatusCode(reinterpret_cast<int&>(resp_code));
+        THROW_WITH_BACKTRACE2(ECurlError, "curl_easy_perform() failed.", res);
     }
 
-    //Cleanup
-    curl_easy_cleanup(curl);
-    curl_global_cleanup();
+    long resp_code = 0;
+    getCurlInfo(CURLINFO_RESPONSE_CODE, &resp_code);
+    mResponse.PickBody(response_string).SetStatusCode(static_cast<int>(resp_code));
 
     return mResponse;
 }
@@ -163,14 +149,6 @@ HttpRequestOptions& CurlHttpRequest::GetOptions()
     return mRequestOptions;
 }
 
-void CurlHttpRequest::checkVersion()
-{
-    curl_version_info_data *d = curl_version_info(CURLVERSION_NOW);
-    if (d->version_num < minimumCurlVersion()) {
-        THROW_WITH_BACKTRACE1(ECurlVersion, "Wrong libcurl version");
-    }
-}
-
 void CurlHttpRequest::checkRequestOptions(HttpRequestOptions aOpts)
 {
     if (aOpts.RequestType == HttpRequestType::NONE || aOpts.BaseUrl == "") {
@@ -178,14 +156,14 @@ void CurlHttpRequest::checkRequestOptions(HttpRequestOptions aOpts)
     }
 }
 
-} // namespace rsp::network::http::curl
+} // namespace rsp::network::http
 
 /**
  * \brief Factory function to decouple depency
  *
  * \return IHttpRequest*
  */
-IHttpRequest* rsp::network::http::HttpRequest::MakeRequest()
+IHttpRequest* rsp::network::HttpRequest::MakeRequest()
 {
-    return new rsp::network::http::curl::CurlHttpRequest();
+    return new rsp::network::curl::CurlHttpRequest();
 }

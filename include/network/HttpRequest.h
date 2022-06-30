@@ -18,45 +18,47 @@
 #include <network/IHttpRequest.h>
 #include <network/HttpResponse.h>
 
-namespace rsp::network::http
+namespace rsp::network {
+
+class HttpRequest: public IHttpRequest
 {
-    
-    class HttpRequest : public IHttpRequest
+public:
+    HttpRequest();
+    HttpRequestOptions& GetOptions() override
     {
-    public:
-        HttpRequest();
-        HttpRequestOptions &GetOptions() override
-        {
-            return mPimpl->GetOptions();
-        }
-        IHttpRequest &SetOptions(const HttpRequestOptions opt) override
-        {
-            mPimpl->SetOptions(opt);
-            return *this;
-        }
-        IHttpRequest &SetHeaders(std::map<std::string, std::string> &headers) override
-        {
-            mPimpl->SetHeaders(headers);
-            return *this;
-        }
-        IHttpRequest &SetBody(std::string const &body) override
-        {
-            mPimpl->SetBody(body);
-            return *this;
-        }
-        IHttpResponse &Execute() override
-        {
-            return mPimpl->Execute();
-        };
-        void Execute(std::function<void(IHttpResponse &)> callback) override
-        {
-            mPimpl->Execute(callback);
-        };
-        
-    protected:
-        std::unique_ptr<IHttpRequest> mPimpl;
-        static IHttpRequest *MakeRequest();
-    };
-}
+        return mPimpl->GetOptions();
+    }
+    IHttpRequest& SetOptions(const HttpRequestOptions opt) override
+    {
+        mPimpl->SetOptions(opt);
+        return *this;
+    }
+    IHttpRequest& SetHeaders(std::map<std::string, std::string> &headers) override
+    {
+        mPimpl->SetHeaders(headers);
+        return *this;
+    }
+    IHttpRequest& SetBody(std::string const &body) override
+    {
+        mPimpl->SetBody(body);
+        return *this;
+    }
+    IHttpResponse& Execute() override
+    {
+        return mPimpl->Execute();
+    }
+    ;
+    void Execute(std::function<void(IHttpResponse&)> callback) override
+    {
+        mPimpl->Execute(callback);
+    }
+    ;
+
+protected:
+    std::unique_ptr<IHttpRequest> mPimpl;
+    static IHttpRequest* MakeRequest();
+};
+
+} // rsp::network
 
 #endif

@@ -18,8 +18,9 @@
 #include <utils/CoreException.h>
 #include <string>
 
-namespace rsp::network::exceptions
+namespace rsp::network
 {
+
 /**
  * \class NetworkException
  *
@@ -50,5 +51,6 @@ public:
     }
 };
 
-}// namespace rsp::network::exceptions
+}// namespace rsp::network
+
 #endif //NETWORKEXCEPTION_H

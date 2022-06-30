@@ -3,7 +3,7 @@
  * \license      Mozilla Public License 2.0
  * \author:      Jesper Madsen
  * Created Date:  Tuesday, May 17th 2022, 8:49:44 am
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -20,14 +20,20 @@
 
 #include <memory>
 
-namespace rsp::network::http {  
-class IHttpSession {
-    public:
-        virtual IHttpRequest& GetDefaultOptions();
-        virtual IHttpRequest& MakeRequest();
-        virtual IHttpRequest& MakeRequest(HttpRequestOptions options);
-        virtual ~IHttpSession(){};
+namespace rsp::network {
+
+class IHttpSession
+{
+public:
+    virtual IHttpRequest& GetDefaultOptions();
+    virtual IHttpRequest& MakeRequest();
+    virtual IHttpRequest& MakeRequest(HttpRequestOptions options);
+    virtual ~IHttpSession()
+    {
+    }
+    ;
 };
-}
+
+} // rsp::network
 
 #endif

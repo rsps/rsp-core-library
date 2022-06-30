@@ -17,7 +17,7 @@
 #include <sstream>
 
 using namespace rsp::logging;
-using namespace rsp::network::http;
+using namespace rsp::network;
 using namespace rsp::utils::AnsiEscapeCodes;
 
 TEST_CASE("Network")
@@ -38,14 +38,14 @@ TEST_CASE("Network")
         request.SetOptions(opt);
 
         IHttpResponse &resp = request.Execute();
-        auto headers = resp.GetHeaders();
+//        auto headers = resp.GetHeaders();
 
-        std::stringstream ss;
-        for (const auto& x : headers) {
-            ss << ec::fg::Green << x.first << ": " << ec::fg::LightCyan << x.second << "\n";
-        }
+//        std::stringstream ss;
+//        for (const auto& x : headers) {
+//            ss << ec::fg::Green << x.first << ": " << ec::fg::LightCyan << x.second << "\n";
+//        }
 
-        MESSAGE("Headers:\n" << ss.str());
+        MESSAGE("Response:\n" << resp);
 
         CHECK_EQ(resp.GetHeaders()["content-type"], "text/html; charset=utf-8");
 
