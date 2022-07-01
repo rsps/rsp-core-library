@@ -18,6 +18,7 @@ target_include_directories("rsp-core-lib-test"
         ${doctest_SOURCE_DIR}/doctest
         ${PROJECT_SOURCE_DIR}/include
     PRIVATE
+        ${PROJECT_SOURCE_DIR}/src
         ${PROJECT_BINARY_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/helpers
 )

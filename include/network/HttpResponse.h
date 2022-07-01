@@ -1,4 +1,4 @@
-/**
+/*!
  * \copyright        Copyright 2022 RSP Systems A/S. All rights reserved.
  * \license          Mozilla Public License 2.0
  * \author:          Jesper Madsen
@@ -28,36 +28,41 @@ public:
         : mrRequest(arRequest)
     {
     }
-    std::map<std::string, std::string>& GetHeaders() override
+
+    const std::map<std::string, std::string>& GetHeaders() const override
     {
         return mHeaders;
     }
+
     IHttpResponse& SetHeaders(std::map<std::string, std::string> &arHeaders) override
     {
         mHeaders = arHeaders;
         return *this;
     }
+
     IHttpResponse& AddHeader(std::string aKey, std::string aValue) override
     {
         mHeaders[aKey] = aValue;
         return *this;
     }
 
-    int GetStatusCode() override
+    int GetStatusCode() const override
     {
         return mStatusCode;
     }
+
     IHttpResponse& SetStatusCode(int aCode) override
     {
         mStatusCode = aCode;
         return *this;
     }
-    IHttpRequest& GetRequest() override
+
+    const IHttpRequest& GetRequest() const override
     {
         return mrRequest;
     }
 
-    std::string& GetBody() override
+    const std::string& GetBody() const override
     {
         return mBody;
     }

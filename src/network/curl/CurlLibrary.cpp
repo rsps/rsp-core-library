@@ -12,6 +12,15 @@
 #include "CurlLibrary.h"
 #include "Exceptions.h"
 
+namespace rsp::network {
+
+NetworkLibrary& NetworkLibrary::Get()
+{
+    return curl::CurlLibrary::Get();
+}
+
+} // namespace rsp::network
+
 namespace rsp::network::curl {
 
 CurlLibrary& CurlLibrary::Get()
@@ -41,9 +50,12 @@ CurlLibrary::~CurlLibrary()
 
 void CurlLibrary::checkVersion()
 {
-    curl_version_info_data *d = curl_version_info(CURLVERSION_NOW);
-    if (d->version_num < minimumCurlVersion()) {
-        THROW_WITH_BACKTRACE2(ECurlVersion, "Wrong libcurl version", d->version_num);
+    mpVersionInfo = curl_version_info(CURLVERSION_NOW);
+    if (!mpVersionInfo) {
+        THROW_WITH_BACKTRACE1(ECurlError, "curl_version_info() return null");
+    }
+    if (mpVersionInfo->version_num < minimumCurlVersion()) {
+        THROW_WITH_BACKTRACE2(ECurlVersion, "Wrong libcurl version", GetVersion());
     }
 }
 

@@ -13,12 +13,20 @@
 
 namespace rsp::network {
 
-std::ostream& operator<<(std::ostream &arStream, IHttpResponse &resp)
+std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse)
 {
-    std::cout << "Response stream operator called" << std::endl;
-    for (auto &h : resp.GetHeaders())
-        arStream << "[" << h.first << ", " << h.second << "]\n";
-    return arStream << "\n" << "StatusCode: " << resp.GetStatusCode();
+    o <<
+        "Headers:\n";
+
+    for(auto &tuple : arResponse.GetHeaders()) {
+        o << "  " << tuple.first << ": " << tuple.second << "\n";
+    }
+
+    o <<
+        "StatusCode: " << arResponse.GetStatusCode() << "\n"
+        "Body Size: " << arResponse.GetBody().size();
+
+    return o;
 }
 
 }

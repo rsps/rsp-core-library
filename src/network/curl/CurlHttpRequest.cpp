@@ -1,4 +1,4 @@
-/**
+/*!
  * \copyright    Copyright 2022 RSP Systems A/S. All rights reserved.
  * \license      Mozilla Public License 2.0
  * \author:      Jesper Madsen
@@ -20,7 +20,7 @@ namespace rsp::network::curl
 {
 
 CurlHttpRequest::CurlHttpRequest()
-    : mResponse(*this), mRequestOptions()
+    : mResponse(*this)
 {
 }
 
@@ -30,10 +30,8 @@ size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, std:
     return size * nmemb;
 }
 
-size_t CurlHttpRequest::headerFunction(void *data, size_t size, size_t nmemb, void *userdata)
+size_t CurlHttpRequest::headerFunction(void *data, size_t size, size_t nmemb, HttpResponse *apResponse)
 {
-    HttpResponse *r;
-    r = reinterpret_cast<HttpResponse*>(userdata);
     std::string header(reinterpret_cast<char*>(data), size * nmemb);
     size_t seperator = header.find_first_of(':');
     if (std::string::npos == seperator) {
@@ -41,34 +39,33 @@ size_t CurlHttpRequest::headerFunction(void *data, size_t size, size_t nmemb, vo
         if (0 == header.length()) {
             return (size * nmemb); // blank line;
         }
-        r->AddHeader(header, "present");
+        apResponse->AddHeader(header, "present");
     }
     else {
         std::string key = header.substr(0, seperator);
         trim(key);
         std::string value = header.substr(seperator + 1);
         trim(value);
-        r->AddHeader(key, value);
+        apResponse->AddHeader(key, value);
     }
 
     return (size * nmemb);
 }
 
-IHttpRequest& CurlHttpRequest::SetOptions(HttpRequestOptions opts)
+IHttpRequest& CurlHttpRequest::SetOptions(const HttpRequestOptions &arOptions)
 {
-    mRequestOptions = opts;
+    mRequestOptions = arOptions;
     return *this;
 }
 
-IHttpRequest& CurlHttpRequest::SetHeaders(std::map<std::string,std::string> &headers)
+const HttpRequestOptions& CurlHttpRequest::GetOptions() const
 {
-    mRequestOptions.Headers = headers;
-    return *this;
+    return mRequestOptions;
 }
 
-IHttpRequest& CurlHttpRequest::SetBody(std::string const &body)
+IHttpRequest& CurlHttpRequest::SetBody(const std::string &arBody)
 {
-    mRequestOptions.Body = body;
+    mRequestOptions.Body = arBody;
     return *this;
 }
 
@@ -144,15 +141,10 @@ IHttpResponse& CurlHttpRequest::Execute()
     return mResponse;
 }
 
-HttpRequestOptions& CurlHttpRequest::GetOptions()
+void CurlHttpRequest::checkRequestOptions(const HttpRequestOptions &arOpts)
 {
-    return mRequestOptions;
-}
-
-void CurlHttpRequest::checkRequestOptions(HttpRequestOptions aOpts)
-{
-    if (aOpts.RequestType == HttpRequestType::NONE || aOpts.BaseUrl == "") {
-        THROW_WITH_BACKTRACE1(ERequestOptions, "Incorrect request option settings");
+    if (arOpts.RequestType == HttpRequestType::NONE || arOpts.BaseUrl == "") {
+        THROW_WITH_BACKTRACE1(ERequestOptions, "Insufficient request option settings");
     }
 }
 

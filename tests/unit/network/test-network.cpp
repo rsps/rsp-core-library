@@ -9,12 +9,14 @@
  */
 
 #include <doctest.h>
+#include <iostream>
+#include <sstream>
 #include <logging/Logger.h>
 #include <network/IHttpRequest.h>
 #include <network/HttpRequest.h>
+#include <network/NetworkLibrary.h>
+#include <posix/FileSystem.h>
 #include <utils/AnsiEscapeCodes.h>
-#include <iostream>
-#include <sstream>
 
 using namespace rsp::logging;
 using namespace rsp::network;
@@ -22,12 +24,17 @@ using namespace rsp::utils::AnsiEscapeCodes;
 
 TEST_CASE("Network")
 {
-    SUBCASE("CurlVersion"){
-
+    SUBCASE("Library Version"){
+        MESSAGE("Network Library: " << NetworkLibrary::Get().GetLibraryName());
+        MESSAGE("Network Library Version: " << NetworkLibrary::Get().GetVersion());
     }
-    SUBCASE("Online"){
 
+    SUBCASE("Online") {
+        std::string ip;
+        CHECK_NOTHROW(ip = rsp::posix::FileSystem::GetCurrentIpAddress());
+        MESSAGE("IP: " << ip);
     }
+
     SUBCASE("Github"){
         HttpRequest request;
         HttpRequestOptions opt;
@@ -45,13 +52,12 @@ TEST_CASE("Network")
 //            ss << ec::fg::Green << x.first << ": " << ec::fg::LightCyan << x.second << "\n";
 //        }
 
+        MESSAGE("Request:\n" << resp.GetRequest());
         MESSAGE("Response:\n" << resp);
 
-        CHECK_EQ(resp.GetHeaders()["content-type"], "text/html; charset=utf-8");
+        CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html; charset=utf-8");
 
         CHECK_EQ(200, resp.GetStatusCode());
-
-        MESSAGE("Body size: " << resp.GetBody().size());
     }
 
 }

@@ -11,8 +11,9 @@
 #ifndef SRC_NETWORK_CURL_EXCEPTIONS_H_
 #define SRC_NETWORK_CURL_EXCEPTIONS_H_
 
-#include <network/NetworkException.h>
+#include <string_view>
 #include <curl/curl.h>
+#include <network/NetworkException.h>
 
 
 namespace rsp::network::curl {
@@ -26,10 +27,10 @@ namespace rsp::network::curl {
 class ECurlVersion: public rsp::network::NetworkException
 {
 public:
-    explicit ECurlVersion(const std::string &aMsg, unsigned long aVersion)
+    explicit ECurlVersion(const std::string &aMsg, std::string_view aVersion)
         : NetworkException(aMsg)
     {
-        mMsg.append(": ").append(std::to_string(aVersion));
+        mMsg.append(": ").append(aVersion);
     }
 };
 

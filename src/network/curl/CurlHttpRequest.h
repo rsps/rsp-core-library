@@ -1,4 +1,4 @@
-/**
+/*!
  * \copyright        Copyright 2022 RSP Systems A/S. All rights reserved.
  * \license          Mozilla Public License 2.0
  * \author:          Jesper Madsen
@@ -35,20 +35,19 @@ public:
     CurlHttpRequest();
     void Execute(std::function<void(rsp::network::IHttpResponse&)> callback) override;
     IHttpResponse& Execute() override;
-    HttpRequestOptions& GetOptions() override;
-    IHttpRequest& SetHeaders(std::map<std::string,std::string> &headers) override;
-    IHttpRequest& SetOptions(const HttpRequestOptions opt) override;
-    IHttpRequest& SetBody(std::string const &body) override;
+    const HttpRequestOptions& GetOptions() const override;
+    IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
+    IHttpRequest& SetBody(const std::string &arBody) override;
 
 protected:
     HttpResponse mResponse;
-    HttpRequestOptions mRequestOptions;
+    HttpRequestOptions mRequestOptions{};
 
 private:
 
     static size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string *data);
-    static size_t headerFunction(void *data, size_t size, size_t nmemb, void *userdata);
-    void checkRequestOptions(HttpRequestOptions aOpts);
+    static size_t headerFunction(void *data, size_t size, size_t nmemb, HttpResponse *apResponse);
+    void checkRequestOptions(const HttpRequestOptions &arOpts);
 };
 }
 

@@ -12,17 +12,25 @@
 #define SRC_NETWORK_CURL_CURLLIBRARY_H_
 
 #include <curl/curl.h>
+#include <string_view>
+#include <network/NetworkLibrary.h>
 
 namespace rsp::network::curl {
 
-class CurlLibrary
+class CurlLibrary : public rsp::network::NetworkLibrary
 {
 public:
     ~CurlLibrary();
 
     static CurlLibrary& Get();
 
+    std::string_view GetLibraryName() const override { return "libcurl"; }
+    std::string_view GetVersion() const override { return mpVersionInfo->version; }
+    std::string_view GetSslVersion() const override { return mpVersionInfo->ssl_version; }
+
 protected:
+    curl_version_info_data* mpVersionInfo = nullptr;
+
     void checkVersion();
 
     constexpr std::uint32_t minimumCurlVersion()
@@ -31,8 +39,10 @@ protected:
     }
 private:
     CurlLibrary();
+    CurlLibrary(const CurlLibrary&) = delete;
+    CurlLibrary& operator=(const CurlLibrary&) = delete;
 };
 
-} /* namespace rsp::network::http::curl */
+} /* namespace rsp::network::curl */
 
 #endif /* SRC_NETWORK_CURL_CURLLIBRARY_H_ */
