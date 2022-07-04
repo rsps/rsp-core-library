@@ -38,24 +38,31 @@ TEST_CASE("Network")
     SUBCASE("Github"){
         HttpRequest request;
         HttpRequestOptions opt;
-//        opt.Headers["haps"] = "snaps";
         opt.BaseUrl = "https://github.com";
-        opt.RequestType = HttpRequestType::GET;
+
+        SUBCASE("HEAD") {
+            opt.RequestType = HttpRequestType::HEAD;
+        }
+        SUBCASE("GET") {
+            opt.RequestType = HttpRequestType::HEAD;
+        }
 
         request.SetOptions(opt);
 
         IHttpResponse &resp = request.Execute();
-//        auto headers = resp.GetHeaders();
-
-//        std::stringstream ss;
-//        for (const auto& x : headers) {
-//            ss << ec::fg::Green << x.first << ": " << ec::fg::LightCyan << x.second << "\n";
-//        }
 
         MESSAGE("Request:\n" << resp.GetRequest());
         MESSAGE("Response:\n" << resp);
 
         CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html; charset=utf-8");
+
+        if (opt.RequestType == HttpRequestType::HEAD) {
+            CHECK_EQ(resp.GetBody().size(), 0);
+            MESSAGE("Response.Body:\n" << resp.GetBody());
+        }
+        else {
+            CHECK_GT(resp.GetBody().size(), 0);
+        }
 
         CHECK_EQ(200, resp.GetStatusCode());
     }

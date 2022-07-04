@@ -45,7 +45,7 @@ protected:
 
 private:
 
-    static size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string *data);
+    static size_t writeFunction(void *ptr, size_t size, size_t nmemb, HttpResponse *data);
     static size_t headerFunction(void *data, size_t size, size_t nmemb, HttpResponse *apResponse);
     void checkRequestOptions(const HttpRequestOptions &arOpts);
 };

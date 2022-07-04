@@ -11,6 +11,7 @@
 #include <iostream>
 #include <map>
 #include <iterator>
+#include <posix/FileIO.h>
 #include "CurlHttpRequest.h"
 #include "Exceptions.h"
 
@@ -22,11 +23,17 @@ namespace rsp::network::curl
 CurlHttpRequest::CurlHttpRequest()
     : mResponse(*this)
 {
+    //Setup default callback functions for Response object
+    setCurlOption(CURLOPT_WRITEFUNCTION, writeFunction);
+    setCurlOption(CURLOPT_WRITEDATA, &mResponse);
+
+    setCurlOption(CURLOPT_HEADERFUNCTION, headerFunction);
+    setCurlOption(CURLOPT_HEADERDATA, &mResponse);
 }
 
-size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, std::string *data)
+size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, HttpResponse *apResponse)
 {
-    data->append(static_cast<char*>(ptr), size * nmemb);
+    apResponse->GetBody().append(static_cast<char*>(ptr), size * nmemb);
     return size * nmemb;
 }
 
@@ -71,6 +78,7 @@ IHttpRequest& CurlHttpRequest::SetBody(const std::string &arBody)
 
 void CurlHttpRequest::Execute(std::function<void(IHttpResponse&)> callback)
 {
+    THROW_WITH_BACKTRACE1(rsp::utils::NotImplementedException, "CurlHttpRequest have not implemented async callback.");
 }
 
 IHttpResponse& CurlHttpRequest::Execute()
@@ -81,6 +89,7 @@ IHttpResponse& CurlHttpRequest::Execute()
 
     switch (mRequestOptions.RequestType) {
         case HttpRequestType::GET:
+            setCurlOption(CURLOPT_HTTPGET, 1L);
             break;
 
         case HttpRequestType::POST:
@@ -89,6 +98,18 @@ IHttpResponse& CurlHttpRequest::Execute()
                 setCurlOption(CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
                 setCurlOption(CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
             }
+            break;
+
+        case HttpRequestType::HEAD:
+            setCurlOption(CURLOPT_NOBODY, 1L);
+            break;
+
+        case HttpRequestType::PUT:
+            setCurlOption(CURLOPT_PUT, 1L);
+            break;
+
+        case HttpRequestType::DELETE:
+            setCurlOption(CURLOPT_CUSTOMREQUEST, "DELETE");
             break;
 
         default:
@@ -102,14 +123,6 @@ IHttpResponse& CurlHttpRequest::Execute()
     //Progress and keep-alive configuration
     setCurlOption(CURLOPT_NOPROGRESS, 1L);
     setCurlOption(CURLOPT_TCP_KEEPALIVE, 1L);
-
-    //Setup callbacks functions for Response object
-    std::string response_string;
-    setCurlOption(CURLOPT_WRITEFUNCTION, writeFunction);
-    setCurlOption(CURLOPT_WRITEDATA, &response_string);
-
-    setCurlOption(CURLOPT_HEADERFUNCTION, headerFunction);
-    setCurlOption(CURLOPT_HEADERDATA, &mResponse);
 
     //Set Request headers
     std::string header;
@@ -136,7 +149,7 @@ IHttpResponse& CurlHttpRequest::Execute()
 
     long resp_code = 0;
     getCurlInfo(CURLINFO_RESPONSE_CODE, &resp_code);
-    mResponse.PickBody(response_string).SetStatusCode(static_cast<int>(resp_code));
+    mResponse.SetStatusCode(static_cast<int>(resp_code));
 
     return mResponse;
 }

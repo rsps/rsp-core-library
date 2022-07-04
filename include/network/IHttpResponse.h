@@ -38,6 +38,7 @@ public:
 
     //HTTP response body
     virtual const std::string& GetBody() const = 0;
+    virtual std::string& GetBody() = 0;
     virtual IHttpResponse& SetBody(const std::string &arBody) = 0;
 
     virtual ~IHttpResponse()

@@ -67,10 +67,9 @@ public:
         return mBody;
     }
 
-    IHttpResponse& PickBody(std::string &arBody)
+    std::string& GetBody() override
     {
-        mBody = std::move(arBody);
-        return *this;
+        return mBody;
     }
 
     IHttpResponse& SetBody(const std::string &arBody)
