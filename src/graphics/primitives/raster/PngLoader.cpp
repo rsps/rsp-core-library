@@ -71,7 +71,7 @@ void PngLoader::LoadImg(const std::string &arImgName)
                 break;
 
             case fourcc("IDAT"):
-                decodeDataChunk(chunk.GetAs<const std::uint8_t*>(), chunk.GetSize());
+                decodeDataChunk(chunk.GetAs<std::uint8_t*>(), chunk.GetSize());
                 break;
 
             case fourcc("PLTE"):
