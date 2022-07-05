@@ -89,6 +89,8 @@ public:
             return *reinterpret_cast<const T*>(mData.data());
         }
 
+        const std::uint8_t* GetData() { return mData.data(); }
+
         const IHDR& GetHeader() { return GetAs<IHDR>(); }
 
     protected:
