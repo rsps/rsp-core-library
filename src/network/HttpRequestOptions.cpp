@@ -21,6 +21,7 @@ std::ostream& operator<<(std::ostream &o, HttpRequestType aType)
         "POST",
         "PUT",
         "HEAD",
+        "PATCH",
         "DELETE"
     };
 

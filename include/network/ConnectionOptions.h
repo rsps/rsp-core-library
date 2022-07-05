@@ -19,13 +19,13 @@ namespace rsp::network {
 class ConnectionOptions
 {
 public:
-    std::string BaseUrl = "";
+    std::string BaseUrl{};
     int ConnectionTimeoutMs = 5000;
     int OtherTimeoutMs = 30000;
-    std::string CertType = "";
-    std::string CertCaPath = "/";
-    std::string CertKeyPath = "/";
-    std::string CertPass = "";
+    std::string CertCaPath{};
+    std::string CertPath{};
+    std::string KeyPath{};
+    std::string KeyPasswd{};
 };
 
 std::ostream& operator<<(std::ostream &o, const ConnectionOptions &arOptions);

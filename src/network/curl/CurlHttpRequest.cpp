@@ -14,8 +14,10 @@
 #include <posix/FileIO.h>
 #include "CurlHttpRequest.h"
 #include "Exceptions.h"
+#include <utils/StrUtils.h>
 
 using namespace rsp::network;
+using namespace rsp::utils;
 
 namespace rsp::network::curl
 {
@@ -37,23 +39,23 @@ size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, Http
     return size * nmemb;
 }
 
-size_t CurlHttpRequest::headerFunction(void *data, size_t size, size_t nmemb, HttpResponse *apResponse)
+size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, HttpResponse *apResponse)
 {
-    std::string header(reinterpret_cast<char*>(data), size * nmemb);
+    std::string header(data, size * nmemb);
     size_t seperator = header.find_first_of(':');
     if (std::string::npos == seperator) {
-        trim(header);
+        StrUtils::Trim(header);
         if (0 == header.length()) {
             return (size * nmemb); // blank line;
         }
-        apResponse->AddHeader(header, "present");
+        apResponse->AddHeader(StrUtils::ToLower(header), "present");
     }
     else {
         std::string key = header.substr(0, seperator);
-        trim(key);
+        StrUtils::Trim(key);
         std::string value = header.substr(seperator + 1);
-        trim(value);
-        apResponse->AddHeader(key, value);
+        StrUtils::Trim(value);
+        apResponse->AddHeader(StrUtils::ToLower(key), value);
     }
 
     return (size * nmemb);
@@ -127,6 +129,16 @@ IHttpResponse& CurlHttpRequest::Execute()
     //Progress and keep-alive configuration
     setCurlOption(CURLOPT_NOPROGRESS, 1L);
     setCurlOption(CURLOPT_TCP_KEEPALIVE, 1L);
+
+    if (!mRequestOptions.CertCaPath.empty()) {
+        setCurlOption(CURLOPT_CAINFO, mRequestOptions.CertCaPath.c_str());
+    }
+
+    if (!mRequestOptions.CertPath.empty()) {
+        setCurlOption(CURLOPT_SSLCERT, mRequestOptions.CertPath.c_str());
+        setCurlOption(CURLOPT_SSLKEY, mRequestOptions.KeyPath.c_str());
+        setCurlOption(CURLOPT_KEYPASSWD, mRequestOptions.KeyPasswd.c_str());
+    }
 
     //Set Request headers
     std::string header;

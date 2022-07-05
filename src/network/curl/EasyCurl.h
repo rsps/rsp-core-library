@@ -50,26 +50,6 @@ protected:
         }
     }
 
-    // trim from start
-    static inline std::string& ltrim(std::string &s)
-    {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int c) {return !std::isspace(c);}));
-        return s;
-    }
-
-    // trim from end
-    static inline std::string& rtrim(std::string &s)
-    {
-        s.erase(std::find_if(s.rbegin(), s.rend(), [](int c) {return !std::isspace(c);}).base(), s.end());
-        return s;
-    }
-
-    // trim from both ends
-    static inline std::string& trim(std::string &s)
-    {
-        return ltrim(rtrim(s));
-    }
-
 private:
     char mErrorBuffer[CURL_ERROR_SIZE] = { 0 };
 };

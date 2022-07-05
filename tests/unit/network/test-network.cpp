@@ -35,36 +35,61 @@ TEST_CASE("Network")
         MESSAGE("IP: " << ip);
     }
 
-    SUBCASE("Github"){
+    SUBCASE("TLS to localhost") {
         HttpRequest request;
         HttpRequestOptions opt;
-        opt.BaseUrl = "https://github.com";
+        opt.BaseUrl = "https://server.localhost:8443";
+        opt.CertCaPath = "/tmp/rsp/ca/ca.crt";
 
         SUBCASE("HEAD") {
             opt.RequestType = HttpRequestType::HEAD;
         }
         SUBCASE("GET") {
-            opt.RequestType = HttpRequestType::HEAD;
+            opt.RequestType = HttpRequestType::GET;
         }
 
         request.SetOptions(opt);
 
-        IHttpResponse &resp = request.Execute();
+        IHttpResponse *resp;
+        CHECK_NOTHROW(resp = &request.Execute());
 
-        MESSAGE("Request:\n" << resp.GetRequest());
-        MESSAGE("Response:\n" << resp);
+        MESSAGE("Request:\n" << resp->GetRequest());
+        MESSAGE("Response:\n" << *resp);
 
-        CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html; charset=utf-8");
+        CHECK_EQ(resp->GetHeaders().at("content-type"), "text/html");
 
         if (opt.RequestType == HttpRequestType::HEAD) {
-            CHECK_EQ(resp.GetBody().size(), 0);
-            MESSAGE("Response.Body:\n" << resp.GetBody());
+            CHECK_EQ(resp->GetBody().size(), 0);
         }
         else {
-            CHECK_GT(resp.GetBody().size(), 0);
+            CHECK_EQ(resp->GetBody().size(), 58);
         }
 
-        CHECK_EQ(200, resp.GetStatusCode());
+        CHECK_EQ(200, resp->GetStatusCode());
     }
 
+    SUBCASE("Validate Client") {
+        HttpRequest request;
+        HttpRequestOptions opt;
+        opt.BaseUrl = "https://server.localhost:44300";
+        opt.CertCaPath = "/tmp/rsp/ca/ca.crt";
+        opt.CertPath = "/tmp/rsp/certs/SN1234.crt";
+        opt.KeyPath = "/tmp/rsp/private/SN1234.key";
+        opt.RequestType = HttpRequestType::GET;
+
+        request.SetOptions(opt);
+
+        IHttpResponse *resp;
+        CHECK_NOTHROW(resp = &request.Execute());
+
+        MESSAGE("Request:\n" << resp->GetRequest());
+        MESSAGE("Response:\n" << *resp);
+
+        CHECK_EQ(resp->GetHeaders().at("content-type"), "text/html");
+
+        CHECK_EQ(resp->GetBody().size(), 58);
+
+        CHECK_EQ(200, resp->GetStatusCode());
+
+    }
 }

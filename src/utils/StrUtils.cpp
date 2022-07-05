@@ -51,39 +51,24 @@ size_t Split(const std::string &arTxt, std::vector<std::string> &aList, char aDe
     return aList.size();
 }
 
-std::string& Trim(std::string &aStr)
-{
-    return LeftTrim(RightTrim(aStr));
-}
-
-std::string& LeftTrim(std::string &aStr)
-{
-    auto it2 = std::find_if(aStr.begin(), aStr.end(),
-        [](char ch) {
-            return !std::isspace<char>(ch , std::locale::classic() );
-        }
-    );
-
-    aStr.erase(aStr.begin(), it2);
-    return aStr;
-}
-
-std::string& RightTrim(std::string &aStr)
-{
-    auto it1 = std::find_if(aStr.rbegin(), aStr.rend(),
-        [](char ch) {
-            return !std::isspace<char>(ch , std::locale::classic() );
-        }
-    );
-    aStr.erase(it1.base(), aStr.end());
-
-    return aStr;
-}
-
 std::string TrimCopy(std::string const& aStr)
 {
    auto s = aStr;
    return LeftTrim(RightTrim(s));
+}
+
+std::string& ToLower(std::string &arStr)
+{
+    std::transform(arStr.begin(), arStr.end(), arStr.begin(),
+        [](int c) { return std::tolower(c); });
+    return arStr;
+}
+
+std::string& ToUpper(std::string &arStr)
+{
+    std::transform(arStr.begin(), arStr.end(), arStr.begin(),
+        [](unsigned char c) { return std::toupper(c); });
+    return arStr;
 }
 
 

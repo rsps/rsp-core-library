@@ -17,10 +17,8 @@ std::ostream& operator <<(std::ostream &o, const ConnectionOptions &arOptions)
         "BaseUrl:           " << arOptions.BaseUrl << "\n"
         "ConnectionTimeout: " << arOptions.ConnectionTimeoutMs << "ms\n"
         "OtherTimeout:      " << arOptions.OtherTimeoutMs << "ms\n"
-        "CertType:          " << arOptions.CertType << "\n"
         "CertCaPath:        " << arOptions.CertCaPath << "\n"
-        "CertKeyPath:       " << arOptions.CertKeyPath << "\n"
-        "CertPass:          " << arOptions.CertPass;
+        "CertPath:          " << arOptions.CertPath;
 
         return o;
 }

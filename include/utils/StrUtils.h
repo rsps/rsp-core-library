@@ -31,16 +31,6 @@ namespace rsp::utils::StrUtils {
 size_t Split(const std::string &arTxt, std::vector<std::string> &aList, char aDelimiter = ' ', bool aKeepEmpty = false);
 
 /**
- * Trim a string, based on locale settings for whitespace.
- *
- * @see https://stackoverflow.com/a/29892589
- *
- * @param aStr String to trim
- * @return The trimmed string
- */
-std::string& Trim(std::string &aStr);
-
-/**
  * Left trim a string, based on locale settings for whitespace.
  *
  * @see https://stackoverflow.com/a/29892589
@@ -48,7 +38,11 @@ std::string& Trim(std::string &aStr);
  * @param aStr String to trim
  * @return The trimmed string
  */
-std::string& LeftTrim(std::string &aStr);
+inline std::string& LeftTrim(std::string &aStr)
+{
+    aStr.erase(aStr.begin(), std::find_if(aStr.begin(), aStr.end(), [](int c) {return !std::isspace(c);}));
+    return aStr;
+}
 
 /**
  * Right trim a string, based on locale settings for whitespace.
@@ -58,7 +52,24 @@ std::string& LeftTrim(std::string &aStr);
  * @param aStr String to trim
  * @return The trimmed string
  */
-std::string& RightTrim(std::string &aStr);
+inline std::string& RightTrim(std::string &aStr)
+{
+    aStr.erase(std::find_if(aStr.rbegin(), aStr.rend(), [](int c) {return !std::isspace(c);}).base(), aStr.end());
+    return aStr;
+}
+
+/**
+ * Trim a string, based on locale settings for whitespace.
+ *
+ * @see https://stackoverflow.com/a/29892589
+ *
+ * @param aStr String to trim
+ * @return The trimmed string
+ */
+inline std::string& Trim(std::string &aStr)
+{
+    return LeftTrim(RightTrim(aStr));
+}
 
 /**
  * Trim a string, based on locale settings for whitespace.
@@ -69,6 +80,22 @@ std::string& RightTrim(std::string &aStr);
  * @return Copy of the trimmed string
  */
 std::string TrimCopy(std::string const& aStr);
+
+/**
+ * \brief Convert all characters in string to lower case
+ *
+ * \param arStr Source string
+ * \return source string with lower case characters
+ */
+std::string& ToLower(std::string &arStr);
+
+/**
+ * \brief Convert all characters in string to upper case
+ *
+ * \param arStr Source string
+ * \return source string with upper case characters
+ */
+std::string& ToUpper(std::string &arStr);
 
 /**
  * Get the user current home directory.
