@@ -3,7 +3,7 @@
 # Based on info from: https://blog.devolutions.net/2020/07/tutorial-how-to-generate-secure-self-signed-server-and-client-certificates-with-openssl/
 #
 
-ROOT_DIR=/tmp
+source ./common.inc
 RNDPASS=__SecureServerPassw00rd__
 
 if [ ! -f /usr/bin/openssl ]; then
@@ -19,6 +19,9 @@ openssl ecparam -name prime256v1 -genkey -noout -out $ROOT_DIR/ca/ca.key
 ## Step 1.2 - Generate the Certificate Authority Certificate
 openssl req -new -x509 -sha256 -key $ROOT_DIR/ca/ca.key -out $ROOT_DIR/ca/ca.crt -subj "/C=DK/ST=Denial/L=Odense/O=Dis/CN=ca.localhost"
 
+cat $ROOT_DIR/ca/ca.key > $ROOT_DIR/ca/ca.pem
+cat $ROOT_DIR/ca/ca.crt >> $ROOT_DIR/ca/ca.pem
+
 # Step 2: Server Certificate
 ## Step 2.1 - Generate the Server Certificate Private Key
 openssl ecparam -name prime256v1 -genkey -noout -out $ROOT_DIR/private/server.key
@@ -31,3 +34,5 @@ openssl x509 -req -in server.csr -CA $ROOT_DIR/ca/ca.crt -CAkey $ROOT_DIR/ca/ca.
 
 rm server.csr
 
+cat $ROOT_DIR/private/server.key > $ROOT_DIR/certs/server.pem
+cat $ROOT_DIR/certs/server.crt >> $ROOT_DIR/certs/server.pem
