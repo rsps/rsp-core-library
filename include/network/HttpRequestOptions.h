@@ -20,7 +20,7 @@ namespace rsp::network {
 
 enum class HttpRequestType
 {
-    NONE, GET, POST, PUT, HEAD, DELETE, __count__
+    NONE, GET, POST, PUT, HEAD, PATCH, DELETE, __count__
 };
 
 std::ostream& operator<<(std::ostream &o, HttpRequestType aType);

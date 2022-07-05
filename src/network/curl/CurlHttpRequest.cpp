@@ -104,6 +104,10 @@ IHttpResponse& CurlHttpRequest::Execute()
             setCurlOption(CURLOPT_NOBODY, 1L);
             break;
 
+        case HttpRequestType::PATCH:
+            setCurlOption(CURLOPT_CUSTOMREQUEST, "PATCH");
+            break;
+
         case HttpRequestType::PUT:
             setCurlOption(CURLOPT_PUT, 1L);
             break;
