@@ -42,13 +42,16 @@ public:
 protected:
     HttpResponse mResponse;
     HttpRequestOptions mRequestOptions{};
+    std::function<void(IHttpResponse&)> mResponseHandler{};
+
+    void requestDone() override;
 
 private:
-
     static size_t writeFunction(void *ptr, size_t size, size_t nmemb, HttpResponse *data);
     static size_t headerFunction(char *data, size_t size, size_t nmemb, HttpResponse *apResponse);
     void checkRequestOptions(const HttpRequestOptions &arOpts);
 };
+
 }
 
 #endif

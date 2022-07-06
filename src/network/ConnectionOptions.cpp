@@ -15,10 +15,12 @@ std::ostream& operator <<(std::ostream &o, const ConnectionOptions &arOptions)
 {
     o <<
         "BaseUrl:           " << arOptions.BaseUrl << "\n"
-        "ConnectionTimeout: " << arOptions.ConnectionTimeoutMs << "ms\n"
-        "OtherTimeout:      " << arOptions.OtherTimeoutMs << "ms\n"
+        "ConnectionTimeout: " << arOptions.ConnectionTimeout << "ms\n"
+        "ResponseTimeout:   " << arOptions.ResponseTimeout << "ms\n"
         "CertCaPath:        " << arOptions.CertCaPath << "\n"
-        "CertPath:          " << arOptions.CertPath;
+        "CertPath:          " << arOptions.CertPath << "\n"
+        "KeyPath:           " << arOptions.KeyPath << "\n"
+        "KeyPasswd:         " << arOptions.KeyPasswd;
 
         return o;
 }

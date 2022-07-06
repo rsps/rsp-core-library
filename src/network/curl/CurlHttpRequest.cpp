@@ -80,6 +80,7 @@ IHttpRequest& CurlHttpRequest::SetBody(const std::string &arBody)
 
 void CurlHttpRequest::Execute(std::function<void(IHttpResponse&)> callback)
 {
+    mResponseHandler = callback;
     THROW_WITH_BACKTRACE1(rsp::utils::NotImplementedException, "CurlHttpRequest have not implemented async callback.");
 }
 
@@ -130,6 +131,14 @@ IHttpResponse& CurlHttpRequest::Execute()
     setCurlOption(CURLOPT_NOPROGRESS, 1L);
     setCurlOption(CURLOPT_TCP_KEEPALIVE, 1L);
 
+    setCurlOption(CURLOPT_CONNECTTIMEOUT, mRequestOptions.ConnectionTimeout);
+    setCurlOption(CURLOPT_SERVER_RESPONSE_TIMEOUT, mRequestOptions.ResponseTimeout);
+
+    setCurlOption(CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
+
+//    CURLMOPT_PIPELINING to CURLPIPE_MULTIPLEX
+//    CURLOPT_PIPEWAIT
+
     if (!mRequestOptions.CertCaPath.empty()) {
         setCurlOption(CURLOPT_CAINFO, mRequestOptions.CertCaPath.c_str());
     }
@@ -174,6 +183,17 @@ void CurlHttpRequest::checkRequestOptions(const HttpRequestOptions &arOpts)
 {
     if (arOpts.RequestType == HttpRequestType::NONE || arOpts.BaseUrl == "") {
         THROW_WITH_BACKTRACE1(ERequestOptions, "Insufficient request option settings");
+    }
+}
+
+void CurlHttpRequest::requestDone()
+{
+    long resp_code = 0;
+    getCurlInfo(CURLINFO_RESPONSE_CODE, &resp_code);
+    mResponse.SetStatusCode(static_cast<int>(resp_code));
+
+    if (mResponseHandler) {
+        mResponseHandler(mResponse);
     }
 }
 

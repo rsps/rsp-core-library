@@ -25,8 +25,10 @@ using namespace rsp::utils::AnsiEscapeCodes;
 TEST_CASE("Network")
 {
     SUBCASE("Library Version"){
-        MESSAGE("Network Library: " << NetworkLibrary::Get().GetLibraryName());
-        MESSAGE("Network Library Version: " << NetworkLibrary::Get().GetVersion());
+        CHECK_EQ(NetworkLibrary::Get().GetLibraryName(), "libcurl");
+        CHECK_GE(NetworkLibrary::Get().GetVersion(), "7.68.0");
+//        MESSAGE("Network Library: " << NetworkLibrary::Get().GetLibraryName());
+//        MESSAGE("Network Library Version: " << NetworkLibrary::Get().GetVersion());
     }
 
     SUBCASE("Online") {
@@ -53,8 +55,8 @@ TEST_CASE("Network")
         IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
-        MESSAGE("Request:\n" << resp->GetRequest());
-        MESSAGE("Response:\n" << *resp);
+//        MESSAGE("Request:\n" << resp->GetRequest());
+//        MESSAGE("Response:\n" << *resp);
 
         CHECK_EQ(resp->GetHeaders().at("content-type"), "text/html");
 
@@ -62,7 +64,7 @@ TEST_CASE("Network")
             CHECK_EQ(resp->GetBody().size(), 0);
         }
         else {
-            CHECK_EQ(resp->GetBody().size(), 58);
+            CHECK_EQ(resp->GetBody().size(), 120);
         }
 
         CHECK_EQ(200, resp->GetStatusCode());
@@ -75,21 +77,43 @@ TEST_CASE("Network")
         opt.CertCaPath = "/tmp/rsp/ca/ca.crt";
         opt.CertPath = "/tmp/rsp/certs/SN1234.crt";
         opt.KeyPath = "/tmp/rsp/private/SN1234.key";
-        opt.RequestType = HttpRequestType::GET;
 
         request.SetOptions(opt);
 
         IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
-        MESSAGE("Request:\n" << resp->GetRequest());
+//        MESSAGE("Request:\n" << resp->GetRequest());
         MESSAGE("Response:\n" << *resp);
 
         CHECK_EQ(resp->GetHeaders().at("content-type"), "text/html");
 
-        CHECK_EQ(resp->GetBody().size(), 58);
+        CHECK_EQ(resp->GetBody().size(), 120);
 
         CHECK_EQ(200, resp->GetStatusCode());
-
     }
+
+    SUBCASE("File Download") {
+        HttpRequest request;
+        HttpRequestOptions opt;
+        opt.BaseUrl = "https://server.localhost:44300/image.png";
+        opt.CertCaPath = "/tmp/rsp/ca/ca.crt";
+        opt.CertPath = "/tmp/rsp/certs/SN1234.crt";
+        opt.KeyPath = "/tmp/rsp/private/SN1234.key";
+
+        request.SetOptions(opt);
+
+        IHttpResponse *resp;
+        CHECK_NOTHROW(resp = &request.Execute());
+
+//        MESSAGE("Request:\n" << resp->GetRequest());
+//        MESSAGE("Response:\n" << *resp);
+
+        CHECK_EQ(resp->GetHeaders().at("content-type"), "image/png");
+
+        CHECK_EQ(resp->GetBody().size(), 25138);
+
+        CHECK_EQ(200, resp->GetStatusCode());
+    }
+
 }

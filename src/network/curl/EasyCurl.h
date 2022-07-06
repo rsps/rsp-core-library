@@ -17,6 +17,7 @@
 
 namespace rsp::network::curl {
 
+class MultiCurl;
 
 class EasyCurl
 {
@@ -26,13 +27,19 @@ public:
     EasyCurl(EasyCurl&& arOther);
     virtual ~EasyCurl();
 
+    static EasyCurl* GetFromHandle(CURL* apHandle);
+
     EasyCurl& operator=(const EasyCurl& arOther);
     EasyCurl& operator=(EasyCurl&& arOther);
 
 protected:
     static long const _followRedirects = 1L;
-    static long const _maxRedirects = 50L;
+    static long const _maxRedirects = 1L;
+
+    friend MultiCurl;
     CURL* mpCurl = nullptr;
+
+    virtual void requestDone() {};
 
     template <typename T>
     void setCurlOption(CURLoption aOption, T aArg) {

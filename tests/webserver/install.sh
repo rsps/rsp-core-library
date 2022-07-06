@@ -1,9 +1,13 @@
 #!/bin/bash
 #
-sudo apt install lighttpd
+
+STATUS=$(dpkg -l |grep lighttpd |cut -d " " -f 1)
+if [ $STATUS != "ii" ]; then
+    sudo apt install lighttpd
+fi
 
 source ./common.inc
 
 mkdir -p $ROOT_DIR/logs $ROOT_DIR/pages
 
-echo "<head><title>Lighty</title></head><body>Web Server</body>" > $ROOT_DIR/pages/index.html
+cp ./public/* $ROOT_DIR/pages/

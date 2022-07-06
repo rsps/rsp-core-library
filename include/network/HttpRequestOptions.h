@@ -31,7 +31,7 @@ public:
     std::map<std::string, std::string> Headers{};
     std::string Uri{};
     std::string Body{};
-    HttpRequestType RequestType = HttpRequestType::NONE;
+    HttpRequestType RequestType = HttpRequestType::GET;
     std::string BasicAuthUsername{};
     std::string BasicAuthPassword{};
 };
