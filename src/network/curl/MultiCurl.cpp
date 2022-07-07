@@ -17,10 +17,6 @@ namespace rsp::network::curl
 MultiCurl::MultiCurl()
 {
     mpMultiHandle = curl_multi_init();
-    CURLMcode mc = curl_multi_timeout(mpMultiHandle, &mMaxTimeout);
-    if (mc != CURLM_OK) {
-        THROW_WITH_BACKTRACE2(ECurlMError, "curl_multi_timeout() failed.", mc);
-    }
 }
 
 MultiCurl::~MultiCurl()
@@ -52,7 +48,33 @@ MultiCurl& MultiCurl::Remove(IHttpRequest *apRequest)
     return *this;
 }
 
-bool MultiCurl::Poll(int aTimeoutMs)
+void MultiCurl::Execute()
+{
+    long timeout = 0;
+    CURLMcode mc = curl_multi_timeout(mpMultiHandle, &timeout);
+    if (mc != CURLM_OK) {
+        THROW_WITH_BACKTRACE2(ECurlMError, "curl_multi_timeout() failed.", mc);
+    }
+
+    while (perform()) {
+        if (!poll(timeout)) {
+            continue;
+        }
+
+        int msgs_in_queue = 0;
+        do {
+
+            CURLMsg *msg = curl_multi_info_read(mpMultiHandle, &msgs_in_queue);
+            if (msg && msg->msg == CURLMSG_DONE) {
+                auto req = EasyCurl::GetFromHandle(msg->easy_handle);
+                req->requestDone();
+            }
+        }
+        while(msgs_in_queue > 0);
+    }
+}
+
+bool MultiCurl::poll(int aTimeoutMs)
 {
     int num_fds;
     CURLMcode mc = curl_multi_poll(mpMultiHandle, nullptr, 0, aTimeoutMs, &num_fds);
@@ -62,7 +84,7 @@ bool MultiCurl::Poll(int aTimeoutMs)
     return (num_fds > 0);
 }
 
-int MultiCurl::Perform()
+int MultiCurl::perform()
 {
     int still_running;
     CURLMcode mc = curl_multi_perform(mpMultiHandle, &still_running);
@@ -71,27 +93,6 @@ int MultiCurl::Perform()
     }
 
     return still_running;
-}
-
-void MultiCurl::Execute()
-{
-    while (Perform()) {
-        if (!Poll(mMaxTimeout)) {
-            continue;
-        }
-
-        int msgs_in_queue = 0;
-        do {
-
-            CURLMsg *msg = curl_multi_info_read(mpMultiHandle, &msgs_in_queue);
-            if (msg && msg->msg == CURLMSG_DONE)
-            {
-                CurlHttpRequest *req = static_cast<CurlHttpRequest*>(EasyCurl::GetFromHandle(msg->easy_handle));
-
-                // TODO: Handle response of easy request.
-            }
-        } while(msgs_in_queue > 0);
-    }
 }
 
 } /* namespace rsp::network::curl */

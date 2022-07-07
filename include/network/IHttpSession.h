@@ -8,28 +8,26 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef I_HTTPSESSION_H
-#define I_HTTPSESSION_H
+#ifndef INCLUDE_NETWORK_IHTTPSESSION_H
+#define INCLUDE_NETWORK_IHTTPSESSION_H
 
 #include <network/IHttpRequest.h>
 #include <network/HttpRequestOptions.h>
-
-#include <memory>
 
 namespace rsp::network {
 
 class IHttpSession
 {
 public:
-    virtual IHttpRequest& GetDefaultOptions();
-    virtual IHttpRequest& MakeRequest();
-    virtual IHttpRequest& MakeRequest(HttpRequestOptions options);
-    virtual ~IHttpSession()
-    {
-    }
-    ;
+    virtual ~IHttpSession() {}
+
+    virtual HttpRequestOptions& GetDefaultOptions() = 0;
+    virtual IHttpRequest& MakeRequest() = 0;
+    virtual IHttpRequest& MakeRequest(const HttpRequestOptions &arOptions) = 0;
+
+    virtual void Execute() = 0;
 };
 
-} // rsp::network
+} // namespace rsp::network
 
 #endif

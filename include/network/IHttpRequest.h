@@ -23,6 +23,8 @@ class IHttpResponse;
 class IHttpRequest
 {
 public:
+    virtual ~IHttpRequest() {}
+
     virtual const HttpRequestOptions& GetOptions() const = 0;
     virtual IHttpRequest & SetOptions(const HttpRequestOptions &arOptions) = 0;
 
@@ -30,10 +32,8 @@ public:
     virtual IHttpRequest & SetBody(const std::string &arBody) = 0;
 
     virtual IHttpResponse& Execute() = 0;
-    virtual void Execute(std::function<void(IHttpResponse&)> callback) = 0;
-    virtual ~IHttpRequest()
-    {
-    }
+
+    virtual IHttpRequest& SetAsyncHandler(std::function<void(rsp::network::IHttpResponse&)> aCallback) = 0;
 };
 
 std::ostream& operator<<(std::ostream &o, const IHttpRequest& arReq);

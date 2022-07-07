@@ -33,11 +33,11 @@ class CurlHttpRequest: public rsp::network::IHttpRequest, public EasyCurl
 {
 public:
     CurlHttpRequest();
-    void Execute(std::function<void(rsp::network::IHttpResponse&)> callback) override;
     IHttpResponse& Execute() override;
     const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
     IHttpRequest& SetBody(const std::string &arBody) override;
+    IHttpRequest& SetAsyncHandler(std::function<void(rsp::network::IHttpResponse&)> aCallback) override;
 
 protected:
     HttpResponse mResponse;
@@ -49,7 +49,10 @@ protected:
 private:
     static size_t writeFunction(void *ptr, size_t size, size_t nmemb, HttpResponse *data);
     static size_t headerFunction(char *data, size_t size, size_t nmemb, HttpResponse *apResponse);
+    static size_t progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
+
     void checkRequestOptions(const HttpRequestOptions &arOpts);
+    void populateOptions();
 };
 
 }

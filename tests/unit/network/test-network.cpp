@@ -15,6 +15,7 @@
 #include <network/IHttpRequest.h>
 #include <network/HttpRequest.h>
 #include <network/NetworkLibrary.h>
+#include <network/HttpSession.h>
 #include <posix/FileSystem.h>
 #include <utils/AnsiEscapeCodes.h>
 
@@ -116,4 +117,49 @@ TEST_CASE("Network")
         CHECK_EQ(200, resp->GetStatusCode());
     }
 
+    SUBCASE("Session Create") {
+        CHECK_NOTHROW(HttpSession session1);
+        HttpSession session;
+        CHECK_NOTHROW(IHttpRequest &request1 = session.MakeRequest());
+
+        HttpRequestOptions opt;
+        opt.BaseUrl = "https://server.localhost:44300/index.html";
+        CHECK_NOTHROW(IHttpRequest &request2 = session.MakeRequest(opt));
+    }
+
+    SUBCASE("Session Requests") {
+        HttpSession session;
+        bool resp1 = false;
+        bool resp2 = false;
+
+        HttpRequestOptions opt;
+        opt.BaseUrl = "https://server.localhost:44300/index.html";
+        opt.CertCaPath = "/tmp/rsp/ca/ca.crt";
+        opt.CertPath = "/tmp/rsp/certs/SN1234.crt";
+        opt.KeyPath = "/tmp/rsp/private/SN1234.key";
+        CHECK_NOTHROW(session.GetDefaultOptions() = opt);
+
+        opt.BaseUrl = "https://server.localhost:44300/image.png";
+        opt.RequestType = HttpRequestType::HEAD;
+        IHttpRequest &request2 = session.MakeRequest(opt);
+        request2.SetAsyncHandler([&resp2](rsp::network::IHttpResponse& resp) {
+            CHECK_EQ(resp.GetHeaders().at("content-type"), "image/png");
+            CHECK_EQ(resp.GetBody().size(), 25138);
+            CHECK_EQ(200, resp.GetStatusCode());
+            resp2 = true;
+        });
+
+        IHttpRequest &request1 = session.MakeRequest();
+        request1.SetAsyncHandler([&resp1](rsp::network::IHttpResponse& resp) {
+            CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
+            CHECK_EQ(resp.GetBody().size(), 120);
+            CHECK_EQ(200, resp.GetStatusCode());
+            resp1 = true;
+        });
+
+        CHECK_NOTHROW(session.Execute());
+
+        CHECK(resp1);
+        CHECK(resp2);
+    }
 }

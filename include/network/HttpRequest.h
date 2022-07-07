@@ -43,9 +43,10 @@ public:
         return mPimpl->Execute();
     }
 
-    void Execute(std::function<void(IHttpResponse&)> callback) override
+    IHttpRequest& SetAsyncHandler(std::function<void(IHttpResponse&)> aCallback) override
     {
-        mPimpl->Execute(callback);
+        mPimpl->SetAsyncHandler(aCallback);
+        return *this;
     }
 
 protected:

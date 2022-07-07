@@ -31,6 +31,10 @@ CurlHttpRequest::CurlHttpRequest()
 
     setCurlOption(CURLOPT_HEADERFUNCTION, headerFunction);
     setCurlOption(CURLOPT_HEADERDATA, &mResponse);
+
+    setCurlOption(CURLOPT_XFERINFOFUNCTION, progressFunction);
+    setCurlOption(CURLOPT_XFERINFODATA, this);
+
 }
 
 size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, HttpResponse *apResponse)
@@ -61,9 +65,17 @@ size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, Ht
     return (size * nmemb);
 }
 
+size_t CurlHttpRequest::progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
+{
+    // TODO: Call progress callback on request here...
+
+    return CURLE_OK;
+}
+
 IHttpRequest& CurlHttpRequest::SetOptions(const HttpRequestOptions &arOptions)
 {
     mRequestOptions = arOptions;
+    populateOptions();
     return *this;
 }
 
@@ -78,16 +90,47 @@ IHttpRequest& CurlHttpRequest::SetBody(const std::string &arBody)
     return *this;
 }
 
-void CurlHttpRequest::Execute(std::function<void(IHttpResponse&)> callback)
+IHttpRequest& CurlHttpRequest::SetAsyncHandler(std::function<void(rsp::network::IHttpResponse&)> aCallback)
 {
-    mResponseHandler = callback;
-    THROW_WITH_BACKTRACE1(rsp::utils::NotImplementedException, "CurlHttpRequest have not implemented async callback.");
+    mResponseHandler = aCallback;
+    return *this;
 }
 
 IHttpResponse& CurlHttpRequest::Execute()
 {
     checkRequestOptions(mRequestOptions);
 
+    //Curl and evaluate
+    auto res = curl_easy_perform(mpCurl);
+    if (res != CURLE_OK) {
+        THROW_WITH_BACKTRACE2(ECurlError, "curl_easy_perform() failed.", res);
+    }
+
+    requestDone();
+
+    return mResponse;
+}
+
+void CurlHttpRequest::checkRequestOptions(const HttpRequestOptions &arOpts)
+{
+    if (arOpts.RequestType == HttpRequestType::NONE || arOpts.BaseUrl == "") {
+        THROW_WITH_BACKTRACE1(ERequestOptions, "Insufficient request option settings");
+    }
+}
+
+void CurlHttpRequest::requestDone()
+{
+    long resp_code = 0;
+    getCurlInfo(CURLINFO_RESPONSE_CODE, &resp_code);
+    mResponse.SetStatusCode(static_cast<int>(resp_code));
+
+    if (mResponseHandler) {
+        mResponseHandler(mResponse);
+    }
+}
+
+void CurlHttpRequest::populateOptions()
+{
     setCurlOption(CURLOPT_URL, std::string(mRequestOptions.BaseUrl + mRequestOptions.Uri).c_str());
 
     switch (mRequestOptions.RequestType) {
@@ -164,36 +207,6 @@ IHttpResponse& CurlHttpRequest::Execute()
         setCurlOption(CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         setCurlOption(CURLOPT_USERPWD,
             std::string(mRequestOptions.BasicAuthUsername + ":" + mRequestOptions.BasicAuthPassword).c_str());
-    }
-
-    //Curl and evaluate
-    auto res = curl_easy_perform(mpCurl);
-    if (res != CURLE_OK) {
-        THROW_WITH_BACKTRACE2(ECurlError, "curl_easy_perform() failed.", res);
-    }
-
-    long resp_code = 0;
-    getCurlInfo(CURLINFO_RESPONSE_CODE, &resp_code);
-    mResponse.SetStatusCode(static_cast<int>(resp_code));
-
-    return mResponse;
-}
-
-void CurlHttpRequest::checkRequestOptions(const HttpRequestOptions &arOpts)
-{
-    if (arOpts.RequestType == HttpRequestType::NONE || arOpts.BaseUrl == "") {
-        THROW_WITH_BACKTRACE1(ERequestOptions, "Insufficient request option settings");
-    }
-}
-
-void CurlHttpRequest::requestDone()
-{
-    long resp_code = 0;
-    getCurlInfo(CURLINFO_RESPONSE_CODE, &resp_code);
-    mResponse.SetStatusCode(static_cast<int>(resp_code));
-
-    if (mResponseHandler) {
-        mResponseHandler(mResponse);
     }
 }
 

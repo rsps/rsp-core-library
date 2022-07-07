@@ -36,3 +36,5 @@ rm server.csr
 
 cat $ROOT_DIR/private/server.key > $ROOT_DIR/certs/server.pem
 cat $ROOT_DIR/certs/server.crt >> $ROOT_DIR/certs/server.pem
+
+./client-cert.sh SN1234
