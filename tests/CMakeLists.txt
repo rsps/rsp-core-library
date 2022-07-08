@@ -29,7 +29,10 @@ target_compile_options(rsp-core-lib-test PRIVATE
 
 if (NOT RELEASE_BUILD)
 target_compile_options(rsp-core-lib-test PRIVATE 
-    -DGFX_FPS=100)
+    -DGFX_FPS=100
+    -g
+    -O0
+    )
 endif()
 
 #get_target_property(INCLUDE_DIRS "rsp-core-lib-test" INCLUDE_DIRECTORIES)

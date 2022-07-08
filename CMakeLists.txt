@@ -109,6 +109,8 @@ target_compile_options(rsp-core-lib PRIVATE
 if (NOT RELEASE_BUILD)
 target_compile_options(rsp-core-lib PRIVATE
     -DDEBUG_LOG
+    -g
+    -O0
 )
 else()
 target_compile_options(rsp-core-lib PRIVATE
