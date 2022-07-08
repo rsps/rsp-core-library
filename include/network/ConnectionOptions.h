@@ -26,6 +26,7 @@ public:
     std::string CertPath{};
     std::string KeyPath{};
     std::string KeyPasswd{};
+    int Verbose = 0;
 };
 
 std::ostream& operator<<(std::ostream &o, const ConnectionOptions &arOptions);

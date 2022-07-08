@@ -27,22 +27,14 @@ void CurlSession::Execute()
     mMulti.Execute();
 }
 
-rsp::network::HttpRequestOptions& CurlSession::GetDefaultOptions()
+rsp::network::IHttpSession& CurlSession::operator <<=(rsp::network::IHttpRequest &arRequest)
 {
-    return mDefaultOptions;
-}
+    if (!arRequest.IsAsync()) {
+        THROW_WITH_BACKTRACE1(EAsyncRequest, "Requests handled by session, must have an async callback.");
+    }
 
-rsp::network::IHttpRequest& CurlSession::MakeRequest()
-{
-    return MakeRequest(mDefaultOptions);
-}
-
-rsp::network::IHttpRequest& CurlSession::MakeRequest(const rsp::network::HttpRequestOptions &arOptions)
-{
-    auto &req = mRequests.emplace_back();
-    req.SetOptions(arOptions);
-    mMulti.Add(&req);
-    return req;
+    mMulti.Add(arRequest);
+    return *this;
 }
 
 } /* namespace rsp::network::curl */

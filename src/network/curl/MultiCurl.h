@@ -13,7 +13,7 @@
 
 #include <map>
 #include <curl/curl.h>
-#include <network/IHttpRequest.h>
+#include "CurlHttpRequest.h"
 #include "Exceptions.h"
 
 namespace rsp::network::curl {
@@ -29,16 +29,17 @@ public:
     MultiCurl& operator=(const MultiCurl&) = delete;
     MultiCurl& operator=(const MultiCurl&&) = delete;
 
-    MultiCurl& Add(IHttpRequest *apRequest);
-    MultiCurl& Remove(IHttpRequest *apRequest);
+    MultiCurl& Add(IHttpRequest &arRequest);
+    MultiCurl& Remove(IHttpRequest &arRequest);
 
     void Execute();
 
 protected:
     CURLM *mpMultiHandle = nullptr;
 
-    bool poll(int aTimeoutMs);
+    int poll(int aTimeoutMs);
     int perform();
+    void processMessages();
 
     template <typename T>
     void setCurlOption(CURLMoption aOption, T aArg) {

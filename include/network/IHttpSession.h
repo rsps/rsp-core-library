@@ -21,9 +21,7 @@ class IHttpSession
 public:
     virtual ~IHttpSession() {}
 
-    virtual HttpRequestOptions& GetDefaultOptions() = 0;
-    virtual IHttpRequest& MakeRequest() = 0;
-    virtual IHttpRequest& MakeRequest(const HttpRequestOptions &arOptions) = 0;
+    virtual IHttpSession& operator <<=(IHttpRequest &arRequest) = 0;
 
     virtual void Execute() = 0;
 };

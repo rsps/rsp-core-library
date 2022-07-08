@@ -22,14 +22,10 @@ class CurlSession: public rsp::network::IHttpSession
 {
 public:
     void Execute() override;
-    rsp::network::HttpRequestOptions& GetDefaultOptions() override;
-    rsp::network::IHttpRequest& MakeRequest() override;
-    rsp::network::IHttpRequest& MakeRequest(const rsp::network::HttpRequestOptions &arOptions) override;
+    rsp::network::IHttpSession& operator <<=(rsp::network::IHttpRequest &arRequest) override;
 
 protected:
     MultiCurl mMulti{};
-    std::vector<CurlHttpRequest> mRequests{};
-    rsp::network::HttpRequestOptions mDefaultOptions{};
 };
 
 } /* namespace rsp::network::curl */

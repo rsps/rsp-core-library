@@ -8,8 +8,12 @@
  * \author      Steffen Brummer
  */
 
+#include <functional>
 #include "MultiCurl.h"
-#include "CurlHttpRequest.h"
+#include <logging/Logger.h>
+#include <network/HttpRequest.h>
+
+using namespace rsp::logging;
 
 namespace rsp::network::curl
 {
@@ -24,23 +28,24 @@ MultiCurl::~MultiCurl()
     curl_multi_cleanup(mpMultiHandle);
 }
 
-MultiCurl& MultiCurl::Add(IHttpRequest *apRequest)
+MultiCurl& MultiCurl::Add(rsp::network::IHttpRequest &arRequest)
 {
-    CurlHttpRequest *p = reinterpret_cast<CurlHttpRequest*>(apRequest);
+    Logger::GetDefault().Debug() << "Adding Request: " << arRequest.GetOptions().BaseUrl << arRequest.GetOptions().Uri << std::endl;
 
-    CURLMcode mc = curl_multi_add_handle(mpMultiHandle, p->mpCurl);
+    CURLMcode mc = curl_multi_add_handle(mpMultiHandle, reinterpret_cast<CURL*>(arRequest.GetHandle()));
     if (mc != CURLM_OK) {
         THROW_WITH_BACKTRACE2(ECurlMError, "curl_multi_add_handle() failed.", mc);
     }
+    arRequest.SetData(this);
 
     return *this;
 }
 
-MultiCurl& MultiCurl::Remove(IHttpRequest *apRequest)
+MultiCurl& MultiCurl::Remove(rsp::network::IHttpRequest &arRequest)
 {
-    CurlHttpRequest *p = reinterpret_cast<CurlHttpRequest*>(apRequest);
+    Logger::GetDefault().Debug() << "Removing Request: " << arRequest.GetOptions().BaseUrl << arRequest.GetOptions().Uri << std::endl;
 
-    CURLMcode mc = curl_multi_remove_handle(mpMultiHandle, p->mpCurl);
+    CURLMcode mc = curl_multi_remove_handle(mpMultiHandle, reinterpret_cast<CURL*>(arRequest.GetHandle()));
     if (mc != CURLM_OK) {
         THROW_WITH_BACKTRACE2(ECurlMError, "curl_multi_remove_handle() failed.", mc);
     }
@@ -55,33 +60,30 @@ void MultiCurl::Execute()
     if (mc != CURLM_OK) {
         THROW_WITH_BACKTRACE2(ECurlMError, "curl_multi_timeout() failed.", mc);
     }
+    timeout = (timeout == 0) ? 5000 : timeout;
 
-    while (perform()) {
-        if (!poll(timeout)) {
+    Logger::GetDefault().Debug() << "Excuting MultiCurl with timeout: " << timeout << std::endl;
+
+    int count = 0;
+    do {
+        count = perform();
+        if (count > 0 && poll(timeout) == 0) {
             continue;
         }
 
-        int msgs_in_queue = 0;
-        do {
-
-            CURLMsg *msg = curl_multi_info_read(mpMultiHandle, &msgs_in_queue);
-            if (msg && msg->msg == CURLMSG_DONE) {
-                auto req = EasyCurl::GetFromHandle(msg->easy_handle);
-                req->requestDone();
-            }
-        }
-        while(msgs_in_queue > 0);
+        processMessages();
     }
+    while(count > 0);
 }
 
-bool MultiCurl::poll(int aTimeoutMs)
+int MultiCurl::poll(int aTimeoutMs)
 {
     int num_fds;
-    CURLMcode mc = curl_multi_poll(mpMultiHandle, nullptr, 0, aTimeoutMs, &num_fds);
+    CURLMcode mc = curl_multi_wait(mpMultiHandle, nullptr, 0, aTimeoutMs, &num_fds);
     if (mc != CURLM_OK) {
         THROW_WITH_BACKTRACE2(ECurlMError, "curl_multi_poll() failed.", mc);
     }
-    return (num_fds > 0);
+    return num_fds;
 }
 
 int MultiCurl::perform()
@@ -93,6 +95,20 @@ int MultiCurl::perform()
     }
 
     return still_running;
+}
+
+void MultiCurl::processMessages()
+{
+    int msgs_in_queue = 0;
+    do {
+        CURLMsg *msg = curl_multi_info_read(mpMultiHandle, &msgs_in_queue);
+        if (msg && msg->msg == CURLMSG_DONE) {
+            auto req = EasyCurl::GetFromHandle(msg->easy_handle);
+            req->requestDone();
+            Remove(*static_cast<CurlHttpRequest*>(req));
+        }
+    }
+    while(msgs_in_queue > 0);
 }
 
 } /* namespace rsp::network::curl */

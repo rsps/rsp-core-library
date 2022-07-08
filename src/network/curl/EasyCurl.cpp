@@ -9,6 +9,7 @@
  */
 
 #include "EasyCurl.h"
+#include <logging/Logger.h>
 
 namespace rsp::network::curl {
 
@@ -32,6 +33,7 @@ EasyCurl::EasyCurl()
 
 EasyCurl::~EasyCurl()
 {
+    DLOG("EasyCurl Destruct");
     if (mpCurl) {
         curl_easy_cleanup(mpCurl);
     }
@@ -39,11 +41,13 @@ EasyCurl::~EasyCurl()
 
 EasyCurl::EasyCurl(const EasyCurl &arOther)
 {
+    DLOG("EasyCurl Copy Construct");
     *this = arOther;
 }
 
 EasyCurl::EasyCurl(EasyCurl &&arOther)
 {
+    DLOG("EasyCurl Move Construct");
     *this = std::move(arOther);
 }
 
@@ -62,6 +66,7 @@ EasyCurl* EasyCurl::GetFromHandle(CURL* apHandle)
 
 EasyCurl& EasyCurl::operator =(const EasyCurl &arOther)
 {
+    DLOG("EasyCurl Copy Assignment");
     if (this != &arOther) {
         mpCurl = curl_easy_duphandle(arOther.mpCurl);
     }
@@ -70,6 +75,7 @@ EasyCurl& EasyCurl::operator =(const EasyCurl &arOther)
 
 EasyCurl& EasyCurl::operator =(EasyCurl &&arOther)
 {
+    DLOG("EasyCurl Move Assignment");
     if (this != &arOther) {
         mpCurl = arOther.mpCurl;
         arOther.mpCurl = nullptr;

@@ -13,9 +13,12 @@
 #include <iterator>
 #include <posix/FileIO.h>
 #include "CurlHttpRequest.h"
+#include "CurlSession.h"
 #include "Exceptions.h"
 #include <utils/StrUtils.h>
+#include <logging/Logger.h>
 
+using namespace rsp::logging;
 using namespace rsp::network;
 using namespace rsp::utils;
 
@@ -35,6 +38,14 @@ CurlHttpRequest::CurlHttpRequest()
     setCurlOption(CURLOPT_XFERINFOFUNCTION, progressFunction);
     setCurlOption(CURLOPT_XFERINFODATA, this);
 
+}
+
+
+CurlHttpRequest::~CurlHttpRequest()
+{
+    if (mpMultiCurl) {
+        mpMultiCurl->Remove(*this);
+    }
 }
 
 size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, HttpResponse *apResponse)
@@ -75,6 +86,7 @@ size_t CurlHttpRequest::progressFunction(CurlHttpRequest *aRequest, curl_off_t d
 IHttpRequest& CurlHttpRequest::SetOptions(const HttpRequestOptions &arOptions)
 {
     mRequestOptions = arOptions;
+//    curl_easy_reset(mpCurl);
     populateOptions();
     return *this;
 }
@@ -90,7 +102,7 @@ IHttpRequest& CurlHttpRequest::SetBody(const std::string &arBody)
     return *this;
 }
 
-IHttpRequest& CurlHttpRequest::SetAsyncHandler(std::function<void(rsp::network::IHttpResponse&)> aCallback)
+IHttpRequest& CurlHttpRequest::SetResponseHandler(std::function<void(rsp::network::IHttpResponse&)> aCallback)
 {
     mResponseHandler = aCallback;
     return *this;
@@ -98,6 +110,9 @@ IHttpRequest& CurlHttpRequest::SetAsyncHandler(std::function<void(rsp::network::
 
 IHttpResponse& CurlHttpRequest::Execute()
 {
+    if (mpMultiCurl) {
+        THROW_WITH_BACKTRACE1(EAsyncRequest, "Async requests must be executed through an IHttpSession.");
+    }
     checkRequestOptions(mRequestOptions);
 
     //Curl and evaluate
@@ -124,9 +139,16 @@ void CurlHttpRequest::requestDone()
     getCurlInfo(CURLINFO_RESPONSE_CODE, &resp_code);
     mResponse.SetStatusCode(static_cast<int>(resp_code));
 
+    Logger::GetDefault().Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << resp_code << std::endl;
+
     if (mResponseHandler) {
         mResponseHandler(mResponse);
     }
+}
+
+std::uintptr_t CurlHttpRequest::GetHandle()
+{
+    return std::uintptr_t(mpCurl);
 }
 
 void CurlHttpRequest::populateOptions()
@@ -165,6 +187,8 @@ void CurlHttpRequest::populateOptions()
         default:
             break;
     }
+
+    setCurlOption(CURLOPT_VERBOSE, mRequestOptions.Verbose);
 
     //Redirect configuration
     setCurlOption(CURLOPT_FOLLOWLOCATION, _followRedirects);

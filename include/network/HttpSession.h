@@ -20,10 +20,8 @@ class HttpSession: public IHttpSession
 {
 public:
     HttpSession();
+    rsp::network::IHttpSession& operator <<=(rsp::network::IHttpRequest &arRequest) override;
     void Execute() override;
-    HttpRequestOptions& GetDefaultOptions() override;
-    IHttpRequest& MakeRequest() override;
-    IHttpRequest& MakeRequest(const rsp::network::HttpRequestOptions &arOptions) override;
 
 protected:
     std::unique_ptr<IHttpSession> mPimpl;

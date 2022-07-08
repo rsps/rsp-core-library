@@ -24,7 +24,13 @@ std::ostream& operator<<(std::ostream &o, const IHttpRequest& arReq)
 HttpRequest::HttpRequest()
     : mPimpl(MakeRequest())
 {
-
 }
+
+HttpRequest::HttpRequest(const HttpRequestOptions& arOptions)
+    : mPimpl(MakeRequest())
+{
+    SetOptions(arOptions);
+}
+
 }
 

@@ -22,19 +22,10 @@ void HttpSession::Execute()
     mPimpl->Execute();
 }
 
-HttpRequestOptions& HttpSession::GetDefaultOptions()
+rsp::network::IHttpSession& HttpSession::operator <<=(rsp::network::IHttpRequest &arRequest)
 {
-    return mPimpl->GetDefaultOptions();
-}
-
-IHttpRequest& HttpSession::MakeRequest()
-{
-    return mPimpl->MakeRequest();
-}
-
-IHttpRequest& HttpSession::MakeRequest(const rsp::network::HttpRequestOptions &arOptions)
-{
-    return mPimpl->MakeRequest(arOptions);
+    *mPimpl <<= arRequest;
+    return *this;
 }
 
 } /* namespace rsp::network */
