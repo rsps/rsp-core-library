@@ -30,6 +30,11 @@ TEST_CASE("Network")
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
+    HttpRequestOptions opt;
+    opt.CertCaPath = "webserver/ssl/ca/ca.crt";
+    opt.CertPath = "webserver/ssl/certs/SN1234.crt";
+    opt.KeyPath = "webserver/ssl/private/SN1234.key";
+
     SUBCASE("Library Version"){
         CHECK_EQ(NetworkLibrary::Get().GetLibraryName(), "libcurl");
         CHECK_GE(NetworkLibrary::Get().GetVersion(), "7.68.0");
@@ -45,9 +50,7 @@ TEST_CASE("Network")
 
     SUBCASE("TLS to localhost") {
         HttpRequest request;
-        HttpRequestOptions opt;
         opt.BaseUrl = "https://server.localhost:8443";
-        opt.CertCaPath = "/tmp/rsp/ca/ca.crt";
 
         SUBCASE("HEAD") {
             opt.RequestType = HttpRequestType::HEAD;
@@ -78,11 +81,7 @@ TEST_CASE("Network")
 
     SUBCASE("Validate Client") {
         HttpRequest request;
-        HttpRequestOptions opt;
         opt.BaseUrl = "https://server.localhost:44300";
-        opt.CertCaPath = "/tmp/rsp/ca/ca.crt";
-        opt.CertPath = "/tmp/rsp/certs/SN1234.crt";
-        opt.KeyPath = "/tmp/rsp/private/SN1234.key";
 
         request.SetOptions(opt);
 
@@ -101,11 +100,7 @@ TEST_CASE("Network")
 
     SUBCASE("File Download") {
         HttpRequest request;
-        HttpRequestOptions opt;
         opt.BaseUrl = "https://server.localhost:44300/image.png";
-        opt.CertCaPath = "/tmp/rsp/ca/ca.crt";
-        opt.CertPath = "/tmp/rsp/certs/SN1234.crt";
-        opt.KeyPath = "/tmp/rsp/private/SN1234.key";
 
         request.SetOptions(opt);
 
@@ -122,7 +117,7 @@ TEST_CASE("Network")
         CHECK_EQ(200, resp->GetStatusCode());
     }
 
-    SUBCASE("Session Requests") {
+    SUBCASE("Http2") {
         CHECK_NOTHROW(HttpSession session1);
         HttpSession session;
         bool resp1 = false;
@@ -133,18 +128,14 @@ TEST_CASE("Network")
             CHECK_THROWS_AS(session <<= request0, EAsyncRequest);
         }
 
-        HttpRequestOptions opt;
         opt.BaseUrl = "https://server.localhost:44300/";
         opt.Uri = "index.html";
-        opt.CertCaPath = "/tmp/rsp/ca/ca.crt";
-        opt.CertPath = "/tmp/rsp/certs/SN1234.crt";
-        opt.KeyPath = "/tmp/rsp/private/SN1234.key";
         opt.Verbose = 1;
         opt.RequestType = HttpRequestType::HEAD;
 
         HttpRequest request1(opt);
         request1.SetResponseHandler([&resp1](rsp::network::IHttpResponse& resp) {
-            MESSAGE("Response 1:\n" << resp);
+//            MESSAGE("Response 1:\n" << resp);
             CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
             CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
             if (resp.GetRequest().GetOptions().RequestType == HttpRequestType::HEAD) {
@@ -161,7 +152,7 @@ TEST_CASE("Network")
         opt.RequestType = HttpRequestType::GET;
         HttpRequest request2(opt);
         request2.SetResponseHandler([&resp2](rsp::network::IHttpResponse& resp) {
-            MESSAGE("Response 2:\n" << resp);
+//            MESSAGE("Response 2:\n" << resp);
             CHECK_EQ(resp.GetHeaders().at("content-type"), "image/png");
             CHECK_EQ(resp.GetHeaders().at("content-length"), "25138");
             CHECK_EQ(resp.GetBody().size(), 25138);
@@ -169,14 +160,14 @@ TEST_CASE("Network")
             resp2 = true;
         });
 
-        session <<= request1;
+        session <<= request1; // HEAD index.html
         CHECK_NOTHROW(session.Execute());
 
         opt.Uri = "index.html";
         request1.SetOptions(opt);
-        session <<= request1;
+        session <<= request1; // GET index.html
 
-        session <<= request2;
+        session <<= request2; // GET image.png
 
         CHECK_NOTHROW(session.Execute());
 

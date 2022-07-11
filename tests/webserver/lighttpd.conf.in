@@ -1,14 +1,14 @@
-var.basedir = "/tmp/rsp"
+var.basedir = "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@/webserver"
 
 server.modules += ("mod_openssl")
 
-server.document-root = basedir + "/pages/"
+server.document-root = basedir + "/public/"
 
 server.port = 8443
 server.name = "server.localhost"
-ssl.pemfile = basedir + "/certs/server.pem"
+ssl.pemfile = basedir + "/ssl/certs/server.pem"
 ssl.engine  = "enable"
-ssl.ca-file = basedir + "/ca/ca.pem"
+ssl.ca-file = basedir + "/ssl/ca/ca.pem"
 
 ssl.openssl.ssl-conf-cmd = ("MinProtocol" => "TLSv1.3",
                             "Options" => "-ServerPreference")
@@ -24,7 +24,7 @@ mimetype.assign = (
     ".png" => "image/png"
 )
 
-server.errorlog = basedir + "/logs/error.log"
+server.errorlog = basedir + "/error.log"
 debug.log-request-handling = "enable"
 debug.log-request-header = "enable"
 #debug.log-state-handling = "enable"
@@ -34,13 +34,13 @@ static-file.exclude-extensions = ( ".fcgi", ".php", ".rb", "~", ".inc" )
 index-file.names = ( "index.html" )
 
 $HTTP["host"] == "server.localhost" {
-    server.document-root = basedir + "/pages/"
+    server.document-root = basedir + "/public/"
 }
 
 $SERVER["socket"] == ":44300" {
     ssl.engine  = "enable"
-    ssl.pemfile = basedir + "/certs/server.pem"
-    ssl.ca-file = basedir + "/ca/ca.pem"
+    ssl.pemfile = basedir + "/ssl/certs/server.pem"
+    ssl.ca-file = basedir + "/ssl/ca/ca.pem"
     
     ssl.verifyclient.exportcert = "enable"
     ssl.verifyclient.activate   = "enable"

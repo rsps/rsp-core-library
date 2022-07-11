@@ -9,6 +9,22 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(DocTest)
 
+include(ExternalProject)
+ExternalProject_Add(Lighttpd
+    GIT_REPOSITORY "https://github.com/lighttpd/lighttpd1.4"
+    GIT_TAG "lighttpd-1.4.65"
+    PREFIX "${PROJECT_BINARY_DIR}/_deps/Lighttpd"
+    CMAKE_ARGS
+        -DWITH_OPENSSL=ON
+        -DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}/webserver
+    TEST_COMMAND ""
+)
+
+configure_file (
+    "${CMAKE_CURRENT_SOURCE_DIR}/webserver/lighttpd.conf.in"
+    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/lighttpd.conf"
+)
+
 enable_testing()
 
 add_executable("rsp-core-lib-test")
@@ -57,4 +73,9 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/testImages
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/fonts 
     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/webserver/public
+    DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/webserver/ssl
+    DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/)
 

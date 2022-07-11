@@ -1,3 +1,0 @@
-ROOT_DIR=/tmp/rsp
-CLNTPASS=__SecureClientPassw00rd__
-SRVPASS=__SecureServerPassw00rd__
