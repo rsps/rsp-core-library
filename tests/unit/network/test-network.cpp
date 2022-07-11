@@ -20,6 +20,7 @@
 #include <posix/FileSystem.h>
 #include <utils/AnsiEscapeCodes.h>
 #include <TestHelpers.h>
+#include <cstdlib>
 
 using namespace rsp::logging;
 using namespace rsp::network;
@@ -34,6 +35,10 @@ TEST_CASE("Network")
     opt.CertCaPath = "webserver/ssl/ca/ca.crt";
     opt.CertPath = "webserver/ssl/certs/SN1234.crt";
     opt.KeyPath = "webserver/ssl/private/SN1234.key";
+
+    // Run lighttpd directly from build directory, no need to install it.
+    std::system("_deps/lighttpd-build/build/lighttpd -f webserver/lighttpd.conf -m _deps/lighttpd-build/build");
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     SUBCASE("Library Version"){
         CHECK_EQ(NetworkLibrary::Get().GetLibraryName(), "libcurl");
@@ -92,9 +97,7 @@ TEST_CASE("Network")
         MESSAGE("Response:\n" << *resp);
 
         CHECK_EQ(resp->GetHeaders().at("content-type"), "text/html");
-
         CHECK_EQ(resp->GetBody().size(), 120);
-
         CHECK_EQ(200, resp->GetStatusCode());
     }
 
@@ -111,9 +114,7 @@ TEST_CASE("Network")
 //        MESSAGE("Response:\n" << *resp);
 
         CHECK_EQ(resp->GetHeaders().at("content-type"), "image/png");
-
         CHECK_EQ(resp->GetBody().size(), 25138);
-
         CHECK_EQ(200, resp->GetStatusCode());
     }
 
@@ -134,7 +135,7 @@ TEST_CASE("Network")
         opt.RequestType = HttpRequestType::HEAD;
 
         HttpRequest request1(opt);
-        request1.SetResponseHandler([&resp1](rsp::network::IHttpResponse& resp) {
+        request1.SetResponseHandler([&resp1](IHttpResponse& resp) {
 //            MESSAGE("Response 1:\n" << resp);
             CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
             CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
@@ -151,7 +152,7 @@ TEST_CASE("Network")
         opt.Uri = "image.png";
         opt.RequestType = HttpRequestType::GET;
         HttpRequest request2(opt);
-        request2.SetResponseHandler([&resp2](rsp::network::IHttpResponse& resp) {
+        request2.SetResponseHandler([&resp2](IHttpResponse& resp) {
 //            MESSAGE("Response 2:\n" << resp);
             CHECK_EQ(resp.GetHeaders().at("content-type"), "image/png");
             CHECK_EQ(resp.GetHeaders().at("content-length"), "25138");
@@ -160,13 +161,19 @@ TEST_CASE("Network")
             resp2 = true;
         });
 
+//      TODO: Maybe improve usage to something like this:
+//        session.SetDefaultOptions(opt);
+//        session.Head("index.html", [](IHttpResponse& resp) { ... });
+//        session.Get("index.html", [&resp1](IHttpResponse& resp) { ... });
+//        session.Get("image.png", [&resp2](IHttpResponse& resp) { ... });
+
         session <<= request1; // HEAD index.html
         CHECK_NOTHROW(session.Execute());
 
         opt.Uri = "index.html";
         request1.SetOptions(opt);
-        session <<= request1; // GET index.html
 
+        session <<= request1; // GET index.html
         session <<= request2; // GET image.png
 
         CHECK_NOTHROW(session.Execute());
@@ -174,4 +181,6 @@ TEST_CASE("Network")
         CHECK(resp1);
         CHECK(resp2);
     }
+
+    std::system("killall lighttpd");
 }

@@ -9,15 +9,24 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(DocTest)
 
-include(ExternalProject)
-ExternalProject_Add(Lighttpd
+FetchContent_Declare(
+    lighttpd_src
     GIT_REPOSITORY "https://github.com/lighttpd/lighttpd1.4"
     GIT_TAG "lighttpd-1.4.65"
-    PREFIX "${PROJECT_BINARY_DIR}/_deps/Lighttpd"
-    CMAKE_ARGS
-        -DWITH_OPENSSL=ON
-        -DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}/webserver
-    TEST_COMMAND ""
+)
+
+FetchContent_GetProperties(lighttpd_src)
+if(NOT lighttpd_POPULATED)
+    FetchContent_Populate(lighttpd_src)
+endif()
+
+add_custom_target(lighttpd
+    COMMENT "Building lighttpd..."
+    BYPRODUCTS ${lighttpd_src_BINARY_DIR}/build/lighttpd
+    COMMAND cmake -G${CMAKE_GENERATOR} -DWITH_OPENSSL=ON ${lighttpd_src_SOURCE_DIR} && cmake --build .
+    WORKING_DIRECTORY ${lighttpd_src_BINARY_DIR}
+    SOURCES ${lighttpd_src_SOURCE_DIR}/src/lemon.c
+    VERBATIM
 )
 
 configure_file (
@@ -28,7 +37,7 @@ configure_file (
 enable_testing()
 
 add_executable("rsp-core-lib-test")
-add_dependencies("rsp-core-lib-test" doctest)
+add_dependencies("rsp-core-lib-test" doctest lighttpd)
 target_include_directories("rsp-core-lib-test"
     PUBLIC
         ${doctest_SOURCE_DIR}/doctest
