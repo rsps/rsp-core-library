@@ -37,7 +37,7 @@ TEST_CASE("Network")
     opt.KeyPath = "webserver/ssl/private/SN1234.key";
 
     // Run lighttpd directly from build directory, no need to install it.
-    std::system("_deps/lighttpd-build/build/lighttpd -f webserver/lighttpd.conf -m _deps/lighttpd-build/build");
+    std::system("_deps/lighttpd_src-build/build/lighttpd -f webserver/lighttpd.conf -m _deps/lighttpd_src-build/build");
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     SUBCASE("Library Version"){
@@ -84,7 +84,27 @@ TEST_CASE("Network")
         CHECK_EQ(200, resp->GetStatusCode());
     }
 
-    SUBCASE("Validate Client") {
+    SUBCASE("Invalid Client") {
+        HttpRequest request;
+        opt.BaseUrl = "https://server.localhost:44300";
+        opt.CertPath = "";
+        opt.KeyPath = "";
+
+        request.SetOptions(opt);
+
+        IHttpResponse *resp;
+        CHECK_THROWS_AS(resp = &request.Execute(), NetworkException);
+        CHECK_THROWS_WITH_AS(resp = &request.Execute(), doctest::Contains("curl_easy_perform() failed. (56) Failure when receiving data from the peer"), NetworkException);
+
+//        MESSAGE("Request:\n" << resp->GetRequest());
+//        MESSAGE("Response:\n" << *resp);
+
+//        CHECK_EQ(resp->GetHeaders().at("content-type"), "text/html");
+//        CHECK_EQ(resp->GetBody().size(), 120);
+//        CHECK_EQ(200, resp->GetStatusCode());
+    }
+
+    SUBCASE("Validated Client") {
         HttpRequest request;
         opt.BaseUrl = "https://server.localhost:44300";
 
