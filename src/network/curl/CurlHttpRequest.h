@@ -35,8 +35,6 @@ class MultiCurl;
 class CurlHttpRequest: public rsp::network::IHttpRequest, public EasyCurl
 {
 public:
-    typedef std::function<void(IHttpResponse&)> ResponseCallback_t;
-
     CurlHttpRequest();
     ~CurlHttpRequest() override;
 
@@ -51,26 +49,11 @@ public:
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
     IHttpRequest& SetBody(const std::string &arBody) override;
 
-    IHttpRequest& SetResponseHandler(ResponseCallback_t aCallback) override;
-    bool IsAsync() override { return bool(mResponseHandler); }
-
     std::uintptr_t GetHandle() override;
-
-    void SetData(void* apData) override
-    {
-        mpMultiCurl = static_cast<MultiCurl*>(apData);
-    }
-
-    void* GetData() override
-    {
-        return mpMultiCurl;
-    }
 
 protected:
     HttpResponse mResponse;
     HttpRequestOptions mRequestOptions{};
-    ResponseCallback_t mResponseHandler{};
-    MultiCurl *mpMultiCurl = nullptr;
 
     void requestDone() override;
 

@@ -12,20 +12,25 @@
 
 namespace rsp::network {
 
-HttpSession::HttpSession()
-    : mPimpl(MakePimpl())
+HttpSession::HttpSession(std::size_t aSize)
+    : mPimpl(MakePimpl(aSize))
 {
 }
 
-void HttpSession::Execute()
+void HttpSession::ProcessRequests()
 {
-    mPimpl->Execute();
+    mPimpl->ProcessRequests();
 }
 
-rsp::network::IHttpSession& HttpSession::operator <<=(rsp::network::IHttpRequest &arRequest)
+IHttpSession& HttpSession::SetDefaultOptions(const HttpRequestOptions &arOptions)
 {
-    *mPimpl <<= arRequest;
+    mPimpl->SetDefaultOptions(arOptions);
     return *this;
+}
+
+IHttpRequest& HttpSession::Request(HttpRequestType aType, std::string_view aUri, ResponseCallback_t aCallback)
+{
+    return mPimpl->Request(aType, aUri, aCallback);
 }
 
 } /* namespace rsp::network */

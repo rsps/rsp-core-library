@@ -13,21 +13,46 @@
 
 #include <vector>
 #include <network/IHttpSession.h>
+#include <utils/ObjectPool.h>
 #include "MultiCurl.h"
 #include "CurlHttpRequest.h"
 
-namespace rsp::network::curl {
+namespace rsp::network {
 
-class CurlSession: public rsp::network::IHttpSession
+namespace curl {
+
+class CurlSession;
+
+class CurlSessionHttpRequest : public CurlHttpRequest
+{
+protected:
+    friend class CurlSession;
+    IHttpSession::ResponseCallback_t mResponseHandler{};
+    CurlSession* mpSession;
+    void requestDone() override;
+};
+
+
+class CurlSession: public IHttpSession
 {
 public:
-    void Execute() override;
-    rsp::network::IHttpSession& operator <<=(rsp::network::IHttpRequest &arRequest) override;
+    CurlSession(std::size_t aSize) : mPool(aSize) {}
+    void ProcessRequests() override;
+    IHttpSession& SetDefaultOptions(const HttpRequestOptions &arOptions) override;
+    IHttpRequest& Request(HttpRequestType aType, std::string_view aUri, ResponseCallback_t aCallback) override;
 
 protected:
     MultiCurl mMulti{};
+    HttpRequestOptions mDefaultOptions;
+    rsp::utils::ObjectPool<CurlSessionHttpRequest> mPool;
+
+private:
+    friend class CurlSessionHttpRequest;
+    void requestCompleted(CurlSessionHttpRequest* apRequest);
 };
 
-} /* namespace rsp::network::curl */
+} /* namespace curl */
+
+} /* namespace rsp::network */
 
 #endif /* SRC_NETWORK_CURL_CURLSESSION_H_ */

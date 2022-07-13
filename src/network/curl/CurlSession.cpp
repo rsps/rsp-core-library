@@ -11,30 +11,59 @@
 #include <network/HttpSession.h>
 #include "CurlSession.h"
 
+using namespace rsp::network;
+
 namespace rsp::network {
 
-IHttpSession* HttpSession::MakePimpl()
+IHttpSession* HttpSession::MakePimpl(std::size_t aSize)
 {
-    return new curl::CurlSession();
+    return new curl::CurlSession(aSize);
 }
 
 } /* namespace rsp::network */
 
 namespace rsp::network::curl {
 
-void CurlSession::Execute()
+void CurlSession::ProcessRequests()
 {
     mMulti.Execute();
 }
 
-rsp::network::IHttpSession& CurlSession::operator <<=(rsp::network::IHttpRequest &arRequest)
+IHttpSession& CurlSession::SetDefaultOptions(const HttpRequestOptions &arOptions)
 {
-    if (!arRequest.IsAsync()) {
-        THROW_WITH_BACKTRACE1(EAsyncRequest, "Requests handled by session, must have an async callback.");
-    }
-
-    mMulti.Add(arRequest);
+    mDefaultOptions = arOptions;
     return *this;
 }
+
+IHttpRequest& CurlSession::Request(HttpRequestType aType, std::string_view aUri, ResponseCallback_t aCallback)
+{
+    HttpRequestOptions opt = mDefaultOptions;
+    opt.RequestType = aType;
+    opt.Uri = aUri;
+
+    auto req = mPool.Get();
+    req->mpSession = this;
+    req->SetOptions(opt);
+    req->mResponseHandler = aCallback;
+    mMulti.Add(*req);
+
+    return *req;
+}
+
+void CurlSession::requestCompleted(CurlSessionHttpRequest *apRequest)
+{
+    mPool.Put(&apRequest);
+}
+
+void CurlSessionHttpRequest::requestDone()
+{
+    CurlHttpRequest::requestDone();
+
+    if (mResponseHandler) {
+        mResponseHandler(mResponse);
+    }
+    mpSession->requestCompleted(this);
+}
+
 
 } /* namespace rsp::network::curl */

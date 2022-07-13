@@ -37,15 +37,11 @@ CurlHttpRequest::CurlHttpRequest()
 
     setCurlOption(CURLOPT_XFERINFOFUNCTION, progressFunction);
     setCurlOption(CURLOPT_XFERINFODATA, this);
-
 }
 
 
 CurlHttpRequest::~CurlHttpRequest()
 {
-    if (mpMultiCurl) {
-        mpMultiCurl->Remove(*this);
-    }
 }
 
 size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, HttpResponse *apResponse)
@@ -102,17 +98,8 @@ IHttpRequest& CurlHttpRequest::SetBody(const std::string &arBody)
     return *this;
 }
 
-IHttpRequest& CurlHttpRequest::SetResponseHandler(std::function<void(rsp::network::IHttpResponse&)> aCallback)
-{
-    mResponseHandler = aCallback;
-    return *this;
-}
-
 IHttpResponse& CurlHttpRequest::Execute()
 {
-    if (mpMultiCurl) {
-        THROW_WITH_BACKTRACE1(EAsyncRequest, "Async requests must be executed through an IHttpSession.");
-    }
     checkRequestOptions(mRequestOptions);
 
     //Curl and evaluate
@@ -140,10 +127,6 @@ void CurlHttpRequest::requestDone()
     mResponse.SetStatusCode(static_cast<int>(resp_code));
 
     Logger::GetDefault().Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << resp_code << std::endl;
-
-    if (mResponseHandler) {
-        mResponseHandler(mResponse);
-    }
 }
 
 std::uintptr_t CurlHttpRequest::GetHandle()

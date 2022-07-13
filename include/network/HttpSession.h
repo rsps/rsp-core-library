@@ -11,7 +11,6 @@
 #ifndef INCLUDE_NETWORK_HTTPSESSION_H_
 #define INCLUDE_NETWORK_HTTPSESSION_H_
 
-#include <memory>
 #include <network/IHttpSession.h>
 
 namespace rsp::network {
@@ -19,13 +18,16 @@ namespace rsp::network {
 class HttpSession: public IHttpSession
 {
 public:
-    HttpSession();
-    rsp::network::IHttpSession& operator <<=(rsp::network::IHttpRequest &arRequest) override;
-    void Execute() override;
+    HttpSession(std::size_t aSize);
+    void ProcessRequests() override;
+
+    IHttpSession& SetDefaultOptions(const HttpRequestOptions &arOptions) override;
+
+    IHttpRequest& Request(HttpRequestType aType, std::string_view aUri, ResponseCallback_t aCallback) override;
 
 protected:
     std::unique_ptr<IHttpSession> mPimpl;
-    static IHttpSession* MakePimpl();
+    static IHttpSession* MakePimpl(std::size_t aSize);
 };
 
 } /* namespace rsp::network */

@@ -33,7 +33,6 @@ EasyCurl::EasyCurl()
 
 EasyCurl::~EasyCurl()
 {
-    DLOG("EasyCurl Destruct");
     if (mpCurl) {
         curl_easy_cleanup(mpCurl);
     }

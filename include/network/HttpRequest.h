@@ -46,30 +46,9 @@ public:
         return mPimpl->Execute();
     }
 
-    IHttpRequest& SetResponseHandler(std::function<void(IHttpResponse&)> aCallback) override
-    {
-        mPimpl->SetResponseHandler(aCallback);
-        return *this;
-    }
-
-    bool IsAsync() override
-    {
-        return mPimpl->IsAsync();
-    }
-
     std::uintptr_t GetHandle() override
     {
         return mPimpl->GetHandle();
-    }
-
-    void SetData(void* apData) override
-    {
-        mPimpl->SetData(apData);
-    }
-
-    void* GetData() override
-    {
-        return mPimpl->GetData();
     }
 
 protected:

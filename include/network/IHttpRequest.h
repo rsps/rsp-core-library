@@ -33,13 +33,7 @@ public:
 
     virtual IHttpResponse& Execute() = 0;
 
-    virtual IHttpRequest& SetResponseHandler(std::function<void(rsp::network::IHttpResponse&)> aCallback) = 0;
-    virtual bool IsAsync() = 0;
-
     virtual std::uintptr_t GetHandle() = 0;
-
-    virtual void SetData(void*) = 0;
-    virtual void* GetData() = 0;
 };
 
 std::ostream& operator<<(std::ostream &o, const IHttpRequest& arReq);

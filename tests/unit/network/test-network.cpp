@@ -81,7 +81,7 @@ TEST_CASE("Network")
             CHECK_EQ(resp->GetBody().size(), 120);
         }
 
-        CHECK_EQ(200, resp->GetStatusCode());
+        CHECK_EQ(resp->GetStatusCode(), 200);
     }
 
     SUBCASE("Invalid Client") {
@@ -95,13 +95,6 @@ TEST_CASE("Network")
         IHttpResponse *resp;
         CHECK_THROWS_AS(resp = &request.Execute(), NetworkException);
         CHECK_THROWS_WITH_AS(resp = &request.Execute(), doctest::Contains("curl_easy_perform() failed. (56) Failure when receiving data from the peer"), NetworkException);
-
-//        MESSAGE("Request:\n" << resp->GetRequest());
-//        MESSAGE("Response:\n" << *resp);
-
-//        CHECK_EQ(resp->GetHeaders().at("content-type"), "text/html");
-//        CHECK_EQ(resp->GetBody().size(), 120);
-//        CHECK_EQ(200, resp->GetStatusCode());
     }
 
     SUBCASE("Validated Client") {
@@ -114,11 +107,11 @@ TEST_CASE("Network")
         CHECK_NOTHROW(resp = &request.Execute());
 
 //        MESSAGE("Request:\n" << resp->GetRequest());
-        MESSAGE("Response:\n" << *resp);
+//        MESSAGE("Response:\n" << *resp);
 
         CHECK_EQ(resp->GetHeaders().at("content-type"), "text/html");
         CHECK_EQ(resp->GetBody().size(), 120);
-        CHECK_EQ(200, resp->GetStatusCode());
+        CHECK_EQ(resp->GetStatusCode(), 200);
     }
 
     SUBCASE("File Download") {
@@ -135,69 +128,52 @@ TEST_CASE("Network")
 
         CHECK_EQ(resp->GetHeaders().at("content-type"), "image/png");
         CHECK_EQ(resp->GetBody().size(), 25138);
-        CHECK_EQ(200, resp->GetStatusCode());
+        CHECK_EQ(resp->GetStatusCode(), 200);
     }
 
-    SUBCASE("Http2") {
-        CHECK_NOTHROW(HttpSession session1);
-        HttpSession session;
+    SUBCASE("Http Session") {
+        CHECK_NOTHROW(HttpSession session1(1));
+        bool respHead = false;
         bool resp1 = false;
         bool resp2 = false;
-
-        {
-            HttpRequest request0;
-            CHECK_THROWS_AS(session <<= request0, EAsyncRequest);
-        }
+        HttpSession session(5);
 
         opt.BaseUrl = "https://server.localhost:44300/";
-        opt.Uri = "index.html";
-        opt.Verbose = 1;
-        opt.RequestType = HttpRequestType::HEAD;
+//        opt.Verbose = 1;
+        session.SetDefaultOptions(opt);
 
-        HttpRequest request1(opt);
-        request1.SetResponseHandler([&resp1](IHttpResponse& resp) {
-//            MESSAGE("Response 1:\n" << resp);
-            CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
-            CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
-            if (resp.GetRequest().GetOptions().RequestType == HttpRequestType::HEAD) {
+        session.Head("index.html",
+            [&respHead](IHttpResponse& resp) {
+//                MESSAGE("Response Head:\n" << resp);
+                CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
+                CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
                 CHECK_EQ(resp.GetBody().size(), 0);
-            }
-            else {
+                CHECK_EQ(resp.GetStatusCode(), 200);
+                respHead = true;
+            });
+        CHECK_NOTHROW(session.ProcessRequests());
+
+        session.Get("index.html",
+            [&resp1](IHttpResponse& resp) {
+//                MESSAGE("Response 1:\n" << resp);
+                CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
+                CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
                 CHECK_EQ(resp.GetBody().size(), 120);
-            }
-            CHECK_EQ(200, resp.GetStatusCode());
-            resp1 = true;
-        });
+                CHECK_EQ(200, resp.GetStatusCode());
+                resp1 = true;
+            });
+        session.Get("image.png",
+            [&resp2](IHttpResponse& resp) {
+//              MESSAGE("Response 2:\n" << resp);
+                CHECK_EQ(resp.GetHeaders().at("content-type"), "image/png");
+                CHECK_EQ(resp.GetHeaders().at("content-length"), "25138");
+                CHECK_EQ(resp.GetBody().size(), 25138);
+                CHECK_EQ(200, resp.GetStatusCode());
+                resp2 = true;
+            });
+        CHECK_NOTHROW(session.ProcessRequests());
 
-        opt.Uri = "image.png";
-        opt.RequestType = HttpRequestType::GET;
-        HttpRequest request2(opt);
-        request2.SetResponseHandler([&resp2](IHttpResponse& resp) {
-//            MESSAGE("Response 2:\n" << resp);
-            CHECK_EQ(resp.GetHeaders().at("content-type"), "image/png");
-            CHECK_EQ(resp.GetHeaders().at("content-length"), "25138");
-            CHECK_EQ(resp.GetBody().size(), 25138);
-            CHECK_EQ(200, resp.GetStatusCode());
-            resp2 = true;
-        });
-
-//      TODO: Maybe improve usage to something like this:
-//        session.SetDefaultOptions(opt);
-//        session.Head("index.html", [](IHttpResponse& resp) { ... });
-//        session.Get("index.html", [&resp1](IHttpResponse& resp) { ... });
-//        session.Get("image.png", [&resp2](IHttpResponse& resp) { ... });
-
-        session <<= request1; // HEAD index.html
-        CHECK_NOTHROW(session.Execute());
-
-        opt.Uri = "index.html";
-        request1.SetOptions(opt);
-
-        session <<= request1; // GET index.html
-        session <<= request2; // GET image.png
-
-        CHECK_NOTHROW(session.Execute());
-
+        CHECK(respHead);
         CHECK(resp1);
         CHECK(resp2);
     }

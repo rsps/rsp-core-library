@@ -36,7 +36,6 @@ MultiCurl& MultiCurl::Add(rsp::network::IHttpRequest &arRequest)
     if (mc != CURLM_OK) {
         THROW_WITH_BACKTRACE2(ECurlMError, "curl_multi_add_handle() failed.", mc);
     }
-    arRequest.SetData(this);
 
     return *this;
 }
@@ -104,8 +103,8 @@ void MultiCurl::processMessages()
         CURLMsg *msg = curl_multi_info_read(mpMultiHandle, &msgs_in_queue);
         if (msg && msg->msg == CURLMSG_DONE) {
             auto req = EasyCurl::GetFromHandle(msg->easy_handle);
-            req->requestDone();
             Remove(*static_cast<CurlHttpRequest*>(req));
+            req->requestDone();
         }
     }
     while(msgs_in_queue > 0);
