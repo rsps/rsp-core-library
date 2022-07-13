@@ -89,17 +89,34 @@ target_include_directories(rsp-core-lib
         ${CURL_INCLUDE_DIRS}
 )
 
-set(GOOD_COMPILER_OPTIONS -pedantic -Wall -Wextra -Wold-style-cast
-    -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization
-    -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations
-    -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual
-    -Wredundant-decls -Wsign-conversion -Wsign-promo
-    -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
-    -Wundef -Wno-unused -Weffc++ -Werror
+add_compile_options(
+    -pedantic -Wall
+    -Wextra
+    -Wold-style-cast
+    -Wcast-align
+    -Wcast-qual
+    -Wctor-dtor-privacy
+    -Wdisabled-optimization
+    -Wformat=2
+    -Winit-self
+    -Wlogical-op
+    -Wmissing-declarations
+    -Wmissing-include-dirs
+    -Wnoexcept
+    -Woverloaded-virtual
+    -Wredundant-decls
+    -Wsign-conversion
+    -Wsign-promo
+    -Wstrict-null-sentinel
+    -Wstrict-overflow=5
+    -Wswitch-default
+    -Wundef
+    -Wno-unused
+    -Weffc++
+    -Werror
 )
 
 target_compile_options(rsp-core-lib PRIVATE
-    ${GOOD_COMPILER_OPTIONS}
     -Wshadow
     ${FREETYPE_BUILD_OPTIONS}
     ${OPENSSL_BUILD_OPTIONS}
