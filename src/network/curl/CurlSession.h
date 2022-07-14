@@ -28,7 +28,7 @@ class CurlSessionHttpRequest : public CurlHttpRequest
 protected:
     friend class CurlSession;
     IHttpSession::ResponseCallback_t mResponseHandler{};
-    CurlSession* mpSession;
+    CurlSession* mpSession = nullptr;
     void requestDone() override;
 };
 
@@ -43,7 +43,7 @@ public:
 
 protected:
     MultiCurl mMulti{};
-    HttpRequestOptions mDefaultOptions;
+    HttpRequestOptions mDefaultOptions{};
     rsp::utils::ObjectPool<CurlSessionHttpRequest> mPool;
 
 private:

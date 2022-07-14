@@ -90,7 +90,8 @@ target_include_directories(rsp-core-lib
 )
 
 add_compile_options(
-    -pedantic -Wall
+    -pedantic
+    -Wall
     -Wextra
     -Wold-style-cast
     -Wcast-align
@@ -114,6 +115,7 @@ add_compile_options(
     -Wno-unused
     -Weffc++
     -Werror
+#     -v -dD
 )
 
 target_compile_options(rsp-core-lib PRIVATE
