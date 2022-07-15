@@ -17,6 +17,10 @@
 
 namespace rsp::network::curl {
 
+/**
+ * \class CurlLibrary
+ * \brief Meta object to initialize the libcurl globals and request library information.
+ */
 class CurlLibrary : public rsp::network::NetworkLibrary
 {
 public:

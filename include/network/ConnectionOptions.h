@@ -16,6 +16,10 @@
 
 namespace rsp::network {
 
+/**
+ * \class ConnectionOptions
+ * \brief Options for a low level connection, including certificates for TLS encryption
+ */
 class ConnectionOptions
 {
 public:

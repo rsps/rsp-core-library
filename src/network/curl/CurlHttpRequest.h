@@ -12,8 +12,6 @@
 #define CURLHTTPREQUEST_H
 
 #include <network/IHttpRequest.h>
-#include <network/HttpRequest.h>
-#include <network/HttpResponse.h>
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -22,6 +20,7 @@
 #include <stdexcept>
 #include <utility>
 #include "EasyCurl.h"
+#include "CurlHttpResponse.h"
 
 namespace rsp::network::curl {
 
@@ -52,15 +51,15 @@ public:
     std::uintptr_t GetHandle() override;
 
 protected:
-    HttpResponse mResponse;
+    CurlHttpResponse mResponse;
     HttpRequestOptions mRequestOptions{};
 
     void requestDone() override;
 
 private:
 
-    static size_t writeFunction(void *ptr, size_t size, size_t nmemb, HttpResponse *data);
-    static size_t headerFunction(char *data, size_t size, size_t nmemb, HttpResponse *apResponse);
+    static size_t writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *data);
+    static size_t headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse);
     static size_t progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
 
     void checkRequestOptions(const HttpRequestOptions &arOpts);

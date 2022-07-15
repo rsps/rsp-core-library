@@ -19,6 +19,11 @@ namespace rsp::network::curl {
 
 class MultiCurl;
 
+/**
+ * \class EasyCurl
+ * \brief Low level wrapper for libcurls Easy interface.
+ * This wrapper allocates an easy handle, but can also lookup this class object from a given handle.
+ */
 class EasyCurl
 {
 public:

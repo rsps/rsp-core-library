@@ -18,13 +18,29 @@
 
 namespace rsp::network {
 
+/**
+ * \enum HttpRequestType
+ * \brief Enumeration of the supported requests types.
+ */
 enum class HttpRequestType
 {
     NONE, GET, POST, PUT, HEAD, PATCH, DELETE, __count__
 };
 
+/**
+ * \fn std::ostream operator <<&(std::ostream&, HttpRequestType)
+ * \brief Output streaming of the request types
+ *
+ * \param o
+ * \param aType
+ * \return
+ */
 std::ostream& operator<<(std::ostream &o, HttpRequestType aType);
 
+/**
+ * \class HttpRequestOptions
+ * \brief Common Options for a HttpRequest, inherits connection options.
+ */
 class HttpRequestOptions: public ConnectionOptions
 {
 public:

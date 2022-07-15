@@ -11,12 +11,14 @@
 #include <iostream>
 #include <map>
 #include <iterator>
+#include <string>
+#include <logging/Logger.h>
+#include <network/HttpRequest.h>
 #include <posix/FileIO.h>
+#include <utils/StrUtils.h>
 #include "CurlHttpRequest.h"
 #include "CurlSession.h"
 #include "Exceptions.h"
-#include <utils/StrUtils.h>
-#include <logging/Logger.h>
 
 using namespace rsp::logging;
 using namespace rsp::network;
@@ -44,13 +46,13 @@ CurlHttpRequest::~CurlHttpRequest()
 {
 }
 
-size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, HttpResponse *apResponse)
+size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
 {
-    apResponse->GetBody().append(static_cast<char*>(ptr), size * nmemb);
+    apResponse->getBody().append(static_cast<char*>(ptr), size * nmemb);
     return size * nmemb;
 }
 
-size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, HttpResponse *apResponse)
+size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
 {
     std::string header(data, size * nmemb);
     size_t seperator = header.find_first_of(':');
@@ -59,14 +61,14 @@ size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, Ht
         if (0 == header.length()) {
             return (size * nmemb); // blank line;
         }
-        apResponse->AddHeader(StrUtils::ToLower(header), "present");
+        apResponse->addHeader(StrUtils::ToLower(header), "present");
     }
     else {
         std::string key = header.substr(0, seperator);
         StrUtils::Trim(key);
         std::string value = header.substr(seperator + 1);
         StrUtils::Trim(value);
-        apResponse->AddHeader(StrUtils::ToLower(key), value);
+        apResponse->addHeader(StrUtils::ToLower(key), value);
     }
 
     return (size * nmemb);
@@ -124,7 +126,7 @@ void CurlHttpRequest::requestDone()
 {
     long resp_code = 0;
     getCurlInfo(CURLINFO_RESPONSE_CODE, &resp_code);
-    mResponse.SetStatusCode(static_cast<int>(resp_code));
+    mResponse.setStatusCode(static_cast<int>(resp_code));
 
     Logger::GetDefault().Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << resp_code << std::endl;
 }

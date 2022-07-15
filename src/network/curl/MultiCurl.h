@@ -18,6 +18,12 @@
 
 namespace rsp::network::curl {
 
+/**
+ * \class MultiCurl
+ * \brief Reduced wrapper for libcurls multi interface.
+ * This implementation is intended for queing multiple requests and let libcurl execute them all.
+ * This allows for utilizing HTTP 1.1 keepalive and http2 transport optimizations.
+ */
 class MultiCurl
 {
 public:

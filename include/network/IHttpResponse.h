@@ -21,25 +21,43 @@ namespace rsp::network {
 //Forward declarations
 class IHttpRequest;
 
+/**
+ * \class IHttpResponse
+ * \brief Interface for a HTTP response object
+ */
 class IHttpResponse
 {
 public:
-    //Headers
+    /**
+     * \brief Get a const reference to the response headers.
+     *
+     * \return Reference to headers.
+     */
     virtual const std::map<std::string, std::string>& GetHeaders() const = 0;
-    virtual IHttpResponse& SetHeaders(std::map<std::string, std::string> &headers) = 0;
-    virtual IHttpResponse& AddHeader(std::string key, std::string value) = 0;
 
-    //HTTP response code
+    /**
+     * \fn int GetStatusCode()const =0
+     * \brief Get the status code of the response
+     *
+     * \return integer status code
+     */
     virtual int GetStatusCode() const = 0;
-    virtual IHttpResponse& SetStatusCode(int aCode) = 0;
 
-    //Origin request
+    /**
+     * \fn const IHttpRequest GetRequest&()const =0
+     * \brief Get the request object causing this response.
+     *
+     * \return Reference to the request object.
+     */
     virtual const IHttpRequest& GetRequest() const = 0;
 
-    //HTTP response body
+    /**
+     * \fn const std::string GetBody&()const =0
+     * \brief Get the body of the response.
+     *
+     * \return String with body content
+     */
     virtual const std::string& GetBody() const = 0;
-    virtual std::string& GetBody() = 0;
-    virtual IHttpResponse& SetBody(const std::string &arBody) = 0;
 
     virtual ~IHttpResponse()
     {

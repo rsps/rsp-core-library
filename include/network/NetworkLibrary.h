@@ -15,15 +15,47 @@
 
 namespace rsp::network {
 
+/**
+ * \class NetworkLibrary
+ * \brief Interface for a singleton network library.
+ *
+ * Implementations must implement the static Get factory and override the rest.
+ */
 class NetworkLibrary
 {
 public:
     virtual ~NetworkLibrary() {}
 
+    /**
+     * \fn NetworkLibrary Get&()
+     * \brief Factory for the library. This allows for lazy instantiation and initialization of the library.
+     *
+     * \return self
+     */
     static NetworkLibrary& Get();
 
+    /**
+     * \fn std::string_view GetLibraryName()const =0
+     * \brief Get the name of the underlying library
+     *
+     * \return string
+     */
     virtual std::string_view GetLibraryName() const = 0;
+
+    /**
+     * \fn std::string_view GetVersion()const =0
+     * \brief Get the version of the underlying library
+     *
+     * \return string
+     */
     virtual std::string_view GetVersion() const = 0;
+
+    /**
+     * \fn std::string_view GetSslVersion()const =0
+     * \brief Get the version of the SSL library used
+     *
+     * \return
+     */
     virtual std::string_view GetSslVersion() const = 0;
 };
 

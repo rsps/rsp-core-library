@@ -17,6 +17,12 @@
 
 namespace rsp::network {
 
+/**
+ * \class IHttpSession
+ * \brief Interface for a multi request HttpSession.
+ * Create this object once and use it multiple times to perform request against the same server.
+ * It encapsulates much of the boiler plate code needed to configure a single request.
+ */
 class IHttpSession
 {
 public:
@@ -24,12 +30,40 @@ public:
 
     virtual ~IHttpSession() {}
 
+    /**
+     * \fn void ProcessRequests()=0
+     * \brief Process all requests currently queued in the session.
+     */
     virtual void ProcessRequests() = 0;
 
+    /**
+     * \fn IHttpSession SetDefaultOptions&(const HttpRequestOptions&)=0
+     * \brief Set the default options, including headers, to use in each request
+     *
+     * \param arOptions
+     * \return self
+     */
     virtual IHttpSession& SetDefaultOptions(const HttpRequestOptions &arOptions) = 0;
 
+    /**
+     * \fn IHttpRequest Request&(HttpRequestType, std::string_view, ResponseCallback_t)=0
+     * \brief Queue a new request of the given type and destination.
+     *
+     * \param aType GET, PUT, POST etc.
+     * \param aUri index.html, login.php etc.
+     * \param aCallback Callback invoked when response is ready
+     * \return self
+     */
     virtual IHttpRequest& Request(HttpRequestType aType, std::string_view aUri, ResponseCallback_t aCallback) = 0;
 
+    /**
+     * \fn IHttpRequest Get|Post|Put|Head|Patch|Delete&(std::string_view, ResponseCallback_t)
+     * \brief REST helpers for cleaner code.
+     *
+     * \param aUri The request destination
+     * \param aCallback Response handler
+     * \return self
+     */
     IHttpRequest& Get(std::string_view aUri, ResponseCallback_t aCallback)   { return Request(HttpRequestType::GET, aUri, aCallback); }
     IHttpRequest& Post(std::string_view aUri, ResponseCallback_t aCallback)  { return Request(HttpRequestType::POST, aUri, aCallback); }
     IHttpRequest& Put(std::string_view aUri, ResponseCallback_t aCallback)   { return Request(HttpRequestType::PUT, aUri, aCallback); }

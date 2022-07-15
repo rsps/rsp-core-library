@@ -34,27 +34,9 @@ public:
         return mHeaders;
     }
 
-    IHttpResponse& SetHeaders(std::map<std::string, std::string> &arHeaders) override
-    {
-        mHeaders = arHeaders;
-        return *this;
-    }
-
-    IHttpResponse& AddHeader(std::string aKey, std::string aValue) override
-    {
-        mHeaders[aKey] = aValue;
-        return *this;
-    }
-
     int GetStatusCode() const override
     {
         return mStatusCode;
-    }
-
-    IHttpResponse& SetStatusCode(int aCode) override
-    {
-        mStatusCode = aCode;
-        return *this;
     }
 
     const IHttpRequest& GetRequest() const override
@@ -65,17 +47,6 @@ public:
     const std::string& GetBody() const override
     {
         return mBody;
-    }
-
-    std::string& GetBody() override
-    {
-        return mBody;
-    }
-
-    IHttpResponse& SetBody(const std::string &arBody)
-    {
-        mBody = arBody;
-        return *this;
     }
 
 protected:

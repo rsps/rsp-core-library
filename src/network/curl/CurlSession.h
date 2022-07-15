@@ -17,9 +17,7 @@
 #include "MultiCurl.h"
 #include "CurlHttpRequest.h"
 
-namespace rsp::network {
-
-namespace curl {
+namespace rsp::network::curl {
 
 class CurlSession;
 
@@ -51,8 +49,6 @@ private:
     void requestCompleted(CurlSessionHttpRequest* apRequest);
 };
 
-} /* namespace curl */
-
-} /* namespace rsp::network */
+} /* namespace rsp::network::curl */
 
 #endif /* SRC_NETWORK_CURL_CURLSESSION_H_ */
