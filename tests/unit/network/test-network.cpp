@@ -66,7 +66,7 @@ TEST_CASE("Network")
 
         request.SetOptions(opt);
 
-        IHttpResponse *resp;
+        IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
 
 //        MESSAGE("Request:\n" << resp->GetRequest());
@@ -92,7 +92,7 @@ TEST_CASE("Network")
 
         request.SetOptions(opt);
 
-        IHttpResponse *resp;
+        IHttpResponse *resp = nullptr;
         CHECK_THROWS_AS(resp = &request.Execute(), NetworkException);
         CHECK_THROWS_WITH_AS(resp = &request.Execute(), doctest::Contains("curl_easy_perform() failed. (56) Failure when receiving data from the peer"), NetworkException);
     }
@@ -103,7 +103,7 @@ TEST_CASE("Network")
 
         request.SetOptions(opt);
 
-        IHttpResponse *resp;
+        IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
 
 //        MESSAGE("Request:\n" << resp->GetRequest());
@@ -120,7 +120,7 @@ TEST_CASE("Network")
 
         request.SetOptions(opt);
 
-        IHttpResponse *resp;
+        IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
 
 //        MESSAGE("Request:\n" << resp->GetRequest());

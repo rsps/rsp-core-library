@@ -9,6 +9,7 @@ OPTION(ARC_ARM "Set to cross-compile for ARM CPU" OFF) # Disabled by default.
 OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
 OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
 OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
+OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
 
 if(ARCH_ARM)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
@@ -145,5 +146,6 @@ add_subdirectory(src)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-add_subdirectory(tests)
-
+if (BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
