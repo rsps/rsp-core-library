@@ -47,21 +47,6 @@ public:
     }
 };
 
-/**
- * \class EAsyncRequest
- *
- * \brief Exception regarding asynchronous requests
- *
- */
-class EAsyncRequest: public NetworkException
-{
-public:
-    explicit EAsyncRequest(const std::string &aMsg)
-        : NetworkException(aMsg)
-    {
-    }
-};
-
 
 
 }// namespace rsp::network
