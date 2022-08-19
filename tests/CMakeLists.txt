@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(DocTest)
 FetchContent_Declare(
     lighttpd_src
     GIT_REPOSITORY "https://github.com/lighttpd/lighttpd1.4"
-    GIT_TAG "lighttpd-1.4.65"
+    GIT_TAG "lighttpd-1.4.66"
 )
 
 FetchContent_GetProperties(lighttpd_src)
