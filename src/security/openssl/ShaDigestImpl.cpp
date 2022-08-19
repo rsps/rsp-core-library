@@ -55,7 +55,7 @@ public:
         params[1] = OSSL_PARAM_construct_end();
 
 //        HMAC_Init_ex(mpCtx, arSecret.data(), static_cast<int>(arSecret.size()), algo, NULL);
-        EVP_MAC_init(mpCtx, arSecret.data(), static_cast<int>(arSecret.size()), params);
+        EVP_MAC_init(mpCtx, arSecret.data(), static_cast<unsigned long int>(arSecret.size()), params);
     }
 
     ~OpenSSLSha()
