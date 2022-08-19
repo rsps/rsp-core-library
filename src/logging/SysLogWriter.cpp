@@ -13,9 +13,16 @@
 
 namespace rsp::logging {
 
+SysLogWriter::SysLogWriter(std::string aIdent, std::string aAcceptLevel, LogType aType)
+    : mIdent(aIdent),
+      mAcceptLevel(ToLogLevel(aAcceptLevel))
+{
+    openlog(mIdent.c_str(), LOG_PID, static_cast<int>(aType));
+}
 
-SysLogWriter::SysLogWriter(std::string aIdent, LogType aType)
-    : mIdent(aIdent)
+SysLogWriter::SysLogWriter(std::string aIdent, LogLevel aAcceptLevel, LogType aType)
+    : mIdent(aIdent),
+      mAcceptLevel(aAcceptLevel)
 {
     openlog(mIdent.c_str(), LOG_PID, static_cast<int>(aType));
 }
@@ -27,7 +34,7 @@ SysLogWriter::~SysLogWriter()
 
 void SysLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel)
 {
-    if (arMsg.length()) {
+    if (arMsg.length() && (mAcceptLevel >= aCurrentLevel)) {
         syslog(static_cast<int>(aCurrentLevel), "%s", arMsg.c_str());
     }
 }

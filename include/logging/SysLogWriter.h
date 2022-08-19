@@ -21,13 +21,15 @@ namespace rsp::logging {
  */
 class SysLogWriter: public LogWriterInterface {
 public:
-    SysLogWriter(std::string aIdent, LogType aType);
+    SysLogWriter(std::string aIdent, std::string aAcceptLevel, LogType aType);
+    SysLogWriter(std::string aIdent, LogLevel aAcceptLevel, LogType aType);
     ~SysLogWriter();
 
     void Write(const std::string &arMsg, LogLevel aCurrentLevel) override;
 
 protected:
     std::string mIdent;
+    LogLevel mAcceptLevel;
 };
 
 } /* namespace logging */
