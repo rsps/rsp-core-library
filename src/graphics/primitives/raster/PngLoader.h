@@ -23,7 +23,7 @@ namespace rsp::graphics
 class FourCC
 {
 public:
-    FourCC() {}
+    FourCC() noexcept {}
     FourCC(std::uint32_t aValue)
     {
         mValue = htobe32(aValue);
