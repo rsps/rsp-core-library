@@ -1,0 +1,50 @@
+var.basedir = "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@/webserver"
+
+server.modules += ("mod_openssl")
+
+server.document-root = basedir + "/public/"
+
+server.port = 8443
+server.name = "server.localhost"
+ssl.pemfile = basedir + "/ssl/certs/server.pem"
+ssl.engine  = "enable"
+ssl.ca-file = basedir + "/ssl/ca/ca.pem"
+
+ssl.openssl.ssl-conf-cmd = ("MinProtocol" => "TLSv1.3",
+                            "Options" => "-ServerPreference")
+
+server.username = "www-data"
+server.groupname = "www-data"
+
+mimetype.assign = (
+    ".html" => "text/html",
+    ".txt" => "text/plain",
+    ".json" => "application/json",
+    ".jpg" => "image/jpeg",
+    ".png" => "image/png"
+)
+
+server.errorlog = basedir + "/error.log"
+debug.log-request-handling = "enable"
+debug.log-request-header = "enable"
+#debug.log-state-handling = "enable"
+debug.log-ssl-noise = "enable"
+
+static-file.exclude-extensions = ( ".fcgi", ".php", ".rb", "~", ".inc" )
+index-file.names = ( "index.html" )
+
+$HTTP["host"] == "server.localhost" {
+    server.document-root = basedir + "/public/"
+}
+
+$SERVER["socket"] == ":44300" {
+    ssl.engine  = "enable"
+    ssl.pemfile = basedir + "/ssl/certs/server.pem"
+    ssl.ca-file = basedir + "/ssl/ca/ca.pem"
+    
+    ssl.verifyclient.exportcert = "enable"
+    ssl.verifyclient.activate   = "enable"
+    ssl.verifyclient.username   = "SSL_CLIENT_S_DN_CN"
+    ssl.verifyclient.enforce    = "enable"
+    ssl.verifyclient.depth      = 3
+}

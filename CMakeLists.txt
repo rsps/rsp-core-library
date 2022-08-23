@@ -8,6 +8,8 @@ OPTION(RELEASE_BUILD "Set to turn off debug output" OFF) # Disabled by default.
 OPTION(ARC_ARM "Set to cross-compile for ARM CPU" OFF) # Disabled by default.
 OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
 OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
+OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
+OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
 
 if(ARCH_ARM)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
@@ -34,6 +36,7 @@ configure_file (
     "${PROJECT_BINARY_DIR}/src/version-def.h"
 )
 
+
 set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
@@ -54,6 +57,14 @@ if (FREETYPE_FONTS)
     set(FONT_LIB Freetype::Freetype)
 endif()
 
+if (NET_LIBCURL)
+#    set(CURL_LIBRARY "-lcurl") 
+    find_package(CURL 7.33 REQUIRED)
+    set(LIBCURL_BUILD_OPTIONS -DUSE_CURL)
+    set(NETWORK_LIB CURL::libcurl)
+#    include_directories(${CURL_INCLUDE_DIR})
+endif()
+
 if (OPENSSL_CRYPTO)
     find_package(OpenSSL REQUIRED)
     set(OPENSSL_BUILD_OPTIONS -DUSE_OPENSSL)
@@ -63,6 +74,7 @@ endif()
 target_link_libraries ("rsp-core-lib"
     ${FONT_LIB}
     ${CRYPTO_LIB}
+    ${NETWORK_LIB}
 )
 
 # Define headers for this library. PUBLIC headers are used for
@@ -75,27 +87,50 @@ target_include_directories(rsp-core-lib
     PRIVATE
         ${PROJECT_BINARY_DIR}/src
         ${FREETYPE_INCLUDE_DIRS}
+        ${CURL_INCLUDE_DIRS}
 )
 
-set(GOOD_COMPILER_OPTIONS -pedantic -Wall -Wextra -Wold-style-cast
-    -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization
-    -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations
-    -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual
-    -Wredundant-decls -Wsign-conversion -Wsign-promo
-    -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default
-    -Wundef -Wno-unused -Weffc++ -Werror
+add_compile_options(
+    -pedantic
+    -Wall
+    -Wextra
+    -Wold-style-cast
+    -Wcast-align
+    -Wcast-qual
+    -Wctor-dtor-privacy
+    -Wdisabled-optimization
+    -Wformat=2
+    -Winit-self
+    -Wlogical-op
+    -Wmissing-declarations
+    -Wmissing-include-dirs
+    -Wnoexcept
+    -Woverloaded-virtual
+    -Wredundant-decls
+    -Wsign-conversion
+    -Wsign-promo
+    -Wstrict-null-sentinel
+    -Wstrict-overflow=5
+    -Wswitch-default
+    -Wundef
+    -Wno-unused
+    -Weffc++
+    -Werror
+#     -v -dD
 )
 
 target_compile_options(rsp-core-lib PRIVATE
-    ${GOOD_COMPILER_OPTIONS}
     -Wshadow
     ${FREETYPE_BUILD_OPTIONS}
     ${OPENSSL_BUILD_OPTIONS}
+    ${LIBCURL_BUILD_OPTIONS}
 )
 
 if (NOT RELEASE_BUILD)
 target_compile_options(rsp-core-lib PRIVATE
     -DDEBUG_LOG
+    -g
+    -O0
 )
 else()
 target_compile_options(rsp-core-lib PRIVATE
@@ -111,5 +146,6 @@ add_subdirectory(src)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-add_subdirectory(tests)
-
+if (BUILD_TESTING)
+    add_subdirectory(tests)
+endif()

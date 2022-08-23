@@ -5,39 +5,147 @@ skinparam stereotypeCBackgroundColor<<Exception>> Red
 
 title Network Classes
 
-namespace rsp {
+namespace rsp.network {
 
-class LibCurlWrapper {
+
+    class NetworkException <<Exception>> {
+        Base class for all exceptions 
+        in the network namespace
+    }
+
+    class ERequestOptions <<Exception>> {
+        Thrown when trying to execute a request
+        with missing required options
+    }
+
+    class ConnectionOptions{
+        + Url: string
+        + ConnectTimeOutMs: uint32_t
+        + TimeOutMs: uint32_t
+        + CertPath: string
+        + KeyPath: string
+    }
+
+    enum HttpRequestType {
+        NONE,
+        GET,
+        POST,
+        PUT,
+        HEAD,
+        PATCH,
+        DELETE
+    }
+    
+    class HttpRequestOptions {
+        + Headers: map<string, string>
+        + Body: string
+        + HttpRequestType RequestType = HttpRequestType.NONE
+        + BasicAuthUsername: string
+        + BasicAuthPassword: string
+    }
+
+
+    class IHttpSession  {
+        + {abstract} ProcessRequests()
+        + {abstract} SetDefaultOptions(arOptions: const HttpRequestOptions&): IHttpSession&
+        + {abstract} Request(aType: HttpRequestType, aUri: std::string_view, aCallback: ResponseCallback_t): IHttpRequest&
+
+        + {abstract} Get(aUri: std::string_view, aCallback: ResponseCallback_t): IHttpRequest&
+        + {abstract} Post(aUri: std::string_view, aCallback: ResponseCallback_t): IHttpRequest&
+        + {abstract} Put(aUri: std::string_view, aCallback: ResponseCallback_t): IHttpRequest&
+        + {abstract} Head(aUri: std::string_view, aCallback: ResponseCallback_t): IHttpRequest&
+        + {abstract} Patch(aUri: std::string_view, aCallback: ResponseCallback_t): IHttpRequest&
+        + {abstract} Delete(aUri: std::string_view, aCallback: ResponseCallback_t): IHttpRequest&
+    }
+
+    interface IHttpRequest {
+        + {abstract} GetOptions(): const HttpRequestOptions&
+        + {abstract} SetOptions(arOptions: const HttpRequestOptions&): IHttpRequest&;
+        + {abstract} Execute(): IHttpResponse&
+        + {abstract} SetBody(arBody: const std::string&): IHttpRequest&
+        + {abstract} GetHandle(): std::uintptr_t
+    }
+
+    interface IHttpResponse{
+        + {abstract} GetStatusCode() : int
+        + {abstract} GetHeaders() : map<string, string>
+        + {abstract} GetRequest() : HttpRequest
+        + {abstract} GetBody() : string
+    }
+
+    class HttpSession {
+    }
+    class HttpRequest {
+    }
+    class HttpResponse {
+    }
+    class NetworkLibrary {
+        + {static} Get(): NetworkLibrary&
+
+        + {abstract} GetLibraryName(): std::string_view
+        + {abstract} GetVersion(): std::string_view
+        + {abstract} GetSslVersion(): std::string_view
+    }
+
+    namespace rsp.network.curl {
+        
+        class CurlLibrary {
+        }
+
+        class CurlHttpRequest {
+        }
+        class CurlSessionHttpRequest {
+        }  
+
+        class CurlHttpResponse {
+        }
+        
+        class EasyCurl {
+        }
+
+        class MultiCurl {
+        }
+        
+        class ECurlVersion <<Exception>> {
+            Thrown if libcurl is not correct version
+        }
+
+        class ECurlError <<Exception>> {
+            Thrown on errors from EasyCurl
+        }
+
+        class ECurlMError <<Exception>> {
+            Thrown on errors from MultiCurl
+        }
+    }
 }
 
-class HttpRequest {
-}
 
-class HttpResponse {
-}
+rsp.network.ERequestOptions -up-|> rsp.network.NetworkException
 
-class HttpDownload {
-}
+rsp.network.curl.ECurlVersion --up-|> rsp.network.NetworkException
+rsp.network.curl.ECurlError --up-|> rsp.network.NetworkException
+rsp.network.curl.ECurlMError --up-|> rsp.network.NetworkException
 
-class DnsLookup {
-}
+rsp.network.HttpRequestOptions -up-|> rsp.network.ConnectionOptions 
+rsp.network.HttpRequestType --* rsp.network.HttpRequestOptions
+rsp.network.HttpSession -up-|> rsp.network.IHttpSession 
 
-class Json <<utils>> {
-}
+rsp.network.HttpRequestOptions --* rsp.network.IHttpSession 
+rsp.network.IHttpRequest --* rsp.network.IHttpSession
 
-class Crc32 {
-}
+rsp.network.HttpResponse -up-|> rsp.network.IHttpResponse
+rsp.network.HttpRequest -up-|> rsp.network.IHttpRequest
 
-LibCurlWrapper <|-- HttpRequest
-LibCurlWrapper <|-- HttpResponse
-LibCurlWrapper <|-- HttpDownload
-LibCurlWrapper <|-- DnsLookup
+rsp.network.IHttpRequest --o rsp.network.HttpSession
+rsp.network.HttpRequestOptions --* rsp.network.IHttpRequest 
+rsp.network.HttpResponse --* rsp.network.IHttpRequest
 
-Crc32 *-- HttpDownload
-
-Json *-- HttpRequest
-Json *-- HttpResponse
-
-}
+rsp.network.curl.CurlLibrary -up-|> rsp.network.NetworkLibrary
+rsp.network.curl.CurlHttpRequest -up-|> rsp.network.IHttpRequest
+rsp.network.curl.CurlHttpRequest -up-* rsp.network.HttpRequest
+rsp.network.curl.CurlSessionHttpRequest -up-|> rsp.network.curl.CurlHttpRequest
+rsp.network.curl.CurlHttpResponse -up-|> rsp.network.IHttpResponse
+rsp.network.curl.CurlSession -up-|> rsp.network.IHttpSession
 
 @enduml

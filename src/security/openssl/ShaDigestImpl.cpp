@@ -12,10 +12,13 @@
 #include <security/Sha.h>
 #include <utils/CoreException.h>
 
+#include <openssl/evp.h>
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
 
 namespace rsp::security {
+
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
 
 /**
  * \class OpenSSLSha
@@ -43,6 +46,7 @@ public:
                 algo = EVP_sha3_256();
                 break;
         }
+
         HMAC_Init_ex(mpCtx, arSecret.data(), static_cast<int>(arSecret.size()), algo, NULL);
     }
 
@@ -74,6 +78,71 @@ public:
 protected:
     HMAC_CTX *mpCtx;
 };
+
+#else // OPENSSL_VERSION_NUMBER < 0x30000000L
+
+class OpenSSLSha : public DigestImpl
+{
+public:
+    OpenSSLSha(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
+        : mpMac(EVP_MAC_fetch(nullptr, "HMAC", nullptr)),
+          mpCtx(EVP_MAC_CTX_new(mpMac))
+    {
+        std::string algo;
+        switch (aAlgorithm) {
+            case HashAlgorithms::Sha1:
+                algo = "SHA1";
+                break;
+
+            default:
+            case HashAlgorithms::Sha256:
+                algo = "SHA256";
+                break;
+
+            case HashAlgorithms::Sha3:
+                algo = "SHA3-256";
+                break;
+        }
+        OSSL_PARAM params[2];
+        params[0] = OSSL_PARAM_construct_utf8_string("digest", algo.data(), 0);
+        params[1] = OSSL_PARAM_construct_end();
+
+        EVP_MAC_init(mpCtx, arSecret.data(), static_cast<unsigned long int>(arSecret.size()), params);
+    }
+
+    ~OpenSSLSha()
+    {
+        EVP_MAC_free(mpMac);
+        EVP_MAC_CTX_free(mpCtx);
+    }
+
+    OpenSSLSha(const OpenSSLSha&) = delete;
+    OpenSSLSha& operator=(const OpenSSLSha&) = delete;
+
+    void Update(const uint8_t *apBuffer, std::size_t aSize) override
+    {
+        EVP_MAC_update(mpCtx, apBuffer, static_cast<unsigned long int>(aSize));
+    }
+
+    SecureBuffer Finalize() override
+    {
+        SecureBuffer result;
+        unsigned long int len;
+
+        EVP_MAC_final(mpCtx, nullptr, &len, 0);
+        result.resize(len);
+        EVP_MAC_final(mpCtx, result.data(), &len, len);
+        ASSERT(len == result.size());
+
+        return result;
+    }
+
+protected:
+    EVP_MAC * mpMac;
+    EVP_MAC_CTX *mpCtx;
+};
+
+#endif
 
 // SHA interface factory for OpenSSL
 DigestImpl* DigestImpl::Create(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
