@@ -40,11 +40,13 @@ TEST_CASE("Image Test")
                           testRect.GetTop() + (rand() % testRect.GetHeight()));
         testImage.Invalidate();
 
+        MESSAGE("point: " << insidePoint);
+
         // Act
         testImage.Render(fb);
 
         // Assert
-        CHECK(fb.GetPixel(insidePoint) == red);
+        CHECK_EQ(uint32_t(red), fb.GetPixel(insidePoint));
         SUBCASE("Do not render if Image valid")
         {
             // Arrange
@@ -55,7 +57,7 @@ TEST_CASE("Image Test")
             testImage.Render(fb);
 
             // Assert
-            CHECK(fb.GetPixel(insidePoint) != red);
+            CHECK_NE(fb.GetPixel(insidePoint), uint32_t(red));
         }
     }
 }

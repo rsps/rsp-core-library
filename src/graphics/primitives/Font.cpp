@@ -17,7 +17,7 @@
 
 namespace rsp::graphics {
 
-std::string Font::mDefaultFontName = "";
+std::string Font::mDefaultFontName = "Exo 2";
 
 
 std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph)
