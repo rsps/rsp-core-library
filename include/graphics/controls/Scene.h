@@ -11,9 +11,9 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include <graphics/controls/TouchControl.h>
 #include <graphics/TouchEvent.h>
 #include "Control.h"
-#include "TouchArea.h"
 #include <vector>
 
 namespace rsp::graphics
@@ -40,9 +40,10 @@ class Scene : public Control
 
   protected:
     std::string mName;
-    std::vector<TouchArea> mTouchables{};
+    std::vector<TouchControl*> mTouchables{};
 
-    TouchArea& makeTouchArea(const Rect &arRect);
+    void removeTouchable(TouchControl *apTouchControl) override;
+    void addTouchable(TouchControl *apTouchControl) override;
 };
 
 } // namespace rsp::graphics

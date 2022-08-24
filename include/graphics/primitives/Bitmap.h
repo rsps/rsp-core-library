@@ -80,8 +80,9 @@ class Bitmap : public Canvas
 
   protected:
     static std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> msFiletypeMap;
-    std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
     PixelData mImagePixels{};
+
+    std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
 };
 
 } // namespace rsp::graphics

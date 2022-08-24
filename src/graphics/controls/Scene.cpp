@@ -22,14 +22,22 @@ Scene::Scene(const Rect &arRect, const std::string &arName)
 
 void Scene::ProcessInput(TouchEvent &arInput)
 {
-    for (TouchArea &area : mTouchables) {
-        area.ProcessInput(arInput);
+    for (TouchControl* area : mTouchables) {
+        area->ProcessInput(arInput);
     }
 }
 
-TouchArea& Scene::makeTouchArea(const Rect &arRect)
+void Scene::addTouchable(TouchControl *apTouchControl)
 {
-    return mTouchables.emplace_back().SetArea(arRect);
+    mTouchables.push_back(apTouchControl);
+}
+
+void Scene::removeTouchable(TouchControl *apTouchControl)
+{
+    auto it = std::find(mTouchables.begin(), mTouchables.end(), apTouchControl);
+    if (it != mTouchables.end()) {
+        mTouchables.erase(it);
+    }
 }
 
 } // namespace rsp::graphics

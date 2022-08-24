@@ -8,9 +8,9 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/controls/TouchArea.h>
 #include <chrono>
 #include <doctest.h>
+#include <graphics/controls/TouchControl.h>
 
 using namespace rsp::graphics;
 
@@ -30,7 +30,7 @@ TEST_CASE("TouchArea Constructor")
     SUBCASE("Construct with Default Values")
     {
         // Act
-        TouchArea area;
+        TouchControl area;
 
         // Assert
         CHECK(area.GetArea().GetHeight() == 0);
@@ -48,17 +48,17 @@ TEST_CASE("TouchArea Constructor")
         MESSAGE("Rect Dimensions: " << myRect);
         // Random point within rect
         // output = min + (rand() % static_cast<int>(max - min + 1))
-        Point insidePoint(myRect.GetLeft() + (rand() % myRect.GetWidth()),
-                          myRect.GetTop() + (rand() % myRect.GetHeight()));
+        Point insidePoint(myRect.GetLeft() + (rand() % static_cast<int>(myRect.GetWidth())),
+                          myRect.GetTop() + (rand() % static_cast<int>(myRect.GetHeight())));
         // Random point lower than inside
         Point lowerPoint(0 + (rand() % myRect.GetLeft()),
                          0 + (rand() % myRect.GetTop()));
         // Random point higher than inside
-        Point higherPoint(myRect.GetRight() + (rand() % myRect.GetWidth()),
-                          myRect.GetBottom() + (rand() % myRect.GetHeight()));
+        Point higherPoint(myRect.GetRight() + (rand() % static_cast<int>(myRect.GetWidth())),
+                          myRect.GetBottom() + (rand() % static_cast<int>(myRect.GetHeight())));
 
         // Act
-        TouchArea area;
+        TouchControl area;
         area.SetArea(myRect);
 
         // Assert
@@ -79,7 +79,7 @@ TEST_CASE("Input Processing")
     bool lifted = false;
     bool clicked = false;
     Rect aRect(10, 10, 200, 200);
-    TouchArea area;
+    TouchControl area;
     area.SetArea(aRect);
     TouchEvent event;
 
@@ -89,19 +89,19 @@ TEST_CASE("Input Processing")
     MESSAGE("Touch Point: " << event.mPoint);
     CHECK(aRect.IsHit(event.mPoint));
 
-    area.GetOnPress() = [&](const Point &arPoint) noexcept {
+    area.GetOnPress() = [&](const Point &arPoint, int aId) noexcept {
         hit_count++;
         pressed = true;
     };
-    area.GetOnMove() = [&](const Point &arPoint) noexcept {
+    area.GetOnMove() = [&](const Point &arPoint, int aId) noexcept {
         hit_count++;
         moved = true;
     };
-    area.GetOnLift() = [&](const Point &arPoint) noexcept {
+    area.GetOnLift() = [&](const Point &arPoint, int aId) noexcept {
         hit_count++;
         lifted = true;
     };
-    area.GetOnClick() = [&](const Point &arPoint) noexcept {
+    area.GetOnClick() = [&](const Point &arPoint, int aId) noexcept {
         hit_count++;
         clicked = true;
     };

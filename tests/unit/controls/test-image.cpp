@@ -25,7 +25,12 @@ TEST_CASE("Image Test")
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
     Rect testRect(Point(0, 0), 200, 100);
-    Image testImage("testImages/Red.bmp", "testImages/Red.bmp", testRect);
+    Bitmap normal("testImages/Red.bmp");
+    Bitmap pressed("testImages/Green.bmp");
+
+    Image testImage(testRect);
+    testImage.GetStyle(Control::States::normal).mpBitmap = &normal;
+    testImage.GetStyle(Control::States::pressed).mpBitmap = &pressed;
 
     SUBCASE("Render Image if Invalid")
     {

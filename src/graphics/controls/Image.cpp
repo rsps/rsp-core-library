@@ -8,24 +8,35 @@
  * \author      Simon Glashoff
  */
 
+#include <algorithm>
 #include "graphics/controls/Image.h"
+#include "graphics/primitives/Rect.h"
 
 namespace rsp::graphics
 {
 
-Image::Image(std::string aPressed, std::string aNormal, Rect &arRect)
-    : Control(arRect)
+void Image::ClearSection()
 {
-    mStateMap.insert(std::pair<States, Bitmap>(States::pressed, Bitmap(aPressed)));
-    mStateMap.insert(std::pair<States, Bitmap>(States::normal, Bitmap(aNormal)));
-}
-Image::~Image()
-{
+    Style &style = mStyles.at(States::normal);
+    mSection = Rect(0u, 0u, style.mpBitmap->GetWidth(), style.mpBitmap->GetHeight());
 }
 
-void Image::paint(Canvas &arCanvas)
+void Image::SetSection(const Rect &arSection)
 {
-    arCanvas.DrawImage(mArea.GetTopLeft(), mStateMap.at(mState));
+    Style &style = mStyles.at(States::normal);
+    mSection = Rect(
+        std::min(0u, static_cast<unsigned int>(arSection.GetTop())),
+        std::min(0u, static_cast<unsigned int>(arSection.GetLeft())),
+        std::min(style.mpBitmap->GetWidth(), static_cast<unsigned int>(arSection.GetWidth())),
+        std::min(style.mpBitmap->GetHeight(), static_cast<unsigned int>(arSection.GetHeight()))
+    );
+}
+
+void Image::paint(Canvas &arCanvas, const Style &arStyle)
+{
+    Control::paint(arCanvas, arStyle);
+
+    arCanvas.DrawImageSection(mArea.GetTopLeft(), *arStyle.mpBitmap, mSection, arStyle.mForegroundColor);
 }
 
 } // namespace rsp::graphics

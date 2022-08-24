@@ -145,11 +145,21 @@ class Rect
     void SetRight(int aRightValue);
 
     /**
+     * \brief Set TopLeft to given point, move BottomRight to keep size.
+     * \param arPoint
+     */
+    void SetOrigin(const Point &arPoint);
+
+    /**
      * \brief Get the top left coordinate.
      *
      * \return Point
      */
-    const Point &GetTopLeft() const
+    Point& GetTopLeft()
+    {
+        return mLeftTop;
+    }
+    const Point& GetTopLeft() const
     {
         return mLeftTop;
     }
@@ -159,7 +169,11 @@ class Rect
      *
      * \return Point
      */
-    const Point &GetBottomRight() const
+    Point& GetBottomRight()
+    {
+        return mRightBottom;
+    }
+    const Point& GetBottomRight() const
     {
         return mRightBottom;
     }
@@ -170,6 +184,7 @@ class Rect
      * \return int
      */
     int GetWidth() const;
+    unsigned int GetWidthU() const { return static_cast<unsigned int>(GetWidth()); }
     /**
      * \brief Set the width of the Rect.
      *
@@ -183,6 +198,8 @@ class Rect
      * \return int
      */
     int GetHeight() const;
+    unsigned int GetHeightU() const { return static_cast<unsigned int>(GetHeight()); }
+
     /**
      * \brief Set the height of the Rect.
      *

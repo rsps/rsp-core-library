@@ -17,6 +17,8 @@
 
 namespace rsp::graphics {
 
+std::string Font::mDefaultFontName = "";
+
 
 std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph)
 {
@@ -41,6 +43,13 @@ void Font::RegisterFont(const char *apFileName)
     FontRawInterface::RegisterFont(apFileName);
 }
 
+
+Font::Font(Styles aStyle)
+    : mColor(Color::White),
+      mpImpl(MakePimpl(mDefaultFontName))
+{
+    SetStyle(aStyle);
+}
 
 Font::Font(const std::string &arFontName, Styles aStyle)
     : mColor(Color::White),
@@ -92,5 +101,9 @@ std::vector<Glyph> Font::MakeGlyphs(const std::string &arText, int aLineSpacing)
     return mpImpl->MakeGlyphs(arText, aLineSpacing);
 }
 
+std::string Font::GetFamilyName() const
+{
+    return mpImpl->GetFamilyName();
+}
 
 }

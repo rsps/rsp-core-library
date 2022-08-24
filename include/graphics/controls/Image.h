@@ -20,13 +20,21 @@ class Image : public Control
 {
   public:
     Image() : Control(){};
-    Image(std::string aNormal, std::string aPressed, Rect &arRect);
-    ~Image();
+    Image(const Rect &arDst) : Control(arDst) {}
+
+    Image(const Image &) = default;
+    Image(Image &&) = default;
+
+    Image& operator=(const Image &) = default;
+    Image& operator=(Image &&arOther) = default;
+
+    void ClearSection();
+    void SetSection(const Rect &arSection);
 
   protected:
-    std::map<States, Bitmap> mStateMap{};
+    Rect mSection{}; // Section of bitmap to display
 
-    void paint(Canvas &arCanvas) override;
+    void paint(Canvas &arCanvas, const Style &arStyle) override;
 };
 
 } // namespace rsp::graphics

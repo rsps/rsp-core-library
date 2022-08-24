@@ -10,6 +10,7 @@
 
 #include "graphics/primitives/Bitmap.h"
 
+#include <algorithm>
 #include <chrono>
 #include <fcntl.h>
 #include <linux/kd.h>
@@ -107,14 +108,19 @@ void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor, bool aFilled)
     }
 }
 
-void Canvas::DrawImage(const Point &aLeftTop, const Bitmap &aBitmap, Color aColor)
+void Canvas::DrawImage(const Point &arLeftTop, const Bitmap &arBitmap, Color aColor)
+{
+    DrawImageSection(arLeftTop, arBitmap, Rect(0u, 0u, arBitmap.GetWidth(), arBitmap.GetHeight()), aColor);
+}
+
+void Canvas::DrawImageSection(const Point &arLeftTop, const Bitmap &arBitmap, const Rect &arSection, Color aColor)
 {
 //    Point origin(aLeftTop.GetX(), aLeftTop.GetY() + int(aBitmap.GetHeight()));
-    Point origin(aLeftTop.GetX(), aLeftTop.GetY());
-    auto pixels = aBitmap.GetPixelData();
-    for (int y = 0; y < static_cast<int>(aBitmap.GetHeight()); y++) {
-        origin.mX = aLeftTop.GetX();
-        for (int x = 0; x < static_cast<int>(aBitmap.GetWidth()); x++) {
+    Point origin(arLeftTop.GetX(), arLeftTop.GetY());
+    auto pixels = arBitmap.GetPixelData();
+    for (int y = arSection.GetTop(); y < arSection.GetHeight(); y++) {
+        origin.mX = arLeftTop.GetX();
+        for (int x = arSection.GetLeft(); x < arSection.GetWidth(); x++) {
             SetPixel(origin, pixels.GetPixelAt(x, y, aColor));
             origin.mX++;
         }
@@ -144,6 +150,5 @@ void Canvas::DrawText(const Text &arText, const Color &arColor)
         }
     }
 }
-
 
 } // namespace rsp::graphics

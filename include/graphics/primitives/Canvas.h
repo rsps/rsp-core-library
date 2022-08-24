@@ -83,10 +83,21 @@ class Canvas
     /**
      * \brief Copies the bitmap content into the canvas.
      *
-     * \param LeftTop
-     * \param aBitmap
+     * \param arLeftTop The destination on the canvas.
+     * \param arBitmap The source bitmap to copy from
+     * \param aColor Foreground color used if the bitmap is monochrome or alpha.
      */
     void DrawImage(const Point &arLeftTop, const Bitmap &arBitmap, Color aColor = Color::White);
+
+    /**
+     * \brief Copies the section part of the bitmap content into the canvas.
+     *
+     * \param arLeftTop The destination on the canvas.
+     * \param arBitmap The source bitmap to copy from
+     * \param arSection Rectangular section of the source bitmap
+     * \param aColor Foreground color used if the bitmap is monochrome or alpha.
+     */
+    void DrawImageSection(const Point &arLeftTop, const Bitmap &arBitmap, const Rect &arSection, Color aColor = Color::White);
 
     /**
      * \brief Draws the given Text object in the given color on the canvas.

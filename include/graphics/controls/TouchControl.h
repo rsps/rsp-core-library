@@ -13,22 +13,24 @@
 #include <graphics/primitives/Rect.h>
 #include <graphics/TouchEvent.h>
 #include <utils/Function.h>
+#include "Control.h"
 
 namespace rsp::graphics
 {
 
-class Scene;
-
-class TouchArea
+class TouchControl : public Control
 {
-  public:
-    using TouchCallback_t = rsp::utils::Function<void(const Point&)>;
+public:
+    using TouchCallback_t = rsp::utils::Function<void(const Point&, int)>;
 
-    TouchArea();
-    ~TouchArea();
+    TouchControl();
+    TouchControl(const Rect &arArea);
+    virtual ~TouchControl();
 
-    TouchArea(const TouchArea&);
-    TouchArea(TouchArea&&);
+    TouchControl(const TouchControl&);
+    TouchControl(TouchControl&&);
+
+    TouchControl& SetId(int aId) { mId = aId; return *this; }
 
     /**
      * \brief Processes input for press or click callbacks
@@ -48,26 +50,20 @@ class TouchArea
      * \param arTouchArea A const reference to a TouchArea
      * \return Reference to this TouchArea
      */
-    TouchArea &operator=(const TouchArea &);
+    TouchControl &operator=(const TouchControl &);
 
     /**
      * \brief Move operator
      * \param arTouchArea A const reference to a TouchArea
      * \return Reference to this TouchArea
      */
-    TouchArea &operator=(TouchArea &&);
-
-    /**
-     * \brief Sets the area of the TouchArea
-     * \param arRect The new rectangle used as the defined area
-     */
-    TouchArea& SetArea(const Rect &arRect);
+    TouchControl &operator=(TouchControl &&);
 
     /**
      * \brief Gets the area of the TouchArea
      * \return A reference to the current defined area as a Rectangle
      */
-    const Rect& GetArea() const { return mTouchArea; }
+    Rect& GetTouchArea() { return mTouchArea; }
 
     /**
      * \brief OnPress callback reference
@@ -97,7 +93,10 @@ class TouchArea
      */
     TouchCallback_t& GetOnClick() { return mOnClick; }
 
-  protected:
+protected:
+    int mId = 0;
+
+private:
     TouchCallback_t mOnPress{};
     TouchCallback_t mOnMove{};
     TouchCallback_t mOnLift{};
@@ -106,6 +105,11 @@ class TouchArea
     Rect mTouchArea{};
     Point mCurrentPress{};
     Point mOriginalPress{};
+
+    virtual void doPress(const Point &arPoint);
+    virtual void doMove(const Point &arPoint);
+    virtual void doLift(const Point &arPoint);
+    virtual void doClick(const Point &arPoint);
 };
 
 } // namespace rsp::graphics

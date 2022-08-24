@@ -8,29 +8,39 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/controls/TouchArea.h"
+#include <graphics/controls/TouchControl.h>
 
 namespace rsp::graphics {
 
-TouchArea::TouchArea()
+TouchControl::TouchControl()
+    : Control()
 {
+    addTouchable(this);
 }
 
-TouchArea::~TouchArea()
+TouchControl::TouchControl(const Rect &arArea)
+    : Control(arArea),
+      mTouchArea(arArea)
 {
+    addTouchable(this);
 }
 
-TouchArea::TouchArea(const TouchArea &arOther)
+TouchControl::~TouchControl()
+{
+    removeTouchable(this);
+}
+
+TouchControl::TouchControl(const TouchControl &arOther)
 {
     operator=(arOther);
 }
 
-TouchArea::TouchArea(TouchArea &&arOther)
+TouchControl::TouchControl(TouchControl &&arOther)
 {
     *this = std::move(arOther);
 }
 
-TouchArea& TouchArea::operator =(const TouchArea &arOther)
+TouchControl& TouchControl::operator =(const TouchControl &arOther)
 {
     if (this != &arOther) {
         mOnPress = arOther.mOnPress;
@@ -45,7 +55,7 @@ TouchArea& TouchArea::operator =(const TouchArea &arOther)
     return *this;
 }
 
-TouchArea& TouchArea::operator =(TouchArea &&arOther)
+TouchControl& TouchControl::operator =(TouchControl &&arOther)
 {
     if (this != &arOther) {
         mOnPress = std::move(arOther.mOnPress);
@@ -60,29 +70,26 @@ TouchArea& TouchArea::operator =(TouchArea &&arOther)
     return *this;
 }
 
-TouchArea& TouchArea::SetArea(const Rect &arRect)
+void TouchControl::ProcessInput(TouchEvent &arInput)
 {
-    mTouchArea = arRect;
-    return *this;
-}
-
-void TouchArea::ProcessInput(TouchEvent &arInput)
-{
+    if (GetState() == Control::States::disabled) {
+        return;
+    }
     switch (arInput.mType) {
         case TouchEvent::Types::Press:
             mCurrentPress = arInput.mPoint;
             mOriginalPress = arInput.mPoint;
             if (IsHit(mCurrentPress)) {
-                mOnPress(mCurrentPress);
+                doPress(mCurrentPress);
             }
             break;
 
         case TouchEvent::Types::Lift:
             if (IsHit(mOriginalPress)) {
                 mCurrentPress = arInput.mPoint;
-                mOnLift(mCurrentPress);
+                doLift(mCurrentPress);
                 if (IsHit(mCurrentPress)) {
-                    mOnClick(mCurrentPress);
+                    doClick(mCurrentPress);
                 }
             }
             break;
@@ -90,7 +97,7 @@ void TouchArea::ProcessInput(TouchEvent &arInput)
         case TouchEvent::Types::Drag:
             if (IsHit(mOriginalPress)) {
                 mCurrentPress = arInput.mPoint;
-                mOnMove(mCurrentPress);
+                doMove(mCurrentPress);
             }
             break;
 
@@ -99,9 +106,32 @@ void TouchArea::ProcessInput(TouchEvent &arInput)
     }
 }
 
-bool TouchArea::IsHit(const Point &arPoint) const
+bool TouchControl::IsHit(const Point &arPoint) const
 {
     return mTouchArea.IsHit(arPoint);
+}
+
+void TouchControl::doPress(const Point &arPoint)
+{
+    SetState(Control::States::pressed);
+    mOnPress(arPoint, mId);
+}
+
+void TouchControl::doMove(const Point &arPoint)
+{
+    SetState(Control::States::dragged);
+    mOnMove(arPoint, mId);
+}
+
+void TouchControl::doLift(const Point &arPoint)
+{
+    SetState(Control::States::normal);
+    mOnLift(arPoint, mId);
+}
+
+void TouchControl::doClick(const Point &arPoint)
+{
+    mOnClick(arPoint, mId);
 }
 
 } // namespace rsp::graphics

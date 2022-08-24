@@ -25,6 +25,9 @@ namespace rsp::graphics {
 
 std::unique_ptr<FontRawInterface> Font::MakePimpl(const std::string &arFontName)
 {
+    if (arFontName.empty()) {
+        THROW_WITH_BACKTRACE1(FontException, "A pre-registered font name must be given on Font object creation.");
+    }
     return std::make_unique<FreeTypeRawFont>(arFontName);
 }
 

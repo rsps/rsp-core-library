@@ -11,7 +11,7 @@
 #ifndef SECONDSCENE_H
 #define SECONDSCENE_H
 
-#include <graphics/controls/Image.h>
+#include <graphics/controls/Button.h>
 #include "Scene480x800.h"
 
 namespace rsp::graphics
@@ -26,35 +26,38 @@ public:
     {
         // myName = "Second Scene";
         //  Set member variables values
+        Bitmap red("testImages/Red.bmp");
+        Bitmap green("testImages/Green.bmp");
+
         Rect topRect(100, 150, 200, 100);
-        mTopBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
-        TouchArea& top_btn = makeTouchArea(topRect);
-        top_btn.GetOnPress() = [this](const Point &arPoint) { mTopBtnImg.SetState(Control::States::pressed); };
-        top_btn.GetOnLift() = [this](const Point &arPoint) { mTopBtnImg.SetState(Control::States::normal); };
+        mTopBtnImg.SetArea(topRect);
+        mTopBtnImg.GetTouchArea() = topRect;
+        mTopBtnImg.GetStyle(Control::States::normal).mpBitmap = &red;
+        mTopBtnImg.GetStyle(Control::States::pressed).mpBitmap = &green;
 
         Rect botRect(100, 300, 300, 100);
-        mBotBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
-        TouchArea& bot_btn = makeTouchArea(botRect);
-        bot_btn.GetOnPress() = [this](const Point &arPoint) { mBotBtnImg.SetState(Control::States::pressed); };
-        bot_btn.GetOnLift() = [this](const Point &arPoint) { mBotBtnImg.SetState(Control::States::normal); };
-        bot_btn.GetOnClick() = std::bind(&SecondScene::doClick, this, std::placeholders::_1);
+        mBotBtnImg.SetArea(botRect);
+        mBotBtnImg.GetTouchArea() = botRect;
+        mBotBtnImg.GetStyle(Control::States::normal).mpBitmap = &red;
+        mBotBtnImg.GetStyle(Control::States::pressed).mpBitmap = &green;
+        mBotBtnImg.GetOnClick() = std::bind(&SecondScene::doClick, this, std::placeholders::_1);
 
         //  Add them to the lists?
         AddChild(&mTopBtnImg);
         AddChild(&mBotBtnImg);
     };
 
-    TouchArea& GetTopArea() { return mTouchables[0]; }
-    TouchArea& GetBotArea() { return mTouchables[1]; }
+    TouchControl& GetTopArea() { return *mTouchables[0]; }
+    TouchControl& GetBotArea() { return *mTouchables[1]; }
 
     Clicked_t& Whenclicked() { return mWhenClicked; }
 
-    Image& GetTopImg() { return mTopBtnImg;};
-    Image& GetBotImg() { return mBotBtnImg;};
+    Image& GetTopImg() { return mTopBtnImg.GetImage();};
+    Image& GetBotImg() { return mBotBtnImg.GetImage();};
 
 protected:
-    Image mTopBtnImg{};
-    Image mBotBtnImg{};
+    Button mTopBtnImg{};
+    Button mBotBtnImg{};
     Clicked_t mWhenClicked{};
 
     void doClick(const Point &arPoint) {

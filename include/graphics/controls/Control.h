@@ -10,13 +10,17 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include <map>
+#include <vector>
 #include <graphics/primitives/Canvas.h>
 #include <graphics/primitives/Color.h>
 #include <graphics/primitives/Rect.h>
-#include <vector>
+#include "Style.h"
 
 namespace rsp::graphics
 {
+
+class TouchControl;
 
 class Control
 {
@@ -104,16 +108,26 @@ class Control
      */
     Control& AddChild(Control *apChild);
 
+    /**
+     * \brief Get reference to the style data associated with the given state.
+     * \param aState The state for which the style is requested
+     * \return A reference to a Style object
+     */
+    Style& GetStyle(States aState) { return mStyles[aState]; }
+
   protected:
     Rect mArea{};
-    Color mBackground{ Color::Black };
+    std::map<States, Style> mStyles{};
     bool mTransparent = false;
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};
     bool mIsInvalid = true;
     States mState = States::normal;
 
-    virtual void paint(Canvas &arCanvas);
+    virtual void addTouchable(TouchControl *apTouchControl);
+    virtual void removeTouchable(TouchControl *apTouchControl);
+
+    virtual void paint(Canvas &arCanvas, const Style &arStyle);
 };
 
 } // namespace rsp::graphics

@@ -82,6 +82,10 @@ public:
      * \param apFileName
      */
     static void RegisterFont(const char *apFileName);
+    static void SetDefaultFont(const std::string &arFontName) { mDefaultFontName = arFontName; }
+    static const std::string& GetDefaultFont() { return mDefaultFontName; }
+
+    Font(Styles aStyle = Styles::Normal);
 
     /**
      * Constructs a Font object based on the given font name (font family) in the given style.
@@ -161,6 +165,7 @@ public:
     Styles GetStyle() const;
 
 protected:
+    static std::string mDefaultFontName;
     Color mColor;
     std::unique_ptr<FontRawInterface> mpImpl;
 

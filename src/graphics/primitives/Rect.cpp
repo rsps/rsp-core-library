@@ -139,6 +139,15 @@ void Rect::SetHeight(int aHeight)
     }
 }
 
+void Rect::SetOrigin(const Point &arPoint)
+{
+    auto w = GetWidth();
+    auto h = GetHeight();
+    GetTopLeft() = arPoint;
+    SetWidth(w);
+    SetHeight(h);
+}
+
 bool Rect::IsHit(const Point &aPoint) const
 {
     // Only works with non-rotated rectangles

@@ -66,7 +66,7 @@ bool Control::Render(Canvas &arCanvas)
     bool result = mIsInvalid;
 
     if (mIsInvalid) {
-        paint(arCanvas);
+        paint(arCanvas, mStyles[mState]);
     }
 
     for (Control* child : mChildren) {
@@ -80,10 +80,24 @@ bool Control::Render(Canvas &arCanvas)
     return result;
 }
 
-void Control::paint(Canvas &arCanvas)
+void Control::paint(Canvas &arCanvas, const Style &arStyle)
 {
     if (!mTransparent) {
-        arCanvas.DrawRectangle(mArea, mBackground, true);
+        arCanvas.DrawRectangle(mArea, arStyle.mBackgroundColor, true);
+    }
+}
+
+void Control::addTouchable(TouchControl *apTouchControl)
+{
+    if (mpParent) {
+        mpParent->addTouchable(apTouchControl);
+    }
+}
+
+void Control::removeTouchable(TouchControl *apTouchControl)
+{
+    if (mpParent) {
+        mpParent->removeTouchable(apTouchControl);
     }
 }
 

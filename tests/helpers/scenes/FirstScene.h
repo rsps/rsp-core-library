@@ -10,7 +10,7 @@
 #ifndef FIRSTSCENE_H
 #define FIRSTSCENE_H
 
-#include <graphics/controls/Image.h>
+#include <graphics/controls/Button.h>
 #include "Scene480x800.h"
 
 namespace rsp::graphics {
@@ -23,18 +23,20 @@ public:
     {
         mTouchables.reserve(2);
 
+        Bitmap normal("testImages/Red.bmp");
+        Bitmap pressed("testImages/Green.bmp");
+
         Rect topRect(100, 400, 200, 100);
-        mTopBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", topRect);
-        TouchArea& top_btn = makeTouchArea(topRect);
-        top_btn.GetOnPress() = [this](const Point &arPoint) { mTopBtnImg.SetState(Control::States::pressed); };
-        top_btn.GetOnLift() = [this](const Point &arPoint) { mTopBtnImg.SetState(Control::States::normal); };
+        mTopBtnImg.SetArea(topRect);
+        mTopBtnImg.GetTouchArea() = topRect;
+        mTopBtnImg.GetStyle(Control::States::normal).mpBitmap = &normal;
+        mTopBtnImg.GetStyle(Control::States::pressed).mpBitmap = &pressed;
 
         Rect botRect(100, 600, 200, 100);
-        mBotBtnImg = Image("testImages/Red.bmp", "testImages/Green.bmp", botRect);
-        TouchArea& bot_btn = makeTouchArea(botRect);
-        bot_btn.GetOnPress() = [this](const Point &arPoint) { mBotBtnImg.SetState(Control::States::pressed); };
-        bot_btn.GetOnLift() = [this](const Point &arPoint) { mBotBtnImg.SetState(Control::States::normal); };
-
+        mBotBtnImg.SetArea(botRect);
+        mBotBtnImg.GetTouchArea() = botRect;
+        mBotBtnImg.GetStyle(Control::States::normal).mpBitmap = &normal;
+        mBotBtnImg.GetStyle(Control::States::pressed).mpBitmap = &pressed;
 
         // Add them to the lists?
         AddChild(&mTopBtnImg);
@@ -42,8 +44,8 @@ public:
     };
 
 protected:
-    Image mTopBtnImg{};
-    Image mBotBtnImg{};
+    Button mTopBtnImg{};
+    Button mBotBtnImg{};
 };
 
 } // namespace rsp::graphics

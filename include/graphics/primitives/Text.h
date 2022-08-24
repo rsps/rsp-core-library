@@ -42,6 +42,11 @@ public:
     };
 
     /**
+     * \brief Constructs an empty text element with the default font.
+     */
+    Text() : mFont(), mArea() {}
+
+    /**
      * \brief Constructs an empty text element with the given font.
      *
      * \param arFontName

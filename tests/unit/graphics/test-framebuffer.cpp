@@ -122,13 +122,13 @@ TEST_CASE("Framebuffer")
 
         // Assert
         // Expect all four side to hold values
-        for (int i = 0; i <= rect.GetWidth(); i++) {
+        for (int i = 0; i <= static_cast<int>(rect.GetWidth()); i++) {
             // Check top side
             CHECK(col == fb.GetPixel(Point(leftTop.GetX() + i, leftTop.GetY()), false));
             // Check bottom side
             CHECK(col == fb.GetPixel(Point(leftTop.GetX() + i, rightBottom.GetY()), false));
         }
-        for (int i = 0; i <= rect.GetHeight(); i++) {
+        for (int i = 0; i <= static_cast<int>(rect.GetHeight()); i++) {
             // Check left side
             CHECK(col == fb.GetPixel(Point(leftTop.GetX(), rightBottom.GetY() - i), false));
             // Check right side
