@@ -22,6 +22,7 @@ static void Randomize()
     srand(ms.count()); // generates random seed val
 }
 
+TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("TouchArea Constructor")
 {
@@ -283,3 +284,5 @@ TEST_CASE("Input Processing")
         }
     }
 }
+
+TEST_SUITE_END();

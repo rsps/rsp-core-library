@@ -32,6 +32,7 @@ const std::uint8_t cImage1bit[] = {
     0x11, 0xFF
 };
 
+TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("PixelData")
 {
@@ -110,4 +111,5 @@ TEST_CASE("PixelData")
 
 }
 
+TEST_SUITE_END();
 

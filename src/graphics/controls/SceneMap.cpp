@@ -13,22 +13,10 @@
 
 namespace rsp::graphics {
 
-SceneMap::SceneMap()
-{
-}
-
-SceneMap::~SceneMap()
-{
-    for(auto &pair : mScenes) {
-        delete pair.second;
-    }
-    mScenes.clear();
-}
-
-Scene& SceneMap::operator [](const std::string &arName)
+SceneMap::SceneCreator SceneMap::operator [](const std::string &arName)
 {
     try {
-        return *mScenes.at(arName);
+        return mScenes.at(arName);
     }
     catch (const std::out_of_range &e) {
         THROW_WITH_BACKTRACE1(SceneNotFound, arName);
@@ -46,16 +34,14 @@ Scene& SceneMap::ActiveScene()
 
 void SceneMap::SetActiveScene(const std::string &arName)
 {
-    mpActiveScene = nullptr;
+    if (mpActiveScene) {
+        mOnDestroy(*mpActiveScene);
+        delete mpActiveScene;
+        mpActiveScene = nullptr;
+    }
 
-    mpActiveScene = &(operator[](arName));
-}
-
-Scene& SceneMap::add(Scene *apScene)
-{
-    mScenes[apScene->GetName()] = apScene;
-
-    return *apScene;
+    mpActiveScene = (operator[](arName))();
+    mOnCreated(*mpActiveScene);
 }
 
 } /* namespace rsp::graphics */

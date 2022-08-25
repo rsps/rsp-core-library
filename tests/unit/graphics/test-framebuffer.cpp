@@ -34,6 +34,8 @@ static unsigned int urand()
     return static_cast<unsigned int>(rand());
 }
 
+TEST_SUITE_BEGIN("Graphics");
+
 TEST_CASE("Framebuffer")
 {
     rsp::logging::Logger logger;
@@ -490,3 +492,5 @@ TEST_CASE("Framebuffer")
     }
 
 }
+
+TEST_SUITE_END();

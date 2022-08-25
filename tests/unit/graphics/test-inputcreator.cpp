@@ -14,6 +14,8 @@
 
 using namespace rsp::graphics;
 
+TEST_SUITE_BEGIN("Graphics");
+
 TEST_CASE("InputCreator Test")
 {
     // Arrange
@@ -58,3 +60,5 @@ TEST_CASE("InputCreator Test")
         counter++;
     }
 }
+
+TEST_SUITE_END();

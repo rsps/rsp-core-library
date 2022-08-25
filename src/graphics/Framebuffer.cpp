@@ -150,7 +150,7 @@ void Framebuffer::SetPixel(const Point &arPoint, const Color &arColor)
     }
 }
 
-uint32_t Framebuffer::GetPixel(const Point &aPoint, const bool aFront) const
+uint32_t Framebuffer::GetPixel(const Point &aPoint, bool aFront) const
 {
     if (!IsInsideScreen(aPoint)) {
         return 0;

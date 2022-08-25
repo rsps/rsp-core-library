@@ -3,9 +3,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \copyright   Copyright 2022 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
- * \author      Simon Glashoff
+ * \author      Steffen Brummer
  */
 
 #include <algorithm>
@@ -18,7 +18,12 @@ namespace rsp::graphics
 void Image::ClearSection()
 {
     Style &style = mStyles.at(States::normal);
-    mSection = Rect(0u, 0u, style.mpBitmap->GetWidth(), style.mpBitmap->GetHeight());
+    if (style.mpBitmap) {
+        mSection = Rect(0u, 0u, style.mpBitmap->GetWidth(), style.mpBitmap->GetHeight());
+    }
+    else {
+        mSection = mArea;
+    }
 }
 
 void Image::SetSection(const Rect &arSection)

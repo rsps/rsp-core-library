@@ -16,6 +16,8 @@
 
 using namespace rsp::graphics;
 
+TEST_SUITE_BEGIN("Graphics");
+
 TEST_CASE("Image Test")
 {
     rsp::logging::Logger logger;
@@ -24,13 +26,12 @@ TEST_CASE("Image Test")
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
-    Rect testRect(Point(0, 0), 200, 100);
+    Rect testRect(Point(20, 20), 200, 100);
     Bitmap normal("testImages/Red.bmp");
-    Bitmap pressed("testImages/Green.bmp");
 
     Image testImage(testRect);
     testImage.GetStyle(Control::States::normal).mpBitmap = &normal;
-    testImage.GetStyle(Control::States::pressed).mpBitmap = &pressed;
+    testImage.ClearSection();
 
     SUBCASE("Render Image if Invalid")
     {
@@ -40,24 +41,25 @@ TEST_CASE("Image Test")
                           testRect.GetTop() + (rand() % testRect.GetHeight()));
         testImage.Invalidate();
 
-        MESSAGE("point: " << insidePoint);
-
         // Act
         testImage.Render(fb);
+        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
 
+//        MESSAGE("insidePoint: " << insidePoint);
         // Assert
-        CHECK_EQ(uint32_t(red), fb.GetPixel(insidePoint));
+        CHECK_EQ(red.AsUint(), fb.GetPixel(insidePoint, true));
         SUBCASE("Do not render if Image valid")
         {
             // Arrange
-            fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
             fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
 
             // Act
             testImage.Render(fb);
 
             // Assert
-            CHECK_NE(fb.GetPixel(insidePoint), uint32_t(red));
+            CHECK_NE(fb.GetPixel(insidePoint), red.AsUint());
         }
     }
 }
+
+TEST_SUITE_END();

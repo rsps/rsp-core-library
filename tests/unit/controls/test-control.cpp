@@ -23,9 +23,8 @@ public:
     void MakeValid() { mIsInvalid = false; }
 };
 
-TEST_CASE("Control Constructor")
-{
-}
+TEST_SUITE_BEGIN("Graphics");
+
 TEST_CASE("Control Invalidation")
 {
     // Arrange
@@ -118,3 +117,5 @@ TEST_CASE("Control States")
         }
     }
 }
+
+TEST_SUITE_END();

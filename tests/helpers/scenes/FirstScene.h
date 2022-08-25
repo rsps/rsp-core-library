@@ -11,32 +11,30 @@
 #define FIRSTSCENE_H
 
 #include <graphics/controls/Button.h>
-#include "Scene480x800.h"
+#include <graphics/controls/Scene.h>
 
 namespace rsp::graphics {
 
-class FirstScene : public Scene480x800
+class FirstScene : public SceneBase<FirstScene>
 {
 public:
     FirstScene()
-        : Scene480x800("FirstScene")
+        : mNormal("testImages/Red.bmp"),
+          mPressed("testImages/Green.bmp")
     {
         mTouchables.reserve(2);
-
-        Bitmap normal("testImages/Red.bmp");
-        Bitmap pressed("testImages/Green.bmp");
 
         Rect topRect(100, 400, 200, 100);
         mTopBtnImg.SetArea(topRect);
         mTopBtnImg.GetTouchArea() = topRect;
-        mTopBtnImg.GetStyle(Control::States::normal).mpBitmap = &normal;
-        mTopBtnImg.GetStyle(Control::States::pressed).mpBitmap = &pressed;
+        mTopBtnImg.GetStyle(Control::States::normal).mpBitmap = &mNormal;
+        mTopBtnImg.GetStyle(Control::States::pressed).mpBitmap = &mPressed;
 
         Rect botRect(100, 600, 200, 100);
         mBotBtnImg.SetArea(botRect);
         mBotBtnImg.GetTouchArea() = botRect;
-        mBotBtnImg.GetStyle(Control::States::normal).mpBitmap = &normal;
-        mBotBtnImg.GetStyle(Control::States::pressed).mpBitmap = &pressed;
+        mBotBtnImg.GetStyle(Control::States::normal).mpBitmap = &mNormal;
+        mBotBtnImg.GetStyle(Control::States::pressed).mpBitmap = &mPressed;
 
         // Add them to the lists?
         AddChild(&mTopBtnImg);
@@ -46,6 +44,8 @@ public:
 protected:
     Button mTopBtnImg{};
     Button mBotBtnImg{};
+    Bitmap mNormal;
+    Bitmap mPressed;
 };
 
 } // namespace rsp::graphics

@@ -136,6 +136,7 @@ class Color
      * \return ARGB
      */
     operator ARGB_t() const;
+    uint32_t AsUint() const { return static_cast<ARGB_t>(*this); }
 
     /**
      * \brief Assign the value from the given Color object.

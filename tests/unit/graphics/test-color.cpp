@@ -19,6 +19,8 @@ constexpr uint8_t cGreen = 0x56;
 constexpr uint8_t cBlue = 0x78;
 constexpr uint32_t cColorVal = 0x12345678;
 
+TEST_SUITE_BEGIN("Graphics");
+
 TEST_CASE("Color Contructors")
 {
     SUBCASE("Separate values contructor")
@@ -168,3 +170,5 @@ TEST_CASE("Color Constants")
         CHECK(cl.GetBlue() == 0xFF);
     }
 }
+
+TEST_SUITE_END();

@@ -13,7 +13,9 @@
 
 #include <map>
 #include <string>
+#include <functional>
 #include <utils/CoreException.h>
+#include <utils/Function.h>
 #include "Scene.h"
 
 namespace rsp::graphics {
@@ -30,31 +32,39 @@ public:
     ActiveSceneNotSet() : rsp::utils::CoreException("No scene has been set activate") {};
 };
 
-
 class SceneMap
 {
 public:
-    SceneMap();
-    SceneMap(const SceneMap&) = default;
-    virtual ~SceneMap();
+    using SceneCreator = std::function<Scene*()>;
+    using SceneNotify = rsp::utils::Function<void(Scene &)>;
 
-    template<class T>
-    Scene& MakeScene() {
-        return add(new T());
-    }
+    SceneMap() {};
+    SceneMap(const SceneMap&) = default;
+
+    #define AddFactory(T) \
+        std::cout << "Creating scene: " << #T << std::endl; \
+        mScenes[#T] = []() { return new T(); }
 
     SceneMap& operator=(const SceneMap&) = default;
 
-    Scene& operator[](const std::string &arName);
+    SceneCreator operator[](const std::string &arName);
 
+    #define ACTIVATE_SCENE(n) SetActiveScene(#n)
     void SetActiveScene(const std::string &arName);
     Scene& ActiveScene();
 
-protected:
-    std::unordered_map<std::string, Scene *> mScenes{};
-    Scene *mpActiveScene = nullptr;
+    template<class T>
+    T& ActiveSceneAs() { return ActiveScene().GetAs<T>(); }
 
-    Scene& add(Scene *apScene);
+
+    SceneNotify& GetAfterCreate() { return mOnCreated; }
+    SceneNotify& GetBeforeDestroy() { return mOnDestroy; }
+
+protected:
+    std::unordered_map<std::string, SceneCreator> mScenes{};
+    Scene *mpActiveScene = nullptr;
+    SceneNotify mOnCreated{};
+    SceneNotify mOnDestroy{};
 };
 
 } /* namespace rsp::graphics */

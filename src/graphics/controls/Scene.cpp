@@ -14,10 +14,11 @@
 namespace rsp::graphics
 {
 
-Scene::Scene(const Rect &arRect, const std::string &arName)
-    : Control(arRect),
-      mName(arName)
+Rect Scene::mScreenSize{0, 0, 480, 800};
+
+void Scene::SetScreenSize(int aWidth, int aHeight)
 {
+    mScreenSize = Rect(0, 0, aWidth, aHeight);
 }
 
 void Scene::ProcessInput(TouchEvent &arInput)

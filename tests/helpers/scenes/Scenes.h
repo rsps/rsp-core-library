@@ -23,12 +23,10 @@ public:
     Scenes()
         : SceneMap()
     {
-        MakeScene<rsp::graphics::FirstScene>();
-        MakeScene<rsp::graphics::SecondScene>();
+        using namespace rsp::graphics;
+        AddFactory(FirstScene);
+        AddFactory(SecondScene);
     }
-
-    rsp::graphics::FirstScene& First() { return *reinterpret_cast<rsp::graphics::FirstScene*>(&operator[]("FirstScene")); }
-    rsp::graphics::SecondScene& Second() { return *reinterpret_cast<rsp::graphics::SecondScene*>(&operator[]("SecondScene")); }
 };
 
 

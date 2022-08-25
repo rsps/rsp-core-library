@@ -9,6 +9,7 @@
  */
 
 #include <graphics/Framebuffer.h>
+#include <graphics/primitives/Font.h>
 #include <graphics/controls/Scene.h>
 #include <messaging/Subscriber.h>
 #include <messaging/Publisher.h>
@@ -41,24 +42,37 @@ class TestSub : public Subscriber<ClickTopics>
     std::string message{};
 };
 
+TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("Scene Test")
 {
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
+    const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
+    const char* cFontName = "Exo 2";
+
+    CHECK_NOTHROW(Font::RegisterFont(cFontFile));
+    CHECK_NOTHROW(Font::SetDefaultFont(cFontName));
+
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+    CHECK_NOTHROW(Framebuffer fb_dummy(p.empty() ? nullptr : p.string().c_str()));
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
 
+    CHECK_NOTHROW(Scenes scenes_dummy);
     Scenes scenes;
+
+    CHECK_NOTHROW(TouchEvent event_dummy);
     TouchEvent event;
 
-    Rect tr = scenes.Second().GetTopArea().GetArea();
+    scenes.SetActiveScene(SecondScene::GetName());
+
+    Rect tr = SecondScene::GetTopRect();
     Point insideTopPoint(tr.GetLeft() + (rand() % tr.GetWidth()),
                          tr.GetTop() + (rand() % tr.GetHeight()));
 
-    Rect br = scenes.Second().GetBotArea().GetArea();
+    Rect br = SecondScene::GetBotRect();
     Point insideBotPoint(br.GetLeft() + (rand() % br.GetWidth()),
                          br.GetTop() + (rand() % br.GetHeight()));
 
@@ -66,7 +80,7 @@ TEST_CASE("Scene Test")
     {
         // Arrange
         event.mType = TouchEvent::Types::Press;
-        scenes.Second().Render(fb);
+        scenes.ActiveScene().Render(fb);
 
         SUBCASE("Process input for Top elements")
         {
@@ -75,11 +89,11 @@ TEST_CASE("Scene Test")
             MESSAGE("Event Point:" << event.mPoint);
 
             // Act
-            scenes.Second().ProcessInput(event);
+            scenes.ActiveScene().ProcessInput(event);
 
             // Assert
-            CHECK(scenes.Second().GetTopImg().IsInvalid());
-            CHECK_FALSE(scenes.Second().GetBotImg().IsInvalid());
+            CHECK(scenes.ActiveSceneAs<SecondScene>().GetTopImg().IsInvalid());
+            CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetBotImg().IsInvalid());
         }
         SUBCASE("Process input for Bot elements")
         {
@@ -87,27 +101,27 @@ TEST_CASE("Scene Test")
             event.mPoint = insideBotPoint;
 
             // Act
-            scenes.Second().ProcessInput(event);
+            scenes.ActiveScene().ProcessInput(event);
 
             // Assert
-            CHECK(scenes.Second().GetBotImg().IsInvalid());
-            CHECK_FALSE(scenes.Second().GetTopImg().IsInvalid());
+            CHECK(scenes.ActiveSceneAs<SecondScene>().GetBotImg().IsInvalid());
+            CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetTopImg().IsInvalid());
         }
     }
     SUBCASE("Scene Render Elements")
     {
         // Arrange
-        scenes.Second().GetTopImg().Invalidate();
-        scenes.Second().GetBotImg().Invalidate();
-        CHECK(scenes.Second().GetTopImg().IsInvalid());
-        CHECK(scenes.Second().GetBotImg().IsInvalid());
+        scenes.ActiveSceneAs<SecondScene>().GetTopImg().Invalidate();
+        scenes.ActiveSceneAs<SecondScene>().GetBotImg().Invalidate();
+        CHECK(scenes.ActiveSceneAs<SecondScene>().GetTopImg().IsInvalid());
+        CHECK(scenes.ActiveSceneAs<SecondScene>().GetBotImg().IsInvalid());
 
         // Act
-        scenes.Second().Render(fb);
+        scenes.ActiveScene().Render(fb);
 
         // Assert
-        CHECK_FALSE(scenes.Second().GetTopImg().IsInvalid());
-        CHECK_FALSE(scenes.Second().GetBotImg().IsInvalid());
+        CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetTopImg().IsInvalid());
+        CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetBotImg().IsInvalid());
     }
 
     SUBCASE("Scene Bind click Callbacks")
@@ -115,7 +129,7 @@ TEST_CASE("Scene Test")
         Broker<ClickTopics> broker;
         Publisher<ClickTopics> publisher(broker);
         bool clicked = false;
-        scenes.Second().Whenclicked() = [&publisher, &clicked]() {
+        scenes.ActiveSceneAs<SecondScene>().WhenClicked() = [&publisher, &clicked]() {
             clicked = true;
             rsp::messaging::ClickedEvent event("Button was clicked.");
             publisher.PublishToBroker(ClickTopics::SceneChange, event);
@@ -128,9 +142,9 @@ TEST_CASE("Scene Test")
 
         // Act
         event.mType = TouchEvent::Types::Press;
-        scenes.Second().ProcessInput(event);
+        scenes.ActiveScene().ProcessInput(event);
         event.mType = TouchEvent::Types::Lift;
-        scenes.Second().ProcessInput(event);
+        scenes.ActiveScene().ProcessInput(event);
 
          // Assert
         CHECK(clicked);
@@ -138,3 +152,5 @@ TEST_CASE("Scene Test")
         CHECK(sub.message == "Button was clicked.");
     }
 }
+
+TEST_SUITE_END();

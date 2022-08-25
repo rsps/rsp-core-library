@@ -17,6 +17,8 @@
 using namespace rsp::utils;
 using namespace rsp::graphics;
 
+TEST_SUITE_BEGIN("Graphics");
+
 TEST_CASE("Bitmap")
 {
     rsp::logging::Logger logger;
@@ -143,3 +145,4 @@ TEST_CASE("Bitmap")
     }
 }
 
+TEST_SUITE_END();

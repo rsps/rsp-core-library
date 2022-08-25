@@ -33,6 +33,8 @@ inline void checkRect(Rect &aRect)
     CHECK(aRect.GetHeight() == cHeight);
 }
 
+TEST_SUITE_BEGIN("Graphics");
+
 TEST_CASE("Rect Contructors")
 {
     SUBCASE("Simple value Rect")
@@ -146,3 +148,5 @@ TEST_CASE("Rect Height and Width")
         CHECK(rect.GetLeft() == ((cLeft + cWidth) - 50));
     }
 }
+
+TEST_SUITE_END();

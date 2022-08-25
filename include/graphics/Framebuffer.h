@@ -36,14 +36,14 @@ class Framebuffer : public BufferedCanvas
      * \param aPoint Reference to the coordinate for the pixel to get
      * \param aFront Gets pixels from the backbuffer by default, set true to read front buffer
      */
-    uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const override;
+    uint32_t GetPixel(const Point &aPoint, bool aFront = false) const override;
 
     /**
      * \brief Swaps front and back buffers
      * \param aSwapOp The type of swap operations to be executed, default is copy
      * \param aColor In case of Clear operation a color is needed, default is black
      */
-    void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy, Color aColor = Color::Black);
+    void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy, Color aColor = Color::Black) override;
 
   protected:
     int mFramebufferFile;
