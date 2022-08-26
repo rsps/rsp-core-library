@@ -13,6 +13,7 @@
 
 #include <graphics/controls/TouchControl.h>
 #include <graphics/TouchEvent.h>
+#include <utils/ConstTypeInfo.h>
 #include "Control.h"
 #include <vector>
 #include <string_view>
@@ -24,12 +25,12 @@ class Scene: public Control
 public:
     static void SetScreenSize(int aWidth, int aHeight);
 
-    Scene(const std::string &arName)
-        : Control(mScreenSize), mName(arName)
+    Scene(const std::string &arName, std::uint32_t aId)
+        : Control(mScreenSize), mName(arName), mId(aId)
     {
     }
-    Scene(const Rect &arRect, const std::string &arName)
-        : Control(arRect), mName(arName)
+    Scene(const Rect &arRect, const std::string &arName, std::uint32_t aId)
+        : Control(arRect), mName(arName), mId(aId)
     {
     }
 
@@ -49,14 +50,13 @@ public:
     virtual void Init()
     {
     }
-    ;
+
     /**
      * \brief De-activation function, called before scene is destroyed, while it is still a fully valid object.
      */
     virtual void DeInit()
     {
     }
-    ;
 
     /**
      * \brief Get the name of the specific scene.
@@ -68,6 +68,11 @@ public:
         return mName;
     }
 
+    std::uint32_t GetId()
+    {
+        return mId;
+    }
+
     /**
      * \brief Processes input in all touchable areas within Scene
      * \param arInput Reference to the input being processed
@@ -77,6 +82,7 @@ public:
 protected:
     static Rect mScreenSize;
     std::string mName;
+    std::uint32_t mId;
     std::vector<TouchControl*> mTouchables { };
 
     void removeTouchable(TouchControl *apTouchControl) override;
@@ -88,47 +94,18 @@ class SceneBase: public Scene
 {
 public:
     SceneBase()
-        : Scene(GetName())
+        : Scene(std::string(NAME), ID)
     {
     }
 
     SceneBase(const Rect &arRect)
-        : Scene(arRect, GetName())
+        : Scene(arRect, std::string(NAME), ID)
     {
     }
 
-    static std::string GetName() {
-        return std::string(get_name());
-    }
+    static constexpr std::uint32_t ID = rsp::utils::crc32::HashOf<T>();
 
-private:
-    // https://stackoverflow.com/questions/35941045/can-i-obtain-c-type-names-in-a-constexpr-way/35943472#35943472
-    constexpr std::string_view get_name()
-    {
-        char const *p = __PRETTY_FUNCTION__;
-        while (*p++ != '=')
-            ;
-        for (; *p == ' ' ; ++p)
-            ;
-        char const *p2 = p;
-        int count = 1;
-        for (; ; ++p2) {
-            switch (*p2) {
-                case '[':
-                    ++count;
-                    break;
-                case ']':
-                    --count;
-                    if (!count) {
-                        return {p, std::size_t(p2 - p)};
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-        return {};
-    }
+    static constexpr std::string_view NAME = rsp::utils::NameOf<T>();
 };
 
 } // namespace rsp::graphics

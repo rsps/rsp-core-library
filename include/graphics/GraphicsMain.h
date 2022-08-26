@@ -42,14 +42,14 @@ public:
      * \brief Change the current active Scene
      * \param aSceneName The name of the scene to change to
      */
-    void ChangeScene(const std::string &arName) { mNextScene = arName; }
+    void ChangeScene(std::uint32_t aId) { mNextScene = aId; }
 
 protected:
     BufferedCanvas &mrBufferedCanvas;
     TouchParser &mrTouchParser;
     SceneMap &mrScenes;
     bool mTerminated = false;
-    std::string mNextScene{};
+    std::uint32_t mNextScene = 0;
 };
 
 } // namespace rsp::graphics

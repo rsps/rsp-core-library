@@ -66,7 +66,7 @@ TEST_CASE("Scene Test")
     CHECK_NOTHROW(TouchEvent event_dummy);
     TouchEvent event;
 
-    scenes.SetActiveScene(SecondScene::GetName());
+    scenes.SetActiveScene(SecondScene::ID);
 
     Rect tr = SecondScene::GetTopRect();
     Point insideTopPoint(tr.GetLeft() + (rand() % tr.GetWidth()),

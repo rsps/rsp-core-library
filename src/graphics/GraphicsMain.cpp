@@ -46,12 +46,12 @@ void GraphicsMain::Run(int aMaxFPS)
         sw.Reset();
 
         // New scene requested?
-        if (!mNextScene.empty()) {
+        if (mNextScene) {
             mrScenes.ActiveScene().DeInit();
-            Logger::GetDefault().Info() << "New Scene: " << mNextScene << std::endl;
             mrScenes.SetActiveScene(mNextScene);
+            Logger::GetDefault().Info() << "SceneChange: " << mrScenes.ActiveScene().GetName() << std::endl;
             mrScenes.ActiveScene().Init();
-            mNextScene.clear();
+            mNextScene = 0;
             mrTouchParser.Flush(); // New scene should not inherit un-handled touch events...
         }
 

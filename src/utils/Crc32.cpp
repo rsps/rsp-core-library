@@ -9,6 +9,7 @@
  */
 
 #include <utils/Crc32.h>
+#include <iomanip>
 
 namespace rsp::utils {
 
@@ -21,10 +22,13 @@ namespace rsp::utils {
 static const uint32_t cCRC32_XOR_MASK = 0xFFFFFFFF;
 
 
-std::uint32_t* Crc32::getTable()
+const std::uint32_t* Crc32::getTable()
 {
+    return crc32::detail::crc_table;
+/*
     static std::uint32_t mTable[256] = { 0 };
 
+    int out = 0;
     if (mTable[0] == 0) {
         uint32_t polynomial = cCRC32_POLY;
         for (uint32_t i = 0; i < 256; i++) {
@@ -37,17 +41,22 @@ std::uint32_t* Crc32::getTable()
                     c >>= 1;
                 }
             }
+            std::cout << "0x" << std::hex << std::setfill('0') << std::setw(8) << c << "L, ";
+            if ((++out % 8) == 0) {
+                std::cout << std::endl;
+            }
             mTable[i] = c;
         }
     }
 
     return mTable;
+*/
 }
 
 
 std::uint32_t Crc32::Calc(const void* aBuf, std::size_t aLen, std::uint32_t aInitial)
 {
-    std::uint32_t* table = getTable();
+    const std::uint32_t* table = getTable();
     uint32_t c = aInitial ^ cCRC32_XOR_MASK;
     const uint8_t* u = static_cast<const uint8_t*>(aBuf);
 
@@ -64,7 +73,7 @@ Crc32::Crc32(uint32_t aInitial)
 
 std::uint32_t Crc32::Add(uint8_t aU)
 {
-    std::uint32_t* table = getTable();
+    const std::uint32_t* table = getTable();
 
     mC = table[(mC ^ aU) & 0xFF] ^ (mC >> 8);
 

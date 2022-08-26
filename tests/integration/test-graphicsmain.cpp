@@ -53,10 +53,10 @@ TEST_CASE("Graphics Main Test")
 
     GraphicsMain gfx(fb, tp, scenes);
 
-    gfx.ChangeScene("SecondScene");
+    gfx.ChangeScene(SecondScene::ID);
 
     scenes.GetAfterCreate() = [&gfx](Scene &aScene) {
-        if (aScene.GetName() == "SecondScene") {
+        if (aScene.GetId() == SecondScene::ID) {
             aScene.GetAs<SecondScene>().WhenClicked() = [&gfx]() {
                 gfx.Terminate();
             };

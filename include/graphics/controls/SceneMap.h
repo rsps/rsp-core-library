@@ -43,14 +43,13 @@ public:
 
     #define AddFactory(T) \
         std::cout << "Creating scene: " << #T << std::endl; \
-        mScenes[#T] = []() { return new T(); }
+        mScenes[T::ID] = []() { return new T(); }
 
     SceneMap& operator=(const SceneMap&) = default;
 
-    SceneCreator operator[](const std::string &arName);
+    SceneCreator operator[](std::uint32_t aId);
 
-    #define ACTIVATE_SCENE(n) SetActiveScene(#n)
-    void SetActiveScene(const std::string &arName);
+    void SetActiveScene(std::uint32_t aId);
     Scene& ActiveScene();
 
     template<class T>
@@ -61,7 +60,7 @@ public:
     SceneNotify& GetBeforeDestroy() { return mOnDestroy; }
 
 protected:
-    std::unordered_map<std::string, SceneCreator> mScenes{};
+    std::map<std::uint32_t, SceneCreator> mScenes{};
     Scene *mpActiveScene = nullptr;
     SceneNotify mOnCreated{};
     SceneNotify mOnDestroy{};
