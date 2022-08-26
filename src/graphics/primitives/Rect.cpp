@@ -18,10 +18,10 @@ namespace rsp::graphics
 
 std::ostream& operator <<(std::ostream &aStream, const Rect &arRect)
 {
-    aStream << "Top: " << arRect.GetTop() << ", "
-        << "Left: " << arRect.GetLeft() << ", "
-        << "Height: " << arRect.GetHeight() << ", "
-        << "Width: " << arRect.GetWidth();
+    aStream << "Left: " << arRect.GetLeft() << ", "
+        << "Top: " << arRect.GetTop() << ", "
+        << "Width: " << arRect.GetWidth() << ", "
+        << "Height: " << arRect.GetHeight();
     return aStream;
 }
 

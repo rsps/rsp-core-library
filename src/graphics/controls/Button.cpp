@@ -13,15 +13,22 @@
 namespace rsp::graphics {
 
 Button::Button()
+    : TouchControl(rsp::utils::MakeTypeInfo<Button>())
 {
     AddChild(&mImage);
 }
 
-Button::Button(const Rect &arArea)
-    : TouchControl(arArea),
-      mImage(arArea)
+Button::Button(const rsp::utils::TypeInfo &arInfo)
+    : TouchControl(arInfo)
 {
     AddChild(&mImage);
+}
+
+Button& Button::SetArea(const Rect &arRect)
+{
+    TouchControl::SetArea(arRect);
+    mImage.SetArea(arRect);
+    return *this;
 }
 
 Button& Button::SetBitmapPosition(const Point &arPoint)

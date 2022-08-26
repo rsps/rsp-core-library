@@ -42,8 +42,12 @@ public:
     SceneMap(const SceneMap&) = default;
 
     #define AddFactory(T) \
-        std::cout << "Creating scene: " << #T << std::endl; \
-        mScenes[T::ID] = []() { return new T(); }
+        std::cout << "Adding scene factory: " << T::NAME << " with id: " << T::ID << std::endl; \
+        mScenes[T::ID] = []() { \
+            Scene* result = new T(); \
+            std::cout << "Created scene: " << result->GetName() << std::endl; \
+            return result; \
+        }
 
     SceneMap& operator=(const SceneMap&) = default;
 

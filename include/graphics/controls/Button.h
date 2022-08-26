@@ -23,7 +23,9 @@ class Button: public TouchControl
 {
 public:
     Button();
-    Button(const Rect &arArea);
+    Button(const rsp::utils::TypeInfo &arInfo);
+
+    Button& SetArea(const Rect &arRect) override;
 
     Text& GetText() { return mText; }
     Image& GetImage() { return mImage; }

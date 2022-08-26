@@ -13,10 +13,8 @@
 
 #include <graphics/controls/TouchControl.h>
 #include <graphics/TouchEvent.h>
-#include <utils/ConstTypeInfo.h>
 #include "Control.h"
 #include <vector>
-#include <string_view>
 
 namespace rsp::graphics {
 
@@ -25,23 +23,19 @@ class Scene: public Control
 public:
     static void SetScreenSize(int aWidth, int aHeight);
 
-    Scene(const std::string &arName, std::uint32_t aId)
-        : Control(mScreenSize), mName(arName), mId(aId)
+    Scene(const rsp::utils::TypeInfo &arInfo)
+        : Control(arInfo)
     {
+        SetArea(mScreenSize);
     }
-    Scene(const Rect &arRect, const std::string &arName, std::uint32_t aId)
-        : Control(arRect), mName(arName), mId(aId)
+    Scene(const Rect &arRect, const rsp::utils::TypeInfo &arInfo)
+        : Control(arInfo)
     {
+        SetArea(arRect);
     }
 
     virtual ~Scene()
     {
-    }
-
-    template<class T>
-    T& GetAs()
-    {
-        return *static_cast<T*>(this);
     }
 
     /**
@@ -59,21 +53,6 @@ public:
     }
 
     /**
-     * \brief Get the name of the specific scene.
-     *
-     * \return string with name of scene
-     */
-    const std::string& GetName()
-    {
-        return mName;
-    }
-
-    std::uint32_t GetId()
-    {
-        return mId;
-    }
-
-    /**
      * \brief Processes input in all touchable areas within Scene
      * \param arInput Reference to the input being processed
      */
@@ -81,8 +60,6 @@ public:
 
 protected:
     static Rect mScreenSize;
-    std::string mName;
-    std::uint32_t mId;
     std::vector<TouchControl*> mTouchables { };
 
     void removeTouchable(TouchControl *apTouchControl) override;
@@ -94,12 +71,12 @@ class SceneBase: public Scene
 {
 public:
     SceneBase()
-        : Scene(std::string(NAME), ID)
+        : Scene(rsp::utils::MakeTypeInfo<T>())
     {
     }
 
     SceneBase(const Rect &arRect)
-        : Scene(arRect, std::string(NAME), ID)
+        : Scene(arRect, rsp::utils::MakeTypeInfo<T>())
     {
     }
 

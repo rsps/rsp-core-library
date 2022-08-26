@@ -57,7 +57,6 @@ TEST_CASE("Scene Test")
 
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    CHECK_NOTHROW(Framebuffer fb_dummy(p.empty() ? nullptr : p.string().c_str()));
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
 
     CHECK_NOTHROW(Scenes scenes_dummy);
@@ -66,7 +65,16 @@ TEST_CASE("Scene Test")
     CHECK_NOTHROW(TouchEvent event_dummy);
     TouchEvent event;
 
+    scenes.GetAfterCreate() = [](Scene &arScene) {
+        MESSAGE("Created Scene: " << arScene.GetName());
+    };
+
+    scenes.GetBeforeDestroy() = [](Scene &arScene) {
+        MESSAGE("Destroying Scene: " << arScene.GetName());
+    };
+
     scenes.SetActiveScene(SecondScene::ID);
+    CHECK_NOTHROW(scenes.ActiveScene());
 
     Rect tr = SecondScene::GetTopRect();
     Point insideTopPoint(tr.GetLeft() + (rand() % tr.GetWidth()),
@@ -80,6 +88,7 @@ TEST_CASE("Scene Test")
     {
         // Arrange
         event.mType = TouchEvent::Types::Press;
+        CHECK_NOTHROW(scenes.ActiveScene());
         scenes.ActiveScene().Render(fb);
 
         SUBCASE("Process input for Top elements")
@@ -131,6 +140,7 @@ TEST_CASE("Scene Test")
         bool clicked = false;
         scenes.ActiveSceneAs<SecondScene>().WhenClicked() = [&publisher, &clicked]() {
             clicked = true;
+            MESSAGE("Click detected");
             rsp::messaging::ClickedEvent event("Button was clicked.");
             publisher.PublishToBroker(ClickTopics::SceneChange, event);
         };
@@ -151,6 +161,7 @@ TEST_CASE("Scene Test")
         CHECK(sub.calledCount == 1);
         CHECK(sub.message == "Button was clicked.");
     }
+    CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Copy));
 }
 
 TEST_SUITE_END();

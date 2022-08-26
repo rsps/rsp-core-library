@@ -175,7 +175,7 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
         }
     }
 
-    std::cout << "Loaded " << arFile.GetFileName() << " into PixelData." << std::endl;
+    std::cout << "Loaded " << arFile.GetFileName() << " into PixelData (" << w << "x" << h << ")," << std::endl;
     mPixelData.GetPixelAt(0, 0, Color::White);
 }
 

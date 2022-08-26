@@ -85,5 +85,7 @@ class Bitmap : public Canvas
     std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
 };
 
+std::ostream& operator<<(std::ostream& os, const Bitmap &arBmp);
+
 } // namespace rsp::graphics
 #endif // BITMAP_H

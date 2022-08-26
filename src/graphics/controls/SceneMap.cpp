@@ -29,6 +29,8 @@ Scene& SceneMap::ActiveScene()
         THROW_WITH_BACKTRACE(ActiveSceneNotSet);
     }
 
+    std::cout << "Get Active Scene: " << mpActiveScene->GetName() << std::endl;
+
     return *mpActiveScene;
 }
 

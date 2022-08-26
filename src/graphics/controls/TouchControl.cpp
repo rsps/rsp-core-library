@@ -13,14 +13,13 @@
 namespace rsp::graphics {
 
 TouchControl::TouchControl()
-    : Control()
+    : Control(rsp::utils::MakeTypeInfo<TouchControl>())
 {
     addTouchable(this);
 }
 
-TouchControl::TouchControl(const Rect &arArea)
-    : Control(arArea),
-      mTouchArea(arArea)
+TouchControl::TouchControl(const rsp::utils::TypeInfo &arInfo)
+    : Control(arInfo)
 {
     addTouchable(this);
 }
@@ -70,6 +69,13 @@ TouchControl& TouchControl::operator =(TouchControl &&arOther)
     return *this;
 }
 
+TouchControl& TouchControl::SetArea(const Rect &arRect)
+{
+    Control::SetArea(arRect);
+    mTouchArea = arRect;
+    return *this;
+}
+
 void TouchControl::ProcessInput(TouchEvent &arInput)
 {
     if (GetState() == Control::States::disabled) {
@@ -114,24 +120,24 @@ bool TouchControl::IsHit(const Point &arPoint) const
 void TouchControl::doPress(const Point &arPoint)
 {
     SetState(Control::States::pressed);
-    mOnPress(arPoint, mId);
+    mOnPress(arPoint, GetId());
 }
 
 void TouchControl::doMove(const Point &arPoint)
 {
     SetState(Control::States::dragged);
-    mOnMove(arPoint, mId);
+    mOnMove(arPoint, GetId());
 }
 
 void TouchControl::doLift(const Point &arPoint)
 {
     SetState(Control::States::normal);
-    mOnLift(arPoint, mId);
+    mOnLift(arPoint, GetId());
 }
 
 void TouchControl::doClick(const Point &arPoint)
 {
-    mOnClick(arPoint, mId);
+    mOnClick(arPoint, GetId());
 }
 
 } // namespace rsp::graphics

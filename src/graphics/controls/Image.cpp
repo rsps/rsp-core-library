@@ -9,8 +9,12 @@
  */
 
 #include <algorithm>
+#include <string>
 #include "graphics/controls/Image.h"
 #include "graphics/primitives/Rect.h"
+#include <utils/CoreException.h>
+
+using namespace rsp::utils;
 
 namespace rsp::graphics
 {
@@ -41,7 +45,17 @@ void Image::paint(Canvas &arCanvas, const Style &arStyle)
 {
     Control::paint(arCanvas, arStyle);
 
+    if (!arStyle.mpBitmap) {
+        THROW_WITH_BACKTRACE1(CoreException, std::string("Bitmap is null for state " + to_string(mState)));
+    }
     arCanvas.DrawImageSection(mArea.GetTopLeft(), *arStyle.mpBitmap, mSection, arStyle.mForegroundColor);
+}
+
+Image& Image::SetArea(const Rect &arRect)
+{
+    Control::SetArea(arRect);
+    mSection = arRect;
+    return *this;
 }
 
 } // namespace rsp::graphics

@@ -12,9 +12,11 @@
 
 #include <map>
 #include <vector>
+#include <string_view>
 #include <graphics/primitives/Canvas.h>
 #include <graphics/primitives/Color.h>
 #include <graphics/primitives/Rect.h>
+#include <utils/ConstTypeInfo.h>
 #include "Style.h"
 
 namespace rsp::graphics
@@ -37,11 +39,32 @@ class Control
     };
 
     Control() {}
-    Control(const Rect &arRect);
+    Control(const rsp::utils::TypeInfo &arInfo) : mTypeInfo(arInfo) {}
     virtual ~Control() {}
 
     Control(const Control &arOther) = default;
     Control &operator=(const Control &arOther) = default;
+
+    template<class T>
+    T& GetAs()
+    {
+        return *static_cast<T*>(this);
+    }
+
+    /**
+     * \brief Get the name of the specific scene.
+     *
+     * \return string with name of scene
+     */
+    std::string GetName()
+    {
+        return std::string(mTypeInfo.mName);
+    }
+
+    std::uint32_t GetId()
+    {
+        return mTypeInfo.mId;
+    }
 
     /**
      * \brief Sets the state of the object
@@ -93,7 +116,7 @@ class Control
      * \brief Sets the area of the object as a rectangle
      * \param aRect A reference to the rectangle to define the objects area
      */
-    void SetArea(const Rect &arRect);
+    virtual Control& SetArea(const Rect &arRect);
 
     /**
      * \brief Gets the area of the object as a rectangle
@@ -115,6 +138,8 @@ class Control
      */
     Style& GetStyle(States aState) { return mStyles[aState]; }
 
+    rsp::utils::TypeInfo& GetInfo() { return mTypeInfo; }
+
   protected:
     Rect mArea{};
     std::map<States, Style> mStyles{};
@@ -123,12 +148,17 @@ class Control
     std::vector<Control *> mChildren{};
     bool mIsInvalid = true;
     States mState = States::normal;
+    rsp::utils::TypeInfo mTypeInfo{rsp::utils::MakeTypeInfo<Control>()};
 
     virtual void addTouchable(TouchControl *apTouchControl);
     virtual void removeTouchable(TouchControl *apTouchControl);
 
     virtual void paint(Canvas &arCanvas, const Style &arStyle);
 };
+
+std::string to_string(Control::States aState);
+std::ostream& operator<<(std::ostream& os, const Control::States aState);
+
 
 } // namespace rsp::graphics
 

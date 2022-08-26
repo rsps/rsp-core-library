@@ -24,13 +24,13 @@ public:
     using TouchCallback_t = rsp::utils::Function<void(const Point&, int)>;
 
     TouchControl();
-    TouchControl(const Rect &arArea);
+    TouchControl(const rsp::utils::TypeInfo &arInfo);
     virtual ~TouchControl();
 
     TouchControl(const TouchControl&);
     TouchControl(TouchControl&&);
 
-    TouchControl& SetId(int aId) { mId = aId; return *this; }
+    TouchControl& SetArea(const Rect &arRect) override;
 
     /**
      * \brief Processes input for press or click callbacks
@@ -92,9 +92,6 @@ public:
      * \return Reference to callback object
      */
     TouchCallback_t& GetOnClick() { return mOnClick; }
-
-protected:
-    int mId = 0;
 
 private:
     TouchCallback_t mOnPress{};

@@ -13,9 +13,22 @@
 namespace rsp::graphics
 {
 
-Control::Control(const Rect &arRect)
-    : mArea(arRect)
+std::string to_string(Control::States aState)
 {
+    const char *names[] = {
+        "disabled",
+        "normal",
+        "pressed",
+        "dragged",
+        "checked"
+    };
+    return names[static_cast<int>(aState)];
+}
+
+std::ostream& operator <<(std::ostream &os, const Control::States aState)
+{
+    os << to_string(aState);
+    return os;
 }
 
 void Control::SetState(States aState)
@@ -40,7 +53,7 @@ void Control::Invalidate()
     }
 }
 
-void Control::SetArea(const Rect &arRect)
+Control& Control::SetArea(const Rect &arRect)
 {
     if (mArea != arRect) {
         mArea = arRect;
@@ -50,6 +63,7 @@ void Control::SetArea(const Rect &arRect)
             mpParent->Invalidate();
         }
     }
+    return *this;
 }
 
 Control& Control::AddChild(Control *apChild)
@@ -63,13 +77,16 @@ Control& Control::AddChild(Control *apChild)
 
 bool Control::Render(Canvas &arCanvas)
 {
+    std::cout << "Rendering: " << GetName() << " (" << this << ")" << std::endl;
     bool result = mIsInvalid;
 
     if (mIsInvalid) {
+        std::cout << "Painting: " << GetName() << std::endl;
         paint(arCanvas, mStyles[mState]);
     }
 
     for (Control* child : mChildren) {
+        std::cout << "Rendering "<< GetName() << "'s child: " << child->GetName() << std::endl;
         if (child->Render(arCanvas)) {
             result = true;
         }

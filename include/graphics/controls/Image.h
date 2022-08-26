@@ -19,14 +19,16 @@ namespace rsp::graphics
 class Image : public Control
 {
   public:
-    Image() : Control(){};
-    Image(const Rect &arDst) : Control(arDst), mSection(arDst) {}
+    Image() : Control(rsp::utils::MakeTypeInfo<Image>()) {};
+    Image(const rsp::utils::TypeInfo &arInfo) : Control(arInfo) {}
 
     Image(const Image &) = default;
     Image(Image &&) = default;
 
     Image& operator=(const Image &) = default;
     Image& operator=(Image &&arOther) = default;
+
+    Image& SetArea(const Rect &arRect) override;
 
     void ClearSection();
     void SetSection(const Rect &arSection);

@@ -19,6 +19,12 @@ using namespace rsp::utils;
 namespace rsp::graphics
 {
 
+std::ostream& operator <<(std::ostream &os, const Bitmap &arBmp)
+{
+    os << arBmp.GetPixelData().GetWidth() << "x" << arBmp.GetPixelData().GetHeight();
+    return os;
+}
+
 Bitmap::Bitmap(const std::string &arImgName)
     : Canvas()
 {
@@ -56,6 +62,5 @@ std::uint32_t Bitmap::GetPixel(const Point &aPoint, const bool aFront) const
     }
     return mImagePixels.GetPixelAt(aPoint.mX, aPoint.mY, Color::White);
 }
-
 
 } // namespace rsp::graphics

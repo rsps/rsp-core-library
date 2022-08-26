@@ -32,15 +32,22 @@ constexpr std::string_view NameOf() noexcept
     for (; *p == ' ' ; ++p)
         ;
     char const *p2 = p;
+    char const *delim = p;
     int count = 1;
     for (; ; ++p2) {
         switch (*p2) {
+            case ';':
+                delim = p2;
+                break;
             case '[':
                 ++count;
                 break;
             case ']':
                 --count;
                 if (!count) {
+                    if (delim != p) {
+                        return {p, std::size_t(delim - p)};
+                    }
                     return {p, std::size_t(p2 - p)};
                 }
                 break;
@@ -70,6 +77,18 @@ constexpr uint32_t HashOf() noexcept
 }
 
 } /* namespace crc32 */
+
+struct TypeInfo
+{
+    std::string mName;
+    uint32_t mId;
+};
+
+template<typename T>
+TypeInfo MakeTypeInfo() noexcept
+{
+    return {std::string(NameOf<T>()), crc32::HashOf<T>()};
+}
 
 } /* namespace rsp::utils */
 

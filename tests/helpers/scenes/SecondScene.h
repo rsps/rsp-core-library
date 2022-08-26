@@ -29,14 +29,16 @@ public:
         //  Set member variables values
         mTopBtn.SetArea(GetTopRect());
         mTopBtn.GetTouchArea() = mTopBtn.GetArea();
-        mTopBtn.GetStyle(Control::States::normal).mpBitmap = &mRed;
-        mTopBtn.GetStyle(Control::States::pressed).mpBitmap = &mGreen;
+        mTopBtn.GetImage().GetStyle(Control::States::normal).mpBitmap = &mRed;
+        mTopBtn.GetImage().GetStyle(Control::States::pressed).mpBitmap = &mGreen;
+        mTopBtn.GetInfo().mName = "TopBtn";
 
         mBotBtn.SetArea(GetBotRect());
         mBotBtn.GetTouchArea() = mBotBtn.GetArea();
-        mBotBtn.GetStyle(Control::States::normal).mpBitmap = &mRed;
-        mBotBtn.GetStyle(Control::States::pressed).mpBitmap = &mGreen;
+        mBotBtn.GetImage().GetStyle(Control::States::normal).mpBitmap = &mRed;
+        mBotBtn.GetImage().GetStyle(Control::States::pressed).mpBitmap = &mGreen;
         mBotBtn.GetOnClick() = std::bind(&SecondScene::doClick, this, std::placeholders::_1);
+        mTopBtn.GetInfo().mName = "BotBtn";
 
         //  Add them to the lists?
         AddChild(&mTopBtn);
@@ -62,6 +64,7 @@ protected:
     Clicked_t mWhenClicked{};
 
     void doClick(const Point &arPoint) {
+        std::cout << "doClick: " << arPoint << std::endl;
         mWhenClicked();
     }
 };

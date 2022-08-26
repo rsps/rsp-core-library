@@ -50,7 +50,7 @@ TEST_CASE("Framebuffer")
 
     srand(ms.count()); // generates random seed val
     Color col(urand() % 200 + 56, urand() % 200 + 56, urand() % 200 + 56, 0xff);
-    MESSAGE("Color: " << col);
+    MESSAGE("Color: " << col.AsUint());
 
     SUBCASE("Clear")
     {

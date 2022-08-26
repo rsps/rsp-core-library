@@ -33,8 +33,7 @@ class Keyboard: public Control
 public:
     enum class Flags : std::uint32_t { Shift = 1 };
 
-    Keyboard() : Control() {}
-    Keyboard(const Rect &arRect) : Control(arRect) {}
+    Keyboard() : Control(rsp::utils::MakeTypeInfo<Keyboard>()) {}
 
 protected:
     std::array<Key, 10> mKeys;
