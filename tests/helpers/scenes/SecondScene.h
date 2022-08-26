@@ -13,6 +13,7 @@
 
 #include <graphics/controls/Button.h>
 #include <graphics/controls/Scene.h>
+#include <graphics/primitives/Bitmap.h>
 
 namespace rsp::graphics
 {
@@ -22,22 +23,21 @@ public:
     using Clicked_t = rsp::utils::Function<void(void)>;
 
     SecondScene()
-        : mRed("testImages/Red.bmp"),
-          mGreen("testImages/Green.bmp")
+        : mNormal("testImages/Red.bmp"),
+          mPressed("testImages/Green.bmp")
     {
         // myName = "Second Scene";
         //  Set member variables values
         mTopBtn.SetArea(GetTopRect());
         mTopBtn.GetTouchArea() = mTopBtn.GetArea();
-        mTopBtn.GetImage().GetStyle(Control::States::normal).mpBitmap = &mRed;
-        mTopBtn.GetImage().GetStyle(Control::States::pressed).mpBitmap = &mGreen;
+        mTopBtn.GetImage().GetStyle(Control::States::normal).mpBitmap = &mNormal;
+        mTopBtn.GetImage().GetStyle(Control::States::pressed).mpBitmap = &mPressed;
         mTopBtn.GetInfo().mName = "TopBtn";
 
         mBotBtn.SetArea(GetBotRect());
         mBotBtn.GetTouchArea() = mBotBtn.GetArea();
-        mBotBtn.GetImage().GetStyle(Control::States::normal).mpBitmap = &mRed;
-        mBotBtn.GetImage().GetStyle(Control::States::pressed).mpBitmap = &mGreen;
-        mBotBtn.GetOnClick() = std::bind(&SecondScene::doClick, this, std::placeholders::_1);
+        mBotBtn.GetImage().GetStyle(Control::States::normal).mpBitmap = &mNormal;
+        mBotBtn.GetImage().GetStyle(Control::States::pressed).mpBitmap = &mPressed;
         mTopBtn.GetInfo().mName = "BotBtn";
 
         //  Add them to the lists?
@@ -48,25 +48,16 @@ public:
     static Rect GetTopRect() { return Rect(100, 150, 200, 100); }
     static Rect GetBotRect() { return Rect(100, 300, 300, 100); }
 
-//    TouchControl& GetTopArea() { return *mTouchables[0]; }
-//    TouchControl& GetBotArea() { return *mTouchables[1]; }
-
-    Clicked_t& WhenClicked() { return mWhenClicked; }
+    Button& GetBottomBtn() { return mBotBtn; }
 
     Image& GetTopImg() { return mTopBtn.GetImage();};
     Image& GetBotImg() { return mBotBtn.GetImage();};
 
 protected:
-    Bitmap mRed;
-    Bitmap mGreen;
+    Bitmap mNormal;
+    Bitmap mPressed;
     Button mTopBtn{};
     Button mBotBtn{};
-    Clicked_t mWhenClicked{};
-
-    void doClick(const Point &arPoint) {
-        std::cout << "doClick: " << arPoint << std::endl;
-        mWhenClicked();
-    }
 };
 
 } // namespace rsp::graphics

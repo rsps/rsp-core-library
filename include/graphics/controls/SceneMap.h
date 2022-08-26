@@ -16,6 +16,7 @@
 #include <functional>
 #include <utils/CoreException.h>
 #include <utils/Function.h>
+#include <logging/Logger.h>
 #include "Scene.h"
 
 namespace rsp::graphics {
@@ -36,16 +37,16 @@ class SceneMap
 {
 public:
     using SceneCreator = std::function<Scene*()>;
-    using SceneNotify = rsp::utils::Function<void(Scene &)>;
+    using SceneNotify = rsp::utils::Function<void(Scene*)>;
 
     SceneMap() {};
     SceneMap(const SceneMap&) = default;
 
     #define AddFactory(T) \
-        std::cout << "Adding scene factory: " << T::NAME << " with id: " << T::ID << std::endl; \
+        GFXLOG("Adding scene factory: " << T::NAME << " with id: " << T::ID); \
         mScenes[T::ID] = []() { \
             Scene* result = new T(); \
-            std::cout << "Created scene: " << result->GetName() << std::endl; \
+            GFXLOG("Created scene: " << result->GetName()); \
             return result; \
         }
 
@@ -53,6 +54,7 @@ public:
 
     SceneCreator operator[](std::uint32_t aId);
 
+    bool HasActiveScene() { return (mpActiveScene != nullptr); }
     void SetActiveScene(std::uint32_t aId);
     Scene& ActiveScene();
 

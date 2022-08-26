@@ -9,6 +9,7 @@
  */
 
 #include <graphics/controls/Control.h>
+#include <graphics/controls/TouchControl.h>
 
 namespace rsp::graphics
 {
@@ -71,22 +72,26 @@ Control& Control::AddChild(Control *apChild)
     if (apChild) {
         mChildren.push_back(apChild);
         apChild->mpParent = this;
+        auto tc = dynamic_cast<TouchControl*>(apChild);
+        if (tc != nullptr) {
+            addTouchable(tc);
+        }
     }
     return *this;
 }
 
 bool Control::Render(Canvas &arCanvas)
 {
-    std::cout << "Rendering: " << GetName() << " (" << this << ")" << std::endl;
+    GFXLOG("Rendering: " << GetName() << " (" << this << ")");
     bool result = mIsInvalid;
 
     if (mIsInvalid) {
-        std::cout << "Painting: " << GetName() << std::endl;
+        GFXLOG("Painting: " << GetName());
         paint(arCanvas, mStyles[mState]);
     }
 
     for (Control* child : mChildren) {
-        std::cout << "Rendering "<< GetName() << "'s child: " << child->GetName() << std::endl;
+        GFXLOG("Rendering "<< GetName() << "'s child: " << child->GetName());
         if (child->Render(arCanvas)) {
             result = true;
         }

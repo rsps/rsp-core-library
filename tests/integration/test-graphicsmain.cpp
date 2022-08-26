@@ -38,6 +38,12 @@ TEST_CASE("Graphics Main Test")
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
+    const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
+    const char* cFontName = "Exo 2";
+
+    CHECK_NOTHROW(Font::RegisterFont(cFontFile));
+    CHECK_NOTHROW(Font::SetDefaultFont(cFontName));
+
     // Make framebuffer
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
@@ -55,9 +61,9 @@ TEST_CASE("Graphics Main Test")
 
     gfx.ChangeScene(SecondScene::ID);
 
-    scenes.GetAfterCreate() = [&gfx](Scene &aScene) {
-        if (aScene.GetId() == SecondScene::ID) {
-            aScene.GetAs<SecondScene>().WhenClicked() = [&gfx]() {
+    scenes.GetAfterCreate() = [&gfx](Scene *apScene) {
+        if (apScene->GetId() == SecondScene::ID) {
+            apScene->GetAs<SecondScene>().GetBottomBtn().GetOnClick() = [&gfx](const Point&, int) {
                 gfx.Terminate();
             };
         }
@@ -66,8 +72,9 @@ TEST_CASE("Graphics Main Test")
     MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
     gfx.Run(GFX_FPS);
 
+    MESSAGE("TopLeft: " << scenes.ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft());
     const uint32_t cGreenColor = 0xFF24b40b;
-    CHECK_EQ(fb.GetPixel(scenes.ActiveScene().GetAs<SecondScene>().GetTopImg().GetArea().GetTopLeft()), cGreenColor);
-    CHECK_EQ(fb.GetPixel(scenes.ActiveScene().GetAs<SecondScene>().GetBotImg().GetArea().GetTopLeft()), cGreenColor);
+    CHECK_EQ(fb.GetPixel(scenes.ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft()), cGreenColor);
+    CHECK_EQ(fb.GetPixel(scenes.ActiveSceneAs<SecondScene>().GetBotRect().GetTopLeft()), cGreenColor);
 }
 

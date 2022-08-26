@@ -10,6 +10,9 @@
 
 #include <graphics/controls/SceneMap.h>
 #include <stdexcept>
+#include <logging/Logger.h>
+
+using namespace rsp::logging;
 
 namespace rsp::graphics {
 
@@ -29,7 +32,7 @@ Scene& SceneMap::ActiveScene()
         THROW_WITH_BACKTRACE(ActiveSceneNotSet);
     }
 
-    std::cout << "Get Active Scene: " << mpActiveScene->GetName() << std::endl;
+    GFXLOG("Get Active Scene: " << mpActiveScene->GetName());
 
     return *mpActiveScene;
 }
@@ -37,13 +40,16 @@ Scene& SceneMap::ActiveScene()
 void SceneMap::SetActiveScene(std::uint32_t aId)
 {
     if (mpActiveScene) {
-        mOnDestroy(*mpActiveScene);
+        mOnDestroy(mpActiveScene);
+        mpActiveScene->DeInit();
         delete mpActiveScene;
         mpActiveScene = nullptr;
     }
 
     mpActiveScene = (operator[](aId))();
-    mOnCreated(*mpActiveScene);
+    Logger::GetDefault().Info() << "SceneChange: " << mpActiveScene->GetName() << std::endl;
+    mpActiveScene->Init();
+    mOnCreated(mpActiveScene);
 }
 
 } /* namespace rsp::graphics */

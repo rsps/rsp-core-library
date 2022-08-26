@@ -15,13 +15,11 @@ namespace rsp::graphics {
 TouchControl::TouchControl()
     : Control(rsp::utils::MakeTypeInfo<TouchControl>())
 {
-    addTouchable(this);
 }
 
 TouchControl::TouchControl(const rsp::utils::TypeInfo &arInfo)
     : Control(arInfo)
 {
-    addTouchable(this);
 }
 
 TouchControl::~TouchControl()

@@ -16,11 +16,22 @@
 #include <graphics/primitives/Canvas.h>
 #include <graphics/primitives/Color.h>
 #include <graphics/primitives/Rect.h>
+#include <logging/Logger.h>
 #include <utils/ConstTypeInfo.h>
+#include <utils/CoreException.h>
 #include "Style.h"
+
+//#define GFXLOG(a) DLOG(a)
+#define GFXLOG(a)
 
 namespace rsp::graphics
 {
+
+class ESceneCast : public rsp::utils::CoreException
+{
+public:
+    ESceneCast(const std::string &arName, const std::string &arType) : rsp::utils::CoreException(arName + " is not of type " + arType) {};
+};
 
 class TouchControl;
 
@@ -48,6 +59,9 @@ class Control
     template<class T>
     T& GetAs()
     {
+        if (GetId() != T::ID) {
+            THROW_WITH_BACKTRACE2(ESceneCast, GetName(), std::string(T::NAME));
+        }
         return *static_cast<T*>(this);
     }
 
