@@ -93,6 +93,7 @@ void TouchControl::ProcessInput(TouchEvent &arInput)
                 mCurrentPress = arInput.mPoint;
                 doLift(mCurrentPress);
                 if (IsHit(mCurrentPress)) {
+                    ToggleChecked();
                     doClick(mCurrentPress);
                 }
             }
@@ -101,7 +102,9 @@ void TouchControl::ProcessInput(TouchEvent &arInput)
         case TouchEvent::Types::Drag:
             if (IsHit(mOriginalPress)) {
                 mCurrentPress = arInput.mPoint;
-                doMove(mCurrentPress);
+                if (IsDragable()) {
+                    doMove(mCurrentPress);
+                }
             }
             break;
 

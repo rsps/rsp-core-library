@@ -42,11 +42,11 @@ class Control
      * \brief Enum type defining the available states
      */
     enum class States : int {
-        disabled,
-        normal,
-        pressed,
-        dragged,
-        checked
+        disabled = 1,
+        normal = 2,
+        pressed = 4,
+        dragged = 8,
+        checked = 16
     };
 
     Control() {}
@@ -101,6 +101,13 @@ class Control
      * \return True if the object is currently marked as invalid
      */
     bool IsInvalid() const { return mIsInvalid; }
+
+    virtual Control& SetDragable(bool aValue) { mIsDragable = aValue; return *this; }
+    virtual bool IsDragable() { return mIsDragable; }
+
+    virtual bool IsChecked() { return mChecked; }
+
+    virtual Control& ToggleChecked() { mChecked = !mChecked; return *this; }
 
     /**
      * \brief Set the object to transparent or not
@@ -161,6 +168,8 @@ class Control
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};
     bool mIsInvalid = true;
+    bool mIsDragable = false;
+    bool mChecked = false;
     States mState = States::normal;
     rsp::utils::TypeInfo mTypeInfo{rsp::utils::MakeTypeInfo<Control>()};
 

@@ -37,6 +37,9 @@ void Control::SetState(States aState)
     if (mState != aState) {
         mState = aState;
         Invalidate();
+        for (Control* child : mChildren) {
+            child->SetState(aState);
+        }
     }
 }
 

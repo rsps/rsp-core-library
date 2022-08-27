@@ -81,7 +81,7 @@ TEST_CASE("Input Processing")
     bool clicked = false;
     Rect aRect(10, 10, 200, 200);
     TouchControl area;
-    area.SetArea(aRect);
+    area.SetArea(aRect).SetDragable(true);
     TouchEvent event;
 
     event.mPoint = Point(aRect.GetLeft() + (rand() % static_cast<int>(aRect.GetWidth() - 1)),

@@ -23,8 +23,8 @@ public:
     using Clicked_t = rsp::utils::Function<void(void)>;
 
     SecondScene()
-        : mNormal("testImages/Red.bmp"),
-          mPressed("testImages/Green.bmp")
+        : mNormal("testImages/Green.bmp"),
+          mPressed("testImages/Red.bmp")
     {
         // myName = "Second Scene";
         //  Set member variables values
@@ -32,13 +32,20 @@ public:
         mTopBtn.GetTouchArea() = mTopBtn.GetArea();
         mTopBtn.GetImage().GetStyle(Control::States::normal).mpBitmap = &mNormal;
         mTopBtn.GetImage().GetStyle(Control::States::pressed).mpBitmap = &mPressed;
+        mTopBtn.SetDragable(true);
+        mTopBtn.GetImage().SetDragable(true);
+        mTopBtn.GetImage().ClearSection();
         mTopBtn.GetInfo().mName = "TopBtn";
 
         mBotBtn.SetArea(GetBotRect());
         mBotBtn.GetTouchArea() = mBotBtn.GetArea();
         mBotBtn.GetImage().GetStyle(Control::States::normal).mpBitmap = &mNormal;
         mBotBtn.GetImage().GetStyle(Control::States::pressed).mpBitmap = &mPressed;
-        mTopBtn.GetInfo().mName = "BotBtn";
+        mBotBtn.GetImage().GetStyle(Control::States::dragged).mpBitmap = &mPressed;
+        mBotBtn.SetDragable(true);
+        mBotBtn.GetImage().SetDragable(true);
+        mBotBtn.GetImage().ClearSection();
+        mBotBtn.GetInfo().mName = "BotBtn";
 
         //  Add them to the lists?
         AddChild(&mTopBtn);
