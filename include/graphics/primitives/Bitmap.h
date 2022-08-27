@@ -29,9 +29,9 @@ namespace rsp::graphics
  * Various raster image formats can be implemented by descending specialized loaders
  * from the ImgLoader class and adding those to the GetRasterLoader method.
  */
-class Bitmap : public Canvas
+class Bitmap: public Canvas
 {
-  public:
+public:
     /**
      * \brief Load bitmap from given file.
      *
@@ -78,14 +78,14 @@ class Bitmap : public Canvas
         return mImagePixels;
     }
 
-  protected:
-    static std::unordered_map<std::string, std::function<std::shared_ptr<ImgLoader>()>> msFiletypeMap;
-    PixelData mImagePixels{};
+protected:
+    static std::unordered_map<std::string,std::function<std::shared_ptr<ImgLoader>()>> msFiletypeMap;
+    PixelData mImagePixels { };
 
     std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
 };
 
-std::ostream& operator<<(std::ostream& os, const Bitmap &arBmp);
+std::ostream& operator<<(std::ostream &os, const Bitmap &arBmp);
 
 } // namespace rsp::graphics
 #endif // BITMAP_H

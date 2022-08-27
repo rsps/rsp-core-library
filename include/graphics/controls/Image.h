@@ -34,8 +34,6 @@ class Image : public Control
     void SetSection(const Rect &arSection);
 
   protected:
-    Rect mSection{}; // Section of bitmap to display
-
     void paint(Canvas &arCanvas, const Style &arStyle) override;
 };
 

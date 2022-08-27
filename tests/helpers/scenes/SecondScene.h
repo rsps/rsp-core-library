@@ -30,21 +30,17 @@ public:
         //  Set member variables values
         mTopBtn.SetArea(GetTopRect());
         mTopBtn.GetTouchArea() = mTopBtn.GetArea();
-        mTopBtn.GetImage().GetStyle(Control::States::normal).mpBitmap = &mNormal;
-        mTopBtn.GetImage().GetStyle(Control::States::pressed).mpBitmap = &mPressed;
+        mTopBtn.GetStyle(Control::States::normal).mBitmapView.SetBitmap(&mNormal).SetDestination(GetTopRect().GetTopLeft());
+        mTopBtn.GetStyle(Control::States::pressed).mBitmapView.SetBitmap(&mPressed).SetDestination(GetTopRect().GetTopLeft());
         mTopBtn.SetDragable(true);
-        mTopBtn.GetImage().SetDragable(true);
-        mTopBtn.GetImage().ClearSection();
         mTopBtn.GetInfo().mName = "TopBtn";
 
         mBotBtn.SetArea(GetBotRect());
         mBotBtn.GetTouchArea() = mBotBtn.GetArea();
-        mBotBtn.GetImage().GetStyle(Control::States::normal).mpBitmap = &mNormal;
-        mBotBtn.GetImage().GetStyle(Control::States::pressed).mpBitmap = &mPressed;
-        mBotBtn.GetImage().GetStyle(Control::States::dragged).mpBitmap = &mPressed;
+        mBotBtn.GetStyle(Control::States::normal).mBitmapView.SetBitmap(&mNormal).SetDestination(GetBotRect().GetTopLeft());
+        mBotBtn.GetStyle(Control::States::pressed).mBitmapView.SetBitmap(&mPressed).SetDestination(GetBotRect().GetTopLeft());
+        mBotBtn.GetStyle(Control::States::dragged).mBitmapView.SetBitmap(&mPressed).SetDestination(GetBotRect().GetTopLeft());
         mBotBtn.SetDragable(true);
-        mBotBtn.GetImage().SetDragable(true);
-        mBotBtn.GetImage().ClearSection();
         mBotBtn.GetInfo().mName = "BotBtn";
 
         //  Add them to the lists?
@@ -55,10 +51,8 @@ public:
     static Rect GetTopRect() { return Rect(100, 150, 200, 100); }
     static Rect GetBotRect() { return Rect(100, 300, 300, 100); }
 
+    Button& GetTopBtn() { return mTopBtn; }
     Button& GetBottomBtn() { return mBotBtn; }
-
-    Image& GetTopImg() { return mTopBtn.GetImage();};
-    Image& GetBotImg() { return mBotBtn.GetImage();};
 
 protected:
     Bitmap mNormal;

@@ -21,40 +21,31 @@ namespace rsp::graphics
 
 void Image::ClearSection()
 {
-    Style &style = mStyles.at(States::normal);
-    if (style.mpBitmap) {
-        mSection = Rect(0u, 0u, style.mpBitmap->GetWidth(), style.mpBitmap->GetHeight());
-    }
-    else {
-        mSection = mArea;
+    for (auto &tuple : mStyles) {
+        tuple.second.mBitmapView.ClearSection();
     }
 }
 
 void Image::SetSection(const Rect &arSection)
 {
-    Style &style = mStyles.at(States::normal);
-    mSection = Rect(
-        std::min(0u, static_cast<unsigned int>(arSection.GetTop())),
-        std::min(0u, static_cast<unsigned int>(arSection.GetLeft())),
-        std::min(style.mpBitmap->GetWidth(), static_cast<unsigned int>(arSection.GetWidth())),
-        std::min(style.mpBitmap->GetHeight(), static_cast<unsigned int>(arSection.GetHeight()))
-    );
+    for (auto &tuple : mStyles) {
+        tuple.second.mBitmapView.SetSection(arSection);
+    }
 }
 
 void Image::paint(Canvas &arCanvas, const Style &arStyle)
 {
     Control::paint(arCanvas, arStyle);
 
-    if (!arStyle.mpBitmap) {
-        THROW_WITH_BACKTRACE1(CoreException, std::string("Bitmap is null for state " + to_string(mState)));
-    }
-    arCanvas.DrawImageSection(mArea.GetTopLeft(), *arStyle.mpBitmap, mSection, arStyle.mForegroundColor);
+    arStyle.mBitmapView.Paint(arCanvas);
 }
 
 Image& Image::SetArea(const Rect &arRect)
 {
     Control::SetArea(arRect);
-    mSection = arRect;
+    for (auto &tuple : mStyles) {
+        tuple.second.mBitmapView.SetSection(arRect).SetDestination(arRect.GetTopLeft());
+    }
     return *this;
 }
 

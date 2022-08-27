@@ -15,25 +15,27 @@ namespace rsp::graphics {
 Button::Button()
     : TouchControl(rsp::utils::MakeTypeInfo<Button>())
 {
-    AddChild(&mImage);
 }
 
 Button::Button(const rsp::utils::TypeInfo &arInfo)
     : TouchControl(arInfo)
 {
-    AddChild(&mImage);
 }
 
 Button& Button::SetArea(const Rect &arRect)
 {
     TouchControl::SetArea(arRect);
-    mImage.SetArea(arRect);
+    for (auto &tuple : mStyles) {
+        tuple.second.mBitmapView.SetSection(arRect).SetDestination(arRect.GetTopLeft());
+    }
     return *this;
 }
 
 Button& Button::SetBitmapPosition(const Point &arPoint)
 {
-    mBitmapPosition = arPoint + mArea.GetTopLeft();
+    for (auto &tuple : mStyles) {
+        tuple.second.mBitmapView.SetDestination(arPoint);
+    }
     Invalidate();
     return *this;
 }
@@ -50,7 +52,7 @@ Button& Button::SetTextPosition(const Point &arPoint)
 void Button::paint(Canvas &arCanvas, const Style &arStyle)
 {
     Control::paint(arCanvas, arStyle);
-
+    arStyle.mBitmapView.Paint(arCanvas);
     arCanvas.DrawText(mText, arStyle.mForegroundColor);
 }
 

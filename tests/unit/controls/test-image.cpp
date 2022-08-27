@@ -30,8 +30,8 @@ TEST_CASE("Image Test")
     Bitmap normal("testImages/Red.bmp");
 
     Image testImage;
-    testImage.GetStyle(Control::States::normal).mpBitmap = &normal;
-    testImage.SetArea(testRect).ClearSection();
+    testImage.GetStyle(Control::States::normal).mBitmapView.SetBitmap(&normal);
+    testImage.SetArea(testRect);
 
     SUBCASE("Render Image if Invalid")
     {
@@ -47,7 +47,7 @@ TEST_CASE("Image Test")
 
 //        MESSAGE("insidePoint: " << insidePoint);
         // Assert
-        CHECK_EQ(red.AsUint(), fb.GetPixel(insidePoint, true));
+        CHECK_EQ(fb.GetPixel(insidePoint, true), red.AsUint());
         SUBCASE("Do not render if Image valid")
         {
             // Arrange

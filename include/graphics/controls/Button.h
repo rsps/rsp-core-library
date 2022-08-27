@@ -28,14 +28,11 @@ public:
     Button& SetArea(const Rect &arRect) override;
 
     Text& GetText() { return mText; }
-    Image& GetImage() { return mImage; }
     Button& SetBitmapPosition(const Point &arPoint);
     Button& SetTextPosition(const Point &arPoint);
 
 protected:
     Text mText{};
-    Image mImage{};
-    Point mBitmapPosition{};
 
     void paint(Canvas &arCanvas, const Style &arStyle) override;
 };

@@ -102,8 +102,8 @@ TEST_CASE("Scene Test")
             scenes.ActiveScene().ProcessInput(event);
 
             // Assert
-            CHECK(scenes.ActiveSceneAs<SecondScene>().GetTopImg().IsInvalid());
-            CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetBotImg().IsInvalid());
+            CHECK(scenes.ActiveSceneAs<SecondScene>().GetTopBtn().IsInvalid());
+            CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().IsInvalid());
         }
         SUBCASE("Process input for Bot elements")
         {
@@ -114,24 +114,24 @@ TEST_CASE("Scene Test")
             scenes.ActiveScene().ProcessInput(event);
 
             // Assert
-            CHECK(scenes.ActiveSceneAs<SecondScene>().GetBotImg().IsInvalid());
-            CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetTopImg().IsInvalid());
+            CHECK(scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().IsInvalid());
+            CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetTopBtn().IsInvalid());
         }
     }
     SUBCASE("Scene Render Elements")
     {
         // Arrange
-        scenes.ActiveSceneAs<SecondScene>().GetTopImg().Invalidate();
-        scenes.ActiveSceneAs<SecondScene>().GetBotImg().Invalidate();
-        CHECK(scenes.ActiveSceneAs<SecondScene>().GetTopImg().IsInvalid());
-        CHECK(scenes.ActiveSceneAs<SecondScene>().GetBotImg().IsInvalid());
+        scenes.ActiveSceneAs<SecondScene>().GetTopBtn().Invalidate();
+        scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().Invalidate();
+        CHECK(scenes.ActiveSceneAs<SecondScene>().GetTopBtn().IsInvalid());
+        CHECK(scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().IsInvalid());
 
         // Act
         scenes.ActiveScene().Render(fb);
 
         // Assert
-        CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetTopImg().IsInvalid());
-        CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetBotImg().IsInvalid());
+        CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetTopBtn().IsInvalid());
+        CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().IsInvalid());
     }
 
     SUBCASE("Scene Bind click Callbacks")

@@ -11,9 +11,8 @@
 #ifndef INCLUDE_GRAPHICS_CONTROLS_STYLE_H_
 #define INCLUDE_GRAPHICS_CONTROLS_STYLE_H_
 
-#include <graphics/primitives/Bitmap.h>
+#include <graphics/primitives/BitmapView.h>
 #include <graphics/primitives/Color.h>
-#include <graphics/primitives/Font.h>
 
 namespace rsp::graphics {
 
@@ -28,7 +27,7 @@ public:
 
     Color mForegroundColor = Color::White;
     Color mBackgroundColor = Color::Black;
-    const Bitmap *mpBitmap = nullptr;
+    BitmapView mBitmapView{};
 };
 
 
