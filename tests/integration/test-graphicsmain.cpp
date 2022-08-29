@@ -63,7 +63,7 @@ TEST_CASE("Graphics Main Test")
 
     scenes.GetAfterCreate() = [&gfx](Scene *apScene) {
         if (apScene->GetId() == SecondScene::ID) {
-            apScene->GetAs<SecondScene>().GetBottomBtn().GetOnClick() = [&gfx](const Point&, int) {
+            apScene->GetAs<SecondScene>().GetBottomBtn().OnClick() = [&gfx](const Point&, int) {
                 gfx.Terminate();
             };
         }

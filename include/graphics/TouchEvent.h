@@ -16,12 +16,15 @@
 namespace rsp::graphics
 {
 
+/**
+ * \brief Object tracking touch interface signals
+ */
 class TouchEvent
 {
   public:
     /**
      * \brief Enum type specifying the different types of touch events
-     *
+     * All coordinates are in absolute screen pixel values.
      */
     enum class Types {
         None,
@@ -31,7 +34,8 @@ class TouchEvent
     };
 
     Types mType = Types::None;
-    Point mPoint{};  /* Value of the absolute X coordinate from touch */
+    Point mCurrent{};  // Value of the latest absolute coordinate from touch controller
+    Point mPress{}; // Absolute coordinate of latest press
 };
 
 std::ostream &operator<<(std::ostream &os, const TouchEvent &arTouchEvent);

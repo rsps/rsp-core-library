@@ -29,18 +29,16 @@ public:
         // myName = "Second Scene";
         //  Set member variables values
         mTopBtn.SetArea(GetTopRect());
-        mTopBtn.GetTouchArea() = mTopBtn.GetArea();
         mTopBtn.GetStyle(Control::States::normal).mBitmapView.SetBitmap(&mNormal).SetDestination(GetTopRect().GetTopLeft());
         mTopBtn.GetStyle(Control::States::pressed).mBitmapView.SetBitmap(&mPressed).SetDestination(GetTopRect().GetTopLeft());
-        mTopBtn.SetDragable(true);
+        mTopBtn.SetDraggable(true);
         mTopBtn.GetInfo().mName = "TopBtn";
 
         mBotBtn.SetArea(GetBotRect());
-        mBotBtn.GetTouchArea() = mBotBtn.GetArea();
         mBotBtn.GetStyle(Control::States::normal).mBitmapView.SetBitmap(&mNormal).SetDestination(GetBotRect().GetTopLeft());
         mBotBtn.GetStyle(Control::States::pressed).mBitmapView.SetBitmap(&mPressed).SetDestination(GetBotRect().GetTopLeft());
         mBotBtn.GetStyle(Control::States::dragged).mBitmapView.SetBitmap(&mPressed).SetDestination(GetBotRect().GetTopLeft());
-        mBotBtn.SetDragable(true);
+        mBotBtn.SetDraggable(true);
         mBotBtn.GetInfo().mName = "BotBtn";
 
         //  Add them to the lists?

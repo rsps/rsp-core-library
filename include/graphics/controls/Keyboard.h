@@ -11,33 +11,39 @@
 #ifndef INCLUDE_GRAPHICS_CONTROLS_KEYBOARD_H_
 #define INCLUDE_GRAPHICS_CONTROLS_KEYBOARD_H_
 
-#include <graphics/controls/TouchControl.h>
+#include <map>
+#include <vector>
+#include <graphics/primitives/BitmapView.h>
+#include <graphics/primitives/Rect.h>
+#include <utils/Function.h>
 #include "Control.h"
-#include <utils/EnumFlags.h>
 
 namespace rsp::graphics {
-
-class Key
-{
-public:
-    TouchControl mTouchArea;
-    int mSymbol;
-    bool checked;
-    Bitmap *mpNormalBmp;
-    Bitmap *mpPressedBmp;
-    Bitmap *mpCheckedBmp;
-};
 
 class Keyboard: public Control
 {
 public:
-    enum class Flags : std::uint32_t { Shift = 1 };
+    class Layout: public Control
+    {
+    public:
+        Layout();
+    protected:
+        std::vector<Control> mKeys{};
+    };
 
-    Keyboard() : Control(rsp::utils::MakeTypeInfo<Keyboard>()) {}
+    enum class LayoutType { None, LowerCase, UpperCase, Numbers, Special };
+
+    Keyboard();
+
+    std::map<LayoutType, Layout>& GetLayouts() { return mLayouts; }
 
 protected:
-    std::array<Key, 10> mKeys;
-    rsp::utils::EnumFlags<Flags> mFlags;
+    std::map<LayoutType, Layout> mLayouts{};
+    LayoutType mCurrentLayout = LayoutType::None;
+    rsp::utils::Function<void(int aSymbol)> mOnKeyClick;
+
+    friend Keyboard::Layout;
+    void doKeyClick(int aSymbol);
 };
 
 } /* namespace rsp::graphics */

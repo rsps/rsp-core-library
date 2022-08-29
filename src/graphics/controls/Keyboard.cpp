@@ -10,10 +10,11 @@
 
 #include <graphics/controls/Keyboard.h>
 
-namespace rsp
-{
-namespace graphics
-{
+namespace rsp::graphics {
 
-} /* namespace graphics */
-} /* namespace rsp */
+Keyboard::Keyboard()
+{
+}
+
+} /* namespace rsp::graphics */
+

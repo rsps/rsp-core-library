@@ -11,8 +11,6 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include <graphics/controls/TouchControl.h>
-#include <graphics/TouchEvent.h>
 #include "Control.h"
 #include <vector>
 
@@ -52,18 +50,8 @@ public:
     {
     }
 
-    /**
-     * \brief Processes input in all touchable areas within Scene
-     * \param arInput Reference to the input being processed
-     */
-    void ProcessInput(TouchEvent &arInput);
-
 protected:
     static Rect mScreenSize;
-    std::vector<TouchControl*> mTouchables { };
-
-    void removeTouchable(TouchControl *apTouchControl) override;
-    void addTouchable(TouchControl *apTouchControl) override;
 };
 
 template<class T>

@@ -16,9 +16,11 @@
 #include <graphics/primitives/Canvas.h>
 #include <graphics/primitives/Color.h>
 #include <graphics/primitives/Rect.h>
+#include <graphics/TouchEvent.h>
 #include <logging/Logger.h>
 #include <utils/ConstTypeInfo.h>
 #include <utils/CoreException.h>
+#include <utils/Function.h>
 #include "Style.h"
 
 //#define GFXLOG(a) DLOG(a)
@@ -38,10 +40,12 @@ class TouchControl;
 class Control
 {
   public:
+    using TouchCallback_t = rsp::utils::Function<void(const Point&, int)>;
+
     /**
      * \brief Enum type defining the available states
      */
-    enum class States : int {
+    enum class States {
         disabled = 1,
         normal = 2,
         pressed = 4,
@@ -100,25 +104,24 @@ class Control
      * \brief Get wether or not the object is currently marked invalid
      * \return True if the object is currently marked as invalid
      */
-    bool IsInvalid() const { return mIsInvalid; }
+    bool IsInvalid() const { return mDirty; }
 
-    virtual Control& SetDragable(bool aValue) { mIsDragable = aValue; return *this; }
-    virtual bool IsDragable() { return mIsDragable; }
+    virtual Control& SetDraggable(bool aValue);
+    virtual bool IsDraggable() { return mDraggable; }
 
     virtual bool IsChecked() { return mChecked; }
+    virtual Control& ToggleChecked();
 
-    virtual Control& ToggleChecked() { mChecked = !mChecked; return *this; }
+    virtual bool IsVisible() {return mVisible; }
+    virtual Control& Show(bool aVisible = true);
+    virtual Control& Hide() { return Show(false); }
 
     /**
      * \brief Set the object to transparent or not
      * \param aValue Boolean determining the object transparent or not
      * \return A reference to the object
      */
-    Control& SetTransparent(bool aValue)
-    {
-        mTransparent = aValue;
-        return *this;
-    }
+    Control& SetTransparent(bool aValue);
 
     /**
      * \brief Gets if the object is transparent
@@ -161,22 +164,74 @@ class Control
 
     rsp::utils::TypeInfo& GetInfo() { return mTypeInfo; }
 
+    /**
+     * \brief Processes input for press or click callbacks
+     * \param arInput Reference to the input being processed
+     * \return True if handled
+     */
+    bool ProcessInput(TouchEvent &arInput);
+
+    /**
+     * \brief Gets the area of the TouchArea
+     * \return A reference to the current defined area as a Rectangle
+     */
+    Rect& TouchArea() { return mTouchArea; }
+
+    /**
+     * \brief OnPress callback reference
+     *
+     * \return Reference to callback object
+     */
+    TouchCallback_t& OnPress() { return mOnPress; }
+
+    /**
+     * \brief OnMove callback reference
+     *
+     * \return Reference to callback object
+     */
+    TouchCallback_t& OnMove() { return mOnMove; }
+
+    /**
+     * \brief OnLift callback reference
+     *
+     * \return Reference to callback object
+     */
+    TouchCallback_t& OnLift() { return mOnLift; }
+
+    /**
+     * \brief OnClick callback reference
+     *
+     * \return Reference to callback object
+     */
+    TouchCallback_t& OnClick() { return mOnClick; }
+
   protected:
     Rect mArea{};
     std::map<States, Style> mStyles{};
-    bool mTransparent = false;
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};
-    bool mIsInvalid = true;
-    bool mIsDragable = false;
+    bool mTransparent = false;
+    bool mDirty = true;
+    bool mDraggable = false;
+    bool mVisible = true;
     bool mChecked = false;
     States mState = States::normal;
     rsp::utils::TypeInfo mTypeInfo{rsp::utils::MakeTypeInfo<Control>()};
 
-    virtual void addTouchable(TouchControl *apTouchControl);
-    virtual void removeTouchable(TouchControl *apTouchControl);
-
     virtual void paint(Canvas &arCanvas, const Style &arStyle);
+
+  private:
+      TouchCallback_t mOnPress{};
+      TouchCallback_t mOnMove{};
+      TouchCallback_t mOnLift{};
+      TouchCallback_t mOnClick{};
+
+      Rect mTouchArea{};
+
+      virtual void doPress(const Point &arPoint);
+      virtual void doMove(const Point &arPoint);
+      virtual void doLift(const Point &arPoint);
+      virtual void doClick(const Point &arPoint);
 };
 
 std::string to_string(Control::States aState);

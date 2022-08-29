@@ -9,7 +9,6 @@
  */
 
 #include <graphics/controls/Control.h>
-#include <graphics/controls/TouchControl.h>
 
 namespace rsp::graphics
 {
@@ -45,10 +44,10 @@ void Control::SetState(States aState)
 
 void Control::Invalidate()
 {
-    if (mIsInvalid) {
+    if (mDirty) {
         return;
     }
-    mIsInvalid = true;
+    mDirty = true;
     for (Control* child : mChildren) {
         child->Invalidate();
     }
@@ -61,6 +60,7 @@ Control& Control::SetArea(const Rect &arRect)
 {
     if (mArea != arRect) {
         mArea = arRect;
+        mTouchArea = arRect;
         Invalidate();
         if (mpParent) {
             // Force repaint of parent, this is resizing
@@ -75,10 +75,6 @@ Control& Control::AddChild(Control *apChild)
     if (apChild) {
         mChildren.push_back(apChild);
         apChild->mpParent = this;
-        auto tc = dynamic_cast<TouchControl*>(apChild);
-        if (tc != nullptr) {
-            addTouchable(tc);
-        }
     }
     return *this;
 }
@@ -86,9 +82,9 @@ Control& Control::AddChild(Control *apChild)
 bool Control::Render(Canvas &arCanvas)
 {
     GFXLOG("Rendering: " << GetName() << " (" << this << ")");
-    bool result = mIsInvalid;
+    bool result = mDirty;
 
-    if (mIsInvalid) {
+    if (mDirty) {
         GFXLOG("Painting: " << GetName());
         paint(arCanvas, mStyles[mState]);
     }
@@ -100,7 +96,7 @@ bool Control::Render(Canvas &arCanvas)
         }
     }
 
-    mIsInvalid = false;
+    mDirty = false;
 
     return result;
 }
@@ -112,18 +108,131 @@ void Control::paint(Canvas &arCanvas, const Style &arStyle)
     }
 }
 
-void Control::addTouchable(TouchControl *apTouchControl)
+Control& Control::SetDraggable(bool aValue)
 {
-    if (mpParent) {
-        mpParent->addTouchable(apTouchControl);
+    if (mDraggable != aValue) {
+        mDraggable = aValue;
+        Invalidate();
     }
+    return *this;
 }
 
-void Control::removeTouchable(TouchControl *apTouchControl)
+Control& Control::Show(bool aVisible)
 {
-    if (mpParent) {
-        mpParent->removeTouchable(apTouchControl);
+    if (mVisible != aVisible) {
+        mVisible = aVisible;
+        Invalidate();
     }
+    return *this;
+}
+
+Control& Control::ToggleChecked()
+{
+    mChecked = !mChecked;
+    Invalidate();
+    return *this;
+}
+
+Control& Control::SetTransparent(bool aValue)
+{
+    if (mTransparent != aValue) {
+        mTransparent = aValue;
+        Invalidate();
+    }
+    return *this;
+}
+
+bool Control::ProcessInput(TouchEvent &arInput)
+{
+    if (!IsVisible()) {
+        return false;
+    }
+    if ((GetState() == Control::States::disabled) && mTouchArea.IsHit(arInput.mCurrent)) {
+        return true;
+    }
+
+    bool result = false;
+
+    switch (arInput.mType) {
+        case TouchEvent::Types::Press:
+            if (mTouchArea.IsHit(arInput.mCurrent)) {
+                for(Control *child : mChildren) {
+                    result = child->ProcessInput(arInput);
+                    if (result) {
+                        break;
+                    }
+                }
+                if (!result) {
+                    result = true;
+                    doPress(arInput.mCurrent);
+                }
+            }
+            break;
+
+        case TouchEvent::Types::Lift:
+            if (mTouchArea.IsHit(arInput.mPress)) {
+                for(Control *child : mChildren) {
+                    result = child->ProcessInput(arInput);
+                    if (result) {
+                        break;
+                    }
+                }
+                if (!result) {
+                    doLift(arInput.mCurrent);
+                    if (mTouchArea.IsHit(arInput.mCurrent)) {
+                        ToggleChecked();
+                        doClick(arInput.mCurrent);
+                        result = true;
+                    }
+                }
+            }
+            break;
+
+        case TouchEvent::Types::Drag:
+            if (mTouchArea.IsHit(arInput.mPress)) {
+                for(Control *child : mChildren) {
+                    result = child->ProcessInput(arInput);
+                    if (result) {
+                        break;
+                    }
+                }
+                if (!result) {
+                    if (IsDraggable()) {
+                        doMove(arInput.mCurrent);
+                    }
+                    result = true;
+                }
+            }
+            break;
+
+        default:
+            break;
+    }
+
+    return result;
+}
+
+void Control::doPress(const Point &arPoint)
+{
+    SetState(Control::States::pressed);
+    mOnPress(arPoint, GetId());
+}
+
+void Control::doMove(const Point &arPoint)
+{
+    SetState(Control::States::dragged);
+    mOnMove(arPoint, GetId());
+}
+
+void Control::doLift(const Point &arPoint)
+{
+    SetState(Control::States::normal);
+    mOnLift(arPoint, GetId());
+}
+
+void Control::doClick(const Point &arPoint)
+{
+    mOnClick(arPoint, GetId());
 }
 
 } // namespace rsp::graphics

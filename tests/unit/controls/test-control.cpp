@@ -17,10 +17,9 @@ using namespace rsp::graphics;
 class TestControl : public Control
 {
 public:
-    TestControl() : Control() { mIsInvalid = false; }
-//    TestControl(const Rect &arRect) : Control(arRect){}
+    TestControl() : Control() { mDirty = false; }
 
-    void MakeValid() { mIsInvalid = false; }
+    void MakeValid() { mDirty = false; }
 };
 
 TEST_SUITE_BEGIN("Graphics");
@@ -68,17 +67,15 @@ TEST_CASE("Control Invalidation")
 
     SUBCASE("Transparent Parent Invalidation")
     {
-        // Arrange
+        CHECK(!myControl.IsInvalid());
+
         TestControl childControl;
         myControl.AddChild(&childControl);
-        childControl.SetTransparent(true);
 
         CHECK(!myControl.IsInvalid());
 
-        // Act
-        childControl.Invalidate();
+        childControl.SetTransparent(true);
 
-        // Assert
         CHECK(myControl.IsInvalid());
     }
 

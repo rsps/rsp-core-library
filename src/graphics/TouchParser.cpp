@@ -39,7 +39,7 @@ std::ostream &operator<<(std::ostream &os, const TouchEvent &arTE)
         "Lift"
     };
 
-    os << "Touch Event: " << cTypeNames[static_cast<int>(arTE.mType)] << " " << arTE.mPoint;
+    os << "Touch Event: " << cTypeNames[static_cast<int>(arTE.mType)] << " " << arTE.mCurrent;
 
     return os;
 }
@@ -60,6 +60,9 @@ bool TouchParser::Poll(TouchEvent &arInput)
         arInput.mType = readType();
         if (arInput.mType != TouchEvent::Types::None) {
             readBody(arInput);
+            if (arInput.mType == TouchEvent::Types::Press) {
+                arInput.mPress = arInput.mCurrent;
+            }
             return true;
         }
     }
@@ -70,7 +73,7 @@ bool TouchParser::Poll(TouchEvent &arInput)
 
 void TouchParser::readRawTouchEvent()
 {
-    std::size_t len = mTouchDevice.Read(reinterpret_cast<char *>(&mRawTouchEvent), sizeof(RawTouchEvent));
+    std::size_t len = mTouchDevice.Read(reinterpret_cast<void*>(&mRawTouchEvent), sizeof(RawTouchEvent));
     if (len != sizeof(RawTouchEvent)) {
         throw NoInputData();
     }
@@ -106,10 +109,10 @@ void TouchParser::readBody(TouchEvent &arInput)
 
         if (mRawTouchEvent.type == EV_ABS) {
             if (mRawTouchEvent.code == ABS_X) {
-                arInput.mPoint.SetX(mRawTouchEvent.value);
+                arInput.mCurrent.SetX(mRawTouchEvent.value);
             }
             else if (mRawTouchEvent.code == ABS_Y) {
-                arInput.mPoint.SetY(mRawTouchEvent.value);
+                arInput.mCurrent.SetY(mRawTouchEvent.value);
             }
         }
         readRawTouchEvent();

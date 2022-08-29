@@ -95,8 +95,9 @@ TEST_CASE("Scene Test")
         SUBCASE("Process input for Top elements")
         {
             // Arrange
-            event.mPoint = insideTopPoint;
-            MESSAGE("Event Point:" << event.mPoint);
+            event.mCurrent = insideTopPoint;
+            event.mPress = event.mCurrent;
+            MESSAGE("Event Point:" << event.mCurrent);
 
             // Act
             scenes.ActiveScene().ProcessInput(event);
@@ -108,7 +109,7 @@ TEST_CASE("Scene Test")
         SUBCASE("Process input for Bot elements")
         {
             // Arrange
-            event.mPoint = insideBotPoint;
+            event.mCurrent = insideBotPoint;
 
             // Act
             scenes.ActiveScene().ProcessInput(event);
@@ -139,7 +140,7 @@ TEST_CASE("Scene Test")
         Broker<ClickTopics> broker;
         Publisher<ClickTopics> publisher(broker);
         bool clicked = false;
-        scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().GetOnClick() = [&publisher, &clicked](const Point&, int) {
+        scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().OnClick() = [&publisher, &clicked](const Point&, int) {
             clicked = true;
             MESSAGE("Click detected");
             rsp::messaging::ClickedEvent event("Button was clicked.");
@@ -149,10 +150,11 @@ TEST_CASE("Scene Test")
         // Arrange
         TestSub sub(broker);
         sub.Subscribe(ClickTopics::SceneChange);
-        event.mPoint = insideBotPoint;
+        event.mCurrent = insideBotPoint;
 
         // Act
         event.mType = TouchEvent::Types::Press;
+        event.mPress = event.mCurrent;
         scenes.ActiveScene().ProcessInput(event);
         event.mType = TouchEvent::Types::Lift;
         scenes.ActiveScene().ProcessInput(event);

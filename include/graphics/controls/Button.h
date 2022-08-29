@@ -11,15 +11,14 @@
 #ifndef INCLUDE_GRAPHICS_CONTROLS_BUTTON_H_
 #define INCLUDE_GRAPHICS_CONTROLS_BUTTON_H_
 
-#include <graphics/controls/TouchControl.h>
 #include <map>
 #include <graphics/primitives/Bitmap.h>
 #include <graphics/primitives/Text.h>
-#include "Image.h"
+#include "Control.h"
 
 namespace rsp::graphics {
 
-class Button: public TouchControl
+class Button: public Control
 {
 public:
     Button();

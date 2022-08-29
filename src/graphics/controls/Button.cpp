@@ -13,18 +13,18 @@
 namespace rsp::graphics {
 
 Button::Button()
-    : TouchControl(rsp::utils::MakeTypeInfo<Button>())
+    : Control(rsp::utils::MakeTypeInfo<Button>())
 {
 }
 
 Button::Button(const rsp::utils::TypeInfo &arInfo)
-    : TouchControl(arInfo)
+    : Control(arInfo)
 {
 }
 
 Button& Button::SetArea(const Rect &arRect)
 {
-    TouchControl::SetArea(arRect);
+    Control::SetArea(arRect);
     for (auto &tuple : mStyles) {
         tuple.second.mBitmapView.SetSection(arRect).SetDestination(arRect.GetTopLeft());
     }
