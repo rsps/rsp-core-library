@@ -48,8 +48,8 @@ TEST_CASE("Graphics Main Test")
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
 
-    // Get screen size
-    Rect screenSize(Point(0, 0), Point(fb.GetWidth(), fb.GetHeight()));
+    // Set default scene size to screen size
+    Scene::SetScreenSize(fb.GetWidth(), fb.GetHeight());
 
     // Make scenes
     Scenes scenes;

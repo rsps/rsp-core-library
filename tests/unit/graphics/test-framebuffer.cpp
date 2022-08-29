@@ -17,21 +17,18 @@
 #include <posix/FileSystem.h>
 #include <utils/StopWatch.h>
 #include <TestHelpers.h>
+#include <utils/Random.h>
 
 using namespace rsp::graphics;
+using namespace rsp::utils;
 
 inline void CheckPixel(const Point &aPoint, const Color &aColour, const Framebuffer &fb)
 {
     if (fb.IsInsideScreen(aPoint)) {
-        CHECK(fb.GetPixel(aPoint) == aColour);
+        CHECK_EQ(fb.GetPixel(aPoint), aColour);
     } else {
-        CHECK(fb.GetPixel(aPoint) == 0);
+        CHECK_EQ(fb.GetPixel(aPoint), 0);
     }
-}
-
-static unsigned int urand()
-{
-    return static_cast<unsigned int>(rand());
 }
 
 TEST_SUITE_BEGIN("Graphics");
@@ -41,6 +38,8 @@ TEST_CASE("Framebuffer")
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
+    Random::Seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
 
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
@@ -49,7 +48,7 @@ TEST_CASE("Framebuffer")
         std::chrono::system_clock::now().time_since_epoch());
 
     srand(ms.count()); // generates random seed val
-    Color col(urand() % 200 + 56, urand() % 200 + 56, urand() % 200 + 56, 0xff);
+    Color col( Random::Roll(56u, 200u), Random::Roll(56u, 200u), Random::Roll(56u, 200u), 0xff);
     MESSAGE("Color: " << col.AsUint());
 
     SUBCASE("Clear")
@@ -61,8 +60,8 @@ TEST_CASE("Framebuffer")
     SUBCASE("Drawing Lines")
     {
         // Arrange
-        Point pointA(urand() % fb.GetWidth(), urand() % fb.GetHeight());
-        Point pointB(urand() % fb.GetWidth(), urand() % fb.GetHeight());
+        Point pointA(Random::Roll(0u, fb.GetWidth()), Random::Roll(0u, fb.GetHeight()));
+        Point pointB(Random::Roll(0u, fb.GetWidth()), Random::Roll(0u, fb.GetHeight()));
 
         // Act
         CHECK_NOTHROW(fb.DrawLine(pointA, pointB, col));
@@ -86,7 +85,7 @@ TEST_CASE("Framebuffer")
                     py += signumY;
                 }
                 px += signumX;
-                CHECK(fb.GetPixel(Point(px, py), false) == col);
+                CHECK_EQ(fb.GetPixel(Point(px, py), false), col.AsUint());
             }
         } else {
             for (int i = 0; i < absDeltaY; i++) {
@@ -96,14 +95,14 @@ TEST_CASE("Framebuffer")
                     px += signumX;
                 }
                 py += signumY;
-                CHECK(fb.GetPixel(Point(px, py), false) == col);
+                CHECK_EQ(fb.GetPixel(Point(px, py), false), col.AsUint());
             }
         }
 
         SUBCASE("Lines are Inclusive")
         {
-            CHECK_EQ(fb.GetPixel(pointA, false), col);
-            CHECK_EQ(fb.GetPixel(pointB, false), col);
+            CHECK_EQ(fb.GetPixel(pointA, false), col.AsUint());
+            CHECK_EQ(fb.GetPixel(pointB, false), col.AsUint());
         }
         fb.SwapBuffer();
     }
@@ -112,11 +111,11 @@ TEST_CASE("Framebuffer")
     {
         // Arrange
         // Generate random values in the LEFT and TOP halves of the screen
-        Point leftTop(urand() % (fb.GetWidth() / 2),
-                      urand() % (fb.GetHeight() / 2));
+        Point leftTop(Random::Roll(0u, fb.GetWidth() / 2u), Random::Roll(0u, fb.GetHeight() / 2u));
         // Generate random values in the RIGHT and BOTTOM halves of the screen
-        Point rightBottom(urand() % (fb.GetWidth() + 1 - (fb.GetWidth() / 2)) + (fb.GetWidth() / 2),
-                          urand() % (fb.GetHeight() + 1 - (fb.GetHeight() / 2)) + (fb.GetHeight() / 2));
+        Point rightBottom(
+            Random::Roll(0u, fb.GetWidth() / 2) + (fb.GetWidth() / 2),
+            Random::Roll(0u, fb.GetHeight() / 2) + (fb.GetHeight() / 2));
         Rect rect(leftTop, rightBottom);
 
         // Act
@@ -142,8 +141,8 @@ TEST_CASE("Framebuffer")
     SUBCASE("Drawing Circles")
     {
         // Arrange
-        Point centerPoint(urand() % fb.GetWidth(), urand() % fb.GetHeight());
-        int radius = static_cast<int>(urand() % (fb.GetWidth() / 2));
+        Point centerPoint(Random::Roll(0u, fb.GetWidth()), Random::Roll(0u, fb.GetHeight()));
+        int radius = Random::Roll(0, static_cast<int>(fb.GetWidth()) / 2);
 
         // Act
         CHECK_NOTHROW(fb.DrawCircle(centerPoint, radius, col));
@@ -215,9 +214,9 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(fb.DrawImage(topLeftImgCorner, testImgMap));
 
             // Assert
-            CHECK(testImgMap.GetHeight() == height);
-            CHECK(testImgMap.GetWidth() == width);
-            CHECK(testImgMap.GetPixelData().GetDataSize() == (width * height * 3));
+            CHECK_EQ(testImgMap.GetHeight(), height);
+            CHECK_EQ(testImgMap.GetWidth(), width);
+            CHECK_EQ(testImgMap.GetPixelData().GetDataSize(), (width * height * 3));
 
             fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
         }
@@ -239,24 +238,30 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
 
             // Assert
-            CHECK(testImgMap.GetPixel(Point(width / 2, 0u)) == red);
-            CHECK(testImgMap.GetPixel(Point(0u, height / 2)) == green);
-            CHECK(testImgMap.GetPixel(Point(width - 1, height / 2)) == blue);
-            CHECK(testImgMap.GetPixel(Point(width / 2, height - 1)) == thisColor);
+            CHECK_EQ(testImgMap.GetPixel(Point(width / 2, 0u)), red.AsUint());
+            CHECK_EQ(testImgMap.GetPixel(Point(0u, height / 2)), green.AsUint());
+            CHECK_EQ(testImgMap.GetPixel(Point(width - 1, height / 2)), blue.AsUint());
+            CHECK_EQ(testImgMap.GetPixel(Point(width / 2, height - 1)), thisColor.AsUint());
         }
         SUBCASE("Draw memory created image")
         {
             // Arrange
             Bitmap emptyMap(height, width, 4);
-            Point randomPoint(urand() % emptyMap.GetWidth(), urand() % emptyMap.GetHeight());
+            Point randomPoint(Random::Roll(0u, width-1), Random::Roll(0u, height-1));
+
+//            MESSAGE("randomPoint: " << randomPoint);
+//            MESSAGE("topLeftImgCorner: " << topLeftImgCorner);
+//            MESSAGE("Combined: " << (topLeftImgCorner + randomPoint));
 
             // Act
-            CHECK_NOTHROW(emptyMap.SetPixel(randomPoint, col));
+            CHECK_NOTHROW(emptyMap.DrawRectangle(Rect(0u, 0u, width, height), col, true) ); //.SetPixel(randomPoint, col));
             CHECK_NOTHROW(fb.DrawImage(topLeftImgCorner, emptyMap));
+            CHECK_NOTHROW(fb.SetPixel(topLeftImgCorner + randomPoint, Color::White));
             CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
 
             // Assert
-            CHECK(emptyMap.GetPixel(randomPoint) == col);
+            CHECK_EQ(fb.GetPixel(topLeftImgCorner, true), col.AsUint());
+            CHECK_EQ(fb.GetPixel(topLeftImgCorner + randomPoint, true), Color::White);
         }
     }
 
@@ -264,7 +269,7 @@ TEST_CASE("Framebuffer")
     {
         // Arrange
         Point topLeft(0, 0);
-        Point randomPoint(urand() % fb.GetWidth(), urand() % fb.GetHeight());
+        Point randomPoint(Random::Roll(0u, fb.GetWidth()), Random::Roll(0u, fb.GetHeight()));
         std::string largeImg = "testImages/largeTestImg.bmp";
         Bitmap largeImgMap(largeImg);
         // Make sure screen is empty
@@ -287,7 +292,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(fb.DrawImage(topLeft, largeImgMap));
 
             // Assert
-            CHECK(fb.GetPixel(randomPoint) != 0);
+            CHECK_NE(fb.GetPixel(randomPoint), 0);
             CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
         }
     }

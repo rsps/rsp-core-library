@@ -16,9 +16,9 @@ namespace rsp::graphics
 
 Rect Scene::mScreenSize{0, 0, 480, 800};
 
-void Scene::SetScreenSize(int aWidth, int aHeight)
+void Scene::SetScreenSize(std::uint32_t aWidth, std::uint32_t aHeight)
 {
-    mScreenSize = Rect(0, 0, aWidth, aHeight);
+    mScreenSize = Rect(0u, 0u, aWidth, aHeight);
 }
 
 void Scene::ProcessInput(TouchEvent &arInput)

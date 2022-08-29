@@ -21,7 +21,7 @@ namespace rsp::graphics {
 class Scene: public Control
 {
 public:
-    static void SetScreenSize(int aWidth, int aHeight);
+    static void SetScreenSize(std::uint32_t aWidth, std::uint32_t aHeight);
 
     Scene(const rsp::utils::TypeInfo &arInfo)
         : Control(arInfo)

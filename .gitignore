@@ -33,3 +33,4 @@ _deps
 .cproject
 
 .~lock*
+/.idea/
