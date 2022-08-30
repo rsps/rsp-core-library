@@ -16,6 +16,7 @@
 #include <graphics/primitives/BitmapView.h>
 #include <graphics/primitives/Rect.h>
 #include <utils/Function.h>
+#include "Button.h"
 #include "Control.h"
 
 namespace rsp::graphics {
@@ -25,20 +26,19 @@ class Keyboard: public Control
 public:
     class Layout: public Control
     {
-    public:
-        Layout();
     protected:
-        std::vector<Control> mKeys{};
+        std::vector<Button> mKeys{};
     };
 
     enum class LayoutType { None, LowerCase, UpperCase, Numbers, Special };
 
     Keyboard();
+    ~Keyboard();
 
-    std::map<LayoutType, Layout>& GetLayouts() { return mLayouts; }
+    std::map<LayoutType, Layout*>& GetLayouts() { return mLayouts; }
 
 protected:
-    std::map<LayoutType, Layout> mLayouts{};
+    std::map<LayoutType, Layout*> mLayouts{};
     LayoutType mCurrentLayout = LayoutType::None;
     rsp::utils::Function<void(int aSymbol)> mOnKeyClick;
 

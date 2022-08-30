@@ -32,6 +32,8 @@ namespace rsp::graphics
 class Bitmap: public Canvas
 {
 public:
+    Bitmap() {}
+
     /**
      * \brief Load bitmap from given file.
      *
@@ -58,6 +60,10 @@ public:
      */
     Bitmap(unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel);
 
+    Bitmap& Load(const std::string &arImgName);
+    Bitmap& Assign(const uint32_t *apPixels, unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel);
+
+
     inline void SetPixel(const Point &arPoint, const Color &arColor) override
     {
         if (!IsInsideScreen(arPoint)) {
@@ -81,8 +87,6 @@ public:
 protected:
     static std::unordered_map<std::string,std::function<std::shared_ptr<ImgLoader>()>> msFiletypeMap;
     PixelData mImagePixels { };
-
-    std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileExtension);
 };
 
 std::ostream& operator<<(std::ostream &os, const Bitmap &arBmp);

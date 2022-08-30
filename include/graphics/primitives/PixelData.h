@@ -12,6 +12,7 @@
 #define INCLUDE_GRAPHICS_PRIMITIVES_PIXELDATA_H_
 
 #include <cstdint>
+#include <cstddef>
 #include <filesystem>
 #include <vector>
 #include <graphics/primitives/Color.h>
@@ -40,6 +41,8 @@ public:
     PixelData(const PixelData&& arOther);
     PixelData& operator=(const PixelData& arOther);
     PixelData& operator=(const PixelData&& arOther);
+
+    PixelData& Init(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth, const std::uint8_t *apData);
 
     const std::uint8_t* GetData() const { return mpData; }
     std::vector<std::uint8_t>& GetData() { return mData; }

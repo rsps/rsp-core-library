@@ -51,6 +51,21 @@ PixelData::PixelData(unsigned int aWidth, unsigned int aHeight, ColorDepth aDept
     mpData = mData.data();
 }
 
+PixelData& PixelData::Init(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth, const std::uint8_t *apData)
+{
+    mColorDepth = aDepth;
+    mWidth = aWidth;
+    mHeight = aHeight;
+    mData.resize(GetDataSize());
+    if (apData) {
+        mpData = const_cast<std::uint8_t*>(apData);
+    }
+    else {
+        mpData = mData.data();
+    }
+    return *this;
+}
+
 std::size_t PixelData::GetDataSize() const
 {
     std::size_t result;

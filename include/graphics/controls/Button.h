@@ -24,6 +24,12 @@ public:
     Button();
     Button(const rsp::utils::TypeInfo &arInfo);
 
+    Button(const Button&) = default;
+    Button(Button&&) = default;
+
+    Button& operator=(const Button&) = default;
+    Button& operator=(Button&&) = default;
+
     Button& SetArea(const Rect &arRect) override;
 
     Text& GetText() { return mText; }

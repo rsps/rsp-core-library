@@ -12,7 +12,34 @@
 
 namespace rsp::graphics {
 
+class LowerCaseLayout: public Keyboard::Layout
+{
+public:
+    LowerCaseLayout()
+    {
+        auto &btn = mKeys.emplace_back();
+        Style &style = btn.GetStyle(Control::States::normal);
+        style.mForegroundColor = Color::White;
+        style.mBitmapView.SetBitmap(&mNormal);
+    }
+
+protected:
+    Bitmap mNormal{};
+    Bitmap mPressed{};
+};
+
 Keyboard::Keyboard()
+{
+}
+
+Keyboard::~Keyboard()
+{
+    for (auto &tuple : mLayouts) {
+        delete tuple.second;
+    }
+}
+
+void Keyboard::doKeyClick(int aSymbol)
 {
 }
 

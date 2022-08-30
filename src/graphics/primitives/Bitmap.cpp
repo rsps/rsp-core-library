@@ -28,14 +28,7 @@ std::ostream& operator <<(std::ostream &os, const Bitmap &arBmp)
 Bitmap::Bitmap(const std::string &arImgName)
     : Canvas()
 {
-    std::filesystem::path filename(arImgName);
-
-    auto loader = ImgLoader::GetRasterLoader(filename.extension());
-    // Get raw data
-    loader->LoadImg(filename);
-    mImagePixels = loader->GetPixelData();
-    mWidth = mImagePixels.GetWidth();
-    mHeight = mImagePixels.GetHeight();
+    Load(arImgName);
 }
 
 Bitmap::Bitmap(const uint32_t *apPixels, unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel)
@@ -61,6 +54,36 @@ std::uint32_t Bitmap::GetPixel(const Point &aPoint, const bool aFront) const
         return 0;
     }
     return mImagePixels.GetPixelAt(aPoint.mX, aPoint.mY, Color::White);
+}
+
+Bitmap& Bitmap::Load(const std::string &arImgName)
+{
+    std::filesystem::path filename(arImgName);
+
+    auto loader = ImgLoader::GetRasterLoader(filename.extension());
+    // Get raw data
+    loader->LoadImg(filename);
+    mImagePixels = loader->GetPixelData();
+    mWidth = mImagePixels.GetWidth();
+    mHeight = mImagePixels.GetHeight();
+    return *this;
+}
+
+Bitmap& Bitmap::Assign(const uint32_t *apPixels, unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel)
+{
+    mHeight = aHeight;
+    mWidth = aWidth;
+    mBytesPerPixel = aBytesPerPixel;
+
+    mImagePixels.Init(aWidth, aHeight, PixelData::ColorDepth::RGB, reinterpret_cast<const std::uint8_t*>(apPixels));
+
+    for (unsigned int y = 0; y < mHeight; y++) {
+        for (unsigned int x = 0; x < mWidth; x++) {
+            mImagePixels.SetPixelAt(x, y, Color(*apPixels++));
+        }
+    }
+
+    return *this;
 }
 
 } // namespace rsp::graphics
