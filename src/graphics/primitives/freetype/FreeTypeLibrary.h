@@ -44,7 +44,7 @@ public:
         return mFtLib;
     }
 
-    FT_Face CreateFontFace(const std::string &arFontName, Font::Styles aStyle);
+    FT_Face CreateFontFace(const std::string &arFontName, FontStyles aStyle);
 
 private:
     FreeTypeLibrary(void);
@@ -54,7 +54,7 @@ private:
 
     FT_Library mFtLib { };
 
-    std::map<std::string, std::map<Font::Styles, FontInfo> > mFontSets{ };
+    std::map<std::string, std::map<FontStyles, FontInfo> > mFontSets{ };
 };
 
 }

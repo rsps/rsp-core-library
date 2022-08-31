@@ -16,10 +16,9 @@
 #include <utils/CoreException.h>
 #include <graphics/primitives/Color.h>
 #include <graphics/primitives/Rect.h>
+#include <graphics/primitives/FontRawInterface.h>
 
 namespace rsp::graphics {
-
-class FontRawInterface;
 
 /**
  * \class FontException
@@ -34,47 +33,12 @@ public:
 };
 
 /**
- * \class Glyph
- * \brief A data class holding all the pixel data of a unicode glyph.
- */
-class Glyph
-{
-public:
-    Glyph() {}
-    Glyph(void* apFace);
-
-    std::vector<uint8_t> mPixels { };
-    uint32_t mSymbolUnicode = 0;
-
-    int mTop = 0;
-    int mLeft = 0;
-    int mWidth = 0;
-    int mHeight = 0;
-};
-
-/**
- * Stream overloading for the Glyph class. Can be used for debugging.
- *
- * \param os
- * \param arGlyph
- * \return
- */
-std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph);
-
-/**
  * \class Font
  * \brief Class for fonts and their properties.
  */
 class Font
 {
 public:
-    enum class Styles {
-        Normal = 0,
-        Italic = 1,
-        Bold = 2,
-        BoldItalic = 3
-    };
-
     /**
      * Static gate to register a font file with the application.
      * The font is later accessed by the family name inside the font.
@@ -85,7 +49,7 @@ public:
     static void SetDefaultFont(const std::string &arFontName) { mDefaultFontName = arFontName; }
     static const std::string& GetDefaultFont() { return mDefaultFontName; }
 
-    Font(Styles aStyle = Styles::Normal);
+    Font(FontStyles aStyle = FontStyles::Normal);
 
     /**
      * Constructs a Font object based on the given font name (font family) in the given style.
@@ -93,7 +57,13 @@ public:
      * \param arFontName
      * \param aStyle
      */
-    Font(const std::string &arFontName, Styles aStyle = Styles::Normal);
+    Font(const std::string &arFontName, FontStyles aStyle = FontStyles::Normal);
+
+    Font(const Font&) = default;
+    Font(Font&&) = default;
+    Font& operator=(const Font&) = default;
+    Font& operator=(Font&&) = default;
+
     /**
      * Destructor
      */
@@ -156,21 +126,18 @@ public:
      * \param aStyle
      * \return Reference to this for fluent calls.
      */
-    Font& SetStyle(Styles aStyle);
+    Font& SetStyle(FontStyles aStyle);
     /**
      * Get the current style of the font.
      *
      * \return Font::Styles
      */
-    Styles GetStyle() const;
+    FontStyles GetStyle() const;
 
 protected:
     static std::string mDefaultFontName;
     Color mColor;
     std::unique_ptr<FontRawInterface> mpImpl;
-
-    Font(const Font&) = delete;
-    Font& operator=(const Font&) = delete;
 
     static std::unique_ptr<FontRawInterface> MakePimpl(const std::string &arFontName);
 };

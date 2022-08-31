@@ -12,9 +12,45 @@
 
 #include <string>
 #include <memory>
-#include <graphics/primitives/Font.h>
+#include <vector>
 
 namespace rsp::graphics {
+
+
+/**
+ * \class Glyph
+ * \brief A data class holding all the pixel data of a unicode glyph.
+ */
+class Glyph
+{
+public:
+    Glyph() {}
+    Glyph(void* apFace);
+
+    std::vector<uint8_t> mPixels { };
+    uint32_t mSymbolUnicode = 0;
+
+    int mTop = 0;
+    int mLeft = 0;
+    int mWidth = 0;
+    int mHeight = 0;
+};
+
+/**
+ * Stream overloading for the Glyph class. Can be used for debugging.
+ *
+ * \param os
+ * \param arGlyph
+ * \return
+ */
+std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph);
+
+enum class FontStyles {
+    Normal = 0,
+    Italic = 1,
+    Bold = 2,
+    BoldItalic = 3
+};
 
 /**
  * \class FontRawInterface
@@ -33,11 +69,11 @@ public:
 
     int GetSize() const { return mSizePx; }
 
-    virtual void SetStyle(Font::Styles aStyle) { mStyle = aStyle; }
-    Font::Styles GetStyle() const { return mStyle; }
+    virtual void SetStyle(FontStyles aStyle) { mStyle = aStyle; }
+    FontStyles GetStyle() const { return mStyle; }
 
 protected:
-    Font::Styles mStyle = Font::Styles::Normal;
+    FontStyles mStyle = FontStyles::Normal;
     int mSizePx = 0;
 };
 

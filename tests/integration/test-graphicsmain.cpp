@@ -52,6 +52,7 @@ TEST_CASE("Graphics Main Test")
     Scene::SetScreenSize(fb.GetWidth(), fb.GetHeight());
 
     // Make scenes
+    CHECK_NOTHROW(rsp::graphics::SecondScene scn2);
     Scenes scenes;
 
     // Make TouchParser

@@ -61,6 +61,12 @@ public:
      */
     Text(const std::string &arFontName, const std::string &arText);
 
+    Text(const Text&) = default;
+    Text(Text&&) = default;
+
+    Text& operator=(const Text&) = default;
+    Text& operator=(Text&&) = default;
+
     /**
      * Simple destructor.
      */

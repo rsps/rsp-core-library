@@ -44,7 +44,7 @@ FreeTypeLibrary& FreeTypeLibrary::Get()
     return instance;
 }
 
-FT_Face FreeTypeLibrary::CreateFontFace(const std::string &arFontName, Font::Styles aStyle)
+FT_Face FreeTypeLibrary::CreateFontFace(const std::string &arFontName, FontStyles aStyle)
 {
     Logger::GetDefault().Info() << "Creating font " << arFontName << " with style " << static_cast<int>(aStyle) << std::endl;
 
@@ -53,11 +53,11 @@ FT_Face FreeTypeLibrary::CreateFontFace(const std::string &arFontName, Font::Sty
         THROW_WITH_BACKTRACE1(FontException, StrUtils::Format("Font named %s is not installed.", arFontName.c_str()));
     }
 
-    if (aStyle != Font::Styles::Normal) {
+    if (aStyle != FontStyles::Normal) {
         auto inner = mFontSets[arFontName].find(aStyle);
         if (inner == mFontSets[arFontName].end()) {
             std::clog << "Font named " << arFontName << " has no style " << static_cast<int>(aStyle) << " installed." << std::endl;
-            aStyle = Font::Styles::Normal;
+            aStyle = FontStyles::Normal;
         }
     }
 
@@ -97,22 +97,22 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
 
         info.Id = id;
         info.StyleName = face->style_name;
-        Font::Styles style{};
+        FontStyles style{};
         bool ignore = true;
 
         if (face->face_index == 0) {
             ignore = false;
             if (face->style_flags & FT_STYLE_FLAG_ITALIC) {
-                style = Font::Styles::Italic;
+                style = FontStyles::Italic;
             }
         }
         else if (StrUtils::StartsWith(face->style_name, "Bold")) {
             ignore = false;
             if (face->style_flags & FT_STYLE_FLAG_ITALIC) {
-                style = Font::Styles::BoldItalic;
+                style = FontStyles::BoldItalic;
             }
             else {
-                style = Font::Styles::Bold;
+                style = FontStyles::Bold;
             }
         }
 

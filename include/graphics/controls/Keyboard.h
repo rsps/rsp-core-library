@@ -12,10 +12,12 @@
 #define INCLUDE_GRAPHICS_CONTROLS_KEYBOARD_H_
 
 #include <map>
-#include <vector>
+#include <array>
+#include <graphics/primitives/Bitmap.h>
 #include <graphics/primitives/BitmapView.h>
+#include <graphics/primitives/Color.h>
+#include <graphics/primitives/Point.h>
 #include <graphics/primitives/Rect.h>
-#include <utils/Function.h>
 #include "Button.h"
 #include "Control.h"
 
@@ -24,26 +26,40 @@ namespace rsp::graphics {
 class Keyboard: public Control
 {
 public:
-    class Layout: public Control
-    {
-    protected:
-        std::vector<Button> mKeys{};
-    };
+    using KeyboardCallback_t = rsp::utils::Function<void(std::string &)>;
 
-    enum class LayoutType { None, LowerCase, UpperCase, Numbers, Special };
+    static constexpr int cKEY_SHIFT    = 1000000;
+    static constexpr int cKEY_LETTERS  = 1000001;
+    static constexpr int cKEY_NUMBERS  = 1000002;
+    static constexpr int cKEY_SPECIALS = 1000003;
+
+    const Rect cSpecialLeft = {13, 496, 96, 64};
+    const Rect cSpecialRight = {371, 496, 96, 64};
+
+    enum class LayoutType { Letters, Numbers, Special };
 
     Keyboard();
     ~Keyboard();
 
-    std::map<LayoutType, Layout*>& GetLayouts() { return mLayouts; }
+    void SetLayout(LayoutType aLayout);
 
+    KeyboardCallback_t& OnKeyClick() { return mOnKeyClick; }
 protected:
-    std::map<LayoutType, Layout*> mLayouts{};
-    LayoutType mCurrentLayout = LayoutType::None;
-    rsp::utils::Function<void(int aSymbol)> mOnKeyClick;
+    KeyboardCallback_t mOnKeyClick;
+    Bitmap mImages;
+    std::array<Button, 26u> mKeys{};
+    Button mBtnShift;
+    Button mBtnLetters;
+    Button mBtnNumbers;
+    Button mBtnSpecials;
+    Button mBtnErase;
+    Button mBtnSpace;
+    std::string mInput{};
 
-    friend Keyboard::Layout;
-    void doKeyClick(int aSymbol);
+    void setupBtn(uint32_t aBtnIndex, Rect aArea, Point aBitmapPosition);
+    void setupBtn(Button &arBtn, Rect aArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol);
+    void setSymbols(const std::string &arSymbols);
+    void doKeyClick(const Point &arPoint, int aSymbol);
 };
 
 } /* namespace rsp::graphics */

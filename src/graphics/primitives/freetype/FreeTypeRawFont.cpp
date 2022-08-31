@@ -141,14 +141,14 @@ void FreeTypeRawFont::SetSize(int aWidthPx, int aHeightPx)
     Logger::GetDefault().Debug() << "Font.SetSize(" << aWidthPx << ", " << aHeightPx << ") -> " << mSizePx << std::endl;
 }
 
-void FreeTypeRawFont::SetStyle(Font::Styles aStyle)
+void FreeTypeRawFont::SetStyle(FontStyles aStyle)
 {
     mStyle = aStyle;
     freeFace();
 }
 
 
-Glyph FreeTypeRawFont::getSymbol(uint32_t aSymbolCode, Font::Styles aStyle) const
+Glyph FreeTypeRawFont::getSymbol(uint32_t aSymbolCode, FontStyles aStyle) const
 {
 #undef FT_LOAD_TARGET_
 #define FT_LOAD_TARGET_( x )   ( static_cast<FT_Int32>(( (x) & 15 ) << 16 ) )
@@ -164,7 +164,7 @@ Glyph FreeTypeRawFont::getSymbol(uint32_t aSymbolCode, Font::Styles aStyle) cons
         THROW_WITH_BACKTRACE2(FontException, "FT_Load_Char() failed", error);
     }
 
-    if ((static_cast<int>(aStyle) & static_cast<int>(Font::Styles::Bold)) && (mpFace->glyph->format == FT_GLYPH_FORMAT_OUTLINE)) {
+    if ((static_cast<int>(aStyle) & static_cast<int>(FontStyles::Bold)) && (mpFace->glyph->format == FT_GLYPH_FORMAT_OUTLINE)) {
         FT_Outline_Embolden( &mpFace->glyph->outline,  (1 << 6));
     }
 

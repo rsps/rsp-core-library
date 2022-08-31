@@ -16,11 +16,12 @@ namespace rsp::graphics
 std::string to_string(Control::States aState)
 {
     const char *names[] = {
-        "disabled",
-        "normal",
-        "pressed",
-        "dragged",
-        "checked"
+        "Disabled",
+        "Normal",
+        "Pressed",
+        "Dragged",
+        "Checked",
+        "CheckedPressed"
     };
     return names[static_cast<int>(aState)];
 }
@@ -117,6 +118,15 @@ Control& Control::SetDraggable(bool aValue)
     return *this;
 }
 
+Control& Control::SetCheckable(bool aValue)
+{
+    if (mCheckable != aValue) {
+        mCheckable = aValue;
+        Invalidate();
+    }
+    return *this;
+}
+
 Control& Control::Show(bool aVisible)
 {
     if (mVisible != aVisible) {
@@ -126,11 +136,17 @@ Control& Control::Show(bool aVisible)
     return *this;
 }
 
-Control& Control::ToggleChecked()
+void Control::toggleChecked()
 {
-    mChecked = !mChecked;
-    Invalidate();
-    return *this;
+    if (IsCheckable()) {
+        if (IsChecked()) {
+            mState = States::normal;
+        }
+        else {
+            mState = States::checked;
+        }
+        Invalidate();
+    }
 }
 
 Control& Control::SetTransparent(bool aValue)
@@ -180,7 +196,7 @@ bool Control::ProcessInput(TouchEvent &arInput)
                 if (!result) {
                     doLift(arInput.mCurrent);
                     if (mTouchArea.IsHit(arInput.mCurrent)) {
-                        ToggleChecked();
+                        toggleChecked();
                         doClick(arInput.mCurrent);
                         result = true;
                     }
@@ -214,7 +230,12 @@ bool Control::ProcessInput(TouchEvent &arInput)
 
 void Control::doPress(const Point &arPoint)
 {
-    SetState(Control::States::pressed);
+    if (GetState() == Control::States::checked) {
+        SetState(Control::States::checkedPressed);
+    }
+    else {
+        SetState(Control::States::pressed);
+    }
     mOnPress(arPoint, GetId());
 }
 

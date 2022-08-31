@@ -56,4 +56,18 @@ void Button::paint(Canvas &arCanvas, const Style &arStyle)
     arCanvas.DrawText(mText, arStyle.mForegroundColor);
 }
 
+Button& Button::SetId(uint32_t aId)
+{
+    GetInfo().mId = aId;
+    Invalidate();
+    return *this;
+}
+
+Button& Button::SetCaption(const std::string &arText)
+{
+    GetText().SetValue(arText);
+    Invalidate();
+    return *this;
+}
+
 } /* namespace rsp::graphics */

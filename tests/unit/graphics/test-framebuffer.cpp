@@ -450,17 +450,17 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-        CHECK_NOTHROW(text.SetValue("Bold").GetFont().SetStyle(Font::Styles::Bold));
+        CHECK_NOTHROW(text.SetValue("Bold").GetFont().SetStyle(FontStyles::Bold));
         CHECK_NOTHROW(fb.DrawText(text.Reload()));
         CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-        CHECK_NOTHROW(text.SetValue("Italic").GetFont().SetStyle(Font::Styles::Italic));
+        CHECK_NOTHROW(text.SetValue("Italic").GetFont().SetStyle(FontStyles::Italic));
         CHECK_NOTHROW(fb.DrawText(text.Reload()));
         CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-        CHECK_NOTHROW(text.SetValue("Bold Italic").GetFont().SetStyle(Font::Styles::BoldItalic));
+        CHECK_NOTHROW(text.SetValue("Bold Italic").GetFont().SetStyle(FontStyles::BoldItalic));
         CHECK_NOTHROW(fb.DrawText(text.Reload()));
         CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
         std::this_thread::sleep_for(std::chrono::milliseconds(500));

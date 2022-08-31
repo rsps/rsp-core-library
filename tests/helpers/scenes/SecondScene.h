@@ -13,6 +13,7 @@
 
 #include <graphics/controls/Button.h>
 #include <graphics/controls/Scene.h>
+#include <graphics/controls/Keyboard.h>
 #include <graphics/primitives/Bitmap.h>
 
 namespace rsp::graphics
@@ -41,9 +42,13 @@ public:
         mBotBtn.SetDraggable(true);
         mBotBtn.GetInfo().mName = "BotBtn";
 
+        mKeyboard.SetArea(Rect({13, 272}, {467, 760}));
+        mKeyboard.GetInfo().mName = "Keyboard";
+
         //  Add them to the lists?
         AddChild(&mTopBtn);
         AddChild(&mBotBtn);
+        AddChild(&mKeyboard);
     };
 
     static Rect GetTopRect() { return Rect(100, 150, 200, 100); }
@@ -57,6 +62,7 @@ protected:
     Bitmap mPressed;
     Button mTopBtn{};
     Button mBotBtn{};
+    Keyboard mKeyboard{};
 };
 
 } // namespace rsp::graphics

@@ -50,7 +50,8 @@ class Control
         normal = 2,
         pressed = 4,
         dragged = 8,
-        checked = 16
+        checked = 16,
+        checkedPressed = 32
     };
 
     Control() {}
@@ -109,8 +110,9 @@ class Control
     virtual Control& SetDraggable(bool aValue);
     virtual bool IsDraggable() { return mDraggable; }
 
-    virtual bool IsChecked() { return mChecked; }
-    virtual Control& ToggleChecked();
+    virtual Control& SetCheckable(bool aValue);
+    virtual bool IsCheckable() { return mCheckable; }
+    virtual bool IsChecked() { return (mState == States::checked) || (mState == States::checkedPressed); }
 
     virtual bool IsVisible() {return mVisible; }
     virtual Control& Show(bool aVisible = true);
@@ -214,10 +216,11 @@ class Control
     bool mDirty = true;
     bool mDraggable = false;
     bool mVisible = true;
-    bool mChecked = false;
+    bool mCheckable = false;
     States mState = States::normal;
     rsp::utils::TypeInfo mTypeInfo{rsp::utils::MakeTypeInfo<Control>()};
 
+    virtual void toggleChecked();
     virtual void paint(Canvas &arCanvas, const Style &arStyle);
 
   private:

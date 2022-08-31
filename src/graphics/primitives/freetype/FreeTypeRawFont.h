@@ -32,7 +32,7 @@ public:
     std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing) override;
     std::string GetFamilyName() const override;
     void SetSize(int aWidthPx, int aHeightPx) override;
-    void SetStyle(Font::Styles aStyle) override;
+    void SetStyle(FontStyles aStyle) override;
 
 protected:
     FT_Face mpFace = nullptr;
@@ -42,7 +42,7 @@ protected:
 
     void createFace();
     void freeFace();
-    Glyph getSymbol(uint32_t aSymbolCode, Font::Styles aStyle) const;
+    Glyph getSymbol(uint32_t aSymbolCode, FontStyles aStyle) const;
     int getKerning(uint aFirst, uint aSecond, uint aKerningMode = 0) const;
     std::u32string stringToU32(const std::string &arText) const;
 };

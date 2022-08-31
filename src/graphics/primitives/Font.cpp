@@ -44,14 +44,14 @@ void Font::RegisterFont(const char *apFileName)
 }
 
 
-Font::Font(Styles aStyle)
+Font::Font(FontStyles aStyle)
     : mColor(Color::White),
       mpImpl(MakePimpl(mDefaultFontName))
 {
     SetStyle(aStyle);
 }
 
-Font::Font(const std::string &arFontName, Styles aStyle)
+Font::Font(const std::string &arFontName, FontStyles aStyle)
     : mColor(Color::White),
       mpImpl(MakePimpl(arFontName))
 {
@@ -84,13 +84,13 @@ Font& Font::SetColor(const Color &arColor)
     return *this;
 }
 
-Font& Font::SetStyle(Styles aStyle)
+Font& Font::SetStyle(FontStyles aStyle)
 {
     mpImpl->SetStyle(aStyle);
     return *this;
 }
 
-Font::Styles Font::GetStyle() const
+FontStyles Font::GetStyle() const
 {
     return mpImpl->GetStyle();
 }
