@@ -23,6 +23,15 @@
 
 namespace rsp::graphics {
 
+class Key : public Button
+{
+public:
+    void Setup(Rect aArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol = 0);
+protected:
+    BitmapView mForeground{};
+    void paint(Canvas &arCanvas, const Style &arStyle) override;
+};
+
 class Keyboard: public Control
 {
 public:
@@ -47,17 +56,17 @@ public:
 protected:
     KeyboardCallback_t mOnKeyClick;
     Bitmap mImages;
-    std::array<Button, 26u> mKeys{};
-    Button mBtnShift;
-    Button mBtnLetters;
-    Button mBtnNumbers;
-    Button mBtnSpecials;
-    Button mBtnErase;
-    Button mBtnSpace;
+    std::array<Key, 26u> mKeys{};
+    Key mBtnShift;
+    Key mBtnLetters;
+    Key mBtnNumbers;
+    Key mBtnSpecials;
+    Key mBtnErase;
+    Key mBtnSpace;
     std::string mInput{};
 
     void setupBtn(uint32_t aBtnIndex, Rect aArea, Point aBitmapPosition);
-    void setupBtn(Button &arBtn, Rect aArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol);
+    void setupBtn(Key &arBtn, Rect aArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol);
     void setSymbols(const std::string &arSymbols);
     void doKeyClick(const Point &arPoint, int aSymbol);
 };

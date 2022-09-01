@@ -18,6 +18,32 @@ using namespace rsp::utils;
 namespace rsp::graphics {
 
 
+void Key::Setup(Rect aArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol)
+{
+    SetArea(aArea);
+
+    Style style;
+    style.mBitmapView = arNormal;
+    GetStyle(Control::States::normal) = style;
+    style.mBitmapView = arPressed;
+    GetStyle(Control::States::pressed) = style;
+
+    SetBitmapPosition(aBitmapPosition);
+    if (aSymbol) {
+        SetCaption(std::string(1, aSymbol));
+        SetId(aSymbol);
+    }
+}
+
+void Key::paint(Canvas &arCanvas, const Style &arStyle)
+{
+    arStyle.mBitmapView.Paint(arCanvas);
+    mForeground.Paint(arCanvas);
+    arCanvas.DrawText(mText, arStyle.mForegroundColor);
+}
+
+
+
 Keyboard::Keyboard()
     : mImages("testImages/Keyboard.bmp")
 {
@@ -54,39 +80,21 @@ Keyboard::Keyboard()
 
 void Keyboard::setupBtn(uint32_t aBtnIndex, Rect aArea, Point aBitmapPosition)
 {
-    Button& arBtn = mKeys[aBtnIndex];
+    Key& arBtn = mKeys[aBtnIndex];
 
     BitmapView normal(&mImages, Rect({194, 160}, {249, 243}));
     BitmapView pressed(&mImages, Rect({249, 160}, {305, 243}));
 
-    Style style;
-    style.mBitmapView = normal;
-    arBtn.GetStyle(Control::States::normal) = style;
-    style.mBitmapView = pressed;
-    arBtn.GetStyle(Control::States::pressed) = style;
-
-    arBtn.SetArea(aArea)
-        .SetBitmapPosition(aBitmapPosition)
-        .SetTransparent(true);
-    arBtn.SetId(aBtnIndex);
+    arBtn.Setup(aArea, aBitmapPosition, normal, pressed);
 
     AddChild(&arBtn);
     arBtn.OnClick() = Method(this, &Keyboard::doKeyClick);
 }
 
-void Keyboard::setupBtn(Button &arBtn, Rect aArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol)
+void Keyboard::setupBtn(Key &arBtn, Rect aArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol)
 {
-    Style style;
-    style.mBitmapView = arNormal;
-    arBtn.GetStyle(Control::States::normal) = style;
-    style.mBitmapView = arPressed;
-    arBtn.GetStyle(Control::States::pressed) = style;
 
-    arBtn.SetArea(aArea)
-        .SetBitmapPosition(aBitmapPosition)
-        .SetTransparent(true);
-    arBtn.SetCaption(std::string(1, aSymbol));
-    arBtn.SetId(aSymbol);
+    arBtn.Setup(aArea, aBitmapPosition, arNormal, arPressed, aSymbol);
 
     AddChild(&arBtn);
     arBtn.OnClick() = Method(this, &Keyboard::doKeyClick);

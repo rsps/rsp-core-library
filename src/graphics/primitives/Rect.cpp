@@ -65,6 +65,30 @@ Rect& Rect::operator=(const Rect &arRect)
     return *this;
 }
 
+Rect Rect::operator &(const Rect &arRect)
+{
+    Point lt = arRect.GetTopLeft();
+    Point rb = arRect.GetBottomRight();
+
+    if (GetTop() > lt.mY) {
+        lt.mY = GetTop();
+    }
+    if (GetLeft() > result.GetLeft()) {
+        result.SetLeft(GetLeft());
+    }
+    if (GetBottom() < result.GetBottom()) {
+        result.SetBottom(GetBottom());
+    }
+    if (GetRight() < result.GetRight()) {
+        result.SetRight(GetRight());
+    }
+    if (    (rb.mY < lt.mY)
+        ||  (rb.mX < lt.mX)) {
+        rb = lt;
+    }
+    return result;
+}
+
 int Rect::GetTop() const
 {
     return mLeftTop.mY;
@@ -167,5 +191,6 @@ void Rect::VerifyDimensions()
         THROW_WITH_BACKTRACE1(rsp::utils::AssertException, "Rect size is negative");
     }
 }
+
 
 } // namespace rsp::graphics

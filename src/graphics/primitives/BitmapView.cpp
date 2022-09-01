@@ -47,8 +47,8 @@ BitmapView& BitmapView::SetSection(const Rect &arSection)
 {
     if (mpBitmap) {
         mSection = Rect(
-            std::min(0u, static_cast<unsigned int>(arSection.GetTop())),
-            std::min(0u, static_cast<unsigned int>(arSection.GetLeft())),
+            static_cast<unsigned int>(arSection.GetTop()),
+            static_cast<unsigned int>(arSection.GetLeft()),
             std::min(mpBitmap->GetWidth(), static_cast<unsigned int>(arSection.GetWidth())),
             std::min(mpBitmap->GetHeight(), static_cast<unsigned int>(arSection.GetHeight()))
         );

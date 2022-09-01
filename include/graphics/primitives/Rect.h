@@ -93,6 +93,13 @@ class Rect
     }
 
     /**
+     * \brief Get the overlapping area of two rect's.
+     * \param arRect
+     * \return New Rect with overlapping area of the two
+     */
+    Rect operator&(const Rect &arRect);
+
+    /**
      * \brief Get the top value
      *
      * \return int
