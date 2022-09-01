@@ -65,9 +65,9 @@ TEST_CASE("TouchArea Constructor")
         area.SetArea(myRect);
 
         // Assert
-        CHECK(area.TouchArea().IsHit(insidePoint));
-        CHECK_FALSE(area.TouchArea().IsHit(lowerPoint));
-        CHECK_FALSE(area.TouchArea().IsHit(higherPoint));
+        CHECK(area.IsHit(insidePoint));
+        CHECK_FALSE(area.IsHit(lowerPoint));
+        CHECK_FALSE(area.IsHit(higherPoint));
     }
 }
 

@@ -75,15 +75,23 @@ class Control
      *
      * \return string with name of scene
      */
-    std::string GetName()
+    const std::string& GetName() const
     {
-        return std::string(mTypeInfo.mName);
+        return mTypeInfo.mName;
+    }
+    Control& SetName(const std::string &arName)
+    {
+        mTypeInfo.mName = arName;
+        return *this;
     }
 
-    std::uint32_t GetId()
+    std::uint32_t GetId() const
     {
         return mTypeInfo.mId;
     }
+    Control& SetId(uint32_t aId);
+    Control& SetId(int aId) { return SetId(static_cast<uint32_t>(aId)); }
+    Control& SetId(char aId) { return SetId(static_cast<uint32_t>(aId)); }
 
     /**
      * \brief Sets the state of the object
@@ -139,16 +147,50 @@ class Control
     virtual bool Render(Canvas &arCanvas);
 
     /**
-     * \brief Sets the area of the object as a rectangle
+     * \brief Sets the area of the object as a rectangle in parent coordinates
      * \param aRect A reference to the rectangle to define the objects area
      */
-    virtual Control& SetArea(const Rect &arRect);
+    virtual Control& SetArea(Rect aRect);
 
     /**
-     * \brief Gets the area of the object as a rectangle
+     * \brief Gets the area of the object as a rectangle in parent coordinates
      * \return A reference to the rectangle defining the objects area
      */
-    const Rect& GetArea() const { return mArea; }
+    Rect GetArea() const;
+
+    /**
+     * \brief Set the origin for this Control object in screen coordinates
+     *
+     * \param arPoint
+     * \return Reference to this
+     */
+    Control& SetOrigin(const Point &arPoint);
+    /**
+     * \brief Get the origin for this Control object in screen coordinates
+     * \return Point
+     */
+    Point GetOrigin() const;
+
+    /**
+     * \brief Gets the touch area in parent coordinates
+     * \return The current defined area as a Rectangle
+     */
+    Rect GetTouchArea();
+
+    /**
+     * \brief Set the touch area in parent coordinates
+     * \param aRect
+     * \return Reference to this
+     */
+    Control& SetTouchArea(Rect aRect);
+
+    /**
+     * \brief Check if a touch coordinate is inside this objects touch area
+     *
+     * \param arPoint
+     * \return bool
+     */
+    bool IsHit(const Point &arPoint) const { return mTouchArea.IsHit(arPoint); }
 
     /**
      * \brief Adds a child to the vector of child control pointer objects
@@ -172,12 +214,6 @@ class Control
      * \return True if handled
      */
     bool ProcessInput(TouchEvent &arInput);
-
-    /**
-     * \brief Gets the area of the TouchArea
-     * \return A reference to the current defined area as a Rectangle
-     */
-    Rect& TouchArea() { return mTouchArea; }
 
     /**
      * \brief OnPress callback reference
@@ -208,7 +244,8 @@ class Control
     TouchCallback_t& OnClick() { return mOnClick; }
 
   protected:
-    Rect mArea{};
+    Rect mArea{}; // Area of Control in screen coordinates
+    Rect mTouchArea{}; // Touch area of Control in screen coordinates
     std::map<States, Style> mStyles{};
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};
@@ -228,8 +265,6 @@ class Control
       TouchCallback_t mOnMove{};
       TouchCallback_t mOnLift{};
       TouchCallback_t mOnClick{};
-
-      Rect mTouchArea{};
 
       virtual void doPress(const Point &arPoint);
       virtual void doMove(const Point &arPoint);

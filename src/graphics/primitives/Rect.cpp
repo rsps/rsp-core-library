@@ -70,23 +70,23 @@ Rect Rect::operator &(const Rect &arRect)
     Point lt = arRect.GetTopLeft();
     Point rb = arRect.GetBottomRight();
 
-    if (GetTop() > lt.mY) {
-        lt.mY = GetTop();
+    if (mLeftTop.mY > lt.mY) {
+        lt.mY = mLeftTop.mY;
     }
-    if (GetLeft() > result.GetLeft()) {
-        result.SetLeft(GetLeft());
+    if (mLeftTop.mX > lt.mX) {
+        lt.mX = mLeftTop.mX;
     }
-    if (GetBottom() < result.GetBottom()) {
-        result.SetBottom(GetBottom());
+    if (mRightBottom.mY < rb.mY) {
+        rb.mY = mRightBottom.mY;
     }
-    if (GetRight() < result.GetRight()) {
-        result.SetRight(GetRight());
+    if (mRightBottom.mX < rb.mX) {
+        rb.mX = mRightBottom.mX;
     }
     if (    (rb.mY < lt.mY)
         ||  (rb.mX < lt.mX)) {
         rb = lt;
     }
-    return result;
+    return Rect(lt, rb);
 }
 
 int Rect::GetTop() const
@@ -163,7 +163,7 @@ void Rect::SetHeight(int aHeight)
     }
 }
 
-void Rect::SetOrigin(const Point &arPoint)
+void Rect::MoveTo(const Point &arPoint)
 {
     auto w = GetWidth();
     auto h = GetHeight();
@@ -192,5 +192,11 @@ void Rect::VerifyDimensions()
     }
 }
 
+Rect Rect::operator +(const Point &arOffset)
+{
+    auto r = *this;
+    r.MoveTo(arOffset);
+    return r;
+}
 
 } // namespace rsp::graphics

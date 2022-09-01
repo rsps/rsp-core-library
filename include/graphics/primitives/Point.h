@@ -58,10 +58,8 @@ class Point
      *
      * \param aPoint
      */
-    Point(const Point &aPoint) noexcept
-        : mX(aPoint.mX), mY(aPoint.mY)
-    {
-    }
+    Point(const Point &) = default;
+    Point(Point &&) = default;
 
     /**
      * \brief Assignment operator.
@@ -69,14 +67,8 @@ class Point
      * \param aPoint
      * \return self
      */
-    Point &operator=(const Point &arPoint) noexcept
-    {
-        if (&arPoint != this) {
-            mX = arPoint.mX;
-            mY = arPoint.mY;
-        }
-        return *this;
-    }
+    Point &operator=(const Point&) = default;
+    Point &operator=(Point&&) = default;
 
     /**
      * \brief Add the values from other point to this

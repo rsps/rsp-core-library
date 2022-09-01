@@ -46,12 +46,7 @@ BitmapView& BitmapView::ClearSection()
 BitmapView& BitmapView::SetSection(const Rect &arSection)
 {
     if (mpBitmap) {
-        mSection = Rect(
-            static_cast<unsigned int>(arSection.GetTop()),
-            static_cast<unsigned int>(arSection.GetLeft()),
-            std::min(mpBitmap->GetWidth(), static_cast<unsigned int>(arSection.GetWidth())),
-            std::min(mpBitmap->GetHeight(), static_cast<unsigned int>(arSection.GetHeight()))
-        );
+        mSection = Rect(0u, 0u, mpBitmap->GetWidth(), mpBitmap->GetHeight()) & arSection;
     }
     else {
         mSection = Rect();
@@ -71,12 +66,12 @@ BitmapView& BitmapView::SetPixelColor(const Color &arColor)
     return *this;
 }
 
-void BitmapView::Paint(Canvas &arCanvas) const
+void BitmapView::Paint(const Point &arOffset, Canvas &arCanvas) const
 {
     if (!mpBitmap) {
         return;
     }
-    arCanvas.DrawImageSection(mDestination, *mpBitmap, mSection, mPixelColor);
+    arCanvas.DrawImageSection(arOffset + mDestination, *mpBitmap, mSection, mPixelColor);
 }
 
 } /* namespace rsp::graphics */

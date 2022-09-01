@@ -22,15 +22,6 @@ Button::Button(const rsp::utils::TypeInfo &arInfo)
 {
 }
 
-Button& Button::SetArea(const Rect &arRect)
-{
-    Control::SetArea(arRect);
-    for (auto &tuple : mStyles) {
-        tuple.second.mBitmapView.SetSection(arRect).SetDestination(arRect.GetTopLeft());
-    }
-    return *this;
-}
-
 Button& Button::SetBitmapPosition(const Point &arPoint)
 {
     for (auto &tuple : mStyles) {
@@ -43,7 +34,7 @@ Button& Button::SetBitmapPosition(const Point &arPoint)
 Button& Button::SetTextPosition(const Point &arPoint)
 {
     Rect r = mText.GetArea();
-    r.SetOrigin(arPoint);
+    r.MoveTo(arPoint);
     mText.SetArea(r);
     Invalidate();
     return *this;
@@ -52,15 +43,8 @@ Button& Button::SetTextPosition(const Point &arPoint)
 void Button::paint(Canvas &arCanvas, const Style &arStyle)
 {
     Control::paint(arCanvas, arStyle);
-    arStyle.mBitmapView.Paint(arCanvas);
+    arStyle.mBitmapView.Paint(GetOrigin(), arCanvas);
     arCanvas.DrawText(mText, arStyle.mForegroundColor);
-}
-
-Button& Button::SetId(uint32_t aId)
-{
-    GetInfo().mId = aId;
-    Invalidate();
-    return *this;
 }
 
 Button& Button::SetCaption(const std::string &arText)

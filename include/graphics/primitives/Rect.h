@@ -92,6 +92,8 @@ class Rect
         return (mLeftTop != arRect.mLeftTop) || (mRightBottom != arRect.mRightBottom);
     }
 
+    Rect operator+(const Point& arOffset);
+
     /**
      * \brief Get the overlapping area of two rect's.
      * \param arRect
@@ -155,7 +157,7 @@ class Rect
      * \brief Set TopLeft to given point, move BottomRight to keep size.
      * \param arPoint
      */
-    void SetOrigin(const Point &arPoint);
+    void MoveTo(const Point &arPoint);
 
     /**
      * \brief Get the top left coordinate.

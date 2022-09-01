@@ -30,19 +30,19 @@ public:
         // myName = "Second Scene";
         //  Set member variables values
         mTopBtn.SetArea(GetTopRect());
-        mTopBtn.GetStyle(Control::States::normal).mBitmapView.SetBitmap(&mNormal).SetDestination(GetTopRect().GetTopLeft());
-        mTopBtn.GetStyle(Control::States::pressed).mBitmapView.SetBitmap(&mPressed).SetDestination(GetTopRect().GetTopLeft());
+        mTopBtn.GetStyle(Control::States::normal).mBitmapView.SetBitmap(&mNormal);
+        mTopBtn.GetStyle(Control::States::pressed).mBitmapView.SetBitmap(&mPressed);
         mTopBtn.SetDraggable(true);
         mTopBtn.GetInfo().mName = "TopBtn";
 
         mBotBtn.SetArea(GetBotRect());
-        mBotBtn.GetStyle(Control::States::normal).mBitmapView.SetBitmap(&mNormal).SetDestination(GetBotRect().GetTopLeft());
-        mBotBtn.GetStyle(Control::States::pressed).mBitmapView.SetBitmap(&mPressed).SetDestination(GetBotRect().GetTopLeft());
-        mBotBtn.GetStyle(Control::States::dragged).mBitmapView.SetBitmap(&mPressed).SetDestination(GetBotRect().GetTopLeft());
+        mBotBtn.GetStyle(Control::States::normal).mBitmapView.SetBitmap(&mNormal);
+        mBotBtn.GetStyle(Control::States::pressed).mBitmapView.SetBitmap(&mPressed);
+        mBotBtn.GetStyle(Control::States::dragged).mBitmapView.SetBitmap(&mPressed);
         mBotBtn.SetDraggable(true);
         mBotBtn.GetInfo().mName = "BotBtn";
 
-        mKeyboard.SetArea(Rect({13, 272}, {467, 760}));
+        mKeyboard.SetArea(Rect(0, 450, 480, 350));
         mKeyboard.GetInfo().mName = "Keyboard";
 
         //  Add them to the lists?

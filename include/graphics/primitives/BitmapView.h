@@ -29,14 +29,19 @@ public:
     BitmapView& operator=(BitmapView&&) = default;
 
     BitmapView& SetBitmap(const Bitmap *apBitmap);
+    const Bitmap* GetBitmap() const { return mpBitmap; }
 
     BitmapView& ClearSection();
     BitmapView& SetSection(const Rect &arSection);
+    const Rect& GetSection() const { return mSection; }
 
     BitmapView& SetDestination(const Point &arPoint);
-    BitmapView& SetPixelColor(const Color &arColor);
+    const Point& GetDestination() const { return mDestination; }
 
-    void Paint(Canvas &arCanvas) const;
+    BitmapView& SetPixelColor(const Color &arColor);
+    const Color& GetPixelColor() const { return mPixelColor; }
+
+    void Paint(const Point &arOffset, Canvas &arCanvas) const;
 
 protected:
     Point mDestination{};

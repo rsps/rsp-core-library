@@ -18,17 +18,16 @@ using namespace rsp::utils;
 namespace rsp::graphics {
 
 
-void Key::Setup(Rect aArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol)
+void Key::Setup(Rect aTouchArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol)
 {
-    SetArea(aArea);
+    SetArea(Rect(aBitmapPosition.GetX(), aBitmapPosition.GetY(), static_cast<int>(arNormal.GetBitmap()->GetWidth()), static_cast<int>(arNormal.GetBitmap()->GetHeight())));
+    SetTouchArea(aTouchArea);
 
     Style style;
     style.mBitmapView = arNormal;
     GetStyle(Control::States::normal) = style;
     style.mBitmapView = arPressed;
     GetStyle(Control::States::pressed) = style;
-
-    SetBitmapPosition(aBitmapPosition);
     if (aSymbol) {
         SetCaption(std::string(1, aSymbol));
         SetId(aSymbol);
@@ -37,8 +36,9 @@ void Key::Setup(Rect aArea, Point aBitmapPosition, BitmapView &arNormal, BitmapV
 
 void Key::paint(Canvas &arCanvas, const Style &arStyle)
 {
-    arStyle.mBitmapView.Paint(arCanvas);
-    mForeground.Paint(arCanvas);
+    std::cout << "Paint bitmap view on " << GetName() << " (" << arStyle.mBitmapView.GetSection() << ") at " << arStyle.mBitmapView.GetDestination() << std::endl;
+    arStyle.mBitmapView.Paint(GetOrigin(), arCanvas);
+    mForeground.Paint(GetOrigin(), arCanvas);
     arCanvas.DrawText(mText, arStyle.mForegroundColor);
 }
 
@@ -70,31 +70,40 @@ Keyboard::Keyboard()
     mBtnShift.GetStyle(Control::States::checkedPressed) = style;
     mBtnShift.SetCheckable(true);
 
-    setupBtn(mBtnShift, Rect(14, 426, 78, 68), {31, 439}, lower_normal, lower_pressed, cKEY_SHIFT);
-    setupBtn(mBtnLetters, cSpecialLeft, {31, 508}, letters_normal, letters_pressed, cKEY_LETTERS);
-    setupBtn(mBtnNumbers, cSpecialLeft, {31, 508}, numbers_normal, numbers_pressed, cKEY_NUMBERS);
-    setupBtn(mBtnSpecials, cSpecialRight, {379, 508}, special_normal, special_pressed, cKEY_SPECIALS);
-    setupBtn(mBtnErase, Rect(388, 426, 78, 68), {403, 439}, erase_normal, erase_pressed, '\b');
-    setupBtn(mBtnSpace, Rect(111, 496, 258, 64), {119, 508}, space_normal, space_pressed, ' ');
+    mBtnShift.SetName("Shift");
+    mBtnLetters.SetName("Letters");
+    mBtnNumbers.SetName("Numbers");
+    mBtnSpecials.SetName("Special");
+    mBtnErase.SetName("Erase");
+    mBtnSpace.SetName("Space");
+
+    setupBtn(mBtnShift, Rect(0, 154, 78, 68), {18, 167}, lower_normal, lower_pressed, cKEY_SHIFT);
+    setupBtn(mBtnLetters, cSpecialLeft, {18, 236}, letters_normal, letters_pressed, cKEY_LETTERS);
+    setupBtn(mBtnNumbers, cSpecialLeft, {18, 236}, numbers_normal, numbers_pressed, cKEY_NUMBERS);
+    setupBtn(mBtnSpecials, cSpecialRight, {366, 236}, special_normal, special_pressed, cKEY_SPECIALS);
+    setupBtn(mBtnErase, Rect(375, 154, 78, 68), {390, 167}, erase_normal, erase_pressed, '\b');
+    setupBtn(mBtnSpace, Rect(98, 224, 258, 64), {106, 236}, space_normal, space_pressed, ' ');
+
+    SetLayout(LayoutType::Letters);
 }
 
-void Keyboard::setupBtn(uint32_t aBtnIndex, Rect aArea, Point aBitmapPosition)
+void Keyboard::setupBtn(uint32_t aBtnIndex, Rect aTouchArea, Point aBitmapPosition)
 {
     Key& arBtn = mKeys[aBtnIndex];
 
     BitmapView normal(&mImages, Rect({194, 160}, {249, 243}));
     BitmapView pressed(&mImages, Rect({249, 160}, {305, 243}));
 
-    arBtn.Setup(aArea, aBitmapPosition, normal, pressed);
+    arBtn.Setup(aTouchArea, aBitmapPosition, normal, pressed);
 
     AddChild(&arBtn);
     arBtn.OnClick() = Method(this, &Keyboard::doKeyClick);
 }
 
-void Keyboard::setupBtn(Key &arBtn, Rect aArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol)
+void Keyboard::setupBtn(Key &arBtn, Rect aTouchArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol)
 {
 
-    arBtn.Setup(aArea, aBitmapPosition, arNormal, arPressed, aSymbol);
+    arBtn.Setup(aTouchArea, aBitmapPosition, arNormal, arPressed, aSymbol);
 
     AddChild(&arBtn);
     arBtn.OnClick() = Method(this, &Keyboard::doKeyClick);
@@ -154,18 +163,28 @@ void Keyboard::SetLayout(LayoutType aLayout)
         case LayoutType::Letters:
             setSymbols(std::string(cLetters));
             mBtnShift.Show();
+            mBtnLetters.Hide();
+            mBtnNumbers.Show();
+            mBtnSpecials.Show();
             break;
 
         case LayoutType::Numbers:
             setSymbols(std::string(cNumbers));
             mBtnShift.Hide();
+            mBtnLetters.Show();
+            mBtnNumbers.Hide();
+            mBtnSpecials.Show();
             break;
 
         case LayoutType::Special:
             setSymbols(std::string(cSpecials));
             mBtnShift.Hide();
+            mBtnLetters.Show();
+            mBtnNumbers.Hide();
+            mBtnSpecials.Hide();
             break;
     }
+
 }
 
 } /* namespace rsp::graphics */

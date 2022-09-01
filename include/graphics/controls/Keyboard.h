@@ -42,8 +42,8 @@ public:
     static constexpr int cKEY_NUMBERS  = 1000002;
     static constexpr int cKEY_SPECIALS = 1000003;
 
-    const Rect cSpecialLeft = {13, 496, 96, 64};
-    const Rect cSpecialRight = {371, 496, 96, 64};
+    const Rect cSpecialLeft = {0, 224, 96, 64};
+    const Rect cSpecialRight = {358, 224, 96, 64};
 
     enum class LayoutType { Letters, Numbers, Special };
 
@@ -65,8 +65,8 @@ protected:
     Key mBtnSpace;
     std::string mInput{};
 
-    void setupBtn(uint32_t aBtnIndex, Rect aArea, Point aBitmapPosition);
-    void setupBtn(Key &arBtn, Rect aArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol);
+    void setupBtn(uint32_t aBtnIndex, Rect aTouchArea, Point aBitmapPosition);
+    void setupBtn(Key &arBtn, Rect aTouchArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol);
     void setSymbols(const std::string &arSymbols);
     void doKeyClick(const Point &arPoint, int aSymbol);
 };

@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <logging/Logger.h>
 #include <utils/CoreException.h>
@@ -39,7 +40,7 @@ std::ostream& operator <<(std::ostream &os, const BmpLoader::BmpHeader_t &arHead
         << "Colors Used: " << arHeader.v1.coloursUsed << "\n"
         << "Important Colors: " << arHeader.v1.importantColours << "\n";
 
-    if (arHeader.v1.size == sizeof(BmpLoader::BitmapV4Header)) {
+    if (arHeader.v1.size >= sizeof(BmpLoader::BitmapV4Header)) {
         os
         << "RedMask: " << std::hex << arHeader.v5.RedMask << "\n"
         << "GreenMask: " << arHeader.v5.GreenMask << "\n"
@@ -85,6 +86,7 @@ void BmpLoader::LoadImg(const std::string &aImgName)
 
     ReadHeader(file);
 
+    std::cout << "Header for " << aImgName << "\n" << mBmpHeader << std::endl;
     if (mBmpHeader.v1.bitsPerPixel <= 8) {
         ReadPalette(file);
     }
@@ -214,10 +216,26 @@ Color BmpLoader::ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::ui
 
         case 32:
             apPixelData += (aY * aPaddedRowSize) + (aX * 4);
-            pixel.SetRed(apPixelData[3]);
-            pixel.SetGreen(apPixelData[2]);
-            pixel.SetBlue(apPixelData[1]);
-            pixel.SetAlpha(apPixelData[0]);
+//            std::cout << "CSType: " << mBmpHeader.v5.CSType[0] << mBmpHeader.v5.CSType[1] << mBmpHeader.v5.CSType[2] << mBmpHeader.v5.CSType[3] << std::endl;
+            if (std::memcmp(mBmpHeader.v5.CSType, "BGRs", 4) == 0) {
+                pixel.SetRed(apPixelData[2]);
+                pixel.SetGreen(apPixelData[1]);
+                pixel.SetBlue(apPixelData[0]);
+                pixel.SetAlpha(apPixelData[3]);
+            }
+            else {
+                pixel.SetRed(apPixelData[3]);
+                pixel.SetGreen(apPixelData[2]);
+                pixel.SetBlue(apPixelData[1]);
+                pixel.SetAlpha(apPixelData[0]);
+            }
+//            std::cout << "ReadPixel(" << aX << ", " << aY << ", 32) -> "
+//                << std::hex << std::setw(2) << std::setfill('0')
+//                << static_cast<int>(pixel.GetAlpha()) << ", "
+//                << static_cast<int>(pixel.GetRed()) << ", "
+//                << static_cast<int>(pixel.GetGreen()) << ", "
+//                << static_cast<int>(pixel.GetBlue()) << std::endl;
+//            exit (1);
             break;
 
         default:

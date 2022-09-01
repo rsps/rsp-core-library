@@ -30,14 +30,8 @@ public:
     Button& operator=(const Button&) = default;
     Button& operator=(Button&&) = default;
 
-    Button& SetArea(const Rect &arRect) override;
-
     Button& SetBitmapPosition(const Point &arPoint);
     Button& SetTextPosition(const Point &arPoint);
-
-    Button& SetId(uint32_t aId);
-    Button& SetId(int aId) { return SetId(static_cast<uint32_t>(aId)); }
-    Button& SetId(char aId) { return SetId(static_cast<uint32_t>(aId)); }
 
     Button& SetCaption(const std::string &arText);
     Text& GetText() { return mText; }

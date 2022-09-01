@@ -37,14 +37,14 @@ void Image::paint(Canvas &arCanvas, const Style &arStyle)
 {
     Control::paint(arCanvas, arStyle);
 
-    arStyle.mBitmapView.Paint(arCanvas);
+    arStyle.mBitmapView.Paint(GetOrigin(), arCanvas);
 }
 
-Image& Image::SetArea(const Rect &arRect)
+Image& Image::SetArea(Rect aRect)
 {
-    Control::SetArea(arRect);
+    Control::SetArea(aRect);
     for (auto &tuple : mStyles) {
-        tuple.second.mBitmapView.SetSection(arRect).SetDestination(arRect.GetTopLeft());
+        tuple.second.mBitmapView.SetSection(aRect).SetDestination(aRect.GetTopLeft());
     }
     return *this;
 }

@@ -28,7 +28,7 @@ class Image : public Control
     Image& operator=(const Image &) = default;
     Image& operator=(Image &&arOther) = default;
 
-    Image& SetArea(const Rect &arRect) override;
+    Image& SetArea(Rect aRect) override;
 
     void ClearSection();
     void SetSection(const Rect &arSection);

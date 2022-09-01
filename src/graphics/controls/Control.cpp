@@ -32,6 +32,13 @@ std::ostream& operator <<(std::ostream &os, const Control::States aState)
     return os;
 }
 
+Control& Control::SetId(uint32_t aId)
+{
+    GetInfo().mId = aId;
+    Invalidate();
+    return *this;
+}
+
 void Control::SetState(States aState)
 {
     if (mState != aState) {
@@ -57,11 +64,14 @@ void Control::Invalidate()
     }
 }
 
-Control& Control::SetArea(const Rect &arRect)
+Control& Control::SetArea(Rect aRect)
 {
-    if (mArea != arRect) {
-        mArea = arRect;
-        mTouchArea = arRect;
+    if (mpParent) {
+        aRect.MoveTo(aRect.GetTopLeft() + mpParent->GetOrigin());
+    }
+    if (mArea != aRect) {
+        mArea = aRect;
+        mTouchArea = aRect;
         Invalidate();
         if (mpParent) {
             // Force repaint of parent, this is resizing
@@ -71,11 +81,51 @@ Control& Control::SetArea(const Rect &arRect)
     return *this;
 }
 
+Rect Control::GetArea() const
+{
+    Rect r = mArea;
+    if (mpParent) {
+        r.MoveTo(r.GetTopLeft() - mpParent->GetOrigin());
+    }
+    return r;
+}
+
+Control& Control::SetOrigin(const Point &arPoint)
+{
+    mArea.MoveTo(arPoint);
+    return *this;
+}
+
+Point Control::GetOrigin() const
+{
+    return mArea.GetTopLeft();
+}
+
+Rect Control::GetTouchArea()
+{
+    Rect r = mTouchArea;
+    if (mpParent) {
+        r.MoveTo(r.GetTopLeft() - mpParent->GetOrigin());
+    }
+    return r;
+}
+
+Control& Control::SetTouchArea(Rect aRect)
+{
+    if (mpParent) {
+        aRect.MoveTo(aRect.GetTopLeft() + mpParent->GetOrigin());
+    }
+    mTouchArea = aRect;
+    return *this;
+}
+
 Control& Control::AddChild(Control *apChild)
 {
     if (apChild) {
         mChildren.push_back(apChild);
+        Rect r = apChild->GetArea();
         apChild->mpParent = this;
+        apChild->SetOrigin(r.GetTopLeft() + GetOrigin());
     }
     return *this;
 }
@@ -85,7 +135,7 @@ bool Control::Render(Canvas &arCanvas)
     GFXLOG("Rendering: " << GetName() << " (" << this << ")");
     bool result = mDirty;
 
-    if (mDirty) {
+    if (mDirty && mVisible) {
         GFXLOG("Painting: " << GetName());
         paint(arCanvas, mStyles[mState]);
     }
