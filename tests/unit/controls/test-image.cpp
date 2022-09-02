@@ -30,7 +30,7 @@ TEST_CASE("Image Test")
     Bitmap normal("testImages/Red.bmp");
 
     Image testImage;
-    testImage.GetStyle(Control::States::normal).mBitmapView.SetBitmap(&normal);
+    testImage.GetStyle(Control::States::normal).mBackground.SetBitmap(&normal);
     testImage.SetArea(testRect);
 
     SUBCASE("Render Image if Invalid")

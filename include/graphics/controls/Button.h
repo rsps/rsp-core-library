@@ -36,6 +36,9 @@ public:
     Button& SetCaption(const std::string &arText);
     Text& GetText() { return mText; }
 
+    Control& SetOrigin(const rsp::graphics::Point &arPoint) override;
+    Control& SetArea(rsp::graphics::Rect aRect) override;
+
 protected:
     Text mText{};
 

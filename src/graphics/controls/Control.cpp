@@ -70,6 +70,9 @@ Control& Control::SetArea(Rect aRect)
         aRect.MoveTo(aRect.GetTopLeft() + mpParent->GetOrigin());
     }
     if (mArea != aRect) {
+        for (Control* child : mChildren) {
+            child->SetOrigin((child->GetOrigin() - mArea.GetTopLeft()) + aRect.GetTopLeft());
+        }
         mArea = aRect;
         mTouchArea = aRect;
         Invalidate();
@@ -92,7 +95,12 @@ Rect Control::GetArea() const
 
 Control& Control::SetOrigin(const Point &arPoint)
 {
+    Point difference = arPoint - mArea.GetTopLeft();
     mArea.MoveTo(arPoint);
+    mTouchArea.MoveTo(mTouchArea.GetTopLeft() + difference);
+    for (Control* child : mChildren) {
+        child->SetOrigin(child->GetOrigin() + difference);
+    }
     return *this;
 }
 
@@ -154,6 +162,7 @@ bool Control::Render(Canvas &arCanvas)
 
 void Control::paint(Canvas &arCanvas, const Style &arStyle)
 {
+    arCanvas.DrawRectangle(mTouchArea, Color::Yellow);
     if (!mTransparent) {
         arCanvas.DrawRectangle(mArea, arStyle.mBackgroundColor, true);
     }

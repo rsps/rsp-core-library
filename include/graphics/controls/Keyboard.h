@@ -26,9 +26,9 @@ namespace rsp::graphics {
 class Key : public Button
 {
 public:
-    void Setup(Rect aArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol = 0);
+    Key();
+    void Setup(Rect aTouchArea, Point aPosition, BitmapView &arBackground, BitmapView &arForeground, int aSymbol = 0);
 protected:
-    BitmapView mForeground{};
     void paint(Canvas &arCanvas, const Style &arStyle) override;
 };
 
@@ -46,6 +46,7 @@ public:
     const Rect cSpecialRight = {358, 224, 96, 64};
 
     enum class LayoutType { Letters, Numbers, Special };
+    enum class ImageIds { SmallSpecial, BigSpecial, Space, Key, LowerCase, UpperCase, Erase };
 
     Keyboard();
     ~Keyboard();
@@ -55,7 +56,7 @@ public:
     KeyboardCallback_t& OnKeyClick() { return mOnKeyClick; }
 protected:
     KeyboardCallback_t mOnKeyClick;
-    Bitmap mImages;
+    std::map<ImageIds, Bitmap> mImages{};
     std::array<Key, 26u> mKeys{};
     Key mBtnShift;
     Key mBtnLetters;
@@ -65,8 +66,7 @@ protected:
     Key mBtnSpace;
     std::string mInput{};
 
-    void setupBtn(uint32_t aBtnIndex, Rect aTouchArea, Point aBitmapPosition);
-    void setupBtn(Key &arBtn, Rect aTouchArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol);
+    void setupBtn(Key &arBtn, Rect aTouchArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol = 0);
     void setSymbols(const std::string &arSymbols);
     void doKeyClick(const Point &arPoint, int aSymbol);
 };

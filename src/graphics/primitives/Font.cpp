@@ -49,6 +49,7 @@ Font::Font(FontStyles aStyle)
       mpImpl(MakePimpl(mDefaultFontName))
 {
     SetStyle(aStyle);
+    SetSize(16);
 }
 
 Font::Font(const std::string &arFontName, FontStyles aStyle)
@@ -56,6 +57,7 @@ Font::Font(const std::string &arFontName, FontStyles aStyle)
       mpImpl(MakePimpl(arFontName))
 {
     SetStyle(aStyle);
+    SetSize(16);
 }
 
 Font::~Font()

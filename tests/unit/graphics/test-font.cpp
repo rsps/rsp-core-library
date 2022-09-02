@@ -45,7 +45,7 @@ TEST_CASE("Font Primitive")
 
     SUBCASE("Get Text Mask") {
         CHECK_NOTHROW(Font::RegisterFont(cFontFile));
-        Text text(cFontName, "Hello World");
+        Text text(cFontName, "qwertyuiopasdfghjklzxcvbnm1234567890-_:;()&@\".,?!'/* []{}#%+~ =¤\\=<>£€$.,?!'/*");
         const int size = 16;
 
         text.GetFont().SetSize(size);

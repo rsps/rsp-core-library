@@ -27,7 +27,8 @@ public:
 
     Color mForegroundColor = Color::White;
     Color mBackgroundColor = Color::Black;
-    BitmapView mBitmapView{};
+    BitmapView mBackground{};
+    BitmapView mForeground{};
 };
 
 

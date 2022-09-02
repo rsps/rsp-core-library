@@ -18,55 +18,125 @@ using namespace rsp::utils;
 namespace rsp::graphics {
 
 
-void Key::Setup(Rect aTouchArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol)
+Key::Key()
 {
-    SetArea(Rect(aBitmapPosition.GetX(), aBitmapPosition.GetY(), static_cast<int>(arNormal.GetBitmap()->GetWidth()), static_cast<int>(arNormal.GetBitmap()->GetHeight())));
+    mText.GetFont().SetSize(34);
+}
+
+void Key::Setup(Rect aTouchArea, Point aPosition, BitmapView &arBackground, BitmapView &arForeground, int aSymbol)
+{
+    SetArea(Rect(aPosition.GetX(), aPosition.GetY(), static_cast<int>(arBackground.GetBitmap()->GetWidth()), static_cast<int>(arBackground.GetBitmap()->GetHeight())));
     SetTouchArea(aTouchArea);
 
     Style style;
-    style.mBitmapView = arNormal;
+    style.mBackground = arBackground.SetPixelColor(Color::White);
+    style.mForeground = arForeground.SetPixelColor(Color(0x494A63));
     GetStyle(Control::States::normal) = style;
-    style.mBitmapView = arPressed;
+    style.mBackground = arBackground.SetPixelColor(Color(0x494A63));
+    style.mForeground = arForeground.SetPixelColor(Color::White);
     GetStyle(Control::States::pressed) = style;
     if (aSymbol) {
-        SetCaption(std::string(1, aSymbol));
+        if ((aSymbol < Keyboard::cKEY_SHIFT) && (aSymbol > ' ')) {
+            std::cout << "Set key symbol: " << static_cast<char>(aSymbol) << " on TextArea(" << mText.GetArea() << ")" << std::endl;
+            SetCaption(std::string(1, aSymbol));
+        }
         SetId(aSymbol);
     }
 }
 
 void Key::paint(Canvas &arCanvas, const Style &arStyle)
 {
-    std::cout << "Paint bitmap view on " << GetName() << " (" << arStyle.mBitmapView.GetSection() << ") at " << arStyle.mBitmapView.GetDestination() << std::endl;
-    arStyle.mBitmapView.Paint(GetOrigin(), arCanvas);
-    mForeground.Paint(GetOrigin(), arCanvas);
+    std::cout << "Paint bitmap view on " << GetName() << "Area(" << mArea << ") TextArea(" << mText.GetArea() << ")" << std::endl;
+    arCanvas.DrawRectangle(mTouchArea, Color::Yellow);
+    arStyle.mBackground.Paint(GetOrigin(), arCanvas);
+    arStyle.mForeground.Paint(GetOrigin(), arCanvas);
     arCanvas.DrawText(mText, arStyle.mForegroundColor);
 }
 
+static Rect cKeyTouchAreas[26] = {
+    {0, 0, 58, 82},
+    {59, 0, 41, 82},
+    {101, 0, 41, 82},
+    {143, 0, 41, 82},
+    {185, 0, 41, 82},
+    {227, 0, 41, 82},
+    {269, 0, 41, 82},
+    {311, 0, 41, 82},
+    {353, 0, 41, 82},
+    {395, 0, 59, 82},
+    {0,   83, 79, 68},
+    {80,  83, 41, 68},
+    {122, 83, 41, 68},
+    {164, 83, 41, 68},
+    {206, 83, 41, 68},
+    {248, 83, 41, 68},
+    {290, 83, 41, 68},
+    {332, 83, 41, 68},
+    {374, 83, 80, 68},
+    {80,  152, 41, 70},
+    {122, 152, 41, 70},
+    {164, 152, 41, 70},
+    {206, 152, 41, 70},
+    {248, 152, 41, 70},
+    {290, 152, 41, 70},
+    {332, 152, 41, 70}
+};
 
+static Point cKeyPositions[26] = {
+    {18, 14},
+    {60, 14},
+    {102, 14},
+    {144, 14},
+    {186, 14},
+    {228, 14},
+    {270, 14},
+    {312, 14},
+    {354, 14},
+    {396, 14},
+    {39, 84},
+    {81, 84},
+    {123, 84},
+    {165, 84},
+    {207, 84},
+    {249, 84},
+    {291, 84},
+    {333, 84},
+    {375, 84},
+    {81, 154},
+    {123, 154},
+    {165, 154},
+    {207, 154},
+    {249, 154},
+    {291, 154},
+    {333, 154}
+};
 
 Keyboard::Keyboard()
-    : mImages("testImages/Keyboard.bmp")
 {
-    BitmapView lower_normal(&mImages, Rect({0, 0}, {63, 48}));
-    BitmapView lower_pressed(&mImages, Rect({64, 0}, {127, 48}));
-    BitmapView upper_normal(&mImages, Rect({128, 0}, {191, 48}));
-    BitmapView upper_pressed(&mImages, Rect({192, 0}, {255, 48}));
-    BitmapView erase_normal(&mImages, Rect({256, 0}, {319, 48}));
-    BitmapView erase_pressed(&mImages, Rect({320, 0}, {383, 48}));
-    BitmapView space_normal(&mImages, Rect({0, 49}, {335, 103}));
-    BitmapView space_pressed(&mImages, Rect({0, 104}, {335, 159}));
-    BitmapView numbers_normal(&mImages, Rect({337, 49}, {433, 103}));
-    BitmapView numbers_pressed(&mImages, Rect({434, 49}, {530, 103}));
-    BitmapView letters_normal(&mImages, Rect({337, 104}, {433, 159}));
-    BitmapView letters_pressed(&mImages, Rect({434, 104}, {530, 159}));
-    BitmapView special_normal(&mImages, Rect({337, 160}, {433, 215}));
-    BitmapView special_pressed(&mImages, Rect({434, 160}, {530, 215}));
+    mImages[ImageIds::BigSpecial].Load("testImages/alpha/BigSpecial.bmp");
+    mImages[ImageIds::SmallSpecial].Load("testImages/alpha/SmallSpecial.bmp");
+    mImages[ImageIds::Space].Load("testImages/alpha/Space.bmp");
+    mImages[ImageIds::Erase].Load("testImages/alpha/Erase.bmp");
+    mImages[ImageIds::Key].Load("testImages/alpha/Key.bmp");
+    mImages[ImageIds::LowerCase].Load("testImages/alpha/LowerCase.bmp");
+    mImages[ImageIds::UpperCase].Load("testImages/alpha/UpperCase.bmp");
+
+    BitmapView big_special(&mImages[ImageIds::BigSpecial]);
+    BitmapView small_special(&mImages[ImageIds::SmallSpecial]);
+    BitmapView space(&mImages[ImageIds::Space]);
+    BitmapView erase(&mImages[ImageIds::Erase]);
+    BitmapView key(&mImages[ImageIds::Key]);
+    BitmapView lowercase(&mImages[ImageIds::LowerCase]);
+    BitmapView uppercase(&mImages[ImageIds::UpperCase]);
+    BitmapView empty;
 
     // Special checked state for shift button
     Style style;
-    style.mBitmapView = upper_normal;
+    style.mBackground = small_special.SetPixelColor(Color::White);
+    style.mForeground = uppercase.SetPixelColor(Color(0x494A63));
     mBtnShift.GetStyle(Control::States::checked) = style;
-    style.mBitmapView = upper_pressed;
+    style.mBackground = small_special.SetPixelColor(Color(0x494A63));
+    style.mForeground = uppercase.SetPixelColor(Color::White);
     mBtnShift.GetStyle(Control::States::checkedPressed) = style;
     mBtnShift.SetCheckable(true);
 
@@ -77,32 +147,26 @@ Keyboard::Keyboard()
     mBtnErase.SetName("Erase");
     mBtnSpace.SetName("Space");
 
-    setupBtn(mBtnShift, Rect(0, 154, 78, 68), {18, 167}, lower_normal, lower_pressed, cKEY_SHIFT);
-    setupBtn(mBtnLetters, cSpecialLeft, {18, 236}, letters_normal, letters_pressed, cKEY_LETTERS);
-    setupBtn(mBtnNumbers, cSpecialLeft, {18, 236}, numbers_normal, numbers_pressed, cKEY_NUMBERS);
-    setupBtn(mBtnSpecials, cSpecialRight, {366, 236}, special_normal, special_pressed, cKEY_SPECIALS);
-    setupBtn(mBtnErase, Rect(375, 154, 78, 68), {390, 167}, erase_normal, erase_pressed, '\b');
-    setupBtn(mBtnSpace, Rect(98, 224, 258, 64), {106, 236}, space_normal, space_pressed, ' ');
+    setupBtn(mBtnShift, Rect(0, 153, 78, 69), {18, 167}, small_special, lowercase, cKEY_SHIFT);
+    setupBtn(mBtnLetters, cSpecialLeft, {18, 236}, big_special, empty, cKEY_LETTERS);
+    setupBtn(mBtnNumbers, cSpecialLeft, {18, 236}, big_special, empty, cKEY_NUMBERS);
+    setupBtn(mBtnSpecials, cSpecialRight, {366, 236}, big_special, empty, cKEY_SPECIALS);
+    setupBtn(mBtnErase, Rect(375, 153, 78, 69), {390, 167}, small_special, erase, '\b');
+    setupBtn(mBtnSpace, Rect(98, 224, 258, 64), {106, 236}, space, empty, ' ');
 
+
+    int index = 0;
+    for(Key& arBtn : mKeys) {
+        setupBtn(arBtn, cKeyTouchAreas[index], cKeyPositions[index], key, empty);
+        index++;
+    }
+
+//    mBtnShift.SetState(States::checked);
     SetLayout(LayoutType::Letters);
-}
-
-void Keyboard::setupBtn(uint32_t aBtnIndex, Rect aTouchArea, Point aBitmapPosition)
-{
-    Key& arBtn = mKeys[aBtnIndex];
-
-    BitmapView normal(&mImages, Rect({194, 160}, {249, 243}));
-    BitmapView pressed(&mImages, Rect({249, 160}, {305, 243}));
-
-    arBtn.Setup(aTouchArea, aBitmapPosition, normal, pressed);
-
-    AddChild(&arBtn);
-    arBtn.OnClick() = Method(this, &Keyboard::doKeyClick);
 }
 
 void Keyboard::setupBtn(Key &arBtn, Rect aTouchArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol)
 {
-
     arBtn.Setup(aTouchArea, aBitmapPosition, arNormal, arPressed, aSymbol);
 
     AddChild(&arBtn);
@@ -111,10 +175,11 @@ void Keyboard::setupBtn(Key &arBtn, Rect aTouchArea, Point aBitmapPosition, Bitm
 
 void Keyboard::setSymbols(const std::string &arSymbols)
 {
+    ASSERT(arSymbols.length() == 26);
     bool checked = mBtnShift.IsChecked();
     unsigned int index = 0;
     for (char symbol : arSymbols) {
-        Button &btn = mKeys[index];
+        Button &btn = mKeys[index++];
         symbol = checked ? std::toupper(symbol) : std::tolower(symbol);
         btn.SetId(symbol);
         btn.SetCaption(std::string(1, symbol));

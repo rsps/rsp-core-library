@@ -22,14 +22,14 @@ namespace rsp::graphics
 void Image::ClearSection()
 {
     for (auto &tuple : mStyles) {
-        tuple.second.mBitmapView.ClearSection();
+        tuple.second.mBackground.ClearSection();
     }
 }
 
 void Image::SetSection(const Rect &arSection)
 {
     for (auto &tuple : mStyles) {
-        tuple.second.mBitmapView.SetSection(arSection);
+        tuple.second.mBackground.SetSection(arSection);
     }
 }
 
@@ -37,14 +37,14 @@ void Image::paint(Canvas &arCanvas, const Style &arStyle)
 {
     Control::paint(arCanvas, arStyle);
 
-    arStyle.mBitmapView.Paint(GetOrigin(), arCanvas);
+    arStyle.mBackground.Paint(GetOrigin(), arCanvas);
 }
 
 Image& Image::SetArea(Rect aRect)
 {
     Control::SetArea(aRect);
     for (auto &tuple : mStyles) {
-        tuple.second.mBitmapView.SetSection(aRect).SetDestination(aRect.GetTopLeft());
+        tuple.second.mBackground.SetSection(aRect).SetDestination(aRect.GetTopLeft());
     }
     return *this;
 }

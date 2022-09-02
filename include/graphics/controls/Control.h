@@ -164,7 +164,7 @@ class Control
      * \param arPoint
      * \return Reference to this
      */
-    Control& SetOrigin(const Point &arPoint);
+    virtual Control& SetOrigin(const Point &arPoint);
     /**
      * \brief Get the origin for this Control object in screen coordinates
      * \return Point

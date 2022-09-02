@@ -24,13 +24,13 @@ public:
     {
         Rect topRect(100, 400, 200, 100);
         mTopBtnImg.SetArea(topRect);
-        mTopBtnImg.GetStyle(Control::States::normal).mBitmapView.SetBitmap(&mNormal);
-        mTopBtnImg.GetStyle(Control::States::pressed).mBitmapView.SetBitmap(&mPressed);
+        mTopBtnImg.GetStyle(Control::States::normal).mBackground.SetBitmap(&mNormal);
+        mTopBtnImg.GetStyle(Control::States::pressed).mBackground.SetBitmap(&mPressed);
 
         Rect botRect(100, 600, 200, 100);
         mBotBtnImg.SetArea(botRect);
-        mBotBtnImg.GetStyle(Control::States::normal).mBitmapView.SetBitmap(&mNormal);
-        mBotBtnImg.GetStyle(Control::States::pressed).mBitmapView.SetBitmap(&mPressed);
+        mBotBtnImg.GetStyle(Control::States::normal).mBackground.SetBitmap(&mNormal);
+        mBotBtnImg.GetStyle(Control::States::pressed).mBackground.SetBitmap(&mPressed);
 
         // Add them to the lists?
         AddChild(&mTopBtnImg);
