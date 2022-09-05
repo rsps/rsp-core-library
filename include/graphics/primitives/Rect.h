@@ -56,6 +56,7 @@ class Rect
      * \param aHeight
      */
     Rect(const Point &aLeftTop, int aWidth, int aHeight);
+    Rect(const Point &aLeftTop, unsigned int aWidth, unsigned int aHeight) : Rect(aLeftTop, static_cast<int>(aWidth), static_cast<int>(aHeight)) {}
 
     /**
      * \brief Copy constructor.
@@ -99,7 +100,8 @@ class Rect
      * \param arRect
      * \return New Rect with overlapping area of the two
      */
-    Rect operator&(const Rect &arRect);
+    Rect operator&(const Rect &arRect) const;
+    Rect& operator&=(const Rect &arRect);
 
     /**
      * \brief Get the top value

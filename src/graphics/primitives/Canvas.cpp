@@ -89,21 +89,22 @@ void Canvas::DrawLine(const Point &aA, const Point &aB, const Color &aColor)
 
 void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor, bool aFilled)
 {
+    Rect r = aRect & mClipRect;
     if (aFilled) {
-        for (int y = aRect.mLeftTop.mY; y <= aRect.mRightBottom.mY; y++) {
-            for (int x = aRect.mLeftTop.mX; x <= aRect.mRightBottom.mX; x++) {
+        for (int y = r.mLeftTop.mY; y <= r.mRightBottom.mY; y++) {
+            for (int x = r.mLeftTop.mX; x <= r.mRightBottom.mX; x++) {
                 SetPixel(Point(x, y), aColor);
             }
         }
     }
     else {
-        for (int i = aRect.mLeftTop.mX; i <= aRect.mRightBottom.mX; i++) {
-            SetPixel(Point(i, aRect.mLeftTop.mY), aColor);     // top
-            SetPixel(Point(i, aRect.mRightBottom.mY), aColor); // bottom
+        for (int i = r.mLeftTop.mX; i <= r.mRightBottom.mX; i++) {
+            SetPixel(Point(i, r.mLeftTop.mY), aColor);     // top
+            SetPixel(Point(i, r.mRightBottom.mY), aColor); // bottom
         }
-        for (int i = aRect.mLeftTop.mY; i <= aRect.mRightBottom.mY; i++) {
-            SetPixel(Point(aRect.mLeftTop.mX, i), aColor);     // left
-            SetPixel(Point(aRect.mRightBottom.mX, i), aColor); // right
+        for (int i = r.mLeftTop.mY; i <= r.mRightBottom.mY; i++) {
+            SetPixel(Point(r.mLeftTop.mX, i), aColor);     // left
+            SetPixel(Point(r.mRightBottom.mX, i), aColor); // right
         }
     }
 }
@@ -115,14 +116,15 @@ void Canvas::DrawImage(const Point &arLeftTop, const Bitmap &arBitmap, Color aCo
 
 void Canvas::DrawImageSection(const Point &arLeftTop, const Bitmap &arBitmap, const Rect &arSection, Color aColor)
 {
-//    std::cout << "DrawImageSection(Point(" << arLeftTop << "), Bitmap(" << arBitmap << "), Rect(" << arSection << "), "<< aColor << ")" << std::endl;
-//    Point origin(aLeftTop.GetX(), aLeftTop.GetY() + int(aBitmap.GetHeight()));
+    std::cout << "DrawImageSection(Point(" << arLeftTop << "), Bitmap(" << arBitmap << "), Rect(" << arSection << "), "<< aColor << ")" << std::endl;
     Point origin = arLeftTop;
-    auto pixels = arBitmap.GetPixelData();
+    auto &pixels = arBitmap.GetPixelData();
+    std::cout << "SetPixel(" << origin << ", GetPixel(" << 0 << ", " << 0 << ")->" << std::hex << pixels.GetPixelAt(0, 0, aColor) << std::dec<< ")" << std::endl;
+    std::cout << "SetPixel(" << origin << ", GetPixel(" << 1 << ", " << 0 << ")->" << std::hex << pixels.GetPixelAt(1, 0, aColor) << std::dec<< ")" << std::endl;
+    std::cout << "SetPixel(" << origin << ", GetPixel(" << 2 << ", " << 0 << ")->" << std::hex << pixels.GetPixelAt(2, 0, aColor) << std::dec<< ")" << std::endl;
     for (int y = arSection.GetTop(); y < arSection.GetHeight(); y++) {
         origin.mX = arLeftTop.GetX();
         for (int x = arSection.GetLeft(); x < arSection.GetWidth(); x++) {
-//            std::cout << "SetPixel(" << origin << ", GetPixel(" << x << ", " << y << ")->" << pixels.GetPixelAt(x, y, aColor) << ")" << std::endl;
             SetPixel(origin, pixels.GetPixelAt(x, y, aColor));
             origin.mX++;
         }
@@ -151,6 +153,12 @@ void Canvas::DrawText(const Text &arText, const Color &arColor)
             }
         }
     }
+}
+
+Canvas& Canvas::SetClipRect(const Rect &arClipRect)
+{
+    mClipRect = Rect(0u, 0u, mWidth, mHeight) & arClipRect;
+    return *this;
 }
 
 } // namespace rsp::graphics

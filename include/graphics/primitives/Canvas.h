@@ -29,9 +29,9 @@ class Canvas
 {
   public:
     Canvas()
-        : mHeight(0), mWidth(0), mBytesPerPixel(0) {}
+        : mHeight(0), mWidth(0), mBytesPerPixel(0), mClipRect() {}
     Canvas(unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel)
-        : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel) {}
+        : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel), mClipRect(0u, 0u, aWidth, aHeight) {}
     /**
      * \brief Virtual destructor for the abstract class.
      */
@@ -170,15 +170,20 @@ class Canvas
      * \param aPoint
      * \return bool
      */
-    inline bool IsInsideScreen(const Point &arPoint) const
+    inline bool IsInsideCanvas(const Point &arPoint) const
     {
-        return !(static_cast<unsigned int>(arPoint.mY) >= mHeight || static_cast<unsigned int>(arPoint.mX) >= mWidth);
+        return mClipRect.IsHit(arPoint);
     }
+
+    Canvas& SetClipRect(const Rect &arClipRect);
+    Rect& GetClipRect() { return mClipRect; }
+
 
 protected:
     unsigned int mHeight;
     unsigned int mWidth;
     unsigned int mBytesPerPixel;
+    Rect mClipRect;
 
     void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Color &arColor)
     {

@@ -13,6 +13,14 @@
 #include <functional>
 #include <utils/Function.h>
 
+#include "pixmaps/BigSpecial.h"
+#include "pixmaps/SmallSpecial.h"
+#include "pixmaps/Erase.h"
+#include "pixmaps/Key.h"
+#include "pixmaps/LowerCase.h"
+#include "pixmaps/UpperCase.h"
+#include "pixmaps/Space.h"
+
 using namespace rsp::utils;
 
 namespace rsp::graphics {
@@ -23,18 +31,14 @@ Key::Key()
     mText.GetFont().SetSize(34);
 }
 
-void Key::Setup(Rect aTouchArea, Point aPosition, BitmapView &arBackground, BitmapView &arForeground, int aSymbol)
+Key& Key::Setup(Rect aTouchArea, Rect aArea, int aSymbol)
 {
-    SetArea(Rect(aPosition.GetX(), aPosition.GetY(), static_cast<int>(arBackground.GetBitmap()->GetWidth()), static_cast<int>(arBackground.GetBitmap()->GetHeight())));
+    SetArea(aArea);
+//    SetArea(Rect(aPosition.GetX(), aPosition.GetY(),
+//        static_cast<int>(std::max(arBackground.GetWidth(), arForeground.GetWidth())),
+//        static_cast<int>(std::max(arBackground.GetHeight(), arForeground.GetHeight()))));
     SetTouchArea(aTouchArea);
 
-    Style style;
-    style.mBackground = arBackground.SetPixelColor(Color::White);
-    style.mForeground = arForeground.SetPixelColor(Color(0x494A63));
-    GetStyle(Control::States::normal) = style;
-    style.mBackground = arBackground.SetPixelColor(Color(0x494A63));
-    style.mForeground = arForeground.SetPixelColor(Color::White);
-    GetStyle(Control::States::pressed) = style;
     if (aSymbol) {
         if ((aSymbol < Keyboard::cKEY_SHIFT) && (aSymbol > ' ')) {
             std::cout << "Set key symbol: " << static_cast<char>(aSymbol) << " on TextArea(" << mText.GetArea() << ")" << std::endl;
@@ -42,11 +46,21 @@ void Key::Setup(Rect aTouchArea, Point aPosition, BitmapView &arBackground, Bitm
         }
         SetId(aSymbol);
     }
+    return *this;
+}
+
+Key& Key::SetStyle(Control::States aState, BitmapView &arForeground, BitmapView &arBackground, Color aFrontColor, Color aBackColor)
+{
+    Style style;
+    style.mForeground = arForeground.SetPixelColor(aFrontColor);
+    style.mBackground = arBackground.SetPixelColor(aBackColor);
+    GetStyle(aState) = style;
+    return *this;
 }
 
 void Key::paint(Canvas &arCanvas, const Style &arStyle)
 {
-    std::cout << "Paint bitmap view on " << GetName() << "Area(" << mArea << ") TextArea(" << mText.GetArea() << ")" << std::endl;
+    std::cout << "Paint bitmap view on " << GetName() << " Area(" << mArea << ") TextArea(" << mText.GetArea() << ")" << std::endl;
     arCanvas.DrawRectangle(mTouchArea, Color::Yellow);
     arStyle.mBackground.Paint(GetOrigin(), arCanvas);
     arStyle.mForeground.Paint(GetOrigin(), arCanvas);
@@ -113,13 +127,13 @@ static Point cKeyPositions[26] = {
 
 Keyboard::Keyboard()
 {
-    mImages[ImageIds::BigSpecial].Load("testImages/alpha/BigSpecial.bmp");
-    mImages[ImageIds::SmallSpecial].Load("testImages/alpha/SmallSpecial.bmp");
-    mImages[ImageIds::Space].Load("testImages/alpha/Space.bmp");
-    mImages[ImageIds::Erase].Load("testImages/alpha/Erase.bmp");
-    mImages[ImageIds::Key].Load("testImages/alpha/Key.bmp");
-    mImages[ImageIds::LowerCase].Load("testImages/alpha/LowerCase.bmp");
-    mImages[ImageIds::UpperCase].Load("testImages/alpha/UpperCase.bmp");
+    mImages[ImageIds::BigSpecial].Assign(cBigSpecial);// Load("testImages/alpha/BigSpecial.bmp");
+    mImages[ImageIds::SmallSpecial].Assign(cSmallSpecial); // Load("testImages/alpha/SmallSpecial.bmp");
+    mImages[ImageIds::Space].Assign(cSpace); // Load("testImages/alpha/Space.bmp");
+    mImages[ImageIds::Erase].Assign(cErase); // Load("testImages/alpha/Erase.bmp");
+    mImages[ImageIds::Key].Assign(cKey); // Load("testImages/alpha/Key.bmp");
+    mImages[ImageIds::LowerCase].Assign(cLowerCase); // Load("testImages/alpha/LowerCase.bmp");
+    mImages[ImageIds::UpperCase].Assign(cUpperCase); // Load("testImages/alpha/UpperCase.bmp");
 
     BitmapView big_special(&mImages[ImageIds::BigSpecial]);
     BitmapView small_special(&mImages[ImageIds::SmallSpecial]);
@@ -130,34 +144,57 @@ Keyboard::Keyboard()
     BitmapView uppercase(&mImages[ImageIds::UpperCase]);
     BitmapView empty;
 
-    // Special checked state for shift button
-    Style style;
-    style.mBackground = small_special.SetPixelColor(Color::White);
-    style.mForeground = uppercase.SetPixelColor(Color(0x494A63));
-    mBtnShift.GetStyle(Control::States::checked) = style;
-    style.mBackground = small_special.SetPixelColor(Color(0x494A63));
-    style.mForeground = uppercase.SetPixelColor(Color::White);
-    mBtnShift.GetStyle(Control::States::checkedPressed) = style;
-    mBtnShift.SetCheckable(true);
+    mBtnShift.Setup(Rect(0, 153, 78, 69), small_special.GetBoundingRect({18, 167}), cKEY_SHIFT)
+        .SetStyle(Control::States::normal, lowercase.SetDestination({11, 7}), small_special, Color(0x494A63), Color::White)
+        .SetStyle(Control::States::pressed, lowercase, small_special, Color::White, Color(0x494A63))
+        .SetStyle(Control::States::checked, uppercase.SetDestination({11, 7}), small_special, Color(0x494A63), Color::White)
+        .SetStyle(Control::States::checkedPressed, uppercase, small_special, Color::White, Color(0x494A63))
+        .SetCheckable(true)
+        .SetName("Shift");
 
-    mBtnShift.SetName("Shift");
-    mBtnLetters.SetName("Letters");
-    mBtnNumbers.SetName("Numbers");
-    mBtnSpecials.SetName("Special");
-    mBtnErase.SetName("Erase");
-    mBtnSpace.SetName("Space");
+    mBtnLetters.Setup(cSpecialLeft, big_special.GetBoundingRect({18, 236}), cKEY_LETTERS)
+        .SetStyle(Control::States::normal, empty, big_special, Color(), Color::White)
+        .SetStyle(Control::States::pressed, empty, big_special, Color(), Color(0x494A63))
+        .SetName("Letters");
 
-    setupBtn(mBtnShift, Rect(0, 153, 78, 69), {18, 167}, small_special, lowercase, cKEY_SHIFT);
-    setupBtn(mBtnLetters, cSpecialLeft, {18, 236}, big_special, empty, cKEY_LETTERS);
-    setupBtn(mBtnNumbers, cSpecialLeft, {18, 236}, big_special, empty, cKEY_NUMBERS);
-    setupBtn(mBtnSpecials, cSpecialRight, {366, 236}, big_special, empty, cKEY_SPECIALS);
-    setupBtn(mBtnErase, Rect(375, 153, 78, 69), {390, 167}, small_special, erase, '\b');
-    setupBtn(mBtnSpace, Rect(98, 224, 258, 64), {106, 236}, space, empty, ' ');
+    mBtnNumbers.Setup(cSpecialLeft, big_special.GetBoundingRect({18, 236}), cKEY_NUMBERS)
+        .SetStyle(Control::States::normal, empty, big_special, Color(), Color::White)
+        .SetStyle(Control::States::pressed, empty, big_special, Color(), Color(0x494A63))
+        .SetName("Numbers");
+
+    mBtnSpecials.Setup(cSpecialRight, big_special.GetBoundingRect({366, 236}), cKEY_SPECIALS)
+        .SetStyle(Control::States::normal, empty, big_special, Color(), Color::White)
+        .SetStyle(Control::States::pressed, empty, big_special, Color(), Color(0x494A63))
+        .SetName("Special");
+
+    mBtnErase.Setup(Rect(375, 153, 78, 69), small_special.GetBoundingRect({390, 167}), '\b')
+        .SetStyle(Control::States::normal, erase.SetDestination({9, 9}), small_special, Color(0x494A63), Color::White)
+        .SetStyle(Control::States::pressed, erase, small_special, Color::White, Color(0x494A63))
+        .SetName("Erase");
+
+    mBtnSpace.Setup(Rect(98, 224, 258, 64), space.GetBoundingRect({106, 236}), ' ')
+        .SetStyle(Control::States::normal, empty, space, Color(), Color::White)
+        .SetStyle(Control::States::pressed, empty, space, Color(), Color(0x494A63))
+        .SetName("Space");
+
+    addBtn(mBtnShift);
+    addBtn(mBtnLetters);
+    addBtn(mBtnNumbers);
+    addBtn(mBtnSpecials);
+    addBtn(mBtnErase);
+    addBtn(mBtnSpace);
+
+    auto &pd = mBtnShift.GetStyle(Control::States::normal).mBackground.GetBitmap()->GetPixelData();
+    std::cout << std::hex << std::setw(8) << std::setfill('0') << pd.GetPixelAt(0, 0, Color::White).AsUint() << std::endl;
+    std::cout << std::hex << std::setw(8) << std::setfill('0') << pd.GetPixelAt(1, 0, Color::White).AsUint() << std::endl;
+    std::cout << std::hex << std::setw(8) << std::setfill('0') << pd.GetPixelAt(2, 0, Color::White).AsUint() << std::endl;
 
 
     int index = 0;
     for(Key& arBtn : mKeys) {
-        setupBtn(arBtn, cKeyTouchAreas[index], cKeyPositions[index], key, empty);
+        arBtn.Setup(cKeyTouchAreas[index], key.GetBoundingRect(cKeyPositions[index]))
+            .SetStyle(Control::States::normal, empty, key, Color(), Color::White)
+            .SetStyle(Control::States::pressed, empty, key, Color(), Color(0x494A63));
         index++;
     }
 
@@ -165,10 +202,8 @@ Keyboard::Keyboard()
     SetLayout(LayoutType::Letters);
 }
 
-void Keyboard::setupBtn(Key &arBtn, Rect aTouchArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol)
+void Keyboard::addBtn(Key &arBtn)
 {
-    arBtn.Setup(aTouchArea, aBitmapPosition, arNormal, arPressed, aSymbol);
-
     AddChild(&arBtn);
     arBtn.OnClick() = Method(this, &Keyboard::doKeyClick);
 }

@@ -50,7 +50,7 @@ Bitmap::Bitmap(unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPer
 
 std::uint32_t Bitmap::GetPixel(const Point &aPoint, const bool aFront) const
 {
-    if (!IsInsideScreen(aPoint)) {
+    if (!IsInsideCanvas(aPoint)) {
         return 0;
     }
     return mImagePixels.GetPixelAt(aPoint.mX, aPoint.mY, Color::White);
@@ -83,6 +83,15 @@ Bitmap& Bitmap::Assign(const uint32_t *apPixels, unsigned int aHeight, unsigned 
         }
     }
 
+    return *this;
+}
+
+Bitmap& Bitmap::Assign(const PixelData &arPixelData)
+{
+    mHeight = arPixelData.GetHeight();
+    mWidth = arPixelData.GetWidth();
+    mBytesPerPixel = (static_cast<int>(arPixelData.GetColorDepth()) + 7) / 8;
+    mImagePixels.Init(mWidth, mHeight, arPixelData.GetColorDepth(), arPixelData.GetData());
     return *this;
 }
 

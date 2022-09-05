@@ -62,11 +62,12 @@ public:
 
     Bitmap& Load(const std::string &arImgName);
     Bitmap& Assign(const uint32_t *apPixels, unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel);
+    Bitmap& Assign(const PixelData &arPixelData);
 
 
     inline void SetPixel(const Point &arPoint, const Color &arColor) override
     {
-        if (!IsInsideScreen(arPoint)) {
+        if (!IsInsideCanvas(arPoint)) {
             return;
         }
         mImagePixels.SetPixelAt(static_cast<unsigned int>(arPoint.GetX()), static_cast<unsigned int>(arPoint.GetY()), arColor);

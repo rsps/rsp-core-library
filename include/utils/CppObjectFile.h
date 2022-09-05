@@ -39,7 +39,6 @@ public:
     }
 
     CppObjectFile& Hex(const std::uint8_t *apData, std::size_t aSize);
-
 protected:
     std::fstream mFile;
     std::string mVariableName;

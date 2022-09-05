@@ -104,6 +104,9 @@ PixelData::ColorDepth BmpLoader::bitsPerPixelToColorDepth(std::uint32_t aBpp)
         case 8:
             return PixelData::ColorDepth::Alpha;
 
+        case 32:
+            return PixelData::ColorDepth::RGBA;
+
         default:
             return PixelData::ColorDepth::RGB;
 

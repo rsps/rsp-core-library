@@ -14,7 +14,7 @@
 namespace rsp::utils {
 
 CppObjectFile::CppObjectFile(const std::filesystem::path &arFileName)
-    : mFile(arFileName, std::ios_base::out),
+    : mFile(arFileName, std::ios_base::out | std::ios_base::trunc),
       mVariableName(arFileName.stem())
 {
     mVariableName.erase(std::remove(mVariableName.begin(), mVariableName.end(), '\"' ), mVariableName.end());
@@ -41,6 +41,7 @@ CppObjectFile& CppObjectFile::Hex(const std::uint8_t *apData, std::size_t aSize)
     if ((aSize % 16) != 15) {
         mFile << "\n";
     }
+    mFile << std::dec;
 
     return *this;
 }

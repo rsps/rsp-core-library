@@ -27,7 +27,8 @@ class Key : public Button
 {
 public:
     Key();
-    void Setup(Rect aTouchArea, Point aPosition, BitmapView &arBackground, BitmapView &arForeground, int aSymbol = 0);
+    Key& Setup(Rect aTouchArea, Rect aArea, int aSymbol = 0);
+    Key& SetStyle(Control::States aState, BitmapView &arForeground, BitmapView &arBackground, Color aFrontColor, Color aBackColor);
 protected:
     void paint(Canvas &arCanvas, const Style &arStyle) override;
 };
@@ -66,7 +67,7 @@ protected:
     Key mBtnSpace;
     std::string mInput{};
 
-    void setupBtn(Key &arBtn, Rect aTouchArea, Point aBitmapPosition, BitmapView &arNormal, BitmapView &arPressed, int aSymbol = 0);
+    void addBtn(Key &arBtn);
     void setSymbols(const std::string &arSymbols);
     void doKeyClick(const Point &arPoint, int aSymbol);
 };

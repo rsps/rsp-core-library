@@ -35,7 +35,7 @@ TEST_CASE("Bitmap")
 
         Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
         Point pt(100, 100);
-        CHECK(bitmap.IsInsideScreen(pt));
+        CHECK(bitmap.IsInsideCanvas(pt));
         CHECK_NE(bitmap.GetPixel(pt), col);
 
         CHECK_NOTHROW(bitmap.SetPixel(pt, col));

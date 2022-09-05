@@ -74,4 +74,14 @@ void BitmapView::Paint(const Point &arOffset, Canvas &arCanvas) const
     arCanvas.DrawImageSection(arOffset + mDestination, *mpBitmap, mSection, mPixelColor);
 }
 
+std::uint32_t BitmapView::GetWidth()
+{
+    return (!mpBitmap) ? 0 : mpBitmap->GetWidth();
+}
+
+std::uint32_t BitmapView::GetHeight()
+{
+    return (!mpBitmap) ? 0 : mpBitmap->GetHeight();
+}
+
 } /* namespace rsp::graphics */

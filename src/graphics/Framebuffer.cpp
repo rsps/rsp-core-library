@@ -137,7 +137,7 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp, Color aColor)
 
 void Framebuffer::SetPixel(const Point &arPoint, const Color &arColor)
 {
-    if (!IsInsideScreen(arPoint)) {
+    if (!IsInsideCanvas(arPoint)) {
         return;
     }
     std::uint32_t location = ((static_cast<std::uint32_t>(arPoint.mX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
@@ -152,7 +152,7 @@ void Framebuffer::SetPixel(const Point &arPoint, const Color &arColor)
 
 uint32_t Framebuffer::GetPixel(const Point &aPoint, bool aFront) const
 {
-    if (!IsInsideScreen(aPoint)) {
+    if (!IsInsideCanvas(aPoint)) {
         return 0;
     }
     std::uint32_t location = ((static_cast<std::uint32_t>(aPoint.mX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)

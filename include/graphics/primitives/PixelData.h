@@ -31,7 +31,7 @@ public:
 class PixelData
 {
 public:
-    enum class ColorDepth { Monochrome = 1, Alpha = 8, RGB = 24 };
+    enum class ColorDepth { Monochrome = 1, Alpha = 8, RGB = 24, RGBA = 32 };
 
     PixelData() noexcept {}
     PixelData(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth);
@@ -41,6 +41,8 @@ public:
     PixelData(const PixelData&& arOther);
     PixelData& operator=(const PixelData& arOther);
     PixelData& operator=(const PixelData&& arOther);
+
+    PixelData ChangeColorDepth(ColorDepth aDepth) const;
 
     PixelData& Init(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth, const std::uint8_t *apData);
 
@@ -78,7 +80,7 @@ protected:
     ColorDepth mColorDepth = ColorDepth::RGB;
     unsigned int mWidth = 0;
     unsigned int mHeight = 0;
-    std::uint8_t *mpData = nullptr;
+    const std::uint8_t *mpData = nullptr;
     std::vector<std::uint8_t> mData{};
 
     friend class ImgLoader;

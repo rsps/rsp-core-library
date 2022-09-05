@@ -43,9 +43,9 @@ void Image::paint(Canvas &arCanvas, const Style &arStyle)
 Image& Image::SetArea(Rect aRect)
 {
     Control::SetArea(aRect);
-    for (auto &tuple : mStyles) {
-        tuple.second.mBackground.SetSection(aRect).SetDestination(aRect.GetTopLeft());
-    }
+//    for (auto &tuple : mStyles) {
+//        tuple.second.mBackground.SetSection(aRect).SetDestination(aRect.GetTopLeft());
+//    }
     return *this;
 }
 

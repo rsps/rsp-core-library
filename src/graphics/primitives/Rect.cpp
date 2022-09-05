@@ -65,7 +65,7 @@ Rect& Rect::operator=(const Rect &arRect)
     return *this;
 }
 
-Rect Rect::operator &(const Rect &arRect)
+Rect Rect::operator &(const Rect &arRect) const
 {
     Point lt = arRect.GetTopLeft();
     Point rb = arRect.GetBottomRight();
@@ -87,6 +87,14 @@ Rect Rect::operator &(const Rect &arRect)
         rb = lt;
     }
     return Rect(lt, rb);
+}
+
+Rect& Rect::operator &=(const Rect &arRect)
+{
+    Rect r = *this & arRect;
+    mLeftTop = r.GetTopLeft();
+    mRightBottom = r.GetBottomRight();
+    return *this;
 }
 
 int Rect::GetTop() const
