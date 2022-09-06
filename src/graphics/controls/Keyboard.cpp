@@ -144,7 +144,7 @@ Keyboard::Keyboard()
     BitmapView uppercase(&mImages[ImageIds::UpperCase]);
     BitmapView empty;
 
-    mBtnShift.Setup(Rect(0, 153, 78, 69), small_special.GetBoundingRect({18, 167}), cKEY_SHIFT)
+    mBtnShift.Setup(Rect(0, 152, 78, 70), small_special.GetBoundingRect({18, 167}), cKEY_SHIFT)
         .SetStyle(Control::States::normal, lowercase.SetDestination({11, 7}), small_special, Color(0x494A63), Color::White)
         .SetStyle(Control::States::pressed, lowercase, small_special, Color::White, Color(0x494A63))
         .SetStyle(Control::States::checked, uppercase.SetDestination({11, 7}), small_special, Color(0x494A63), Color::White)
@@ -167,7 +167,7 @@ Keyboard::Keyboard()
         .SetStyle(Control::States::pressed, empty, big_special, Color(), Color(0x494A63))
         .SetName("Special");
 
-    mBtnErase.Setup(Rect(375, 153, 78, 69), small_special.GetBoundingRect({390, 167}), '\b')
+    mBtnErase.Setup(Rect(375, 152, 79, 70), small_special.GetBoundingRect({390, 167}), '\b')
         .SetStyle(Control::States::normal, erase.SetDestination({9, 9}), small_special, Color(0x494A63), Color::White)
         .SetStyle(Control::States::pressed, erase, small_special, Color::White, Color(0x494A63))
         .SetName("Erase");
@@ -184,17 +184,12 @@ Keyboard::Keyboard()
     addBtn(mBtnErase);
     addBtn(mBtnSpace);
 
-    auto &pd = mBtnShift.GetStyle(Control::States::normal).mBackground.GetBitmap()->GetPixelData();
-    std::cout << std::hex << std::setw(8) << std::setfill('0') << pd.GetPixelAt(0, 0, Color::White).AsUint() << std::endl;
-    std::cout << std::hex << std::setw(8) << std::setfill('0') << pd.GetPixelAt(1, 0, Color::White).AsUint() << std::endl;
-    std::cout << std::hex << std::setw(8) << std::setfill('0') << pd.GetPixelAt(2, 0, Color::White).AsUint() << std::endl;
-
-
     int index = 0;
     for(Key& arBtn : mKeys) {
         arBtn.Setup(cKeyTouchAreas[index], key.GetBoundingRect(cKeyPositions[index]))
-            .SetStyle(Control::States::normal, empty, key, Color(), Color::White)
+            .SetStyle(Control::States::normal, empty, empty, Color(), Color::White)
             .SetStyle(Control::States::pressed, empty, key, Color(), Color(0x494A63));
+        addBtn(arBtn);
         index++;
     }
 

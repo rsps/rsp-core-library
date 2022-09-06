@@ -145,7 +145,7 @@ bool Control::Render(Canvas &arCanvas)
 
     if (mDirty && mVisible) {
         GFXLOG("Painting: " << GetName());
-        arCanvas.SetClipRect(mArea);
+        arCanvas.SetClipRect(mTouchArea);
         paint(arCanvas, mStyles[mState]);
     }
 

@@ -10,11 +10,11 @@
 #ifndef GRAPHICSMAIN_H
 #define GRAPHICSMAIN_H
 
-#include "graphics/BufferedCanvas.h"
 #include <graphics/controls/SceneMap.h>
-#include <graphics/TouchParser.h>
 #include <messaging/Subscriber.h>
 #include <messaging/Broker.h>
+#include "BufferedCanvas.h"
+#include "TouchParser.h"
 
 namespace rsp::graphics
 {

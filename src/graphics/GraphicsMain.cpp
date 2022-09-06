@@ -68,5 +68,4 @@ void GraphicsMain::Run(int aMaxFPS)
     }
 }
 
-
 } // namespace rsp::graphics

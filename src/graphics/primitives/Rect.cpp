@@ -184,9 +184,9 @@ bool Rect::IsHit(const Point &aPoint) const
 {
     // Only works with non-rotated rectangles
     if (aPoint.GetX() >= mLeftTop.GetX() &&
-        aPoint.GetX() < mRightBottom.GetX() &&
+        aPoint.GetX() <= mRightBottom.GetX() &&
         aPoint.GetY() >= mLeftTop.GetY() &&
-        aPoint.GetY() < mRightBottom.GetY())
+        aPoint.GetY() <= mRightBottom.GetY())
         return true;
 
     return false;
