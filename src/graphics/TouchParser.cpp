@@ -39,7 +39,7 @@ std::ostream &operator<<(std::ostream &os, const TouchEvent &arTE)
         "Lift"
     };
 
-    os << "Touch Event: " << cTypeNames[static_cast<int>(arTE.mType)] << " " << arTE.mCurrent;
+    os << cTypeNames[static_cast<int>(arTE.mType)] << "(" << arTE.mCurrent << ")";
 
     return os;
 }

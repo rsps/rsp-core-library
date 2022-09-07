@@ -227,57 +227,52 @@ bool Control::ProcessInput(TouchEvent &arInput)
         return true;
     }
 
-    bool result = false;
-
     switch (arInput.mType) {
         case TouchEvent::Types::Press:
-            if (mTouchArea.IsHit(arInput.mCurrent)) {
+            if (mArea.IsHit(arInput.mCurrent)) {
                 for(Control *child : mChildren) {
-                    result = child->ProcessInput(arInput);
-                    if (result) {
-                        break;
+                    if (child->ProcessInput(arInput)) {
+                        return true;
                     }
                 }
-                if (!result) {
-                    result = true;
-                    doPress(arInput.mCurrent);
-                }
+            }
+            if (mTouchArea.IsHit(arInput.mCurrent)) {
+                doPress(arInput.mCurrent);
+                return true;
             }
             break;
 
         case TouchEvent::Types::Lift:
-            if (mTouchArea.IsHit(arInput.mPress)) {
+            if (mArea.IsHit(arInput.mPress)) {
                 for(Control *child : mChildren) {
-                    result = child->ProcessInput(arInput);
-                    if (result) {
-                        break;
+                    if (child->ProcessInput(arInput)) {
+                        return true;
                     }
                 }
-                if (!result) {
-                    doLift(arInput.mCurrent);
-                    if (mTouchArea.IsHit(arInput.mCurrent)) {
-                        toggleChecked();
-                        doClick(arInput.mCurrent);
-                        result = true;
-                    }
+            }
+            if (mTouchArea.IsHit(arInput.mPress)) {
+                doLift(arInput.mCurrent);
+                if (mTouchArea.IsHit(arInput.mCurrent)) {
+                    toggleChecked();
+                    doClick(arInput.mCurrent);
                 }
+                return true;
             }
             break;
 
         case TouchEvent::Types::Drag:
-            if (mTouchArea.IsHit(arInput.mPress)) {
+            if (mArea.IsHit(arInput.mPress)) {
                 for(Control *child : mChildren) {
-                    result = child->ProcessInput(arInput);
-                    if (result) {
-                        break;
+                    if (child->ProcessInput(arInput)) {
+                        return true;
                     }
                 }
-                if (!result) {
-                    if (IsDraggable()) {
-                        doMove(arInput.mCurrent);
-                    }
-                    result = true;
+            }
+            if (mTouchArea.IsHit(arInput.mPress)) {
+                if (IsDraggable()) {
+                    doMove(arInput.mCurrent);
                 }
+                return true;
             }
             break;
 
@@ -285,7 +280,7 @@ bool Control::ProcessInput(TouchEvent &arInput)
             break;
     }
 
-    return result;
+    return false;
 }
 
 void Control::doPress(const Point &arPoint)

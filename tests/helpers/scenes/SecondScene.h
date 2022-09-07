@@ -16,8 +16,8 @@
 #include <graphics/controls/Keyboard.h>
 #include <graphics/primitives/Bitmap.h>
 
-namespace rsp::graphics
-{
+namespace rsp::graphics {
+
 class SecondScene : public SceneBase<SecondScene>
 {
 public:
@@ -48,14 +48,15 @@ public:
         //  Add them to the lists?
         AddChild(&mTopBtn);
         AddChild(&mBotBtn);
-        AddChild(&mKeyboard);
+//        AddChild(&mKeyboard);
     };
 
     static Rect GetTopRect() { return Rect(100, 150, 200, 100); }
-    static Rect GetBotRect() { return Rect(100, 300, 300, 100); }
+    static Rect GetBotRect() { return Rect(100, 300, 200, 100); }
 
     Button& GetTopBtn() { return mTopBtn; }
     Button& GetBottomBtn() { return mBotBtn; }
+    Keyboard& GetKeyboard() { return mKeyboard; }
 
 protected:
     Bitmap mNormal;

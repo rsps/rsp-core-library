@@ -30,6 +30,7 @@ public:
     using TimerCallback_t = rsp::utils::Function<void(Timer&)>;
 
     Timer() {}
+    Timer(int aId, std::chrono::milliseconds aTimeout) : mId(aId), mTimeout(aTimeout) {}
     virtual ~Timer();
 
     Timer& SetId(int aId) { mId = aId; return *this; }

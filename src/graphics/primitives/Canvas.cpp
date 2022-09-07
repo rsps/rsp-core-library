@@ -119,9 +119,6 @@ void Canvas::DrawImageSection(const Point &arLeftTop, const Bitmap &arBitmap, co
     std::cout << "DrawImageSection(Point(" << arLeftTop << "), Bitmap(" << arBitmap << "), Rect(" << arSection << "), "<< aColor << ")" << std::endl;
     Point origin = arLeftTop;
     auto &pixels = arBitmap.GetPixelData();
-    std::cout << "SetPixel(" << origin << ", GetPixel(" << 0 << ", " << 0 << ")->" << std::hex << pixels.GetPixelAt(0, 0, aColor) << std::dec<< ")" << std::endl;
-    std::cout << "SetPixel(" << origin << ", GetPixel(" << 1 << ", " << 0 << ")->" << std::hex << pixels.GetPixelAt(1, 0, aColor) << std::dec<< ")" << std::endl;
-    std::cout << "SetPixel(" << origin << ", GetPixel(" << 2 << ", " << 0 << ")->" << std::hex << pixels.GetPixelAt(2, 0, aColor) << std::dec<< ")" << std::endl;
     for (int y = arSection.GetTop(); y < arSection.GetHeight(); y++) {
         origin.mX = arLeftTop.GetX();
         for (int x = arSection.GetLeft(); x < arSection.GetWidth(); x++) {

@@ -31,7 +31,7 @@ public:
      * \brief Runs the Gui loop. The overall CPU usage can be reduced by setting a lower frame rate.
      * \param Maximum allowed frames per second on the GUI.
      */
-    void Run(int aMaxFPS = 30);
+    void Run(int aMaxFPS = 30, bool aPollTimers = false);
 
     /**
      * \brief Sets Gui loop to terminate on next loop through

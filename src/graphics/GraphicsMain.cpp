@@ -12,6 +12,7 @@
 #include <chrono>
 #include <thread>
 #include <utils/StopWatch.h>
+#include <utils/Timer.h>
 #include <algorithm>
 #include <logging/Logger.h>
 
@@ -34,7 +35,7 @@ GraphicsMain::~GraphicsMain()
 {
 }
 
-void GraphicsMain::Run(int aMaxFPS)
+void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
 {
     TouchEvent event;
     rsp::utils::StopWatch sw;
@@ -45,6 +46,10 @@ void GraphicsMain::Run(int aMaxFPS)
 
         sw.Reset();
 
+        if (aPollTimers) {
+            rsp::utils::TimerQueue::Get().Poll();
+        }
+
         // New scene requested?
         if (mNextScene) {
             mrScenes.SetActiveScene(mNextScene);
@@ -54,7 +59,7 @@ void GraphicsMain::Run(int aMaxFPS)
 
         // New inputs?
         if (mrTouchParser.Poll(event)) {
-            Logger::GetDefault().Debug() << event << std::endl;
+            Logger::GetDefault().Debug() << "Touch Event: " << event << std::endl;
             mrScenes.ActiveScene().ProcessInput(event);
         }
 
