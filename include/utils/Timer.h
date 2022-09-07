@@ -61,6 +61,8 @@ protected:
 class TimerQueue : public rsp::utils::Singleton<TimerQueue>
 {
 public:
+    TimerQueue();
+
     /**
      * \brief Poll the timer queue to trigger expired timers
      */
@@ -74,7 +76,10 @@ public:
     void RegisterTimer(Timer *apTimer);
     void UnregisterTimer(Timer *apTimer);
 protected:
-    std::list<Timer*> mQueue;
+    std::list<Timer*> mQueue{};
+    std::chrono::milliseconds mOffset{};
+
+    std::uint64_t Count(std::chrono::steady_clock::time_point aTp);
 };
 
 } /* namespace rsp::graphics */
