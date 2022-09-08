@@ -55,7 +55,7 @@ public:
      * \param Reference to the touch event object to be populated
      * \return bool True if the event is successfully filled
      */
-    bool Poll(TouchEvent &arInput);
+    virtual bool Poll(TouchEvent &arInput);
 
     /**
      * \brief Flush the input buffer for remaining raw touch events

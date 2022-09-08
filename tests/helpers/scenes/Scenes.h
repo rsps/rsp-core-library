@@ -15,6 +15,7 @@
 
 #include "FirstScene.h"
 #include "SecondScene.h"
+#include "InputScene.h"
 
 
 class Scenes : public rsp::graphics::SceneMap
@@ -26,6 +27,7 @@ public:
         using namespace rsp::graphics;
         AddFactory(FirstScene);
         AddFactory(SecondScene);
+        AddFactory(InputScene);
     }
 };
 

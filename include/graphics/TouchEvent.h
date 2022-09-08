@@ -11,6 +11,7 @@
 #define INPUT_H
 
 #include <iostream>
+#include <chrono>
 #include <graphics/primitives/Point.h>
 
 namespace rsp::graphics
@@ -33,6 +34,29 @@ class TouchEvent
         Lift
     };
 
+    TouchEvent() {}
+
+    TouchEvent(std::chrono::steady_clock::time_point aTime, Types aType, const Point &arPoint)
+        : mTime(aTime),
+          mType(aType),
+          mCurrent(arPoint)
+    {
+        if (mType == Types::Press) {
+            mPress = arPoint;
+        }
+    }
+
+    void Fill(std::chrono::steady_clock::time_point aTime, Types aType, const Point &arPoint)
+    {
+        mTime = aTime;
+        mType = aType;
+        mCurrent = arPoint;
+        if (mType == Types::Press) {
+            mPress = arPoint;
+        }
+    }
+
+    std::chrono::steady_clock::time_point mTime{};
     Types mType = Types::None;
     Point mCurrent{};  // Value of the latest absolute coordinate from touch controller
     Point mPress{}; // Absolute coordinate of latest press

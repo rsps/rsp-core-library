@@ -74,7 +74,6 @@ Control& Control::SetArea(Rect aRect)
             child->SetOrigin((child->GetOrigin() - mArea.GetTopLeft()) + aRect.GetTopLeft());
         }
         mArea = aRect;
-        mTouchArea = aRect;
         Invalidate();
         if (mpParent) {
             // Force repaint of parent, this is resizing
@@ -146,6 +145,7 @@ bool Control::Render(Canvas &arCanvas)
     if (mDirty && mVisible) {
         GFXLOG("Painting: " << GetName());
         arCanvas.SetClipRect(mTouchArea);
+//        arCanvas.SetClipRect(mArea);
         paint(arCanvas, mStyles[mState]);
     }
 

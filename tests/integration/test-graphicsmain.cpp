@@ -20,21 +20,11 @@
 #include <utils/Timer.h>
 #include <scenes/Scenes.h>
 #include <TestHelpers.h>
+#include <TestTouchParser.h>
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
 using namespace std::literals::chrono_literals;
-
-class TestTouchParser : public TouchParser
-{
-public:
-    using TouchParser::TouchParser;
-
-    void Flush() override
-    {
-        MESSAGE("Flushing touch queue.");
-    }
-};
 
 static TouchEvent& Touch(TouchEvent::Types aType, Point aPoint)
 {
@@ -81,8 +71,6 @@ TEST_CASE("Graphics Main Test")
 
     int progress = 0;
     t1.Callback() = [&](Timer &arTimer) {
-//        scenes.ActiveSceneAs<SecondScene>().GetKeyboard();
-
         switch(progress++) {
             case 0:
                 scenes.ActiveScene().ProcessInput(Touch(TouchEvent::Types::Press, {0, 0}));
@@ -98,11 +86,20 @@ TEST_CASE("Graphics Main Test")
     };
 
     scenes.GetAfterCreate() = [&gfx, &t1](Scene *apScene) {
-        if (apScene->GetId() == SecondScene::ID) {
-            apScene->GetAs<SecondScene>().GetBottomBtn().OnClick() = [&gfx,&t1](const Point&, int id) {
-                CHECK_EQ(id, SecondScene::ID);
+        switch (apScene->GetId()) {
+            case SecondScene::ID:
+                apScene->GetAs<SecondScene>().GetBottomBtn().OnClick() = [&gfx](const Point&, int id) {
+                    CHECK_EQ(id, SecondScene::ID);
+                    gfx.ChangeScene(InputScene::ID);
+                };
+            break;
+
+            case InputScene::ID:
                 t1.Enable();
-            };
+            break;
+
+            default:
+            break;
         }
     };
 
