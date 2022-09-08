@@ -60,7 +60,7 @@ void Timer::trigger()
 TimerQueue::TimerQueue()
 {
     TLOG("Creating TimerQueue");
-    mOffset = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch();
+//    mOffset = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch();
 }
 
 void TimerQueue::Poll()
@@ -74,11 +74,11 @@ void TimerQueue::Poll()
         }
         auto it = mQueue.begin();
 
-        auto now = std::chrono::steady_clock::now();
+        RunTime now;
             TLOG("Timer " << (*it)->GetId()
-            << " expires at " << Count((*it)->mTimeoutAt)
+            << " expires at " << (*it)->mTimeoutAt
             << ". Now: "
-            << Count(now));
+            << now);
 
         if ((*it)->mTimeoutAt <= now) {
             expired.push_back(*it);
@@ -105,11 +105,11 @@ void TimerQueue::RegisterTimer(Timer *apTimer)
     if (!apTimer) {
         return;
     }
-    apTimer->mTimeoutAt = std::chrono::steady_clock::now() + apTimer->GetTimeout();
+    apTimer->mTimeoutAt = RunTime(apTimer->GetTimeout());
 
     for (auto it = mQueue.begin(); it != mQueue.end(); ++it) {
-        TLOG("Check timer: " << apTimer->GetId() << ":" << Count(apTimer->mTimeoutAt)
-            << " < " << (*it)->GetId() << ":" << Count((*it)->mTimeoutAt));
+        TLOG("Check timer: " << apTimer->GetId() << ":" << apTimer->mTimeoutAt
+            << " < " << (*it)->GetId() << ":" << (*it)->mTimeoutAt);
 
         if (apTimer->mTimeoutAt < (*it)->mTimeoutAt) {
             TLOG("Inserting timer " << apTimer->GetId() << " before timer " << (*it)->GetId());

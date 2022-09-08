@@ -11,10 +11,10 @@
 #ifndef INCLUDE_UTILS_TIMER_H_
 #define INCLUDE_UTILS_TIMER_H_
 
-#include <chrono>
 #include <list>
 #include "Function.h"
 #include "Singleton.h"
+#include "RunTime.h"
 
 namespace rsp::utils {
 
@@ -51,7 +51,7 @@ protected:
     TimerCallback_t mCallback{};
 
     friend TimerQueue;
-    std::chrono::time_point<std::chrono::steady_clock> mTimeoutAt{};
+    RunTime mTimeoutAt{};
     virtual void trigger();
 };
 
@@ -78,9 +78,6 @@ public:
     void UnregisterTimer(Timer *apTimer);
 protected:
     std::list<Timer*> mQueue{};
-    std::chrono::milliseconds mOffset{};
-
-    std::uint64_t Count(std::chrono::steady_clock::time_point aTp);
 };
 
 } /* namespace rsp::graphics */
