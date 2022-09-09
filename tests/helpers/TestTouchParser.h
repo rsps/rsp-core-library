@@ -16,24 +16,20 @@
 class TestTouchParser: public rsp::graphics::TouchParser
 {
 public:
-    using TouchParser::TouchParser;
-
-    TestTouchParser(rsp::graphics::TouchEvent *apTouchEvents, std::size_t aCount);
+    TestTouchParser(): TouchParser(std::string()) {};
     TestTouchParser(const TestTouchParser&) = delete;
     TestTouchParser& operator=(const TestTouchParser&) = delete;
+
+    TestTouchParser& SetEvents(const rsp::graphics::TouchEvent *apTouchEvents, std::size_t aCount);
 
     bool Poll(rsp::graphics::TouchEvent &arInput) override;
 
     void Flush() override;
 
-    TestTouchParser& SetEvents(rsp::graphics::TouchEvent *apTouchEvents, std::size_t aCount);
-
 protected:
-    rsp::graphics::TouchEvent *mpTouchEvents = nullptr;
+    const rsp::graphics::TouchEvent *mpTouchEvents = nullptr;
     std::size_t mEventCount = 0;
     std::size_t mIndex = 0;
-
-    bool getNextEvent(rsp::graphics::TouchEvent &arInput);
 };
 
 #endif /* TESTS_HELPERS_TESTTOUCHPARSER_H_ */

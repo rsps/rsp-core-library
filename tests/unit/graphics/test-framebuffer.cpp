@@ -60,23 +60,23 @@ TEST_CASE("Framebuffer")
     SUBCASE("Drawing Lines")
     {
         // Arrange
-        Point pointA(Random::Roll(0u, fb.GetWidth()), Random::Roll(0u, fb.GetHeight()));
-        Point pointB(Random::Roll(0u, fb.GetWidth()), Random::Roll(0u, fb.GetHeight()));
+        Point pointA(Random::Roll(0, fb.GetWidth()), Random::Roll(0, fb.GetHeight()));
+        Point pointB(Random::Roll(0, fb.GetWidth()), Random::Roll(0, fb.GetHeight()));
 
         // Act
         CHECK_NOTHROW(fb.DrawLine(pointA, pointB, col));
 
         // Assert
-        int deltaX = pointB.GetX() - pointA.GetX();
-        int deltaY = pointB.GetY() - pointA.GetY();
+        int deltaX = static_cast<int>(pointB.GetX() - pointA.GetX());
+        int deltaY = static_cast<int>(pointB.GetY() - pointA.GetY());
         int absDeltaX = abs(deltaX);
         int absDeltaY = abs(deltaY);
         int signumX = (deltaX > 0) ? 1 : -1;
         int signumY = (deltaY > 0) ? 1 : -1;
         int x = absDeltaX >> 1;
         int y = absDeltaY >> 1;
-        int px = pointA.GetX();
-        int py = pointA.GetY();
+        int px = static_cast<int>(pointA.GetX());
+        int py = static_cast<int>(pointA.GetY());
         if (absDeltaX >= absDeltaY) {
             for (int i = 0; i < absDeltaX; i++) {
                 y += absDeltaY;
@@ -111,11 +111,11 @@ TEST_CASE("Framebuffer")
     {
         // Arrange
         // Generate random values in the LEFT and TOP halves of the screen
-        Point leftTop(Random::Roll(0u, fb.GetWidth() / 2u), Random::Roll(0u, fb.GetHeight() / 2u));
+        Point leftTop(Random::Roll(0, fb.GetWidth() / 2), Random::Roll(0, fb.GetHeight() / 2));
         // Generate random values in the RIGHT and BOTTOM halves of the screen
         Point rightBottom(
-            Random::Roll(0u, fb.GetWidth() / 2) + (fb.GetWidth() / 2),
-            Random::Roll(0u, fb.GetHeight() / 2) + (fb.GetHeight() / 2));
+            Random::Roll(0, fb.GetWidth() / 2) + (fb.GetWidth() / 2),
+            Random::Roll(0, fb.GetHeight() / 2) + (fb.GetHeight() / 2));
         Rect rect(leftTop, rightBottom);
 
         // Act
@@ -123,17 +123,17 @@ TEST_CASE("Framebuffer")
 
         // Assert
         // Expect all four side to hold values
-        for (int i = 0; i <= static_cast<int>(rect.GetWidth()); i++) {
+        for (GuiUnit_t i = 0; i < rect.GetWidth(); i++) {
             // Check top side
-            CHECK(col == fb.GetPixel(Point(leftTop.GetX() + i, leftTop.GetY()), false));
+            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(leftTop.GetX() + i, leftTop.GetY()), false));
             // Check bottom side
-            CHECK(col == fb.GetPixel(Point(leftTop.GetX() + i, rightBottom.GetY()), false));
+            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(leftTop.GetX() + i, rightBottom.GetY()), false));
         }
-        for (int i = 0; i <= static_cast<int>(rect.GetHeight()); i++) {
+        for (GuiUnit_t i = 0; i < rect.GetHeight(); i++) {
             // Check left side
-            CHECK(col == fb.GetPixel(Point(leftTop.GetX(), rightBottom.GetY() - i), false));
+            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(leftTop.GetX(), rightBottom.GetY() - i), false));
             // Check right side
-            CHECK(col == fb.GetPixel(Point(rightBottom.GetX(), rightBottom.GetY() - i), false));
+            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(rightBottom.GetX(), rightBottom.GetY() - i), false));
         }
         fb.SwapBuffer();
     }
@@ -141,15 +141,15 @@ TEST_CASE("Framebuffer")
     SUBCASE("Drawing Circles")
     {
         // Arrange
-        Point centerPoint(Random::Roll(0u, fb.GetWidth()), Random::Roll(0u, fb.GetHeight()));
-        int radius = Random::Roll(0, static_cast<int>(fb.GetWidth()) / 2);
+        Point centerPoint(Random::Roll(0, fb.GetWidth()), Random::Roll(0, fb.GetHeight()));
+        GuiUnit_t radius = Random::Roll(0, fb.GetWidth() / 2);
 
         // Act
         CHECK_NOTHROW(fb.DrawCircle(centerPoint, radius, col));
 
         // Assert
-        int error = -radius;
-        int y = 0;
+        int error = -static_cast<int>(radius);
+        GuiUnit_t y = 0;
         while (radius >= y) {
             CheckPixel(Point(centerPoint.GetX() + radius, centerPoint.GetY() + y), col, fb);
             CheckPixel(Point(centerPoint.GetX() - radius, centerPoint.GetY() + y), col, fb);
@@ -159,14 +159,14 @@ TEST_CASE("Framebuffer")
             CheckPixel(Point(centerPoint.GetX() - y, centerPoint.GetY() + radius), col, fb);
             CheckPixel(Point(centerPoint.GetX() + y, centerPoint.GetY() - radius), col, fb);
             CheckPixel(Point(centerPoint.GetX() - y, centerPoint.GetY() - radius), col, fb);
-            error += y;
+            error += static_cast<int>(y);
             y++;
-            error += y;
+            error += static_cast<int>(y);
 
             if (error >= 0) {
-                error += -radius;
+                error += -static_cast<int>(radius);
                 radius--;
-                error += -radius;
+                error += -static_cast<int>(radius);
             }
         }
         fb.SwapBuffer();
@@ -195,11 +195,11 @@ TEST_CASE("Framebuffer")
 
         // Act
         Bitmap testImgMap(testImage);
-        unsigned int height = testImgMap.GetHeight();
-        unsigned int width = testImgMap.GetWidth();
+        GuiUnit_t height = testImgMap.GetHeight();
+        GuiUnit_t width = testImgMap.GetWidth();
         Point topLeft(0, 0);
-        Point topRight(width - 1, 0u);
-        Point botLeft(0u, height - 1);
+        Point topRight(width - 1, 0);
+        Point botLeft(0, height - 1);
         Point botRight(width - 1, height - 1);
 
         // Assert
@@ -207,6 +207,9 @@ TEST_CASE("Framebuffer")
         CHECK(testImgMap.IsInsideCanvas(topRight));
         CHECK(testImgMap.IsInsideCanvas(botLeft));
         CHECK(testImgMap.IsInsideCanvas(botRight));
+        CHECK_EQ(testImgMap.GetHeight(), height);
+        CHECK_EQ(testImgMap.GetWidth(), width);
+        CHECK_EQ(testImgMap.GetPixelData().GetDataSize(), (width * height * 3));
 
         SUBCASE("Draw image from file")
         {
@@ -214,47 +217,51 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(fb.DrawImage(topLeftImgCorner, testImgMap));
 
             // Assert
-            CHECK_EQ(testImgMap.GetHeight(), height);
-            CHECK_EQ(testImgMap.GetWidth(), width);
-            CHECK_EQ(testImgMap.GetPixelData().GetDataSize(), (width * height * 3));
+            CHECK_EQ(fb.GetPixel(topLeftImgCorner + Point(4, 4), false), Color(0xFF020F92));
 
-            fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+            CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
         }
         SUBCASE("Draw edited image file")
         {
             // Arrange
-            Color red(Color::Red);
-            Color green(Color::Green);
-            Color blue(Color::Blue);
-            Color thisColor(0xFF777777);
+            auto offset = [](Point &p, int val) { return (p + Point(val, val)); };
 
             // Act
-            CHECK_NOTHROW(testImgMap.DrawLine(topLeft, topRight, red));
-            CHECK_NOTHROW(testImgMap.DrawLine(topLeft, botLeft, green));
-            CHECK_NOTHROW(testImgMap.DrawLine(topRight, botRight, blue));
-            CHECK_NOTHROW(testImgMap.DrawLine(botLeft, botRight, thisColor));
+            for (int i=0; i < 16 ;++i){
+                uint8_t val = 0x77+(i*8);
+                Color grey(val, val, val, 0xFF);
+                CHECK_NOTHROW(testImgMap.DrawRectangle(Rect(offset(topLeft, i), offset(botRight, -i)), grey));
+            }
+
+            CHECK_NOTHROW(testImgMap.DrawLine(topLeft, botRight, Color::Red));
+            CHECK_NOTHROW(testImgMap.DrawLine(botLeft, topRight, Color::Red));
 
             CHECK_NOTHROW(fb.DrawImage(topLeftImgCorner, testImgMap));
             CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
 
             // Assert
-            CHECK_EQ(testImgMap.GetPixel(Point(width / 2, 0u)), red.AsUint());
-            CHECK_EQ(testImgMap.GetPixel(Point(0u, height / 2)), green.AsUint());
-            CHECK_EQ(testImgMap.GetPixel(Point(width - 1, height / 2)), blue.AsUint());
-            CHECK_EQ(testImgMap.GetPixel(Point(width / 2, height - 1)), thisColor.AsUint());
+            CHECK_EQ(testImgMap.GetPixel(Point(width / 2, 0)), 0xFF777777);
+            CHECK_EQ(testImgMap.GetPixel(Point(0, height / 2)), 0xFF777777);
+            CHECK_EQ(testImgMap.GetPixel(Point(width - 12, height / 2)), 0xFFCFCFCF);
+            CHECK_EQ(testImgMap.GetPixel(Point(width / 2, height - 4)), 0xFF8F8F8F);
+
+            CHECK_EQ(fb.GetPixel(topLeftImgCorner + Point(width / 2, 0), true), 0xFF777777);
+            CHECK_EQ(fb.GetPixel(topLeftImgCorner + Point(0, height / 2), true), 0xFF777777);
+            CHECK_EQ(fb.GetPixel(topLeftImgCorner + Point(width - 12, height / 2), true), 0xFFCFCFCF);
+            CHECK_EQ(fb.GetPixel(topLeftImgCorner + Point(width / 2, height - 4), true), 0xFF8F8F8F);
         }
         SUBCASE("Draw memory created image")
         {
             // Arrange
             Bitmap emptyMap(height, width, 4);
-            Point randomPoint(Random::Roll(0u, width-1), Random::Roll(0u, height-1));
+            Point randomPoint(Random::Roll(0, width-1), Random::Roll(0, height-1));
 
 //            MESSAGE("randomPoint: " << randomPoint);
 //            MESSAGE("topLeftImgCorner: " << topLeftImgCorner);
 //            MESSAGE("Combined: " << (topLeftImgCorner + randomPoint));
 
             // Act
-            CHECK_NOTHROW(emptyMap.DrawRectangle(Rect(0u, 0u, width, height), col, true) ); //.SetPixel(randomPoint, col));
+            CHECK_NOTHROW(emptyMap.DrawRectangle(Rect(0, 0, width, height), col, true) ); //.SetPixel(randomPoint, col));
             CHECK_NOTHROW(fb.DrawImage(topLeftImgCorner, emptyMap));
             CHECK_NOTHROW(fb.SetPixel(topLeftImgCorner + randomPoint, Color::White));
             CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
@@ -269,7 +276,7 @@ TEST_CASE("Framebuffer")
     {
         // Arrange
         Point topLeft(0, 0);
-        Point randomPoint(Random::Roll(0u, fb.GetWidth()), Random::Roll(0u, fb.GetHeight()));
+        Point randomPoint(Random::Roll(0, fb.GetWidth()), Random::Roll(0, fb.GetHeight()));
         std::string largeImg = "testImages/largeTestImg.bmp";
         Bitmap largeImgMap(largeImg);
         // Make sure screen is empty
@@ -307,7 +314,7 @@ TEST_CASE("Framebuffer")
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
-            CHECK_NOTHROW(fb.DrawImage(Point(topLeftPoint.GetX(), topLeftPoint.GetY() - i), imgSimple));
+            CHECK_NOTHROW(fb.DrawImage(Point(topLeftPoint.GetX(), topLeftPoint.GetY() - static_cast<GuiUnit_t>(i)), imgSimple));
             CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
         }
         int fps = (1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
@@ -334,7 +341,7 @@ TEST_CASE("Framebuffer")
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
-            CHECK_NOTHROW(fb.DrawImage(Point(topLeftPoint.GetX(), topLeftPoint.GetY() - i), imgSimple, mcl[(i / 20) % 5]));
+            CHECK_NOTHROW(fb.DrawImage(Point(topLeftPoint.GetX(), topLeftPoint.GetY() - static_cast<GuiUnit_t>(i)), imgSimple, mcl[(i / 20) % 5]));
             CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
 //            std::this_thread::sleep_for(std::chrono::milliseconds(25));
         }

@@ -31,7 +31,7 @@ Bitmap::Bitmap(const std::string &arImgName)
     Load(arImgName);
 }
 
-Bitmap::Bitmap(const uint32_t *apPixels, unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel)
+Bitmap::Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel)
     : Canvas(aHeight, aWidth, aBytesPerPixel),
       mImagePixels(aWidth, aHeight, PixelData::ColorDepth::RGB, reinterpret_cast<const std::uint8_t*>(apPixels))
 {
@@ -42,7 +42,7 @@ Bitmap::Bitmap(const uint32_t *apPixels, unsigned int aHeight, unsigned int aWid
     }
 }
 
-Bitmap::Bitmap(unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel)
+Bitmap::Bitmap(GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel)
     : Canvas(aHeight, aWidth, aBytesPerPixel),
       mImagePixels(aWidth, aHeight, PixelData::ColorDepth::RGB)
 {
@@ -66,10 +66,11 @@ Bitmap& Bitmap::Load(const std::string &arImgName)
     mImagePixels = loader->GetPixelData();
     mWidth = mImagePixels.GetWidth();
     mHeight = mImagePixels.GetHeight();
+    mClipRect = Rect(0, 0, mWidth, mHeight);
     return *this;
 }
 
-Bitmap& Bitmap::Assign(const uint32_t *apPixels, unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel)
+Bitmap& Bitmap::Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel)
 {
     mHeight = aHeight;
     mWidth = aWidth;

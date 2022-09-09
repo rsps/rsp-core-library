@@ -10,38 +10,26 @@
 
 #include "TestTouchParser.h"
 
-TestTouchParser::TestTouchParser(rsp::graphics::TouchEvent *apTouchEvents, std::size_t aCount)
-    : TouchParser(),
-      mpTouchEvents(apTouchEvents),
-      mEventCount(aCount)
-{
-}
-
-TestTouchParser& TestTouchParser::SetEvents(rsp::graphics::TouchEvent *apTouchEvents, std::size_t aCount)
+TestTouchParser& TestTouchParser::SetEvents(const rsp::graphics::TouchEvent *apTouchEvents, std::size_t aCount)
 {
     mpTouchEvents = apTouchEvents;
     mEventCount = aCount;
+    mIndex = 0;
     return *this;
 }
 
 bool TestTouchParser::Poll(rsp::graphics::TouchEvent &arInput)
 {
-    if (mEventCount) {
-        return getNextEvent(arInput);
+    if ((mIndex < mEventCount) && (std::chrono::steady_clock::now() >= mpTouchEvents[mIndex].mTime)) {
+        arInput.Assign(mpTouchEvents[mIndex++]);
+        return true;
     }
-    return TouchParser::Poll(arInput);
+    return false;
 }
 
 void TestTouchParser::Flush()
 {
     std::cout << "Flushing touch queue." << std::endl;
+    mIndex = mEventCount;
 }
 
-bool TestTouchParser::getNextEvent(rsp::graphics::TouchEvent &arInput)
-{
-    if (mIndex < mEventCount) {
-        arInput = mpTouchEvents[mIndex++];
-        return true;
-    }
-    return false;
-}

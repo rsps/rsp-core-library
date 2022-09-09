@@ -26,6 +26,7 @@ namespace rsp::graphics {
 class Key : public Button
 {
 public:
+    TYPEINFO(Key)
     Key();
     Key& Setup(Rect aTouchArea, Rect aArea, int aSymbol = 0);
     Key& SetStyle(Control::States aState, BitmapView &arForeground, BitmapView &arBackground, Color aFrontColor, Color aBackColor);
@@ -36,6 +37,8 @@ protected:
 class Keyboard: public Control
 {
 public:
+    TYPEINFO(Keyboard)
+
     using KeyboardCallback_t = rsp::utils::Function<void(std::string &)>;
 
     static constexpr int cKEY_SHIFT    = 1000000;

@@ -19,14 +19,9 @@ namespace rsp::graphics {
 class Scene: public Control
 {
 public:
-    static void SetScreenSize(std::uint32_t aWidth, std::uint32_t aHeight);
+    static void SetScreenSize(GuiUnit_t aWidth, GuiUnit_t aHeight);
 
-    Scene(const rsp::utils::TypeInfo &arInfo)
-        : Control(arInfo)
-    {
-        SetArea(mScreenSize);
-    }
-    Scene(const Rect &arRect, const rsp::utils::TypeInfo &arInfo)
+    Scene(const rsp::utils::TypeInfo &arInfo, const Rect &arRect = mScreenSize)
         : Control(arInfo)
     {
         SetArea(arRect);
@@ -58,6 +53,8 @@ template<class T>
 class SceneBase: public Scene
 {
 public:
+    TYPEINFO(T)
+
     SceneBase()
         : Scene(rsp::utils::MakeTypeInfo<T>())
     {
@@ -67,10 +64,6 @@ public:
         : Scene(arRect, rsp::utils::MakeTypeInfo<T>())
     {
     }
-
-    static constexpr std::uint32_t ID = rsp::utils::crc32::HashOf<T>();
-
-    static constexpr std::string_view NAME = rsp::utils::NameOf<T>();
 };
 
 } // namespace rsp::graphics

@@ -26,9 +26,9 @@ constexpr int cHeight = 600;
 inline void checkRect(Rect &aRect)
 {
     CHECK(aRect.GetTop() == cTop);
-    CHECK(aRect.GetBottom() == cTop + cHeight);
+    CHECK(aRect.GetBottom() == cTop + cHeight - 1);
     CHECK(aRect.GetLeft() == cLeft);
-    CHECK(aRect.GetRight() == cLeft + cWidth);
+    CHECK(aRect.GetRight() == cLeft + cWidth - 1);
     CHECK(aRect.GetWidth() == cWidth);
     CHECK(aRect.GetHeight() == cHeight);
 }
@@ -39,6 +39,16 @@ TEST_CASE("Rect Contructors")
 {
     SUBCASE("Simple value Rect")
     {
+        Rect a(0, 0, 10, 10);
+        CHECK_EQ(a.GetHeight(), 10);
+        CHECK_EQ(a.GetWidth(), 10);
+        CHECK_EQ(a.GetTop(), 0);
+        CHECK_EQ(a.GetBottom(), 9);
+        CHECK_EQ(a.GetLeft(), 0);
+        CHECK_EQ(a.GetRight(), 9);
+        CHECK(a.IsHit(Point(0,0)));
+        CHECK_FALSE(a.IsHit(Point(10,10)));
+
         // Arrange & Act
         Rect rect_base_values(cLeft, cTop, cWidth, cHeight);
 
@@ -47,8 +57,18 @@ TEST_CASE("Rect Contructors")
     }
     SUBCASE("Points Rect")
     {
+        Rect a(Point(0, 0), Point(9, 9));
+        CHECK_EQ(a.GetHeight(), 10);
+        CHECK_EQ(a.GetWidth(), 10);
+        CHECK_EQ(a.GetTop(), 0);
+        CHECK_EQ(a.GetBottom(), 9);
+        CHECK_EQ(a.GetLeft(), 0);
+        CHECK_EQ(a.GetRight(), 9);
+        CHECK(a.IsHit(Point(0,0)));
+        CHECK_FALSE(a.IsHit(Point(10,10)));
+
         // Arrange & Act
-        Rect rect_points(Point(cLeft, cTop), Point(cLeft + cWidth, cTop + cHeight));
+        Rect rect_points(Point(cLeft, cTop), Point(cLeft + cWidth - 1, cTop + cHeight - 1));
 
         // Assert
         checkRect(rect_points);
@@ -70,38 +90,46 @@ TEST_CASE("Rect Swapping Edges")
     SUBCASE("Set Bottom above Top")
     {
         // Act
-        CHECK_THROWS_AS(rect.SetBottom(cTop - 1), const AssertException &);
+//        CHECK_THROWS_AS(rect.SetBottom(cTop - 1), const AssertException &);
+        CHECK_NOTHROW(rect.SetBottom(cTop - 1));
 
         // Assert
         CHECK(rect.GetTop() == cTop);
-        CHECK(rect.GetBottom() == (cTop + cHeight));
+        CHECK(rect.GetBottom() == (cTop - 1));
+        CHECK_EQ(rect.GetHeight(), 0);
     }
     SUBCASE("Set Top below Bottom")
     {
         // Act
-        CHECK_THROWS_AS(rect.SetTop(cTop + cHeight + 1), const AssertException &);
+//        CHECK_THROWS_AS(rect.SetTop(cTop + cHeight + 1), const AssertException &);
+        CHECK_NOTHROW(rect.SetTop(cTop + cHeight + 1));
 
         // Assert
-        CHECK(rect.GetTop() == cTop);
-        CHECK(rect.GetBottom() == (cTop + cHeight));
+        CHECK_EQ(rect.GetTop(), cTop + cHeight + 1);
+        CHECK_EQ(rect.GetBottom(), cTop + cHeight + cHeight);
+        CHECK_EQ(rect.GetHeight(), cHeight);
     }
     SUBCASE("Set Right cLeft of Left")
     {
         // Act
-        CHECK_THROWS_AS(rect.SetRight(cLeft - 1), const AssertException &);
+//        CHECK_THROWS_AS(rect.SetRight(cLeft - 1), const AssertException &);
+        CHECK_NOTHROW(rect.SetRight(cLeft - 1));
 
         // Assert
-        CHECK(rect.GetRight() == (cLeft + cWidth));
+        CHECK(rect.GetRight() == (cLeft - 1));
         CHECK(rect.GetLeft() == cLeft);
+        CHECK_EQ(rect.GetWidth(), 0);
     }
     SUBCASE("Set Left right of Right")
     {
         // Act
-        CHECK_THROWS_AS(rect.SetLeft(cLeft + cWidth + 1), const AssertException &);
+//        CHECK_THROWS_AS(rect.SetLeft(cLeft + cWidth + 1), const AssertException &);
+        CHECK_NOTHROW(rect.SetLeft(cLeft + cWidth + 1));
 
         // Assert
-        CHECK(rect.GetRight() == (cLeft + cWidth));
-        CHECK(rect.GetLeft() == cLeft);
+        CHECK(rect.GetRight() == (cLeft + cWidth + cWidth));
+        CHECK(rect.GetLeft() == cLeft + cWidth + 1);
+        CHECK_EQ(rect.GetWidth(), cWidth);
     }
 }
 
@@ -110,7 +138,7 @@ TEST_CASE("Rect Height and Width")
     Rect rect(cLeft, cTop, cWidth, cHeight);
     SUBCASE("Set Height set correctly")
     {
-        int oldBottom = rect.GetBottom();
+        GuiUnit_t oldBottom = rect.GetBottom();
 
         // Act
         rect.SetHeight(cHeight + 1);
@@ -122,30 +150,12 @@ TEST_CASE("Rect Height and Width")
     SUBCASE("Set Width set correctly")
     {
         // Act
-        int oldRight = rect.GetRight();
+        GuiUnit_t oldRight = rect.GetRight();
         rect.SetWidth(cWidth + 1);
 
         // Assert
         CHECK(rect.GetWidth() == (cWidth + 1));
         CHECK(rect.GetRight() == (oldRight + 1));
-    }
-    SUBCASE("Set Negative Height")
-    {
-        // Not checking if the end result is negative (meaning outside the screen)
-
-        CHECK(rect.GetHeight() != 50);
-        CHECK_NOTHROW(rect.SetHeight(-50));
-        CHECK(rect.GetHeight() == 50);
-        CHECK(rect.GetTop() == ((cTop + cHeight) - 50));
-    }
-    SUBCASE("Set Negative Width")
-    {
-        // Not checking if the end result is negative (meaning outside the screen)
-
-        CHECK(rect.GetWidth() != 50);
-        CHECK_NOTHROW(rect.SetWidth(-50));
-        CHECK(rect.GetWidth() == 50);
-        CHECK(rect.GetLeft() == ((cLeft + cWidth) - 50));
     }
 }
 

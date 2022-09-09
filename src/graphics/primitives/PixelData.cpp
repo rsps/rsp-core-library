@@ -38,7 +38,7 @@ std::ostream& operator<<(std::ostream& os, const PixelData::ColorDepth arDepth)
 }
 
 
-PixelData::PixelData(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth, const std::uint8_t *apData)
+PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData)
     : mColorDepth(aDepth),
       mWidth(aWidth),
       mHeight(aHeight),
@@ -46,7 +46,7 @@ PixelData::PixelData(unsigned int aWidth, unsigned int aHeight, ColorDepth aDept
 {
 }
 
-PixelData::PixelData(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth)
+PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
     : mColorDepth(aDepth),
       mWidth(aWidth),
       mHeight(aHeight)
@@ -55,7 +55,7 @@ PixelData::PixelData(unsigned int aWidth, unsigned int aHeight, ColorDepth aDept
     mpData = mData.data();
 }
 
-PixelData& PixelData::Init(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth, const std::uint8_t *apData)
+PixelData& PixelData::Init(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData)
 {
     mColorDepth = aDepth;
     mWidth = aWidth;
@@ -100,7 +100,7 @@ std::size_t PixelData::GetDataSize() const
     return result;
 }
 
-Color PixelData::GetPixelAt(unsigned int aX, unsigned int aY, Color aColor) const
+Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const
 {
     if (aX >= mWidth || aY >= mHeight) {
         THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(mWidth) + "," + std::to_string(aY) + "<" + std::to_string(mHeight) + ")");
@@ -141,7 +141,7 @@ Color PixelData::GetPixelAt(unsigned int aX, unsigned int aY, Color aColor) cons
     return result;
 }
 
-PixelData& PixelData::SetPixelAt(unsigned int aX, unsigned int aY, Color aColor)
+PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
 {
     if (aX >= mWidth || aY >= mHeight) {
         THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(mWidth) + "," + std::to_string(aY) + "<" + std::to_string(mHeight) + ")");
@@ -272,7 +272,7 @@ PixelData& PixelData::operator =(const PixelData &&arOther)
     return *this;
 }
 
-void PixelData::initAfterLoad(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth)
+void PixelData::initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
 {
     mColorDepth = aDepth;
     mWidth = aWidth;

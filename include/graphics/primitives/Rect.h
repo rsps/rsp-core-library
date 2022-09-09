@@ -28,7 +28,8 @@ class Framebuffer;
 class Rect
 {
   public:
-    Rect() : mLeftTop(0, 0), mRightBottom(0, 0){};
+    Rect() {};
+
     /**
      * \brief Constructs a Rect from coordinate and size.
      *
@@ -37,8 +38,7 @@ class Rect
      * \param aWidth
      * \param aHeight
      */
-    Rect(int aLeft, int aTop, int aWidth, int aHeight);
-    Rect(unsigned int aLeft, unsigned int aTop, unsigned int aWidth, unsigned int aHeight);
+    Rect(GuiUnit_t aLeft, GuiUnit_t aTop, GuiUnit_t aWidth, GuiUnit_t aHeight);
 
     /**
      * \brief Construct a Rect from two points.
@@ -46,7 +46,7 @@ class Rect
      * \param aLeftTop
      * \param aRightBottom
      */
-    Rect(const Point &aLeftTop, const Point &aRightBottom);
+    Rect(const Point &arLeftTop, const Point &arRightBottom);
 
     /**
      * \brief Construct a Rect from origin point and size.
@@ -55,15 +55,14 @@ class Rect
      * \param aWidth
      * \param aHeight
      */
-    Rect(const Point &aLeftTop, int aWidth, int aHeight);
-    Rect(const Point &aLeftTop, unsigned int aWidth, unsigned int aHeight) : Rect(aLeftTop, static_cast<int>(aWidth), static_cast<int>(aHeight)) {}
+    Rect(const Point &arLeftTop, GuiUnit_t aWidth, GuiUnit_t aHeight);
 
     /**
      * \brief Copy constructor.
      *
      * \param aRect
      */
-    Rect(const Rect &aRect);
+    Rect(const Rect &aOther) = default;
 
     /**
      * \brief Assignment operator
@@ -71,7 +70,9 @@ class Rect
      * \param arRect
      * \return
      */
-    Rect &operator=(const Rect &arRect);
+    Rect& operator=(const Rect &arRect) = default;
+
+    bool empty() const;
 
     /**
      * \brief Equal to operator
@@ -80,7 +81,7 @@ class Rect
      */
     inline bool operator==(const Rect &arRect)
     {
-        return (mLeftTop == arRect.mLeftTop) && (mRightBottom == arRect.mRightBottom);
+        return !(*this != arRect);
     }
 
     /**
@@ -88,12 +89,18 @@ class Rect
      * \param arRect
      * \return True if not equal
      */
-    inline bool operator!=(const Rect &arRect)
+    inline bool operator!=(const Rect &arOther)
     {
-        return (mLeftTop != arRect.mLeftTop) || (mRightBottom != arRect.mRightBottom);
+        return (mLeftTop != arOther.mLeftTop) || (mWidth != arOther.mWidth) || (mHeight != arOther.mHeight);
     }
 
-    Rect operator+(const Point& arOffset);
+    Rect operator+(const Point& arOffset) const;
+
+    Rect operator+(int aValue);
+    Rect operator-(int aValue) { return operator+(-aValue); }
+
+    Rect& operator+=(int aValue);
+    Rect& operator-=(int aValue) { return operator+=(-aValue); }
 
     /**
      * \brief Get the overlapping area of two rect's.
@@ -108,52 +115,52 @@ class Rect
      *
      * \return int
      */
-    int GetTop() const;
+    GuiUnit_t GetTop() const;
     /**
      * \brief Set the top value of the Rect.
      *
      * \param aTopValue
      */
-    void SetTop(int aTopValue);
+    void SetTop(GuiUnit_t aTopValue);
 
     /**
      * \brief Get the bottom value
      *
      * \return int
      */
-    int GetBottom() const;
+    GuiUnit_t GetBottom() const;
     /**
      * \brief Set the bottom value of the Rect.
      *
      * \param aBotValue
      */
-    void SetBottom(int aBotValue);
+    void SetBottom(GuiUnit_t aBotValue);
 
     /**
      * \brief Get the left value
      *
      * \return int
      */
-    int GetLeft() const;
+    GuiUnit_t GetLeft() const;
     /**
      * \brief Set the left value of the Rect.
      *
      * \param aLeftValue
      */
-    void SetLeft(int aLeftValue);
+    void SetLeft(GuiUnit_t aLeftValue);
 
     /**
      * \brief Get the right value.
      *
      * \return int
      */
-    int GetRight() const;
+    GuiUnit_t GetRight() const;
     /**
      * \brief Set the right value of the Rect.
      *
      * \param aRightValue
      */
-    void SetRight(int aRightValue);
+    void SetRight(GuiUnit_t aRightValue);
 
     /**
      * \brief Set TopLeft to given point, move BottomRight to keep size.
@@ -180,43 +187,39 @@ class Rect
      *
      * \return Point
      */
-    Point& GetBottomRight()
+    Point GetBottomRight() const
     {
-        return mRightBottom;
-    }
-    const Point& GetBottomRight() const
-    {
-        return mRightBottom;
+        return Point(
+            std::max(static_cast<int>(mLeftTop.mX), static_cast<int>(mLeftTop.mX + mWidth - 1)),
+            std::max(static_cast<int>(mLeftTop.mY), static_cast<int>(mLeftTop.mY + mHeight - 1)));
     }
 
     /**
      * \brief Get the width of the Rect.
      *
-     * \return int
+     * \return GuiUnit_t
      */
-    int GetWidth() const;
-    unsigned int GetWidthU() const { return static_cast<unsigned int>(GetWidth()); }
+    GuiUnit_t GetWidth() const;
     /**
      * \brief Set the width of the Rect.
      *
      * \param aWidth
      */
-    void SetWidth(int aWidth);
+    void SetWidth(GuiUnit_t aWidth);
 
     /**
      * \brief Get the height of the Rect.
      *
-     * \return int
+     * \return GuiUnit_t
      */
-    int GetHeight() const;
-    unsigned int GetHeightU() const { return static_cast<unsigned int>(GetHeight()); }
+    GuiUnit_t GetHeight() const;
 
     /**
      * \brief Set the height of the Rect.
      *
      * \param aHeight
      */
-    void SetHeight(int aHeight);
+    void SetHeight(GuiUnit_t aHeight);
 
     /**
      * \brief Determines if a point is inside area covered by the Rect.
@@ -226,19 +229,20 @@ class Rect
      */
     bool IsHit(const Point &aPoint) const;
     /**
-     * \brief Verifies the dimensions of the rectangle by checking if height and width are above zero
+     * \brief Limits the dimensions of the rectangle by checking if height and width are above zero
      *
      * \throws AssertException
      */
-    void VerifyDimensions();
+    void LimitDimensions();
 
   protected:
     // Allow friends to access members for speed optimizations.
     friend Canvas;
     friend Framebuffer;
 
-    Point mLeftTop;
-    Point mRightBottom;
+    Point mLeftTop = {0, 0};
+    GuiUnit_t mWidth = 0;
+    GuiUnit_t mHeight = 0;
 };
 
 std::ostream &operator<<(std::ostream &aStream, const Rect &arRect);

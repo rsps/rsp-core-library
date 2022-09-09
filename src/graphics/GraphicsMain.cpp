@@ -52,9 +52,9 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
 
         // New scene requested?
         if (mNextScene) {
+            mrTouchParser.Flush(); // New scene should not inherit un-handled touch events...
             mrScenes.SetActiveScene(mNextScene);
             mNextScene = 0;
-            mrTouchParser.Flush(); // New scene should not inherit un-handled touch events...
         }
 
         // New inputs?

@@ -29,10 +29,10 @@
 namespace rsp::graphics
 {
 
-class ESceneCast : public rsp::utils::CoreException
+class EControlCast : public rsp::utils::CoreException
 {
 public:
-    ESceneCast(const std::string &arName, const std::string &arType) : rsp::utils::CoreException(arName + " is not of type " + arType) {};
+    EControlCast(const std::string &arName, const std::string &arType) : rsp::utils::CoreException(arName + " is not of type " + arType) {};
 };
 
 class TouchControl;
@@ -54,21 +54,11 @@ class Control
         checkedPressed = 32
     };
 
-    Control() {}
-    Control(const rsp::utils::TypeInfo &arInfo) : mTypeInfo(arInfo) {}
+    Control(const rsp::utils::TypeInfo &arTypeInfo) : mTypeInfo(arTypeInfo) {}
     virtual ~Control() {}
 
     Control(const Control &arOther) = default;
     Control &operator=(const Control &arOther) = default;
-
-    template<class T>
-    T& GetAs()
-    {
-        if (GetId() != T::ID) {
-            THROW_WITH_BACKTRACE2(ESceneCast, GetName(), std::string(T::NAME));
-        }
-        return *static_cast<T*>(this);
-    }
 
     /**
      * \brief Get the name of the specific scene.
@@ -92,6 +82,15 @@ class Control
     Control& SetId(uint32_t aId);
     Control& SetId(int aId) { return SetId(static_cast<uint32_t>(aId)); }
     Control& SetId(char aId) { return SetId(static_cast<uint32_t>(aId)); }
+
+    template<class T>
+    T& GetAs()
+    {
+        if (GetId() != T::ID) {
+            THROW_WITH_BACKTRACE2(EControlCast, GetName(), std::string(T::NAME));
+        }
+        return *static_cast<T*>(this);
+    }
 
     /**
      * \brief Sets the state of the object
@@ -206,6 +205,8 @@ class Control
      */
     Style& GetStyle(States aState) { return mStyles[aState]; }
 
+    Control& SetBitmapPosition(const Point &arPoint);
+
     rsp::utils::TypeInfo& GetInfo() { return mTypeInfo; }
 
     /**
@@ -255,7 +256,7 @@ class Control
     bool mVisible = true;
     bool mCheckable = false;
     States mState = States::normal;
-    rsp::utils::TypeInfo mTypeInfo{rsp::utils::MakeTypeInfo<Control>()};
+    rsp::utils::TypeInfo mTypeInfo;
 
     virtual void toggleChecked();
     virtual void paint(Canvas &arCanvas, const Style &arStyle);
@@ -271,6 +272,10 @@ class Control
       virtual void doLift(const Point &arPoint);
       virtual void doClick(const Point &arPoint);
 };
+
+#define TYPEINFO(a) \
+        static constexpr std::uint32_t ID = rsp::utils::crc32::HashOf<a>(); \
+        static constexpr std::string_view NAME = rsp::utils::NameOf<a>();
 
 std::string to_string(Control::States aState);
 std::ostream& operator<<(std::ostream& os, const Control::States aState);

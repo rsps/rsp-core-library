@@ -30,8 +30,8 @@ class Canvas
   public:
     Canvas()
         : mHeight(0), mWidth(0), mBytesPerPixel(0), mClipRect() {}
-    Canvas(unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel)
-        : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel), mClipRect(0u, 0u, aWidth, aHeight) {}
+    Canvas(GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel)
+        : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel), mClipRect(0, 0, aWidth, aHeight) {}
     /**
      * \brief Virtual destructor for the abstract class.
      */
@@ -49,7 +49,7 @@ class Canvas
      * \param aSweepAngle
      * \param aColor
      */
-    void DrawArc(const Point &arCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &arColor);
+    void DrawArc(const Point &arCenter, GuiUnit_t aRadius1, GuiUnit_t aRadius2, int aStartAngel, int aSweepAngle, const Color &arColor);
     /**
      * \brief Draw a full circle
      *
@@ -57,7 +57,7 @@ class Canvas
      * \param aRadius
      * \param aColor
      */
-    void DrawCircle(const Point &arCenter, int aRadius, const Color &arColor);
+    void DrawCircle(const Point &arCenter, GuiUnit_t aRadius, const Color &arColor);
 
     /**
      * \brief Draw a straight line from A to B.
@@ -139,7 +139,7 @@ class Canvas
      *
      * \return uint32_t
      */
-    unsigned int GetWidth() const
+    GuiUnit_t GetWidth() const
     {
         return mWidth;
     }
@@ -149,7 +149,7 @@ class Canvas
      *
      * \return uint32_t
      */
-    unsigned int GetHeight() const
+    GuiUnit_t GetHeight() const
     {
         return mHeight;
     }
@@ -173,6 +173,13 @@ class Canvas
     inline bool IsInsideCanvas(const Point &arPoint) const
     {
         return mClipRect.IsHit(arPoint);
+//        if (arPoint.GetX() >= 0 &&
+//            arPoint.GetX() <  mWidth &&
+//            arPoint.GetY() >= 0 &&
+//            arPoint.GetY() <  mHeight) {
+//            return true;
+//        }
+//        return false;
     }
 
     Canvas& SetClipRect(const Rect &arClipRect);
@@ -180,12 +187,12 @@ class Canvas
 
 
 protected:
-    unsigned int mHeight;
-    unsigned int mWidth;
+    GuiUnit_t mHeight;
+    GuiUnit_t mWidth;
     unsigned int mBytesPerPixel;
     Rect mClipRect;
 
-    void plot4Points(int aCenterX, int aCenterY, int aX, int aY, const Color &arColor)
+    void plot4Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
     {
         SetPixel(Point(aCenterX + aX, aCenterY + aY), arColor);
         SetPixel(Point(aCenterX - aX, aCenterY + aY), arColor);
@@ -193,7 +200,7 @@ protected:
         SetPixel(Point(aCenterX - aX, aCenterY - aY), arColor);
     }
 
-    void plot8Points(int aCenterX, int aCenterY, int aX, int aY, const Color &arColor)
+    void plot8Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
     {
         plot4Points(aCenterX, aCenterY, aX, aY, arColor);
         plot4Points(aCenterX, aCenterY, aY, aX, arColor);

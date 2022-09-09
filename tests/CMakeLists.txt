@@ -50,7 +50,7 @@ target_include_directories("rsp-core-lib-test"
 
 if (NOT RELEASE_BUILD)
 target_compile_options(rsp-core-lib-test PRIVATE 
-    -DGFX_FPS=100
+    -DGFX_FPS=20
     -g
     -O0
     )

@@ -12,63 +12,23 @@
 
 namespace rsp::graphics {
 
-Button::Button()
-    : Control(rsp::utils::MakeTypeInfo<Button>())
-{
-}
+//Button::Button()
+//    : Control(rsp::utils::MakeTypeInfo<Button>())
+//{
+//}
+//
+//Button::Button(const rsp::utils::TypeInfo &arInfo)
+//    : Control(arInfo)
+//{
+//}
 
-Button::Button(const rsp::utils::TypeInfo &arInfo)
-    : Control(arInfo)
-{
-}
 
-Button& Button::SetBitmapPosition(const Point &arPoint)
-{
-    for (auto &tuple : mStyles) {
-        tuple.second.mBackground.SetDestination(arPoint);
-    }
-    Invalidate();
-    return *this;
-}
-
-Button& Button::SetTextPosition(const Point &arPoint)
-{
-    Rect r = mText.GetArea();
-    r.MoveTo(arPoint);
-    mText.SetArea(r);
-    Invalidate();
-    return *this;
-}
-
-void Button::paint(Canvas &arCanvas, const Style &arStyle)
-{
-    Control::paint(arCanvas, arStyle);
-    arStyle.mBackground.Paint(GetOrigin(), arCanvas);
-    arStyle.mForeground.Paint(GetOrigin(), arCanvas);
-    arCanvas.DrawText(mText, arStyle.mForegroundColor);
-}
-
-Button& Button::SetCaption(const std::string &arText)
-{
-    mText.SetValue(arText).Reload();
-    Invalidate();
-    return *this;
-}
-
-Control& Button::SetOrigin(const rsp::graphics::Point &arPoint)
-{
-    Point difference = arPoint - mArea.GetTopLeft();
-    Control::SetOrigin(arPoint);
-    Rect r = mText.GetArea();
-    r.MoveTo(r.GetTopLeft() + difference);
-    mText.SetArea(r);
-    return *this;
-}
-
-Control& Button::SetArea(rsp::graphics::Rect aRect)
-{
-    mText.SetArea(aRect);
-    return Control::SetArea(aRect);
-}
+//void Button::paint(Canvas &arCanvas, const Style &arStyle)
+//{
+//    Button::paint(arCanvas, arStyle);
+//    arStyle.mBackground.Paint(GetOrigin(), arCanvas);
+//    arStyle.mForeground.Paint(GetOrigin(), arCanvas);
+//    arCanvas.DrawText(mText, arStyle.mForegroundColor);
+//}
 
 } /* namespace rsp::graphics */

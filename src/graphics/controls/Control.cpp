@@ -9,6 +9,11 @@
  */
 
 #include <graphics/controls/Control.h>
+#include <logging/Logger.h>
+
+#define SHOW_TOUCH_AREAS 1
+
+using namespace rsp::logging;
 
 namespace rsp::graphics
 {
@@ -137,6 +142,15 @@ Control& Control::AddChild(Control *apChild)
     return *this;
 }
 
+Control& Control::SetBitmapPosition(const Point &arPoint)
+{
+    for (auto &tuple : mStyles) {
+        tuple.second.mBackground.SetDestination(arPoint);
+    }
+    Invalidate();
+    return *this;
+}
+
 bool Control::Render(Canvas &arCanvas)
 {
     GFXLOG("Rendering: " << GetName() << " (" << this << ")");
@@ -144,8 +158,7 @@ bool Control::Render(Canvas &arCanvas)
 
     if (mDirty && mVisible) {
         GFXLOG("Painting: " << GetName());
-        arCanvas.SetClipRect(mTouchArea);
-//        arCanvas.SetClipRect(mArea);
+        arCanvas.SetClipRect(mArea);
         paint(arCanvas, mStyles[mState]);
     }
 
@@ -154,6 +167,7 @@ bool Control::Render(Canvas &arCanvas)
         if (child->Render(arCanvas)) {
             result = true;
         }
+        arCanvas.SetClipRect(mArea); // Reset canvas clip rect
     }
 
     mDirty = false;
@@ -163,10 +177,21 @@ bool Control::Render(Canvas &arCanvas)
 
 void Control::paint(Canvas &arCanvas, const Style &arStyle)
 {
-    arCanvas.DrawRectangle(mTouchArea, Color::Yellow);
     if (!mTransparent) {
         arCanvas.DrawRectangle(mArea, arStyle.mBackgroundColor, true);
     }
+
+    arStyle.mBackground.Paint(GetOrigin(), arCanvas);
+    arStyle.mForeground.Paint(GetOrigin(), arCanvas);
+
+#ifdef SHOW_TOUCH_AREAS
+    if (!mTouchArea.empty()) {
+        auto r = arCanvas.GetClipRect();
+        arCanvas.SetClipRect(mTouchArea + 1);
+        arCanvas.DrawRectangle(mTouchArea, Color::Yellow);
+        arCanvas.SetClipRect(r);
+    }
+#endif
 }
 
 Control& Control::SetDraggable(bool aValue)
@@ -253,6 +278,7 @@ bool Control::ProcessInput(TouchEvent &arInput)
             if (mTouchArea.IsHit(arInput.mPress)) {
                 doLift(arInput.mCurrent);
                 if (mTouchArea.IsHit(arInput.mCurrent)) {
+                    Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput << std::endl;
                     toggleChecked();
                     doClick(arInput.mCurrent);
                 }

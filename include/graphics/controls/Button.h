@@ -15,34 +15,19 @@
 #include <graphics/primitives/Bitmap.h>
 #include <graphics/primitives/Text.h>
 #include "Control.h"
+#include "Label.h"
 
 namespace rsp::graphics {
 
-class Button: public Control
+class Button: public Label
 {
 public:
-    Button();
-    Button(const rsp::utils::TypeInfo &arInfo);
-
-    Button(const Button&) = default;
-    Button(Button&&) = default;
-
-    Button& operator=(const Button&) = default;
-    Button& operator=(Button&&) = default;
-
-    Button& SetBitmapPosition(const Point &arPoint);
-    Button& SetTextPosition(const Point &arPoint);
-
-    Button& SetCaption(const std::string &arText);
-    Text& GetText() { return mText; }
-
-    Control& SetOrigin(const rsp::graphics::Point &arPoint) override;
-    Control& SetArea(rsp::graphics::Rect aRect) override;
+    TYPEINFO(Button)
+    Button() : Label(rsp::utils::MakeTypeInfo<Button>()) {}
+    Button(const rsp::utils::TypeInfo &arInfo) : Label(arInfo) {};
 
 protected:
-    Text mText{};
-
-    void paint(Canvas &arCanvas, const Style &arStyle) override;
+//    void paint(Canvas &arCanvas, const Style &arStyle) override;
 };
 
 } /* namespace rsp::graphics */

@@ -18,22 +18,18 @@ namespace rsp::graphics
 
 class Image : public Control
 {
-  public:
-    Image() : Control(rsp::utils::MakeTypeInfo<Image>()) {};
-    Image(const rsp::utils::TypeInfo &arInfo) : Control(arInfo) {}
+public:
+    TYPEINFO(Image)
 
-    Image(const Image &) = default;
-    Image(Image &&) = default;
-
-    Image& operator=(const Image &) = default;
-    Image& operator=(Image &&arOther) = default;
+    Image() : Control(rsp::utils::MakeTypeInfo<Image>()) {}
+    Image(const rsp::utils::TypeInfo &arInfo) : Control(arInfo) {};
 
     Image& SetArea(Rect aRect) override;
 
     void ClearSection();
     void SetSection(const Rect &arSection);
 
-  protected:
+protected:
     void paint(Canvas &arCanvas, const Style &arStyle) override;
 };
 

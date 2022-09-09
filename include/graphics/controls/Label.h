@@ -1,23 +1,43 @@
-#ifndef LABEL_H
-#define LABEL_H
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2022 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Steffen Brummer
+ */
 
-#include "graphics/controls/Control.h"
+#ifndef INCLUDE_GRAPHICS_CONTROLS_LABEL_H
+#define INCLUDE_GRAPHICS_CONTROLS_LABEL_H
+
+#include "Control.h"
+#include <graphics/primitives/Text.h>
 
 namespace rsp::graphics
 {
 
 class Label : public Control
 {
-  private:
-    std::string mCaption;
-    // Font mFont;
+public:
+    TYPEINFO(Label)
 
-  public:
-    Label();
-    ~Label();
+    Label() : Control(rsp::utils::MakeTypeInfo<Label>()) {}
+    Label(const rsp::utils::TypeInfo &arInfo) : Control(arInfo) {};
 
-    void SetCaption(std::string const &aCaption);
+    Label& SetCaption(const std::string &arCaption);
+    Label& SetTextPosition(const Point &arPoint);
+
+    Text& GetText() { return mText; }
+
+    Control& SetOrigin(const Point &arPoint) override;
+    Control& SetArea(Rect aRect) override;
+
+protected:
+    Text mText{};
+
+    void paint(Canvas &arCanvas, const Style &arStyle) override;
 };
 
 } // namespace rsp::graphics
-#endif // LABEL_H
+#endif // INCLUDE_GRAPHICS_CONTROLS_LABEL_H

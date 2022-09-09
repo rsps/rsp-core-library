@@ -21,6 +21,8 @@ class Canvas;
 class Bitmap;
 class Framebuffer;
 
+typedef std::int32_t GuiUnit_t;
+
 /**
  * \brief Point class
  *
@@ -44,12 +46,12 @@ class Point
      * \param aY
      */
     Point(int aX, int aY) noexcept
-        : mX(aX), mY(aY)
+        : mX(static_cast<GuiUnit_t>(aX)), mY(static_cast<GuiUnit_t>(aY))
     {
     }
 
     Point(unsigned int aX, unsigned int aY) noexcept
-        : mX(static_cast<int>(aX)), mY(static_cast<int>(aY))
+        : mX(static_cast<GuiUnit_t>(aX)), mY(static_cast<GuiUnit_t>(aY))
     {
     }
 
@@ -134,7 +136,7 @@ class Point
      * \brief Gets the value of the X coordinate
      * \return Integer
      */
-    int GetX() const noexcept
+    GuiUnit_t GetX() const noexcept
     {
         return mX;
     }
@@ -143,7 +145,7 @@ class Point
      * \brief Set the value of the X coordinate
      * \param aValue
      */
-    void SetX(int aValue) noexcept
+    void SetX(GuiUnit_t aValue) noexcept
     {
         mX = aValue;
     }
@@ -152,7 +154,7 @@ class Point
      * \brief Gets the value of the Y coordinate
      * \return Integer
      */
-    int GetY() const noexcept
+    GuiUnit_t GetY() const noexcept
     {
         return mY;
     }
@@ -161,7 +163,7 @@ class Point
      * \brief Set the value of the Y coordinate
      * \param aValue
      */
-    void SetY(int aValue) noexcept
+    void SetY(GuiUnit_t aValue) noexcept
     {
         mY = aValue;
     }
@@ -173,8 +175,8 @@ class Point
     friend Bitmap;
     friend Rect;
 
-    int mX;
-    int mY;
+    GuiUnit_t mX;
+    GuiUnit_t mY;
 };
 
 std::ostream &operator<<(std::ostream &os, const Point &p);

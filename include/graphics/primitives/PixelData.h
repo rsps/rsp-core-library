@@ -18,6 +18,7 @@
 #include <graphics/primitives/Color.h>
 #include <utils/CoreException.h>
 #include <logging/Logger.h>
+#include "Point.h"
 
 namespace rsp::graphics {
 
@@ -34,8 +35,8 @@ public:
     enum class ColorDepth { Monochrome = 1, Alpha = 8, RGB = 24, RGBA = 32 };
 
     PixelData() noexcept {}
-    PixelData(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth);
-    PixelData(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth, const std::uint8_t *aData);
+    PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth);
+    PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData);
 
     PixelData(const PixelData& arOther);
     PixelData(const PixelData&& arOther);
@@ -44,7 +45,7 @@ public:
 
     PixelData ChangeColorDepth(ColorDepth aDepth) const;
 
-    PixelData& Init(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth, const std::uint8_t *apData);
+    PixelData& Init(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData);
 
     const std::uint8_t* GetData() const { return mpData; }
     std::vector<std::uint8_t>& GetData() { return mData; }
@@ -53,8 +54,8 @@ public:
 
     std::size_t GetDataSize() const;
 
-    unsigned int GetWidth() const { return mWidth; }
-    unsigned int GetHeight() const { return mHeight; }
+    GuiUnit_t GetWidth() const { return mWidth; }
+    GuiUnit_t GetHeight() const { return mHeight; }
     ColorDepth GetColorDepth() const { return mColorDepth; }
 
     /**
@@ -68,23 +69,21 @@ public:
      * \param aColor
      * \return Color
      */
-    Color GetPixelAt(unsigned int aX, unsigned int aY, Color aColor) const;
-    Color GetPixelAt(int aX, int aY, Color aColor) const { return GetPixelAt(static_cast<unsigned int>(aX), static_cast<unsigned int>(aY), aColor); }
+    Color GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const;
 
-    PixelData& SetPixelAt(unsigned int aX, unsigned int aY, Color aColor);
-    PixelData& SetPixelAt(int aX, int aY, Color aColor) { return SetPixelAt(static_cast<unsigned int>(aX), static_cast<unsigned int>(aY), aColor); }
+    PixelData& SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor);
 
     void SaveToCFile(const std::filesystem::path &arFileName);
 
 protected:
     ColorDepth mColorDepth = ColorDepth::RGB;
-    unsigned int mWidth = 0;
-    unsigned int mHeight = 0;
+    GuiUnit_t mWidth = 0;
+    GuiUnit_t mHeight = 0;
     const std::uint8_t *mpData = nullptr;
     std::vector<std::uint8_t> mData{};
 
     friend class ImgLoader;
-    void initAfterLoad(unsigned int aWidth, unsigned int aHeight, ColorDepth aDepth);
+    void initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth);
 };
 
 std::ostream& operator<<(std::ostream& os, const PixelData::ColorDepth arDepth);

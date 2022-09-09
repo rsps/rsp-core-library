@@ -126,6 +126,7 @@ static Point cKeyPositions[26] = {
 };
 
 Keyboard::Keyboard()
+    : Control(rsp::utils::MakeTypeInfo<Keyboard>())
 {
     mImages[ImageIds::BigSpecial].Assign(cBigSpecial);// Load("testImages/alpha/BigSpecial.bmp");
     mImages[ImageIds::SmallSpecial].Assign(cSmallSpecial); // Load("testImages/alpha/SmallSpecial.bmp");

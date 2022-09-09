@@ -36,6 +36,17 @@ class TouchEvent
 
     TouchEvent() {}
 
+    TouchEvent(int aOffset, Types aType, const Point &arPoint)
+        : mTime(std::chrono::steady_clock::now()),
+          mType(aType),
+          mCurrent(arPoint)
+    {
+        mTime += std::chrono::milliseconds(aOffset);
+        if (mType == Types::Press) {
+            mPress = arPoint;
+        }
+    }
+
     TouchEvent(std::chrono::steady_clock::time_point aTime, Types aType, const Point &arPoint)
         : mTime(aTime),
           mType(aType),
@@ -46,13 +57,13 @@ class TouchEvent
         }
     }
 
-    void Fill(std::chrono::steady_clock::time_point aTime, Types aType, const Point &arPoint)
+    void Assign(const TouchEvent &arOther)
     {
-        mTime = aTime;
-        mType = aType;
-        mCurrent = arPoint;
+        mTime = arOther.mTime;
+        mType = arOther.mType;
+        mCurrent = arOther.mCurrent;
         if (mType == Types::Press) {
-            mPress = arPoint;
+            mPress = arOther.mCurrent;
         }
     }
 
@@ -60,6 +71,12 @@ class TouchEvent
     Types mType = Types::None;
     Point mCurrent{};  // Value of the latest absolute coordinate from touch controller
     Point mPress{}; // Absolute coordinate of latest press
+};
+
+struct TouchEvents
+{
+    const TouchEvent *mpEvents;
+    std::size_t mCount;
 };
 
 std::ostream &operator<<(std::ostream &os, const TouchEvent &arTouchEvent);

@@ -41,8 +41,8 @@ public:
     BitmapView& SetPixelColor(const Color &arColor);
     const Color& GetPixelColor() const { return mPixelColor; }
 
-    std::uint32_t GetWidth();
-    std::uint32_t GetHeight();
+    GuiUnit_t GetWidth();
+    GuiUnit_t GetHeight();
 
     Rect GetBoundingRect(Point aPoint = {0,0}) { return Rect(aPoint, GetWidth(), GetHeight()); }
 

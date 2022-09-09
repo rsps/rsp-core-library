@@ -49,7 +49,6 @@ TEST_CASE("Graphics Main Test")
     CHECK_NOTHROW(Font::SetDefaultFont(cFontName));
 
     TimerQueue::Create();
-    Timer t1(1, 100ms);
 
     // Make framebuffer
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
@@ -60,55 +59,72 @@ TEST_CASE("Graphics Main Test")
 
     // Make scenes
     CHECK_NOTHROW(SecondScene scn2);
+    CHECK_NOTHROW(InputScene scn3);
     Scenes scenes;
 
     // Make TouchParser
-    TestTouchParser tp("testImages/touchTest.bin");
+    TestTouchParser tp;
 
     GraphicsMain gfx(fb, tp, scenes);
 
-    gfx.ChangeScene(SecondScene::ID);
+    SUBCASE("Second Scene") {
+        gfx.ChangeScene(SecondScene::ID);
 
-    int progress = 0;
-    t1.Callback() = [&](Timer &arTimer) {
-        switch(progress++) {
-            case 0:
-                scenes.ActiveScene().ProcessInput(Touch(TouchEvent::Types::Press, {0, 0}));
-                break;
-            case 1:
-                scenes.ActiveScene().ProcessInput(Touch(TouchEvent::Types::Lift, {0, 0}));
-                break;
-            default:
+        int topBtnClicked = 0;
+        scenes.GetAfterCreate() = [&gfx, &topBtnClicked, &tp](Scene *apScene) {
+            CHECK_EQ(apScene->GetId(), SecondScene::ID);
+
+            tp.SetEvents(SecondScene::GetTouchEvents().data(), SecondScene::GetTouchEvents().size());
+
+            int topBtnId = static_cast<int>(apScene->GetAs<SecondScene>().GetTopBtn().GetId());
+            apScene->GetAs<SecondScene>().GetTopBtn().OnClick() = [&topBtnClicked, topBtnId](const Point& arPoint, int id) {
+                CHECK_EQ(id, topBtnId);
+                topBtnClicked++;
+            };
+
+            apScene->GetAs<SecondScene>().GetBottomBtn().OnClick() = [](const Point& arPoint, int id) {
+                FAIL("There should not be a click event from bottom button.");
+            };
+
+            // Check for lift even though we lift outside button
+            apScene->GetAs<SecondScene>().GetBottomBtn().OnLift() = [&gfx](const Point& arPoint, int id) {
+                CHECK_EQ(arPoint, Point(310, 390));
                 gfx.Terminate();
-                break;
-        }
-        arTimer.Enable();
-    };
+            };
+        };
 
-    scenes.GetAfterCreate() = [&gfx, &t1](Scene *apScene) {
-        switch (apScene->GetId()) {
-            case SecondScene::ID:
-                apScene->GetAs<SecondScene>().GetBottomBtn().OnClick() = [&gfx](const Point&, int id) {
-                    CHECK_EQ(id, SecondScene::ID);
-                    gfx.ChangeScene(InputScene::ID);
-                };
-            break;
+        MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
+        gfx.Run(GFX_FPS, true);
 
-            case InputScene::ID:
-                t1.Enable();
-            break;
+        const uint32_t cGreenColor = 0xFF24b40b;
+        CHECK_EQ(fb.GetPixel(scenes.ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1)), cGreenColor);
+        CHECK_EQ(fb.GetPixel(scenes.ActiveSceneAs<SecondScene>().GetBotRect().GetTopLeft() + Point(1,1)), cGreenColor);
+        CHECK_EQ(topBtnClicked, 2);
+    }
 
-            default:
-            break;
-        }
-    };
+    SUBCASE("Input Scene") {
+        gfx.ChangeScene(InputScene::ID);
 
-    MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
-    gfx.Run(GFX_FPS, true);
+        int progress = 0;
+        Timer t1(1, 100ms);
+        t1.Callback() = [&](Timer &arTimer) {
+            switch(progress++) {
+                case 0:
+                    break;
+                case 1:
+                    break;
+                default:
+                    gfx.Terminate();
+                    break;
+            }
+            arTimer.Enable();
+        };
+        t1.Enable();
 
-    MESSAGE("TopLeft: " << scenes.ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft());
-    const uint32_t cGreenColor = 0xFF24b40b;
-    CHECK_EQ(fb.GetPixel(scenes.ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft()), cGreenColor);
-    CHECK_EQ(fb.GetPixel(scenes.ActiveSceneAs<SecondScene>().GetBotRect().GetTopLeft()), cGreenColor);
+        MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
+        gfx.Run(GFX_FPS, true);
+    }
+
+    TimerQueue::Destroy();
 }
 

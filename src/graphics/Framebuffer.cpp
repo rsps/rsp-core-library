@@ -50,6 +50,9 @@ Framebuffer::Framebuffer(const char *apDevPath)
     mWidth = mVariableInfo.xres;
     mHeight = mVariableInfo.yres;
     mBytesPerPixel = mVariableInfo.bits_per_pixel / 8;
+    mClipRect.SetWidth(mWidth);
+    mClipRect.SetHeight(mHeight);
+
     // std::clog << "Framebuffer opened. Width=" << mWidth << " Height=" << mHeight << " BytesPerPixel=" << mBytesPerPixel << std::endl;
 
     // set yres_virtual for double buffering

@@ -14,6 +14,7 @@
 #include <messaging/Subscriber.h>
 #include <messaging/Publisher.h>
 #include <posix/FileSystem.h>
+#include <utils/Random.h>
 #include <doctest.h>
 
 #include <eventTypes/ClickedEvent.h>
@@ -22,6 +23,7 @@
 
 using namespace rsp::graphics;
 using namespace rsp::messaging;
+using namespace rsp::utils;
 
 class TestSub : public Subscriber<ClickTopics>
 {
@@ -78,12 +80,12 @@ TEST_CASE("Scene Test")
     CHECK_NOTHROW(scenes.ActiveScene());
 
     Rect tr = SecondScene::GetTopRect();
-    Point insideTopPoint(tr.GetLeft() + (rand() % tr.GetWidth()),
-                         tr.GetTop() + (rand() % tr.GetHeight()));
+    Point insideTopPoint(tr.GetLeft() + Random::Roll(0, tr.GetWidth()-1),
+                         tr.GetTop() + Random::Roll(0, tr.GetHeight()-1));
 
     Rect br = SecondScene::GetBotRect();
-    Point insideBotPoint(br.GetLeft() + (rand() % br.GetWidth()),
-                         br.GetTop() + (rand() % br.GetHeight()));
+    Point insideBotPoint(br.GetLeft() + Random::Roll(0, br.GetWidth()-1),
+                         br.GetTop() + Random::Roll(0, br.GetHeight()-1));
 
     SUBCASE("Scene Process Input")
     {

@@ -25,42 +25,42 @@
 
 namespace rsp::graphics
 {
-void Canvas::DrawArc(const Point &aCenter, int aRadius1, int aRadius2, int aStartAngel, int aSweepAngle, const Color &aColor)
+void Canvas::DrawArc(const Point &aCenter, GuiUnit_t aRadius1, GuiUnit_t aRadius2, int aStartAngel, int aSweepAngle, const Color &aColor)
 {
     THROW_WITH_BACKTRACE1(rsp::utils::NotImplementedException, "Canvas::DrawArc has not been implemented yet.");
 }
 
-void Canvas::DrawCircle(const Point &aCenter, int aRadius, const Color &aColor)
+void Canvas::DrawCircle(const Point &aCenter, GuiUnit_t aRadius, const Color &aColor)
 {
-    int error = -aRadius;
-    int y = 0;
+    int error = -static_cast<int>(aRadius);
+    GuiUnit_t y = 0;
 
     while (aRadius >= y) {
         plot8Points(aCenter.mX, aCenter.mY, aRadius, y, aColor);
-        error += y;
+        error += static_cast<int>(y);
         y++;
-        error += y;
+        error += static_cast<int>(y);
 
         if (error >= 0) {
-            error += -aRadius;
+            error += -static_cast<int>(aRadius);
             aRadius--;
-            error += -aRadius;
+            error += -static_cast<int>(aRadius);
         }
     }
 }
 
 void Canvas::DrawLine(const Point &aA, const Point &aB, const Color &aColor)
 {
-    int deltaX = aB.mX - aA.mX;
-    int deltaY = aB.mY - aA.mY;
+    int deltaX = static_cast<int>(aB.mX - aA.mX);
+    int deltaY = static_cast<int>(aB.mY - aA.mY);
     int absDeltaX = abs(deltaX);
     int absDeltaY = abs(deltaY);
     int signumX = (deltaX > 0) ? 1 : -1;
     int signumY = (deltaY > 0) ? 1 : -1;
     int x = absDeltaX >> 1;
     int y = absDeltaY >> 1;
-    int px = aA.mX;
-    int py = aA.mY;
+    int px = static_cast<int>(aA.mX);
+    int py = static_cast<int>(aA.mY);
 
     SetPixel(aA, aColor);
     if (absDeltaX >= absDeltaY) {
@@ -90,21 +90,24 @@ void Canvas::DrawLine(const Point &aA, const Point &aB, const Color &aColor)
 void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor, bool aFilled)
 {
     Rect r = aRect & mClipRect;
+    GuiUnit_t h_end = r.mLeftTop.mY + r.mHeight;
+    GuiUnit_t w_end = r.mLeftTop.mX + r.mWidth;
     if (aFilled) {
-        for (int y = r.mLeftTop.mY; y <= r.mRightBottom.mY; y++) {
-            for (int x = r.mLeftTop.mX; x <= r.mRightBottom.mX; x++) {
+        for (GuiUnit_t y = r.mLeftTop.mY; y < h_end; y++) {
+            for (GuiUnit_t x = r.mLeftTop.mX; x < w_end; x++) {
                 SetPixel(Point(x, y), aColor);
             }
         }
     }
     else {
-        for (int i = r.mLeftTop.mX; i <= r.mRightBottom.mX; i++) {
-            SetPixel(Point(i, r.mLeftTop.mY), aColor);     // top
-            SetPixel(Point(i, r.mRightBottom.mY), aColor); // bottom
+        Point rb = r.GetBottomRight();
+        for (GuiUnit_t x = r.mLeftTop.mX; x < w_end; x++) {
+            SetPixel(Point(x, r.mLeftTop.mY), aColor); // top
+            SetPixel(Point(x, rb.mY), aColor); // bottom
         }
-        for (int i = r.mLeftTop.mY; i <= r.mRightBottom.mY; i++) {
-            SetPixel(Point(r.mLeftTop.mX, i), aColor);     // left
-            SetPixel(Point(r.mRightBottom.mX, i), aColor); // right
+        for (GuiUnit_t y = r.mLeftTop.mY; y < h_end; y++) {
+            SetPixel(Point(r.mLeftTop.mX, y), aColor); // left
+            SetPixel(Point(rb.mX, y), aColor); // right
         }
     }
 }

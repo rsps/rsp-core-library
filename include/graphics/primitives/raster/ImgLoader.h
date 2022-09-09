@@ -75,7 +75,7 @@ class ImgLoader
      * \brief Get the height of the bitmap
      * \return Value of the height
      */
-    unsigned int GetHeight() const
+    GuiUnit_t GetHeight() const
     {
         return mPixelData.GetHeight();
     }
@@ -84,7 +84,7 @@ class ImgLoader
      * \brief Get the width of the bitmap
      * \return Value of the width
      */
-    unsigned int GetWidth() const
+    GuiUnit_t GetWidth() const
     {
         return mPixelData.GetWidth();
     }
@@ -92,7 +92,7 @@ class ImgLoader
   protected:
     PixelData mPixelData{};
 
-    void initAfterLoad(unsigned int aWidth, unsigned int aHeight, PixelData::ColorDepth aDepth);
+    void initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, PixelData::ColorDepth aDepth);
 };
 
 } // namespace rsp::graphics

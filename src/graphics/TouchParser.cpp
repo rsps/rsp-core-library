@@ -46,7 +46,9 @@ std::ostream &operator<<(std::ostream &os, const TouchEvent &arTE)
 
 TouchParser::TouchParser(const std::string &arPath)
 {
-    mTouchDevice.Open(arPath, std::ifstream::binary);
+    if (arPath.length()) {
+        mTouchDevice.Open(arPath, std::ifstream::binary);
+    }
 }
 
 TouchParser::~TouchParser()
@@ -117,6 +119,9 @@ void TouchParser::readBody(TouchEvent &arInput)
         }
         readRawTouchEvent();
     }
+
+    std::uint64_t m = (mRawTouchEvent.stime * 1000) + (mRawTouchEvent.mtime / 1000);
+    arInput.mTime = std::chrono::steady_clock::time_point(std::chrono::milliseconds{m});
 }
 
 void TouchParser::Flush()

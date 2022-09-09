@@ -49,7 +49,7 @@ public:
      * \param aWidth
      * \param aBytesPerPixel
      */
-    Bitmap(const uint32_t *apPixels, unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel);
+    Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel);
 
     /**
      * \brief Create an empty in memory bitmap
@@ -58,10 +58,10 @@ public:
      * \param aWidth
      * \param aBytesPerPixel
      */
-    Bitmap(unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel);
+    Bitmap(GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel);
 
     Bitmap& Load(const std::string &arImgName);
-    Bitmap& Assign(const uint32_t *apPixels, unsigned int aHeight, unsigned int aWidth, unsigned int aBytesPerPixel);
+    Bitmap& Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel);
     Bitmap& Assign(const PixelData &arPixelData);
 
 
@@ -70,7 +70,7 @@ public:
         if (!IsInsideCanvas(arPoint)) {
             return;
         }
-        mImagePixels.SetPixelAt(static_cast<unsigned int>(arPoint.GetX()), static_cast<unsigned int>(arPoint.GetY()), arColor);
+        mImagePixels.SetPixelAt(arPoint.GetX(), arPoint.GetY(), arColor);
     }
 
     std::uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;

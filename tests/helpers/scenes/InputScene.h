@@ -10,6 +10,7 @@
 #ifndef TESTS_HELPERS_SCENES_INPUTSCENE_H_
 #define TESTS_HELPERS_SCENES_INPUTSCENE_H_
 
+#include <array>
 #include <graphics/controls/Button.h>
 #include <graphics/controls/Scene.h>
 #include <graphics/controls/Keyboard.h>
@@ -20,7 +21,13 @@ namespace rsp::graphics {
 class InputScene : public SceneBase<InputScene>
 {
 public:
-    using Clicked_t = rsp::utils::Function<void(void)>;
+    static std::array<TouchEvent, 2>& GetTouchEvents() {
+        static std::array events {
+            TouchEvent(50, TouchEvent::Types::Press, Point(100, 100)),
+            TouchEvent(51, TouchEvent::Types::Lift, Point(100, 100)),  // Click outside any buttons
+        };
+        return events;
+    }
 
     InputScene()
     {

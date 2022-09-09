@@ -12,6 +12,7 @@
 #include <doctest.h>
 #include <graphics/controls/Control.h>
 #include <utils/Random.h>
+#include <TestHelpers.h>
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
@@ -24,16 +25,24 @@ static void Randomize()
     Random::Seed(ms.count());
 }
 
+class TestControl : public Control
+{
+public:
+    TestControl() : Control(rsp::utils::MakeTypeInfo<TestControl>()) {}
+};
+
 TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("TouchArea Constructor")
 {
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
     Randomize();
 
     SUBCASE("Construct with Default Values")
     {
         // Act
-        Control area;
+        TestControl area;
 
         // Assert
         CHECK(area.GetArea().GetHeight() == 0);
@@ -43,26 +52,25 @@ TEST_CASE("TouchArea Constructor")
     SUBCASE("Construct From Rect")
     {
         // Arrange
-        int randomLeft = 1 + (rand() % 100);
-        int randomTop = 1 + (rand() % 500);
-        int randomWidth = 1 + (rand() % 300);
-        int randomHeight = 1 + (rand() % 300);
+        GuiUnit_t randomLeft = Random::Roll(1, 100);
+        GuiUnit_t randomTop = Random::Roll(1, 500);
+        GuiUnit_t randomWidth = Random::Roll(1, 300);
+        GuiUnit_t randomHeight = Random::Roll(1, 300);
         Rect myRect(randomLeft, randomTop, randomWidth, randomHeight);
         MESSAGE("Rect Dimensions: " << myRect);
         // Random point within rect
-        // output = min + (rand() % static_cast<int>(max - min + 1))
-        Point insidePoint(myRect.GetLeft() + Random::Roll(0, static_cast<int>(myRect.GetWidth())),
-                          myRect.GetTop() + Random::Roll(0, static_cast<int>(myRect.GetHeight())));
+        Point insidePoint(myRect.GetLeft() + Random::Roll(0, myRect.GetWidth()),
+                          myRect.GetTop() + Random::Roll(0, myRect.GetHeight()));
         // Random point lower than inside
         Point lowerPoint(Random::Roll(0, myRect.GetLeft()),
                          Random::Roll(0, myRect.GetTop()));
         // Random point higher than inside
-        Point higherPoint(myRect.GetRight() + Random::Roll(0, static_cast<int>(myRect.GetWidth())),
-                          myRect.GetBottom() + Random::Roll(0, static_cast<int>(myRect.GetHeight())));
+        Point higherPoint(myRect.GetRight() + Random::Roll(0, myRect.GetWidth()),
+                          myRect.GetBottom() + Random::Roll(0, myRect.GetHeight()));
 
         // Act
-        Control area;
-        area.SetArea(myRect);
+        TestControl area;
+        area.SetArea(myRect).SetTouchArea(myRect);
 
         // Assert
         CHECK(area.IsHit(insidePoint));
@@ -73,6 +81,8 @@ TEST_CASE("TouchArea Constructor")
 
 TEST_CASE("Input Processing")
 {
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
     Randomize();
 
     // Arrange
@@ -82,12 +92,12 @@ TEST_CASE("Input Processing")
     bool lifted = false;
     bool clicked = false;
     Rect aRect(10, 10, 200, 200);
-    Control area;
-    area.SetArea(aRect).SetDraggable(true);
+    TestControl area;
+    area.SetArea(aRect).SetTouchArea(aRect).SetDraggable(true);
     TouchEvent event;
 
-    event.mCurrent = Point(aRect.GetLeft() + Random::Roll(0, static_cast<int>(aRect.GetWidth() - 1)),
-                         aRect.GetTop() + Random::Roll(0, static_cast<int>(aRect.GetHeight() - 1)));
+    event.mCurrent = Point(aRect.GetLeft() + Random::Roll(0, aRect.GetWidth() - 1),
+                         aRect.GetTop() + Random::Roll(0, aRect.GetHeight() - 1));
 
     MESSAGE("Touch Point: " << event.mCurrent);
     CHECK(aRect.IsHit(event.mCurrent));
