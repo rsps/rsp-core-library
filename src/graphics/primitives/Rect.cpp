@@ -75,23 +75,41 @@ Rect Rect::operator &(const Rect &arOther) const
     return Rect(lt, rb);
 }
 
-Rect& Rect::operator &=(const Rect &arRect)
+Rect& Rect::operator &=(const Rect &arOther)
 {
-    Rect r = *this & arRect;
+    Rect r = *this & arOther;
     mLeftTop = r.GetTopLeft();
     mWidth = r.mWidth;
     mHeight = r.mHeight;
     return *this;
 }
 
+Rect Rect::operator |(const Rect &arOther) const
+{
+    Rect r = *this;
+    r |= arOther;
+    return r;
+}
+
+Rect& Rect::operator |=(const Rect &arOther)
+{
+    mLeftTop.mX = std::min(mLeftTop.mX, arOther.mLeftTop.mX);
+    mLeftTop.mY = std::min(mLeftTop.mY, arOther.mLeftTop.mY);
+    SetRight(std::max(GetRight(), arOther.GetRight()));
+    SetBottom(std::max(GetBottom(), arOther.GetBottom()));
+    return *this;
+}
+
+
 GuiUnit_t Rect::GetTop() const
 {
     return mLeftTop.mY;
 }
 
-void Rect::SetTop(GuiUnit_t aTopValue)
+Rect& Rect::SetTop(GuiUnit_t aTopValue)
 {
     mLeftTop.mY = aTopValue;
+    return *this;
 }
 
 GuiUnit_t Rect::GetBottom() const
@@ -99,10 +117,11 @@ GuiUnit_t Rect::GetBottom() const
     return mLeftTop.mY + mHeight - 1;
 }
 
-void Rect::SetBottom(GuiUnit_t aBotValue)
+Rect& Rect::SetBottom(GuiUnit_t aBotValue)
 {
     mHeight = aBotValue - mLeftTop.mY + 1;
     LimitDimensions();
+    return *this;
 }
 
 GuiUnit_t Rect::GetLeft() const
@@ -110,9 +129,10 @@ GuiUnit_t Rect::GetLeft() const
     return mLeftTop.mX;
 }
 
-void Rect::SetLeft(GuiUnit_t aLeftValue)
+Rect& Rect::SetLeft(GuiUnit_t aLeftValue)
 {
     mLeftTop.mX = aLeftValue;
+    return *this;
 }
 
 GuiUnit_t Rect::GetRight() const
@@ -120,10 +140,11 @@ GuiUnit_t Rect::GetRight() const
     return mLeftTop.mX + mWidth - 1;
 }
 
-void Rect::SetRight(GuiUnit_t aRightValue)
+Rect& Rect::SetRight(GuiUnit_t aRightValue)
 {
     mWidth = aRightValue - mLeftTop.mX + 1;
     LimitDimensions();
+    return *this;
 }
 
 GuiUnit_t Rect::GetWidth() const
@@ -131,10 +152,11 @@ GuiUnit_t Rect::GetWidth() const
     return mWidth;
 }
 
-void Rect::SetWidth(GuiUnit_t aWidth)
+Rect& Rect::SetWidth(GuiUnit_t aWidth)
 {
     mWidth = aWidth;
     LimitDimensions();
+    return *this;
 }
 
 GuiUnit_t Rect::GetHeight() const
@@ -142,24 +164,33 @@ GuiUnit_t Rect::GetHeight() const
     return mHeight;
 }
 
-void Rect::SetHeight(GuiUnit_t aHeight)
+Rect& Rect::SetHeight(GuiUnit_t aHeight)
 {
     mHeight = aHeight;
     LimitDimensions();
+    return *this;
 }
 
-void Rect::MoveTo(const Point &arPoint)
+Rect& Rect::MoveTo(const Point &arPoint)
 {
     mLeftTop = arPoint;
+    return *this;
+}
+
+Rect& Rect::Move(int aX, int aY)
+{
+    mLeftTop.mX += aX;
+    mLeftTop.mY += aY;
+    return *this;
 }
 
 bool Rect::IsHit(const Point &aPoint) const
 {
     // Only works with non-rotated rectangles
-    if (aPoint.GetX() >= mLeftTop.GetX() &&
-        aPoint.GetX() <  (mLeftTop.GetX() + mWidth) &&
-        aPoint.GetY() >= mLeftTop.GetY() &&
-        aPoint.GetY() <  (mLeftTop.GetY() + mHeight)) {
+    if (aPoint.mX >= mLeftTop.mX &&
+        aPoint.mX <  (mLeftTop.mX + mWidth) &&
+        aPoint.mY >= mLeftTop.mY &&
+        aPoint.mY <  (mLeftTop.mY + mHeight)) {
         return true;
     }
 
@@ -176,33 +207,25 @@ void Rect::LimitDimensions()
     }
 }
 
-Rect Rect::operator +(const Point &arOffset) const
+bool Rect::empty() const
 {
-    auto r = *this;
-    r.mLeftTop += arOffset;
-    return r;
+    return (mWidth == 0) || (mHeight == 0);
 }
 
-Rect Rect::operator +(int aValue)
+Rect& Rect::SetSize(GuiUnit_t aWidth, GuiUnit_t aHeight)
 {
-    auto r = *this;
-    r += aValue;
-    return r;
-}
-
-Rect& Rect::operator +=(int aValue)
-{
-    mLeftTop.mX -= aValue;
-    mLeftTop.mY -= aValue;
-    mWidth += aValue + aValue;
-    mHeight += aValue + aValue;
+    mWidth = aWidth;
+    mHeight = aHeight;
     LimitDimensions();
     return *this;
 }
 
-bool Rect::empty() const
+Rect& Rect::AddSize(int aWidth, int aHeight)
 {
-    return (mWidth == 0) || (mHeight == 0);
+    mWidth += aWidth;
+    mHeight += aHeight;
+    LimitDimensions();
+    return *this;
 }
 
 } // namespace rsp::graphics

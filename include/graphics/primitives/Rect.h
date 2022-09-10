@@ -72,6 +72,10 @@ class Rect
      */
     Rect& operator=(const Rect &arRect) = default;
 
+    /**
+     * \brief Check if the rect covers no area
+     * \return true if height or width is zero.
+     */
     bool empty() const;
 
     /**
@@ -94,21 +98,21 @@ class Rect
         return (mLeftTop != arOther.mLeftTop) || (mWidth != arOther.mWidth) || (mHeight != arOther.mHeight);
     }
 
-    Rect operator+(const Point& arOffset) const;
-
-    Rect operator+(int aValue);
-    Rect operator-(int aValue) { return operator+(-aValue); }
-
-    Rect& operator+=(int aValue);
-    Rect& operator-=(int aValue) { return operator+=(-aValue); }
-
     /**
      * \brief Get the overlapping area of two rect's.
      * \param arRect
      * \return New Rect with overlapping area of the two
      */
-    Rect operator&(const Rect &arRect) const;
-    Rect& operator&=(const Rect &arRect);
+    Rect operator&(const Rect &arOther) const;
+    Rect& operator&=(const Rect &arOther);
+
+    /**
+     * \brief Get the bounding area of two rect's.
+     * \param arRect
+     * \return New Rect that contains the areas of the two
+     */
+    Rect operator|(const Rect &arOther) const;
+    Rect& operator|=(const Rect &arOther);
 
     /**
      * \brief Get the top value
@@ -121,7 +125,7 @@ class Rect
      *
      * \param aTopValue
      */
-    void SetTop(GuiUnit_t aTopValue);
+    Rect& SetTop(GuiUnit_t aTopValue);
 
     /**
      * \brief Get the bottom value
@@ -134,7 +138,7 @@ class Rect
      *
      * \param aBotValue
      */
-    void SetBottom(GuiUnit_t aBotValue);
+    Rect& SetBottom(GuiUnit_t aBotValue);
 
     /**
      * \brief Get the left value
@@ -147,7 +151,7 @@ class Rect
      *
      * \param aLeftValue
      */
-    void SetLeft(GuiUnit_t aLeftValue);
+    Rect& SetLeft(GuiUnit_t aLeftValue);
 
     /**
      * \brief Get the right value.
@@ -160,13 +164,38 @@ class Rect
      *
      * \param aRightValue
      */
-    void SetRight(GuiUnit_t aRightValue);
+    Rect& SetRight(GuiUnit_t aRightValue);
 
     /**
      * \brief Set TopLeft to given point, move BottomRight to keep size.
      * \param arPoint
      */
-    void MoveTo(const Point &arPoint);
+    Rect& MoveTo(const Point &arPoint);
+    Rect& operator=(const Point &arPosition) { return MoveTo(arPosition); }
+
+    /**
+     * \brief Move this rect by the given x/y offsets.
+     * \param aX
+     * \param aY
+     * \return self
+     */
+    Rect& Move(int aX, int aY);
+
+    /**
+     * \brief Set the size of this rect
+     * \param aWidth
+     * \param aHeight
+     * \return self
+     */
+    Rect& SetSize(GuiUnit_t aWidth, GuiUnit_t aHeight);
+    /**
+     * \brief Add given values to the size of this rect
+     * \param aWidth
+     * \param aHeight
+     * \return self
+     */
+    Rect& AddSize(int aWidth, int aHeight);
+
 
     /**
      * \brief Get the top left coordinate.
@@ -205,7 +234,7 @@ class Rect
      *
      * \param aWidth
      */
-    void SetWidth(GuiUnit_t aWidth);
+    Rect& SetWidth(GuiUnit_t aWidth);
 
     /**
      * \brief Get the height of the Rect.
@@ -219,7 +248,7 @@ class Rect
      *
      * \param aHeight
      */
-    void SetHeight(GuiUnit_t aHeight);
+    Rect& SetHeight(GuiUnit_t aHeight);
 
     /**
      * \brief Determines if a point is inside area covered by the Rect.

@@ -58,14 +58,14 @@ Key& Key::SetStyle(Control::States aState, BitmapView &arForeground, BitmapView 
     return *this;
 }
 
-void Key::paint(Canvas &arCanvas, const Style &arStyle)
-{
-    std::cout << "Paint bitmap view on " << GetName() << " Area(" << mArea << ") TextArea(" << mText.GetArea() << ")" << std::endl;
-    arCanvas.DrawRectangle(mTouchArea, Color::Yellow);
-    arStyle.mBackground.Paint(GetOrigin(), arCanvas);
-    arStyle.mForeground.Paint(GetOrigin(), arCanvas);
-    arCanvas.DrawText(mText, arStyle.mForegroundColor);
-}
+//void Key::paint(Canvas &arCanvas, const Style &arStyle)
+//{
+////    std::cout << "Paint bitmap view on " << GetName() << " Area(" << mArea << ") TextArea(" << mText.GetArea() << ")" << std::endl;
+//    arCanvas.DrawRectangle(mTouchArea, Color::Yellow);
+//    arStyle.mBackground.Paint(GetOrigin(), arCanvas);
+//    arStyle.mForeground.Paint(GetOrigin(), arCanvas);
+//    arCanvas.DrawText(mText, arStyle.mForegroundColor);
+//}
 
 static Rect cKeyTouchAreas[26] = {
     {0, 0, 58, 82},

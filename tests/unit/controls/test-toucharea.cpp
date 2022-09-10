@@ -52,30 +52,37 @@ TEST_CASE("TouchArea Constructor")
     SUBCASE("Construct From Rect")
     {
         // Arrange
-        GuiUnit_t randomLeft = Random::Roll(1, 100);
-        GuiUnit_t randomTop = Random::Roll(1, 500);
-        GuiUnit_t randomWidth = Random::Roll(1, 300);
-        GuiUnit_t randomHeight = Random::Roll(1, 300);
-        Rect myRect(randomLeft, randomTop, randomWidth, randomHeight);
-        MESSAGE("Rect Dimensions: " << myRect);
-        // Random point within rect
-        Point insidePoint(myRect.GetLeft() + Random::Roll(0, myRect.GetWidth()),
-                          myRect.GetTop() + Random::Roll(0, myRect.GetHeight()));
-        // Random point lower than inside
-        Point lowerPoint(Random::Roll(0, myRect.GetLeft()),
-                         Random::Roll(0, myRect.GetTop()));
-        // Random point higher than inside
-        Point higherPoint(myRect.GetRight() + Random::Roll(0, myRect.GetWidth()),
-                          myRect.GetBottom() + Random::Roll(0, myRect.GetHeight()));
-
-        // Act
+        GuiUnit_t left = Random::Roll(1, 100);
+        GuiUnit_t top = Random::Roll(1, 500);
+        GuiUnit_t width = Random::Roll(1, 300);
+        GuiUnit_t height = Random::Roll(1, 300);
+        Rect myRect(left, top, width, height);
         TestControl area;
         area.SetArea(myRect).SetTouchArea(myRect);
 
+        // Act
+        for (int i=0 ; i < 1000 ; ++i) {
+            // Random point within rect
+            Point insidePoint(Random::Roll(left, left + width - 1),
+                              Random::Roll(top, top + height - 1));
+            CHECK(area.IsHit(insidePoint));
+            if (!area.IsHit(insidePoint)) {
+                MESSAGE("Rect Dimensions: " << myRect);
+                MESSAGE("Inside Point: " << insidePoint);
+            }
+        }
+
         // Assert
-        CHECK(area.IsHit(insidePoint));
-        CHECK_FALSE(area.IsHit(lowerPoint));
-        CHECK_FALSE(area.IsHit(higherPoint));
+        CHECK(area.IsHit(Point(left, top)));
+        CHECK(area.IsHit(Point(left, top + height - 1)));
+        CHECK(area.IsHit(Point(left + width - 1, top)));
+        CHECK(area.IsHit(Point(left + width - 1, top + height - 1)));
+
+        CHECK_FALSE(area.IsHit(Point(left-1, top)));
+        CHECK_FALSE(area.IsHit(Point(left, top-1)));
+        CHECK_FALSE(area.IsHit(Point(left, top + height)));
+        CHECK_FALSE(area.IsHit(Point(left + width, top)));
+        CHECK_FALSE(area.IsHit(Point(left + width, top + height)));
     }
 }
 

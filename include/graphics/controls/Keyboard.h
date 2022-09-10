@@ -30,8 +30,6 @@ public:
     Key();
     Key& Setup(Rect aTouchArea, Rect aArea, int aSymbol = 0);
     Key& SetStyle(Control::States aState, BitmapView &arForeground, BitmapView &arBackground, Color aFrontColor, Color aBackColor);
-protected:
-    void paint(Canvas &arCanvas, const Style &arStyle) override;
 };
 
 class Keyboard: public Control
