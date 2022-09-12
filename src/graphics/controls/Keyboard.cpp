@@ -8,10 +8,13 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/controls/Keyboard.h>
 #include <cctype>
 #include <functional>
+#include <string>
+#include <locale>
+#include <codecvt>
 #include <utils/Function.h>
+#include <graphics/controls/Keyboard.h>
 
 #include "pixmaps/BigSpecial.h"
 #include "pixmaps/SmallSpecial.h"
@@ -29,6 +32,7 @@ namespace rsp::graphics {
 Key::Key()
 {
     mText.GetFont().SetSize(34);
+    SetTransparent(true);
 }
 
 Key& Key::Setup(Rect aTouchArea, Rect aArea, int aSymbol)
@@ -53,81 +57,76 @@ Key& Key::SetStyle(Control::States aState, BitmapView &arForeground, BitmapView 
 {
     Style style;
     style.mForeground = arForeground.SetPixelColor(aFrontColor);
+    style.mForegroundColor = aFrontColor;
     style.mBackground = arBackground.SetPixelColor(aBackColor);
+    style.mBackgroundColor = aBackColor;
     GetStyle(aState) = style;
     return *this;
 }
 
-//void Key::paint(Canvas &arCanvas, const Style &arStyle)
-//{
-////    std::cout << "Paint bitmap view on " << GetName() << " Area(" << mArea << ") TextArea(" << mText.GetArea() << ")" << std::endl;
-//    arCanvas.DrawRectangle(mTouchArea, Color::Yellow);
-//    arStyle.mBackground.Paint(GetOrigin(), arCanvas);
-//    arStyle.mForeground.Paint(GetOrigin(), arCanvas);
-//    arCanvas.DrawText(mText, arStyle.mForegroundColor);
-//}
-
 static Rect cKeyTouchAreas[26] = {
-    {0, 0, 58, 82},
-    {59, 0, 41, 82},
-    {101, 0, 41, 82},
-    {143, 0, 41, 82},
-    {185, 0, 41, 82},
-    {227, 0, 41, 82},
-    {269, 0, 41, 82},
-    {311, 0, 41, 82},
-    {353, 0, 41, 82},
-    {395, 0, 59, 82},
-    {0,   83, 79, 68},
-    {80,  83, 41, 68},
-    {122, 83, 41, 68},
-    {164, 83, 41, 68},
-    {206, 83, 41, 68},
-    {248, 83, 41, 68},
-    {290, 83, 41, 68},
-    {332, 83, 41, 68},
-    {374, 83, 80, 68},
-    {80,  152, 41, 70},
-    {122, 152, 41, 70},
-    {164, 152, 41, 70},
-    {206, 152, 41, 70},
-    {248, 152, 41, 70},
-    {290, 152, 41, 70},
-    {332, 152, 41, 70}
+    {  0,   0, 59, 83}, // Q
+    { 59,   0, 42, 83}, // W
+    {101,   0, 42, 83}, // E
+    {143,   0, 42, 83}, // R
+    {185,   0, 42, 83}, // T
+    {227,   0, 42, 83}, // Y
+    {269,   0, 42, 83}, // U
+    {311,   0, 42, 83}, // I
+    {353,   0, 42, 83}, // O
+    {395,   0, 59, 83}, // P
+    {  0,  83, 80, 69}, // A
+    { 80,  83, 42, 69}, // S
+    {122,  83, 42, 69}, // D
+    {164,  83, 42, 69}, // F
+    {206,  83, 42, 69}, // G
+    {248,  83, 42, 69}, // H
+    {290,  83, 42, 69}, // J
+    {332,  83, 42, 69}, // K
+    {374,  83, 80, 69}, // L
+    { 80, 152, 42, 71}, // Z
+    {122, 152, 42, 71}, // X
+    {164, 152, 42, 71}, // C
+    {206, 152, 42, 71}, // V
+    {248, 152, 42, 71}, // B
+    {290, 152, 42, 71}, // N
+    {332, 152, 42, 71}  // M
 };
 
 static Point cKeyPositions[26] = {
-    {18, 14},
-    {60, 14},
-    {102, 14},
-    {144, 14},
-    {186, 14},
-    {228, 14},
-    {270, 14},
-    {312, 14},
-    {354, 14},
-    {396, 14},
-    {39, 84},
-    {81, 84},
-    {123, 84},
-    {165, 84},
-    {207, 84},
-    {249, 84},
-    {291, 84},
-    {333, 84},
-    {375, 84},
-    {81, 154},
-    {123, 154},
-    {165, 154},
-    {207, 154},
-    {249, 154},
-    {291, 154},
-    {333, 154}
+    {18, 14},   // Q
+    {60, 14},   // W
+    {102, 14},  // E
+    {144, 14},  // R
+    {186, 14},  // T
+    {228, 14},  // Y
+    {270, 14},  // U
+    {312, 14},  // I
+    {354, 14},  // O
+    {396, 14},  // P
+    {39, 84},   // A
+    {81, 84},   // S
+    {123, 84},  // D
+    {165, 84},  // F
+    {207, 84},  // G
+    {249, 84},  // H
+    {291, 84},  // J
+    {333, 84},  // K
+    {375, 84},  // L
+    {81, 154},  // Z
+    {123, 154}, // X
+    {165, 154}, // C
+    {207, 154}, // V
+    {249, 154}, // B
+    {291, 154}, // N
+    {333, 154}  // M
 };
 
 Keyboard::Keyboard()
     : Control(rsp::utils::MakeTypeInfo<Keyboard>())
 {
+    SetTransparent(true);
+
     mImages[ImageIds::BigSpecial].Assign(cBigSpecial);// Load("testImages/alpha/BigSpecial.bmp");
     mImages[ImageIds::SmallSpecial].Assign(cSmallSpecial); // Load("testImages/alpha/SmallSpecial.bmp");
     mImages[ImageIds::Space].Assign(cSpace); // Load("testImages/alpha/Space.bmp");
@@ -145,30 +144,33 @@ Keyboard::Keyboard()
     BitmapView uppercase(&mImages[ImageIds::UpperCase]);
     BitmapView empty;
 
-    mBtnShift.Setup(Rect(0, 152, 78, 70), small_special.GetBoundingRect({18, 167}), cKEY_SHIFT)
+    mBtnShift.Setup(Rect(0, 152, 80, 71), small_special.GetBoundingRect({18, 167}), cKEY_SHIFT)
         .SetStyle(Control::States::normal, lowercase.SetDestination({11, 7}), small_special, Color(0x494A63), Color::White)
         .SetStyle(Control::States::pressed, lowercase, small_special, Color::White, Color(0x494A63))
-        .SetStyle(Control::States::checked, uppercase.SetDestination({11, 7}), small_special, Color(0x494A63), Color::White)
+        .SetStyle(Control::States::checked, uppercase.SetDestination({11, 3}), small_special, Color(0x494A63), Color::White)
         .SetStyle(Control::States::checkedPressed, uppercase, small_special, Color::White, Color(0x494A63))
         .SetCheckable(true)
         .SetName("Shift");
 
     mBtnLetters.Setup(cSpecialLeft, big_special.GetBoundingRect({18, 236}), cKEY_LETTERS)
-        .SetStyle(Control::States::normal, empty, big_special, Color(), Color::White)
-        .SetStyle(Control::States::pressed, empty, big_special, Color(), Color(0x494A63))
+        .SetStyle(Control::States::normal, empty, big_special, Color::Black, Color::White)
+        .SetStyle(Control::States::pressed, empty, big_special, Color::White, Color(0x494A63))
         .SetName("Letters");
+    mBtnLetters.SetCaption("ABC").SetFontSize(22);
 
     mBtnNumbers.Setup(cSpecialLeft, big_special.GetBoundingRect({18, 236}), cKEY_NUMBERS)
-        .SetStyle(Control::States::normal, empty, big_special, Color(), Color::White)
-        .SetStyle(Control::States::pressed, empty, big_special, Color(), Color(0x494A63))
+        .SetStyle(Control::States::normal, empty, big_special, Color::Black, Color::White)
+        .SetStyle(Control::States::pressed, empty, big_special, Color::White, Color(0x494A63))
         .SetName("Numbers");
+    mBtnNumbers.SetCaption("123").SetFontSize(22);
 
     mBtnSpecials.Setup(cSpecialRight, big_special.GetBoundingRect({366, 236}), cKEY_SPECIALS)
-        .SetStyle(Control::States::normal, empty, big_special, Color(), Color::White)
-        .SetStyle(Control::States::pressed, empty, big_special, Color(), Color(0x494A63))
+        .SetStyle(Control::States::normal, empty, big_special, Color::Black, Color::White)
+        .SetStyle(Control::States::pressed, empty, big_special, Color::White, Color(0x494A63))
         .SetName("Special");
+    mBtnSpecials.SetCaption("+-/").SetFontSize(22);
 
-    mBtnErase.Setup(Rect(375, 152, 79, 70), small_special.GetBoundingRect({390, 167}), '\b')
+    mBtnErase.Setup(Rect(374, 152, 80, 71), small_special.GetBoundingRect({390, 167}), '\b')
         .SetStyle(Control::States::normal, erase.SetDestination({9, 9}), small_special, Color(0x494A63), Color::White)
         .SetStyle(Control::States::pressed, erase, small_special, Color::White, Color(0x494A63))
         .SetName("Erase");
@@ -188,7 +190,7 @@ Keyboard::Keyboard()
     int index = 0;
     for(Key& arBtn : mKeys) {
         arBtn.Setup(cKeyTouchAreas[index], key.GetBoundingRect(cKeyPositions[index]))
-            .SetStyle(Control::States::normal, empty, empty, Color(), Color::White)
+            .SetStyle(Control::States::normal, empty, empty, Color::White, Color::Black)
             .SetStyle(Control::States::pressed, empty, key, Color(), Color(0x494A63));
         addBtn(arBtn);
         index++;
@@ -206,14 +208,17 @@ void Keyboard::addBtn(Key &arBtn)
 
 void Keyboard::setSymbols(const std::string &arSymbols)
 {
-    ASSERT(arSymbols.length() == 26);
+    ASSERT(arSymbols.length() >= 26);
     bool checked = mBtnShift.IsChecked();
+    std::u32string utf32 = std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.from_bytes(arSymbols);
     unsigned int index = 0;
-    for (char symbol : arSymbols) {
+    for (char32_t symbol : utf32) {
         Button &btn = mKeys[index++];
-        symbol = checked ? std::toupper(symbol) : std::tolower(symbol);
+        symbol = checked ? std::towupper(symbol) : std::towlower(symbol);
         btn.SetId(symbol);
-        btn.SetCaption(std::string(1, symbol));
+        std::wstring ws(1, symbol);
+        std::string utf8 = std::wstring_convert<std::codecvt_utf8<wchar_t>>{}.to_bytes(ws);
+        btn.SetCaption(utf8);
     }
 }
 
@@ -230,9 +235,11 @@ void Keyboard::doKeyClick(const Point &arPoint, int aSymbol)
             break;
 
         case cKEY_NUMBERS:
+            SetLayout(LayoutType::Numbers);
             break;
 
         case cKEY_SPECIALS:
+            SetLayout(LayoutType::Special);
             break;
 
         case '\b':
@@ -243,7 +250,8 @@ void Keyboard::doKeyClick(const Point &arPoint, int aSymbol)
             break;
 
         default:
-            mInput.push_back(aSymbol);
+            std::wstring ws(1, aSymbol);
+            mInput += std::wstring_convert<std::codecvt_utf8<wchar_t>>{}.to_bytes(ws);
             mOnKeyClick(mInput);
             break;
     }
@@ -251,9 +259,9 @@ void Keyboard::doKeyClick(const Point &arPoint, int aSymbol)
 
 void Keyboard::SetLayout(LayoutType aLayout)
 {
-    const char* cLetters  = "qwertyuiopasdfghjklzxcvbnm";
+    const char* cLetters = "qwertyuiopasdfghjklzxcvbnm";
     const char* cNumbers  = "1234567890-_:;()&@\".,?!'/*";
-    const char* cSpecials = " []{}#%+~ =¤\\=<>£€$.,?!'/*";
+    const char* cSpecials = " []{}#%+~ =¤\\≈<>£€$.,?!'/*";
 
     switch (aLayout) {
         case LayoutType::Letters:
@@ -267,7 +275,7 @@ void Keyboard::SetLayout(LayoutType aLayout)
         case LayoutType::Numbers:
             setSymbols(std::string(cNumbers));
             mBtnShift.Hide();
-            mBtnLetters.Show();
+            mBtnLetters.Setup(cSpecialLeft, mBtnLetters.GetArea().MoveTo(Point(18, 236))).Show();
             mBtnNumbers.Hide();
             mBtnSpecials.Show();
             break;
@@ -275,12 +283,20 @@ void Keyboard::SetLayout(LayoutType aLayout)
         case LayoutType::Special:
             setSymbols(std::string(cSpecials));
             mBtnShift.Hide();
-            mBtnLetters.Show();
-            mBtnNumbers.Hide();
+            mBtnLetters.Setup(cSpecialRight, mBtnLetters.GetArea().MoveTo(Point(366, 236))).Show();
+            mBtnNumbers.Show();
             mBtnSpecials.Hide();
             break;
     }
 
+}
+
+Keyboard& Keyboard::SetInput(const std::string &arText)
+{
+    mInput = arText;
+    Invalidate();
+    mOnKeyClick(mInput);
+    return *this;
 }
 
 } /* namespace rsp::graphics */

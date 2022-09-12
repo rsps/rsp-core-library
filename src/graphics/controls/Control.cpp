@@ -11,7 +11,7 @@
 #include <graphics/controls/Control.h>
 #include <logging/Logger.h>
 
-#define SHOW_TOUCH_AREAS 1
+//#define SHOW_TOUCH_AREAS 1
 
 using namespace rsp::logging;
 
@@ -187,9 +187,7 @@ void Control::paint(Canvas &arCanvas, const Style &arStyle)
 #ifdef SHOW_TOUCH_AREAS
     if (!mTouchArea.empty()) {
         arCanvas.SetClipRect(mTouchArea);
-        Rect r = mTouchArea;
-        r.AddSize(-1, -1);
-        arCanvas.DrawRectangle(r, Color::Yellow);
+        arCanvas.DrawRectangle(mTouchArea, Color::Yellow);
     }
 #endif
 }
@@ -221,19 +219,6 @@ Control& Control::Show(bool aVisible)
     return *this;
 }
 
-void Control::toggleChecked()
-{
-    if (IsCheckable()) {
-        if (IsChecked()) {
-            mState = States::normal;
-        }
-        else {
-            mState = States::checked;
-        }
-        Invalidate();
-    }
-}
-
 Control& Control::SetTransparent(bool aValue)
 {
     if (mTransparent != aValue) {
@@ -263,6 +248,12 @@ bool Control::ProcessInput(TouchEvent &arInput)
             }
             if (mTouchArea.IsHit(arInput.mCurrent)) {
                 doPress(arInput.mCurrent);
+                if (GetState() == Control::States::checked) {
+                    SetState(Control::States::checkedPressed);
+                }
+                else {
+                    SetState(Control::States::pressed);
+                }
                 return true;
             }
             break;
@@ -279,8 +270,22 @@ bool Control::ProcessInput(TouchEvent &arInput)
                 doLift(arInput.mCurrent);
                 if (mTouchArea.IsHit(arInput.mCurrent)) {
                     Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput << std::endl;
-                    toggleChecked();
+                    if (IsCheckable()) {
+                        if (IsChecked()) {
+                            mState = States::normal;
+                        }
+                        else {
+                            mState = States::checked;
+                        }
+                        Invalidate();
+                    }
+                    else {
+                        SetState(Control::States::normal);
+                    }
                     doClick(arInput.mCurrent);
+                }
+                else {
+                    SetState(Control::States::normal);
                 }
                 return true;
             }
@@ -297,6 +302,7 @@ bool Control::ProcessInput(TouchEvent &arInput)
             if (mTouchArea.IsHit(arInput.mPress)) {
                 if (IsDraggable()) {
                     doMove(arInput.mCurrent);
+                    SetState(Control::States::dragged);
                 }
                 return true;
             }
@@ -311,24 +317,16 @@ bool Control::ProcessInput(TouchEvent &arInput)
 
 void Control::doPress(const Point &arPoint)
 {
-    if (GetState() == Control::States::checked) {
-        SetState(Control::States::checkedPressed);
-    }
-    else {
-        SetState(Control::States::pressed);
-    }
     mOnPress(arPoint, GetId());
 }
 
 void Control::doMove(const Point &arPoint)
 {
-    SetState(Control::States::dragged);
     mOnMove(arPoint, GetId());
 }
 
 void Control::doLift(const Point &arPoint)
 {
-    SetState(Control::States::normal);
     mOnLift(arPoint, GetId());
 }
 

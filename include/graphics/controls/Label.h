@@ -27,6 +27,7 @@ public:
 
     Label& SetCaption(const std::string &arCaption);
     Label& SetTextPosition(const Point &arPoint);
+    Label& SetFontSize(int aSizePx);
 
     Text& GetText() { return mText; }
 

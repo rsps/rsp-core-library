@@ -46,7 +46,7 @@ TEST_CASE("Bitmap to C")
         if (!FileSystem::DirectoryExists(root + "/monochrome")) {
             return;
         }
-        std::vector<std::filesystem::path> list = FileSystem::Glob("testImages/monochrome/*.bmp");
+        std::vector<std::filesystem::path> list = FileSystem::Glob(root + "/monochrome/*.bmp");
 
         for(std::filesystem::path &path : list) {
             Bitmap bmp(path);
@@ -59,20 +59,22 @@ TEST_CASE("Bitmap to C")
         if (!FileSystem::DirectoryExists(root + "/rgb")) {
             return;
         }
-        std::vector<std::filesystem::path> list = FileSystem::Glob("testImages/rgb/*.bmp");
+        MESSAGE("Found directory " << root + "/rgb");
+        std::vector<std::filesystem::path> list = FileSystem::Glob(root+ "/rgb/*.bmp");
 
         for(std::filesystem::path &path : list) {
+            MESSAGE("Convert file " << path);
             Bitmap bmp(path);
             PixelData rgb = bmp.GetPixelData().ChangeColorDepth(PixelData::ColorDepth::RGB);
             rgb.SaveToCFile(path.replace_extension("cpp"));
         }
     }
 
-    SUBCASE("RGB") {
+    SUBCASE("RGBA") {
         if (!FileSystem::DirectoryExists(root + "/rgba")) {
             return;
         }
-        std::vector<std::filesystem::path> list = FileSystem::Glob("testImages/rgba/*.bmp");
+        std::vector<std::filesystem::path> list = FileSystem::Glob(root + "/rgba/*.bmp");
 
         for(std::filesystem::path &path : list) {
             Bitmap bmp(path);

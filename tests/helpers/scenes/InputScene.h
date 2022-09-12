@@ -12,35 +12,79 @@
 
 #include <array>
 #include <graphics/controls/Button.h>
-#include <graphics/controls/Scene.h>
 #include <graphics/controls/Keyboard.h>
+#include <graphics/controls/Label.h>
+#include <graphics/controls/Scene.h>
 #include <graphics/primitives/Bitmap.h>
 
 namespace rsp::graphics {
 
+#define KB_X 12
+#define KB_Y 450
+
+#define CLICK(_time, _key) \
+    TouchEvent(_time, TouchEvent::Types::Press, _key), \
+    TouchEvent(_time+20, TouchEvent::Types::Lift, _key)
+
+
 class InputScene : public SceneBase<InputScene>
 {
 public:
-    static std::array<TouchEvent, 2>& GetTouchEvents() {
+    static std::array<TouchEvent, 36>& GetTouchEvents() {
         static std::array events {
-            TouchEvent(50, TouchEvent::Types::Press, Point(100, 100)),
-            TouchEvent(51, TouchEvent::Types::Lift, Point(100, 100)),  // Click outside any buttons
+            CLICK(300, _SHIFT),
+            CLICK(400, _H),
+            CLICK(500, _SHIFT),
+            CLICK(600, _E),
+            CLICK(700, _L),
+            CLICK(800, _L),
+            CLICK(900, _O),
+            CLICK(1000, _SPACE),
+            CLICK(1100, _NUMBERS),
+            CLICK(1200, _1),
+            CLICK(1300, _2),
+            CLICK(1400, _8),
+            CLICK(1500, _0),
+            CLICK(1700, _ERASE),
+            CLICK(1800, _SPECIAL),
+            CLICK(1900, _EURO_SIGN),
+            CLICK(2000, _QUESTION_MARK),
+            CLICK(2100, _SPECIAL),
         };
         return events;
     }
 
     InputScene()
+        : mBackground("testImages/rgb/Background.bmp")
     {
-        mKeyboard.SetArea(Rect(12, 450, 460, 350));
-        mKeyboard.GetInfo().mName = "Keyboard";
+        SetTransparent(true); // No need to paint background color, we have full screen image.
 
+        GetStyle(Control::States::normal).mBackground.SetBitmap(&mBackground);
+
+        mLabel.GetText().GetFont().SetSize(34);
+        mLabel.SetArea(Rect(80, 150, 340, 60));
+        mLabel.GetStyle(States::normal).mForegroundColor = Color::Black;
+        mLabel.GetStyle(States::normal).mBackgroundColor = Color::White;
+
+        mKeyboard.SetArea(Rect(KB_X, KB_Y, 460, 350));
+        mKeyboard.GetInfo().mName = "Keyboard";
+        mKeyboard.OnKeyClick() = rsp::utils::Method(this, &InputScene::onInputChange);
+
+        AddChild(&mLabel);
         AddChild(&mKeyboard);
     };
 
     Keyboard& GetKeyboard() { return mKeyboard; }
 
 protected:
+    Label mLabel{};
     Keyboard mKeyboard{};
+    Bitmap mBackground{};
+
+    void onInputChange(const std::string &arInput)
+    {
+        mLabel.SetCaption(arInput);
+    }
 };
 
 } // namespace rsp::graphics

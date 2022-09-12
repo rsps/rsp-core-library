@@ -10,8 +10,7 @@
 
 #include <graphics/controls/Label.h>
 
-namespace rsp::graphics
-{
+namespace rsp::graphics {
 
 Label& Label::SetCaption(const std::string &arCaption)
 {
@@ -41,7 +40,11 @@ Control& Label::SetOrigin(const Point &arPoint)
 
 Control& Label::SetArea(Rect aRect)
 {
-    mText.SetArea(aRect);
+    Rect r = aRect;
+    if (mpParent) {
+        r.MoveTo(r.GetTopLeft() + mpParent->GetOrigin());
+    }
+    mText.SetArea(r);
     return Control::SetArea(aRect);
 }
 
@@ -50,6 +53,14 @@ void Label::paint(Canvas &arCanvas, const Style &arStyle)
 {
     Control::paint(arCanvas, arStyle);
     arCanvas.DrawText(mText, arStyle.mForegroundColor);
+}
+
+Label& Label::SetFontSize(int aSizePx)
+{
+    mText.GetFont().SetSize(aSizePx);
+    mText.Reload();
+    Invalidate();
+    return *this;
 }
 
 } //namespace rsp::graphics

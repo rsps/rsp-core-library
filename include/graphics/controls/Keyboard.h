@@ -13,6 +13,7 @@
 
 #include <map>
 #include <array>
+#include <string>
 #include <graphics/primitives/Bitmap.h>
 #include <graphics/primitives/BitmapView.h>
 #include <graphics/primitives/Color.h>
@@ -22,6 +23,88 @@
 #include "Control.h"
 
 namespace rsp::graphics {
+
+#define KEY(x,y) {KB_X + x, KB_Y + y}
+
+#define _SPACE   KEY( 98, 224)
+#define _NUMBERS KEY(  0, 224)
+#define _LETTERS KEY(  0, 224)
+#define _SPECIAL KEY(358, 224)
+#define _SHIFT   KEY(  0, 152)
+#define _ERASE   KEY(375, 152)
+
+#define _Q KEY(  0,   0)
+#define _W KEY( 59,   0)
+#define _E KEY(101,   0)
+#define _R KEY(143,   0)
+#define _T KEY(185,   0)
+#define _Y KEY(227,   0)
+#define _U KEY(269,   0)
+#define _I KEY(311,   0)
+#define _O KEY(353,   0)
+#define _P KEY(395,   0)
+#define _A KEY(  0,  83)
+#define _S KEY( 80,  83)
+#define _D KEY(122,  83)
+#define _F KEY(164,  83)
+#define _G KEY(206,  83)
+#define _H KEY(248,  83)
+#define _J KEY(290,  83)
+#define _K KEY(332,  83)
+#define _L KEY(374,  83)
+#define _Z KEY( 80, 152)
+#define _X KEY(122, 152)
+#define _C KEY(164, 152)
+#define _V KEY(206, 152)
+#define _B KEY(248, 152)
+#define _N KEY(290, 152)
+#define _M KEY(332, 152)
+
+#define _1 _Q
+#define _2 _W
+#define _3 _E
+#define _4 _R
+#define _5 _T
+#define _6 _Y
+#define _7 _U
+#define _8 _I
+#define _9 _O
+#define _0 _P
+#define _MINUS _A
+#define _UNDERSCORE _S
+#define _COLON _D
+#define _SEMICOLON _F
+#define _LEFT_PARANTHESES _G
+#define _RIGHT_PARANTHESES _H
+#define _AMPERSAND _J
+#define _CURLY_A _K
+#define _QUOTE _L
+#define _DOT _Z
+#define _COMMA _X
+#define _QUESTION_MARK _C
+#define _EXCLAMATION _V
+#define _APOSTROPHE _B
+#define _SLASH _N
+#define _ASTERISK _M
+
+#define _LEFT_BRACKET _W
+#define _RIGHT_BRACKET _E
+#define _LEFT_BRACE _R
+#define _RIGHT_BRACE _T
+#define _NUMBER_SIGN _Y
+#define _PERCENT_SIGN _U
+#define _PLUS_SIGN _I
+#define _TILDE _O
+#define _EQUAL_SIGN _A
+#define _CURRENCY_SIGN _S
+#define _BACKSLASH _D
+#define _ALMOST_EQUAL _F
+#define _LESS_THAN _G
+#define _GREATER_THAN _H
+#define _POUND_SIGN _J
+#define _EURO_SIGN _K
+#define _DOLLAR_SIGN _L
+
 
 class Key : public Button
 {
@@ -37,15 +120,15 @@ class Keyboard: public Control
 public:
     TYPEINFO(Keyboard)
 
-    using KeyboardCallback_t = rsp::utils::Function<void(std::string &)>;
+    using KeyboardCallback_t = rsp::utils::Function<void(const std::string &)>;
 
     static constexpr int cKEY_SHIFT    = 1000000;
     static constexpr int cKEY_LETTERS  = 1000001;
     static constexpr int cKEY_NUMBERS  = 1000002;
     static constexpr int cKEY_SPECIALS = 1000003;
 
-    const Rect cSpecialLeft = {0, 224, 96, 64};
-    const Rect cSpecialRight = {358, 224, 96, 64};
+    const Rect cSpecialLeft = {0, 224, 98, 64};
+    const Rect cSpecialRight = {356, 224, 98, 64};
 
     enum class LayoutType { Letters, Numbers, Special };
     enum class ImageIds { SmallSpecial, BigSpecial, Space, Key, LowerCase, UpperCase, Erase };
@@ -54,6 +137,9 @@ public:
     ~Keyboard();
 
     void SetLayout(LayoutType aLayout);
+
+    const std::string GetInput() { return mInput; }
+    Keyboard& SetInput(const std::string &arText);
 
     KeyboardCallback_t& OnKeyClick() { return mOnKeyClick; }
 protected:

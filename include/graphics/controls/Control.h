@@ -258,7 +258,6 @@ class Control
     States mState = States::normal;
     rsp::utils::TypeInfo mTypeInfo;
 
-    virtual void toggleChecked();
     virtual void paint(Canvas &arCanvas, const Style &arStyle);
 
   private:

@@ -23,12 +23,12 @@ using namespace rsp::logging;
 namespace rsp::graphics {
 
 
-std::unique_ptr<FontRawInterface> Font::MakePimpl(const std::string &arFontName)
+std::shared_ptr<FontRawInterface> Font::MakePimpl(const std::string &arFontName)
 {
     if (arFontName.empty()) {
         THROW_WITH_BACKTRACE1(FontException, "A pre-registered font name must be given on Font object creation.");
     }
-    return std::make_unique<FreeTypeRawFont>(arFontName);
+    return std::make_shared<FreeTypeRawFont>(arFontName);
 }
 
 
@@ -99,9 +99,9 @@ std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aL
         if (rs > 1) {
             result[rs - 2].mWidth += getKerning(result[rs - 2].mSymbolUnicode, result[rs - 1].mSymbolUnicode);
 
-            // Space ' ' has no width, add width of next character to space character
+            // Space ' ' has no width, add width of previous character to space character
             if (result[rs - 2].mWidth == 0) {
-                result[rs - 2].mWidth = mSizePx;
+                result[rs - 2].mWidth = (rs > 2) ? result[rs - 3].mWidth : mSizePx;
             }
         }
     }

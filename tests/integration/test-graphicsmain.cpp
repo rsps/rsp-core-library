@@ -67,6 +67,11 @@ TEST_CASE("Graphics Main Test")
 
     GraphicsMain gfx(fb, tp, scenes);
 
+    SUBCASE("Clear") {
+        fb.SwapBuffer(Framebuffer::SwapOperations::Clear);
+        fb.SwapBuffer(Framebuffer::SwapOperations::Clear);
+    }
+
     SUBCASE("Second Scene") {
         gfx.ChangeScene(SecondScene::ID);
 
@@ -105,19 +110,15 @@ TEST_CASE("Graphics Main Test")
     SUBCASE("Input Scene") {
         gfx.ChangeScene(InputScene::ID);
 
-        int progress = 0;
-        Timer t1(1, 100ms);
+        scenes.GetAfterCreate() = [&tp](Scene *apScene) {
+            CHECK_EQ(apScene->GetId(), InputScene::ID);
+
+            tp.SetEvents(InputScene::GetTouchEvents().data(), InputScene::GetTouchEvents().size());
+        };
+
+        Timer t1(1, 2500ms);
         t1.Callback() = [&](Timer &arTimer) {
-            switch(progress++) {
-                case 0:
-                    break;
-                case 1:
-                    break;
-                default:
-                    gfx.Terminate();
-                    break;
-            }
-            arTimer.Enable();
+            gfx.Terminate();
         };
         t1.Enable();
 

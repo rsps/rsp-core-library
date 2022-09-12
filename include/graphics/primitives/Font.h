@@ -137,9 +137,9 @@ public:
 protected:
     static std::string mDefaultFontName;
     Color mColor;
-    std::unique_ptr<FontRawInterface> mpImpl;
+    std::shared_ptr<FontRawInterface> mpImpl;
 
-    static std::unique_ptr<FontRawInterface> MakePimpl(const std::string &arFontName);
+    static std::shared_ptr<FontRawInterface> MakePimpl(const std::string &arFontName);
 };
 
 }
