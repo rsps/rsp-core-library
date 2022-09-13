@@ -27,10 +27,10 @@ public:
     FTGlyph(FT_Face apFace);
 
     const uint8_t* GetPixelRow(int aY) const override {
-        return &mpPixels[mPitch * aY];
+        return &mPixels.data()[mPitch * aY];
     }
 protected:
-    uint8_t *mpPixels = nullptr;
+    std::vector<uint8_t> mPixels{};
     int mPitch = 0;
 };
 
@@ -40,7 +40,6 @@ public:
     int GetCount() const override { return mGlyphs.size(); }
     Glyph& GetGlyph(int aIndex) override { return *static_cast<Glyph*>(&mGlyphs.at(aIndex)); };
 
-protected:
     std::vector<FTGlyph> mGlyphs;
 };
 

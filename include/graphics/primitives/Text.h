@@ -184,11 +184,11 @@ public:
     Text& Reload();
 
     /**
-     * Get a reference to the glyphs for the current text.
+     * Get the glyphs for the current text.
      *
-     * \return Vector of Glyph objects.
+     * \return Pointer to Glyphs object.
      */
-    Glyphs& GetGlyphs() const { return *mpGlyphs; }
+    const std::unique_ptr<Glyphs>& GetGlyphs() const { return mpGlyphs; }
 
     /**
      * Calculate the minimum bounding rectangle containing all the glyphs.
@@ -196,7 +196,7 @@ public:
      * \param apGlyphs
      * \return Rect
      */
-    Rect CalcBoundingRect(std::unique_ptr<Glyphs>& apGlyphs) const;
+    Rect CalcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs) const;
 
 protected:
     Font mFont;

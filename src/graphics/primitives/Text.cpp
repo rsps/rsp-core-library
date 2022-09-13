@@ -84,14 +84,14 @@ void Text::scaleToFit()
     alignGlyphs();
 }
 
-Rect Text::CalcBoundingRect(std::unique_ptr<Glyphs>& apGlyphs) const
+Rect Text::CalcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs) const
 {
     int w = 0;
     int h = 0;
     int line_count = 1;
     int line_width = 0;
     for (int i=0 ; i < apGlyphs->GetCount(); ++i) {
-        Glyph &glyph = apGlyphs->GetGlyph(i);
+        const Glyph &glyph = apGlyphs->GetGlyph(i);
         if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
             line_count++;
             if (w > line_width) {

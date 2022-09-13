@@ -36,11 +36,11 @@ TEST_CASE("Font Primitive")
         font.SetSize(16);
 
         auto glyphs = font.MakeGlyphs("A");
-        CHECK(glyphs.size() == 1);
-        CHECK(glyphs[0].mHeight > 0);
-        CHECK(glyphs[0].mHeight < 16);
-        CHECK(glyphs[0].mWidth > 0);
-        CHECK(glyphs[0].mWidth < 16);
+        CHECK(glyphs->GetCount() == 1);
+        CHECK(glyphs->GetGlyph(0).mHeight > 0);
+        CHECK(glyphs->GetGlyph(0).mHeight < 16);
+        CHECK(glyphs->GetGlyph(0).mWidth > 0);
+        CHECK(glyphs->GetGlyph(0).mWidth < 16);
     }
 
     SUBCASE("Get Text Mask") {
@@ -50,7 +50,7 @@ TEST_CASE("Font Primitive")
 
         text.GetFont().SetSize(size);
 
-        auto glyphs = text.GetGlyphs();
+        auto &glyphs = text.GetGlyphs();
         Rect r = text.CalcBoundingRect(glyphs);
 
         CHECK(r.GetHeight() < size);
@@ -65,7 +65,7 @@ TEST_CASE("Font Primitive")
         Rect dst(100, 200, 280, 200);
         text.SetScaleToFit(true).SetArea(dst).Reload();
 
-        auto glyphs = text.GetGlyphs();
+        auto &glyphs = text.GetGlyphs();
         Rect r = text.CalcBoundingRect(glyphs);
 
         MESSAGE(r.GetHeight(), " < ", dst.GetHeight());
