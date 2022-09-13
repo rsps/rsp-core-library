@@ -59,17 +59,20 @@ inline static uint unsign(int aValue)
     return static_cast<uint>(aValue);
 }
 
-Glyph::Glyph(void* apFace)
+FTGlyph::FTGlyph(FT_Face apFace)
 {
-    FT_Face arFace = reinterpret_cast<FT_Face>(apFace);
+    mWidth = static_cast<int>(apFace->glyph->bitmap.width);
+    mHeight = static_cast<int>(apFace->glyph->bitmap.rows);
+    mTop = apFace->glyph->bitmap_top;
+    mLeft = apFace->glyph->bitmap_left;
 
-    mWidth = static_cast<int>(arFace->glyph->bitmap.width);
-    mHeight = static_cast<int>(arFace->glyph->bitmap.rows);
-    mTop = arFace->glyph->bitmap_top;
-    mLeft = arFace->glyph->bitmap_left;
+    mAdvanceX = apFace->glyph->advance.x;
+    mAdvanceY = apFace->glyph->advance.y;
 
-    mPixels.resize(static_cast<std::vector<uint8_t>::size_type>(unsign(mWidth)) * unsign(mHeight), 0xFF);
-    memcpy(mPixels.data(), arFace->glyph->bitmap.buffer, mPixels.size());
+//    mPixels.resize(static_cast<std::vector<uint8_t>::size_type>(unsign(mWidth)) * unsign(mHeight), 0xFF);
+//    memcpy(mPixels.data(), arFace->glyph->bitmap.buffer, mPixels.size());
+    mpPixels = apFace->glyph->bitmap.buffer;
+    mPitch = apFace->glyph->bitmap.pitch;
 }
 
 
@@ -84,19 +87,28 @@ FreeTypeRawFont::~FreeTypeRawFont()
     freeFace();
 }
 
-std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aLineSpacing)
+std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aLineSpacing)
 {
     createFace();
+
+    auto glyphs = std::make_unique<Glyphs>();
+
+//    FT_MulFix(face_->units_per_EM, face_->size->metrics.x_scale ) >> 6
+    glyphs->mLineHeight = FT_MulFix(mpFace->units_per_EM, mpFace->size->metrics.y_scale ) >> 6;
 
     std::u32string unicode = stringToU32(arText);
     int line_height = 0;
 
-    std::vector<Glyph> result;
+    glyphs
+    std::vector<FTGlyph> result;
     for (char32_t c : unicode) {
         result.push_back(getSymbol(c, mStyle));
         line_height = std::max(line_height, result.back().mHeight);
         auto rs = result.size();
         if (rs > 1) {
+            if (arText == "+-/") {
+                std::cout << "break" << std::endl;
+            }
             result[rs - 2].mWidth += getKerning(result[rs - 2].mSymbolUnicode, result[rs - 1].mSymbolUnicode);
 
             // Space ' ' has no width, add width of previous character to space character
@@ -121,7 +133,7 @@ std::vector<Glyph> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aL
             left += glyph.mWidth;
         }
     }
-    return result;
+    return glyphs;
 }
 
 std::string FreeTypeRawFont::GetFamilyName() const

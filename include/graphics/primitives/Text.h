@@ -188,22 +188,22 @@ public:
      *
      * \return Vector of Glyph objects.
      */
-    const std::vector<Glyph>& GetGlyphs() const { return mGlyphs; }
+    Glyphs& GetGlyphs() const { return *mpGlyphs; }
 
     /**
      * Calculate the minimum bounding rectangle containing all the glyphs.
      *
-     * \param arGlyphs
+     * \param apGlyphs
      * \return Rect
      */
-    Rect CalcBoundingRect(const std::vector<Glyph> &arGlyphs) const;
+    Rect CalcBoundingRect(std::unique_ptr<Glyphs>& apGlyphs) const;
 
 protected:
     Font mFont;
     Rect mArea;
     std::string mValue{};
     bool mScaleToFit = false;
-    std::vector<Glyph> mGlyphs{};
+    std::unique_ptr<Glyphs> mpGlyphs{};
     int mLineCount = 0;
     int mLineMaxChar = 0;
     int mLineSpacing = 1;

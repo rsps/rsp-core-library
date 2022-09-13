@@ -76,7 +76,7 @@ public:
      * \param aLineSpacing
      * \return
      */
-    std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing = 0) const;
+    std::unique_ptr<Glyphs> MakeGlyphs(const std::string &arText, int aLineSpacing = 0);
 
     /**
      * Get the family name of the font.

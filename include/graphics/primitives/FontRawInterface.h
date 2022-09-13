@@ -18,22 +18,41 @@ namespace rsp::graphics {
 
 
 /**
- * \class Glyph
+ * \class GlyphInterface
  * \brief A data class holding all the pixel data of a unicode glyph.
  */
 class Glyph
 {
 public:
-    Glyph() {}
-    Glyph(void* apFace);
+    virtual ~Glyph() {};
 
-    std::vector<uint8_t> mPixels { };
     uint32_t mSymbolUnicode = 0;
-
     int mTop = 0;
     int mLeft = 0;
     int mWidth = 0;
     int mHeight = 0;
+    int mAdvanceX = 0;
+    int mAdvanceY = 0;
+
+    /**
+     * \brief Get a pointer to a row of alpha values, with a length equal to the glyph width.
+     *
+     * \param aY Row index to return
+     * \return Pointer to alpha values
+     */
+    virtual const uint8_t* GetPixelRow(int aY) const = 0;
+};
+
+class Glyphs
+{
+public:
+    virtual ~Glyphs() {}
+    virtual int GetCount() const = 0;
+    virtual Glyph& GetGlyph(int aIndex) = 0;
+
+    int mUnderlineYCenter=0;
+    int mUnderlineThickness=0;
+    int mLineHeight=0;
 };
 
 /**
@@ -63,7 +82,7 @@ public:
 
     virtual ~FontRawInterface() {};
 
-    virtual std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing) = 0;
+    virtual std::unique_ptr<Glyphs> MakeGlyphs(const std::string &arText, int aLineSpacing) = 0;
     virtual std::string GetFamilyName() const = 0;
     virtual void SetSize(int aWidthPx, int aHeightPx) = 0;
 

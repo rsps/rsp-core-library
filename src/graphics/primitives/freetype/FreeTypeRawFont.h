@@ -13,11 +13,36 @@
 #ifdef USE_FREETYPE
 
 #include <map>
+#include <vector>
 #include <string>
 #include <graphics/primitives/FontRawInterface.h>
 #include "FreeTypeLibrary.h"
 
 namespace rsp::graphics {
+
+class FTGlyph : public Glyph
+{
+public:
+    FTGlyph() {}
+    FTGlyph(FT_Face apFace);
+
+    const uint8_t* GetPixelRow(int aY) const override {
+        return &mpPixels[mPitch * aY];
+    }
+protected:
+    uint8_t *mpPixels = nullptr;
+    int mPitch = 0;
+};
+
+class FTGlyphs : public Glyphs
+{
+public:
+    int GetCount() const override { return mGlyphs.size(); }
+    Glyph& GetGlyph(int aIndex) override { return *static_cast<Glyph*>(&mGlyphs.at(aIndex)); };
+
+protected:
+    std::vector<FTGlyph> mGlyphs;
+};
 
 /**
  * \class FreeTypeRawFont
@@ -29,7 +54,7 @@ public:
     FreeTypeRawFont(const std::string &arFontName, int aFaceIndex = 0);
     ~FreeTypeRawFont();
 
-    std::vector<Glyph> MakeGlyphs(const std::string &arText, int aLineSpacing) override;
+    std::unique_ptr<Glyphs> MakeGlyphs(const std::string &arText, int aLineSpacing) override;
     std::string GetFamilyName() const override;
     void SetSize(int aWidthPx, int aHeightPx) override;
     void SetStyle(FontStyles aStyle) override;
@@ -42,7 +67,7 @@ protected:
 
     void createFace();
     void freeFace();
-    Glyph getSymbol(uint32_t aSymbolCode, FontStyles aStyle) const;
+    FTGlyph getSymbol(uint32_t aSymbolCode, FontStyles aStyle) const;
     int getKerning(uint aFirst, uint aSecond, uint aKerningMode = 0) const;
     std::u32string stringToU32(const std::string &arText) const;
 };
