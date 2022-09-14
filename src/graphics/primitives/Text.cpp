@@ -84,6 +84,10 @@ void Text::scaleToFit()
 
 void Text::calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs)
 {
+    mBoundingRect = apGlyphs->mBoundingRect;
+    alignGlyphs();
+    return;
+
     int w = 0;
     int h = apGlyphs->mLineHeight;
     int line_count = 1;
@@ -132,6 +136,7 @@ void Text::loadGlyphs()
 void Text::alignGlyphs()
 {
     if (mVAlign == VAlign::Top && mHAlign == HAlign::Left) {
+        mBoundingRect.MoveTo(mArea.GetTopLeft());
         return;
     }
 
@@ -166,6 +171,7 @@ void Text::alignGlyphs()
         glyph.mTop += voffset;
         glyph.mLeft += hoffset;
     }
+    mBoundingRect.MoveTo(mArea.GetTopLeft() + Point(hoffset, voffset));
 }
 
 }

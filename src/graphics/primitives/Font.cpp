@@ -42,10 +42,12 @@ std::ostream& operator <<(std::ostream &os, const Glyphs &arGlyphs)
         << "  Thickness: " << arGlyphs.mUnderlineThickness << "\n"
         << "  Line height: " << arGlyphs.mLineHeight << "\n"
         << "  BBox: xMin:" << arGlyphs.mBBoxMinX << ", yMin:" << arGlyphs.mBBoxMinY
-        << ", xMax:" << arGlyphs.mBBoxMaxX << ", yMax:" << arGlyphs.mBBoxMaxY<< "\n";
+        << ", xMax:" << arGlyphs.mBBoxMaxX << ", yMax:" << arGlyphs.mBBoxMaxY<< "\n"
+        << "  Baseline: " << arGlyphs.mBaseLine << "\n"
+        << "  BRect: " << arGlyphs.mBoundingRect;
 
     for (int i=0 ; i < arGlyphs.GetCount() ; ++i) {
-        os << "  " << arGlyphs.GetGlyph(i) << "\n";
+        os << "\n  " << arGlyphs.GetGlyph(i);
     }
     return os;
 }

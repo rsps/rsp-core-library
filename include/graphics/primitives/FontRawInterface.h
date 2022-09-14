@@ -56,9 +56,11 @@ public:
     int mBBoxMaxX = 0;
     int mBBoxMinY = 0;
     int mBBoxMaxY = 0;
-    int mUnderlineYCenter=0;
-    int mUnderlineThickness=0;
-    int mLineHeight=0;
+    int mUnderlineYCenter = 0;
+    int mUnderlineThickness = 0;
+    int mLineHeight = 0;
+    int mBaseLine = 0;
+    Rect mBoundingRect{};
 };
 
 /**

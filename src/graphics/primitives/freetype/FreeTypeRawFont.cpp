@@ -97,14 +97,6 @@ std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
 
     auto glyphs = std::make_unique<FTGlyphs>();
 
-//    FT_MulFix(face_->units_per_EM, face_->size->metrics.x_scale ) >> 6
-    glyphs->mLineHeight = FT_MulFix(mpFace->units_per_EM, mpFace->size->metrics.y_scale ) >> 6;
-    glyphs->mUnderlineYCenter = (mpFace->underline_position - 32) >> 6;
-    glyphs->mUnderlineThickness = (mpFace->underline_thickness + 63) >> 6;
-    glyphs->mBBoxMinX = (mpFace->bbox.xMin-32) >> 6;
-    glyphs->mBBoxMaxX = (mpFace->bbox.xMax-32) >> 6;
-    glyphs->mBBoxMinY = (mpFace->bbox.yMin+32) >> 6;
-    glyphs->mBBoxMaxY = (mpFace->bbox.yMax+32) >> 6;
 
     std::u32string unicode = stringToU32(arText);
 
@@ -125,12 +117,18 @@ std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
         }
     }
 
-    if (arText == "+-/") {
-        DLOG(*glyphs);
-    }
+    glyphs->mLineHeight = mpFace->size->metrics.y_ppem;
+    glyphs->mUnderlineYCenter = (mpFace->underline_position - 32) >> 6;
+    glyphs->mUnderlineThickness = (mpFace->underline_thickness + 63) >> 6;
+    glyphs->mBBoxMinX = (mpFace->bbox.xMin-32) >> 6;
+    glyphs->mBBoxMaxX = (mpFace->bbox.xMax-32) >> 6;
+    glyphs->mBBoxMinY = (mpFace->bbox.yMin+32) >> 6;
+    glyphs->mBBoxMaxY = (mpFace->bbox.yMax+32) >> 6;
+    glyphs->mBaseLine = (mpFace->ascender + (mpFace->ascender - mpFace->descender - mpFace->units_per_EM)) >> 6;
 
-//    int baseline = glyphs->mLineHeight + glyphs->mBBoxMaxY;
-    int baseline = FT_MulFix(mpFace->ascender + (mpFace->ascender - mpFace->descender - mpFace->units_per_EM), mpFace->size->metrics.y_scale) >> 6;
+    int baseline = glyphs->mBaseLine;
+    int min_left = 0;
+    int max_left = 0;
     int line_left = 0;
     for (Glyph &glyph : glyphs->mGlyphs) {
         if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
@@ -139,10 +137,20 @@ std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
         }
         else {
 //            glyph.mTop += top - glyph.mHeight - glyph.mTop;
-            glyph.mTop = baseline - glyph.mTop;
+            glyph.mTop = baseline - glyph.mTop - glyphs->mBBoxMinX;
+            if (glyph.mLeft < min_left) {
+                min_left = glyph.mLeft;
+            }
             glyph.mLeft += line_left;
             line_left += glyph.mAdvanceX;
+            if (line_left > max_left) {
+                max_left = line_left;
+            }
         }
+    }
+    glyphs->mBoundingRect = Rect(min_left, 0, max_left, mpFace->size->metrics.y_ppem);
+    if ((arText == "+-/") || (arText == "Hel")) {
+        DLOG(*glyphs);
     }
     return glyphs;
 }

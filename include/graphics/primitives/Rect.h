@@ -179,7 +179,7 @@ class Rect
      * \param aY
      * \return self
      */
-    Rect& Move(int aX, int aY);
+    Rect& MoveBy(int aX, int aY);
 
     /**
      * \brief Set the size of this rect

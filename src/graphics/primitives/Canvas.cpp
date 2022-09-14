@@ -140,10 +140,7 @@ void Canvas::DrawText(Text &arText)
 void Canvas::DrawText(const Text &arText, Color aColor, Color aBackColor)
 {
     if (aBackColor != Color::None) {
-        Rect r = arText.GetBoundingRect();
-        auto tl = arText.GetArea().GetTopLeft();
-        r.Move(tl.mX, tl.mY);
-        DrawRectangle(r, aBackColor, true);
+        DrawRectangle(arText.GetBoundingRect(), aBackColor, true);
     }
     auto &glyphs = arText.GetGlyphs();
     if (!glyphs) {

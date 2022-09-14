@@ -35,8 +35,10 @@ Rect::Rect(GuiUnit_t aLeft, GuiUnit_t aTop, GuiUnit_t aWidth, GuiUnit_t aHeight)
 
 Rect::Rect(const Point &aLeftTop, const Point &aBottomRight)
     : mLeftTop(aLeftTop),
-      mWidth(aBottomRight.mX - aLeftTop.mX + 1),
-      mHeight(aBottomRight.mY - aLeftTop.mY + 1)
+      mWidth(aBottomRight.mX - aLeftTop.mX),
+      mHeight(aBottomRight.mY - aLeftTop.mY)
+//      mWidth(aBottomRight.mX - aLeftTop.mX + 1),
+//      mHeight(aBottomRight.mY - aLeftTop.mY + 1)
 {
     LimitDimensions();
 }
@@ -177,7 +179,7 @@ Rect& Rect::MoveTo(const Point &arPoint)
     return *this;
 }
 
-Rect& Rect::Move(int aX, int aY)
+Rect& Rect::MoveBy(int aX, int aY)
 {
     mLeftTop.mX += aX;
     mLeftTop.mY += aY;
