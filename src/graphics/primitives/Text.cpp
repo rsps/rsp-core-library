@@ -62,17 +62,17 @@ void Text::scaleToFit()
         mFont.SetSize(width, height);
 
         mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
-        auto r = CalcBoundingRect(mpGlyphs);
+        calcBoundingRect(mpGlyphs);
 
         done = 0;
-        if ((r.GetWidth() < w_limit) || (r.GetWidth() > mArea.GetWidth())) {
-            width += ((mArea.GetWidth() - r.GetWidth()) + (mLineMaxChar/2)) / mLineMaxChar;
+        if ((mBoundingRect.GetWidth() < w_limit) || (mBoundingRect.GetWidth() > mArea.GetWidth())) {
+            width += ((mArea.GetWidth() - mBoundingRect.GetWidth()) + (mLineMaxChar/2)) / mLineMaxChar;
         }
         else {
             done++;
         }
-        if ((r.GetHeight() < h_limit) || (r.GetHeight() > mArea.GetHeight())) {
-            height += (mArea.GetHeight() - r.GetHeight()) / mLineCount;
+        if ((mBoundingRect.GetHeight() < h_limit) || (mBoundingRect.GetHeight() > mArea.GetHeight())) {
+            height += (mArea.GetHeight() - mBoundingRect.GetHeight()) / mLineCount;
         }
         else {
             done++;
@@ -80,14 +80,12 @@ void Text::scaleToFit()
     }
     while( (done != 2) && --attempts);
     Logger::GetDefault().Debug() << "scaleToFit done: " << done << " attempts: " << attempts << std::endl;
-
-    alignGlyphs();
 }
 
-Rect Text::CalcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs) const
+void Text::calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs)
 {
     int w = 0;
-    int h = 0;
+    int h = apGlyphs->mLineHeight;
     int line_count = 1;
     int line_width = 0;
     for (int i=0 ; i < apGlyphs->GetCount(); ++i) {
@@ -100,18 +98,23 @@ Rect Text::CalcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs) const
             w = 0;
         }
         else {
-            w += glyph.mWidth;
-            if (h < glyph.mHeight) {
-                h = glyph.mHeight;
-            }
+            w += glyph.mAdvanceX; //.mWidth;
+//            if (h < glyph.mHeight) {
+//                h = glyph.mHeight;
+//            }
         }
     }
     if (w > line_width) {
         line_width = w;
     }
 
-    return Rect(0, 0, line_width, (h * line_count) + ((line_count - 1) * mLineSpacing));
+    mBoundingRect = Rect(0, 0, line_width, (h * line_count) + ((line_count - 1) * mLineSpacing));
+    alignGlyphs();
 
+    if (apGlyphs->GetCount()) {
+        const Glyph &glyph = apGlyphs->GetGlyph(0);
+        mBoundingRect.MoveTo(Point(glyph.mLeft, glyph.mTop));
+    }
 }
 
 void Text::loadGlyphs()
@@ -121,8 +124,9 @@ void Text::loadGlyphs()
     }
     else {
         mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
-        alignGlyphs();
+        calcBoundingRect(mpGlyphs);
     }
+    mDirty = false;
 }
 
 void Text::alignGlyphs()
@@ -130,8 +134,6 @@ void Text::alignGlyphs()
     if (mVAlign == VAlign::Top && mHAlign == HAlign::Left) {
         return;
     }
-
-    auto r = CalcBoundingRect(mpGlyphs);
 
     int voffset = 0;
     int hoffset = 0;
@@ -141,10 +143,10 @@ void Text::alignGlyphs()
             voffset = 0;
             break;
         case VAlign::Center:
-            voffset = (mArea.GetHeight() - r.GetHeight()) / 2;
+            voffset = (mArea.GetHeight() - mBoundingRect.GetHeight()) / 2;
             break;
         case VAlign::Bottom:
-            voffset = (mArea.GetHeight() - r.GetHeight());
+            voffset = (mArea.GetHeight() - mBoundingRect.GetHeight());
             break;
     }
     switch(mHAlign) {
@@ -153,10 +155,10 @@ void Text::alignGlyphs()
             hoffset = 0;
             break;
         case HAlign::Center:
-            hoffset = (mArea.GetWidth() - r.GetWidth()) / 2;
+            hoffset = (mArea.GetWidth() - mBoundingRect.GetWidth()) / 2;
             break;
         case HAlign::Right:
-            hoffset = (mArea.GetWidth()- r.GetWidth());
+            hoffset = (mArea.GetWidth()- mBoundingRect.GetWidth());
             break;
     }
     for (int i=0 ; i < mpGlyphs->GetCount() ; ++i) {

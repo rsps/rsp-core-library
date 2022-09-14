@@ -11,7 +11,7 @@
 #include <graphics/controls/Control.h>
 #include <logging/Logger.h>
 
-//#define SHOW_TOUCH_AREAS 1
+#define SHOW_TOUCH_AREAS 1
 
 using namespace rsp::logging;
 
@@ -149,6 +149,14 @@ Control& Control::SetBitmapPosition(const Point &arPoint)
     }
     Invalidate();
     return *this;
+}
+
+void Control::UpdateData()
+{
+    refresh();
+    for (Control* child : mChildren) {
+        child->UpdateData();
+    }
 }
 
 bool Control::Render(Canvas &arCanvas)

@@ -39,6 +39,7 @@ class FTGlyphs : public Glyphs
 public:
     int GetCount() const override { return mGlyphs.size(); }
     Glyph& GetGlyph(int aIndex) override { return *static_cast<Glyph*>(&mGlyphs.at(aIndex)); };
+    const Glyph& GetGlyph(int aIndex) const override { return *static_cast<const Glyph*>(&mGlyphs.at(aIndex)); };
 
     std::vector<FTGlyph> mGlyphs;
 };
@@ -66,8 +67,8 @@ protected:
 
     void createFace();
     void freeFace();
-    FTGlyph getSymbol(uint32_t aSymbolCode, FontStyles aStyle) const;
-    int getKerning(uint aFirst, uint aSecond, uint aKerningMode = 0) const;
+    FTGlyph getSymbol(char32_t aSymbolCode, FontStyles aStyle) const;
+    int getKerning(char32_t aFirst, char32_t aSecond, uint aKerningMode = 0) const;
     std::u32string stringToU32(const std::string &arText) const;
 };
 

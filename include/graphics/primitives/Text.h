@@ -87,7 +87,7 @@ public:
      * \param arValue
      * \return Reference to this for fluent calls.
      */
-    Text& SetValue(const std::string &arValue) { mValue = arValue; return *this; }
+    Text& SetValue(const std::string &arValue) { mValue = arValue; mDirty = true; return *this; }
 
     /**
      * Getter for the area where the text is drawn on a canvas.
@@ -101,7 +101,7 @@ public:
      * \param arRect
      * \return Reference to this for fluent calls.
      */
-    Text& SetArea(const Rect &arRect) { mArea = arRect; return *this; }
+    Text& SetArea(const Rect &arRect) { mArea = arRect; mDirty = true; return *this; }
 
     /**
      * Returns a reference to the internal font object.
@@ -123,7 +123,7 @@ public:
      * \param aValue
      * \return Reference to this for fluent calls.
      */
-    Text& SetScaleToFit(bool aValue = true) { mScaleToFit = aValue; return *this; }
+    Text& SetScaleToFit(bool aValue = true) { mScaleToFit = aValue; mDirty = true; return *this; }
 
     /**
      * Get the current value of the line spacing.
@@ -138,7 +138,7 @@ public:
      * \param aSpacing
      * \return Reference to this for fluent calls.
      */
-    Text& SetLineSpacing(int aSpacing) { mLineSpacing = aSpacing; return *this; }
+    Text& SetLineSpacing(int aSpacing) { mLineSpacing = aSpacing; mDirty = true; return *this; }
 
     /**
      * Get the number of lines in the text content.
@@ -160,7 +160,7 @@ public:
      * \param aVAlign
      * \return Reference to this for fluent calls.
      */
-    Text& SetVAlignment(VAlign aVAlign) { mVAlign = aVAlign; return *this; }
+    Text& SetVAlignment(VAlign aVAlign) { mVAlign = aVAlign; mDirty = true; return *this; }
 
     /**
      * Get the current horizontal alignment setting.
@@ -174,7 +174,7 @@ public:
      * \param aHAlign
      * \return Reference to this for fluent calls.
      */
-    Text& SetHAlignment(HAlign aHAlign) { mHAlign = aHAlign; return *this; }
+    Text& SetHAlignment(HAlign aHAlign) { mHAlign = aHAlign; mDirty = true; return *this; }
 
     /**
      * Reload all glyphs based on the current settings.
@@ -184,6 +184,13 @@ public:
     Text& Reload();
 
     /**
+     * \brief Check if the text object has changed and needs glyph reloading
+     *
+     * \return True if glyphs needs to be reloaded.
+     */
+    bool IsDirty() { return mDirty; }
+
+    /**
      * Get the glyphs for the current text.
      *
      * \return Pointer to Glyphs object.
@@ -191,16 +198,16 @@ public:
     const std::unique_ptr<Glyphs>& GetGlyphs() const { return mpGlyphs; }
 
     /**
-     * Calculate the minimum bounding rectangle containing all the glyphs.
+     * Get the minimum bounding rectangle containing all the glyphs.
      *
-     * \param apGlyphs
      * \return Rect
      */
-    Rect CalcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs) const;
+    const Rect& GetBoundingRect() const { return mBoundingRect; }
 
 protected:
     Font mFont;
     Rect mArea;
+    Rect mBoundingRect{};
     std::string mValue{};
     bool mScaleToFit = false;
     std::unique_ptr<Glyphs> mpGlyphs{};
@@ -209,10 +216,12 @@ protected:
     int mLineSpacing = 1;
     HAlign mHAlign = HAlign::Center;
     VAlign mVAlign = VAlign::Center;
+    bool mDirty = false;
 
     void scaleToFit();
     void loadGlyphs();
     void alignGlyphs();
+    void calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs);
 };
 
 } /* namespace rsp::graphics */

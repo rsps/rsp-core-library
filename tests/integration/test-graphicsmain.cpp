@@ -116,9 +116,36 @@ TEST_CASE("Graphics Main Test")
             tp.SetEvents(InputScene::GetTouchEvents().data(), InputScene::GetTouchEvents().size());
         };
 
-        Timer t1(1, 2500ms);
+        int progress = 0;
+        Timer t1(1, 2800ms);
         t1.Callback() = [&](Timer &arTimer) {
-            gfx.Terminate();
+            switch (progress++) {
+                case 0:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
+                    break;
+                case 1:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Center);
+                    break;
+                case 2:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Right);
+                    break;
+                case 3:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Left);
+                    break;
+                case 4:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Center);
+                    break;
+                case 5:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Right);
+                    break;
+                case 6:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Center).SetHAlignment(Text::HAlign::Center);
+                    break;
+                default:
+                    gfx.Terminate();
+                    break;
+            }
+            arTimer.SetTimeout(200ms).Enable();
         };
         t1.Enable();
 

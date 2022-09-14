@@ -81,7 +81,10 @@ constexpr uint32_t HashOf() noexcept
 struct TypeInfo
 {
     std::string mName;
-    uint32_t mId;
+    union {
+        uint32_t mId;
+        char32_t mIdChar;
+    };
 };
 
 template<typename T>

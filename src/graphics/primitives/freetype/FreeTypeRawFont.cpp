@@ -73,6 +73,9 @@ FTGlyph::FTGlyph(FT_Face apFace)
     mPixels.resize(static_cast<std::vector<uint8_t>::size_type>(unsign(mPitch)) * unsign(mHeight), 0xFF);
     memcpy(mPixels.data(), apFace->glyph->bitmap.buffer, mPixels.size());
 
+    Rect r(apFace->bbox.xMin, apFace->bbox.yMin, apFace->bbox.xMax, apFace->bbox.yMax);
+
+//    std::cout << "BBOX: " << r << std::endl;
 //    mpPixels = apFace->glyph->bitmap.buffer;
 }
 
@@ -96,6 +99,12 @@ std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
 
 //    FT_MulFix(face_->units_per_EM, face_->size->metrics.x_scale ) >> 6
     glyphs->mLineHeight = FT_MulFix(mpFace->units_per_EM, mpFace->size->metrics.y_scale ) >> 6;
+    glyphs->mUnderlineYCenter = (mpFace->underline_position - 32) >> 6;
+    glyphs->mUnderlineThickness = (mpFace->underline_thickness + 63) >> 6;
+    glyphs->mBBoxMinX = (mpFace->bbox.xMin-32) >> 6;
+    glyphs->mBBoxMaxX = (mpFace->bbox.xMax-32) >> 6;
+    glyphs->mBBoxMinY = (mpFace->bbox.yMin+32) >> 6;
+    glyphs->mBBoxMaxY = (mpFace->bbox.yMax+32) >> 6;
 
     std::u32string unicode = stringToU32(arText);
 
@@ -116,19 +125,23 @@ std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
         }
     }
 
-//    DLOG("Line Height: " << line_height);
+    if (arText == "+-/") {
+        DLOG(*glyphs);
+    }
 
-    int top = glyphs->mLineHeight;
-    int left = 0;
+//    int baseline = glyphs->mLineHeight + glyphs->mBBoxMaxY;
+    int baseline = FT_MulFix(mpFace->ascender + (mpFace->ascender - mpFace->descender - mpFace->units_per_EM), mpFace->size->metrics.y_scale) >> 6;
+    int line_left = 0;
     for (Glyph &glyph : glyphs->mGlyphs) {
         if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
-            top += glyphs->mLineHeight + aLineSpacing;
-            left = 0;
+            baseline += glyphs->mLineHeight + aLineSpacing;
+            line_left = 0;
         }
         else {
-            glyph.mTop += top - glyph.mHeight - glyph.mTop;
-            glyph.mLeft += left;
-            left += glyph.mAdvanceX;
+//            glyph.mTop += top - glyph.mHeight - glyph.mTop;
+            glyph.mTop = baseline - glyph.mTop;
+            glyph.mLeft += line_left;
+            line_left += glyph.mAdvanceX;
         }
     }
     return glyphs;
@@ -158,7 +171,7 @@ void FreeTypeRawFont::SetStyle(FontStyles aStyle)
 }
 
 
-FTGlyph FreeTypeRawFont::getSymbol(uint32_t aSymbolCode, FontStyles aStyle) const
+FTGlyph FreeTypeRawFont::getSymbol(char32_t aSymbolCode, FontStyles aStyle) const
 {
 #undef FT_LOAD_TARGET_
 #define FT_LOAD_TARGET_( x )   ( static_cast<FT_Int32>(( (x) & 15 ) << 16 ) )
@@ -186,7 +199,7 @@ FTGlyph FreeTypeRawFont::getSymbol(uint32_t aSymbolCode, FontStyles aStyle) cons
     return result;
 }
 
-int FreeTypeRawFont::getKerning(uint aFirst, uint aSecond, uint aKerningMode) const
+int FreeTypeRawFont::getKerning(char32_t aFirst, char32_t aSecond, uint aKerningMode) const
 {
     if (aKerningMode == 0) {
         aKerningMode = FT_KERNING_DEFAULT;

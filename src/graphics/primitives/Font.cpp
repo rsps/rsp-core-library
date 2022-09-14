@@ -10,6 +10,7 @@
 
 #include <string>
 #include <locale>
+#include <codecvt>
 #include <algorithm>
 #include <graphics/primitives/Font.h>
 #include <graphics/primitives/FontRawInterface.h>
@@ -22,19 +23,30 @@ std::string Font::mDefaultFontName("Exo 2");
 
 std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph)
 {
-    os << "Symbol: ";
-    if ((arGlyph.mSymbolUnicode > 31) && (arGlyph.mSymbolUnicode < 127)) {
-        os << static_cast<char>(arGlyph.mSymbolUnicode);
-    }
-    else {
-        os << "0x" << std::hex << static_cast<int>(arGlyph.mSymbolUnicode) << std::dec;
-    }
-    os << ", "
+    os << "Symbol: '";
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
+    os << convert.to_bytes(&arGlyph.mSymbolUnicode, &arGlyph.mSymbolUnicode + 1);
+    os << "' "
         << "Top: " << arGlyph.mTop << ", "
         << "Left: " << arGlyph.mLeft << ", "
         << "Height: " << arGlyph.mHeight << ", "
-        << "Width: " << arGlyph.mWidth;
+        << "Width: " << arGlyph.mWidth << ", "
+        << "Advance: (" << arGlyph.mAdvanceX << "," << arGlyph.mAdvanceY << ")";
+    return os;
+}
 
+std::ostream& operator <<(std::ostream &os, const Glyphs &arGlyphs)
+{
+    os << "Glyphs (" << arGlyphs.GetCount() << ")\n"
+        << "  Underline: " << arGlyphs.mUnderlineYCenter << "\n"
+        << "  Thickness: " << arGlyphs.mUnderlineThickness << "\n"
+        << "  Line height: " << arGlyphs.mLineHeight << "\n"
+        << "  BBox: xMin:" << arGlyphs.mBBoxMinX << ", yMin:" << arGlyphs.mBBoxMinY
+        << ", xMax:" << arGlyphs.mBBoxMaxX << ", yMax:" << arGlyphs.mBBoxMaxY<< "\n";
+
+    for (int i=0 ; i < arGlyphs.GetCount() ; ++i) {
+        os << "  " << arGlyphs.GetGlyph(i) << "\n";
+    }
     return os;
 }
 

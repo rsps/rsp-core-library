@@ -139,7 +139,15 @@ class Control
     bool IsTransparent() const { return mTransparent; }
 
     /**
-     * \brief Abstract method for rendering the object
+     * \brief Virtual method for traversing all GUI elements before rendering.
+     *        Useful if GUI elements depends on external data, that
+     *        needs to be shown in sync with the GUI rendering.
+     *        The method calls the refresh method on all elements.
+     */
+    virtual void UpdateData();
+
+    /**
+     * \brief Virtual method for rendering the object
      * \param aCanvas The canvas the object is rendered on
      * \return bool True if anything was rendered
      */
@@ -259,6 +267,7 @@ class Control
     rsp::utils::TypeInfo mTypeInfo;
 
     virtual void paint(Canvas &arCanvas, const Style &arStyle);
+    virtual void refresh() {};
 
   private:
       TouchCallback_t mOnPress{};

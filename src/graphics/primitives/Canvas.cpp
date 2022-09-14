@@ -137,9 +137,14 @@ void Canvas::DrawText(Text &arText)
     DrawText(arText, arText.GetFont().GetColor());
 }
 
-void Canvas::DrawText(const Text &arText, const Color &arColor)
+void Canvas::DrawText(const Text &arText, Color aColor, Color aBackColor)
 {
-    Color col = arColor;
+    if (aBackColor != Color::None) {
+        Rect r = arText.GetBoundingRect();
+        auto tl = arText.GetArea().GetTopLeft();
+        r.Move(tl.mX, tl.mY);
+        DrawRectangle(r, aBackColor, true);
+    }
     auto &glyphs = arText.GetGlyphs();
     if (!glyphs) {
         return;
@@ -152,8 +157,8 @@ void Canvas::DrawText(const Text &arText, const Color &arColor)
                 auto c = *p_row++;
                 auto p = Point(x + glyph.mLeft + arText.GetArea().GetLeft(), y + glyph.mTop + arText.GetArea().GetTop());
                 if (c && arText.GetArea().IsHit(p)) {
-                    col.SetAlpha(c);
-                    SetPixel(p, col);
+                    aColor.SetAlpha(c);
+                    SetPixel(p, aColor);
                 }
             }
         }

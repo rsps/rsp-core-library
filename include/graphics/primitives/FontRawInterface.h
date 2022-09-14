@@ -13,6 +13,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <graphics/primitives/Rect.h>
 
 namespace rsp::graphics {
 
@@ -26,7 +27,7 @@ class Glyph
 public:
     virtual ~Glyph() {};
 
-    uint32_t mSymbolUnicode = 0;
+    char32_t mSymbolUnicode = 0;
     int mTop = 0;
     int mLeft = 0;
     int mWidth = 0;
@@ -49,7 +50,12 @@ public:
     virtual ~Glyphs() {}
     virtual int GetCount() const = 0;
     virtual Glyph& GetGlyph(int aIndex) = 0;
+    virtual const Glyph& GetGlyph(int aIndex) const = 0;
 
+    int mBBoxMinX = 0;
+    int mBBoxMaxX = 0;
+    int mBBoxMinY = 0;
+    int mBBoxMaxY = 0;
     int mUnderlineYCenter=0;
     int mUnderlineThickness=0;
     int mLineHeight=0;
@@ -63,6 +69,15 @@ public:
  * \return
  */
 std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph);
+
+/**
+ * \brief Stream overloading for the Glyphs container. Can be used for debugging.
+ *
+ * \param os
+ * \param arGlyphs
+ * \return
+ */
+std::ostream& operator <<(std::ostream &os, const Glyphs &arGlyphs);
 
 enum class FontStyles {
     Normal = 0,

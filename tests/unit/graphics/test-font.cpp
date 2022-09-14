@@ -50,8 +50,7 @@ TEST_CASE("Font Primitive")
 
         text.GetFont().SetSize(size);
 
-        auto &glyphs = text.GetGlyphs();
-        Rect r = text.CalcBoundingRect(glyphs);
+        Rect r = text.Reload().GetBoundingRect();
 
         CHECK(r.GetHeight() < size);
         CHECK(r.GetWidth() < (size * text.GetValue().size()));
@@ -65,8 +64,7 @@ TEST_CASE("Font Primitive")
         Rect dst(100, 200, 280, 200);
         text.SetScaleToFit(true).SetArea(dst).Reload();
 
-        auto &glyphs = text.GetGlyphs();
-        Rect r = text.CalcBoundingRect(glyphs);
+        Rect r = text.Reload().GetBoundingRect();
 
         MESSAGE(r.GetHeight(), " < ", dst.GetHeight());
         MESSAGE(r.GetWidth(), " < ", dst.GetWidth());

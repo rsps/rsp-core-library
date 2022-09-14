@@ -105,7 +105,7 @@ class Canvas
      * \param aRect
      * \param arColor
      */
-    void DrawText(const Text &arText, const Color &arColor);
+    void DrawText(const Text &arText, Color aColor, Color aBackColor = Color::None);
 
     /**
      * \brief Draws the given Text object in the color of the objects own font.

@@ -14,8 +14,7 @@
 #include "Control.h"
 #include <graphics/primitives/Text.h>
 
-namespace rsp::graphics
-{
+namespace rsp::graphics {
 
 class Label : public Control
 {
@@ -28,6 +27,8 @@ public:
     Label& SetCaption(const std::string &arCaption);
     Label& SetTextPosition(const Point &arPoint);
     Label& SetFontSize(int aSizePx);
+    Label& SetVAlignment(Text::VAlign aVAlign);
+    Label& SetHAlignment(Text::HAlign aHAlign);
 
     Text& GetText() { return mText; }
 
@@ -38,7 +39,9 @@ protected:
     Text mText{};
 
     void paint(Canvas &arCanvas, const Style &arStyle) override;
+    void refresh() override;
 };
 
 } // namespace rsp::graphics
+
 #endif // INCLUDE_GRAPHICS_CONTROLS_LABEL_H

@@ -8,14 +8,14 @@
  * \author      Steffen Brummer
  */
 
+#include <string>
 #include <graphics/controls/Label.h>
 
 namespace rsp::graphics {
 
 Label& Label::SetCaption(const std::string &arCaption)
 {
-    mText.SetValue(arCaption).Reload();
-    Invalidate();
+    mText.SetValue(arCaption);
     return *this;
 }
 
@@ -24,7 +24,18 @@ Label& Label::SetTextPosition(const Point &arPoint)
     Rect r = mText.GetArea();
     r.MoveTo(arPoint);
     mText.SetArea(r);
-    Invalidate();
+    return *this;
+}
+
+Label& Label::SetVAlignment(Text::VAlign aVAlign)
+{
+    mText.SetVAlignment(aVAlign);
+    return *this;
+}
+
+Label& Label::SetHAlignment(Text::HAlign aHAlign)
+{
+    mText.SetHAlignment(aHAlign);
     return *this;
 }
 
@@ -55,15 +66,21 @@ void Label::paint(Canvas &arCanvas, const Style &arStyle)
         GetId();
     }
     Control::paint(arCanvas, arStyle);
-    arCanvas.DrawText(mText, arStyle.mForegroundColor);
+    arCanvas.DrawText(mText, arStyle.mForegroundColor, Color::Green);
 }
 
 Label& Label::SetFontSize(int aSizePx)
 {
     mText.GetFont().SetSize(aSizePx);
-    mText.Reload();
-    Invalidate();
     return *this;
+}
+
+void Label::refresh()
+{
+    if (mText.IsDirty()) {
+        mText.Reload();
+        Invalidate();
+    }
 }
 
 } //namespace rsp::graphics

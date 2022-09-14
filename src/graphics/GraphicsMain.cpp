@@ -63,6 +63,8 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
             mrScenes.ActiveScene().ProcessInput(event);
         }
 
+        mrScenes.ActiveScene().UpdateData();
+
         // Render invalidated things
         if (mrScenes.ActiveScene().Render(mrBufferedCanvas)) {
             mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);

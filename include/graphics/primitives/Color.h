@@ -34,6 +34,7 @@ class Color
      * \brief Predefined basic colors
      */
     enum : ARGB_t {
+        None = 0,
         White =   0xFFFFFFFF,
         Silver =  0xFFC0C0C0,
         Grey =    0xFF808080,

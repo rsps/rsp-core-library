@@ -30,7 +30,7 @@ namespace rsp::graphics {
 class InputScene : public SceneBase<InputScene>
 {
 public:
-    static std::array<TouchEvent, 36>& GetTouchEvents() {
+    static std::array<TouchEvent, 44>& GetTouchEvents() {
         static std::array events {
             CLICK(300, _SHIFT),
             CLICK(400, _H),
@@ -50,6 +50,10 @@ public:
             CLICK(1900, _EURO_SIGN),
             CLICK(2000, _QUESTION_MARK),
             CLICK(2100, _SPECIAL),
+            CLICK(2200, _S),
+            CLICK(2250, _D),
+            CLICK(2300, _G),
+            CLICK(2350, _P),
         };
         return events;
     }
@@ -62,7 +66,7 @@ public:
         GetStyle(Control::States::normal).mBackground.SetBitmap(&mBackground);
 
         mLabel.GetText().GetFont().SetSize(34);
-        mLabel.SetArea(Rect(80, 150, 340, 60));
+        mLabel.SetArea(Rect(80, 150, 320, 160));
         mLabel.GetStyle(States::normal).mForegroundColor = Color::Black;
         mLabel.GetStyle(States::normal).mBackgroundColor = Color::White;
 
@@ -75,6 +79,7 @@ public:
     };
 
     Keyboard& GetKeyboard() { return mKeyboard; }
+    Label& GetLabel() { return mLabel; }
 
 protected:
     Label mLabel{};
