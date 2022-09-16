@@ -103,11 +103,11 @@ void Canvas::DrawRectangle(const Rect &aRect, const Color &aColor, bool aFilled)
         Point rb = r.GetBottomRight();
         for (GuiUnit_t x = r.mLeftTop.mX; x < w_end; x++) {
             SetPixel(Point(x, r.mLeftTop.mY), aColor); // top
-            SetPixel(Point(x, rb.mY), aColor); // bottom
+            SetPixel(Point(x, rb.mY-1), aColor); // bottom
         }
         for (GuiUnit_t y = r.mLeftTop.mY; y < h_end; y++) {
             SetPixel(Point(r.mLeftTop.mX, y), aColor); // left
-            SetPixel(Point(rb.mX, y), aColor); // right
+            SetPixel(Point(rb.mX-1, y), aColor); // right
         }
     }
 }

@@ -22,8 +22,10 @@ class Framebuffer;
 /**
  * Rect class
  *
- * A Rect is made from two 2D coordinates (LeftTop and RightBottom Points).
- * It can also be expressed as one point of origin with width and height properties.
+ * A Rect is made from a 2D coordinate (LeftTop) and a width and a height.
+ * The RightBottom coordinate is just outside the rectangular area.
+ * E.g. {0,0} to {1,1} = Rect with size and height of 1, covering 1x1 units. Highest included point is {0,0}
+ * {0,0} to {10,10} = Rect with size and height of 10, covering 10x10 units. Highest included point is {9,9}
  */
 class Rect
 {
@@ -46,7 +48,7 @@ class Rect
      * \param aLeftTop
      * \param aRightBottom
      */
-    Rect(const Point &arLeftTop, const Point &arRightBottom);
+//    Rect(const Point &arLeftTop, const Point &arRightBottom);
 
     /**
      * \brief Construct a Rect from origin point and size.
@@ -138,7 +140,7 @@ class Rect
      *
      * \param aBotValue
      */
-    Rect& SetBottom(GuiUnit_t aBotValue);
+//    Rect& SetBottom(GuiUnit_t aBotValue);
 
     /**
      * \brief Get the left value
@@ -164,7 +166,7 @@ class Rect
      *
      * \param aRightValue
      */
-    Rect& SetRight(GuiUnit_t aRightValue);
+//    Rect& SetRight(GuiUnit_t aRightValue);
 
     /**
      * \brief Set TopLeft to given point, move BottomRight to keep size.
@@ -179,7 +181,7 @@ class Rect
      * \param aY
      * \return self
      */
-    Rect& MoveBy(int aX, int aY);
+    Rect& Move(int aX, int aY);
 
     /**
      * \brief Set the size of this rect
@@ -213,14 +215,13 @@ class Rect
 
     /**
      * \brief Get the bottom right coordinate.
+     *        The coordinate is just outside the rect area.
      *
      * \return Point
      */
     Point GetBottomRight() const
     {
-        return Point(
-            std::max(static_cast<int>(mLeftTop.mX), static_cast<int>(mLeftTop.mX + mWidth)),
-            std::max(static_cast<int>(mLeftTop.mY), static_cast<int>(mLeftTop.mY + mHeight)));
+        return Point(GetRight(), GetBottom());
     }
 
     /**

@@ -33,15 +33,13 @@ Rect::Rect(GuiUnit_t aLeft, GuiUnit_t aTop, GuiUnit_t aWidth, GuiUnit_t aHeight)
     LimitDimensions();
 }
 
-Rect::Rect(const Point &aLeftTop, const Point &aBottomRight)
-    : mLeftTop(aLeftTop),
-      mWidth(aBottomRight.mX - aLeftTop.mX),
-      mHeight(aBottomRight.mY - aLeftTop.mY)
+//Rect::Rect(const Point &aLeftTop, const Point &aBottomRight)
+//    : mLeftTop(aLeftTop),
 //      mWidth(aBottomRight.mX - aLeftTop.mX + 1),
 //      mHeight(aBottomRight.mY - aLeftTop.mY + 1)
-{
-    LimitDimensions();
-}
+//{
+//    LimitDimensions();
+//}
 
 Rect::Rect(const Point &aLeftTop, GuiUnit_t aWidth, GuiUnit_t aHeight)
     : mLeftTop(aLeftTop),
@@ -54,27 +52,25 @@ Rect::Rect(const Point &aLeftTop, GuiUnit_t aWidth, GuiUnit_t aHeight)
 
 Rect Rect::operator &(const Rect &arOther) const
 {
-    Point lt = arOther.GetTopLeft();
-    Point rb = arOther.GetBottomRight();
-    Point right_bottom = GetBottomRight();
+    if (mLeftTop.mX > (arOther.mLeftTop.mX + arOther.mWidth)) {
+        return Rect();
+    }
+    if ((mLeftTop.mX + mWidth) < arOther.mLeftTop.mX) {
+        return Rect();
+    }
+    if (mLeftTop.mY > (arOther.mLeftTop.mY + arOther.mHeight)) {
+        return Rect();
+    }
+    if ((mLeftTop.mY + mHeight) < arOther.mLeftTop.mY) {
+        return Rect();
+    }
 
-    if (mLeftTop.mY > lt.mY) {
-        lt.mY = mLeftTop.mY;
-    }
-    if (mLeftTop.mX > lt.mX) {
-        lt.mX = mLeftTop.mX;
-    }
-    if (right_bottom.mY < rb.mY) {
-        rb.mY = right_bottom.mY;
-    }
-    if (right_bottom.mX < rb.mX) {
-        rb.mX = right_bottom.mX;
-    }
-    if (    (rb.mY < lt.mY)
-        ||  (rb.mX < lt.mX)) {
-        rb = lt;
-    }
-    return Rect(lt, rb);
+    int minX = std::max(mLeftTop.mX, arOther.mLeftTop.mX);
+    int minY = std::max(mLeftTop.mY, arOther.mLeftTop.mY);
+    int maxX = std::min(mLeftTop.mX + mWidth, arOther.mLeftTop.mX + arOther.mWidth);
+    int maxY = std::min(mLeftTop.mY + mHeight, arOther.mLeftTop.mY + arOther.mHeight);
+
+    return Rect(minX, minY, maxX - minX, maxY - minY);
 }
 
 Rect& Rect::operator &=(const Rect &arOther)
@@ -95,10 +91,14 @@ Rect Rect::operator |(const Rect &arOther) const
 
 Rect& Rect::operator |=(const Rect &arOther)
 {
-    mLeftTop.mX = std::min(mLeftTop.mX, arOther.mLeftTop.mX);
-    mLeftTop.mY = std::min(mLeftTop.mY, arOther.mLeftTop.mY);
-    SetRight(std::max(GetRight(), arOther.GetRight()));
-    SetBottom(std::max(GetBottom(), arOther.GetBottom()));
+    int minX = std::min(mLeftTop.mX, arOther.mLeftTop.mX);
+    int minY = std::min(mLeftTop.mY, arOther.mLeftTop.mY);
+    int maxX = std::max(mLeftTop.mX + mWidth, arOther.mLeftTop.mX + arOther.mWidth);
+    int maxY = std::max(mLeftTop.mY + mHeight, arOther.mLeftTop.mY + arOther.mHeight);
+    mLeftTop.mX = minX;
+    mLeftTop.mY = minY;
+    mWidth = maxX - minX;
+    mHeight = maxY - minY;
     return *this;
 }
 
@@ -119,12 +119,12 @@ GuiUnit_t Rect::GetBottom() const
     return mLeftTop.mY + mHeight;
 }
 
-Rect& Rect::SetBottom(GuiUnit_t aBotValue)
-{
-    mHeight = aBotValue - mLeftTop.mY;
-    LimitDimensions();
-    return *this;
-}
+//Rect& Rect::SetBottom(GuiUnit_t aBotValue)
+//{
+//    mHeight = aBotValue - mLeftTop.mY;
+//    LimitDimensions();
+//    return *this;
+//}
 
 GuiUnit_t Rect::GetLeft() const
 {
@@ -142,12 +142,12 @@ GuiUnit_t Rect::GetRight() const
     return mLeftTop.mX + mWidth;
 }
 
-Rect& Rect::SetRight(GuiUnit_t aRightValue)
-{
-    mWidth = aRightValue - mLeftTop.mX;
-    LimitDimensions();
-    return *this;
-}
+//Rect& Rect::SetRight(GuiUnit_t aRightValue)
+//{
+//    mWidth = aRightValue - mLeftTop.mX;
+//    LimitDimensions();
+//    return *this;
+//}
 
 GuiUnit_t Rect::GetWidth() const
 {
@@ -179,7 +179,7 @@ Rect& Rect::MoveTo(const Point &arPoint)
     return *this;
 }
 
-Rect& Rect::MoveBy(int aX, int aY)
+Rect& Rect::Move(int aX, int aY)
 {
     mLeftTop.mX += aX;
     mLeftTop.mY += aY;

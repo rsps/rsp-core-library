@@ -116,7 +116,7 @@ TEST_CASE("Framebuffer")
         Point rightBottom(
             Random::Roll(0, fb.GetWidth() / 2) + (fb.GetWidth() / 2),
             Random::Roll(0, fb.GetHeight() / 2) + (fb.GetHeight() / 2));
-        Rect rect(leftTop, rightBottom);
+        Rect rect(leftTop, rightBottom.GetX() - leftTop.GetX(), rightBottom.GetY() - leftTop.GetY());
 
         // Act
         CHECK_NOTHROW(fb.DrawRectangle(rect, col));
@@ -127,13 +127,13 @@ TEST_CASE("Framebuffer")
             // Check top side
             CHECK_EQ(col.AsUint(), fb.GetPixel(Point(leftTop.GetX() + i, leftTop.GetY()), false));
             // Check bottom side
-            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(leftTop.GetX() + i, rightBottom.GetY()), false));
+            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(leftTop.GetX() + i, rightBottom.GetY()-1), false));
         }
         for (GuiUnit_t i = 0; i < rect.GetHeight(); i++) {
             // Check left side
-            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(leftTop.GetX(), rightBottom.GetY() - i), false));
+            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(leftTop.GetX(), rightBottom.GetY()-1 - i), false));
             // Check right side
-            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(rightBottom.GetX(), rightBottom.GetY() - i), false));
+            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(rightBottom.GetX()-1, rightBottom.GetY()-1 - i), false));
         }
         fb.SwapBuffer();
     }
@@ -230,7 +230,7 @@ TEST_CASE("Framebuffer")
             for (int i=0; i < 16 ;++i){
                 uint8_t val = 0x77+(i*8);
                 Color grey(val, val, val, 0xFF);
-                CHECK_NOTHROW(testImgMap.DrawRectangle(Rect(offset(topLeft, i), offset(botRight, -i)), grey));
+                CHECK_NOTHROW(testImgMap.DrawRectangle(Rect(offset(topLeft, i), width-(i*2), height-(i*2)), grey));
             }
 
             CHECK_NOTHROW(testImgMap.DrawLine(topLeft, botRight, Color::Red));
@@ -398,6 +398,7 @@ TEST_CASE("Framebuffer")
 
         const Color rainbow[] = { Color::White, Color::Red, Color::Yellow, Color::Green, Color::Aqua, Color::Lime, Color::Blue, Color::Silver };
 
+        MESSAGE("FPS Test");
         CHECK_NOTHROW(text.SetScaleToFit(true).SetLineSpacing(50));
 //        Rect screen(0, 0, 480, 800);
         rsp::utils::StopWatch sw;
@@ -407,7 +408,7 @@ TEST_CASE("Framebuffer")
             std::stringstream ss;
             ss << "FPS:\n" << fps;
             CHECK_NOTHROW(text.SetValue(ss.str()));
-            CHECK_NOTHROW(fb.DrawText(text.Reload(), rainbow[(i + 3) & 0x07]));
+            CHECK_NOTHROW(fb.DrawText(text.Reload(), Color::Black));
             CHECK_NOTHROW(text.SetScaleToFit(false)); // Only scale first time to speed it up
             CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear, rainbow[i & 0x07]));
         }

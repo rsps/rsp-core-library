@@ -52,7 +52,7 @@ TEST_CASE("Font Primitive")
 
         Rect r = text.Reload().GetBoundingRect();
 
-        CHECK(r.GetHeight() < size);
+        CHECK(r.GetHeight() < size+4);
         CHECK(r.GetWidth() < (size * text.GetValue().size()));
     }
 

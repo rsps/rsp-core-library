@@ -50,19 +50,22 @@ Text& Text::Reload()
 
 void Text::scaleToFit()
 {
-    int width = ((mArea.GetWidth() + (mLineMaxChar/2)) / mLineMaxChar); // Texts seems to be about 1/3 of desired width
+//    int width = ((mArea.GetWidth() + (mLineMaxChar/2)) / mLineMaxChar); // Texts seems to be about 1/3 of desired width
+    int width = mArea.GetWidth() / mLineMaxChar; // Texts seems to be about 1/3 of desired width
     int height = mArea.GetHeight() / mLineCount;
     int done;
     int attempts = 5;
     int w_limit = mArea.GetWidth() * 90 / 100; // >90%
     int h_limit = mArea.GetHeight() * 90 / 100; // > 90%
-    Logger::GetDefault().Debug() << "scaleToFit w_limit: " << w_limit << " h_limit: " << h_limit << std::endl;
+    Logger::GetDefault().Debug() << "scaleToFit w_limit: " << w_limit << " h_limit: " << h_limit << " line count: " << mLineCount << std::endl;
 
     do {
         mFont.SetSize(width, height);
 
         mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
         calcBoundingRect(mpGlyphs);
+
+        Logger::GetDefault().Debug() << "Area: " << mArea << ", Bounding Rect: " << mBoundingRect << std::endl;
 
         done = 0;
         if ((mBoundingRect.GetWidth() < w_limit) || (mBoundingRect.GetWidth() > mArea.GetWidth())) {

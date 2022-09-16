@@ -122,9 +122,11 @@ std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
     int min_left = 0;
     int max_left = 0;
     int line_left = 0;
+    int max_height = glyphs->mLineHeight;
     for (Glyph &glyph : glyphs->mGlyphs) {
         if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
             baseline += glyphs->mLineHeight + aLineSpacing;
+            max_height += glyphs->mLineHeight + aLineSpacing;
             line_left = 0;
         }
         else {
@@ -142,7 +144,7 @@ std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
     if (glyphs->mGlyphs.size() && (glyphs->mGlyphs.back().mWidth > glyphs->mGlyphs.back().mAdvanceX)) {
         max_left++;
     }
-    glyphs->mBoundingRect = Rect(min_left, 0, max_left, glyphs->mLineHeight);
+    glyphs->mBoundingRect = Rect(min_left, 0, max_left, max_height);
     if ((arText == "123") || (arText == "+-/")) {
         DLOG(*glyphs);
     }
@@ -178,11 +180,11 @@ FTGlyph FreeTypeRawFont::getSymbol(char32_t aSymbolCode, FontStyles aStyle) cons
 #undef FT_LOAD_TARGET_
 #define FT_LOAD_TARGET_( x )   ( static_cast<FT_Int32>(( (x) & 15 ) << 16 ) )
 
-//    if (aSymbolCode == '\n') {
-//        Glyph nl { };
-//        nl.mSymbolUnicode = aSymbolCode;
-//        return nl;
-//    }
+    if (aSymbolCode == '\n') {
+        FTGlyph nl { };
+        nl.mSymbolUnicode = aSymbolCode;
+        return nl;
+    }
 
     FT_Error error = FT_Load_Char(mpFace, aSymbolCode, FT_LOAD_RENDER /*| FT_LOAD_TARGET_LCD_V*/);
     if (error) {
