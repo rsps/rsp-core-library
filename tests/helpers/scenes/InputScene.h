@@ -10,6 +10,9 @@
 #ifndef TESTS_HELPERS_SCENES_INPUTSCENE_H_
 #define TESTS_HELPERS_SCENES_INPUTSCENE_H_
 
+#define KB_X 12
+#define KB_Y 450
+
 #include <array>
 #include <graphics/controls/Button.h>
 #include <graphics/controls/Keyboard.h>
@@ -18,9 +21,6 @@
 #include <graphics/primitives/Bitmap.h>
 
 namespace rsp::graphics {
-
-#define KB_X 12
-#define KB_Y 450
 
 #define CLICK(_time, _key) \
     TouchEvent(_time, TouchEvent::Types::Press, _key), \

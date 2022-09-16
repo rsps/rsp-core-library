@@ -24,6 +24,17 @@
 
 namespace rsp::graphics {
 
+/**
+ * \brief Macro definitions for key placement and touch
+ *        Set KB_X/Y to the offset on the screen where the macros
+ *        are to be used.
+ *        E.g. See InputScene unit test.
+ */
+#ifndef KB_X
+#define KB_X 0
+#define KB_Y 0
+#endif
+
 #define KEY(x,y) {KB_X + x, KB_Y + y}
 
 #define _SPACE   KEY( 98, 224)

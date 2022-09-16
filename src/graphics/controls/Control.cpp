@@ -194,7 +194,9 @@ void Control::paint(Canvas &arCanvas, const Style &arStyle)
 
 #ifdef SHOW_TOUCH_AREAS
     if (!mTouchArea.empty()) {
-        arCanvas.SetClipRect(mTouchArea);
+        Rect r = mTouchArea;
+        r.AddSize(1, 1);
+        arCanvas.SetClipRect(r);
         arCanvas.DrawRectangle(mTouchArea, Color::Yellow);
     }
 #endif

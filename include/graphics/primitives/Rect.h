@@ -219,8 +219,8 @@ class Rect
     Point GetBottomRight() const
     {
         return Point(
-            std::max(static_cast<int>(mLeftTop.mX), static_cast<int>(mLeftTop.mX + mWidth - 1)),
-            std::max(static_cast<int>(mLeftTop.mY), static_cast<int>(mLeftTop.mY + mHeight - 1)));
+            std::max(static_cast<int>(mLeftTop.mX), static_cast<int>(mLeftTop.mX + mWidth)),
+            std::max(static_cast<int>(mLeftTop.mY), static_cast<int>(mLeftTop.mY + mHeight)));
     }
 
     /**

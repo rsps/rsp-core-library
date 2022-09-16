@@ -26,7 +26,7 @@ public:
     Style& operator=(Style &&) = default;
 
     Color mForegroundColor = Color::White;
-    Color mBackgroundColor = Color::Black;
+    Color mBackgroundColor = Color::None;
     BitmapView mBackground{};
     BitmapView mForeground{};
 };

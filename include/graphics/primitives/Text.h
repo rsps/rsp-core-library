@@ -177,6 +177,13 @@ public:
     Text& SetHAlignment(HAlign aHAlign) { mHAlign = aHAlign; mDirty = true; return *this; }
 
     /**
+     * \brief Set the font size and mark text for refreshing
+     * \param aSizePx
+     * \return self
+     */
+    Text& SetFontSize(int aSizePx) { mFont.SetSize(aSizePx); mDirty = true; return *this; }
+
+    /**
      * Reload all glyphs based on the current settings.
      *
      * \return Reference to this for fluent calls.

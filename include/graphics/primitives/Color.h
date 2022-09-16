@@ -53,7 +53,7 @@ class Color
         Purple =  0xFF800080
     };
 
-    Color() : mValue(White) {}
+    Color() : mValue(None) {}
 
     /**
      * \brief Construct with given base colors.

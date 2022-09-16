@@ -146,13 +146,14 @@ void Canvas::DrawText(const Text &arText, Color aColor, Color aBackColor)
     if (!glyphs) {
         return;
     }
+    Point tl = arText.GetArea().GetTopLeft();
     for (int i=0; i < glyphs->GetCount() ; ++i) {
         Glyph &glyph = glyphs->GetGlyph(i);
         for (int y = 0; y < glyph.mHeight; y++) {
             const uint8_t* p_row = glyph.GetPixelRow(y);
             for (int x = 0; x < glyph.mWidth; x++) {
                 auto c = *p_row++;
-                auto p = Point(x + glyph.mLeft + arText.GetArea().GetLeft(), y + glyph.mTop + arText.GetArea().GetTop());
+                auto p = Point(x + glyph.mLeft + tl.mX, y + glyph.mTop + tl.mY);
                 if (c && arText.GetArea().IsHit(p)) {
                     aColor.SetAlpha(c);
                     SetPixel(p, aColor);

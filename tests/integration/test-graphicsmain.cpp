@@ -119,6 +119,7 @@ TEST_CASE("Graphics Main Test")
         int progress = 0;
         Timer t1(1, 2800ms);
         t1.Callback() = [&](Timer &arTimer) {
+            auto timeout = 200ms;
             switch (progress++) {
                 case 0:
                     scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
@@ -141,11 +142,33 @@ TEST_CASE("Graphics Main Test")
                 case 6:
                     scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Center).SetHAlignment(Text::HAlign::Center);
                     break;
+                case 7:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(16);
+                    timeout = 1000ms;
+                    break;
+                case 8:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(22);
+                    timeout = 1000ms;
+                    break;
+                case 9:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(26);
+                    timeout = 1000ms;
+                    break;
+                case 10:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(40);
+                    timeout = 1000ms;
+                    CHECK_EQ(scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue(), "Hello 128€?sdgp");
+                    break;
+                case 11:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetCaption("æøåößđŋµÅÖ");
+                    timeout = 1000ms;
+                    break;
                 default:
+                    CHECK_EQ(scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue(), "æøåößđŋµÅÖ");
                     gfx.Terminate();
                     break;
             }
-            arTimer.SetTimeout(200ms).Enable();
+            arTimer.SetTimeout(timeout).Enable();
         };
         t1.Enable();
 

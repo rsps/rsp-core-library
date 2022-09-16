@@ -93,38 +93,30 @@ FreeTypeRawFont::~FreeTypeRawFont()
 
 std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aLineSpacing)
 {
+    /**
+     * For general font terms
+     * @See https://wiki.inkscape.org/wiki/File:Glyph_metrics.png
+     */
     createFace();
 
     auto glyphs = std::make_unique<FTGlyphs>();
-
 
     std::u32string unicode = stringToU32(arText);
 
     for (char32_t c : unicode) {
         glyphs->mGlyphs.push_back(getSymbol(c, mStyle));
-//        line_height = std::max(line_height, glyphs->mGlyphs.back().mHeight);
         auto rs = glyphs->mGlyphs.size();
         if (rs > 1) {
-            if (arText == "+-/") {
-                std::cout << "break" << std::endl;
-            }
             glyphs->mGlyphs[rs - 2].mWidth += getKerning(glyphs->mGlyphs[rs - 2].mSymbolUnicode, glyphs->mGlyphs[rs - 1].mSymbolUnicode);
-
-            // Space ' ' has no width, add width of previous character to space character
-            if (glyphs->mGlyphs[rs - 2].mWidth == 0) {
-                glyphs->mGlyphs[rs - 2].mWidth = (rs > 2) ? glyphs->mGlyphs[rs - 3].mWidth : mSizePx;
-            }
         }
     }
 
-    glyphs->mLineHeight = mpFace->size->metrics.y_ppem;
+    glyphs->mLineHeight = mpFace->size->metrics.height >> 6; // (max_y - min_y); // mpFace->size->metrics.y_ppem;
     glyphs->mUnderlineYCenter = (mpFace->underline_position - 32) >> 6;
     glyphs->mUnderlineThickness = (mpFace->underline_thickness + 63) >> 6;
-    glyphs->mBBoxMinX = (mpFace->bbox.xMin-32) >> 6;
-    glyphs->mBBoxMaxX = (mpFace->bbox.xMax-32) >> 6;
-    glyphs->mBBoxMinY = (mpFace->bbox.yMin+32) >> 6;
-    glyphs->mBBoxMaxY = (mpFace->bbox.yMax+32) >> 6;
-    glyphs->mBaseLine = (mpFace->ascender + (mpFace->ascender - mpFace->descender - mpFace->units_per_EM)) >> 6;
+//    int internal_leading = (mpFace->ascender - mpFace->descender - mpFace->units_per_EM);
+//    glyphs->mBaseLine = (mpFace->size->metrics.ascender * glyphs->mLineHeight) / (mpFace->size->metrics.ascender + std::abs(mpFace->size->metrics.descender));
+    glyphs->mBaseLine = (mpFace->ascender * glyphs->mLineHeight) / (mpFace->ascender + std::abs(mpFace->descender));
 
     int baseline = glyphs->mBaseLine;
     int min_left = 0;
@@ -136,8 +128,7 @@ std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
             line_left = 0;
         }
         else {
-//            glyph.mTop += top - glyph.mHeight - glyph.mTop;
-            glyph.mTop = baseline - glyph.mTop - glyphs->mBBoxMinX;
+            glyph.mTop = baseline - glyph.mTop;
             if (glyph.mLeft < min_left) {
                 min_left = glyph.mLeft;
             }
@@ -148,8 +139,11 @@ std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
             }
         }
     }
-    glyphs->mBoundingRect = Rect(min_left, 0, max_left, mpFace->size->metrics.y_ppem);
-    if ((arText == "+-/") || (arText == "Hel")) {
+    if (glyphs->mGlyphs.size() && (glyphs->mGlyphs.back().mWidth > glyphs->mGlyphs.back().mAdvanceX)) {
+        max_left++;
+    }
+    glyphs->mBoundingRect = Rect(min_left, 0, max_left, glyphs->mLineHeight);
+    if ((arText == "123") || (arText == "+-/")) {
         DLOG(*glyphs);
     }
     return glyphs;
@@ -201,8 +195,8 @@ FTGlyph FreeTypeRawFont::getSymbol(char32_t aSymbolCode, FontStyles aStyle) cons
 
     FTGlyph result { mpFace };
     result.mSymbolUnicode = aSymbolCode;
-    if (aSymbolCode == '\n') {
-        result.mAdvanceY = result.mAdvanceX;
+    if (aSymbolCode == ' ') {
+        result.mWidth = result.mAdvanceX;
     }
     return result;
 }

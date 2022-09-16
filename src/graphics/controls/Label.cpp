@@ -66,12 +66,12 @@ void Label::paint(Canvas &arCanvas, const Style &arStyle)
         GetId();
     }
     Control::paint(arCanvas, arStyle);
-    arCanvas.DrawText(mText, arStyle.mForegroundColor, Color::Green);
+    arCanvas.DrawText(mText, arStyle.mForegroundColor, arStyle.mBackgroundColor);
 }
 
 Label& Label::SetFontSize(int aSizePx)
 {
-    mText.GetFont().SetSize(aSizePx);
+    mText.SetFontSize(aSizePx);
     return *this;
 }
 

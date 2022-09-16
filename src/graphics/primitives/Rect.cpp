@@ -116,12 +116,12 @@ Rect& Rect::SetTop(GuiUnit_t aTopValue)
 
 GuiUnit_t Rect::GetBottom() const
 {
-    return mLeftTop.mY + mHeight - 1;
+    return mLeftTop.mY + mHeight;
 }
 
 Rect& Rect::SetBottom(GuiUnit_t aBotValue)
 {
-    mHeight = aBotValue - mLeftTop.mY + 1;
+    mHeight = aBotValue - mLeftTop.mY;
     LimitDimensions();
     return *this;
 }
@@ -139,12 +139,12 @@ Rect& Rect::SetLeft(GuiUnit_t aLeftValue)
 
 GuiUnit_t Rect::GetRight() const
 {
-    return mLeftTop.mX + mWidth - 1;
+    return mLeftTop.mX + mWidth;
 }
 
 Rect& Rect::SetRight(GuiUnit_t aRightValue)
 {
-    mWidth = aRightValue - mLeftTop.mX + 1;
+    mWidth = aRightValue - mLeftTop.mX;
     LimitDimensions();
     return *this;
 }

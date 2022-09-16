@@ -52,10 +52,6 @@ public:
     virtual Glyph& GetGlyph(int aIndex) = 0;
     virtual const Glyph& GetGlyph(int aIndex) const = 0;
 
-    int mBBoxMinX = 0;
-    int mBBoxMaxX = 0;
-    int mBBoxMinY = 0;
-    int mBBoxMaxY = 0;
     int mUnderlineYCenter = 0;
     int mUnderlineThickness = 0;
     int mLineHeight = 0;
