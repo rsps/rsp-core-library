@@ -33,13 +33,13 @@ Rect::Rect(GuiUnit_t aLeft, GuiUnit_t aTop, GuiUnit_t aWidth, GuiUnit_t aHeight)
     LimitDimensions();
 }
 
-//Rect::Rect(const Point &aLeftTop, const Point &aBottomRight)
-//    : mLeftTop(aLeftTop),
-//      mWidth(aBottomRight.mX - aLeftTop.mX + 1),
-//      mHeight(aBottomRight.mY - aLeftTop.mY + 1)
-//{
-//    LimitDimensions();
-//}
+Rect::Rect(const Point &aLeftTop, const Point &aBottomRight)
+    : mLeftTop(aLeftTop),
+      mWidth(aBottomRight.mX - aLeftTop.mX),
+      mHeight(aBottomRight.mY - aLeftTop.mY)
+{
+    LimitDimensions();
+}
 
 Rect::Rect(const Point &aLeftTop, GuiUnit_t aWidth, GuiUnit_t aHeight)
     : mLeftTop(aLeftTop),
@@ -119,12 +119,12 @@ GuiUnit_t Rect::GetBottom() const
     return mLeftTop.mY + mHeight;
 }
 
-//Rect& Rect::SetBottom(GuiUnit_t aBotValue)
-//{
-//    mHeight = aBotValue - mLeftTop.mY;
-//    LimitDimensions();
-//    return *this;
-//}
+Rect& Rect::SetBottom(GuiUnit_t aBotValue)
+{
+    mHeight = aBotValue - mLeftTop.mY;
+    LimitDimensions();
+    return *this;
+}
 
 GuiUnit_t Rect::GetLeft() const
 {
@@ -142,12 +142,12 @@ GuiUnit_t Rect::GetRight() const
     return mLeftTop.mX + mWidth;
 }
 
-//Rect& Rect::SetRight(GuiUnit_t aRightValue)
-//{
-//    mWidth = aRightValue - mLeftTop.mX;
-//    LimitDimensions();
-//    return *this;
-//}
+Rect& Rect::SetRight(GuiUnit_t aRightValue)
+{
+    mWidth = aRightValue - mLeftTop.mX;
+    LimitDimensions();
+    return *this;
+}
 
 GuiUnit_t Rect::GetWidth() const
 {

@@ -48,7 +48,7 @@ class Rect
      * \param aLeftTop
      * \param aRightBottom
      */
-//    Rect(const Point &arLeftTop, const Point &arRightBottom);
+    Rect(const Point &arLeftTop, const Point &arRightBottom);
 
     /**
      * \brief Construct a Rect from origin point and size.
@@ -140,7 +140,7 @@ class Rect
      *
      * \param aBotValue
      */
-//    Rect& SetBottom(GuiUnit_t aBotValue);
+    Rect& SetBottom(GuiUnit_t aBotValue);
 
     /**
      * \brief Get the left value
@@ -166,7 +166,7 @@ class Rect
      *
      * \param aRightValue
      */
-//    Rect& SetRight(GuiUnit_t aRightValue);
+    Rect& SetRight(GuiUnit_t aRightValue);
 
     /**
      * \brief Set TopLeft to given point, move BottomRight to keep size.

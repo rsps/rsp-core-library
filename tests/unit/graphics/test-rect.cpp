@@ -46,6 +46,11 @@ TEST_CASE("Rect Constructors")
         CHECK_EQ(a.GetLeft(), 0);
         CHECK_EQ(a.GetRight(), 10);
         CHECK(a.IsHit(Point(0,0)));
+        CHECK(a.IsHit(Point(9,0)));
+        CHECK(a.IsHit(Point(0,9)));
+        CHECK(a.IsHit(Point(9,9)));
+        CHECK_FALSE(a.IsHit(Point(10,0)));
+        CHECK_FALSE(a.IsHit(Point(0,10)));
         CHECK_FALSE(a.IsHit(Point(10,10)));
 
         // Arrange & Act

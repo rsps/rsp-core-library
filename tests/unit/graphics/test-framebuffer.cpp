@@ -136,6 +136,26 @@ TEST_CASE("Framebuffer")
             CHECK_EQ(col.AsUint(), fb.GetPixel(Point(rightBottom.GetX()-1, rightBottom.GetY()-1 - i), false));
         }
         fb.SwapBuffer();
+
+        Rect small(10, 10, 1, 1);
+        Color white(Color::White);
+        CHECK_NOTHROW(fb.DrawRectangle(small, white));
+        CHECK_EQ(fb.GetPixel(Point(10, 10)), white);
+        CHECK_NE(fb.GetPixel(Point(11, 10)), white);
+        CHECK_NE(fb.GetPixel(Point(10, 11)), white);
+        CHECK_NE(fb.GetPixel(Point(11, 11)), white);
+        fb.SwapBuffer();
+
+        Rect medium(20, 20, 10, 10);
+        CHECK_NOTHROW(fb.DrawRectangle(medium, white));
+        CHECK_EQ(fb.GetPixel(Point(20, 20)), white);
+        CHECK_EQ(fb.GetPixel(Point(20, 29)), white);
+        CHECK_NE(fb.GetPixel(Point(20, 30)), white);
+        CHECK_EQ(fb.GetPixel(Point(29, 20)), white);
+        CHECK_NE(fb.GetPixel(Point(30, 20)), white);
+        CHECK_EQ(fb.GetPixel(Point(29, 29)), white);
+        CHECK_NE(fb.GetPixel(Point(30, 30)), white);
+        fb.SwapBuffer();
     }
 
     SUBCASE("Drawing Circles")
