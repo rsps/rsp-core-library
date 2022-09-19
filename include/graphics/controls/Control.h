@@ -258,7 +258,7 @@ public:
      * \param aValue
      * \return Self
      */
-    Control& SetTouchAreaColor(Color aValue = Color::None) { mTouchAreaColor = aValue; return *this; }
+    static void SetTouchAreaColor(Color aValue = Color::None) { mTouchAreaColor = aValue; }
 
 protected:
     Rect mArea{}; // Area of Control in screen coordinates
@@ -278,7 +278,7 @@ protected:
     virtual void refresh() {};
 
 private:
-    static bool mTouchAreaColor;
+    static Color mTouchAreaColor;
     TouchCallback_t mOnPress{};
     TouchCallback_t mOnMove{};
     TouchCallback_t mOnLift{};

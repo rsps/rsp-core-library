@@ -35,14 +35,29 @@ public:
 
     /**
      * \brief Sets Gui loop to terminate on next loop through
+     * \return self
      */
-    void Terminate() { mTerminated = true; }
+    GraphicsMain& Terminate() { mTerminated = true; return *this; }
 
     /**
      * \brief Change the current active Scene
      * \param aSceneName The name of the scene to change to
+     * \return self
      */
-    void ChangeScene(std::uint32_t aId) { mNextScene = aId; }
+    GraphicsMain& ChangeScene(std::uint32_t aId) { mNextScene = aId; return *this; }
+
+    /**
+     * \brief Register a widget that is rendered after all other controls have been rendered.
+     * \param apWidget
+     * \return self
+     */
+    GraphicsMain& RegisterOverlay(Control *apWidget) { mpOverlay = apWidget; return *this; }
+
+    /**
+     * \brief Get current frame rates per seconds.
+     * \return integer FPS
+     */
+    int GetFPS() { return mFps; }
 
 protected:
     BufferedCanvas &mrBufferedCanvas;
@@ -50,6 +65,8 @@ protected:
     SceneMap &mrScenes;
     bool mTerminated = false;
     std::uint32_t mNextScene = 0;
+    Control *mpOverlay = nullptr;
+    int mFps = 0;
 };
 
 } // namespace rsp::graphics

@@ -64,14 +64,21 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
         }
 
         mrScenes.ActiveScene().UpdateData();
+//        mrScenes.ActiveScene().Invalidate();
 
         // Render invalidated things
-        if (mrScenes.ActiveScene().Render(mrBufferedCanvas)) {
+        bool changed = mrScenes.ActiveScene().Render(mrBufferedCanvas);
+        if (mpOverlay) {
+            mpOverlay->UpdateData();
+            changed |= mpOverlay->Render(mrBufferedCanvas);
+        }
+        if (changed) {
             mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
         }
 
         int64_t delay = std::max(std::int64_t(0), frame_time - sw.Elapsed<std::chrono::milliseconds>());
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+        mFps = 1000 / std::max(std::int64_t(1), sw.Elapsed<std::chrono::milliseconds>());
     }
 }
 

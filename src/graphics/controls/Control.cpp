@@ -16,7 +16,7 @@ using namespace rsp::logging;
 namespace rsp::graphics
 {
 
-bool Control::mTouchAreaColor = false;
+Color Control::mTouchAreaColor = false;
 
 std::string to_string(Control::States aState)
 {

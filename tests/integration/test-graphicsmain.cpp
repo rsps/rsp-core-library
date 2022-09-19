@@ -15,6 +15,7 @@
 
 #include <doctest.h>
 #include <posix/FileSystem.h>
+#include <graphics/controls/Label.h>
 #include <graphics/Framebuffer.h>
 #include <graphics/GraphicsMain.h>
 #include <utils/Timer.h>
@@ -36,6 +37,34 @@ static TouchEvent& Touch(TouchEvent::Types aType, Point aPoint)
     }
     return event;
 }
+
+class Overlay : public Label
+{
+public:
+    Overlay(GraphicsMain &arGfx)
+        : mrGfx(arGfx)
+    {
+        SetTransparent(false);
+        GetText().GetFont().SetSize(12); //.SetBackgroundColor(Color::Black);
+        SetArea(Rect(0, 0, 100, 15));
+        GetStyle(States::normal).mForegroundColor = Color::Yellow;
+        GetStyle(States::normal).mBackgroundColor = Color::Black;
+        SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
+    }
+
+    void UpdateData() override {
+        int fps = mrGfx.GetFPS();
+        mIterations++;
+        mTotalFps += fps;
+        SetCaption("FPS: " + std::to_string(fps) + ", " + std::to_string(mTotalFps / mIterations));
+        refresh();
+    }
+
+protected:
+    GraphicsMain &mrGfx;
+    int mIterations = 0;
+    int mTotalFps = 0;
+};
 
 TEST_CASE("Graphics Main Test")
 {
@@ -66,6 +95,10 @@ TEST_CASE("Graphics Main Test")
     TestTouchParser tp;
 
     GraphicsMain gfx(fb, tp, scenes);
+
+    Overlay overlay(gfx);
+
+    gfx.RegisterOverlay(&overlay);
 
     SUBCASE("Clear") {
         fb.SwapBuffer(Framebuffer::SwapOperations::Clear);
@@ -99,7 +132,7 @@ TEST_CASE("Graphics Main Test")
         };
 
         MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
-        gfx.Run(GFX_FPS, true);
+        gfx.Run(1000, true);
 
         const uint32_t cGreenColor = 0xFF24b40b;
         CHECK_EQ(fb.GetPixel(scenes.ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1)), cGreenColor);
@@ -160,8 +193,9 @@ TEST_CASE("Graphics Main Test")
                     CHECK_EQ(scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue(), "Hello 128€?sdgp");
                     break;
                 case 11:
+                    Control::SetTouchAreaColor(Color::Yellow);
                     scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetFont().SetBackgroundColor(Color::Silver);
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().Invalidate();
+                    scenes.ActiveSceneAs<InputScene>().Invalidate();
                     timeout = 800ms;
                     break;
                 case 12:
@@ -169,8 +203,9 @@ TEST_CASE("Graphics Main Test")
                     timeout = 800ms;
                     break;
                 case 13:
+                    Control::SetTouchAreaColor(Color::None);
                     scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetFont().SetBackgroundColor(Color::None);
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().Invalidate();
+                    scenes.ActiveSceneAs<InputScene>().Invalidate();
                     timeout = 200ms;
                     break;
                 default:
@@ -185,6 +220,8 @@ TEST_CASE("Graphics Main Test")
         MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
         gfx.Run(GFX_FPS, true);
     }
+
+    gfx.RegisterOverlay(nullptr);
 
     TimerQueue::Destroy();
 }
