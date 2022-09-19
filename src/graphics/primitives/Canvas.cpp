@@ -134,7 +134,7 @@ void Canvas::DrawImageSection(const Point &arLeftTop, const Bitmap &arBitmap, co
 
 void Canvas::DrawText(Text &arText)
 {
-    DrawText(arText, arText.GetFont().GetColor());
+    DrawText(arText, arText.GetFont().GetColor(), arText.GetFont().GetBackgroundColor());
 }
 
 void Canvas::DrawText(const Text &arText, Color aColor, Color aBackColor)

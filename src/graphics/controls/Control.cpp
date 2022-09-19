@@ -11,12 +11,12 @@
 #include <graphics/controls/Control.h>
 #include <logging/Logger.h>
 
-#define SHOW_TOUCH_AREAS 1
-
 using namespace rsp::logging;
 
 namespace rsp::graphics
 {
+
+bool Control::mTouchAreaColor = false;
 
 std::string to_string(Control::States aState)
 {
@@ -192,14 +192,12 @@ void Control::paint(Canvas &arCanvas, const Style &arStyle)
     arStyle.mBackground.Paint(GetOrigin(), arCanvas);
     arStyle.mForeground.Paint(GetOrigin(), arCanvas);
 
-#ifdef SHOW_TOUCH_AREAS
-    if (!mTouchArea.empty()) {
+    if ((mTouchAreaColor != Color::None) && !mTouchArea.empty()) {
         Rect r = mTouchArea;
         r.AddSize(1, 1);
         arCanvas.SetClipRect(r);
-        arCanvas.DrawRectangle(mTouchArea, Color::Yellow);
+        arCanvas.DrawRectangle(mTouchArea, mTouchAreaColor);
     }
-#endif
 }
 
 Control& Control::SetDraggable(bool aValue)

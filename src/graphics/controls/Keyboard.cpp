@@ -38,9 +38,6 @@ Key::Key()
 Key& Key::Setup(Rect aTouchArea, Rect aArea, int aSymbol)
 {
     SetArea(aArea);
-//    SetArea(Rect(aPosition.GetX(), aPosition.GetY(),
-//        static_cast<int>(std::max(arBackground.GetWidth(), arForeground.GetWidth())),
-//        static_cast<int>(std::max(arBackground.GetHeight(), arForeground.GetHeight()))));
     SetTouchArea(aTouchArea);
 
     if (aSymbol) {
@@ -127,13 +124,13 @@ Keyboard::Keyboard()
 {
     SetTransparent(true);
 
-    mImages[ImageIds::BigSpecial].Assign(cBigSpecial);// Load("testImages/alpha/BigSpecial.bmp");
-    mImages[ImageIds::SmallSpecial].Assign(cSmallSpecial); // Load("testImages/alpha/SmallSpecial.bmp");
-    mImages[ImageIds::Space].Assign(cSpace); // Load("testImages/alpha/Space.bmp");
-    mImages[ImageIds::Erase].Assign(cErase); // Load("testImages/alpha/Erase.bmp");
-    mImages[ImageIds::Key].Assign(cKey); // Load("testImages/alpha/Key.bmp");
-    mImages[ImageIds::LowerCase].Assign(cLowerCase); // Load("testImages/alpha/LowerCase.bmp");
-    mImages[ImageIds::UpperCase].Assign(cUpperCase); // Load("testImages/alpha/UpperCase.bmp");
+    mImages[ImageIds::BigSpecial].Assign(cBigSpecial);
+    mImages[ImageIds::SmallSpecial].Assign(cSmallSpecial);
+    mImages[ImageIds::Space].Assign(cSpace);
+    mImages[ImageIds::Erase].Assign(cErase);
+    mImages[ImageIds::Key].Assign(cKey);
+    mImages[ImageIds::LowerCase].Assign(cLowerCase);
+    mImages[ImageIds::UpperCase].Assign(cUpperCase);
 
     BitmapView big_special(&mImages[ImageIds::BigSpecial]);
     BitmapView small_special(&mImages[ImageIds::SmallSpecial]);
@@ -196,7 +193,6 @@ Keyboard::Keyboard()
         index++;
     }
 
-//    mBtnShift.SetState(States::checked);
     SetLayout(LayoutType::Letters);
 }
 

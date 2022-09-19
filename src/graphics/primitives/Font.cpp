@@ -97,6 +97,12 @@ Font& Font::SetColor(const Color &arColor)
     return *this;
 }
 
+Font& Font::SetBackgroundColor(const Color &arColor)
+{
+    mBackgroundColor = arColor;
+    return *this;
+}
+
 Font& Font::SetStyle(FontStyles aStyle)
 {
     mpImpl->SetStyle(aStyle);

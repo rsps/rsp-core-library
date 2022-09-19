@@ -62,11 +62,9 @@ Control& Label::SetArea(Rect aRect)
 
 void Label::paint(Canvas &arCanvas, const Style &arStyle)
 {
-    if (GetName() == "Special") {
-        GetId();
-    }
     Control::paint(arCanvas, arStyle);
-    arCanvas.DrawText(mText, arStyle.mForegroundColor, arStyle.mBackgroundColor);
+    mText.GetFont().SetColor(arStyle.mForegroundColor);
+    arCanvas.DrawText(mText);
 }
 
 Label& Label::SetFontSize(int aSizePx)

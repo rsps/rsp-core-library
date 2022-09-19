@@ -144,24 +144,34 @@ TEST_CASE("Graphics Main Test")
                     break;
                 case 7:
                     scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(16);
-                    timeout = 1000ms;
+                    timeout = 500ms;
                     break;
                 case 8:
                     scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(22);
-                    timeout = 1000ms;
+                    timeout = 500ms;
                     break;
                 case 9:
                     scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(26);
-                    timeout = 1000ms;
+                    timeout = 500ms;
                     break;
                 case 10:
                     scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(40);
-                    timeout = 1000ms;
+                    timeout = 500ms;
                     CHECK_EQ(scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue(), "Hello 128€?sdgp");
                     break;
                 case 11:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetFont().SetBackgroundColor(Color::Silver);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().Invalidate();
+                    timeout = 800ms;
+                    break;
+                case 12:
                     scenes.ActiveSceneAs<InputScene>().GetLabel().SetCaption("æøåößđŋµÅÖ");
-                    timeout = 1000ms;
+                    timeout = 800ms;
+                    break;
+                case 13:
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetFont().SetBackgroundColor(Color::None);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().Invalidate();
+                    timeout = 200ms;
                     break;
                 default:
                     CHECK_EQ(scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue(), "æøåößđŋµÅÖ");

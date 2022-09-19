@@ -39,7 +39,7 @@ class TouchControl;
 
 class Control
 {
-  public:
+public:
     using TouchCallback_t = rsp::utils::Function<void(const Point&, int)>;
 
     /**
@@ -252,7 +252,15 @@ class Control
      */
     TouchCallback_t& OnClick() { return mOnClick; }
 
-  protected:
+    /**
+     * \brief A design helper function, it will paint a rectangle indicating
+     *        the touch area of Control objects in the given color.
+     * \param aValue
+     * \return Self
+     */
+    Control& SetTouchAreaColor(Color aValue = Color::None) { mTouchAreaColor = aValue; return *this; }
+
+protected:
     Rect mArea{}; // Area of Control in screen coordinates
     Rect mTouchArea{}; // Touch area of Control in screen coordinates
     std::map<States, Style> mStyles{};
@@ -269,16 +277,17 @@ class Control
     virtual void paint(Canvas &arCanvas, const Style &arStyle);
     virtual void refresh() {};
 
-  private:
-      TouchCallback_t mOnPress{};
-      TouchCallback_t mOnMove{};
-      TouchCallback_t mOnLift{};
-      TouchCallback_t mOnClick{};
+private:
+    static bool mTouchAreaColor;
+    TouchCallback_t mOnPress{};
+    TouchCallback_t mOnMove{};
+    TouchCallback_t mOnLift{};
+    TouchCallback_t mOnClick{};
 
-      virtual void doPress(const Point &arPoint);
-      virtual void doMove(const Point &arPoint);
-      virtual void doLift(const Point &arPoint);
-      virtual void doClick(const Point &arPoint);
+    virtual void doPress(const Point &arPoint);
+    virtual void doMove(const Point &arPoint);
+    virtual void doLift(const Point &arPoint);
+    virtual void doClick(const Point &arPoint);
 };
 
 #define TYPEINFO(a) \
