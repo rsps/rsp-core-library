@@ -18,6 +18,7 @@
 #include <graphics/controls/Keyboard.h>
 #include <graphics/controls/Label.h>
 #include <graphics/controls/Scene.h>
+#include <graphics/TouchEvent.h>
 #include <graphics/primitives/Bitmap.h>
 
 namespace rsp::graphics {
