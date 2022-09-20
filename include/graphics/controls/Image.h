@@ -24,8 +24,6 @@ public:
     Image() : Control(rsp::utils::MakeTypeInfo<Image>()) {}
     Image(const rsp::utils::TypeInfo &arInfo) : Control(arInfo) {};
 
-    Image& SetArea(Rect aRect) override;
-
     void ClearSection();
     void SetSection(const Rect &arSection);
 

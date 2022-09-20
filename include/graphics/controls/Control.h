@@ -157,7 +157,7 @@ public:
      * \brief Sets the area of the object as a rectangle in parent coordinates
      * \param aRect A reference to the rectangle to define the objects area
      */
-    virtual Control& SetArea(Rect aRect);
+    Control& SetArea(Rect aRect);
 
     /**
      * \brief Gets the area of the object as a rectangle in parent coordinates
@@ -276,6 +276,7 @@ protected:
 
     virtual void paint(Canvas &arCanvas, const Style &arStyle);
     virtual void refresh() {};
+    virtual void doSetArea(const Rect &arRect);
 
 private:
     static Color mTouchAreaColor;

@@ -85,7 +85,12 @@ Control& Control::SetArea(Rect aRect)
             mpParent->Invalidate();
         }
     }
+    doSetArea(aRect);
     return *this;
+}
+
+void Control::doSetArea(const Rect &arRect)
+{
 }
 
 Rect Control::GetArea() const
