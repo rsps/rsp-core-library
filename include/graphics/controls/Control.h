@@ -291,9 +291,9 @@ private:
     virtual void doClick(const Point &arPoint);
 };
 
-#define TYPEINFO(a) \
-        static constexpr std::uint32_t ID = rsp::utils::crc32::HashOf<a>(); \
-        static constexpr std::string_view NAME = rsp::utils::NameOf<a>();
+#define TYPEINFO(__a) \
+        static constexpr std::uint32_t ID = rsp::utils::crc32::HashOf<__a>(); \
+        static constexpr std::string_view NAME = rsp::utils::NameOf<__a>();
 
 std::string to_string(Control::States aState);
 std::ostream& operator<<(std::ostream& os, const Control::States aState);
