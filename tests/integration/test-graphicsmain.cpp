@@ -27,17 +27,6 @@ using namespace rsp::graphics;
 using namespace rsp::utils;
 using namespace std::literals::chrono_literals;
 
-static TouchEvent& Touch(TouchEvent::Types aType, Point aPoint)
-{
-    static TouchEvent event;
-    event.mType = aType;
-    event.mCurrent = aPoint;
-    if (aType == TouchEvent::Types::Press) {
-        event.mPress = aPoint;
-    }
-    return event;
-}
-
 class Overlay : public Label
 {
 public:
@@ -45,8 +34,8 @@ public:
         : mrGfx(arGfx)
     {
         SetTransparent(false);
-        GetText().GetFont().SetSize(12); //.SetBackgroundColor(Color::Black);
-        SetArea(Rect(0, 0, 100, 15));
+        mText.GetFont().SetSize(12); //.SetBackgroundColor(Color::Black);
+        SetArea(Rect(0, 0, 150, 15));
         GetStyle(States::normal).mForegroundColor = Color::Yellow;
         GetStyle(States::normal).mBackgroundColor = Color::Black;
         SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
@@ -56,7 +45,13 @@ public:
         int fps = mrGfx.GetFPS();
         mIterations++;
         mTotalFps += fps;
-        SetCaption("FPS: " + std::to_string(fps) + ", " + std::to_string(mTotalFps / mIterations));
+        if (fps && (fps < mMinFps)) {
+            mMinFps = fps;
+        }
+        if (fps > mMaxFps) {
+            mMaxFps = fps;
+        }
+        SetCaption("FPS: " + std::to_string(fps) + ", " + std::to_string(mTotalFps / mIterations) + ", " + std::to_string(mMinFps) + ", " + std::to_string(mMaxFps));
         refresh();
     }
 
@@ -64,6 +59,8 @@ protected:
     GraphicsMain &mrGfx;
     int mIterations = 0;
     int mTotalFps = 0;
+    int mMinFps = 10000000;
+    int mMaxFps = 0;
 };
 
 TEST_CASE("Graphics Main Test")
@@ -217,8 +214,8 @@ TEST_CASE("Graphics Main Test")
         };
         t1.Enable();
 
-        MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
-        gfx.Run(GFX_FPS, true);
+        MESSAGE("Running GFX loop with " << 1000 << " FPS");
+        gfx.Run(1000, true);
     }
 
     gfx.RegisterOverlay(nullptr);
