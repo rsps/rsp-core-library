@@ -71,6 +71,7 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
         if (mpOverlay) {
             mpOverlay->UpdateData();
             changed |= mpOverlay->Render(mrBufferedCanvas);
+            mrBufferedCanvas.SetClipRect(mrScenes.ActiveScene().GetArea());
         }
         if (changed) {
             mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);

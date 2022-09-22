@@ -132,8 +132,10 @@ TEST_CASE("Graphics Main Test")
         gfx.Run(1000, true);
 
         const uint32_t cGreenColor = 0xFF24b40b;
-        CHECK_EQ(fb.GetPixel(scenes.ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1)), cGreenColor);
-        CHECK_EQ(fb.GetPixel(scenes.ActiveSceneAs<SecondScene>().GetBotRect().GetTopLeft() + Point(1,1)), cGreenColor);
+        Point toppoint = scenes.ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1);
+        Point botpoint = scenes.ActiveSceneAs<SecondScene>().GetBotRect().GetTopLeft() + Point(1,1);
+        CHECK_EQ(fb.GetPixel(toppoint, true), cGreenColor);
+        CHECK_EQ(fb.GetPixel(botpoint, true), cGreenColor);
         CHECK_EQ(topBtnClicked, 2);
     }
 
