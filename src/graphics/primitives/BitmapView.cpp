@@ -13,29 +13,36 @@
 
 namespace rsp::graphics {
 
-BitmapView::BitmapView(const Bitmap* apBitmap)
-    : mpBitmap(apBitmap)
+BitmapView::BitmapView(const PixelData &arPixelData)
+    : mpPixelData(&arPixelData)
 {
-    SetSection(Rect(0u, 0u, apBitmap->GetWidth(), apBitmap->GetHeight()));
+    SetSection(Rect(0u, 0u, mpPixelData->GetWidth(), mpPixelData->GetHeight()));
 }
 
-BitmapView::BitmapView(const Bitmap *apBitmap, const Rect &arSection)
-    : mpBitmap(apBitmap)
+BitmapView::BitmapView(const PixelData &arPixelData, const Rect &arSection)
+    : mpPixelData(&arPixelData)
 {
     SetSection(arSection);
 }
 
-BitmapView& BitmapView::SetBitmap(const Bitmap *apBitmap)
+BitmapView& BitmapView::SetPixelData(const PixelData &arPixelData)
 {
-    mpBitmap = apBitmap;
+    mpPixelData = &arPixelData;
+    ClearSection();
+    return *this;
+}
+
+BitmapView& BitmapView::SetPixelData(const Bitmap &arBitmap)
+{
+    mpPixelData = &(arBitmap.GetPixelData());
     ClearSection();
     return *this;
 }
 
 BitmapView& BitmapView::ClearSection()
 {
-    if (mpBitmap) {
-        mSection = Rect(0u, 0u, mpBitmap->GetWidth(), mpBitmap->GetHeight());
+    if (mpPixelData) {
+        mSection = Rect(0u, 0u, mpPixelData->GetWidth(), mpPixelData->GetHeight());
     }
     else {
         mSection = Rect();
@@ -45,8 +52,8 @@ BitmapView& BitmapView::ClearSection()
 
 BitmapView& BitmapView::SetSection(const Rect &arSection)
 {
-    if (mpBitmap) {
-        mSection = Rect(0u, 0u, mpBitmap->GetWidth(), mpBitmap->GetHeight()) & arSection;
+    if (mpPixelData) {
+        mSection = Rect(0u, 0u, mpPixelData->GetWidth(), mpPixelData->GetHeight()) & arSection;
     }
     else {
         mSection = Rect();
@@ -68,20 +75,20 @@ BitmapView& BitmapView::SetPixelColor(const Color &arColor)
 
 void BitmapView::Paint(const Point &arOffset, Canvas &arCanvas) const
 {
-    if (!mpBitmap) {
+    if (!mpPixelData) {
         return;
     }
-    arCanvas.DrawImageSection(arOffset + mDestination, *mpBitmap, mSection, mPixelColor);
+    arCanvas.DrawPixelData(arOffset + mDestination, *mpPixelData, mSection, mPixelColor);
 }
 
 GuiUnit_t BitmapView::GetWidth()
 {
-    return (!mpBitmap) ? 0 : mpBitmap->GetWidth();
+    return (!mpPixelData) ? 0 : mpPixelData->GetWidth();
 }
 
 GuiUnit_t BitmapView::GetHeight()
 {
-    return (!mpBitmap) ? 0 : mpBitmap->GetHeight();
+    return (!mpPixelData) ? 0 : mpPixelData->GetHeight();
 }
 
 } /* namespace rsp::graphics */

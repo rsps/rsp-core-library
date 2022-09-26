@@ -13,6 +13,7 @@
 
 #include "Bitmap.h"
 #include "Color.h"
+#include "PixelData.h"
 
 namespace rsp::graphics {
 
@@ -20,16 +21,17 @@ class BitmapView
 {
 public:
     BitmapView() {};
-    BitmapView(const Bitmap* apBitmap);
-    BitmapView(const Bitmap* apBitmap, const Rect& arSection);
+    BitmapView(const PixelData &arPixelData);
+    BitmapView(const PixelData &arPixelData, const Rect& arSection);
+
     BitmapView(const BitmapView &) = default;
     BitmapView(BitmapView &&) = default;
 
     BitmapView& operator=(const BitmapView&) = default;
     BitmapView& operator=(BitmapView&&) = default;
 
-    BitmapView& SetBitmap(const Bitmap *apBitmap);
-    const Bitmap* GetBitmap() const { return mpBitmap; }
+    BitmapView& SetPixelData(const PixelData &arPixelData);
+    BitmapView& SetPixelData(const Bitmap &arBitmap);
 
     BitmapView& ClearSection();
     BitmapView& SetSection(const Rect &arSection);
@@ -52,7 +54,7 @@ protected:
     Point mDestination{};
     Color mPixelColor = Color::White;
     Rect mSection{};
-    const Bitmap* mpBitmap = nullptr;
+    const PixelData* mpPixelData = nullptr;
 };
 
 } /* namespace rsp::graphics */

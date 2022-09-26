@@ -15,6 +15,7 @@
 #include "Point.h"
 #include "Rect.h"
 #include "Text.h"
+#include "PixelData.h"
 
 namespace rsp::graphics
 {
@@ -98,6 +99,15 @@ class Canvas
      * \param aColor Foreground color used if the bitmap is monochrome or alpha.
      */
     void DrawImageSection(const Point &arLeftTop, const Bitmap &arBitmap, const Rect &arSection, Color aColor = Color::White);
+
+    /**
+     * \brief Copies part of a pixel data buffer into this canvas.
+     * \param arLeftTop
+     * \param arPixelData
+     * \param arSection
+     * \param aColor
+     */
+    void DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData, const Rect &arSection, Color aColor);
 
     /**
      * \brief Draws the given Text object in the given color on the canvas.

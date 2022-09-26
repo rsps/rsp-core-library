@@ -142,7 +142,6 @@ public:
     const Rect cSpecialRight = {356, 224, 98, 64};
 
     enum class LayoutType { Letters, Numbers, Special };
-    enum class ImageIds { SmallSpecial, BigSpecial, Space, Key, LowerCase, UpperCase, Erase };
 
     Keyboard();
     ~Keyboard();
@@ -155,7 +154,6 @@ public:
     KeyboardCallback_t& OnKeyClick() { return mOnKeyClick; }
 protected:
     KeyboardCallback_t mOnKeyClick;
-    std::map<ImageIds, Bitmap> mImages{};
     std::array<Key, 26u> mKeys{};
     Key mBtnShift;
     Key mBtnLetters;

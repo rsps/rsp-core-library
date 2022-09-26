@@ -63,7 +63,7 @@ public:
     {
         SetTransparent(true); // No need to paint background color, we have full screen image.
 
-        GetStyle(Control::States::normal).mBackground.SetBitmap(&mBackground);
+        GetStyle(Control::States::normal).mBackground.SetPixelData(mBackground);
 
         mLabel.GetText().GetFont().SetSize(34);
         mLabel.SetArea(Rect(80, 150, 320, 160));

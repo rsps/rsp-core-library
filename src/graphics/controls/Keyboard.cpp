@@ -124,21 +124,13 @@ Keyboard::Keyboard()
 {
     SetTransparent(true);
 
-    mImages[ImageIds::BigSpecial].Assign(cBigSpecial);
-    mImages[ImageIds::SmallSpecial].Assign(cSmallSpecial);
-    mImages[ImageIds::Space].Assign(cSpace);
-    mImages[ImageIds::Erase].Assign(cErase);
-    mImages[ImageIds::Key].Assign(cKey);
-    mImages[ImageIds::LowerCase].Assign(cLowerCase);
-    mImages[ImageIds::UpperCase].Assign(cUpperCase);
-
-    BitmapView big_special(&mImages[ImageIds::BigSpecial]);
-    BitmapView small_special(&mImages[ImageIds::SmallSpecial]);
-    BitmapView space(&mImages[ImageIds::Space]);
-    BitmapView erase(&mImages[ImageIds::Erase]);
-    BitmapView key(&mImages[ImageIds::Key]);
-    BitmapView lowercase(&mImages[ImageIds::LowerCase]);
-    BitmapView uppercase(&mImages[ImageIds::UpperCase]);
+    BitmapView big_special(cBigSpecial);
+    BitmapView small_special(cSmallSpecial);
+    BitmapView space(cSpace);
+    BitmapView erase(cErase);
+    BitmapView key(cKey);
+    BitmapView lowercase(cLowerCase);
+    BitmapView uppercase(cUpperCase);
     BitmapView empty;
 
     mBtnShift.Setup(Rect(0, 152, 80, 71), small_special.GetBoundingRect({18, 167}), cKEY_SHIFT)
