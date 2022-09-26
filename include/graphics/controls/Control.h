@@ -157,7 +157,7 @@ public:
      * \brief Sets the area of the object as a rectangle in parent coordinates
      * \param aRect A reference to the rectangle to define the objects area
      */
-    virtual Control& SetArea(Rect aRect);
+    Control& SetArea(Rect aRect);
 
     /**
      * \brief Gets the area of the object as a rectangle in parent coordinates
@@ -276,6 +276,7 @@ protected:
 
     virtual void paint(Canvas &arCanvas, const Style &arStyle);
     virtual void refresh() {};
+    virtual void doSetArea(const Rect &arRect);
 
 private:
     static Color mTouchAreaColor;
@@ -290,9 +291,9 @@ private:
     virtual void doClick(const Point &arPoint);
 };
 
-#define TYPEINFO(a) \
-        static constexpr std::uint32_t ID = rsp::utils::crc32::HashOf<a>(); \
-        static constexpr std::string_view NAME = rsp::utils::NameOf<a>();
+#define TYPEINFO(__a) \
+        static constexpr std::uint32_t ID = rsp::utils::crc32::HashOf<__a>(); \
+        static constexpr std::string_view NAME = rsp::utils::NameOf<__a>();
 
 std::string to_string(Control::States aState);
 std::ostream& operator<<(std::ostream& os, const Control::States aState);

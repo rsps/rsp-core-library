@@ -25,9 +25,6 @@ public:
     TYPEINFO(Button)
     Button() : Label(rsp::utils::MakeTypeInfo<Button>()) {}
     Button(const rsp::utils::TypeInfo &arInfo) : Label(arInfo) {};
-
-protected:
-//    void paint(Canvas &arCanvas, const Style &arStyle) override;
 };
 
 } /* namespace rsp::graphics */

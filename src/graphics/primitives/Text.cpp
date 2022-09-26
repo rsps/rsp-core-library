@@ -106,9 +106,6 @@ void Text::calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs)
         }
         else {
             w += glyph.mAdvanceX; //.mWidth;
-//            if (h < glyph.mHeight) {
-//                h = glyph.mHeight;
-//            }
         }
     }
     if (w > line_width) {

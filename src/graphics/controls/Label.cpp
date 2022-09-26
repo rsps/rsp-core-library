@@ -49,14 +49,13 @@ Control& Label::SetOrigin(const Point &arPoint)
     return *this;
 }
 
-Control& Label::SetArea(Rect aRect)
+void Label::doSetArea(const Rect &arRect)
 {
-    Rect r = aRect;
+    Rect r = arRect;
     if (mpParent) {
         r.MoveTo(r.GetTopLeft() + mpParent->GetOrigin());
     }
     mText.SetArea(r);
-    return Control::SetArea(aRect);
 }
 
 

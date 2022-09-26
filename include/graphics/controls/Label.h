@@ -33,13 +33,13 @@ public:
     Text& GetText() { return mText; }
 
     Control& SetOrigin(const Point &arPoint) override;
-    Control& SetArea(Rect aRect) override;
 
 protected:
     Text mText{};
 
     void paint(Canvas &arCanvas, const Style &arStyle) override;
     void refresh() override;
+    void doSetArea(const Rect &arRect) override;
 };
 
 } // namespace rsp::graphics
