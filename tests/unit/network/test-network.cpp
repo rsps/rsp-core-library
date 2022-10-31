@@ -9,6 +9,7 @@
  */
 
 #include <doctest.h>
+#include <cstring>
 #include <iostream>
 #include <sstream>
 #include <logging/Logger.h>
@@ -18,6 +19,7 @@
 #include <network/HttpSession.h>
 #include <network/NetworkException.h>
 #include <posix/FileSystem.h>
+#include <posix/FileIO.h>
 #include <utils/AnsiEscapeCodes.h>
 #include <TestHelpers.h>
 #include <cstdlib>
@@ -129,6 +131,10 @@ TEST_CASE("Network")
         CHECK_EQ(resp->GetHeaders().at("content-type"), "image/png");
         CHECK_EQ(resp->GetBody().size(), 25138);
         CHECK_EQ(resp->GetStatusCode(), 200);
+
+        rsp::posix::FileIO file("./webserver/public/image.png", std::ios_base::in);
+        auto s = file.GetContents();
+        CHECK(std::memcmp(s.data(), resp->GetBody().data(), s.size()) == 0);
     }
 
     SUBCASE("Http Session") {
