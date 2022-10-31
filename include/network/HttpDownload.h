@@ -12,11 +12,26 @@
 #define INCLUDE_NETWORK_HTTPDOWNLOAD_H_
 
 #include <network/HttpRequest.h>
+#include <posix/FileIO.h>
 
 namespace rsp::network {
 
+/**
+ * \class HttpDownload
+ * \brief Helper class to perform a download request to a destination file.
+ *
+ * If the file already exists, its size and hash is checked against the file on the server.
+ * If the file is only partially downloaded, download will be resumed.
+ */
 class HttpDownload: public HttpRequest
 {
+public:
+    HttpDownload(const std::string &arFilename);
+
+    IHttpResponse& Execute() override;
+
+protected:
+    rsp::posix::FileIO mFile;
 };
 
 } /* namespace rsp::network */

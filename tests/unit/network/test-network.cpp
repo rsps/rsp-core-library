@@ -126,7 +126,7 @@ TEST_CASE("Network")
         CHECK_NOTHROW(resp = &request.Execute());
 
 //        MESSAGE("Request:\n" << resp->GetRequest());
-//        MESSAGE("Response:\n" << *resp);
+        MESSAGE("Response:\n" << *resp);
 
         CHECK_EQ(resp->GetHeaders().at("content-type"), "image/png");
         CHECK_EQ(resp->GetBody().size(), 25138);
