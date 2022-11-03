@@ -10,41 +10,49 @@
 
 #include <string>
 #include <network/HttpDownload.h>
+#include <posix/FileSystem.h>
+#include <utils/StrUtils.h>
+
+using namespace rsp::posix;
+using namespace rsp::utils;
 
 namespace rsp::network {
 
 HttpDownload::HttpDownload(const std::string &arFilename)
-    : mFile(arFilename, std::ios::in | std::ios::out, 0640)
 {
+    if (FileSystem::FileExists(arFilename)) {
+        auto mtime = FileSystem::GetFileModifiedTime(arFilename);
+        mModifiedTime = StrUtils::TimeStamp(mtime, StrUtils::TimeFormats::HTTP);
+    }
+
+    mFile.Open(arFilename, std::ios::in | std::ios::out, 0640);
+
+    WriteToFile(mFile);
 }
 
 IHttpResponse& HttpDownload::Execute()
 {
-    // TODO: If file exists, first make head request and verify if file is correct and finished.
-    // TODO: OR execute with etag in "If-None-Match" header and ranges set to "file size-"
-    HttpRequestOptions opt = GetOptions();
-    opt.RequestType = HttpRequestType::GET;
-    opt.Headers["Range"] = std::string("bytes=") + std::to_string(mFile.GetSize()) + "-";
-    opt.Headers["ETag"] = ""; // TODO: Add etag of file here if known.
+    HttpRequestOptions orig_opt = GetOptions();
+    orig_opt.RequestType = HttpRequestType::GET;
+
+    HttpRequestOptions opt = orig_opt;
+    if (mFile.GetSize() > 0) {
+        opt.Headers["Range"] = std::string("bytes=") + std::to_string(mFile.GetSize()) + "-";
+    }
+    if (!mModifiedTime.empty()) {
+        opt.Headers["If-Unmodified-Since"] = mModifiedTime;
+        // Returns 412 if condition fails.
+    }
     SetOptions(opt);
 
-//    IHttpResponse &resp = mPimpl->Execute();
-//    if (resp.GetStatusCode() == 200) {
-//        if (resp.GetHeaders().at("content-length") == mFile.GetSize()) {
-//            // TODO: Check etag hash, check Aretaeus documentation
-//        }
-//        else {
-//
-//        }
-////            content-type: image/png
-////            etag: "4284873773"
-////            last-modified: Tue, 23 Aug 2022 13:03:39 GMT
-//
+    IHttpResponse& resp = mPimpl->Execute();
+
+//    if (resp.GetStatusCode() != 200) {
+//        SetOptions(orig_opt);
+//        return mPimpl->Execute();
 //    }
 
-
-    // Start over or continue according to result of file check.
-    return mPimpl->Execute();
+    return resp;
 }
 
 } /* namespace rsp::network */

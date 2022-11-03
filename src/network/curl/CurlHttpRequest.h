@@ -43,6 +43,8 @@ public:
     CurlHttpRequest& operator=(const CurlHttpRequest&) = default;
     CurlHttpRequest& operator=(CurlHttpRequest&&) = default;
 
+    IHttpRequest& WriteToFile(rsp::posix::FileIO &arFile) override;
+
     IHttpResponse& Execute() override;
     const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
@@ -59,6 +61,7 @@ protected:
 private:
 
     static size_t writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *data);
+    static size_t fileWriteFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile);
     static size_t headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse);
     static size_t progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
 

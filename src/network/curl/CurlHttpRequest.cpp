@@ -46,9 +46,22 @@ CurlHttpRequest::~CurlHttpRequest()
 {
 }
 
+IHttpRequest& CurlHttpRequest::WriteToFile(rsp::posix::FileIO &arFile)
+{
+    setCurlOption(CURLOPT_WRITEFUNCTION, fileWriteFunction);
+    setCurlOption(CURLOPT_WRITEDATA, &arFile);
+    return *this;
+}
+
 size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
 {
     apResponse->getBody().append(static_cast<char*>(ptr), size * nmemb);
+    return size * nmemb;
+}
+
+size_t CurlHttpRequest::fileWriteFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile)
+{
+    apFile->Write(ptr, size * nmemb);
     return size * nmemb;
 }
 
@@ -222,7 +235,7 @@ void CurlHttpRequest::populateOptions()
 } // namespace rsp::network::http
 
 /**
- * \brief Factory function to decouple depency
+ * \brief Factory function to decouple dependency
  *
  * \return IHttpRequest*
  */

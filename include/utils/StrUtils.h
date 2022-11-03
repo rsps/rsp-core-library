@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <filesystem>
 
 namespace rsp::utils::StrUtils {
 
@@ -171,7 +172,7 @@ std::string ReduceToCommon(std::vector<std::string> &arList);
 std::string& ReplaceAll(std::string &aText, const std::string& aFrom, const std::string& aTo);
 
 
-enum class TimeFormats { Normal, Logging, RFC3339, RFC3339Milli };
+enum class TimeFormats { Normal, Logging, RFC3339, RFC3339Milli, HTTP };
 /**
  * Format a time_point into a string timestamp with milliseconds.
  *
@@ -183,6 +184,7 @@ std::string TimeStamp(TimeFormats aFormat);
 std::string TimeStamp(std::chrono::steady_clock::time_point aTime, TimeFormats aFormat = TimeFormats::Logging);
 std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats aFormat = TimeFormats::Logging);
 std::string TimeStamp(std::chrono::milliseconds aMilliSeconds, TimeFormats aFormat = TimeFormats::Logging);
+std::string TimeStamp(std::filesystem::file_time_type aFiletime, TimeFormats aFormat = TimeFormats::Logging);
 
 
 /**

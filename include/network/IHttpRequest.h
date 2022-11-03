@@ -15,6 +15,7 @@
 #include <functional>
 #include <network/HttpRequestOptions.h>
 #include <network/IHttpResponse.h>
+#include <posix/FileIO.h>
 
 namespace rsp::network {
 
@@ -28,6 +29,15 @@ class IHttpRequest
 {
 public:
     virtual ~IHttpRequest() {}
+
+    /**
+     * \fn void WriteToFile(rsp::posix::FileIO&)=0
+     * \brief Redirect response body to the given file
+     *
+     * \param arFile
+     * \return self
+     */
+    virtual IHttpRequest& WriteToFile(rsp::posix::FileIO &arFile) =  0;
 
     /**
      * \fn const HttpRequestOptions GetOptions&()const =0

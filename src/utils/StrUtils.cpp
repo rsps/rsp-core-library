@@ -195,6 +195,10 @@ std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats a
             ss << std::put_time(gmtime_r(&t, &tbuf), "%FT%T.") << std::setfill('0') << std::setw(3) << msecs.count() << "Z";
             break;
 
+        case TimeFormats::HTTP:
+            ss << std::put_time(gmtime_r(&t, &tbuf), "%a, %d %b %Y %H:%M:%S") << " GMT";
+            break;
+
         default:
             ss << std::put_time(gmtime_r(&t, &tbuf), "%F %T");
             break;
@@ -212,6 +216,13 @@ std::string TimeStamp(std::chrono:: milliseconds aMilliSeconds, TimeFormats aFor
 {
     std::chrono::time_point<std::chrono::system_clock> dur(aMilliSeconds);
     return TimeStamp(dur, aFormat);
+}
+
+std::string TimeStamp(std::filesystem::file_time_type aFiletime, TimeFormats aFormat)
+{
+    using namespace std::chrono;
+    auto tp = time_point_cast<system_clock::duration>(aFiletime - std::filesystem::file_time_type::clock::now() + system_clock::now());
+    return TimeStamp(tp, aFormat);
 }
 
 //__attribute__((__format__(__printf__, 1, 0)))
@@ -236,7 +247,6 @@ std::string Format(const char* apFormat, ...)
 #pragma GCC diagnostic pop
     return std::string(buffer, size - 1); // We don't want the '\0' inside
 }
-
 
 } /* namespace StrUtils */
 

@@ -15,6 +15,7 @@
 #include <logging/Logger.h>
 #include <network/IHttpRequest.h>
 #include <network/HttpRequest.h>
+#include <network/HttpDownload.h>
 #include <network/NetworkLibrary.h>
 #include <network/HttpSession.h>
 #include <network/NetworkException.h>
@@ -23,6 +24,8 @@
 #include <utils/AnsiEscapeCodes.h>
 #include <TestHelpers.h>
 #include <cstdlib>
+#include <unistd.h>
+#include <sys/types.h>
 
 using namespace rsp::logging;
 using namespace rsp::network;
@@ -135,6 +138,65 @@ TEST_CASE("Network")
         rsp::posix::FileIO file("./webserver/public/image.png", std::ios_base::in);
         auto s = file.GetContents();
         CHECK(std::memcmp(s.data(), resp->GetBody().data(), s.size()) == 0);
+    }
+
+    SUBCASE("File Download To File") {
+        const char* cFile = "./image.png";
+        rsp::posix::FileSystem::DeleteFile(std::string(cFile));
+
+        HttpDownload request(cFile);
+        opt.BaseUrl = "https://server.localhost:44300/image.png";
+
+        request.SetOptions(opt);
+
+        IHttpResponse *resp = nullptr;
+        CHECK_NOTHROW(resp = &request.Execute());
+
+//        MESSAGE("Request:\n" << resp->GetRequest());
+        MESSAGE("Response:\n" << *resp);
+
+        CHECK_EQ(resp->GetHeaders().at("content-type"), "image/png");
+        CHECK_EQ(resp->GetBody().size(), 0);
+        CHECK_EQ(resp->GetStatusCode(), 200);
+
+        rsp::posix::FileIO file("./webserver/public/image.png", std::ios_base::in);
+        auto s1 = file.GetContents();
+        rsp::posix::FileIO file2(cFile, std::ios_base::in);
+        auto s2 = file2.GetContents();
+        CHECK_EQ(s2.size(), 25138);
+        CHECK(std::memcmp(s1.data(), s2.data(), s1.size()) == 0);
+    }
+
+    SUBCASE("Partial File Download To File") {
+        const char* cFile = "./image.png";
+
+        truncate(cFile, 20*1024);
+
+        IHttpResponse *resp = nullptr;
+        {
+            HttpDownload request(cFile);
+            opt.BaseUrl = "https://server.localhost:44300/image.png";
+
+            request.SetOptions(opt);
+
+            CHECK_NOTHROW(resp = &request.Execute());
+
+            MESSAGE("Request:\n" << resp->GetRequest());
+            MESSAGE("Response:\n" << *resp);
+        }
+
+        CHECK_EQ(resp->GetHeaders().at("content-type"), "image/png");
+        CHECK_EQ(resp->GetBody().size(), 0);
+        CHECK_EQ(resp->GetStatusCode(), 206);
+
+        rsp::posix::FileIO file("./webserver/public/image.png", std::ios_base::in);
+        auto s1 = file.GetContents();
+        rsp::posix::FileIO file2(cFile, std::ios_base::in);
+        auto s2 = file2.GetContents();
+        CHECK_EQ(s2.size(), 25138);
+        CHECK(std::memcmp(s1.data(), s2.data(), s1.size()) == 0);
+
+//        rsp::posix::FileSystem::DeleteFile(std::string(cFile));
     }
 
     SUBCASE("Http Session") {

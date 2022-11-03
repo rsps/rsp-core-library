@@ -11,6 +11,7 @@
 #ifndef INCLUDE_NETWORK_HTTPDOWNLOAD_H_
 #define INCLUDE_NETWORK_HTTPDOWNLOAD_H_
 
+#include <string>
 #include <network/HttpRequest.h>
 #include <posix/FileIO.h>
 
@@ -31,7 +32,8 @@ public:
     IHttpResponse& Execute() override;
 
 protected:
-    rsp::posix::FileIO mFile;
+    std::string mModifiedTime{};
+    rsp::posix::FileIO mFile{};
 };
 
 } /* namespace rsp::network */

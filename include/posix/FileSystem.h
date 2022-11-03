@@ -15,6 +15,7 @@
 #include <vector>
 #include <thread>
 #include <filesystem>
+#include <chrono>
 
 /**
  * Namespace with common directory and OS operations.
@@ -152,6 +153,24 @@ std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, boo
  * \return Path to character device
  */
 std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriverName, const std::filesystem::path &arPath);
+
+/**
+ * \fn std::chrono::system_clock::time_point GetFileModifiedTime(const std::string&)
+ * \brief The the time when a file was last modified.
+ *
+ * \param arFileName
+ * \return time_point
+ */
+std::filesystem::file_time_type GetFileModifiedTime(const std::filesystem::path &arFileName);
+
+/**
+ * \fn void SetFileModifiedTime(const std::string&, std::chrono::system_clock::time_point)
+ * \brief Set the time when a file was last modified.
+ *
+ * \param arFileName
+ * \param time_point
+ */
+void SetFileModifiedTime(const std::filesystem::path &arFileName, std::filesystem::file_time_type &arTime);
 
 }
 

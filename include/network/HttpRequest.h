@@ -24,6 +24,11 @@ public:
     HttpRequest();
     HttpRequest(const HttpRequestOptions& arOptions);
 
+    IHttpRequest& WriteToFile(rsp::posix::FileIO &arFile) override
+    {
+        return mPimpl->WriteToFile(arFile);
+    }
+
     const HttpRequestOptions& GetOptions() const override
     {
         return mPimpl->GetOptions();

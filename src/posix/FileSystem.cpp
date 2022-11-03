@@ -424,5 +424,15 @@ std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriver
 //        Minor = minor(stat_buf.st_rdev);
 }
 
+std::filesystem::file_time_type GetFileModifiedTime(const std::filesystem::path &arFileName)
+{
+    return std::filesystem::last_write_time(arFileName);
+}
+
+void SetFileModifiedTime(const std::filesystem::path &arFileName, std::filesystem::file_time_type &arTime)
+{
+    return std::filesystem::last_write_time(arFileName, arTime);
+}
+
 } // namespace FileSystem
 
