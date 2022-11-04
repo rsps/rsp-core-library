@@ -207,6 +207,43 @@ std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats a
     return ss.str();
 }
 
+
+std::chrono::system_clock::time_point ToTimePoint(const std::string &arTimeString, TimeFormats aFormat)
+{
+
+    std::tm tm = {};
+    std::stringstream ss(arTimeString);
+    unsigned int msecs = 0;
+
+    switch (aFormat) {
+        case TimeFormats::Logging:
+            ss >> std::get_time(&tm, "%F %T.");
+            ss >> msecs;
+            break;
+
+        case TimeFormats::RFC3339:
+            ss >> std::get_time(&tm, "%FT%T");
+            break;
+
+        case TimeFormats::RFC3339Milli:
+            ss >> std::get_time(&tm, "%FT%T.");
+            ss >> msecs;
+            break;
+
+        case TimeFormats::HTTP:
+            ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S");
+            break;
+
+        default:
+            ss >> std::get_time(&tm, "%F %T");
+            break;
+    }
+
+    auto tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+    tp += std::chrono::milliseconds(msecs);
+    return tp;
+}
+
 std::string TimeStamp(std::chrono::steady_clock::time_point aTime, TimeFormats aFormat)
 {
     return TimeStamp(rsp::utils::ClockCast<std::chrono::system_clock::time_point>(aTime), aFormat);

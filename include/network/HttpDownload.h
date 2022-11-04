@@ -13,7 +13,6 @@
 
 #include <string>
 #include <network/HttpRequest.h>
-#include <posix/FileIO.h>
 
 namespace rsp::network {
 
@@ -27,13 +26,17 @@ namespace rsp::network {
 class HttpDownload: public HttpRequest
 {
 public:
-    HttpDownload(const std::string &arFilename);
+    using HttpRequest::HttpRequest;
+    HttpDownload(const std::string &arFileName);
+
+    HttpDownload& SetFileName(const std::string &arFileName);
 
     IHttpResponse& Execute() override;
 
 protected:
-    std::string mModifiedTime{};
-    rsp::posix::FileIO mFile{};
+    std::string mFileName{};
+
+    void SetFileModifiedTime(const std::string &arTimeString);
 };
 
 } /* namespace rsp::network */

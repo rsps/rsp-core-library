@@ -77,6 +77,9 @@ bool FileExists(const std::string aPath)
 
 void DeleteFile(const std::string &arFileName)
 {
+    if (!FileExists(arFileName)) {
+        return;
+    }
     if (std::remove(arFileName.c_str()) != 0) {
         THROW_SYSTEM("Could not delete " + arFileName);
     }
@@ -429,9 +432,9 @@ std::filesystem::file_time_type GetFileModifiedTime(const std::filesystem::path 
     return std::filesystem::last_write_time(arFileName);
 }
 
-void SetFileModifiedTime(const std::filesystem::path &arFileName, std::filesystem::file_time_type &arTime)
+void SetFileModifiedTime(const std::filesystem::path &arFileName, std::filesystem::file_time_type aTime)
 {
-    return std::filesystem::last_write_time(arFileName, arTime);
+    return std::filesystem::last_write_time(arFileName, aTime);
 }
 
 } // namespace FileSystem

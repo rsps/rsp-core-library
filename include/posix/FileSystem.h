@@ -170,7 +170,7 @@ std::filesystem::file_time_type GetFileModifiedTime(const std::filesystem::path 
  * \param arFileName
  * \param time_point
  */
-void SetFileModifiedTime(const std::filesystem::path &arFileName, std::filesystem::file_time_type &arTime);
+void SetFileModifiedTime(const std::filesystem::path &arFileName, std::filesystem::file_time_type aTime);
 
 }
 

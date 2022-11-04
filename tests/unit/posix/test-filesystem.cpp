@@ -12,6 +12,7 @@
 #include <posix/FileSystem.h>
 #include <string>
 #include <fstream>
+#include <chrono>
 #include <utils/StrUtils.h>
 #include <algorithm>
 #include <sstream>
@@ -91,6 +92,25 @@ TEST_CASE("Testing FileSystem") {
         MESSAGE((p.empty() ? "Not Found!" : p.string()));
 
         CHECK(StrUtils::StartsWith(p.string(), "/dev/fb"));
+    }
+
+    SUBCASE("File time") {
+        using namespace std::literals::chrono_literals;
+        using namespace std::chrono;
+
+        std::string filename = "testfile.tmp";
+
+        std::ofstream fout(filename);
+        fout << "test" << std::endl;
+        fout.close();
+
+        std::string mtime = StrUtils::TimeStamp(FileSystem::GetFileModifiedTime(filename), StrUtils::TimeFormats::HTTP);
+
+        auto tp = StrUtils::ToTimePoint(mtime, StrUtils::TimeFormats::HTTP);
+        auto file_time = file_clock::from_sys(time_point_cast<system_clock::duration>(tp));
+        FileSystem::SetFileModifiedTime(filename, file_time);
+
+        CHECK_EQ(mtime, StrUtils::TimeStamp(FileSystem::GetFileModifiedTime(filename), StrUtils::TimeFormats::HTTP));
     }
 }
 

@@ -12,6 +12,8 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
+#include <chrono>
+#include <filesystem>
 #include <logging/Logger.h>
 #include <network/IHttpRequest.h>
 #include <network/HttpRequest.h>
@@ -22,6 +24,7 @@
 #include <posix/FileSystem.h>
 #include <posix/FileIO.h>
 #include <utils/AnsiEscapeCodes.h>
+#include <utils/StrUtils.h>
 #include <TestHelpers.h>
 #include <cstdlib>
 #include <unistd.h>
@@ -29,7 +32,9 @@
 
 using namespace rsp::logging;
 using namespace rsp::network;
+using namespace rsp::utils;
 using namespace rsp::utils::AnsiEscapeCodes;
+using namespace rsp::posix;
 
 TEST_CASE("Network")
 {
@@ -54,7 +59,7 @@ TEST_CASE("Network")
 
     SUBCASE("Online") {
         std::string ip;
-        CHECK_NOTHROW(ip = rsp::posix::FileSystem::GetCurrentIpAddress());
+        CHECK_NOTHROW(ip = FileSystem::GetCurrentIpAddress());
         MESSAGE("IP: " << ip);
     }
 
@@ -120,29 +125,11 @@ TEST_CASE("Network")
     }
 
     SUBCASE("File Download") {
-        HttpRequest request;
-        opt.BaseUrl = "https://server.localhost:44300/image.png";
-
-        request.SetOptions(opt);
-
-        IHttpResponse *resp = nullptr;
-        CHECK_NOTHROW(resp = &request.Execute());
-
-//        MESSAGE("Request:\n" << resp->GetRequest());
-        MESSAGE("Response:\n" << *resp);
-
-        CHECK_EQ(resp->GetHeaders().at("content-type"), "image/png");
-        CHECK_EQ(resp->GetBody().size(), 25138);
-        CHECK_EQ(resp->GetStatusCode(), 200);
-
-        rsp::posix::FileIO file("./webserver/public/image.png", std::ios_base::in);
-        auto s = file.GetContents();
-        CHECK(std::memcmp(s.data(), resp->GetBody().data(), s.size()) == 0);
-    }
-
-    SUBCASE("File Download To File") {
         const char* cFile = "./image.png";
-        rsp::posix::FileSystem::DeleteFile(std::string(cFile));
+        const char* cSourceFile = "./webserver/public/image.png";
+
+        FileIO file(cSourceFile, std::ios_base::in);
+        auto source = file.GetContents();
 
         HttpDownload request(cFile);
         opt.BaseUrl = "https://server.localhost:44300/image.png";
@@ -150,53 +137,61 @@ TEST_CASE("Network")
         request.SetOptions(opt);
 
         IHttpResponse *resp = nullptr;
-        CHECK_NOTHROW(resp = &request.Execute());
 
-//        MESSAGE("Request:\n" << resp->GetRequest());
-        MESSAGE("Response:\n" << *resp);
-
-        CHECK_EQ(resp->GetHeaders().at("content-type"), "image/png");
-        CHECK_EQ(resp->GetBody().size(), 0);
-        CHECK_EQ(resp->GetStatusCode(), 200);
-
-        rsp::posix::FileIO file("./webserver/public/image.png", std::ios_base::in);
-        auto s1 = file.GetContents();
-        rsp::posix::FileIO file2(cFile, std::ios_base::in);
-        auto s2 = file2.GetContents();
-        CHECK_EQ(s2.size(), 25138);
-        CHECK(std::memcmp(s1.data(), s2.data(), s1.size()) == 0);
-    }
-
-    SUBCASE("Partial File Download To File") {
-        const char* cFile = "./image.png";
-
-        truncate(cFile, 20*1024);
-
-        IHttpResponse *resp = nullptr;
-        {
-            HttpDownload request(cFile);
-            opt.BaseUrl = "https://server.localhost:44300/image.png";
-
-            request.SetOptions(opt);
+        SUBCASE("To Memory") {
+            FileSystem::DeleteFile(std::string(cFile));
+            request.SetFileName("");
 
             CHECK_NOTHROW(resp = &request.Execute());
 
-            MESSAGE("Request:\n" << resp->GetRequest());
-            MESSAGE("Response:\n" << *resp);
+            CHECK_EQ(resp->GetBody().size(), source.size());
+            CHECK_EQ(resp->GetStatusCode(), 200);
+            CHECK(std::memcmp(source.data(), resp->GetBody().data(), source.size()) == 0);
+        }
+
+        SUBCASE("To File") {
+            FileSystem::DeleteFile(std::string(cFile));
+
+            CHECK_NOTHROW(resp = &request.Execute());
+
+            CHECK_EQ(resp->GetBody().size(), 0);
+            CHECK_EQ(resp->GetStatusCode(), 206);
+        }
+
+        SUBCASE("Partial To File") {
+            truncate(cFile, 20*1024); // This changes mtime
+
+            CHECK_NOTHROW(resp = &request.Execute());
+
+            CHECK_EQ(resp->GetBody().size(), 0);
+            CHECK_EQ(resp->GetStatusCode(), 206);
+        }
+
+        SUBCASE("Modified To File") {
+            using namespace std::literals::chrono_literals;
+
+            std::filesystem::file_time_type mtime = FileSystem::GetFileModifiedTime(cFile);
+            truncate(cFile, 20*1024); // This changes mtime
+            FileSystem::SetFileModifiedTime(cFile, mtime + 1h);
+
+            CHECK_NOTHROW(resp = &request.Execute());
+
+            CHECK_EQ(resp->GetBody().size(), 0);
+            CHECK_EQ(resp->GetStatusCode(), 206);
         }
 
         CHECK_EQ(resp->GetHeaders().at("content-type"), "image/png");
-        CHECK_EQ(resp->GetBody().size(), 0);
-        CHECK_EQ(resp->GetStatusCode(), 206);
 
-        rsp::posix::FileIO file("./webserver/public/image.png", std::ios_base::in);
-        auto s1 = file.GetContents();
-        rsp::posix::FileIO file2(cFile, std::ios_base::in);
-        auto s2 = file2.GetContents();
-        CHECK_EQ(s2.size(), 25138);
-        CHECK(std::memcmp(s1.data(), s2.data(), s1.size()) == 0);
+//        MESSAGE("Request:\n" << resp->GetRequest());
+//        MESSAGE("Response:\n" << *resp);
 
-//        rsp::posix::FileSystem::DeleteFile(std::string(cFile));
+        if (FileSystem::FileExists(cFile)) {
+            CHECK_EQ(StrUtils::TimeStamp(FileSystem::GetFileModifiedTime(cFile)), StrUtils::TimeStamp(FileSystem::GetFileModifiedTime(cSourceFile)));
+            FileIO file2(cFile, std::ios_base::in);
+            auto s2 = file2.GetContents();
+            CHECK_EQ(s2.size(), source.size());
+            CHECK(std::memcmp(source.data(), s2.data(), source.size()) == 0);
+        }
     }
 
     SUBCASE("Http Session") {

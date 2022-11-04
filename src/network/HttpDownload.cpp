@@ -9,8 +9,11 @@
  */
 
 #include <string>
+#include <chrono>
+#include <filesystem>
 #include <network/HttpDownload.h>
 #include <posix/FileSystem.h>
+#include <posix/FileIO.h>
 #include <utils/StrUtils.h>
 
 using namespace rsp::posix;
@@ -18,41 +21,63 @@ using namespace rsp::utils;
 
 namespace rsp::network {
 
-HttpDownload::HttpDownload(const std::string &arFilename)
+HttpDownload::HttpDownload(const std::string &arFileName)
 {
-    if (FileSystem::FileExists(arFilename)) {
-        auto mtime = FileSystem::GetFileModifiedTime(arFilename);
-        mModifiedTime = StrUtils::TimeStamp(mtime, StrUtils::TimeFormats::HTTP);
-    }
+    SetFileName(arFileName);
+}
 
-    mFile.Open(arFilename, std::ios::in | std::ios::out, 0640);
-
-    WriteToFile(mFile);
+HttpDownload& HttpDownload::SetFileName(const std::string &arFileName)
+{
+    mFileName = arFileName;
+    return *this;
 }
 
 IHttpResponse& HttpDownload::Execute()
 {
+    if (mFileName.empty()) {
+        return HttpRequest::Execute();
+    }
+
+    std::string modified_time{};
+    if (FileSystem::FileExists(mFileName)) {
+        auto mtime = FileSystem::GetFileModifiedTime(mFileName);
+        modified_time = StrUtils::TimeStamp(mtime, StrUtils::TimeFormats::HTTP);
+    }
+
+    rsp::posix::FileIO file(mFileName, std::ios::in | std::ios::out | std::ios_base::ate, 0640);
+
+    WriteToFile(file); // Redirect response body to file
+
     HttpRequestOptions orig_opt = GetOptions();
     orig_opt.RequestType = HttpRequestType::GET;
 
     HttpRequestOptions opt = orig_opt;
-    if (mFile.GetSize() > 0) {
-        opt.Headers["Range"] = std::string("bytes=") + std::to_string(mFile.GetSize()) + "-";
-    }
-    if (!mModifiedTime.empty()) {
-        opt.Headers["If-Unmodified-Since"] = mModifiedTime;
-        // Returns 412 if condition fails.
+    opt.Headers["Range"] = std::string("bytes=") + std::to_string(file.GetSize()) + "-"; // Returns 206 if range request succeeds
+    if (!modified_time.empty()) {
+        opt.Headers["If-Unmodified-Since"] = modified_time; // Returns 412 if condition fails.
     }
     SetOptions(opt);
 
-    IHttpResponse& resp = mPimpl->Execute();
+    IHttpResponse* resp = &(mPimpl->Execute());
 
-//    if (resp.GetStatusCode() != 200) {
-//        SetOptions(orig_opt);
-//        return mPimpl->Execute();
-//    }
+    if (resp->GetStatusCode() != 206) {
+        file.SetSize(0);
+        SetOptions(orig_opt);
+        resp = &(mPimpl->Execute());
+    }
 
-    return resp;
+    file.Close();
+    SetFileModifiedTime(resp->GetHeaders().at("last-modified"));
+
+    return *resp;
+}
+
+void HttpDownload::SetFileModifiedTime(const std::string &arTimeString)
+{
+    using namespace std::chrono;
+    auto tp = StrUtils::ToTimePoint(arTimeString, StrUtils::TimeFormats::HTTP);
+    auto file_time = file_clock::from_sys(time_point_cast<system_clock::duration>(tp));
+    FileSystem::SetFileModifiedTime(mFileName, file_time);
 }
 
 } /* namespace rsp::network */

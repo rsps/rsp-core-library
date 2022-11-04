@@ -185,7 +185,7 @@ std::string TimeStamp(std::chrono::steady_clock::time_point aTime, TimeFormats a
 std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats aFormat = TimeFormats::Logging);
 std::string TimeStamp(std::chrono::milliseconds aMilliSeconds, TimeFormats aFormat = TimeFormats::Logging);
 std::string TimeStamp(std::filesystem::file_time_type aFiletime, TimeFormats aFormat = TimeFormats::Logging);
-
+std::chrono::system_clock::time_point ToTimePoint(const std::string &arTimeString, TimeFormats aFormat = TimeFormats::Logging);
 
 /**
  * Create and format a std::string using printf format specifiers.
