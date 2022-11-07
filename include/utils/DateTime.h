@@ -24,26 +24,95 @@ namespace rsp::utils {
 class DateTime
 {
 public:
-    struct Format
-    {
-        static const char* cRFC3339 = "%FT%TZ";
-        static const char* cRFC3339Milli = "%FT%T.";
-        static const char* cISO8601 = "%F %T%z";
-        static const char* cISO8601UTC = "%F %T";
-        static const char* cLogging = "%F %T.";
-        static const char* cHTTP = "%a, %d %b %Y %H:%M:%S";
+    static constexpr int64_t cNanoSecondsPerSecond = (1000000000L);
+    static constexpr int64_t cNanoSecondsPerMinute = (60*cNanoSecondsPerSecond);
+    static constexpr int64_t cNanoSecondsPerHour = (60*60*cNanoSecondsPerSecond);
+    static constexpr int64_t cNanoSecondsPerDay = (24*60*60*cNanoSecondsPerSecond);
+    static constexpr int64_t cSecondsPerDay = (24*60*60);
+
+    struct Date {
+        int16_t Year = 0;
+        uint8_t Month = 1; // 1-12
+        uint8_t DayOfMonth = 1; // 1-31
+
+        Date() {}
+        Date(int16_t aYear, uint8_t aMonth, uint8_t aDay) : Year(aYear), Month(aMonth), DayOfMonth(aDay) {}
+        Date(int64_t aJulianDays);
+        Date(const Date &arOther) = default;
+        Date(Date &&arOther) = default;
+        Date& operator=(const Date &arOther) = default;
+        Date& operator=(Date &&arOther) = default;
+        operator int64_t() const { return ToJulianDays(); }
+        int64_t ToJulianDays() const;
+    };
+    struct Time {
+        uint8_t Hours = 0; // 0-23
+        uint8_t Minutes = 0; // 0-59
+        uint8_t Seconds = 0; // 0-60, Allows for one leap second
+
+        Time() {}
+        Time(uint8_t aHours, uint8_t aMinutes, uint8_t aSeconds) : Hours(aHours), Minutes(aMinutes), Seconds(aSeconds) {}
+        Time(int64_t aNanoSeconds);
+        Time(const Time &arOther) = default;
+        Time(Time &&arOther) = default;
+        Time& operator=(const Time &arOther) = default;
+        Time& operator=(Time &&arOther) = default;
+        operator int64_t() const { return ToNanoSeconds(); }
+        int64_t ToNanoSeconds() const;
+    };
+    enum class Formats {
+       RFC3339,
+       RFC3339Milli,
+       ISO8601,
+       ISO8601UTC,
+       Logging,
+       HTTP
     };
 
     DateTime() {};
-    DateTime(std::chrono::duration aDuration);
-    DateTime(std::chrono::time_point aTimePoint);
-    DateTime(std::filesystem::file_time_type);
-    DateTime(const std::string &arTimeString, const std::string &arFormat = "");
+    DateTime(int aYear, int aMonth, int aDayOfMonth, int aHour, int aMinute, int aSecond);
+    DateTime(std::chrono::system_clock::duration aDuration);
+    DateTime(std::chrono::system_clock::time_point aTimePoint);
+    DateTime(std::filesystem::file_time_type aFileTime);
+    DateTime(const std::string &arTimeString, const char *apFormat);
+    DateTime(const std::string &arTimeString, Formats aFormat);
     virtual ~DateTime() {};
+
     DateTime(const DateTime &other) = default;
     DateTime(DateTime &&other) = default;
     DateTime& operator=(const DateTime &other) = default;
     DateTime& operator=(DateTime &&other) = default;
+
+    DateTime& Add(const DateTime &arOther);
+    DateTime& Add(int64_t aSeconds);
+    DateTime& Add(int64_t aDays, int64_t aNanoSeconds);
+
+    bool operator==(const DateTime &arOther) const;
+    bool operator<(const DateTime &arOther) const;
+    bool operator<=(const DateTime &arOther) const;
+    bool operator>(const DateTime &arOther) const;
+    bool operator>=(const DateTime &arOther) const;
+
+    int64_t SecondsBetween(const DateTime &arOther) const;
+
+    operator std::chrono::system_clock::duration() const;
+    operator std::chrono::system_clock::time_point() const;
+    operator std::filesystem::file_time_type() const;
+    operator std::tm() const;
+
+    std::string ToString(const char *apFormat) const;
+    std::string ToString(Formats aFormat) const;
+    std::string ToRFC3339() const;
+    std::string ToRFC3339Milli() const;
+    std::string ToISO8601() const;
+    std::string ToISO8601UTC() const;
+    std::string ToLogging() const;
+    std::string ToHTTP() const;
+
+    DateTime& FromString(const std::string &arTimeString, const char *apFormat);
+
+    Date GetDate() const;
+    Time GetTime() const;
 
 protected:
     std::int64_t mJulianDays = 0;
