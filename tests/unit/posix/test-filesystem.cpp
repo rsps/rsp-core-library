@@ -13,6 +13,7 @@
 #include <string>
 #include <fstream>
 #include <chrono>
+#include <locale>
 #include <utils/StrUtils.h>
 #include <algorithm>
 #include <sstream>
@@ -100,11 +101,12 @@ TEST_CASE("Testing FileSystem") {
 
         std::string filename = "testfile.tmp";
 
-        std::ofstream fout(filename);
-        fout << "test" << std::endl;
-        fout.close();
+//        std::ofstream fout(filename);
+//        fout << "test" << std::endl;
+//        fout.close();
 
         std::string mtime = StrUtils::TimeStamp(FileSystem::GetFileModifiedTime(filename), StrUtils::TimeFormats::HTTP);
+        MESSAGE("mtime: " << mtime);
 
         auto tp = StrUtils::ToTimePoint(mtime, StrUtils::TimeFormats::HTTP);
         auto file_time = file_clock::from_sys(time_point_cast<system_clock::duration>(tp));

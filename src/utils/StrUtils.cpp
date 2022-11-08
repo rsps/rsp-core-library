@@ -177,8 +177,11 @@ std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats a
     auto msecs = now_ms - now_s;
     auto t = std::chrono::system_clock::to_time_t(aTime);
 
-    std::stringstream ss;
     std::tm tbuf;
+
+    std::cout << "TimeStamp is: " << asctime(gmtime_r(&t, &tbuf)) << std::endl;;
+
+    std::stringstream ss;
 
 //    2006-01-02T15:04:05.999999Z07:00
 
@@ -196,7 +199,7 @@ std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats a
             break;
 
         case TimeFormats::HTTP:
-            ss << std::put_time(gmtime_r(&t, &tbuf), "%a, %d %b %Y %H:%M:%S") << " GMT";
+            ss << std::put_time(localtime_r(&t, &tbuf), "%a, %d %b %Y %H:%M:%S %Z"); // << " GMT";
             break;
 
         default:
@@ -213,6 +216,7 @@ std::chrono::system_clock::time_point ToTimePoint(const std::string &arTimeStrin
 
     std::tm tm = {};
     std::stringstream ss(arTimeString);
+    ss.imbue(std::locale("C"));
     unsigned int msecs = 0;
 
     switch (aFormat) {
@@ -231,7 +235,7 @@ std::chrono::system_clock::time_point ToTimePoint(const std::string &arTimeStrin
             break;
 
         case TimeFormats::HTTP:
-            ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S");
+            ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S %Z");
             break;
 
         default:
@@ -240,7 +244,7 @@ std::chrono::system_clock::time_point ToTimePoint(const std::string &arTimeStrin
     }
 
     auto tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
-    tp += std::chrono::milliseconds(msecs);
+//    tp += std::chrono::milliseconds(msecs);
     return tp;
 }
 

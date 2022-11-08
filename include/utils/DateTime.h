@@ -13,6 +13,7 @@
 
 #include <cstdint>
 #include <chrono>
+#include <ostream>
 #include <filesystem>
 
 namespace rsp::utils {
@@ -20,15 +21,23 @@ namespace rsp::utils {
 /**
  * \class DateTime
  * \brief A generic date time class that internally holds a Julian date and the nanoseconds count of the day.
+ *
+ * The Julian date calculation is using the conversion algorithms by Henry F. Fliegel and Thomas C. Van Flandern.
+ * Thus Julian day 0 corresponds to -4713-11-24 Gregorian Calendar, which is -4712-01-01 Julian Calendar
+ * \see https://www.hermetic.ch/cal_stud/jdn.htm
  */
 class DateTime
 {
 public:
     static constexpr int64_t cNanoSecondsPerSecond = (1000000000L);
+    static constexpr int64_t cMicroSecondsPerSecond = (1000000L);
+    static constexpr int64_t cMilliSecondsPerSecond = (1000L);
     static constexpr int64_t cNanoSecondsPerMinute = (60*cNanoSecondsPerSecond);
     static constexpr int64_t cNanoSecondsPerHour = (60*60*cNanoSecondsPerSecond);
     static constexpr int64_t cNanoSecondsPerDay = (24*60*60*cNanoSecondsPerSecond);
     static constexpr int64_t cSecondsPerDay = (24*60*60);
+    static constexpr int64_t cMilliSecondsPerDay = (24*60*60*cMilliSecondsPerSecond);
+    static constexpr int64_t cMicroSecondsPerDay = (24*60*60*cMicroSecondsPerSecond);
 
     struct Date {
         int16_t Year = 0;
@@ -76,6 +85,8 @@ public:
     DateTime(std::filesystem::file_time_type aFileTime);
     DateTime(const std::string &arTimeString, const char *apFormat);
     DateTime(const std::string &arTimeString, Formats aFormat);
+    DateTime(int64_t aDays, int64_t aNanoSeconds);
+    DateTime(int64_t aSeconds);
     virtual ~DateTime() {};
 
     DateTime(const DateTime &other) = default;
@@ -83,9 +94,10 @@ public:
     DateTime& operator=(const DateTime &other) = default;
     DateTime& operator=(DateTime &&other) = default;
 
-    DateTime& Add(const DateTime &arOther);
-    DateTime& Add(int64_t aSeconds);
-    DateTime& Add(int64_t aDays, int64_t aNanoSeconds);
+    DateTime operator+(const DateTime &arOther) const;
+    DateTime operator-(const DateTime &arOther) const;
+    DateTime& operator+=(const DateTime &arOther);
+    DateTime& operator-=(const DateTime &arOther);
 
     bool operator==(const DateTime &arOther) const;
     bool operator<(const DateTime &arOther) const;
@@ -94,6 +106,9 @@ public:
     bool operator>=(const DateTime &arOther) const;
 
     int64_t SecondsBetween(const DateTime &arOther) const;
+    int64_t MilliSecondsBetween(const DateTime &arOther) const;
+    int64_t MicroSecondsBetween(const DateTime &arOther) const;
+    int64_t NanoSecondsBetween(const DateTime &arOther) const;
 
     operator std::chrono::system_clock::duration() const;
     operator std::chrono::system_clock::time_point() const;
@@ -118,6 +133,10 @@ protected:
     std::int64_t mJulianDays = 0;
     std::int64_t mNanoSecondsOfDay = 0;
 };
+
+std::ostream& operator<< (std::ostream& os, const DateTime::Date &arDate);
+std::ostream& operator<< (std::ostream& os, const DateTime::Time &arTime);
+std::ostream& operator<< (std::ostream& os, const DateTime &arDateTime);
 
 } /* namespace rsp::utils */
 
