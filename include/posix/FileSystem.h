@@ -161,7 +161,7 @@ std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriver
  * \param arFileName
  * \return time_point
  */
-std::filesystem::file_time_type GetFileModifiedTime(const std::filesystem::path &arFileName);
+std::chrono::system_clock::time_point GetFileModifiedTime(const std::filesystem::path &arFileName);
 
 /**
  * \fn void SetFileModifiedTime(const std::string&, std::chrono::system_clock::time_point)
@@ -170,7 +170,7 @@ std::filesystem::file_time_type GetFileModifiedTime(const std::filesystem::path 
  * \param arFileName
  * \param time_point
  */
-void SetFileModifiedTime(const std::filesystem::path &arFileName, std::filesystem::file_time_type aTime);
+void SetFileModifiedTime(const std::filesystem::path &arFileName, std::chrono::system_clock::time_point aTime);
 
 }
 

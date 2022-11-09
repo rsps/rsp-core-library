@@ -132,6 +132,8 @@ public:
 protected:
     std::int64_t mJulianDays = 0;
     std::int64_t mNanoSecondsOfDay = 0;
+
+    std::chrono::seconds getTimezoneOffset(std::tm &arTm) const;
 };
 
 std::ostream& operator<< (std::ostream& os, const DateTime::Date &arDate);

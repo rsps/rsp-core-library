@@ -179,7 +179,7 @@ std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats a
 
     std::tm tbuf;
 
-    std::cout << "TimeStamp is: " << asctime(gmtime_r(&t, &tbuf)) << std::endl;;
+//    std::cout << "TimeStamp is: " << asctime(gmtime_r(&t, &tbuf)) << std::endl;;
 
     std::stringstream ss;
 
@@ -199,7 +199,7 @@ std::string TimeStamp(std::chrono::system_clock::time_point aTime, TimeFormats a
             break;
 
         case TimeFormats::HTTP:
-            ss << std::put_time(localtime_r(&t, &tbuf), "%a, %d %b %Y %H:%M:%S %Z"); // << " GMT";
+            ss << std::put_time(gmtime_r(&t, &tbuf), "%a, %d %b %Y %H:%M:%S %Z"); // << " GMT";
             break;
 
         default:
@@ -243,8 +243,20 @@ std::chrono::system_clock::time_point ToTimePoint(const std::string &arTimeStrin
             break;
     }
 
+    // Find offset to system time at the specific time.
+    // Then offset the tm object back to GMT.
+    std::time_t t = std::mktime(&tm);
+    std::tm gm_tm;
+    gmtime_r(&t, &gm_tm);
+    gm_tm.tm_isdst = false;
+    std::time_t gm_t = std::mktime(&gm_tm);
+    std::time_t tz_offset = (gm_t - t);
+    t -= tz_offset;
+    gmtime_r(&t, &tm); // Re-fill tm from timezone corrected time.
+//    std::cout << "HTTP: " << std::put_time(&tm, "%a, %d %b %Y %H:%M:%S %Z") << std::endl;
+
     auto tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
-//    tp += std::chrono::milliseconds(msecs);
+    tp += std::chrono::milliseconds(msecs) - std::chrono::seconds(tz_offset); // Subtract timezone offset from time_point.
     return tp;
 }
 

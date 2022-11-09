@@ -76,8 +76,7 @@ void HttpDownload::SetFileModifiedTime(const std::string &arTimeString)
 {
     using namespace std::chrono;
     auto tp = StrUtils::ToTimePoint(arTimeString, StrUtils::TimeFormats::HTTP);
-    auto file_time = file_clock::from_sys(time_point_cast<system_clock::duration>(tp));
-    FileSystem::SetFileModifiedTime(mFileName, file_time);
+    FileSystem::SetFileModifiedTime(mFileName, tp);
 }
 
 } /* namespace rsp::network */

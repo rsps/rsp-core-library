@@ -21,9 +21,7 @@ TEST_CASE("DateTime")
 
     SUBCASE("Zero") {
         DateTime dt;
-
-        MESSAGE("DateTime() = " << dt);
-
+//        MESSAGE("DateTime() = " << dt);
         CHECK_EQ(dt.ToRFC3339Milli(), "-4713-11-24T00:00:00.000");
 
         std::tm tm = dt;
@@ -36,9 +34,15 @@ TEST_CASE("DateTime")
     }
 
     SUBCASE("Constructors") {
+        SUBCASE("Date") {
+            /** \see https://www.aavso.org/jd-calculator */
+            DateTime::Date dt(2022, 11, 8);
+            CHECK_EQ(dt.ToJulianDays(), 2459892);
+        }
+
         SUBCASE("From values") {
             DateTime dt(2022, 11, 8, 15, 43, 23);
-            MESSAGE("DateTime(2022, 11, 08, 15, 43, 23) = " << dt);
+//            MESSAGE("DateTime(2022, 11, 08, 15, 43, 23) = " << dt);
 //            MESSAGE("NanoSeconds: " << dt.GetTime().ToNanoSeconds());
             CHECK_EQ(dt.ToLogging(), "2022-11-08 15:43:23.000");
         }

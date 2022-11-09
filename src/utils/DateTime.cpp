@@ -14,6 +14,8 @@
 #include <iomanip>
 #include <utils/DateTime.h>
 
+using namespace std::literals::chrono_literals;
+
 namespace rsp::utils {
 
 DateTime::DateTime(int aYear, int aMonth, int aDayOfMonth, int aHour, int aMinute, int aSecond)
@@ -41,6 +43,8 @@ DateTime::DateTime(std::chrono::system_clock::time_point aTimePoint)
 DateTime::DateTime(std::filesystem::file_time_type aFileTime)
     : DateTime(std::chrono::file_clock::to_sys(aFileTime))
 {
+    std::chrono::year y{2022y};
+
 }
 
 DateTime::DateTime(const std::string &arTimeString, const char *apFormat)
@@ -223,8 +227,8 @@ DateTime::operator std::chrono::system_clock::time_point() const
 
 DateTime::operator std::filesystem::file_time_type() const
 {
-    std::filesystem::file_time_type ft{std::chrono::nanoseconds((mJulianDays * cNanoSecondsPerDay) + mNanoSecondsOfDay)};
-    return ft;
+    std::chrono::system_clock::time_point sctp{std::chrono::nanoseconds((mJulianDays * cNanoSecondsPerDay) + mNanoSecondsOfDay)};
+    return std::chrono::file_clock::from_sys(sctp);
 }
 
 DateTime::operator std::tm() const
@@ -316,14 +320,26 @@ DateTime& DateTime::FromString(const std::string &arTimeString, const char *apFo
     if (std::string(apFormat).back() == '.') {
         ss >> msecs;
     }
+
     auto sctp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
-    sctp += std::chrono::milliseconds(msecs);
+    sctp += std::chrono::milliseconds(msecs) - getTimezoneOffset(tm);
 
     auto tp = std::chrono::time_point_cast<std::chrono::nanoseconds>(sctp);
     mJulianDays = (tp.time_since_epoch().count() / cNanoSecondsPerDay);
     mNanoSecondsOfDay = (tp.time_since_epoch().count() % cNanoSecondsPerDay);
 
     return *this;
+}
+
+std::chrono::seconds DateTime::getTimezoneOffset(std::tm &arTm) const
+{
+    std::time_t t = std::mktime(&arTm);
+    std::tm gm_tm;
+    gmtime_r(&t, &gm_tm);
+    gm_tm.tm_isdst = false;
+    std::time_t tz_offset = (std::mktime(&gm_tm) - t);
+
+    return std::chrono::seconds(tz_offset);
 }
 
 DateTime::Date DateTime::GetDate() const
@@ -357,7 +373,6 @@ DateTime::Date::Date(int64_t aJulianDays)
 int64_t DateTime::Date::ToJulianDays() const
 {
     auto m = (Month - 14) / 12;
-    std::cout << "m: " << m << std::endl;
     auto jd = (1461 * (Year + 4800 + m)) / 4
         + (367 * (Month - 2 - 12 * m)) / 12
         - (3 * ((Year + 4900 + m) / 100)) / 4

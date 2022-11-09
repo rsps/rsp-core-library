@@ -170,7 +170,7 @@ TEST_CASE("Network")
         SUBCASE("Modified To File") {
             using namespace std::literals::chrono_literals;
 
-            std::filesystem::file_time_type mtime = FileSystem::GetFileModifiedTime(cFile);
+            auto mtime = FileSystem::GetFileModifiedTime(cFile);
             truncate(cFile, 20*1024); // This changes mtime
             FileSystem::SetFileModifiedTime(cFile, mtime + 1h);
 

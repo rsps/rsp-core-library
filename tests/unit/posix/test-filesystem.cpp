@@ -20,8 +20,9 @@
 
 using namespace rsp::posix;
 using namespace rsp::utils;
+using namespace std::chrono;
 
-TEST_CASE("Testing FileSystem") {
+TEST_CASE("FileSystem") {
 
     const std::string cSubDir = "subdir/subdir1/subdir2";
     std::string cwd;
@@ -101,18 +102,33 @@ TEST_CASE("Testing FileSystem") {
 
         std::string filename = "testfile.tmp";
 
-//        std::ofstream fout(filename);
-//        fout << "test" << std::endl;
-//        fout.close();
+        std::ofstream fout(filename);
+        fout << "test" << std::endl;
+        fout.close();
 
         std::string mtime = StrUtils::TimeStamp(FileSystem::GetFileModifiedTime(filename), StrUtils::TimeFormats::HTTP);
         MESSAGE("mtime: " << mtime);
 
         auto tp = StrUtils::ToTimePoint(mtime, StrUtils::TimeFormats::HTTP);
-        auto file_time = file_clock::from_sys(time_point_cast<system_clock::duration>(tp));
-        FileSystem::SetFileModifiedTime(filename, file_time);
+        mtime = StrUtils::TimeStamp(tp, StrUtils::TimeFormats::HTTP);
+        auto d = floor<days>(tp);
+        year_month_day ymd(sys_days{d});
+        std::chrono::hh_mm_ss<seconds> hms{ floor<seconds>(tp - d)};
+
+//        MESSAGE("mtime2: " << mtime << ", "
+//            << static_cast<int>(ymd.year()) << "-" << std::setfill('0')
+//            << static_cast<unsigned>(ymd.month()) << "-"
+//            << std::setw(1) << static_cast<unsigned>(ymd.day()) << " "
+//            << hms.hours().count() << ":"
+//            << hms.minutes().count() << ":"
+//            << hms.seconds().count()
+//            );
+
+        FileSystem::SetFileModifiedTime(filename, tp);
 
         CHECK_EQ(mtime, StrUtils::TimeStamp(FileSystem::GetFileModifiedTime(filename), StrUtils::TimeFormats::HTTP));
+
+        std::filesystem::remove(filename);
     }
 }
 
