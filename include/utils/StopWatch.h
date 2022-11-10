@@ -28,13 +28,13 @@ public:
      * \fn  StopWatch()
      * \brief Constructor that registers the start time
      */
-    StopWatch() : mBegin(std::chrono::high_resolution_clock::now()) { }
+    StopWatch() : mBegin(std::chrono::steady_clock::now()) { }
 
     /**
      * \fn void Reset()
      * \brief Reset the start time
      */
-    void Reset() { mBegin = std::chrono::high_resolution_clock::now(); }
+    void Reset() { mBegin = std::chrono::steady_clock::now(); }
 
     /**
      * \fn int64_t Elapsed()
@@ -45,11 +45,11 @@ public:
      */
     template<typename T>
     int64_t Elapsed() {
-        return std::chrono::duration_cast<T>(std::chrono::high_resolution_clock::now() - mBegin).count();
+        return std::chrono::duration_cast<T>(std::chrono::steady_clock::now() - mBegin).count();
     }
 
 protected:
-    std::chrono::high_resolution_clock::time_point mBegin;
+    std::chrono::steady_clock::time_point mBegin;
 };
 
 }
