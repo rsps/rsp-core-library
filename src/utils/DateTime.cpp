@@ -20,6 +20,11 @@ using namespace std::chrono;
 
 namespace rsp::utils {
 
+DateTime::DateTime()
+    : mTp(std::chrono::system_clock::now())
+{
+}
+
 DateTime::DateTime(int aYear, int aMonth, int aDayOfMonth, int aHour, int aMinute, int aSecond, int aMilliSecond)
 {
     Date dt{year(aYear), month(aMonth), day(aDayOfMonth)};
@@ -228,6 +233,81 @@ DateTime& DateTime::FromString(const std::string &arTimeString, const char *apFo
     mTp += std::chrono::milliseconds(msecs) - getTimezoneOffset(tm);
 
     return *this;
+}
+
+DateTime DateTime::operator +(const DateTime &arOther) const
+{
+    return DateTime(mTp.time_since_epoch() + arOther.mTp.time_since_epoch());
+}
+
+DateTime DateTime::operator -(const DateTime &arOther) const
+{
+    return DateTime(mTp - arOther.mTp);
+}
+
+DateTime& DateTime::operator +=(const DateTime &arOther)
+{
+    mTp += arOther.mTp.time_since_epoch();
+    return *this;
+}
+
+DateTime& DateTime::operator -=(const DateTime &arOther)
+{
+    mTp -= arOther.mTp.time_since_epoch();
+    return *this;
+}
+
+DateTime DateTime::operator+(const std::chrono::system_clock::duration &arDuration) const
+{
+    return DateTime(mTp + arDuration);
+}
+
+DateTime DateTime::operator-(const std::chrono::system_clock::duration &arDuration) const
+{
+    return DateTime(mTp - arDuration);
+}
+
+DateTime& DateTime::operator +=(const std::chrono::system_clock::duration &arDuration)
+{
+    mTp += arDuration;
+    return *this;
+}
+
+DateTime& DateTime::operator -=(const std::chrono::system_clock::duration &arDuration)
+{
+    mTp -= arDuration;
+    return *this;
+}
+
+
+bool DateTime::operator <(const DateTime &arOther) const
+{
+    return mTp < arOther.mTp;
+}
+
+bool DateTime::operator >(const DateTime &arOther) const
+{
+    return mTp > arOther.mTp;
+}
+
+bool DateTime::operator <=(const DateTime &arOther) const
+{
+    return mTp <= arOther.mTp;
+}
+
+bool DateTime::operator >=(const DateTime &arOther) const
+{
+    return mTp >= arOther.mTp;
+}
+
+bool DateTime::operator ==(const DateTime &arOther) const
+{
+    return mTp == arOther.mTp;
+}
+
+bool DateTime::operator !=(const DateTime &arOther) const
+{
+    return mTp != arOther.mTp;
 }
 
 std::chrono::seconds DateTime::getTimezoneOffset(std::tm &arTm) const

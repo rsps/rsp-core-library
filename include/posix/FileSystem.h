@@ -16,6 +16,7 @@
 #include <thread>
 #include <filesystem>
 #include <chrono>
+#include <utils/DateTime.h>
 
 /**
  * Namespace with common directory and OS operations.
@@ -159,18 +160,18 @@ std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriver
  * \brief The the time when a file was last modified.
  *
  * \param arFileName
- * \return time_point
+ * \return DateTime
  */
-std::chrono::system_clock::time_point GetFileModifiedTime(const std::filesystem::path &arFileName);
+rsp::utils::DateTime GetFileModifiedTime(const std::filesystem::path &arFileName);
 
 /**
  * \fn void SetFileModifiedTime(const std::string&, std::chrono::system_clock::time_point)
  * \brief Set the time when a file was last modified.
  *
  * \param arFileName
- * \param time_point
+ * \param DateTime
  */
-void SetFileModifiedTime(const std::filesystem::path &arFileName, std::chrono::system_clock::time_point aTime);
+void SetFileModifiedTime(const std::filesystem::path &arFileName, const rsp::utils::DateTime &arTime);
 
 }
 

@@ -37,7 +37,9 @@ public:
        HTTP
     };
 
-    DateTime() {};
+    static DateTime Now() { return DateTime(); }
+
+    DateTime();
     DateTime(int aYear, int aMonth, int aDayOfMonth, int aHour, int aMinute, int aSecond, int aMilliSecond=0);
     DateTime(std::chrono::system_clock::duration aDuration);
     DateTime(std::chrono::system_clock::time_point aTimePoint);
@@ -52,6 +54,21 @@ public:
     DateTime(DateTime &&other) = default;
     DateTime& operator=(const DateTime &other) = default;
     DateTime& operator=(DateTime &&other) = default;
+
+    DateTime operator+(const DateTime &arOther) const;
+    DateTime operator-(const DateTime &arOther) const;
+    DateTime& operator+=(const DateTime &arOther);
+    DateTime& operator-=(const DateTime &arOther);
+    DateTime operator+(const std::chrono::system_clock::duration &arDuration) const;
+    DateTime operator-(const std::chrono::system_clock::duration &arDuration) const;
+    DateTime& operator+=(const std::chrono::system_clock::duration &arDuration);
+    DateTime& operator-=(const std::chrono::system_clock::duration &arDuration);
+    bool operator<(const DateTime &arOther) const;
+    bool operator>(const DateTime &arOther) const;
+    bool operator<=(const DateTime &arOther) const;
+    bool operator>=(const DateTime &arOther) const;
+    bool operator==(const DateTime &arOther) const;
+    bool operator!=(const DateTime &arOther) const;
 
     int64_t SecondsBetween(const DateTime &arOther) const;
     int64_t MilliSecondsBetween(const DateTime &arOther) const;

@@ -30,13 +30,13 @@ TEST_CASE("Testing StrUtils")
     StrUtils::ReplaceAll(s, "llo", "ll of a");
     CHECK(s == "Hell of a World");
 
-    std::chrono::system_clock::time_point tp;
-    CHECK(StrUtils::TimeStamp(tp) == "1970-01-01 00:00:00.000");
-
-    // The following should fail if time was set since startup
-    CHECK(StrUtils::TimeStamp(std::chrono::steady_clock::now()) == StrUtils::TimeStamp(std::chrono::system_clock::now()));
-
-    CHECK(StrUtils::TimeStamp(std::chrono::milliseconds(0)) == "1970-01-01 00:00:00.000");
+//    std::chrono::system_clock::time_point tp;
+//    CHECK(StrUtils::TimeStamp(tp) == "1970-01-01 00:00:00.000");
+//
+//    // The following should fail if time was set since startup
+//    CHECK(StrUtils::TimeStamp(std::chrono::steady_clock::now()) == StrUtils::TimeStamp(std::chrono::system_clock::now()));
+//
+//    CHECK(StrUtils::TimeStamp(std::chrono::milliseconds(0)) == "1970-01-01 00:00:00.000");
 
     CHECK(StrUtils::Format("%02d-%4.4s", 8, "Long Sentence") == "08-Long");
 }

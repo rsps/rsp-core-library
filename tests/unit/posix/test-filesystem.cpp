@@ -15,6 +15,7 @@
 #include <chrono>
 #include <locale>
 #include <utils/StrUtils.h>
+#include <utils/DateTime.h>
 #include <algorithm>
 #include <sstream>
 
@@ -106,27 +107,14 @@ TEST_CASE("FileSystem") {
         fout << "test" << std::endl;
         fout.close();
 
-        std::string mtime = StrUtils::TimeStamp(FileSystem::GetFileModifiedTime(filename), StrUtils::TimeFormats::HTTP);
-        MESSAGE("mtime: " << mtime);
+        DateTime mfdt(FileSystem::GetFileModifiedTime(filename));
+        MESSAGE("mtime: " << mfdt.ToHTTP());
 
-        auto tp = StrUtils::ToTimePoint(mtime, StrUtils::TimeFormats::HTTP);
-        mtime = StrUtils::TimeStamp(tp, StrUtils::TimeFormats::HTTP);
-        auto d = floor<days>(tp);
-        year_month_day ymd(sys_days{d});
-        std::chrono::hh_mm_ss<seconds> hms{ floor<seconds>(tp - d)};
+        mfdt -= std::chrono::seconds(5);
 
-//        MESSAGE("mtime2: " << mtime << ", "
-//            << static_cast<int>(ymd.year()) << "-" << std::setfill('0')
-//            << static_cast<unsigned>(ymd.month()) << "-"
-//            << std::setw(1) << static_cast<unsigned>(ymd.day()) << " "
-//            << hms.hours().count() << ":"
-//            << hms.minutes().count() << ":"
-//            << hms.seconds().count()
-//            );
+        FileSystem::SetFileModifiedTime(filename, mfdt);
 
-        FileSystem::SetFileModifiedTime(filename, tp);
-
-        CHECK_EQ(mtime, StrUtils::TimeStamp(FileSystem::GetFileModifiedTime(filename), StrUtils::TimeFormats::HTTP));
+        CHECK_EQ(mfdt.ToRFC3339Milli(), FileSystem::GetFileModifiedTime(filename).ToRFC3339Milli());
 
         std::filesystem::remove(filename);
     }

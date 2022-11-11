@@ -16,8 +16,8 @@
 
 using namespace rsp::utils;
 
-#define DMESG(a) MESSAGE(a)
-//#define DMESG(a)
+//#define DMESG(a) MESSAGE(a)
+#define DMESG(a)
 
 TEST_CASE("DateTime")
 {
@@ -30,8 +30,8 @@ TEST_CASE("DateTime")
     const std::string cCustom("08-2022-11 23:43(15).813"); // Format: "%d-%Y-%m %S:%M:%H."
 
     SUBCASE("Zero") {
-        DateTime dt;
-        DMESG("DateTime() = " << dt);
+        DateTime dt(0);
+        DMESG("DateTime(0) = " << dt);
         CHECK_EQ(dt.ToRFC3339Milli(), "1970-01-01T00:00:00.000Z");
 
         std::tm tm = dt;
@@ -45,6 +45,11 @@ TEST_CASE("DateTime")
 
     SUBCASE("Constructors") {
 
+        SUBCASE("Now") {
+            DateTime dt1;
+            DateTime dt2(std::chrono::system_clock::now());
+            CHECK_EQ(dt1.MilliSecondsBetween(dt2), 0); // Test shows difference is way less than 1 microsecond on workstation
+        }
         SUBCASE("From values") {
             DateTime dt(2022, 11, 8, 15, 43, 23, 813);
             DMESG("DateTime(2022, 11, 08, 15, 43, 23, 813) = " << dt);
@@ -162,6 +167,35 @@ TEST_CASE("DateTime")
         CHECK_EQ(dt.MilliSecondsBetween(dt2), 42666);
         CHECK_EQ(dt.MicroSecondsBetween(dt2), 42666444);
         CHECK_EQ(dt.NanoSecondsBetween(dt2), 42666444023L);
+    }
+
+    SUBCASE("operators") {
+        DateTime dt(cRFC3339Milli, DateTime::Formats::RFC3339Milli);
+        auto dt2 = dt;
+
+        SUBCASE("durations") {
+            dt2 += std::chrono::milliseconds(12);
+            CHECK_EQ(dt.MilliSecondsBetween(dt2), 12);
+            CHECK(dt != dt2);
+
+            CHECK_EQ(dt2, (dt + std::chrono::milliseconds(12)));
+            CHECK_EQ((dt2 - std::chrono::milliseconds(12)) , dt);
+
+            dt2 -= std::chrono::milliseconds(12);
+            CHECK(dt == dt2);
+        }
+
+        SUBCASE("DateTime") {
+            DateTime dt3(std::chrono::seconds(13));
+            DateTime dt4 = dt + dt3;
+            dt2 += dt3;
+            CHECK_EQ(dt.SecondsBetween(dt2), 13);
+            CHECK_NE(dt, dt2);
+            CHECK_EQ(dt2, dt4);
+            dt2 -= dt3;
+            CHECK_EQ(dt, dt2);
+            CHECK_EQ(dt2, (dt4 - dt3));
+        }
     }
 }
 

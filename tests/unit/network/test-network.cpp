@@ -186,7 +186,7 @@ TEST_CASE("Network")
 //        MESSAGE("Response:\n" << *resp);
 
         if (FileSystem::FileExists(cFile)) {
-            CHECK_EQ(StrUtils::TimeStamp(FileSystem::GetFileModifiedTime(cFile)), StrUtils::TimeStamp(FileSystem::GetFileModifiedTime(cSourceFile)));
+            CHECK_EQ(FileSystem::GetFileModifiedTime(cFile), FileSystem::GetFileModifiedTime(cSourceFile));
             FileIO file2(cFile, std::ios_base::in);
             auto s2 = file2.GetContents();
             CHECK_EQ(s2.size(), source.size());

@@ -12,7 +12,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-#include <utils/StrUtils.h>
+#include <utils/DateTime.h>
 #include <logging/FileLogWriter.h>
 
 using namespace rsp::utils;
@@ -39,7 +39,8 @@ FileLogWriter::~FileLogWriter()
 void FileLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel)
 {
     if (arMsg.length() && (mAcceptLevel >= aCurrentLevel)) {
-        mOutput << "[" << StrUtils::TimeStamp() << "] (" << ToString(aCurrentLevel) << ") " << arMsg << std::flush;
+        DateTime dt;
+        mOutput << "[" << dt.ToLogging() << "] (" << ToString(aCurrentLevel) << ") " << arMsg << std::flush;
     }
 }
 

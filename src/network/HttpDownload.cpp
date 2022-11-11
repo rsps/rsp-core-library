@@ -14,7 +14,7 @@
 #include <network/HttpDownload.h>
 #include <posix/FileSystem.h>
 #include <posix/FileIO.h>
-#include <utils/StrUtils.h>
+#include <utils/DateTime.h>
 
 using namespace rsp::posix;
 using namespace rsp::utils;
@@ -41,7 +41,7 @@ IHttpResponse& HttpDownload::Execute()
     std::string modified_time{};
     if (FileSystem::FileExists(mFileName)) {
         auto mtime = FileSystem::GetFileModifiedTime(mFileName);
-        modified_time = StrUtils::TimeStamp(mtime, StrUtils::TimeFormats::HTTP);
+        modified_time = DateTime::Now().ToHTTP();
     }
 
     rsp::posix::FileIO file(mFileName, std::ios::in | std::ios::out | std::ios_base::ate, 0640);
@@ -75,8 +75,8 @@ IHttpResponse& HttpDownload::Execute()
 void HttpDownload::SetFileModifiedTime(const std::string &arTimeString)
 {
     using namespace std::chrono;
-    auto tp = StrUtils::ToTimePoint(arTimeString, StrUtils::TimeFormats::HTTP);
-    FileSystem::SetFileModifiedTime(mFileName, tp);
+    DateTime dt(arTimeString, DateTime::Formats::HTTP);
+    FileSystem::SetFileModifiedTime(mFileName, dt);
 }
 
 } /* namespace rsp::network */
