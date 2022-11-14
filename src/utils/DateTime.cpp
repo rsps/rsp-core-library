@@ -159,9 +159,7 @@ std::string DateTime::ToString(const char *apFormat) const
     ss << std::put_time(&tm, apFormat);
 
     if (std::string(apFormat).back() == '.') {
-        time_point<system_clock, milliseconds> msd = time_point_cast<milliseconds>(mTp);
-        unsigned msecs = msd.time_since_epoch().count() % 1000;
-        ss << std::setfill('0') << std::setw(3) << msecs;
+        encodeFractions(ss, mTp);
     }
 
     return ss.str();
@@ -230,7 +228,7 @@ DateTime& DateTime::FromString(const std::string &arTimeString, const char *apFo
     }
 
     mTp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
-    mTp += std::chrono::milliseconds(msecs) - getTimezoneOffset(tm);
+    mTp += decodeFractions(msecs) - getTimezoneOffset(tm);
 
     return *this;
 }
@@ -317,7 +315,7 @@ std::chrono::seconds DateTime::getTimezoneOffset(std::tm &arTm) const
     gmtime_r(&t, &gm_tm);
     gm_tm.tm_isdst = false;
     std::time_t tz_offset = (std::mktime(&gm_tm) - t);
-    return std::chrono::seconds(tz_offset);
+    return seconds(tz_offset);
 }
 
 DateTime::Date DateTime::GetDate() const
@@ -353,6 +351,26 @@ std::ostream& operator <<(std::ostream &os, const DateTime::Time &arTime)
 std::ostream& operator <<(std::ostream &os, const DateTime &arDateTime)
 {
     os << arDateTime.GetDate() << " " << arDateTime.GetTime();
+    return os;
+}
+
+std::chrono::system_clock::duration DateTime::decodeFractions(uint64_t aFractions) const
+{
+    if (aFractions >= 1000000) {
+        return nanoseconds(aFractions);
+    }
+    if (aFractions >= 1000) {
+        return microseconds(aFractions);
+    }
+    return milliseconds(aFractions);
+}
+
+std::ostream& DateTime::encodeFractions(std::ostream& os, std::chrono::system_clock::time_point aTp) const
+{
+    time_point<system_clock, milliseconds> msd = time_point_cast<milliseconds>(aTp);
+    unsigned msecs = msd.time_since_epoch().count() % 1000;
+
+    os << std::setfill('0') << std::setw(3) << msecs;
     return os;
 }
 

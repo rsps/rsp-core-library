@@ -29,6 +29,11 @@ public:
     using HttpRequest::HttpRequest;
     HttpDownload(const std::string &arFileName);
 
+    /**
+     * \brief Set the filename to store the download into.
+     * \param arFileName
+     * \return self
+     */
     HttpDownload& SetFileName(const std::string &arFileName);
 
     IHttpResponse& Execute() override;
