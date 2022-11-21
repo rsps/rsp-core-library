@@ -210,6 +210,7 @@ TEST_CASE("Network")
 //                MESSAGE("Response Head:\n" << resp);
                 CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                 CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
+                CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
                 CHECK_EQ(resp.GetBody().size(), 0);
                 CHECK_EQ(resp.GetStatusCode(), 200);
                 respHead = true;
@@ -221,15 +222,17 @@ TEST_CASE("Network")
 //                MESSAGE("Response 1:\n" << resp);
                 CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                 CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
+                CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
                 CHECK_EQ(resp.GetBody().size(), 120);
                 CHECK_EQ(200, resp.GetStatusCode());
                 resp1 = true;
             });
         session.Get("image.png",
             [&resp2](IHttpResponse& resp) {
-//              MESSAGE("Response 2:\n" << resp);
+//                MESSAGE("Response 2:\n" << resp);
                 CHECK_EQ(resp.GetHeaders().at("content-type"), "image/png");
                 CHECK_EQ(resp.GetHeaders().at("content-length"), "25138");
+                CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
                 CHECK_EQ(resp.GetBody().size(), 25138);
                 CHECK_EQ(200, resp.GetStatusCode());
                 resp2 = true;
