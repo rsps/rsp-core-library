@@ -53,6 +53,14 @@ IHttpRequest& CurlHttpRequest::WriteToFile(rsp::posix::FileIO &arFile)
     return *this;
 }
 
+IHttpRequest& CurlHttpRequest::ReadFromFile(rsp::posix::FileIO &arFile)
+{
+    setCurlOption(CURLOPT_UPLOAD, 1L);
+    setCurlOption(CURLOPT_READDATA, arFile.GetHandle());
+    setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(arFile.GetSize()));
+    return *this;
+}
+
 size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
 {
     apResponse->getBody().append(static_cast<char*>(ptr), size * nmemb);

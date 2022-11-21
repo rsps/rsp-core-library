@@ -194,6 +194,28 @@ TEST_CASE("Network")
         }
     }
 
+    SUBCASE("File Upload") {
+        const char* cFile = "./image.png";
+        const char* cSourceFile = "./webserver/public/image.png";
+
+        FileIO file(cFile, std::ios_base::in);
+
+        opt.BaseUrl = "https://server.localhost:8443";
+        opt.RequestType = HttpRequestType::POST;
+        opt.Verbose = 1;
+
+        HttpRequest request;
+        request.SetOptions(opt);
+        request.ReadFromFile(file);
+
+        IHttpResponse *resp = nullptr;
+        CHECK_NOTHROW(resp = &request.Execute());
+
+        CHECK_EQ(resp->GetBody().size(), 0);
+        CHECK_EQ(resp->GetStatusCode(), 200);
+
+    }
+
     SUBCASE("Http Session") {
         CHECK_NOTHROW(HttpSession session1(1));
         bool respHead = false;

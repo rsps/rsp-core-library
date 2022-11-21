@@ -44,6 +44,7 @@ public:
     CurlHttpRequest& operator=(CurlHttpRequest&&) = default;
 
     IHttpRequest& WriteToFile(rsp::posix::FileIO &arFile) override;
+    IHttpRequest& ReadFromFile(rsp::posix::FileIO &arFile) override;
 
     IHttpResponse& Execute() override;
     const HttpRequestOptions& GetOptions() const override;
