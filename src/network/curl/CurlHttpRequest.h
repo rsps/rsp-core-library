@@ -68,7 +68,7 @@ private:
     static size_t progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
 
     void checkRequestOptions(const HttpRequestOptions &arOpts);
-    void populateOptions();
+    void populateOptions(curl_slist *apHeaders);
 
 };
 

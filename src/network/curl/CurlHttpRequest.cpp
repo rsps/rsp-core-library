@@ -110,8 +110,6 @@ size_t CurlHttpRequest::progressFunction(CurlHttpRequest *aRequest, curl_off_t d
 IHttpRequest& CurlHttpRequest::SetOptions(const HttpRequestOptions &arOptions)
 {
     mRequestOptions = arOptions;
-//    curl_easy_reset(mpCurl);
-    populateOptions();
     return *this;
 }
 
@@ -130,8 +128,15 @@ IHttpResponse& CurlHttpRequest::Execute()
 {
     checkRequestOptions(mRequestOptions);
 
+    curl_slist *headers = nullptr;
+    populateOptions(headers);
+    if (headers) {
+        setCurlOption(CURLOPT_HTTPHEADER, headers);
+    }
+
     //Curl and evaluate
     auto res = curl_easy_perform(mpCurl);
+    curl_slist_free_all(headers);
     if (res != CURLE_OK) {
         THROW_WITH_BACKTRACE2(ECurlError, "curl_easy_perform() failed.", res);
     }
@@ -162,7 +167,7 @@ std::uintptr_t CurlHttpRequest::GetHandle()
     return std::uintptr_t(mpCurl);
 }
 
-void CurlHttpRequest::populateOptions()
+void CurlHttpRequest::populateOptions(curl_slist *apHeaders)
 {
     setCurlOption(CURLOPT_URL, std::string(mRequestOptions.BaseUrl + mRequestOptions.Uri).c_str());
 
@@ -228,14 +233,16 @@ void CurlHttpRequest::populateOptions()
     }
 
     //Set Request headers
-    std::string header;
-    curl_slist *headers = NULL;
-    std::map<std::string,std::string>::const_iterator iter = mRequestOptions.Headers.begin();
-    for (; iter != mRequestOptions.Headers.end(); ++iter) {
-        header = iter->first + ": " + iter->second;
-        headers = curl_slist_append(headers, header.c_str());
+    for (auto const& tuple : mRequestOptions.Headers) {
+        std::string header = tuple.first + ": " + tuple.second;
+        auto *temp = curl_slist_append(apHeaders, header.c_str());
+        if (temp == nullptr) {
+            curl_slist_free_all(apHeaders);
+            apHeaders = nullptr;
+            THROW_WITH_BACKTRACE1(ECurlError, "curl_slist_free_all failed.");
+        }
+        apHeaders = temp;
     }
-    setCurlOption(CURLOPT_HTTPHEADER, headers);
 
     //Set basic auth
     if (mRequestOptions.BasicAuthUsername.length() > 0) {

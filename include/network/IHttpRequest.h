@@ -61,7 +61,7 @@ public:
      * \param arOptions
      * \return self
      */
-    virtual IHttpRequest & SetOptions(const HttpRequestOptions &arOptions) = 0;
+    virtual IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) = 0;
 
     /**
      * \fn IHttpRequest SetBody&(const std::string&)=0
@@ -70,7 +70,7 @@ public:
      * \param arBody
      * \return self
      */
-    virtual IHttpRequest & SetBody(const std::string &arBody) = 0;
+    virtual IHttpRequest& SetBody(const std::string &arBody) = 0;
 
     /**
      * \fn IHttpResponse Execute&()=0

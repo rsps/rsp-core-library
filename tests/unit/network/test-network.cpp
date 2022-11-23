@@ -17,6 +17,7 @@
 #include <logging/Logger.h>
 #include <network/IHttpRequest.h>
 #include <network/HttpRequest.h>
+#include <network/HttpForm.h>
 #include <network/HttpDownload.h>
 #include <network/NetworkLibrary.h>
 #include <network/HttpSession.h>
@@ -203,12 +204,46 @@ TEST_CASE("Network")
         file.Seek(0);
 
         opt.BaseUrl = "https://server.localhost:8443/cgi/upload.sh";
-        opt.RequestType = HttpRequestType::POST;
+        opt.RequestType = HttpRequestType::PUT;
 //        opt.Verbose = 1;
 
         HttpRequest request;
         request.SetOptions(opt);
         request.ReadFromFile(file);
+
+        IHttpResponse *resp = nullptr;
+        CHECK_NOTHROW(resp = &request.Execute());
+
+        MESSAGE(resp->GetBody());
+
+        CHECK_EQ(resp->GetBody().size(), 47);
+        CHECK_EQ(resp->GetStatusCode(), 200);
+
+        CHECK(FileSystem::FileExists(cUploadedFile));
+        FileIO file2(cUploadedFile, std::ios_base::in);
+        auto s2 = file2.GetContents();
+        CHECK_EQ(s2.size(), source.size());
+        CHECK(std::memcmp(source.data(), s2.data(), source.size()) == 0);
+
+        FileSystem::DeleteFile(std::string(cUploadedFile));
+    }
+
+    SUBCASE("Form Upload") {
+        const char* cUploadedFile = "./webserver/upload.png";
+        const char* cSourceFile = "./webserver/public/image.png";
+
+        FileIO file(cSourceFile, std::ios_base::in);
+        auto source = file.GetContents();
+        file.Seek(0);
+
+        opt.BaseUrl = "https://server.localhost:8443/cgi/upload-form.sh";
+        opt.RequestType = HttpRequestType::POST;
+//        opt.Verbose = 1;
+
+        HttpForm request;
+        request.SetOptions(opt);
+        request.AddField("upload-filename", "uploaded.png");
+        request.AddFile("upload-file", file);
 
         IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
