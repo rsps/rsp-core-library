@@ -56,7 +56,8 @@ IHttpRequest& CurlHttpRequest::WriteToFile(rsp::posix::FileIO &arFile)
 IHttpRequest& CurlHttpRequest::ReadFromFile(rsp::posix::FileIO &arFile)
 {
     setCurlOption(CURLOPT_UPLOAD, 1L);
-    setCurlOption(CURLOPT_READDATA, arFile.GetHandle());
+    setCurlOption(CURLOPT_READFUNCTION, fileReadFunction);
+    setCurlOption(CURLOPT_READDATA, &arFile);
     setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(arFile.GetSize()));
     return *this;
 }
@@ -69,8 +70,12 @@ size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, Curl
 
 size_t CurlHttpRequest::fileWriteFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile)
 {
-    apFile->Write(ptr, size * nmemb);
-    return size * nmemb;
+    return apFile->Write(ptr, size * nmemb);
+}
+
+size_t CurlHttpRequest::fileReadFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile)
+{
+    return apFile->Read(ptr, size * nmemb);
 }
 
 size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse)

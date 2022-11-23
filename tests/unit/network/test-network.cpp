@@ -195,14 +195,16 @@ TEST_CASE("Network")
     }
 
     SUBCASE("File Upload") {
-        const char* cFile = "./image.png";
+        const char* cUploadedFile = "./webserver/upload.png";
         const char* cSourceFile = "./webserver/public/image.png";
 
-        FileIO file(cFile, std::ios_base::in);
+        FileIO file(cSourceFile, std::ios_base::in);
+        auto source = file.GetContents();
+        file.Seek(0);
 
-        opt.BaseUrl = "https://server.localhost:8443";
+        opt.BaseUrl = "https://server.localhost:8443/cgi/upload.sh";
         opt.RequestType = HttpRequestType::POST;
-        opt.Verbose = 1;
+//        opt.Verbose = 1;
 
         HttpRequest request;
         request.SetOptions(opt);
@@ -211,9 +213,18 @@ TEST_CASE("Network")
         IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
 
-        CHECK_EQ(resp->GetBody().size(), 0);
+        MESSAGE(resp->GetBody());
+
+        CHECK_EQ(resp->GetBody().size(), 47);
         CHECK_EQ(resp->GetStatusCode(), 200);
 
+        CHECK(FileSystem::FileExists(cUploadedFile));
+        FileIO file2(cUploadedFile, std::ios_base::in);
+        auto s2 = file2.GetContents();
+        CHECK_EQ(s2.size(), source.size());
+        CHECK(std::memcmp(source.data(), s2.data(), source.size()) == 0);
+
+        FileSystem::DeleteFile(std::string(cUploadedFile));
     }
 
     SUBCASE("Http Session") {
