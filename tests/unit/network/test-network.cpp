@@ -17,7 +17,6 @@
 #include <logging/Logger.h>
 #include <network/IHttpRequest.h>
 #include <network/HttpRequest.h>
-#include <network/HttpForm.h>
 #include <network/HttpDownload.h>
 #include <network/NetworkLibrary.h>
 #include <network/HttpSession.h>
@@ -203,7 +202,7 @@ TEST_CASE("Network")
         auto source = file.GetContents();
         file.Seek(0);
 
-        opt.BaseUrl = "https://server.localhost:8443/cgi/upload.sh";
+        opt.BaseUrl = "https://server.localhost:44300/cgi/upload.sh";
         opt.RequestType = HttpRequestType::PUT;
 //        opt.Verbose = 1;
 
@@ -236,14 +235,14 @@ TEST_CASE("Network")
         auto source = file.GetContents();
         file.Seek(0);
 
-        opt.BaseUrl = "https://server.localhost:8443/cgi/upload-form.sh";
+        opt.BaseUrl = "https://server.localhost:44300/cgi/upload-form.sh";
         opt.RequestType = HttpRequestType::POST;
-//        opt.Verbose = 1;
+        opt.Verbose = 1;
 
-        HttpForm request;
+        HttpRequest request;
         request.SetOptions(opt);
-        request.AddField("upload-filename", "uploaded.png");
-        request.AddFile("upload-file", file);
+        request.AddField("filename", "uploaded.png");
+        request.AddFile("filedata", file);
 
         IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());

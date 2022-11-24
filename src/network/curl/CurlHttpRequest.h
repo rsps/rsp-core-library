@@ -51,6 +51,9 @@ public:
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
     IHttpRequest& SetBody(const std::string &arBody) override;
 
+    IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override;
+    IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override;
+
     std::uintptr_t GetHandle() override;
 
 protected:
@@ -68,7 +71,7 @@ private:
     static size_t progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
 
     void checkRequestOptions(const HttpRequestOptions &arOpts);
-    void populateOptions(curl_slist *apHeaders);
+    void populateOptions(curl_slist **apHeaders);
 
 };
 

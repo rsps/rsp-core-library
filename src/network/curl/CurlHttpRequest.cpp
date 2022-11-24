@@ -124,12 +124,34 @@ IHttpRequest& CurlHttpRequest::SetBody(const std::string &arBody)
     return *this;
 }
 
+IHttpRequest& CurlHttpRequest::AddField(const std::string &arFieldName, const std::string &arValue)
+{
+    curl_mimepart *field = curl_mime_addpart(getForm());
+    if (field == nullptr) {
+        THROW_WITH_BACKTRACE1(ECurlError, "curl_mime_addpart() failed.");
+    }
+    curl_mime_name(field, arFieldName.c_str());
+    curl_mime_data(field, arValue.c_str(), CURL_ZERO_TERMINATED);
+    return *this;
+}
+
+IHttpRequest& CurlHttpRequest::AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile)
+{
+    curl_mimepart *field = curl_mime_addpart(getForm());
+    if (field == nullptr) {
+        THROW_WITH_BACKTRACE1(ECurlError, "curl_mime_addpart() failed.");
+    }
+    curl_mime_name(field, arFieldName.c_str());
+    curl_mime_filedata(field, arFile.GetFileName().c_str());
+    return *this;
+}
+
 IHttpResponse& CurlHttpRequest::Execute()
 {
     checkRequestOptions(mRequestOptions);
 
     curl_slist *headers = nullptr;
-    populateOptions(headers);
+    populateOptions(&headers);
     if (headers) {
         setCurlOption(CURLOPT_HTTPHEADER, headers);
     }
@@ -167,7 +189,7 @@ std::uintptr_t CurlHttpRequest::GetHandle()
     return std::uintptr_t(mpCurl);
 }
 
-void CurlHttpRequest::populateOptions(curl_slist *apHeaders)
+void CurlHttpRequest::populateOptions(curl_slist **apHeaders)
 {
     setCurlOption(CURLOPT_URL, std::string(mRequestOptions.BaseUrl + mRequestOptions.Uri).c_str());
 
@@ -178,7 +200,10 @@ void CurlHttpRequest::populateOptions(curl_slist *apHeaders)
 
         case HttpRequestType::POST:
             setCurlOption(CURLOPT_POST, 1L);
-            if (mRequestOptions.Body.size() > 0) {
+            if (hasForm()) {
+                setCurlOption(CURLOPT_MIMEPOST, getForm());
+            }
+            else if (mRequestOptions.Body.size() > 0) {
                 setCurlOption(CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
                 setCurlOption(CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
             }
@@ -229,19 +254,22 @@ void CurlHttpRequest::populateOptions(curl_slist *apHeaders)
     if (!mRequestOptions.CertPath.empty()) {
         setCurlOption(CURLOPT_SSLCERT, mRequestOptions.CertPath.c_str());
         setCurlOption(CURLOPT_SSLKEY, mRequestOptions.KeyPath.c_str());
-        setCurlOption(CURLOPT_KEYPASSWD, mRequestOptions.KeyPasswd.c_str());
+        if (!mRequestOptions.KeyPasswd.empty()) {
+            setCurlOption(CURLOPT_KEYPASSWD, mRequestOptions.KeyPasswd.c_str());
+        }
     }
 
     //Set Request headers
     for (auto const& tuple : mRequestOptions.Headers) {
         std::string header = tuple.first + ": " + tuple.second;
-        auto *temp = curl_slist_append(apHeaders, header.c_str());
+        std::cout << "Header: " << header << std::endl;
+        auto *temp = curl_slist_append(*apHeaders, header.c_str());
         if (temp == nullptr) {
-            curl_slist_free_all(apHeaders);
-            apHeaders = nullptr;
+            curl_slist_free_all(*apHeaders);
+            *apHeaders = nullptr;
             THROW_WITH_BACKTRACE1(ECurlError, "curl_slist_free_all failed.");
         }
-        apHeaders = temp;
+        *apHeaders = temp;
     }
 
     //Set basic auth

@@ -44,10 +44,14 @@ protected:
     friend MultiCurl;
     CURL* mpCurl = nullptr;
 
+    curl_mime* getForm();
+    bool hasForm() { return (mpForm != nullptr); }
+
     virtual void requestDone() {};
 
     template <typename T>
     void setCurlOption(CURLoption aOption, T aArg) {
+//        std::cout << "Curl Option: " << static_cast<int>(aOption) << " : " << aArg << std::endl;
         auto err = curl_easy_setopt(mpCurl, aOption, aArg);
         if (err != CURLE_OK) {
             THROW_WITH_BACKTRACE2(ECurlError, "curl_easy_setopt() failed:", err);
@@ -64,6 +68,7 @@ protected:
 
 private:
     char mErrorBuffer[CURL_ERROR_SIZE] = { 0 };
+    curl_mime *mpForm = nullptr;
 };
 
 } /* namespace rsp::network::http::curl */

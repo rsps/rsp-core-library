@@ -33,6 +33,9 @@ EasyCurl::EasyCurl()
 
 EasyCurl::~EasyCurl()
 {
+    if (mpForm) {
+        curl_mime_free(mpForm);
+    }
     if (mpCurl) {
         curl_easy_cleanup(mpCurl);
     }
@@ -50,19 +53,6 @@ EasyCurl::EasyCurl(EasyCurl &&arOther)
     *this = std::move(arOther);
 }
 
-EasyCurl* EasyCurl::GetFromHandle(CURL* apHandle)
-{
-    EasyCurl *p;
-    auto err = curl_easy_getinfo(apHandle, CURLINFO_PRIVATE, &p);
-    if (err != CURLE_OK) {
-        THROW_WITH_BACKTRACE2(ECurlError, "Curl private pointer GET failed.", err);
-    }
-    if (!p) {
-        THROW_WITH_BACKTRACE1(ECurlError, "Curl private pointer was not set.");
-    }
-    return p;
-}
-
 EasyCurl& EasyCurl::operator =(const EasyCurl &arOther)
 {
     DLOG("EasyCurl Copy Assignment");
@@ -78,8 +68,31 @@ EasyCurl& EasyCurl::operator =(EasyCurl &&arOther)
     if (this != &arOther) {
         mpCurl = arOther.mpCurl;
         arOther.mpCurl = nullptr;
+        mpForm = arOther.mpForm;
+        arOther.mpForm = nullptr;
     }
     return *this;
+}
+
+EasyCurl* EasyCurl::GetFromHandle(CURL* apHandle)
+{
+    EasyCurl *p;
+    auto err = curl_easy_getinfo(apHandle, CURLINFO_PRIVATE, &p);
+    if (err != CURLE_OK) {
+        THROW_WITH_BACKTRACE2(ECurlError, "Curl private pointer GET failed.", err);
+    }
+    if (!p) {
+        THROW_WITH_BACKTRACE1(ECurlError, "Curl private pointer was not set.");
+    }
+    return p;
+}
+
+curl_mime* EasyCurl::getForm()
+{
+    if (!mpForm) {
+        mpForm = curl_mime_init(mpCurl);
+    }
+    return mpForm;
 }
 
 } /* namespace rsp::network::http::curl */

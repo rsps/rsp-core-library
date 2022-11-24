@@ -73,6 +73,26 @@ public:
     virtual IHttpRequest& SetBody(const std::string &arBody) = 0;
 
     /**
+     * \fn IHttpForm AddField&(std::string_view, std::string_view)
+     * \brief Add a form field as key/value pair
+     *
+     * \param aFieldName Name of the field
+     * \param aValue Value of the field
+     * \return self
+     */
+    virtual IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) = 0;
+
+    /**
+     * \fn IHttpForm AddFile&(std::string_view, rsp::posix::FileIO&)
+     * \brief Add a file field to the form
+     *
+     * \param aFieldName Name of the field
+     * \param arFile File value of the field
+     * \return self
+     */
+    virtual IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) = 0;
+
+    /**
      * \fn IHttpResponse Execute&()=0
      * \brief Execute the request. This returns a response or throws on transport errors.
      *
