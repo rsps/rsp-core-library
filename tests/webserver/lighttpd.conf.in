@@ -29,6 +29,8 @@ mimetype.assign = (
 )
 
 server.errorlog = basedir + "/error.log"
+server.breakagelog = basedir + "/cgi.log"
+
 debug.log-request-handling = "enable"
 debug.log-request-header = "enable"
 #debug.log-state-handling = "enable"
@@ -47,7 +49,7 @@ $HTTP["host"] == "server.localhost" {
 $HTTP["url"] =~ "^/cgi/" {
         alias.url += ( "/cgi/" => basedir + "/cgi/" )
         cgi.assign = (
-            ".sh"  => "/bin/sh",
+            ".sh"  => "/bin/bash",
         )
 }
 

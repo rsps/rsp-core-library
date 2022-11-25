@@ -36,6 +36,35 @@ using namespace rsp::utils;
 using namespace rsp::utils::AnsiEscapeCodes;
 using namespace rsp::posix;
 
+static std::string ToHex(const std::string &arString)
+{
+    std::stringstream out;
+    std::string delim = ", ";
+    auto sz = arString.size();
+
+    for (std::size_t i = 0 ; i < sz ; i++) {
+        if ((i % 16) == 0) {
+            out << "    ";
+        }
+        if (i == (sz - 1)) {
+            delim = "";
+        }
+
+        out << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(arString[i]) << delim;
+
+        if ((i % 16) == 15) {
+            out << "\n";
+        }
+    }
+    if ((sz % 16) != 15) {
+        out << "\n";
+    }
+    out << std::dec;
+
+    return out.str();
+}
+
+
 TEST_CASE("Network")
 {
     rsp::logging::Logger logger;
@@ -237,7 +266,7 @@ TEST_CASE("Network")
 
         opt.BaseUrl = "https://server.localhost:44300/cgi/upload-form.sh";
         opt.RequestType = HttpRequestType::POST;
-        opt.Verbose = 1;
+//        opt.Verbose = 1;
 
         HttpRequest request;
         request.SetOptions(opt);
@@ -247,9 +276,21 @@ TEST_CASE("Network")
         IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
 
-        MESSAGE(resp->GetBody());
+        auto body = resp->GetBody();
+//        MESSAGE(body);
 
-        CHECK_EQ(resp->GetBody().size(), 47);
+        std::string expected = "\n"
+            "Uploaded file size: 25437\n"
+            "CTYPE: multipart/form-data\n"
+            "filename: uploaded.png\r\n"
+            "filedata: filename=\"image.png\"; Content-Type: image/png\r\n";
+
+//        std::cout << ToHex(body) << std::endl;
+//        std::cout << ToHex(expected) << std::endl;
+
+        CHECK_EQ(body, expected);
+
+        CHECK_EQ(resp->GetBody().size(), 135);
         CHECK_EQ(resp->GetStatusCode(), 200);
 
         CHECK(FileSystem::FileExists(cUploadedFile));
@@ -274,7 +315,7 @@ TEST_CASE("Network")
 
         session.Head("index.html",
             [&respHead](IHttpResponse& resp) {
-//                MESSAGE("Response Head:\n" << resp);
+                MESSAGE("Response Head:\n" << resp);
                 CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                 CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
                 CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
