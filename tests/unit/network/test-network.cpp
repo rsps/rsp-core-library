@@ -36,35 +36,6 @@ using namespace rsp::utils;
 using namespace rsp::utils::AnsiEscapeCodes;
 using namespace rsp::posix;
 
-static std::string ToHex(const std::string &arString)
-{
-    std::stringstream out;
-    std::string delim = ", ";
-    auto sz = arString.size();
-
-    for (std::size_t i = 0 ; i < sz ; i++) {
-        if ((i % 16) == 0) {
-            out << "    ";
-        }
-        if (i == (sz - 1)) {
-            delim = "";
-        }
-
-        out << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(arString[i]) << delim;
-
-        if ((i % 16) == 15) {
-            out << "\n";
-        }
-    }
-    if ((sz % 16) != 15) {
-        out << "\n";
-    }
-    out << std::dec;
-
-    return out.str();
-}
-
-
 TEST_CASE("Network")
 {
     rsp::logging::Logger logger;
@@ -287,8 +258,8 @@ TEST_CASE("Network")
             "filename: uploaded.png\r\n"
             "filedata: filename=\"image.png\"; Content-Type: image/png\r\n";
 
-//        std::cout << ToHex(body) << std::endl;
-//        std::cout << ToHex(expected) << std::endl;
+//        std::cout << TestHelpers::ToHex(body) << std::endl;
+//        std::cout << TestHelpers::ToHex(expected) << std::endl;
 
         CHECK_EQ(body, expected);
 

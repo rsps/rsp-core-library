@@ -22,6 +22,8 @@ public:
 
     static void ParseArguments(const char ** apArgv);
 
+    static std::string ToHex(const std::string &arString);
+
 protected:
     static rsp::logging::LogLevel mLogLevel;
 };
