@@ -125,7 +125,7 @@ void BmpLoader::ReadHeader(rsp::posix::FileIO &arFile)
         mBytesPerPixel = mBytesPerPixel + 1;
     }
 
-    initAfterLoad(static_cast<uint32_t>(std::abs(mBmpHeader.v1.width)), static_cast<uint32_t>(std::abs(mBmpHeader.v1.heigth)), bitsPerPixelToColorDepth(mBmpHeader.v1.bitsPerPixel));
+    initAfterLoad(static_cast<GuiUnit_t>(std::abs(mBmpHeader.v1.width)), static_cast<GuiUnit_t>(std::abs(mBmpHeader.v1.heigth)), bitsPerPixelToColorDepth(mBmpHeader.v1.bitsPerPixel));
 }
 
 void BmpLoader::ReadPalette(rsp::posix::FileIO &arFile)
@@ -166,7 +166,7 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
         for (std::uint32_t y = 0; y < h ; y++) {
             for (std::uint32_t x = 0; x < w; x++) {
                 Color color(ReadPixel(data, x, y, paddedRowSize));
-                mPixelData.SetPixelAt(x, y, color);
+                mPixelData.SetPixelAt(GuiUnit_t(x), GuiUnit_t(y), color);
             }
         }
     }
@@ -174,7 +174,7 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
         for (std::uint32_t y = 0; y < h ; y++) {
             for (std::uint32_t x = 0; x < w; x++) {
                 Color color(ReadPixel(data, x, h-1-y, paddedRowSize));
-                mPixelData.SetPixelAt(x, y, color);
+                mPixelData.SetPixelAt(GuiUnit_t(x), GuiUnit_t(y), color);
             }
 //            std::cout << std::endl;
         }

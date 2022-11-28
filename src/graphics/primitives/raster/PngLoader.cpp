@@ -67,7 +67,7 @@ void PngLoader::LoadImg(const std::string &arImgName)
                 mIhdr = chunk.GetHeader();
                 mIhdr.Width = be32toh(mIhdr.Width);
                 mIhdr.Height = be32toh(mIhdr.Height);
-                initAfterLoad(mIhdr.Width, mIhdr.Height, getColorDepth());
+                initAfterLoad(static_cast<GuiUnit_t>(mIhdr.Width), static_cast<GuiUnit_t>(mIhdr.Height), getColorDepth());
                 break;
 
             case fourcc("IDAT"):

@@ -21,13 +21,13 @@ void RunTime::Init()
 }
 
 RunTime::RunTime()
+    : mValue(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch())
 {
-    mValue = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch();
 }
 
 RunTime::RunTime(const std::chrono::milliseconds &arValue)
+    : mValue(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch() + arValue)
 {
-    mValue = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch() + arValue;
 }
 
 bool RunTime::operator <=(const RunTime &arOther)
@@ -40,7 +40,7 @@ bool RunTime::operator <(const RunTime &arOther)
     return mValue < arOther.mValue;
 }
 
-std::uint64_t RunTime::Milliseconds() const
+std::int64_t RunTime::Milliseconds() const
 {
     return (mValue - mStartedAt).count();
 }

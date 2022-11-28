@@ -112,17 +112,17 @@ TEST_CASE("Graphics Main Test")
             tp.SetEvents(SecondScene::GetTouchEvents().data(), SecondScene::GetTouchEvents().size());
 
             int topBtnId = static_cast<int>(apScene->GetAs<SecondScene>().GetTopBtn().GetId());
-            apScene->GetAs<SecondScene>().GetTopBtn().OnClick() = [&topBtnClicked, topBtnId](const Point& arPoint, int id) {
+            apScene->GetAs<SecondScene>().GetTopBtn().OnClick() = [&topBtnClicked, topBtnId](const Point& arPoint, uint32_t id) {
                 CHECK_EQ(id, topBtnId);
                 topBtnClicked++;
             };
 
-            apScene->GetAs<SecondScene>().GetBottomBtn().OnClick() = [](const Point& arPoint, int id) {
+            apScene->GetAs<SecondScene>().GetBottomBtn().OnClick() = [](const Point& arPoint, uint32_t id) {
                 FAIL("There should not be a click event from bottom button.");
             };
 
             // Check for lift even though we lift outside button
-            apScene->GetAs<SecondScene>().GetBottomBtn().OnLift() = [&gfx](const Point& arPoint, int id) {
+            apScene->GetAs<SecondScene>().GetBottomBtn().OnLift() = [&gfx](const Point& arPoint, uint32_t id) {
                 CHECK_EQ(arPoint, Point(310, 390));
                 gfx.Terminate();
             };

@@ -35,8 +35,8 @@ Bitmap::Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, un
     : Canvas(aHeight, aWidth, aBytesPerPixel),
       mImagePixels(aWidth, aHeight, PixelData::ColorDepth::RGB, reinterpret_cast<const std::uint8_t*>(apPixels))
 {
-    for (unsigned int y = 0; y < mHeight; y++) {
-        for (unsigned int x = 0; x < mWidth; x++) {
+    for (GuiUnit_t y = 0; y < mHeight; y++) {
+        for (GuiUnit_t x = 0; x < mWidth; x++) {
             mImagePixels.SetPixelAt(x, y, Color(*apPixels++));
         }
     }
@@ -78,8 +78,8 @@ Bitmap& Bitmap::Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aW
 
     mImagePixels.Init(aWidth, aHeight, PixelData::ColorDepth::RGB, reinterpret_cast<const std::uint8_t*>(apPixels));
 
-    for (unsigned int y = 0; y < mHeight; y++) {
-        for (unsigned int x = 0; x < mWidth; x++) {
+    for (GuiUnit_t y = 0; y < mHeight; y++) {
+        for (GuiUnit_t x = 0; x < mWidth; x++) {
             mImagePixels.SetPixelAt(x, y, Color(*apPixels++));
         }
     }
@@ -91,7 +91,7 @@ Bitmap& Bitmap::Assign(const PixelData &arPixelData)
 {
     mHeight = arPixelData.GetHeight();
     mWidth = arPixelData.GetWidth();
-    mBytesPerPixel = (static_cast<int>(arPixelData.GetColorDepth()) + 7) / 8;
+    mBytesPerPixel = (static_cast<unsigned int>(arPixelData.GetColorDepth()) + 7u) / 8u;
     mImagePixels.Init(mWidth, mHeight, arPixelData.GetColorDepth(), arPixelData.GetData());
     return *this;
 }

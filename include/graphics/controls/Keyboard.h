@@ -153,19 +153,19 @@ public:
 
     KeyboardCallback_t& OnKeyClick() { return mOnKeyClick; }
 protected:
-    KeyboardCallback_t mOnKeyClick;
+    KeyboardCallback_t mOnKeyClick{};
     std::array<Key, 26u> mKeys{};
-    Key mBtnShift;
-    Key mBtnLetters;
-    Key mBtnNumbers;
-    Key mBtnSpecials;
-    Key mBtnErase;
-    Key mBtnSpace;
+    Key mBtnShift{};
+    Key mBtnLetters{};
+    Key mBtnNumbers{};
+    Key mBtnSpecials{};
+    Key mBtnErase{};
+    Key mBtnSpace{};
     std::string mInput{};
 
     void addBtn(Key &arBtn);
     void setSymbols(const std::string &arSymbols);
-    void doKeyClick(const Point &arPoint, int aSymbol);
+    void doKeyClick(const Point &arPoint, uint32_t aSymbol);
 };
 
 } /* namespace rsp::graphics */

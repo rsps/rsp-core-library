@@ -203,8 +203,8 @@ void Keyboard::setSymbols(const std::string &arSymbols)
     for (char32_t symbol : utf32) {
         Button &btn = mKeys[index++];
         symbol = checked ? std::towupper(symbol) : std::towlower(symbol);
-        btn.SetId(symbol);
-        std::wstring ws(1, symbol);
+        btn.SetId(uint32_t(symbol));
+        std::wstring ws(1, wchar_t(symbol));
         std::string utf8 = std::wstring_convert<std::codecvt_utf8<wchar_t>>{}.to_bytes(ws);
         btn.SetCaption(utf8);
     }
@@ -214,7 +214,7 @@ Keyboard::~Keyboard()
 {
 }
 
-void Keyboard::doKeyClick(const Point &arPoint, int aSymbol)
+void Keyboard::doKeyClick(const Point &arPoint, uint32_t aSymbol)
 {
     switch(aSymbol) {
         case cKEY_SHIFT:
@@ -238,8 +238,9 @@ void Keyboard::doKeyClick(const Point &arPoint, int aSymbol)
             break;
 
         default:
-            std::wstring ws(1, aSymbol);
-            mInput += std::wstring_convert<std::codecvt_utf8<wchar_t>>{}.to_bytes(ws);
+            std::wstring ws(1, wchar_t(aSymbol));
+            std::string utf8 = std::wstring_convert<std::codecvt_utf8<wchar_t>>{}.to_bytes(ws);
+            mInput += utf8;
             mOnKeyClick(mInput);
             break;
     }

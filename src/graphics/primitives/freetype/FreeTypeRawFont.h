@@ -37,11 +37,11 @@ protected:
 class FTGlyphs : public Glyphs
 {
 public:
-    int GetCount() const override { return mGlyphs.size(); }
-    Glyph& GetGlyph(int aIndex) override { return *static_cast<Glyph*>(&mGlyphs.at(aIndex)); };
-    const Glyph& GetGlyph(int aIndex) const override { return *static_cast<const Glyph*>(&mGlyphs.at(aIndex)); };
+    unsigned int GetCount() const override { return mGlyphs.size(); }
+    Glyph& GetGlyph(unsigned aIndex) override { return *static_cast<Glyph*>(&mGlyphs.at(aIndex)); };
+    const Glyph& GetGlyph(unsigned aIndex) const override { return *static_cast<const Glyph*>(&mGlyphs.at(aIndex)); };
 
-    std::vector<FTGlyph> mGlyphs;
+    std::vector<FTGlyph> mGlyphs{};
 };
 
 /**

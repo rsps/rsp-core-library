@@ -25,7 +25,7 @@ DateTime::DateTime()
 {
 }
 
-DateTime::DateTime(int aYear, int aMonth, int aDayOfMonth, int aHour, int aMinute, int aSecond, int aMilliSecond)
+DateTime::DateTime(int aYear, unsigned aMonth, unsigned aDayOfMonth, int aHour, int aMinute, int aSecond, int aMilliSecond)
 {
     Date dt{year(aYear), month(aMonth), day(aDayOfMonth)};
     Time tm{seconds((aHour * 3600) + (aMinute * 60) + aSecond)};

@@ -19,7 +19,7 @@ std::uint32_t Fnv1a::Hash32(const void *apData, std::uint32_t aLen)
 
     const uint8_t *data = reinterpret_cast<const uint8_t *>(apData);
 
-    for(int i = 0; i < aLen; ++i) {
+    for(uint32_t i = 0; i < aLen; ++i) {
         hash = (hash ^ data[i]) * prime;
     }
 
@@ -33,7 +33,7 @@ std::uint64_t Fnv1a::Hash64(const void *apData, std::uint64_t aLen)
 
     const uint8_t *data = reinterpret_cast<const uint8_t *>(apData);
 
-    for(int i = 0; i < aLen; ++i) {
+    for(uint32_t i = 0; i < aLen; ++i) {
         hash = (hash ^ data[i]) * prime;
     }
 

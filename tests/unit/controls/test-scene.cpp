@@ -142,11 +142,11 @@ TEST_CASE("Scene Test")
         Broker<ClickTopics> broker;
         Publisher<ClickTopics> publisher(broker);
         bool clicked = false;
-        scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().OnClick() = [&publisher, &clicked](const Point&, int) {
+        scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().OnClick() = [&publisher, &clicked](const Point&, uint32_t) {
             clicked = true;
             MESSAGE("Click detected");
-            rsp::messaging::ClickedEvent event("Button was clicked.");
-            publisher.PublishToBroker(ClickTopics::SceneChange, event);
+            rsp::messaging::ClickedEvent click_event("Button was clicked.");
+            publisher.PublishToBroker(ClickTopics::SceneChange, click_event);
         };
 
         // Arrange

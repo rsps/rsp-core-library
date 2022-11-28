@@ -109,19 +109,19 @@ TEST_CASE("Input Processing")
     MESSAGE("Touch Point: " << event.mCurrent);
     CHECK(aRect.IsHit(event.mCurrent));
 
-    area.OnPress() = [&](const Point &arPoint, int aId) noexcept {
+    area.OnPress() = [&](const Point &arPoint, uint32_t aId) noexcept {
         hit_count++;
         pressed = true;
     };
-    area.OnMove() = [&](const Point &arPoint, int aId) noexcept {
+    area.OnMove() = [&](const Point &arPoint, uint32_t aId) noexcept {
         hit_count++;
         moved = true;
     };
-    area.OnLift() = [&](const Point &arPoint, int aId) noexcept {
+    area.OnLift() = [&](const Point &arPoint, uint32_t aId) noexcept {
         hit_count++;
         lifted = true;
     };
-    area.OnClick() = [&](const Point &arPoint, int aId) noexcept {
+    area.OnClick() = [&](const Point &arPoint, uint32_t aId) noexcept {
         hit_count++;
         clicked = true;
     };

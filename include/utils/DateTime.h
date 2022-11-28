@@ -70,7 +70,7 @@ public:
      * \param aSecond
      * \param aMilliSecond
      */
-    DateTime(int aYear, int aMonth, int aDayOfMonth, int aHour, int aMinute, int aSecond, int aMilliSecond=0);
+    DateTime(int aYear, unsigned aMonth, unsigned aDayOfMonth, int aHour, int aMinute, int aSecond, int aMilliSecond=0);
     /**
      * \brief Construct from a duration. The time is set to the duration since Unix epoch.
      * \param aDuration

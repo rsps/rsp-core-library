@@ -73,7 +73,7 @@ PixelData& PixelData::Init(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDept
 
 std::size_t PixelData::GetDataSize() const
 {
-    std::size_t result;
+    int result;
 
     switch (mColorDepth) {
         case ColorDepth::Monochrome:
@@ -97,7 +97,7 @@ std::size_t PixelData::GetDataSize() const
             break;
     }
 
-    return result;
+    return std::size_t(result);
 }
 
 Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const
@@ -106,7 +106,7 @@ Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const
         THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(mWidth) + "," + std::to_string(aY) + "<" + std::to_string(mHeight) + ")");
     }
     Color result(aColor);
-    unsigned int offset;
+    int offset;
     switch (mColorDepth) {
         case ColorDepth::Monochrome:
             offset = (((mWidth + 7) >> 3) * aY) + (aX >> 3);
@@ -159,7 +159,7 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
     std::uint8_t *pdata = mData.data();
 
 //    Color result;
-    unsigned int offset;
+    int offset;
     switch (mColorDepth) {
         case ColorDepth::Monochrome:
             offset = (((mWidth + 7) >> 3) * aY) + (aX >> 3);
@@ -310,8 +310,8 @@ void PixelData::SaveToCFile(const std::filesystem::path &arFileName)
 PixelData PixelData::ChangeColorDepth(ColorDepth aDepth) const
 {
     PixelData pd(GetWidth(), GetHeight(), aDepth);
-    for (unsigned int y = 0; y < GetHeight() ; ++y) {
-        for (unsigned int x = 0; x < GetWidth() ; ++x) {
+    for (GuiUnit_t y = 0; y < GetHeight() ; ++y) {
+        for (GuiUnit_t x = 0; x < GetWidth() ; ++x) {
             Color pixel = GetPixelAt(x, y, Color::Black);
             pd.SetPixelAt(x, y, pixel);
         }

@@ -244,7 +244,7 @@ TEST_CASE("Framebuffer")
         SUBCASE("Draw edited image file")
         {
             // Arrange
-            auto offset = [](Point &p, int val) { return (p + Point(val, val)); };
+            auto offset = [](Point &point, int val) { return (point + Point(val, val)); };
 
             // Act
             for (int i=0; i < 16 ;++i){

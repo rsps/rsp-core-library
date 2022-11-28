@@ -29,7 +29,7 @@ public:
     bool operator<=(const RunTime& arOther);
     bool operator<(const RunTime& arOther);
 
-    std::uint64_t Milliseconds() const;
+    std::int64_t Milliseconds() const;
 
     operator std::chrono::milliseconds() { return mValue; }
 

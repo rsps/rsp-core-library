@@ -47,8 +47,8 @@ Framebuffer::Framebuffer(const char *apDevPath)
     ioctl(mFramebufferFile, FBIOGET_FSCREENINFO, &mFixedInfo);
 
     // set Canvas specific variables
-    mWidth = mVariableInfo.xres;
-    mHeight = mVariableInfo.yres;
+    mWidth = static_cast<GuiUnit_t>(mVariableInfo.xres);
+    mHeight = static_cast<GuiUnit_t>(mVariableInfo.yres);
     mBytesPerPixel = mVariableInfo.bits_per_pixel / 8;
     mClipRect.SetWidth(mWidth);
     mClipRect.SetHeight(mHeight);

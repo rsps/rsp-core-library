@@ -43,7 +43,7 @@ std::ostream& operator <<(std::ostream &os, const Glyphs &arGlyphs)
         << "  Line height: " << arGlyphs.mLineHeight << "\n"
         << "  BRect: " << arGlyphs.mBoundingRect;
 
-    for (int i=0 ; i < arGlyphs.GetCount() ; ++i) {
+    for (unsigned i=0 ; i < arGlyphs.GetCount() ; ++i) {
         os << "\n  " << arGlyphs.GetGlyph(i);
     }
     return os;

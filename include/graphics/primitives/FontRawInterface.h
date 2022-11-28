@@ -48,9 +48,9 @@ class Glyphs
 {
 public:
     virtual ~Glyphs() {}
-    virtual int GetCount() const = 0;
-    virtual Glyph& GetGlyph(int aIndex) = 0;
-    virtual const Glyph& GetGlyph(int aIndex) const = 0;
+    virtual unsigned GetCount() const = 0;
+    virtual Glyph& GetGlyph(unsigned int aIndex) = 0;
+    virtual const Glyph& GetGlyph(unsigned int aIndex) const = 0;
 
     int mUnderlineYCenter = 0;
     int mUnderlineThickness = 0;

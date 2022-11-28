@@ -40,7 +40,7 @@ class TouchControl;
 class Control
 {
 public:
-    using TouchCallback_t = rsp::utils::Function<void(const Point&, int)>;
+    using TouchCallback_t = rsp::utils::Function<void(const Point&, uint32_t)>;
 
     /**
      * \brief Enum type defining the available states

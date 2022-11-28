@@ -49,6 +49,36 @@ include(GNUInstallDirs)
 
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 
+add_compile_options(
+    -pedantic
+    -Wall
+    -Wextra
+    -Wold-style-cast
+    -Wcast-align
+    -Wcast-qual
+    -Wctor-dtor-privacy
+    -Wdisabled-optimization
+    -Wformat=2
+    -Winit-self
+    -Wlogical-op
+    -Wmissing-declarations
+    -Wmissing-include-dirs
+    -Wnoexcept
+    -Wold-style-cast
+    -Woverloaded-virtual
+    -Wredundant-decls
+    -Wsign-conversion
+    -Wsign-promo
+    -Wstrict-null-sentinel
+    -Wstrict-overflow=5
+#    -Wswitch-default
+    -Wundef
+    -Wno-unused
+    -Weffc++
+    -Werror
+#     -v -dD
+)
+
 add_library("rsp-core-lib" STATIC)
 
 if (FREETYPE_FONTS)
@@ -90,36 +120,7 @@ target_include_directories(rsp-core-lib
         ${CURL_INCLUDE_DIRS}
 )
 
-add_compile_options(
-    -pedantic
-    -Wall
-    -Wextra
-    -Wold-style-cast
-    -Wcast-align
-    -Wcast-qual
-    -Wctor-dtor-privacy
-    -Wdisabled-optimization
-    -Wformat=2
-    -Winit-self
-    -Wlogical-op
-    -Wmissing-declarations
-    -Wmissing-include-dirs
-    -Wnoexcept
-    -Woverloaded-virtual
-    -Wredundant-decls
-    -Wsign-conversion
-    -Wsign-promo
-    -Wstrict-null-sentinel
-    -Wstrict-overflow=5
-    -Wswitch-default
-    -Wundef
-    -Wno-unused
-    -Weffc++
-    -Werror
-#     -v -dD
-)
-
-target_compile_options(rsp-core-lib PRIVATE
+target_compile_options(rsp-core-lib PUBLIC
     -Wshadow
     ${FREETYPE_BUILD_OPTIONS}
     ${OPENSSL_BUILD_OPTIONS}

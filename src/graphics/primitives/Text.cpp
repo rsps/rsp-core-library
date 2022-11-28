@@ -95,7 +95,7 @@ void Text::calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs)
     int h = apGlyphs->mLineHeight;
     int line_count = 1;
     int line_width = 0;
-    for (int i=0 ; i < apGlyphs->GetCount(); ++i) {
+    for (unsigned i=0 ; i < apGlyphs->GetCount(); ++i) {
         const Glyph &glyph = apGlyphs->GetGlyph(i);
         if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
             line_count++;
@@ -166,7 +166,7 @@ void Text::alignGlyphs()
             hoffset = (mArea.GetWidth()- mBoundingRect.GetWidth());
             break;
     }
-    for (int i=0 ; i < mpGlyphs->GetCount() ; ++i) {
+    for (unsigned i=0 ; i < mpGlyphs->GetCount() ; ++i) {
         Glyph &glyph = mpGlyphs->GetGlyph(i);
         glyph.mTop += voffset;
         glyph.mLeft += hoffset;

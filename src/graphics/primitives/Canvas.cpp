@@ -151,7 +151,7 @@ void Canvas::DrawText(const Text &arText, Color aColor, Color aBackColor)
         return;
     }
     Point tl = arText.GetArea().GetTopLeft();
-    for (int i=0; i < glyphs->GetCount() ; ++i) {
+    for (unsigned i=0; i < glyphs->GetCount() ; ++i) {
         Glyph &glyph = glyphs->GetGlyph(i);
         for (int y = 0; y < glyph.mHeight; y++) {
             const uint8_t* p_row = glyph.GetPixelRow(y);
