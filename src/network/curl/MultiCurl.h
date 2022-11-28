@@ -13,8 +13,8 @@
 
 #include <map>
 #include <curl/curl.h>
-#include "CurlHttpRequest.h"
 #include "Exceptions.h"
+#include "CurlSessionHttpRequest.h"
 
 namespace rsp::network::curl {
 
@@ -35,8 +35,8 @@ public:
     MultiCurl& operator=(const MultiCurl&) = delete;
     MultiCurl& operator=(const MultiCurl&&) = delete;
 
-    MultiCurl& Add(IHttpRequest &arRequest);
-    MultiCurl& Remove(IHttpRequest &arRequest);
+    MultiCurl& Add(CurlSessionHttpRequest &arRequest);
+    MultiCurl& Remove(CurlSessionHttpRequest &arRequest);
 
     void Execute();
 

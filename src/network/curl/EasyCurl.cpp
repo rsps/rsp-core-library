@@ -36,6 +36,9 @@ EasyCurl::~EasyCurl()
     if (mpForm) {
         curl_mime_free(mpForm);
     }
+    if (mpHeaders) {
+        curl_slist_free_all(mpHeaders);
+    }
     if (mpCurl) {
         curl_easy_cleanup(mpCurl);
     }
@@ -70,6 +73,8 @@ EasyCurl& EasyCurl::operator =(EasyCurl &&arOther)
         arOther.mpCurl = nullptr;
         mpForm = arOther.mpForm;
         arOther.mpForm = nullptr;
+        mpHeaders = arOther.mpHeaders;
+        arOther.mpHeaders = nullptr;
     }
     return *this;
 }

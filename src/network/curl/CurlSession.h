@@ -15,20 +15,9 @@
 #include <network/IHttpSession.h>
 #include <utils/ObjectPool.h>
 #include "MultiCurl.h"
-#include "CurlHttpRequest.h"
+#include "CurlSessionHttpRequest.h"
 
 namespace rsp::network::curl {
-
-class CurlSession;
-
-class CurlSessionHttpRequest : public CurlHttpRequest
-{
-protected:
-    friend class CurlSession;
-    IHttpSession::ResponseCallback_t mResponseHandler{};
-    CurlSession* mpSession = nullptr;
-    void requestDone() override;
-};
 
 
 class CurlSession: public IHttpSession

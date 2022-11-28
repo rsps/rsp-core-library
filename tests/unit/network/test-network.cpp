@@ -90,6 +90,8 @@ TEST_CASE("Network")
         std::string ip;
         CHECK_NOTHROW(ip = FileSystem::GetCurrentIpAddress());
         MESSAGE("IP: " << ip);
+        std::vector<std::string> list;
+        CHECK_EQ(StrUtils::Split(ip, list, '.', false), 4);
     }
 
     SUBCASE("TLS to localhost") {
@@ -242,7 +244,7 @@ TEST_CASE("Network")
         IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
 
-        MESSAGE(resp->GetBody());
+//        MESSAGE(resp->GetBody());
 
         CHECK_EQ(resp->GetBody().size(), 47);
         CHECK_EQ(resp->GetStatusCode(), 200);
@@ -315,7 +317,7 @@ TEST_CASE("Network")
 
         session.Head("index.html",
             [&respHead](IHttpResponse& resp) {
-                MESSAGE("Response Head:\n" << resp);
+//                MESSAGE("Response Head:\n" << resp);
                 CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                 CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
                 CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");

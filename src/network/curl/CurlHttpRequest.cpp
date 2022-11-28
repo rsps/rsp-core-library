@@ -148,17 +148,10 @@ IHttpRequest& CurlHttpRequest::AddFile(const std::string &arFieldName, rsp::posi
 
 IHttpResponse& CurlHttpRequest::Execute()
 {
-    checkRequestOptions(mRequestOptions);
-
-    curl_slist *headers = nullptr;
-    populateOptions(&headers);
-    if (headers) {
-        setCurlOption(CURLOPT_HTTPHEADER, headers);
-    }
+    prepareRequest();
 
     //Curl and evaluate
     auto res = curl_easy_perform(mpCurl);
-    curl_slist_free_all(headers);
     if (res != CURLE_OK) {
         THROW_WITH_BACKTRACE2(ECurlError, "curl_easy_perform() failed.", res);
     }
@@ -175,6 +168,12 @@ void CurlHttpRequest::checkRequestOptions(const HttpRequestOptions &arOpts)
     }
 }
 
+void CurlHttpRequest::prepareRequest()
+{
+    checkRequestOptions(mRequestOptions);
+    populateOptions();
+}
+
 void CurlHttpRequest::requestDone()
 {
     long resp_code = 0;
@@ -189,7 +188,7 @@ std::uintptr_t CurlHttpRequest::GetHandle()
     return std::uintptr_t(mpCurl);
 }
 
-void CurlHttpRequest::populateOptions(curl_slist **apHeaders)
+void CurlHttpRequest::populateOptions()
 {
     setCurlOption(CURLOPT_URL, std::string(mRequestOptions.BaseUrl + mRequestOptions.Uri).c_str());
 
@@ -262,14 +261,17 @@ void CurlHttpRequest::populateOptions(curl_slist **apHeaders)
     //Set Request headers
     for (auto const& tuple : mRequestOptions.Headers) {
         std::string header = tuple.first + ": " + tuple.second;
-        std::cout << "Header: " << header << std::endl;
-        auto *temp = curl_slist_append(*apHeaders, header.c_str());
+        Logger::GetDefault().Debug() << "Add header: " << header << std::endl;
+        auto *temp = curl_slist_append(mpHeaders, header.c_str());
         if (temp == nullptr) {
-            curl_slist_free_all(*apHeaders);
-            *apHeaders = nullptr;
+            curl_slist_free_all(mpHeaders);
+            mpHeaders = nullptr;
             THROW_WITH_BACKTRACE1(ECurlError, "curl_slist_free_all failed.");
         }
-        *apHeaders = temp;
+        mpHeaders = temp;
+    }
+    if (mpHeaders) {
+        setCurlOption(CURLOPT_HTTPHEADER, mpHeaders);
     }
 
     //Set basic auth

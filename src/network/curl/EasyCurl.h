@@ -43,10 +43,12 @@ protected:
 
     friend MultiCurl;
     CURL* mpCurl = nullptr;
+    curl_slist *mpHeaders = nullptr;
 
     curl_mime* getForm();
     bool hasForm() { return (mpForm != nullptr); }
 
+    virtual void prepareRequest() {};
     virtual void requestDone() {};
 
     template <typename T>

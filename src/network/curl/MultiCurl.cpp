@@ -28,8 +28,10 @@ MultiCurl::~MultiCurl()
     curl_multi_cleanup(mpMultiHandle);
 }
 
-MultiCurl& MultiCurl::Add(rsp::network::IHttpRequest &arRequest)
+MultiCurl& MultiCurl::Add(CurlSessionHttpRequest &arRequest)
 {
+    static_cast<EasyCurl*>(&arRequest)->prepareRequest(); // EasyCurl is friendly
+
     Logger::GetDefault().Debug() << "Adding Request: " << arRequest.GetOptions().BaseUrl << arRequest.GetOptions().Uri << std::endl;
 
     CURLMcode mc = curl_multi_add_handle(mpMultiHandle, reinterpret_cast<CURL*>(arRequest.GetHandle()));
@@ -40,7 +42,7 @@ MultiCurl& MultiCurl::Add(rsp::network::IHttpRequest &arRequest)
     return *this;
 }
 
-MultiCurl& MultiCurl::Remove(rsp::network::IHttpRequest &arRequest)
+MultiCurl& MultiCurl::Remove(CurlSessionHttpRequest &arRequest)
 {
     Logger::GetDefault().Debug() << "Removing Request: " << arRequest.GetOptions().BaseUrl << arRequest.GetOptions().Uri << std::endl;
 
@@ -59,7 +61,7 @@ void MultiCurl::Execute()
     if (mc != CURLM_OK) {
         THROW_WITH_BACKTRACE2(ECurlMError, "curl_multi_timeout() failed.", mc);
     }
-    timeout = (timeout == 0) ? 5000 : timeout;
+    timeout = (timeout < 0) ? 5000 : timeout;
 
     Logger::GetDefault().Debug() << "Excuting MultiCurl with timeout: " << timeout << std::endl;
 
@@ -102,8 +104,11 @@ void MultiCurl::processMessages()
     do {
         CURLMsg *msg = curl_multi_info_read(mpMultiHandle, &msgs_in_queue);
         if (msg && msg->msg == CURLMSG_DONE) {
+            if (msg->data.result > 0 && msg->data.result < 100) {
+                THROW_WITH_BACKTRACE2(ECurlError, "curl_multi failed.", msg->data.result);
+            }
             auto req = EasyCurl::GetFromHandle(msg->easy_handle);
-            Remove(*static_cast<CurlHttpRequest*>(req));
+            Remove(*static_cast<CurlSessionHttpRequest*>(req));
             req->requestDone();
         }
     }

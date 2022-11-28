@@ -16,8 +16,6 @@
 
 namespace rsp::network {
 
-class MultiCurl;
-
 class HttpRequest: public IHttpRequest
 {
 public:
