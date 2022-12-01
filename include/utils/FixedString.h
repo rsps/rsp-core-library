@@ -34,7 +34,7 @@ public:
     {
         _mStr[0] = _mStr[N] = 0;
         if (s) {
-            std::strncpy(_mStr, s, sizeof(_mStr) - 1);
+            std::strncpy(_mStr, s, N);
         }
     }
 
@@ -45,14 +45,14 @@ public:
 
     FixedString<N>& operator=(const char *apS)
     {
-        std::strncpy(_mStr, apS, sizeof(_mStr));
+        std::strncpy(_mStr, apS, N);
         _mStr[N] = 0;
         return *this;
     }
 
     FixedString<N>& operator=(const std::string &arOther)
     {
-        std::strncpy(_mStr, arOther.data(), sizeof(_mStr));
+        std::strncpy(_mStr, arOther.data(), N);
         _mStr[N] = 0;
         return *this;
     }
@@ -69,22 +69,22 @@ public:
 
     bool operator==(const std::string &arS) const
     {
-        return std::strncmp(_mStr, arS.data(), sizeof(_mStr)) == 0;
+        return std::strncmp(_mStr, arS.c_str(), N+1) == 0;
     }
 
     bool operator==(const char *apS) const
     {
-        return std::strncmp(_mStr, apS, sizeof(_mStr)) == 0;
+        return std::strncmp(_mStr, apS, N+1) == 0;
     }
 
     std::size_t size() const
     {
-        return std::strlen(_mStr);
+        return std::strlen(&_mStr[0]);
     }
 
 private:
-    char _mStr[N + 1]; // keep an extra char for null
-};
+    char _mStr[N + 1]; // keep an extra char for zero terminator
+} __attribute__((packed));
 
 } // namespace rsp::utils
 
