@@ -15,7 +15,7 @@ mkdir -p $ROOT_DIR/ca $ROOT_DIR/private $ROOT_DIR/certs
 openssl ecparam -name prime256v1 -genkey -noout -out $ROOT_DIR/ca/ca.key
 
 ## Step 1.2 - Generate the Certificate Authority Certificate
-openssl req -new -x509 -sha256 -key $ROOT_DIR/ca/ca.key -out $ROOT_DIR/ca/ca.crt -subj "/C=DK/ST=Denial/L=Odense/O=RSP/CN=ca.localhost"
+openssl req -new -x509 -sha256 -days 1000 -key $ROOT_DIR/ca/ca.key -out $ROOT_DIR/ca/ca.crt -subj "/C=DK/ST=Denial/L=Odense/O=RSP/CN=ca.localhost"
 
 cat $ROOT_DIR/ca/ca.key > $ROOT_DIR/ca/ca.pem
 cat $ROOT_DIR/ca/ca.crt >> $ROOT_DIR/ca/ca.pem
