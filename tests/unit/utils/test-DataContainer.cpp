@@ -24,7 +24,7 @@ struct MyData {
     float Float = 43.1f;
     int Integer = 42;
     FixedString<10> String{"Hello"};
-};
+} __attribute__((packed));
 
 
 TEST_CASE("Data Container")
@@ -38,7 +38,9 @@ TEST_CASE("Data Container")
 
     SUBCASE("Init")
     {
-        CHECK_EQ(sizeof(MyData), 20);
+        CHECK_EQ(sizeof(MyData), 19);
+        CHECK_EQ(sizeof(MyData::String), 11);
+        CHECK_EQ(dc.GetSize(), 19);
         CHECK_EQ(sizeof(dc.Get()), sizeof(MyData));
 
         MESSAGE(dc.Get().Integer);

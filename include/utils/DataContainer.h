@@ -208,7 +208,6 @@ protected:
     rsp::posix::FileIO mFile{};
 };
 
-
 /**
  * \brief Generic base class for high integrity data containers with basic load and save functionality.
  */
@@ -217,6 +216,10 @@ class DataContainerBase : public IDataContent
 {
     static_assert(std::is_base_of<IDataSignature, _SIGNATURE>::value, "_SIGNATURE must inherit from IDataSignature");
     static_assert(std::is_base_of<IDataStorage, _STORAGE>::value, "_STORAGE must inherit from IDataStorage");
+
+    static constexpr bool has_size = requires(const _DATA& t) { t.size(); };
+    static constexpr bool has_data = requires(const _DATA& t) { t.data(); };
+
 public:
 
     virtual ~DataContainerBase() {}
@@ -271,21 +274,38 @@ public:
      */
     std::size_t GetSize() const override
     {
-        return sizeof(mData);
+        if constexpr (has_size) {
+            return mData.size();
+        }
+        else {
+            return sizeof(mData);
+        }
     }
     std::uint8_t* GetData() override
     {
-        return reinterpret_cast<std::uint8_t*>(&mData);
+        if constexpr (has_data) {
+            return reinterpret_cast<std::uint8_t*>(mData.data());
+        }
+        else {
+            return reinterpret_cast<std::uint8_t*>(&mData);
+        }
     }
     const std::uint8_t* GetData() const override
     {
-        return reinterpret_cast<const std::uint8_t*>(&mData);
+        if constexpr (has_data) {
+            return reinterpret_cast<const std::uint8_t*>(mData.data());
+        }
+        else {
+            return reinterpret_cast<const std::uint8_t*>(&mData);
+        }
     }
 
 protected:
     _SIGNATURE mSignature{};
     _STORAGE   mStorage{};
+#pragma pack(1)
     _DATA mData{};
+#pragma pack()
 };
 
 

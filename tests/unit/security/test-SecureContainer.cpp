@@ -17,7 +17,8 @@
 using namespace rsp::utils;
 using namespace rsp::security;
 
-struct MyData {
+struct MyData
+{
     std::uint32_t Integer = 42;
     FixedString<100> String{};
 };
