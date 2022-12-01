@@ -161,7 +161,7 @@ void MakeDirectory(const std::string aDir)
         if (*p == '/') {
             *p = 0;
             if ((mkdir(tmp, 0755) != 0) && (errno != EEXIST)) {
-                THROW_SYSTEM("DeviceScanner - Could not create directory: " + aDir);
+                THROW_SYSTEM("FileSystem - Could not create directory: " + aDir);
             }
             *p = '/';
         }
