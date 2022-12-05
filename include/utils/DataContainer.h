@@ -238,7 +238,7 @@ public:
     {
         mStorage.ReadSignature(mSignature);
         if constexpr (has_size) {
-            mData.size(mStorage.GetSize() - mSignature.GetSize());
+            mData.resize(mStorage.GetSize() - mSignature.GetSize());
         }
         mStorage.Read(*this);
         mSignature.Verify(*this);
