@@ -70,6 +70,11 @@ void FileDataStorage::WriteSignature(const rsp::utils::IDataSignature &arSignatu
     mFile.ExactWrite(arSignature.GetData(), arSignature.GetSize());
 }
 
+std::size_t FileDataStorage::GetSize()
+{
+    return mFile.GetSize();
+}
+
 
 
 std::ostream& operator <<(std::ostream &os, const IDataSignature &arSignature)
@@ -89,6 +94,5 @@ std::ostream& operator <<(std::ostream &os, const IDataContent &arContent)
     }
     return os << std::dec;
 }
-
 
 } /* namespace rsp::utils */

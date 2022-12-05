@@ -116,6 +116,12 @@ struct IDataStorage
      * \param arContent const reference to IDataContent instance
      */
     virtual void Write(const IDataContent &arContent) = 0;
+
+    /**
+     * \brief Get the total size of the storage, used for dynamic containers.
+     * \return size_t
+     */
+    virtual std::size_t GetSize() = 0;
 };
 
 /**
@@ -202,6 +208,7 @@ public:
     void Write(const rsp::utils::IDataContent &arContent) override;
     void ReadSignature(rsp::utils::IDataSignature &arSignature) override;
     void WriteSignature(const rsp::utils::IDataSignature &arSignature) override;
+    std::size_t GetSize() override;
 
 protected:
     std::string mFileName{};
@@ -230,6 +237,9 @@ public:
     void Load()
     {
         mStorage.ReadSignature(mSignature);
+        if constexpr (has_size) {
+            mData.size(mStorage.GetSize() - mSignature.GetSize());
+        }
         mStorage.Read(*this);
         mSignature.Verify(*this);
     }
