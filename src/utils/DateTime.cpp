@@ -96,6 +96,13 @@ DateTime::DateTime(std::tm &arTm)
     mTp -= getTimezoneOffset(arTm);
 }
 
+DateTime::DateTime(timespec &arTimeSpec)
+    : mTp(seconds(arTimeSpec.tv_sec))
+{
+    mTp += nanoseconds(arTimeSpec.tv_nsec);
+}
+
+
 int64_t DateTime::SecondsBetween(const DateTime &arOther) const
 {
     system_clock::time_point tp = arOther;
@@ -148,8 +155,11 @@ DateTime::operator std::tm() const
 //    t -= getTimezoneOffset(result).count();
 //    gmtime_r(&t, &result);
     return result;
+}
 
-
+timespec DateTime::GetTimeSpec() const
+{
+    return timepointToTimespec(mTp);
 }
 
 std::string DateTime::ToString(const char *apFormat) const

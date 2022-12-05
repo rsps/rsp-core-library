@@ -15,8 +15,20 @@
 #include <chrono>
 #include <ostream>
 #include <filesystem>
+#include <time.h>
 
 namespace rsp::utils {
+
+constexpr timespec timepointToTimespec(
+    std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> tp)
+{
+    using namespace std::chrono;
+    auto secs = time_point_cast<seconds>(tp);
+    auto ns = time_point_cast<nanoseconds>(tp) -
+             time_point_cast<nanoseconds>(secs);
+
+    return timespec{secs.time_since_epoch().count(), ns.count()};
+}
 
 /**
  * \class DateTime
@@ -109,6 +121,11 @@ public:
      */
     DateTime(std::tm &arTm);
     /**
+     * \brief Construct from posix timespec struct
+     * \param arTimeSpec
+     */
+    DateTime(timespec &arTimeSpec);
+    /**
      * \brief Destructor
      */
     virtual ~DateTime() {};
@@ -185,6 +202,8 @@ public:
     operator std::filesystem::file_time_type() const;
     operator std::time_t() const;
     operator std::tm() const;
+
+    timespec GetTimeSpec() const;
 
     /**
      * \brief Format the timestamp to a string using the given format.
