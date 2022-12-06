@@ -13,12 +13,18 @@
 
 #include <utils/Function.h>
 
-class DC
+class DependencyContainer;
+typedef DependencyContainer DC; // Alias
+typedef DependencyContainer DI; // Alias
+
+class DependencyContainer
 {
     template<typename T>
-    DC& registerFactory(rsp::utils::Function<T(void)> aFactory));
+    DC& registerFactory(rsp::utils::Function<T(void)> aFactory)
+    {
+        return *this;
+    }
 };
 
-typedef DC DependencyContainer;
 
 #endif /* INCLUDE_UTILS_DEPENDENCYCONTAINER_H_ */
