@@ -115,6 +115,12 @@ public:
     {
         return compare(apOther) == 0;
     }
+
+    operator SecureBuffer() const
+    {
+        return SecureBuffer(reinterpret_cast<const std::uint8_t*>(data()), size());
+    }
+
 };
 
 } /* namespace rsp::security */
