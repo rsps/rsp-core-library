@@ -39,4 +39,7 @@ TEST_CASE("Testing StrUtils")
 //    CHECK(StrUtils::TimeStamp(std::chrono::milliseconds(0)) == "1970-01-01 00:00:00.000");
 
     CHECK(StrUtils::Format("%02d-%4.4s", 8, "Long Sentence") == "08-Long");
+
+    std::string str("From String");
+    CHECK(StrUtils::Format("%02d-%8.8s", 10, str.c_str()) == "10-From Str");
 }
