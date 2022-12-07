@@ -202,10 +202,10 @@ void CurlHttpRequest::populateOptions()
             if (hasForm()) {
                 setCurlOption(CURLOPT_MIMEPOST, getForm());
             }
-            else if (mRequestOptions.Body.size() > 0) {
-                setCurlOption(CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
-                setCurlOption(CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
-            }
+//            else if (mRequestOptions.Body.size() > 0) {
+//                setCurlOption(CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
+//                setCurlOption(CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
+//            }
             break;
 
         case HttpRequestType::HEAD:
