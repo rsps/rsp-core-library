@@ -63,7 +63,7 @@ void MultiCurl::Execute()
     }
     timeout = (timeout < 0) ? 5000 : timeout;
 
-    Logger::GetDefault().Debug() << "Excuting MultiCurl with timeout: " << timeout << std::endl;
+    Logger::GetDefault().Debug() << "Executing MultiCurl with timeout: " << timeout << std::endl;
 
     int count = 0;
     do {
