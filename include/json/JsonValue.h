@@ -182,6 +182,24 @@ public:
      */
     void Clear() override;
 
+    /**
+     * \brief Deep compare two JsonValue objects. Type and content must match.
+     * \param arOther
+     * \return True if equal
+     */
+    bool operator==(const JsonValue &arOther) const;
+
+    /**
+     * \brief Deep compare two JsonValue objects. Type and content must match.
+     * \param arOther
+     * \return True if NOT equal
+     */
+    bool operator!=(const JsonValue &arOther) const
+    {
+        return !((*this) == arOther);
+    }
+
+
 protected:
     class PrintFormat {
     public:

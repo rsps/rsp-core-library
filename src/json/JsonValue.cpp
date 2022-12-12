@@ -456,5 +456,46 @@ void JsonValue::objectToStringStream(std::stringstream &arResult, PrintFormat &a
     arResult << in1 << "}";
 }
 
+bool JsonValue::operator ==(const JsonValue &arOther) const
+{
+    if (this == &arOther) {
+        return true;
+    }
+    if (GetJsonType() != arOther.GetJsonType()) {
+        return false;
+    }
+    switch(GetJsonType()) {
+        case JsonTypes::Null:
+            return (arOther.GetJsonType() == JsonTypes::Null);
+
+        case JsonTypes::Bool:
+            return (AsBool() == arOther.AsBool());
+
+        case JsonTypes::Number:
+            return (AsDouble() == arOther.AsDouble());
+
+        case JsonTypes::String:
+            return (AsString() == arOther.AsString());
+
+        case JsonTypes::Object:
+            for (const JsonValue &jv : mItems) {
+                if (!(jv == arOther[jv.mName])) {
+                    return false;
+                }
+            }
+            return true;
+
+        case JsonTypes::Array:
+            int i = 0;
+            for (const JsonValue &jv : mItems) {
+                if (!(jv == arOther[i])) {
+                    return false;
+                }
+            }
+            return true;
+    }
+    return false;
+}
+
 } // namespace rsp::json
 
