@@ -41,8 +41,6 @@ protected:
     static long const _followRedirects = 1L;
     static long const _maxRedirects = 1L;
 
-    void init();
-
     friend MultiCurl;
     CURL* mpCurl = nullptr;
     curl_slist *mpHeaders = nullptr;
@@ -50,7 +48,7 @@ protected:
     curl_mime* getForm();
     bool hasForm() { return (mpForm != nullptr); }
 
-    virtual void prepareRequest() {};
+    virtual void prepareRequest();
     virtual void requestDone() {};
 
     template <typename T>

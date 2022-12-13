@@ -170,6 +170,7 @@ void CurlHttpRequest::checkRequestOptions(const HttpRequestOptions &arOpts)
 
 void CurlHttpRequest::prepareRequest()
 {
+    EasyCurl::prepareRequest();
     checkRequestOptions(mRequestOptions);
     populateOptions();
 }
@@ -190,9 +191,6 @@ std::uintptr_t CurlHttpRequest::GetHandle()
 
 void CurlHttpRequest::populateOptions()
 {
-    curl_easy_reset(mpCurl);
-    init();
-
     setCurlOption(CURLOPT_URL, std::string(mRequestOptions.BaseUrl + mRequestOptions.Uri).c_str());
 
     switch (mRequestOptions.RequestType) {
@@ -262,6 +260,10 @@ void CurlHttpRequest::populateOptions()
     }
 
     //Set Request headers
+    if (mpHeaders) {
+        curl_slist_free_all(mpHeaders);
+        mpHeaders = nullptr;
+    }
     for (auto const& tuple : mRequestOptions.Headers) {
         std::string header = tuple.first + ": " + tuple.second;
         Logger::GetDefault().Debug() << "Add header: " << header << std::endl;
