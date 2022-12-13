@@ -11,6 +11,8 @@
 #include <utils/Thread.h>
 #include <logging/Logger.h>
 
+using namespace rsp::logging;
+
 namespace rsp::utils {
 
 
@@ -52,7 +54,7 @@ Thread& Thread::Stop()
 
 void Thread::run()
 {
-    rsp::logging::Logger::GetDefault().Info() << "Running thread '" << mName << "'" << std::endl;
+    Logger::GetDefault().Info() << "Running thread '" << mName << "'" << std::endl;
     try {
         try {
             while (!mTerminated) {
@@ -60,6 +62,7 @@ void Thread::run()
             }
         }
         catch (const std::exception &e) {
+            Logger::GetDefault().Error() << "Thread '" << GetName() << "'" << " excepted with: " << e.what() << std::endl;
             throw ThreadException(GetName(), e.what());
         }
     }
