@@ -190,6 +190,8 @@ std::uintptr_t CurlHttpRequest::GetHandle()
 
 void CurlHttpRequest::populateOptions()
 {
+    curl_easy_reset(mpCurl);
+
     setCurlOption(CURLOPT_URL, std::string(mRequestOptions.BaseUrl + mRequestOptions.Uri).c_str());
 
     switch (mRequestOptions.RequestType) {
