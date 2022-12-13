@@ -41,6 +41,8 @@ protected:
     static long const _followRedirects = 1L;
     static long const _maxRedirects = 1L;
 
+    void init();
+
     friend MultiCurl;
     CURL* mpCurl = nullptr;
     curl_slist *mpHeaders = nullptr;
