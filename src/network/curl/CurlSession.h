@@ -32,6 +32,7 @@ protected:
     MultiCurl mMulti{};
     HttpRequestOptions mDefaultOptions{};
     rsp::utils::ObjectPool<CurlSessionHttpRequest> mPool;
+    std::vector<CurlSessionHttpRequest*> mPending{};
 
 private:
     friend class CurlSessionHttpRequest;

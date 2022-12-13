@@ -22,6 +22,11 @@ namespace rsp::network::curl {
 
 void CurlSession::ProcessRequests()
 {
+    for (auto p : mPending) {
+        mMulti.Add(*p);
+    }
+    mPending.clear();
+
     mMulti.Execute();
 }
 
@@ -41,7 +46,7 @@ IHttpRequest& CurlSession::Request(HttpRequestType aType, std::string_view aUri,
     req->mpSession = this;
     req->SetOptions(opt);
     req->mResponseHandler = aCallback;
-    mMulti.Add(*req);
+    mPending.push_back(req);
 
     return *req;
 }
