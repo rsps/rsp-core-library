@@ -10,6 +10,8 @@
 
 #include <network/HttpResponse.h>
 #include <iostream>
+#include <stdexcept>
+#include <utils/StrUtils.h>
 
 namespace rsp::network {
 
@@ -27,6 +29,16 @@ std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse)
         "Body Size: " << arResponse.GetBody().size();
 
     return o;
+}
+
+const std::string& HttpResponse::GetHeader(const std::string &arName) const
+{
+    try {
+        return mHeaders.at(arName);
+    }
+    catch (const std::out_of_range &e) {
+    }
+    THROW_WITH_BACKTRACE1(EHeaderNotFound, rsp::utils::StrUtils::Format("No response header named %s was found", arName.c_str()));
 }
 
 }

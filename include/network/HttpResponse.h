@@ -34,6 +34,8 @@ public:
         return mHeaders;
     }
 
+    const std::string& GetHeader(const std::string &arName) const override;
+
     int GetStatusCode() const override
     {
         return mStatusCode;

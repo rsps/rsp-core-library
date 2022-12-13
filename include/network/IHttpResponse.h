@@ -15,8 +15,19 @@
 #include <map>
 #include <string>
 #include <network/IHttpRequest.h>
+#include <utils/CoreException.h>
 
 namespace rsp::network {
+
+
+class EHeaderNotFound : public rsp::utils::CoreException
+{
+public:
+    explicit EHeaderNotFound(const std::string &arMsg)
+        : CoreException(arMsg)
+    {
+    }
+};
 
 //Forward declarations
 class IHttpRequest;
@@ -34,6 +45,13 @@ public:
      * \return Reference to headers.
      */
     virtual const std::map<std::string, std::string>& GetHeaders() const = 0;
+
+    /**
+     * \brief Get a const reference to the specific header value.
+     * \param arName
+     * \return Reference to header value
+     */
+    virtual const std::string& GetHeader(const std::string &arName) const = 0;
 
     /**
      * \fn int GetStatusCode()const =0
