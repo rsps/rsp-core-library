@@ -25,10 +25,10 @@ namespace rsp::security {
  * \brief OpenSSL implementation of the SHA interface.
  *
  */
-class OpenSSLSha : public DigestImpl
+class OpenSSLHMac : public DigestImpl
 {
 public:
-    OpenSSLSha(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
+    OpenSSLHMac(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
         : mpCtx(HMAC_CTX_new())
     {
         const EVP_MD *algo;
@@ -50,13 +50,13 @@ public:
         HMAC_Init_ex(mpCtx, arSecret.data(), static_cast<int>(arSecret.size()), algo, NULL);
     }
 
-    ~OpenSSLSha()
+    ~OpenSSLHMac()
     {
         HMAC_CTX_free(mpCtx);
     }
 
-    OpenSSLSha(const OpenSSLSha&) = delete;
-    OpenSSLSha& operator=(const OpenSSLSha&) = delete;
+    OpenSSLHMac(const OpenSSLHMac&) = delete;
+    OpenSSLHMac& operator=(const OpenSSLHMac&) = delete;
 
     void Update(const uint8_t *apBuffer, std::size_t aSize) override
     {
@@ -81,10 +81,10 @@ protected:
 
 #else // OPENSSL_VERSION_NUMBER < 0x30000000L
 
-class OpenSSLSha : public DigestImpl
+class OpenSSLHMac : public DigestImpl
 {
 public:
-    OpenSSLSha(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
+    OpenSSLHMac(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
         : mpMac(EVP_MAC_fetch(nullptr, "HMAC", nullptr)),
           mpCtx(EVP_MAC_CTX_new(mpMac))
     {
@@ -110,14 +110,14 @@ public:
         EVP_MAC_init(mpCtx, arSecret.data(), static_cast<unsigned long int>(arSecret.size()), params);
     }
 
-    ~OpenSSLSha()
+    ~OpenSSLHMac()
     {
         EVP_MAC_free(mpMac);
         EVP_MAC_CTX_free(mpCtx);
     }
 
-    OpenSSLSha(const OpenSSLSha&) = delete;
-    OpenSSLSha& operator=(const OpenSSLSha&) = delete;
+    OpenSSLHMac(const OpenSSLHMac&) = delete;
+    OpenSSLHMac& operator=(const OpenSSLHMac&) = delete;
 
     void Update(const uint8_t *apBuffer, std::size_t aSize) override
     {
@@ -142,16 +142,70 @@ protected:
     EVP_MAC_CTX *mpCtx;
 };
 
+class OpenSSLSha: public DigestImpl
+{
+public:
+    OpenSSLSha(HashAlgorithms aAlgorithm)
+        : mpMdctx(EVP_MD_CTX_create())
+    {
+        const EVP_MD* md = nullptr;
+
+        switch (aAlgorithm) {
+            case HashAlgorithms::Sha1:
+                md = EVP_sha1();
+                break;
+
+            default:
+            case HashAlgorithms::Sha256:
+                md = EVP_sha256();
+                break;
+
+            case HashAlgorithms::Sha3:
+                md = EVP_sha3_256();
+                break;
+        }
+
+        EVP_DigestInit_ex2(mpMdctx, md, nullptr);
+    }
+
+    void Update(const uint8_t *apBuffer, std::size_t aSize) override
+    {
+        EVP_DigestUpdate(mpMdctx, apBuffer, static_cast<unsigned long int>(aSize));
+    }
+
+    SecureBuffer Finalize() override
+    {
+        SecureBuffer result;
+        unsigned int len;
+
+        result.resize(std::size_t(EVP_MAX_MD_SIZE));
+        EVP_DigestFinal_ex(mpMdctx, result.data(), &len);
+        result.resize(std::size_t(len));
+
+        return result;
+    }
+
+    OpenSSLSha(const OpenSSLSha&) = delete;
+    OpenSSLSha& operator=(const OpenSSLSha&) = delete;
+
+protected:
+    EVP_MD_CTX* mpMdctx;
+};
+
+
 #endif
 
 // SHA interface factory for OpenSSL
 DigestImpl* DigestImpl::Create(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
 {
-    return new OpenSSLSha(arSecret, aAlgorithm);
+    if (arSecret.size() > 0) {
+        return new OpenSSLHMac(arSecret, aAlgorithm);
+    }
+    return new OpenSSLSha(aAlgorithm);
 }
 
 
-
 } // namespace rsp::security
+
 
 #endif /* USE_OPENSSL */

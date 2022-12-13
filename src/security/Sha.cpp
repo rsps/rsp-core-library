@@ -17,6 +17,11 @@ Sha::Sha(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
 {
 }
 
+Sha::Sha(HashAlgorithms aAlgorithm)
+    : mPimpl(DigestImpl::Create("", aAlgorithm))
+{
+}
+
 Sha::~Sha()
 {
 }

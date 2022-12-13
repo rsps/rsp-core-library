@@ -45,11 +45,17 @@ class Sha
 {
 public:
     /**
-     * \brief Constructor that takes a seed secret and the algorithm to use.
-     * \param aSecret String used to seed the hash
+     * \brief Constructor for HMAC SHA that takes a seed secret and the algorithm to use.
+     * \param arSecret The secret used to sign the HMAC
      * \param aAlgorithm SHA algorithm to use.
      */
     Sha(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm);
+
+    /**
+     * \brief Constructor for message digest SHA that takes the algorithm to use
+     * \param aAlgorithm SHA algorithm to use
+     */
+    Sha(HashAlgorithms aAlgorithm);
     ~Sha();
 
     /**
