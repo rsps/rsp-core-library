@@ -19,6 +19,7 @@ TEST_CASE("Secure Buffers")
     SUBCASE("String")
     {
         const char* p;
+        std::string unsecure;
 
         {
             SecureString s("Hello World");
@@ -26,6 +27,7 @@ TEST_CASE("Secure Buffers")
             CHECK_EQ(s, "Hello World");
 
             MESSAGE(s);
+            unsecure = s;
 
             p = s.data();
 
@@ -36,6 +38,8 @@ TEST_CASE("Secure Buffers")
         CHECK_NE(p[0], 'H');
         CHECK_NE(p[3], 'l');
         CHECK_NE(p[6], 'W');
+
+        CHECK_EQ(unsecure, "Hello World");
     }
 
     SUBCASE("Buffer")

@@ -74,6 +74,14 @@ public:
     }
 
     /**
+     * \brief Return a std::string with the current content.
+     */
+    operator std::string()
+    {
+        return data();
+    }
+
+    /**
      * \brief Assignment operator, assign from SecureBuffer
      * \param arOther SecureBuffer with data to copy
      * \return Reference to this
