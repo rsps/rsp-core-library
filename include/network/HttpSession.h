@@ -22,6 +22,8 @@ public:
     void ProcessRequests() override;
 
     IHttpSession& SetDefaultOptions(const HttpRequestOptions &arOptions) override;
+    HttpRequestOptions& GetDefaultOptions() override;
+    const HttpRequestOptions& GetDefaultOptions() const override;
 
     IHttpRequest& Request(HttpRequestType aType, std::string_view aUri, ResponseCallback_t aCallback) override;
 

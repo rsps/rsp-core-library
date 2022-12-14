@@ -26,6 +26,9 @@ public:
     CurlSession(std::size_t aSize) : mPool(aSize) {}
     void ProcessRequests() override;
     IHttpSession& SetDefaultOptions(const HttpRequestOptions &arOptions) override;
+    HttpRequestOptions& GetDefaultOptions() override { return mDefaultOptions; }
+    const HttpRequestOptions& GetDefaultOptions() const override { return mDefaultOptions; }
+
     IHttpRequest& Request(HttpRequestType aType, std::string_view aUri, ResponseCallback_t aCallback) override;
 
 protected:

@@ -31,13 +31,11 @@ public:
     virtual ~IHttpSession() {}
 
     /**
-     * \fn void ProcessRequests()=0
      * \brief Process all requests currently queued in the session.
      */
     virtual void ProcessRequests() = 0;
 
     /**
-     * \fn IHttpSession SetDefaultOptions&(const HttpRequestOptions&)=0
      * \brief Set the default options, including headers, to use in each request
      *
      * \param arOptions
@@ -46,7 +44,14 @@ public:
     virtual IHttpSession& SetDefaultOptions(const HttpRequestOptions &arOptions) = 0;
 
     /**
-     * \fn IHttpRequest Request&(HttpRequestType, std::string_view, ResponseCallback_t)=0
+     * \brief Get the default options used in each request.
+     *
+     * \return Reference to HttpRequestOptions
+     */
+    virtual HttpRequestOptions& GetDefaultOptions() = 0;
+    virtual const HttpRequestOptions& GetDefaultOptions() const = 0;
+
+    /**
      * \brief Queue a new request of the given type and destination.
      *
      * \param aType GET, PUT, POST etc.
@@ -57,7 +62,6 @@ public:
     virtual IHttpRequest& Request(HttpRequestType aType, std::string_view aUri, ResponseCallback_t aCallback) = 0;
 
     /**
-     * \fn IHttpRequest Get|Post|Put|Head|Patch|Delete&(std::string_view, ResponseCallback_t)
      * \brief REST helpers for cleaner code.
      *
      * \param aUri The request destination

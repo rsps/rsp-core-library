@@ -173,6 +173,7 @@ void CurlHttpRequest::prepareRequest()
     EasyCurl::prepareRequest();
     checkRequestOptions(mRequestOptions);
     populateOptions();
+    mResponse.clear();
 }
 
 void CurlHttpRequest::requestDone()

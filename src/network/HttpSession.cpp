@@ -33,4 +33,14 @@ IHttpRequest& HttpSession::Request(HttpRequestType aType, std::string_view aUri,
     return mPimpl->Request(aType, aUri, aCallback);
 }
 
+rsp::network::HttpRequestOptions& HttpSession::GetDefaultOptions()
+{
+    return mPimpl->GetDefaultOptions();
+}
+
+const rsp::network::HttpRequestOptions& HttpSession::GetDefaultOptions() const
+{
+    return mPimpl->GetDefaultOptions();
+}
+
 } /* namespace rsp::network */

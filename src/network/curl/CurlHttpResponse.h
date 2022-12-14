@@ -42,6 +42,12 @@ protected:
     {
         return mBody;
     }
+    void clear()
+    {
+        mHeaders.clear();
+        mStatusCode = 0;
+        mBody.clear();
+    }
 
 
 };
