@@ -73,6 +73,12 @@ public:
     virtual IHttpRequest& SetBody(const std::string &arBody) = 0;
 
     /**
+     * \brief Get the body content of this request
+     * \return string
+     */
+    virtual const std::string& GetBody() const = 0;
+
+    /**
      * \fn IHttpForm AddField&(std::string_view, std::string_view)
      * \brief Add a form field as key/value pair
      *

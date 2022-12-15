@@ -48,6 +48,7 @@ public:
     const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
     IHttpRequest& SetBody(const std::string &arBody) override;
+    const std::string& GetBody() const override;
 
     IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override;
     IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override;

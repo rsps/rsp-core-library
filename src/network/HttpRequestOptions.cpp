@@ -30,19 +30,21 @@ std::ostream& operator<<(std::ostream &o, HttpRequestType aType)
 
 std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)
 {
-    o << *static_cast<const ConnectionOptions*>(&arOptions) << "\n"
-        "Uri:  " << arOptions.Uri << "\n"
-        "Request Type: " << arOptions.RequestType << "\n"
-        "Basic Auth User: " << arOptions.BasicAuthUsername << "\n"
-        "Basic Auth Pw: " << arOptions.BasicAuthPassword << "\n"
-        "Headers:\n";
+    o << *static_cast<const ConnectionOptions*>(&arOptions) << "\n" <<
+        arOptions.RequestType << " " << arOptions.Uri << "\n";
+    if (!arOptions.BasicAuthUsername.empty()) {
+        o <<
+            "Basic Auth User: " << arOptions.BasicAuthUsername << "\n"
+            "Basic Auth Pw: " << arOptions.BasicAuthPassword << "\n";
+    }
+    o << "Headers:\n";
 
     for(auto &tuple : arOptions.Headers) {
         o << "  " << tuple.first << ": " << tuple.second << "\n";
     }
 
     o <<
-        "Body size: " << arOptions.Body.size();
+        "Body:\n" << arOptions.Body;
 
     return o;
 }

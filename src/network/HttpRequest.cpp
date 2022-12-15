@@ -15,7 +15,8 @@ namespace rsp::network {
 std::ostream& operator<<(std::ostream &o, const IHttpRequest& arReq)
 {
     o <<
-        "Options:\n" << arReq.GetOptions();
+        "Options:\n" << arReq.GetOptions() <<
+        "\nBody:\n" << arReq.GetBody();
 
     return o;
 }

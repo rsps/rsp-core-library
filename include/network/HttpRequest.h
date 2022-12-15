@@ -49,6 +49,11 @@ public:
         return *this;
     }
 
+    const std::string& GetBody() const override
+    {
+        return mPimpl->GetBody();
+    }
+
     IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override
     {
         return mPimpl->AddField(arFieldName, arValue);

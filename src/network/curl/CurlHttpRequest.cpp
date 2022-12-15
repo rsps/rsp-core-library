@@ -124,6 +124,12 @@ IHttpRequest& CurlHttpRequest::SetBody(const std::string &arBody)
     return *this;
 }
 
+const std::string& CurlHttpRequest::GetBody() const
+{
+    return mRequestOptions.Body;
+}
+
+
 IHttpRequest& CurlHttpRequest::AddField(const std::string &arFieldName, const std::string &arValue)
 {
     curl_mimepart *field = curl_mime_addpart(getForm());
