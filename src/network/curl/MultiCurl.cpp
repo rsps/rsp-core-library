@@ -32,7 +32,7 @@ MultiCurl& MultiCurl::Add(CurlSessionHttpRequest &arRequest)
 {
     static_cast<EasyCurl*>(&arRequest)->prepareRequest(); // EasyCurl is friendly
 
-    Logger::GetDefault().Debug() << "Adding Request: " << arRequest.GetOptions().BaseUrl << arRequest.GetOptions().Uri << std::endl;
+    Logger::GetDefault().Debug() << "Adding Request: " << arRequest.GetOptions().RequestType << " " << arRequest.GetOptions().BaseUrl << arRequest.GetOptions().Uri << std::endl;
 
     CURLMcode mc = curl_multi_add_handle(mpMultiHandle, reinterpret_cast<CURL*>(arRequest.GetHandle()));
     if (mc != CURLM_OK) {
@@ -44,7 +44,7 @@ MultiCurl& MultiCurl::Add(CurlSessionHttpRequest &arRequest)
 
 MultiCurl& MultiCurl::Remove(CurlSessionHttpRequest &arRequest)
 {
-    Logger::GetDefault().Debug() << "Removing Request: " << arRequest.GetOptions().BaseUrl << arRequest.GetOptions().Uri << std::endl;
+    Logger::GetDefault().Debug() << "Removing Request: " << arRequest.GetOptions().RequestType << " " << arRequest.GetOptions().BaseUrl << arRequest.GetOptions().Uri << std::endl;
 
     CURLMcode mc = curl_multi_remove_handle(mpMultiHandle, reinterpret_cast<CURL*>(arRequest.GetHandle()));
     if (mc != CURLM_OK) {
