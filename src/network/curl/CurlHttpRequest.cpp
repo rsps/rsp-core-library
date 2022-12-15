@@ -62,6 +62,17 @@ IHttpRequest& CurlHttpRequest::ReadFromFile(rsp::posix::FileIO &arFile)
     return *this;
 }
 
+IHttpRequest& CurlHttpRequest::ReadFromString(const std::string &arString)
+{
+    setCurlOption(CURLOPT_UPLOAD, 1L);
+    setCurlOption(CURLOPT_READFUNCTION, stringReadFunction);
+    mUploadBuffer.Remaining = arString.size();
+    mUploadBuffer.Data = arString.c_str();
+    setCurlOption(CURLOPT_READDATA, &mUploadBuffer);
+    setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(arString.size()));
+    return *this;
+}
+
 size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
 {
     apResponse->getBody().append(static_cast<char*>(ptr), size * nmemb);
@@ -76,6 +87,19 @@ size_t CurlHttpRequest::fileWriteFunction(void *ptr, size_t size, size_t nmemb, 
 size_t CurlHttpRequest::fileReadFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile)
 {
     return apFile->Read(ptr, size * nmemb);
+}
+
+size_t CurlHttpRequest::stringReadFunction(void *ptr, size_t size, size_t nmemb, UploadBuffer *apBuf)
+{
+    size_t sz = size * nmemb;
+    if (sz > apBuf->Remaining) {
+        sz = apBuf->Remaining;
+    }
+//    Logger::GetDefault().Debug() << "Copying " << sz << " characters to network buffer" << std::endl;
+    std::memcpy(ptr, apBuf->Data, sz);
+    apBuf->Data += sz;
+    apBuf->Remaining -= sz;
+    return sz;
 }
 
 size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
@@ -223,8 +247,7 @@ void CurlHttpRequest::populateOptions()
         case HttpRequestType::PATCH:
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PATCH");
             if (mRequestOptions.Body.size() > 0) {
-                setCurlOption(CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
-                setCurlOption(CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
+                ReadFromString(mRequestOptions.Body);
             }
             break;
 
@@ -232,8 +255,7 @@ void CurlHttpRequest::populateOptions()
             // setCurlOption(CURLOPT_PUT, 1L); // Seems to put files only
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PUT");
             if (mRequestOptions.Body.size() > 0) {
-                setCurlOption(CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
-                setCurlOption(CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
+                ReadFromString(mRequestOptions.Body);
             }
             break;
 

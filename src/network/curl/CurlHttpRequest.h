@@ -43,6 +43,7 @@ public:
 
     IHttpRequest& WriteToFile(rsp::posix::FileIO &arFile) override;
     IHttpRequest& ReadFromFile(rsp::posix::FileIO &arFile) override;
+    IHttpRequest& ReadFromString(const std::string &arString);
 
     IHttpResponse& Execute() override;
     const HttpRequestOptions& GetOptions() const override;
@@ -58,6 +59,11 @@ public:
 protected:
     CurlHttpResponse mResponse;
     HttpRequestOptions mRequestOptions{};
+    struct UploadBuffer {
+        size_t Remaining = 0;
+        const char* Data = nullptr;
+    };
+    UploadBuffer mUploadBuffer{};
 
     void prepareRequest() override;
     void requestDone() override;
@@ -67,6 +73,7 @@ private:
     static size_t writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *data);
     static size_t fileWriteFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile);
     static size_t fileReadFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile);
+    static size_t stringReadFunction(void *ptr, size_t size, size_t nmemb, UploadBuffer *apBuf);
     static size_t headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse);
     static size_t progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
 
