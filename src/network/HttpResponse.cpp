@@ -26,7 +26,7 @@ std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse)
 
     o <<
         "StatusCode: " << arResponse.GetStatusCode() << "\n"
-        "Body Size: " << arResponse.GetBody().size();
+        "Body: " << arResponse.GetBody();
 
     return o;
 }
