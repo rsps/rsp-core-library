@@ -216,10 +216,19 @@ void CurlHttpRequest::populateOptions()
 
         case HttpRequestType::PATCH:
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PATCH");
+            if (mRequestOptions.Body.size() > 0) {
+                setCurlOption(CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
+                setCurlOption(CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
+            }
             break;
 
         case HttpRequestType::PUT:
-            setCurlOption(CURLOPT_PUT, 1L);
+            // setCurlOption(CURLOPT_PUT, 1L); // Seems to put files only
+            setCurlOption(CURLOPT_CUSTOMREQUEST, "PUT");
+            if (mRequestOptions.Body.size() > 0) {
+                setCurlOption(CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
+                setCurlOption(CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
+            }
             break;
 
         case HttpRequestType::DELETE:
