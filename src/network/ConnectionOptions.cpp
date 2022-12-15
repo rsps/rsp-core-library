@@ -16,13 +16,17 @@ std::ostream& operator <<(std::ostream &o, const ConnectionOptions &arOptions)
     o <<
         "BaseUrl:           " << arOptions.BaseUrl << "\n"
         "ConnectionTimeout: " << arOptions.ConnectionTimeout << "s\n"
-        "ResponseTimeout:   " << arOptions.ResponseTimeout << "s\n"
-        "CertCaPath:        " << arOptions.CertCaPath << "\n"
-        "CertPath:          " << arOptions.CertPath << "\n"
-        "KeyPath:           " << arOptions.KeyPath << "\n"
-        "KeyPasswd:         " << arOptions.KeyPasswd;
+        "ResponseTimeout:   " << arOptions.ResponseTimeout << "s\n";
 
-        return o;
+    if (!arOptions.CertCaPath.empty() || !arOptions.CertPath.empty()) {
+        o <<
+            "CertCaPath:        " << arOptions.CertCaPath << "\n"
+            "CertPath:          " << arOptions.CertPath << "\n"
+            "KeyPath:           " << arOptions.KeyPath << "\n"
+            "KeyPasswd:         " << arOptions.KeyPasswd;
+    }
+
+    return o;
 }
 
 } // namespace rsp::network
