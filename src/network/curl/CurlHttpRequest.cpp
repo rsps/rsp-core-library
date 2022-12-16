@@ -234,13 +234,9 @@ void CurlHttpRequest::populateOptions()
                 setCurlOption(CURLOPT_POST, 1L);
                 setCurlOption(CURLOPT_MIMEPOST, getForm());
             }
-            else if (mRequestOptions.Body.size() > 0) {
+            else {
                 setCurlOption(CURLOPT_CUSTOMREQUEST, "POST");
-                if (mRequestOptions.Body.size() > 0) {
-                    ReadFromString(mRequestOptions.Body);
-                }
-//                setCurlOption(CURLOPT_POSTFIELDS, mRequestOptions.Body.c_str());
-//                setCurlOption(CURLOPT_POSTFIELDSIZE, mRequestOptions.Body.size());
+                ReadFromString(mRequestOptions.Body);
             }
             break;
 
