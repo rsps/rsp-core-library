@@ -199,7 +199,7 @@ bool JsonValue::MemberExists(std::string_view aKey) const
 JsonValue& JsonValue::Add(JsonValue aValue)
 {
     forceArray();
-    Logger::GetDefault().Info() << "JsonArray::Add(): \"" << aValue.Encode() << std::endl;
+    Logger::GetDefault().Info() << "JsonArray::Add(): " << aValue.Encode() << std::endl;
     mItems.emplace_back(aValue);
     return *this;
 }

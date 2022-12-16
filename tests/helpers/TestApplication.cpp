@@ -9,7 +9,6 @@
  */
 
 #include "TestApplication.h"
-
 #include <logging/FileLogWriter.h>
 #include <application/Console.h>
 
