@@ -24,6 +24,9 @@ public:
 
     static std::string ToHex(const std::string &arString);
 
+    static bool ValidateJson(const std::string &arJson);
+    static bool ValidateJsonFile(const std::string &arJsonFile);
+
 protected:
     static rsp::logging::LogLevel mLogLevel;
 };

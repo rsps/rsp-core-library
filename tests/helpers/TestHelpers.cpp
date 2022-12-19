@@ -78,3 +78,23 @@ std::string TestHelpers::ToHex(const std::string &arString)
     return out.str();
 }
 
+bool TestHelpers::ValidateJson(const std::string &arJson)
+{
+    std::ofstream fout("/tmp/ValidateJson.json");
+    fout << arJson;
+    fout.close();
+
+    int result = std::system("/usr/bin/jsonlint-php /tmp/ValidateJson.json");
+
+    std::remove("/tmp/ValidateJson.json");
+
+    return (result == 0);
+}
+
+bool TestHelpers::ValidateJsonFile(const std::string &arJsonFile)
+{
+    int result = std::system((std::string("/usr/bin/jsonlint-php ") + arJsonFile).c_str());
+
+    return (result == 0);
+}
+

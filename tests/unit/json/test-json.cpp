@@ -167,6 +167,8 @@ null }
         CHECK("Euro sign: €" == v1.AsString());
         result = v1.Encode(true, true);
         CHECK(result == orig);
+
+        CHECK(TestHelpers::ValidateJson(result));
     }
 
     SUBCASE("Validate") {
