@@ -57,6 +57,9 @@ public:
      */
     StructElement(const T& aValue) : mIsNull(false), mData(aValue), mMargin(defaultItem<T>::default_value()) {}
 
+    StructElement(const StructElement<T> &arOther) = default;
+    StructElement(StructElement<T> &&arOther) = default;
+
     /**
      * \fn bool IsNull()const
      * \brief Returns true if content is null, not set or uninitialized.

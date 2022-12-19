@@ -14,6 +14,7 @@
 #include <utils/Nullable.h>
 #include <string>
 #include "CoreException.h"
+#include <utils/StructElement.h>
 
 namespace rsp::utils {
 
@@ -36,7 +37,6 @@ class EConversionError : public EVariantException {
 public:
     explicit EConversionError(const std::string aFrom, const std::string aTo) : EVariantException(std::string("Variant Conversion Error. From " + aFrom + " to " + aTo).c_str()) {}
 };
-
 
 /**
  * \class Variant
@@ -61,8 +61,29 @@ public:
     Variant(const Variant &arOther);
     Variant(Variant &&arOther);
 
+    template<class T>
+    Variant(const rsp::utils::StructElement<T>& arOther) : Variant(ToVariant(arOther)) {}
+
     Variant& operator=(const Variant &arOther);
     Variant& operator=(Variant &&arOther);
+
+    template<class T>
+    Variant& operator=(const rsp::utils::StructElement<T>& arOther) {
+        *this = ToVariant(arOther);
+        return *this;
+    }
+
+    /**
+     * \brief operator overload for Variant
+     */
+    template<class T>
+    Variant ToVariant(const rsp::utils::StructElement<T>& arOther)
+    {
+        if (arOther.IsNull()) {
+            return Variant();
+        }
+        return Variant(arOther.Get());
+    }
 
     /**
      * \fn  Variant(...)
@@ -81,6 +102,7 @@ public:
     Variant(void* apValue);
     Variant(const std::string &arValue);
     Variant(const char *apValue);
+
     /**
      * \fn  ~Variant()
      * \brief Virtual destructor

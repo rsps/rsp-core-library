@@ -10,12 +10,14 @@
 
 #include <string>
 #include <doctest.h>
+#include <json/JsonValue.h>
 #include <utils/StructElement.h>
 #include <linux/input.h>
 
 using namespace rsp::utils;
+using namespace rsp::json;
 
-TEST_CASE("Nullable StructElement") {
+TEST_CASE("StructElement") {
 
     struct MyData {
         StructElement<int> mInteger;
@@ -45,6 +47,15 @@ TEST_CASE("Nullable StructElement") {
         std::string s;
         CHECK_NOTHROW(s = data.mString.Get(defaultItem<std::string>::default_value()));
         CHECK(s.empty());
+
+        JsonValue js;
+        CHECK_NOTHROW(js = data.mInteger);
+        CHECK(js.IsNull());
+
+        data.mInteger = 42;
+        CHECK_NOTHROW(js = data.mInteger);
+        CHECK(!js.IsNull());
+        CHECK_EQ(int(js), 42);
     }
 
     SUBCASE("Set/Get value") {

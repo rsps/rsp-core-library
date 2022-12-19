@@ -82,12 +82,12 @@ public:
     static std::string GetJsonTypeAsString(JsonTypes aType);
 
 // Disable wrong effc++ warning on "return *this;" in template functions. Fixed in GCC 11.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Weffc++"
+//#pragma GCC diagnostic push
+//#pragma GCC diagnostic ignored "-Weffc++"
     // Use template to call inherited assignment operators
     template<class T>
-    JsonValue& operator=(T aValue) { Variant::operator=(aValue); return *this; }
-#pragma GCC diagnostic pop
+    JsonValue& operator=(T aValue) { rsp::utils::Variant::operator=(aValue); return *this; }
+//#pragma GCC diagnostic pop
 
     /**
      * \brief Check if value content is an array

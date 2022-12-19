@@ -12,6 +12,7 @@
 #include <doctest.h>
 #include <utils/InRange.h>
 #include <utils/Variant.h>
+#include <utils/StructElement.h>
 
 using namespace rsp::utils;
 
@@ -43,6 +44,11 @@ TEST_CASE("Variant")
         CHECK(v.AsInt() == 42);
         float f = v;
         CHECK(IsInRange(f, 42.0f, 42.0f));
+
+        StructElement<int> se;
+        v = se;
+        CHECK(v.IsNull());
+        CHECK(v.GetType() == Variant::Types::Null);
     }
 
     SUBCASE("Streaming") {
