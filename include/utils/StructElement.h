@@ -60,6 +60,9 @@ public:
     StructElement(const StructElement<T> &arOther) = default;
     StructElement(StructElement<T> &&arOther) = default;
 
+    StructElement& operator=(const StructElement<T> &arOther) = default;
+    StructElement& operator=(StructElement<T> &&arOther) = default;
+
     /**
      * \fn bool IsNull()const
      * \brief Returns true if content is null, not set or uninitialized.
