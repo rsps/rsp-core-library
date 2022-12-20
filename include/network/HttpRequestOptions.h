@@ -15,6 +15,8 @@
 #include <memory>
 #include <string>
 #include <map>
+#include <posix/FileIO.h>
+#include <utils/StructElement.h>
 
 namespace rsp::network {
 
@@ -50,6 +52,16 @@ public:
     HttpRequestType RequestType = HttpRequestType::GET;
     std::string BasicAuthUsername{};
     std::string BasicAuthPassword{};
+    rsp::utils::StructElement<rsp::posix::FileIO*> WriteFile{};
+    rsp::utils::StructElement<rsp::posix::FileIO*> ReadFile{};
+
+    void Clear() {
+        Headers.clear();
+        Uri.clear();
+        Body.clear();
+        WriteFile.Clear();
+        ReadFile.Clear();
+    }
 };
 
 std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions);

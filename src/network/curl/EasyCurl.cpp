@@ -19,16 +19,6 @@ EasyCurl::EasyCurl()
     if (!mpCurl) {
         THROW_WITH_BACKTRACE1(ECurlError, "Curl initialization failed.");
     }
-
-    auto err = curl_easy_setopt(mpCurl, CURLOPT_ERRORBUFFER, mErrorBuffer);
-    if (err != CURLE_OK) {
-        THROW_WITH_BACKTRACE2(ECurlError, "Curl error buffer initialization failed.", err);
-    }
-
-    err = curl_easy_setopt(mpCurl, CURLOPT_PRIVATE, this);
-    if (err != CURLE_OK) {
-        THROW_WITH_BACKTRACE2(ECurlError, "Curl private pointer SET failed.", err);
-    }
 }
 
 EasyCurl::~EasyCurl()
@@ -59,7 +49,17 @@ EasyCurl::EasyCurl(EasyCurl &&arOther)
 void EasyCurl::prepareRequest()
 {
     // Clear request to avoid old headers to be persistent.
-//    curl_easy_reset(mpCurl);
+    curl_easy_reset(mpCurl);
+
+    auto err = curl_easy_setopt(mpCurl, CURLOPT_ERRORBUFFER, mErrorBuffer);
+    if (err != CURLE_OK) {
+        THROW_WITH_BACKTRACE2(ECurlError, "Curl error buffer initialization failed.", err);
+    }
+
+    err = curl_easy_setopt(mpCurl, CURLOPT_PRIVATE, this);
+    if (err != CURLE_OK) {
+        THROW_WITH_BACKTRACE2(ECurlError, "Curl private pointer SET failed.", err);
+    }
 }
 
 EasyCurl& EasyCurl::operator =(const EasyCurl &arOther)

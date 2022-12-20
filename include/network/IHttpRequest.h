@@ -31,22 +31,6 @@ public:
     virtual ~IHttpRequest() {}
 
     /**
-     * \fn void WriteToFile(rsp::posix::FileIO&)=0
-     * \brief Redirect response body to the given file
-     *
-     * \param arFile
-     * \return self
-     */
-    virtual IHttpRequest& WriteToFile(rsp::posix::FileIO &arFile) =  0;
-
-    /**
-     * \brief Upload the given file to url
-     * \param arFile
-     * \return self
-     */
-    virtual IHttpRequest& ReadFromFile(rsp::posix::FileIO &arFile) = 0;
-
-    /**
      * \fn const HttpRequestOptions GetOptions&()const =0
      * \brief Get a const reference to the internal options object.
      *

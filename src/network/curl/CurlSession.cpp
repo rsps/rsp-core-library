@@ -56,6 +56,7 @@ void CurlSession::requestCompleted(CurlSessionHttpRequest *apRequest)
     mPool.Put(&apRequest);
 }
 
+
 void CurlSessionHttpRequest::requestDone()
 {
     CurlHttpRequest::requestDone();

@@ -22,16 +22,6 @@ public:
     HttpRequest();
     HttpRequest(const HttpRequestOptions& arOptions);
 
-    IHttpRequest& WriteToFile(rsp::posix::FileIO &arFile) override
-    {
-        return mPimpl->WriteToFile(arFile);
-    }
-
-    IHttpRequest& ReadFromFile(rsp::posix::FileIO &arFile) override
-    {
-        return mPimpl->ReadFromFile(arFile);
-    }
-
     const HttpRequestOptions& GetOptions() const override
     {
         return mPimpl->GetOptions();
@@ -61,7 +51,6 @@ public:
 
     IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override
     {
-        ReadFromFile(arFile);
         return mPimpl->AddFile(arFieldName, arFile);
     }
 

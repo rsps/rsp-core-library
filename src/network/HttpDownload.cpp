@@ -41,17 +41,16 @@ IHttpResponse& HttpDownload::Execute()
     std::string modified_time{};
     if (FileSystem::FileExists(mFileName)) {
         auto mtime = FileSystem::GetFileModifiedTime(mFileName);
-        modified_time = DateTime::Now().ToHTTP();
+        modified_time = mtime.ToHTTP();
     }
 
     rsp::posix::FileIO file(mFileName, std::ios::in | std::ios::out | std::ios_base::ate, 0640);
-
-    WriteToFile(file); // Redirect response body to file
 
     HttpRequestOptions orig_opt = GetOptions();
     orig_opt.RequestType = HttpRequestType::GET;
 
     HttpRequestOptions opt = orig_opt;
+    opt.WriteFile = &file; // Redirect response body to file
     opt.Headers["Range"] = std::string("bytes=") + std::to_string(file.GetSize()) + "-"; // Returns 206 if range request succeeds
     if (!modified_time.empty()) {
         opt.Headers["If-Unmodified-Since"] = modified_time; // Returns 412 if condition fails.
@@ -67,7 +66,7 @@ IHttpResponse& HttpDownload::Execute()
     }
 
     file.Close();
-    SetFileModifiedTime(resp->GetHeaders().at("last-modified"));
+    SetFileModifiedTime(resp->GetHeader("last-modified"));
 
     return *resp;
 }

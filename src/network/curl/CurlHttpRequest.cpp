@@ -30,15 +30,6 @@ namespace rsp::network::curl
 CurlHttpRequest::CurlHttpRequest()
     : mResponse(*this)
 {
-    //Setup default callback functions for Response object
-    setCurlOption(CURLOPT_WRITEFUNCTION, writeFunction);
-    setCurlOption(CURLOPT_WRITEDATA, &mResponse);
-
-    setCurlOption(CURLOPT_HEADERFUNCTION, headerFunction);
-    setCurlOption(CURLOPT_HEADERDATA, &mResponse);
-
-    setCurlOption(CURLOPT_XFERINFOFUNCTION, progressFunction);
-    setCurlOption(CURLOPT_XFERINFODATA, this);
 }
 
 
@@ -46,23 +37,21 @@ CurlHttpRequest::~CurlHttpRequest()
 {
 }
 
-IHttpRequest& CurlHttpRequest::WriteToFile(rsp::posix::FileIO &arFile)
+void CurlHttpRequest::writeToFile(rsp::posix::FileIO* apFile)
 {
     setCurlOption(CURLOPT_WRITEFUNCTION, fileWriteFunction);
-    setCurlOption(CURLOPT_WRITEDATA, &arFile);
-    return *this;
+    setCurlOption(CURLOPT_WRITEDATA, apFile);
 }
 
-IHttpRequest& CurlHttpRequest::ReadFromFile(rsp::posix::FileIO &arFile)
+void CurlHttpRequest::readFromFile(rsp::posix::FileIO* apFile)
 {
     setCurlOption(CURLOPT_UPLOAD, 1L);
     setCurlOption(CURLOPT_READFUNCTION, fileReadFunction);
-    setCurlOption(CURLOPT_READDATA, &arFile);
-    setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(arFile.GetSize()));
-    return *this;
+    setCurlOption(CURLOPT_READDATA, apFile);
+    setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(apFile->GetSize()));
 }
 
-IHttpRequest& CurlHttpRequest::ReadFromString(const std::string &arString)
+void CurlHttpRequest::readFromString(const std::string &arString)
 {
     setCurlOption(CURLOPT_UPLOAD, 1L);
     setCurlOption(CURLOPT_READFUNCTION, stringReadFunction);
@@ -70,7 +59,6 @@ IHttpRequest& CurlHttpRequest::ReadFromString(const std::string &arString)
     mUploadBuffer.Data = arString.c_str();
     setCurlOption(CURLOPT_READDATA, &mUploadBuffer);
     setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(arString.size()));
-    return *this;
 }
 
 size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
@@ -173,6 +161,7 @@ IHttpRequest& CurlHttpRequest::AddFile(const std::string &arFieldName, rsp::posi
     }
     curl_mime_name(field, arFieldName.c_str());
     curl_mime_filedata(field, arFile.GetFileName().c_str());
+    mRequestOptions.ReadFile = &arFile;
     return *this;
 }
 
@@ -201,6 +190,16 @@ void CurlHttpRequest::checkRequestOptions(const HttpRequestOptions &arOpts)
 void CurlHttpRequest::prepareRequest()
 {
     EasyCurl::prepareRequest();
+    //Setup default callback functions for Response object
+    setCurlOption(CURLOPT_WRITEFUNCTION, writeFunction);
+    setCurlOption(CURLOPT_WRITEDATA, &mResponse);
+
+    setCurlOption(CURLOPT_HEADERFUNCTION, headerFunction);
+    setCurlOption(CURLOPT_HEADERDATA, &mResponse);
+
+    setCurlOption(CURLOPT_XFERINFOFUNCTION, progressFunction);
+    setCurlOption(CURLOPT_XFERINFODATA, this);
+
     checkRequestOptions(mRequestOptions);
     populateOptions();
     mResponse.clear();
@@ -213,6 +212,8 @@ void CurlHttpRequest::requestDone()
     mResponse.setStatusCode(static_cast<int>(resp_code));
 
     Logger::GetDefault().Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << resp_code << std::endl;
+
+    EasyCurl::requestDone();
 }
 
 std::uintptr_t CurlHttpRequest::GetHandle()
@@ -236,7 +237,7 @@ void CurlHttpRequest::populateOptions()
             }
             else {
                 setCurlOption(CURLOPT_CUSTOMREQUEST, "POST");
-                ReadFromString(mRequestOptions.Body);
+                readFromString(mRequestOptions.Body);
             }
             break;
 
@@ -247,7 +248,7 @@ void CurlHttpRequest::populateOptions()
         case HttpRequestType::PATCH:
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PATCH");
             if (mRequestOptions.Body.size() > 0) {
-                ReadFromString(mRequestOptions.Body);
+                readFromString(mRequestOptions.Body);
             }
             break;
 
@@ -255,7 +256,7 @@ void CurlHttpRequest::populateOptions()
             // setCurlOption(CURLOPT_PUT, 1L); // Seems to put files only
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PUT");
             if (mRequestOptions.Body.size() > 0) {
-                ReadFromString(mRequestOptions.Body);
+                readFromString(mRequestOptions.Body);
             }
             break;
 
@@ -265,6 +266,13 @@ void CurlHttpRequest::populateOptions()
 
         default:
             break;
+    }
+
+    if (!mRequestOptions.WriteFile.IsNull()) {
+        writeToFile(mRequestOptions.WriteFile.Get());
+    }
+    if (!mRequestOptions.ReadFile.IsNull()) {
+        readFromFile(mRequestOptions.ReadFile.Get());
     }
 
     setCurlOption(CURLOPT_VERBOSE, mRequestOptions.Verbose);

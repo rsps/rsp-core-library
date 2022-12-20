@@ -55,6 +55,7 @@ std::string TestHelpers::ToHex(const std::string &arString)
     std::stringstream out;
     std::string delim = ", ";
     auto sz = arString.size();
+    std::string line;
 
     for (std::size_t i = 0 ; i < sz ; i++) {
         if ((i % 16) == 0) {
@@ -63,15 +64,22 @@ std::string TestHelpers::ToHex(const std::string &arString)
         if (i == (sz - 1)) {
             delim = "";
         }
+        if (arString[i] >= '0' && arString[i] <= 'z') {
+            line += arString[i];
+        }
+        else {
+            line += '.';
+        }
 
-        out << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(arString[i]) << delim;
+        out << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<unsigned int>(std::uint8_t(arString[i])) << delim;
 
         if ((i % 16) == 15) {
-            out << "\n";
+            out << "  " << line << "\n";
+            line.clear();
         }
     }
     if ((sz % 16) != 15) {
-        out << "\n";
+        out << "  " << line << "\n";
     }
     out << std::dec;
 

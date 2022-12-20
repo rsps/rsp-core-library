@@ -41,10 +41,6 @@ public:
     CurlHttpRequest& operator=(const CurlHttpRequest&) = default;
     CurlHttpRequest& operator=(CurlHttpRequest&&) = default;
 
-    IHttpRequest& WriteToFile(rsp::posix::FileIO &arFile) override;
-    IHttpRequest& ReadFromFile(rsp::posix::FileIO &arFile) override;
-    IHttpRequest& ReadFromString(const std::string &arString);
-
     IHttpResponse& Execute() override;
     const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
@@ -64,6 +60,10 @@ protected:
         const char* Data = nullptr;
     };
     UploadBuffer mUploadBuffer{};
+
+    void writeToFile(rsp::posix::FileIO *apFile);
+    void readFromFile(rsp::posix::FileIO *apFile);
+    void readFromString(const std::string &arString);
 
     void prepareRequest() override;
     void requestDone() override;
