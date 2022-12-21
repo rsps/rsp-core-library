@@ -161,7 +161,6 @@ IHttpRequest& CurlHttpRequest::AddFile(const std::string &arFieldName, rsp::posi
     }
     curl_mime_name(field, arFieldName.c_str());
     curl_mime_filedata(field, arFile.GetFileName().c_str());
-    mRequestOptions.ReadFile = &arFile;
     return *this;
 }
 
