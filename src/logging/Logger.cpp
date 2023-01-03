@@ -52,7 +52,7 @@ bool LoggerInterface::HasWriters() const
 void LoggerInterface::write(const LogStreamInterface *apStream, const std::string &arMsg)
 {
     LogLevel current_level = apStream->GetLevel();
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
 
     for (std::shared_ptr<LogWriterInterface> &w : mWriters) {
         w->Write(arMsg, current_level);

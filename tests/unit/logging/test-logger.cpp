@@ -56,7 +56,7 @@ const rsp::logging::ConsoleLogWriter::ConsoleColors_t cConsoleColors {
 };
 
 
-TEST_CASE("Testing the Logger class") {
+TEST_CASE("Logging") {
 
     std::remove(cFileName);
     mConsoleErrorBuffer.clear();

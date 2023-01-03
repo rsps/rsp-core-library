@@ -83,7 +83,7 @@ public:
 
 protected:
     static std::shared_ptr<LoggerInterface> mpDefaultInstance;
-    std::mutex mMutex{};
+    std::recursive_mutex mMutex{};
     std::vector<std::shared_ptr<LogWriterInterface>> mWriters{};
 
     friend class LogStreamInterface;
