@@ -11,8 +11,8 @@
 #define INCLUDE_JSON_JSONVALUE_H_
 
 #include <string_view>
+#include <vector>
 #include <utils/Variant.h>
-#include <utils/InsertOrderedMap.h>
 
 namespace rsp::json {
 

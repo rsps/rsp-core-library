@@ -7,6 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
+#include <string>
 #include <json/JsonStream.h>
 
 namespace rsp::json {
