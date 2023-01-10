@@ -225,6 +225,7 @@ bool Variant::AsBool() const
         case Types::Int64:
         case Types::Uint64:
         case Types::Uint32:
+        case Types::Uint16:
             return (mInt != 0);
 
         case Types::Float:
@@ -260,7 +261,8 @@ std::int64_t Variant::AsInt() const
         case Types::Int64:
         case Types::Uint64:
         case Types::Uint32:
-            return static_cast<std::int64_t>(mInt);
+        case Types::Uint16:
+            return mInt;
 
         case Types::Float:
         case Types::Double:
@@ -289,6 +291,7 @@ double Variant::AsDouble() const
         case Types::Int64:
         case Types::Uint64:
         case Types::Uint32:
+        case Types::Uint16:
             return static_cast<double>(mInt);
 
         case Types::Float:
@@ -331,10 +334,12 @@ std::string Variant::AsString() const
 
         case Types::Int:
         case Types::Int64:
+            return std::to_string(mInt);
+
         case Types::Uint64:
         case Types::Uint32:
         case Types::Uint16:
-            return std::to_string(mInt);
+            return std::to_string(static_cast<uint64_t>(mInt));
 
         case Types::Float:
         case Types::Double:
@@ -383,6 +388,7 @@ std::string Variant::typeToText() const
         case Types::Int64: return "int64";
         case Types::Uint64: return "uint64";
         case Types::Uint32: return "uint32";
+        case Types::Uint16: return "uint16";
         case Types::Float: return "float";
         case Types::Double: return "double";
         case Types::Pointer: return "pointer";
