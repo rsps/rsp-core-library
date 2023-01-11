@@ -27,7 +27,7 @@ constexpr timespec timepointToTimespec(
     auto ns = time_point_cast<nanoseconds>(tp) -
              time_point_cast<nanoseconds>(secs);
 
-    return timespec{secs.time_since_epoch().count(), ns.count()};
+    return timespec{static_cast<decltype(timespec::tv_sec)>(secs.time_since_epoch().count()), static_cast<decltype(timespec::tv_nsec)>(ns.count())};
 }
 
 /**
