@@ -142,6 +142,8 @@ protected:
     EVP_MAC_CTX *mpCtx;
 };
 
+#endif
+
 class OpenSSLSha: public DigestImpl
 {
 public:
@@ -165,7 +167,8 @@ public:
                 break;
         }
 
-        EVP_DigestInit_ex2(mpMdctx, md, nullptr);
+        EVP_DigestInit_ex(mpMdctx, md, nullptr);
+//        EVP_DigestInit_ex2(mpMdctx, md, nullptr);
     }
 
     void Update(const uint8_t *apBuffer, std::size_t aSize) override
@@ -191,9 +194,6 @@ public:
 protected:
     EVP_MD_CTX* mpMdctx;
 };
-
-
-#endif
 
 // SHA interface factory for OpenSSL
 DigestImpl* DigestImpl::Create(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
