@@ -47,7 +47,7 @@ TEST_CASE("Network")
     opt.KeyPath = "webserver/ssl/private/SN1234.key";
 
     // Run lighttpd directly from build directory, no need to install it.
-    std::system("_deps/lighttpd_src-build/build/lighttpd -f webserver/lighttpd.conf -m _deps/lighttpd_src-build/build");
+    CHECK(0 == std::system("_deps/lighttpd_src-build/build/lighttpd -f webserver/lighttpd.conf -m _deps/lighttpd_src-build/build"));
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     SUBCASE("Library Version"){
@@ -162,7 +162,7 @@ TEST_CASE("Network")
         }
 
         SUBCASE("Partial To File") {
-            truncate(cFile.c_str(), 20*1024); // This changes mtime
+            CHECK(0 == truncate(cFile.c_str(), 20*1024)); // This changes mtime
 
             CHECK_NOTHROW(resp = &request.Execute());
 
@@ -174,7 +174,7 @@ TEST_CASE("Network")
             using namespace std::literals::chrono_literals;
 
             auto mtime = FileSystem::GetFileModifiedTime(cFile);
-            truncate(cFile.c_str(), 20*1024); // This changes mtime
+            CHECK(0 == truncate(cFile.c_str(), 20*1024)); // This changes mtime
             // This line will work, as the result is the partial data from an unmodified file.
             FileSystem::SetFileModifiedTime(cFile, mtime + 2h);
 
@@ -191,7 +191,7 @@ TEST_CASE("Network")
 //            request.SetOptions(opt);
 
             auto mtime = FileSystem::GetFileModifiedTime(cFile);
-            truncate(cFile.c_str(), 20*1024); // This changes mtime
+            CHECK(0 == truncate(cFile.c_str(), 20*1024)); // This changes mtime
             // FIXME: This line should fail with a "412 Precondition Failed", lighttpd does not send the correct result.
             FileSystem::SetFileModifiedTime(cFile, mtime - 2h);
 
@@ -346,5 +346,5 @@ TEST_CASE("Network")
         CHECK(resp2);
     }
 
-    std::system("killall lighttpd");
+    CHECK(0 == std::system("killall lighttpd"));
 }
