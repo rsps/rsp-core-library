@@ -64,7 +64,6 @@ add_compile_options(
     -Wmissing-declarations
     -Wmissing-include-dirs
     -Wnoexcept
-    -Wold-style-cast
     -Woverloaded-virtual
     -Wredundant-decls
     -Wsign-conversion
@@ -129,6 +128,7 @@ target_compile_options(rsp-core-lib PUBLIC
 
 if (NOT RELEASE_BUILD)
 target_compile_options(rsp-core-lib PRIVATE
+    -Wshadow
     -DDEBUG_LOG
     -g
     -O0
