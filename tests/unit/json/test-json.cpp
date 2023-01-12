@@ -45,13 +45,21 @@ TEST_CASE("Json") {
             "NestedValue": "Cheers"
         }
     }
-}    
-)" };
+}
+)"  };
 
     SUBCASE("Create Float") {
         JsonValue v1(1.4f);
         CHECK(v1.GetJsonType() == JsonTypes::Number);
         CHECK(IsEqual(1.4f, static_cast<float>(v1), 0.000001f));
+        CHECK_EQ("1.4", v1.Encode());
+    }
+
+    SUBCASE("Create Double") {
+        JsonValue v1(1.2345678);
+        CHECK(v1.GetJsonType() == JsonTypes::Number);
+        CHECK(IsEqual(1.2345678, static_cast<double>(v1), 0.00000001));
+        CHECK_EQ("1.2345678", v1.Encode());
     }
 
     SUBCASE("Create String") {
