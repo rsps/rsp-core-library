@@ -70,7 +70,7 @@ add_compile_options(
     -Wsign-conversion
     -Wsign-promo
     -Wstrict-null-sentinel
-    -Wstrict-overflow=5
+    -Wstrict-overflow=3
 #    -Wswitch-default
     -Wundef
     -Wno-unused
