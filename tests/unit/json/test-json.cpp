@@ -48,6 +48,13 @@ TEST_CASE("Json") {
 }
 )"  };
 
+    SUBCASE("System") {
+        CHECK_EQ(sizeof(float), 4);
+        CHECK_EQ(sizeof(double), 8);
+        CHECK_EQ(sizeof(long double), 16);
+    }
+
+
     SUBCASE("Create Empty") {
         JsonValue v1;
         CHECK(v1.GetJsonType() == JsonTypes::Null);
