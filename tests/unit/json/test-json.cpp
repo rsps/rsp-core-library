@@ -48,18 +48,29 @@ TEST_CASE("Json") {
 }
 )"  };
 
+    SUBCASE("Create Empty") {
+        JsonValue v1;
+        CHECK(v1.GetJsonType() == JsonTypes::Null);
+        CHECK_EQ("null", v1.Encode());
+        CHECK_THROWS_AS(v1.AsInt(), EConversionError);
+        CHECK_THROWS_AS(v1.AsFloat(), EConversionError);
+        CHECK_THROWS_AS(v1.AsDouble(), EConversionError);
+        CHECK_EQ("null", v1.AsString());
+    }
+
+
     SUBCASE("Create Float") {
-        JsonValue v1(1.4f);
+        JsonValue v1(1.42f);
         CHECK(v1.GetJsonType() == JsonTypes::Number);
-        CHECK(IsEqual(1.4f, static_cast<float>(v1), 0.000001f));
-        CHECK_EQ("1.4", v1.Encode());
+        CHECK(IsEqual(1.42f, static_cast<float>(v1), 0.000001f));
+        CHECK_EQ("1.41999996", v1.Encode());
     }
 
     SUBCASE("Create Double") {
-        JsonValue v1(1.2345678);
+        JsonValue v1(456321.7651234);
         CHECK(v1.GetJsonType() == JsonTypes::Number);
-        CHECK(IsEqual(1.2345678, static_cast<double>(v1), 0.00000001));
-        CHECK_EQ("1.2345678", v1.Encode());
+        CHECK(IsEqual(456321.7651234, static_cast<double>(v1), 0.00000001));
+        CHECK_EQ("456321.76512340002", v1.Encode());
     }
 
     SUBCASE("Create String") {

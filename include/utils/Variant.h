@@ -182,6 +182,7 @@ protected:
     union {
         bool mBool;
         std::int64_t mInt{};
+        float mFloat;
         double mDouble;
         uintptr_t mPointer;
     };

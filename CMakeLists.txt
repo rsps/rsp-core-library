@@ -128,14 +128,13 @@ target_compile_options(rsp-core-lib PUBLIC
 
 if (NOT RELEASE_BUILD)
 target_compile_options(rsp-core-lib PRIVATE
-    -Wshadow
     -DDEBUG_LOG
     -g
     -O0
 )
 else()
 target_compile_options(rsp-core-lib PRIVATE
-    -O3 -Wall
+    -O3
 )
 endif()
 

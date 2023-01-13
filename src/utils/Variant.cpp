@@ -103,7 +103,7 @@ Variant::Variant(std::uint16_t aValue)
 
 Variant::Variant(float aValue)
     : mType(Types::Float),
-      mDouble(aValue)
+      mFloat(aValue)
 {
 }
 
@@ -180,7 +180,7 @@ Variant& Variant::operator =(std::uint16_t aValue)
 Variant& Variant::operator =(float aValue)
 {
     mType = Types::Float;
-    mDouble = aValue;
+    mFloat = aValue;
     return *this;
 }
 
@@ -229,6 +229,8 @@ bool Variant::AsBool() const
             return (mInt != 0);
 
         case Types::Float:
+            return (std::fabs(mFloat) < 0.001f);
+
         case Types::Double:
             return (std::fabs(mDouble) < 0.0001f);
 
@@ -265,6 +267,7 @@ std::int64_t Variant::AsInt() const
             return mInt;
 
         case Types::Float:
+            return static_cast<std::int64_t>(mFloat);
         case Types::Double:
             return static_cast<std::int64_t>(mDouble);
 
@@ -295,6 +298,7 @@ double Variant::AsDouble() const
             return static_cast<double>(mInt);
 
         case Types::Float:
+            return static_cast<double>(mFloat);
         case Types::Double:
             return mDouble;
 
@@ -317,6 +321,7 @@ std::string to_string_with_high_precision(const T a_value)
 {
     const unsigned int digits = std::numeric_limits<T>::max_digits10;
     std::ostringstream out;
+//    out << "digits " << digits << " ";
     out.precision(digits);
 //    out << std::fixed;
     out << a_value;
@@ -342,6 +347,7 @@ std::string Variant::AsString() const
             return std::to_string(static_cast<uint64_t>(mInt));
 
         case Types::Float:
+            return to_string_with_high_precision(mFloat);
         case Types::Double:
             return to_string_with_high_precision(mDouble);
 
