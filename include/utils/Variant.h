@@ -50,7 +50,7 @@ public:
      * \enum Types
      * \brief Type declaration used for each native type.
      */
-    enum class Types {Null, Bool, Int, Int64, Uint64, Uint32, Uint16, Float, Double, Pointer, String};
+    enum class Types : std::uint32_t {Null, Bool, Int, Int64, Uint64, Uint32, Uint16, Float, Double, Pointer, String};
 
     /**
      * \fn  Variant()
@@ -176,6 +176,8 @@ public:
     float AsFloat() const { return static_cast<float>(AsDouble()); }
     std::string AsString() const;
     void* AsPointer() const;
+
+    std::int64_t RawAsInt() const { return mInt; }
 
 protected:
     Types mType;

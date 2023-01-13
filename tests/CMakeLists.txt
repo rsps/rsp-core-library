@@ -36,9 +36,11 @@ configure_file (
 
 enable_testing()
 
-add_executable("rsp-core-lib-test")
-add_dependencies("rsp-core-lib-test" doctest lighttpd)
-target_include_directories("rsp-core-lib-test"
+set (TEST_BINARY "rsp-core-lib-test")
+
+add_executable(${TEST_BINARY})
+add_dependencies(${TEST_BINARY} doctest lighttpd)
+target_include_directories(${TEST_BINARY}
     PUBLIC
         ${doctest_SOURCE_DIR}/doctest
         ${PROJECT_SOURCE_DIR}/include
@@ -49,7 +51,7 @@ target_include_directories("rsp-core-lib-test"
 )
 
 if (NOT RELEASE_BUILD)
-target_compile_options(rsp-core-lib-test PRIVATE 
+target_compile_options(${TEST_BINARY} PRIVATE 
     -DGFX_FPS=20
     -g
     -O0
@@ -59,17 +61,17 @@ endif()
 #get_target_property(INCLUDE_DIRS "rsp-core-lib-test" INCLUDE_DIRECTORIES)
 #message(STATUS "IncDirs: ${INCLUDE_DIRS}")
 
-target_link_libraries ("rsp-core-lib-test"
+target_link_libraries (${TEST_BINARY}
     rsp-core-lib
     Threads::Threads
 )
 #target_link_libraries(demo ${FREETYPE_LIBRARIES})
 
-add_test("tests" "rsp-core-lib-test")
+add_test("tests" ${TEST_BINARY})
 
 
 file(GLOB_RECURSE SRC_FILES *.cpp)
-target_sources("rsp-core-lib-test" PRIVATE
+target_sources(${TEST_BINARY} PRIVATE
     ${SRC_FILES}
 )
 
@@ -85,3 +87,6 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/webserver/ssl
     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/webserver/cgi
     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/)
+
+    
+install(TARGETS ${TEST_BINARY} DESTINATION tgm/)

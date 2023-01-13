@@ -63,7 +63,9 @@ TEST_CASE("Json") {
         CHECK_THROWS_AS(v1.AsFloat(), EConversionError);
         CHECK_THROWS_AS(v1.AsDouble(), EConversionError);
         CHECK_EQ("null", v1.AsString());
-    }
+
+//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v1)) << "\n" << TestHelpers::ToHex(reinterpret_cast<std::uint8_t*>(&v1), sizeof(Variant)));
+}
 
 
     SUBCASE("Create Float") {
@@ -78,6 +80,17 @@ TEST_CASE("Json") {
         CHECK(v1.GetJsonType() == JsonTypes::Number);
         CHECK(IsEqual(456321.7651234, static_cast<double>(v1), 0.00000001));
         CHECK_EQ("456321.76512340002", v1.Encode());
+
+//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v1)) << "\nInt: " << v1.RawAsInt() << "\n" << TestHelpers::ToHex(reinterpret_cast<std::uint8_t*>(&v1), sizeof(Variant)));
+
+        auto v2 = JsonValue::Decode("{\"Value\": 456321.7651234}");
+        auto &v3 = v2["Value"];
+        CHECK(v3.GetJsonType() == JsonTypes::Number);
+        CHECK(IsEqual(456321.7651234, static_cast<double>(v3), 0.00000001));
+        CHECK_EQ("456321.76512340002", v3.Encode());
+
+        // Explore output here: https://www.exploringbinary.com/floating-point-converter/
+//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v3)) << "\nInt: " << v3.RawAsInt() << "\n" << TestHelpers::ToHex(reinterpret_cast<std::uint8_t*>(&v3), sizeof(Variant)));
     }
 
     SUBCASE("Create String") {

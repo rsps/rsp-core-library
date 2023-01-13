@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <logging/ConsoleLogWriter.h>
 #include <posix/FileIO.h>
+#include <posix/FileSystem.h>
 #include "TestHelpers.h"
 
 using namespace rsp::logging;
@@ -27,7 +28,7 @@ void TestHelpers::AddConsoleLogger(Logger& arLogger)
     arLogger.AddLogWriter(std::make_shared<rsp::logging::ConsoleLogWriter>(mLogLevel));
 }
 
-std::uint8_t TestHelpers::TamperWithFile(const std::string &arFileName, std::size_t aOffset, std::uint8_t aValue)
+std::uint8_t TestHelpers::TamperWithFile(const std::string &arFileName, std::uint32_t aOffset, std::uint8_t aValue)
 {
     std::uint8_t result;
     rsp::posix::FileIO f(arFileName, std::ios_base::in | std::ios_base::out);
@@ -52,34 +53,40 @@ void TestHelpers::ParseArguments(const char **apArgv)
 
 std::string TestHelpers::ToHex(const std::string &arString)
 {
+    return ToHex(reinterpret_cast<const std::uint8_t*>(arString.c_str()), arString.size());
+}
+
+std::string TestHelpers::ToHex(const std::uint8_t *apData, std::uint32_t aSize)
+{
     std::stringstream out;
     std::string delim = ", ";
-    auto sz = arString.size();
     std::string line;
 
-    for (std::size_t i = 0 ; i < sz ; i++) {
+    for (std::size_t i = 0 ; i < aSize ; i++) {
         if ((i % 16) == 0) {
             out << "    ";
         }
-        if (i == (sz - 1)) {
-            delim = "";
+        if (i == (aSize - 1)) {
+            delim = "  ";
         }
-        if (arString[i] >= '0' && arString[i] <= 'z') {
-            line += arString[i];
+        if (char(*apData) >= '0' && char(*apData) <= 'z') {
+            line += char(*apData);
         }
         else {
             line += '.';
         }
 
-        out << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<unsigned int>(std::uint8_t(arString[i])) << delim;
+        out << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<unsigned int>(*apData) << delim;
+
+        apData++;
 
         if ((i % 16) == 15) {
             out << "  " << line << "\n";
             line.clear();
         }
     }
-    if ((sz % 16) != 15) {
-        out << "  " << line << "\n";
+    if ((aSize % 16) != 15) {
+        out << std::string((16 - (aSize % 16)) * 6, ' ') << "  " << line << "\n";
     }
     out << std::dec;
 
@@ -92,7 +99,10 @@ bool TestHelpers::ValidateJson(const std::string &arJson)
     fout << arJson;
     fout.close();
 
-    int result = std::system("/usr/bin/jsonlint-php /tmp/ValidateJson.json");
+    int result = 1;
+    if (rsp::posix::FileSystem::FileExists("/usr/bin/jsonlint-php")) {
+        result = std::system("/usr/bin/jsonlint-php /tmp/ValidateJson.json");
+    }
 
     std::remove("/tmp/ValidateJson.json");
 

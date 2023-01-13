@@ -13,7 +13,7 @@
 #include <utils/Variant.h>
 #include <logging/Logger.h>
 
-// # define JLOG(a) DLOG(a)
+//#define JLOG(a) DLOG(a)
 #define JLOG(a)
 
 namespace rsp::utils {
@@ -22,11 +22,12 @@ Variant::Variant()
     : mType(Types::Null),
       mPointer(reinterpret_cast<uintptr_t>(nullptr))
 {
+    JLOG("Variant default constructor");
 }
 
 Variant::Variant(const Variant &arOther)
     : mType(arOther.mType),
-      mPointer(arOther.mPointer),
+      mInt(arOther.mInt),
       mString(arOther.mString)
 {
     JLOG("Variant copy constructor");
@@ -34,7 +35,7 @@ Variant::Variant(const Variant &arOther)
 
 Variant::Variant(Variant &&arOther)
     : mType(arOther.mType),
-      mPointer(arOther.mPointer),
+      mInt(arOther.mInt),
       mString(arOther.mString)
 {
     JLOG("Variant move constructor");
@@ -46,7 +47,7 @@ Variant& Variant::operator=(const Variant &arOther)
     if (&arOther != this) {
         JLOG("Variant copy assignment");
         mType = arOther.mType;
-        mPointer = arOther.mPointer;
+        mInt = arOther.mInt,
         mString = arOther.mString;
     }
     return *this;
@@ -57,7 +58,7 @@ Variant& Variant::operator=(Variant &&arOther)
     if (&arOther != this) {
         JLOG("Variant move assignment");
         mType = arOther.mType;
-        mPointer = std::move(arOther.mPointer);
+        mInt = std::move(arOther.mInt),
         mString = std::move(arOther.mString);
         arOther.mType = Types::Null;
     }
@@ -69,54 +70,63 @@ Variant::Variant(bool aValue)
     : mType(Types::Bool),
       mBool(aValue)
 {
+    JLOG("Variant bool constructor");
 }
 
 Variant::Variant(int aValue)
     : mType(Types::Int),
       mInt(aValue)
 {
+    JLOG("Variant int constructor");
 }
 
 Variant::Variant(std::int64_t aValue)
     : mType(Types::Int64),
       mInt(aValue)
 {
+    JLOG("Variant int64 constructor");
 }
 
 Variant::Variant(std::uint64_t aValue)
     : mType(Types::Uint64),
       mInt(static_cast<std::int64_t>(aValue))
 {
+    JLOG("Variant uint64 constructor");
 }
 
 Variant::Variant(std::uint32_t aValue)
     : mType(Types::Uint32),
       mInt(aValue)
 {
+    JLOG("Variant uint32 constructor");
 }
 
 Variant::Variant(std::uint16_t aValue)
     : mType(Types::Uint16),
       mInt(aValue)
 {
+    JLOG("Variant uint16 constructor");
 }
 
 Variant::Variant(float aValue)
     : mType(Types::Float),
       mFloat(aValue)
 {
+    JLOG("Variant float constructor");
 }
 
 Variant::Variant(double aValue)
     : mType(Types::Double),
       mDouble(aValue)
 {
+    JLOG("Variant double constructor");
 }
 
 Variant::Variant(void *apValue)
     : mType(Types::Pointer),
       mPointer(reinterpret_cast<uintptr_t>(apValue))
 {
+    JLOG("Variant pointer constructor");
 }
 
 Variant::Variant(const std::string &arValue)

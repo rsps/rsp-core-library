@@ -18,11 +18,12 @@ class TestHelpers
 public:
     static void AddConsoleLogger(rsp::logging::Logger& arLogger);
 
-    static std::uint8_t TamperWithFile(const std::string& arFileName, std::size_t aOffset, std::uint8_t aValue);
+    static std::uint8_t TamperWithFile(const std::string& arFileName, std::uint32_t aOffset, std::uint8_t aValue);
 
     static void ParseArguments(const char ** apArgv);
 
     static std::string ToHex(const std::string &arString);
+    static std::string ToHex(const std::uint8_t *apData, std::uint32_t aSize);
 
     static bool ValidateJson(const std::string &arJson);
     static bool ValidateJsonFile(const std::string &arJsonFile);

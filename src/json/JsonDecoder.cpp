@@ -402,7 +402,10 @@ JsonValue JsonDecoder::getNumber()
     }
 
     if (is_float) {
-        return JsonValue(std::strtod(result.c_str(), nullptr));
+        double val = std::strtod(result.c_str(), nullptr);
+//        std::cout.precision(17);
+//        std::cout << "strtod: " << val << std::endl;
+        return JsonValue(val);
     }
     else if (is_negative) {
         return JsonValue(static_cast<std::int64_t>(std::strtoll(result.c_str(), nullptr, 10)));
