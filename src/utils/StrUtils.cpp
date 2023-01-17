@@ -60,7 +60,7 @@ std::string TrimCopy(std::string const& aStr)
 std::string& ToLower(std::string &arStr)
 {
     std::transform(arStr.begin(), arStr.end(), arStr.begin(),
-        [](int c) { return std::tolower(c); });
+        [](unsigned char c){ return std::tolower(c); });
     return arStr;
 }
 
