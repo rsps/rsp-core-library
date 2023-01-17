@@ -134,8 +134,8 @@ public:
 
     LogStream& operator=(LogStream &&arOther);
 
-    template< class type> LogStream& operator<<( type aValue) {
-        mBuffer << aValue;
+    template< class type> LogStream& operator<<(const type &arValue) {
+        mBuffer << arValue;
         return *this;
     }
 
