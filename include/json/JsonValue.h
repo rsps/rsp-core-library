@@ -60,7 +60,7 @@ public:
      * \param aForceToUCS2 Set to use UCS2 codepoints for all characters above ASCII.
      * \return JSON formatted string
      */
-    std::string Encode(bool aPrettyPrint = false, bool aForceToUCS2 = false) const;
+    std::string Encode(bool aPrettyPrint = false, bool aForceToUCS2 = false, unsigned int aArrayLineLength = 0) const;
 
     /**
      * \brief Decode a string into a JsonValue object
@@ -203,9 +203,10 @@ public:
 protected:
     class PrintFormat {
     public:
-        PrintFormat() : indent(0) {}
-        PrintFormat(unsigned int aIndent, const char* aNl, const char* aSp) : indent(aIndent), nl(aNl), sp(aSp) {}
-        unsigned int indent;
+        PrintFormat() {}
+        PrintFormat(unsigned int aIndent, unsigned int aArrayLineLength, const char* aNl, const char* aSp) : indent(aIndent), arll(aArrayLineLength), nl(aNl), sp(aSp) {}
+        unsigned int indent = 0;
+        unsigned int arll = 0;
         std::string nl{};
         std::string sp{};
     };

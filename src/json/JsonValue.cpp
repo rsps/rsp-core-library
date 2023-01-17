@@ -96,13 +96,13 @@ JsonValue& JsonValue::operator=(JsonValue&& arOther)
 }
 
 
-std::string JsonValue::Encode(bool aPrettyPrint, bool aForceToUCS2) const
+std::string JsonValue::Encode(bool aPrettyPrint, bool aForceToUCS2, unsigned int aArrayLineLength) const
 {
 //    JLOG("Encode(" << aPrettyPrint << ", " << aForceToUCS2 << ") on " << *this);
     std::stringstream result;
 
     if (aPrettyPrint) {
-        PrintFormat pf(4, "\n", " ");
+        PrintFormat pf(4, aArrayLineLength, "\n", " ");
         toStringStream(result, pf, 0, aForceToUCS2);
     }
     else {
@@ -413,17 +413,53 @@ void JsonValue::arrayToStringStream(std::stringstream &arResult, PrintFormat &ar
 {
     std::string in(static_cast<std::string::size_type>(arPf.indent) * (aLevel + 1), ' ');
     std::string c = ",";
+    int min_witdh = 0;
 
     arResult << "[" << arPf.nl;
 
     auto rest = mItems.size();
-    for (const JsonValue& el : mItems) {
-       arResult << in;
-       el.toStringStream(arResult, arPf, aLevel+1, aForceToUCS2);
-       if (--rest == 0) {
-           c = "";
-       }
-       arResult << c << arPf.nl;
+    arResult << in;
+    unsigned int item_count = 0;
+
+    if (arPf.arll && arPf.indent && rest) {
+        switch (mItems[0].GetType()) {
+            case Types::Int:
+            case Types::Uint32:
+                min_witdh = 10;
+                break;
+
+            case Types::Int64:
+            case Types::Uint64:
+                min_witdh = 20;
+                break;
+
+            case Types::Uint16:
+                min_witdh = 5;
+                break;
+
+            default:
+                min_witdh = 7;
+                break;
+        }
+    }
+
+    for (const JsonValue &el : mItems) {
+        if (min_witdh) {
+            arResult << std::setw(min_witdh) << std::setfill(' ');
+        }
+        el.toStringStream(arResult, arPf, aLevel + 1, aForceToUCS2);
+        if (--rest == 0) {
+            c = "";
+            in.clear();
+        }
+        arResult << c;
+        if ((rest == 0) || (++item_count >= arPf.arll)) {
+            arResult << arPf.nl << in;
+            item_count = 0;
+        }
+        else {
+            arResult << " ";
+        }
     }
     std::string in1(static_cast<std::string::size_type>(arPf.indent) * aLevel, ' ');
     arResult << in1 << "]";
