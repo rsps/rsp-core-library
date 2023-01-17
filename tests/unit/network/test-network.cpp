@@ -78,8 +78,12 @@ TEST_CASE("Network")
 
         request.SetOptions(opt);
 
+        logger.Info() << "Request:\n" << request << std::endl;
+
         IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
+
+        logger.Info() << "Response:\n" << *resp << std::endl;
 
 //        MESSAGE("Request:\n" << resp->GetRequest());
 //        MESSAGE("Response:\n" << *resp);

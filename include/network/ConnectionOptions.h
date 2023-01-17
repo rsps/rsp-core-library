@@ -11,7 +11,7 @@
 #ifndef CONNECTIONOPTIONS_H
 #define CONNECTIONOPTIONS_H
 
-#include <iostream>
+#include <ostream>
 #include <string>
 
 namespace rsp::network {

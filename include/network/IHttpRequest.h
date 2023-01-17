@@ -12,6 +12,7 @@
 #define I_HTTPREQUEST_H
 
 #include <memory>
+#include <ostream>
 #include <functional>
 #include <network/HttpRequestOptions.h>
 #include <network/IHttpResponse.h>

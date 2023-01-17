@@ -28,6 +28,18 @@ using namespace rsp::logging;
 
 const char *cFileName = "__logger-test.log";
 
+struct MyType {
+    int Value = 42;
+};
+
+std::ostream& operator<< (std::ostream& os, const MyType &arType);
+
+std::ostream& operator<< (std::ostream& os, const MyType &arType)
+{
+    os << arType.Value;
+    return os;
+}
+
 
 static std::vector<std::string> mConsoleInfoBuffer;
 static std::vector<std::string> mConsoleErrorBuffer;
@@ -82,6 +94,9 @@ TEST_CASE("Logging") {
     std::this_thread::sleep_for(std::chrono::milliseconds(4));
     log.Debug() << "Debug" << std::endl;
 
+    MyType type;
+    log.Info() << type << std::endl;
+
     std::clog << LogLevel::Critical << "Critical to std::clog" << std::endl;
 
     log.Emergency() << "Sleeping for 1 second" << std::flush;
@@ -133,7 +148,10 @@ TEST_CASE("Logging") {
     std::getline(fin, line);
     CHECK(StrUtils::EndsWith(line, "Debug") == false);
 
-    CHECK(StrUtils::EndsWith(line, "(critical) Critical to std::clog") == true);
+    CHECK(StrUtils::EndsWith(line, "42") == true);
+
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "(critical) Critical to std::clog") == true, line);
     CHECK(StrUtils::StartsWith(mConsoleErrorBuffer[1], std::string(AnsiEscapeCodes::ec::fg::Red) + "Critical to std::clog") == true);
 
     std::getline(fin, line);

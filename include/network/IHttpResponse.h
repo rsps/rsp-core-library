@@ -11,7 +11,7 @@
 #ifndef I_HTTPRESPONSE_H
 #define I_HTTPRESPONSE_H
 
-#include <iostream>
+#include <ostream>
 #include <map>
 #include <string>
 #include <network/IHttpRequest.h>
