@@ -12,6 +12,7 @@
 #include <json/JsonExceptions.h>
 #include <sstream>
 #include <logging/Logger.h>
+#include <utils/StrUtils.h>
 
 using namespace rsp::json;
 
@@ -402,10 +403,7 @@ JsonValue JsonDecoder::getNumber()
     }
 
     if (is_float) {
-        double val = std::strtod(result.c_str(), nullptr);
-//        std::cout.precision(17);
-//        std::cout << "strtod: " << val << std::endl;
-        return JsonValue(val);
+        return JsonValue(rsp::utils::StrUtils::ToDouble(result));
     }
     else if (is_negative) {
         return JsonValue(static_cast<std::int64_t>(std::strtoll(result.c_str(), nullptr, 10)));

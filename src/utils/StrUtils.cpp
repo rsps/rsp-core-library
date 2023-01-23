@@ -187,6 +187,7 @@ std::string Format(const char* apFormat, ...)
 double ToDouble(const std::string &arString)
 {
     std::istringstream stream(arString);
+    stream.imbue(std::locale::classic());
     double d;
     // maybe use some manipulators
     stream >> d;
@@ -201,6 +202,7 @@ std::string ToString(double aValue, int aDigits, bool aFixed)
         aDigits = std::numeric_limits<double>::max_digits10;
     }
     std::ostringstream out;
+    out.imbue(std::locale::classic());
     if (aDigits >= 0) {
         out.precision(aDigits);
     }
@@ -217,6 +219,7 @@ std::string ToString(float aValue, int aDigits, bool aFixed)
         aDigits = std::numeric_limits<float>::max_digits10;
     }
     std::ostringstream out;
+    out.imbue(std::locale::classic());
     if (aDigits >= 0) {
         out.precision(aDigits);
     }

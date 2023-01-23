@@ -44,7 +44,7 @@ TEST_CASE("StrUtils") {
     CHECK(StrUtils::Format("%02d-%8.8s", 10, str.c_str()) == "10-From Str");
 
     CHECK_EQ(StrUtils::ToDouble("123.123456789"), 123.123456789);
-    CHECK_THROWS_AS(StrUtils::ToDouble("Banana123.123456789"), const DecimalConversionError&);
+    CHECK_THROWS_AS(StrUtils::ToDouble("banana123.123456789"), const DecimalConversionError&);
 
     CHECK_EQ(StrUtils::ToString(123.12345678), "123.12345678");
     CHECK_EQ(StrUtils::ToString(123.12345678, 5), "123.12");
@@ -54,6 +54,7 @@ TEST_CASE("StrUtils") {
     CHECK_EQ(StrUtils::ToString(4.4783619199999997e-06, 12), "4.47836192e-06");
 
     std::locale::global(std::locale("da_DK.UTF8"));
-    CHECK_EQ(StrUtils::ToString(4.4783619199999997e-06, 12, true), "0,000004478362");
+    CHECK_EQ(StrUtils::ToDouble("123,123456789"), 123.0);
+    CHECK_EQ(StrUtils::ToString(4.4783619199999997e-06, 12, true), "0.000004478362");
     std::locale::global(std::locale::classic());
 }
