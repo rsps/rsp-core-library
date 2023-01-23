@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <utils/Variant.h>
 #include <logging/Logger.h>
+#include <utils/StrUtils.h>
 
 //#define JLOG(a) DLOG(a)
 #define JLOG(a)
@@ -316,26 +317,13 @@ double Variant::AsDouble() const
             return static_cast<double>(mPointer);
 
         case Types::String:
-            return std::strtod(mString.c_str(), nullptr);
+            return StrUtils::ToDouble(mString);
 
         default:
             THROW_WITH_BACKTRACE2(EConversionError, typeToText(), "double");
             break;
     }
     return 0.0f;
-}
-
-
-template <typename T>
-std::string to_string_with_high_precision(const T a_value)
-{
-    const unsigned int digits = std::numeric_limits<T>::max_digits10;
-    std::ostringstream out;
-//    out << "digits " << digits << " ";
-    out.precision(digits);
-//    out << std::fixed;
-    out << a_value;
-    return out.str();
 }
 
 std::string Variant::AsString() const
@@ -357,9 +345,9 @@ std::string Variant::AsString() const
             return std::to_string(static_cast<uint64_t>(mInt));
 
         case Types::Float:
-            return to_string_with_high_precision(mFloat);
+            return StrUtils::ToString(mFloat);
         case Types::Double:
-            return to_string_with_high_precision(mDouble);
+            return StrUtils::ToString(mDouble);
 
         case Types::Pointer:
         {

@@ -170,17 +170,61 @@ std::string Format(const char* apFormat, ...)
 
     va_start(arglist, apFormat);
     std::size_t size = static_cast<std::size_t>(vsnprintf(nullptr, 0, apFormat, arglist)) + 1; // Extra space for '\0'
-    if (size > 255) {
-        errno = ENOMEM;
-        THROW_SYSTEM("StrUtils::format buffer to small");
-    }
-    char buffer[256];
+
+    std::string result;
+    result.reserve(size);
+    result.resize(size);
+
     va_start(arglist, apFormat); // Reset arglist ptr.
-    vsnprintf(buffer, 255, apFormat, arglist);
+    vsnprintf(&result.front(), 255, apFormat, arglist);
 
     va_end(arglist);
 #pragma GCC diagnostic pop
-    return std::string(buffer, size - 1); // We don't want the '\0' inside
+    result.resize(size-1); // We don't want the '\0' inside
+    return result;
+}
+
+double ToDouble(const std::string &arString)
+{
+    std::istringstream stream(arString);
+    double d;
+    // maybe use some manipulators
+    stream >> d;
+    if(!stream)
+        THROW_WITH_BACKTRACE1(DecimalConversionError, std::string("StrUtils::ToDouble conversion error. From " + arString + " to double"));
+    return d;
+}
+
+std::string ToString(double aValue, int aDigits, bool aFixed)
+{
+    if (aDigits == -1) {
+        aDigits = std::numeric_limits<double>::max_digits10;
+    }
+    std::ostringstream out;
+    if (aDigits >= 0) {
+        out.precision(aDigits);
+    }
+    if (aFixed) {
+        out << std::fixed;
+    }
+    out << aValue;
+    return out.str();
+}
+
+std::string ToString(float aValue, int aDigits, bool aFixed)
+{
+    if (aDigits == -1) {
+        aDigits = std::numeric_limits<float>::max_digits10;
+    }
+    std::ostringstream out;
+    if (aDigits >= 0) {
+        out.precision(aDigits);
+    }
+    if (aFixed) {
+        out << std::fixed;
+    }
+    out << aValue;
+    return out.str();
 }
 
 } /* namespace StrUtils */

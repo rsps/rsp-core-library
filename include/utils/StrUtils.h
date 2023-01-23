@@ -182,6 +182,32 @@ std::string& ReplaceAll(std::string &aText, const std::string& aFrom, const std:
  */
 std::string Format(const char* apFormat, ...) __attribute__((__format__(__printf__, 1, 0)));
 
+/**
+ * \brief Convert a string to double. The decimal point is locale dependent.
+ * \param arString
+ * \return double
+ */
+double ToDouble(const std::string &arString);
+
+/**
+ * \brief Convert a double to string with the given precision. The decimal point is locale dependent.
+ * \param aValue double
+ * \param aDigits Number of decimals in result.
+ * \param aFixed Force decimal point notation
+ * \return string
+ */
+std::string ToString(double aValue, int aDigits = -1, bool aFixed = false);
+
+/**
+ * \brief Convert a float to string with the given precision. The decimal point is locale dependent.
+ * \param aValue float
+ * \param aDigits Number of decimals in result.
+ * \param aFixed Force decimal point notation
+ * \return string
+ */
+std::string ToString(float aValue, int aDigits = -1, bool aFixed = false);
+
+
 }
 
 #endif /* SRC_UTILS_STRUTILS_H_ */

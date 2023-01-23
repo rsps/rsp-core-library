@@ -10,11 +10,11 @@
 
 #include <doctest.h>
 #include <utils/StrUtils.h>
+#include <utils/CoreException.h>
 
 using namespace rsp::utils;
 
-TEST_CASE("Testing StrUtils")
-{
+TEST_CASE("StrUtils") {
     CHECK(StrUtils::GetHomeDir() != "");
 
     CHECK(StrUtils::GetConfigDir() != "");
@@ -42,4 +42,18 @@ TEST_CASE("Testing StrUtils")
 
     std::string str("From String");
     CHECK(StrUtils::Format("%02d-%8.8s", 10, str.c_str()) == "10-From Str");
+
+    CHECK_EQ(StrUtils::ToDouble("123.123456789"), 123.123456789);
+    CHECK_THROWS_AS(StrUtils::ToDouble("Banana123.123456789"), const DecimalConversionError&);
+
+    CHECK_EQ(StrUtils::ToString(123.12345678), "123.12345678");
+    CHECK_EQ(StrUtils::ToString(123.12345678, 5), "123.12");
+    CHECK_EQ(StrUtils::ToString(123.12345678f), "123.123459");
+    CHECK_EQ(StrUtils::ToString(123.12345678f, 5), "123.12");
+
+    CHECK_EQ(StrUtils::ToString(4.4783619199999997e-06, 12), "4.47836192e-06");
+
+    std::locale::global(std::locale("da_DK.UTF8"));
+    CHECK_EQ(StrUtils::ToString(4.4783619199999997e-06, 12, true), "0,000004478362");
+    std::locale::global(std::locale::classic());
 }

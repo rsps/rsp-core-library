@@ -63,6 +63,15 @@ public:
     }
 };
 
+class DecimalConversionError : public CoreException
+{
+public:
+    DecimalConversionError(const std::string &arMsg)
+        : CoreException(arMsg)
+    {
+    }
+};
+
 class AssertException: public CoreException
 {
 public:
