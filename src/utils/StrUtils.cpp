@@ -191,8 +191,9 @@ double ToDouble(const std::string &arString)
     double d;
     // maybe use some manipulators
     stream >> d;
-    if(!stream)
+    if(!stream) {
         THROW_WITH_BACKTRACE1(DecimalConversionError, std::string("StrUtils::ToDouble conversion error. From " + arString + " to double"));
+    }
     return d;
 }
 
@@ -218,16 +219,7 @@ std::string ToString(float aValue, int aDigits, bool aFixed)
     if (aDigits == -1) {
         aDigits = std::numeric_limits<float>::max_digits10;
     }
-    std::ostringstream out;
-    out.imbue(std::locale::classic());
-    if (aDigits >= 0) {
-        out.precision(aDigits);
-    }
-    if (aFixed) {
-        out << std::fixed;
-    }
-    out << aValue;
-    return out.str();
+    return ToString(static_cast<double>(aValue), aDigits, aFixed);
 }
 
 } /* namespace StrUtils */
