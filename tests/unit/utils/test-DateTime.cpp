@@ -99,6 +99,14 @@ TEST_CASE("DateTime")
             CHECK_EQ(dt.ToRFC3339Milli(), cRFC3339Milli);
         }
 
+        SUBCASE("From QtGlucobeam Common_Id") {
+            const char* common_id = "20230130T104540.925Z200037";
+            DateTime dt(common_id, "%Y%m%dT%H%M%S.");
+            DateTime same(2023,01,30,10,45,40,925);
+            DMESG("DateTime(2023,01,30,10,45,40,925) = " << dt);
+            CHECK_EQ(dt, same);
+        }
+
         SUBCASE("From duration") {
             auto t = std::time(nullptr);
             DateTime dt(std::chrono::milliseconds((t * 1000) + 813));
