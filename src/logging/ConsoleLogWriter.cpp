@@ -35,10 +35,10 @@ ConsoleLogWriter::ConsoleLogWriter(std::string aAcceptLevel, ConsoleLogStreamsIn
 }
 
 ConsoleLogWriter::ConsoleLogWriter(LogLevel aAcceptLevel, ConsoleLogStreamsInterface *apConsole, const ConsoleColors_t *apColors)
-    : mAcceptLevel(aAcceptLevel),
-      mpConsole(apConsole ? apConsole : new DefaultConsoleStream()),
+    : mpConsole(apConsole ? apConsole : new DefaultConsoleStream()),
 	  mpColors(apColors)
 {
+    mAcceptLevel = aAcceptLevel;
 }
 
 ConsoleLogWriter::~ConsoleLogWriter()
