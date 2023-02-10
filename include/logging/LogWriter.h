@@ -29,6 +29,7 @@ enum class LogLevel {
     Notice     = LOG_NOTICE, /**< Notice */
     Info       = LOG_INFO,   /**< Info */
     Debug      = LOG_DEBUG,  /**< Debug */
+    __END__
 };
 
 /**

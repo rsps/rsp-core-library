@@ -38,7 +38,7 @@ public:
  */
 class ConsoleLogWriter: public LogWriterInterface {
 public:
-	using ConsoleColors_t = std::array<const std::string, static_cast<int>(LogLevel::Debug)+1>;
+	using ConsoleColors_t = std::array<const std::string, std::size_t(LogLevel::__END__)>;
 
     ConsoleLogWriter(std::string aAcceptLevel, ConsoleLogStreamsInterface *apConsole = nullptr, const ConsoleColors_t *apColors = nullptr);
     ConsoleLogWriter(LogLevel aAcceptLevel, ConsoleLogStreamsInterface *apConsole = nullptr, const ConsoleColors_t *apColors = nullptr);
@@ -50,7 +50,6 @@ public:
     ConsoleLogWriter& operator= (const ConsoleLogWriter&) = delete;
 
 protected:
-    LogLevel mAcceptLevel;
     ConsoleLogStreamsInterface* mpConsole;
     const ConsoleColors_t *mpColors;
 };

@@ -21,29 +21,27 @@ class DefaultConsoleStream : public ConsoleLogStreamsInterface
 {
 public:
     void Error(const std::string &arMsg) override {
-        std::cerr << arMsg;
+        std::cerr << arMsg << std::flush;
     }
 
     void Info(const std::string &arMsg) override {
-        std::cout << arMsg;
+        std::cout << arMsg << std::flush;
     }
 };
 
 ConsoleLogWriter::ConsoleLogWriter(std::string aAcceptLevel, ConsoleLogStreamsInterface *apConsole, const ConsoleColors_t *apColors)
-    : mAcceptLevel(ToLogLevel(aAcceptLevel)),
-      mpConsole(apConsole),
-	  mpColors(apColors)
+    : ConsoleLogWriter(ToLogLevel(aAcceptLevel), apConsole, apColors)
 {
 }
 
 ConsoleLogWriter::ConsoleLogWriter(LogLevel aAcceptLevel, ConsoleLogStreamsInterface *apConsole, const ConsoleColors_t *apColors)
     : mAcceptLevel(aAcceptLevel),
-      mpConsole(apConsole),
+      mpConsole(apConsole ? apConsole : new DefaultConsoleStream()),
 	  mpColors(apColors)
 {
 }
 
-logging::ConsoleLogWriter::~ConsoleLogWriter()
+ConsoleLogWriter::~ConsoleLogWriter()
 {
     if (mpConsole) {
         delete mpConsole;
@@ -52,26 +50,23 @@ logging::ConsoleLogWriter::~ConsoleLogWriter()
 
 void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel)
 {
-    if (!mpConsole) {
-        mpConsole = new DefaultConsoleStream();
+    if (!arMsg.length() || (mAcceptLevel < aCurrentLevel)) {
+        return;
     }
 
-    if (aCurrentLevel <= mAcceptLevel) {
+    std::string s;
+    if (mpColors) {
+        s = (*mpColors)[std::size_t(aCurrentLevel)] + arMsg + std::string(AnsiEscapeCodes::ec::ConsoleDefault);
+    }
+    else {
+        s = arMsg;
+    }
 
-    	std::string s;
-    	if (mpColors) {
-    		s = (*mpColors)[static_cast<long unsigned int>(aCurrentLevel)] + arMsg + std::string(AnsiEscapeCodes::ec::ConsoleDefault);
-    	}
-    	else {
-    		s = arMsg;
-    	}
-
-        if (aCurrentLevel < LogLevel::Warning) {
-            mpConsole->Error(s);
-        }
-        else {
-            mpConsole->Info(s);
-        }
+    if (aCurrentLevel < LogLevel::Warning) {
+        mpConsole->Error(s); // Write to std::cerr
+    }
+    else {
+        mpConsole->Info(s);
     }
 }
 
