@@ -50,7 +50,7 @@ class Canvas
      * \param aSweepAngle
      * \param aColor
      */
-    void DrawArc(const Point &arCenter, GuiUnit_t aRadius1, GuiUnit_t aRadius2, int aStartAngel, int aSweepAngle, const Color &arColor);
+    virtual void DrawArc(const Point &arCenter, GuiUnit_t aRadius1, GuiUnit_t aRadius2, int aStartAngel, int aSweepAngle, const Color &arColor);
     /**
      * \brief Draw a full circle
      *
@@ -58,7 +58,7 @@ class Canvas
      * \param aRadius
      * \param aColor
      */
-    void DrawCircle(const Point &arCenter, GuiUnit_t aRadius, const Color &arColor);
+    virtual void DrawCircle(const Point &arCenter, GuiUnit_t aRadius, const Color &arColor);
 
     /**
      * \brief Draw a straight line from A to B.
@@ -67,7 +67,7 @@ class Canvas
      * \param aB
      * \param aColor
      */
-    void DrawLine(const Point &arA, const Point &arB, const Color &arColor);
+    virtual void DrawLine(const Point &arA, const Point &arB, const Color &arColor);
 
     /**
      * \brief Draw a rectangle
@@ -79,7 +79,7 @@ class Canvas
      * \param aColor
      * \param aFilled
      */
-    void DrawRectangle(const Rect &arRect, const Color &arColor, bool aFilled = false);
+    virtual void DrawRectangle(const Rect &arRect, const Color &arColor, bool aFilled = false);
 
     /**
      * \brief Copies the bitmap content into the canvas.
@@ -88,7 +88,7 @@ class Canvas
      * \param arBitmap The source bitmap to copy from
      * \param aColor Foreground color used if the bitmap is monochrome or alpha.
      */
-    void DrawImage(const Point &arLeftTop, const Bitmap &arBitmap, Color aColor = Color::White);
+    virtual void DrawImage(const Point &arLeftTop, const Bitmap &arBitmap, Color aColor = Color::White);
 
     /**
      * \brief Copies the section part of the bitmap content into the canvas.
@@ -98,7 +98,7 @@ class Canvas
      * \param arSection Rectangular section of the source bitmap
      * \param aColor Foreground color used if the bitmap is monochrome or alpha.
      */
-    void DrawImageSection(const Point &arLeftTop, const Bitmap &arBitmap, const Rect &arSection, Color aColor = Color::White);
+    virtual void DrawImageSection(const Point &arLeftTop, const Bitmap &arBitmap, const Rect &arSection, Color aColor = Color::White);
 
     /**
      * \brief Copies part of a pixel data buffer into this canvas.
@@ -107,7 +107,7 @@ class Canvas
      * \param arSection
      * \param aColor
      */
-    void DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData, const Rect &arSection, Color aColor);
+    virtual void DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData, const Rect &arSection, Color aColor);
 
     /**
      * \brief Draws the given Text object in the given color on the canvas.
@@ -115,7 +115,7 @@ class Canvas
      * \param aRect
      * \param arColor
      */
-    void DrawText(const Text &arText, Color aColor, Color aBackColor = Color::None);
+    virtual void DrawText(const Text &arText, Color aColor, Color aBackColor = Color::None);
 
     /**
      * \brief Draws the given Text object in the color of the objects own font.

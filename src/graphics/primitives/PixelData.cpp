@@ -169,15 +169,11 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
             else {
                 pdata[offset] &= ~(1 << (aX % 8));
             }
-            offset = (((mWidth + 7) >> 3) * aY) + (aX >> 3);
-//            result.SetAlpha( ((pdata[offset] & (1 << (aX % 8))) > 0) ? 255 : 0);
             break;
 
         case ColorDepth::Alpha:
             offset = (aY * mWidth) + aX;
             pdata[offset] = aColor.GetAlpha();
-            offset = (aY * mWidth) + aX;
-//            result.SetAlpha(pdata[offset]);
             break;
 
         case ColorDepth::RGB:
@@ -185,9 +181,6 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
             pdata[offset + 0] = aColor.GetRed();
             pdata[offset + 1] = aColor.GetGreen();
             pdata[offset + 2] = aColor.GetBlue();
-//            result.SetRed(pdata[offset + 0]);
-//            result.SetGreen(pdata[offset + 1]);
-//            result.SetBlue(pdata[offset + 2]);
             break;
 
         case ColorDepth::RGBA:
@@ -196,10 +189,6 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
             pdata[offset + 1] = aColor.GetGreen();
             pdata[offset + 2] = aColor.GetBlue();
             pdata[offset + 3] = aColor.GetAlpha();
-//            result.SetRed(pdata[offset + 0]);
-//            result.SetGreen(pdata[offset + 1]);
-//            result.SetBlue(pdata[offset + 2]);
-//            result.SetAlpha(pdata[offset + 3]);
             break;
 
         default:
