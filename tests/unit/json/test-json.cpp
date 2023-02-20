@@ -307,5 +307,21 @@ null }
         CHECK(o["Member2"].MemberExists("NestedMember"));
         CHECK_EQ(o["Member2"]["NestedMember"].AsString(), "NestedValue");
     }
+
+    SUBCASE("Optionals") {
+        auto o = Json::Decode(json_object);
+
+        int int_value;
+        CHECK(o.TryAssign(int_value, "IntValue"));
+        CHECK_FALSE(o.TryAssign(int_value, "NonExisting"));
+        CHECK_EQ(int_value, 42);
+
+        double dbl_value = o.TryGet("FloatValue", 0.54321);
+        CHECK_EQ(dbl_value, 1.234567);
+
+        JsonValue js_value = o.TryGet("NonExisting", JsonValue().Add(1).Add(2));
+        CHECK(js_value.IsArray());
+        CHECK_EQ(js_value[1].AsInt(), 2);
+    }
 }
 

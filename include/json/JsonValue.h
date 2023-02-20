@@ -90,6 +90,41 @@ public:
 //#pragma GCC diagnostic pop
 
     /**
+     * \brief Try to assign member value to lvalue.
+     * \tparam T
+     * \tparam I
+     * \param arLValue
+     * \param arIndex
+     * \return True if successful
+     */
+    template<class T, class I>
+    bool TryAssign(T& arLValue, const I& arIndex) try
+    {
+        arLValue = (*this)[arIndex];
+        return true;
+    }
+    catch(...) {
+        return false;
+    }
+
+    /**
+     * \brief Try to get member value else return default.
+     * \tparam T
+     * \tparam I
+     * \param arIndex
+     * \param arDefault
+     * \return Value or default
+     */
+    template<class T, class I>
+    T TryGet(I &arIndex, const T& arDefault) try
+    {
+        return (*this)[arIndex];
+    }
+    catch(...) {
+        return arDefault;
+    }
+
+    /**
      * \brief Check if value content is an array
      * \return True if content is an array
      */

@@ -16,6 +16,8 @@
 
 namespace rsp::json {
 
+#define OPTIONAL(a) try { a; } catch(...) {}
+
 /**
  * \class Jsonable
  * \brief Interface with helpers for building json formatted stringstream
