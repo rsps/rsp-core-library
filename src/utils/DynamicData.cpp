@@ -15,7 +15,7 @@ namespace rsp::utils {
 
 std::ostream& operator<< (std::ostream& os, const DynamicData& arValue)
 {
-    os << *static_cast<Variant*>(&arValue);
+    os << *static_cast<const Variant*>(&arValue);
     return os;
 }
 
@@ -84,14 +84,14 @@ DynamicData& DynamicData::operator [](size_type aIndex)
 {
     DDLOG("DynamicData - Access item " << aIndex);
     forceArray();
-    return mItems.at(static_cast<std::vector::size_type>(aIndex));
+    return mItems.at(aIndex);
 }
 
 const DynamicData& DynamicData::operator [](size_type aIndex) const
 {
     DDLOG("DynamicData - Getting item " << aIndex);
     tryArray();
-    return mItems.at(static_cast<std::vector::size_type>(aIndex));
+    return mItems.at(aIndex);
 }
 
 DynamicData::size_type DynamicData::GetCount() const
@@ -237,7 +237,7 @@ void DynamicData::tryObject() const
     }
 }
 
-void DynamicData::forceObject()
+void DynamicData::forceArray()
 {
     if (mType == Types::Null) {
         mType = Types::Array;
@@ -246,7 +246,7 @@ void DynamicData::forceObject()
     tryArray();
 }
 
-void DynamicData::forceArray()
+void DynamicData::forceObject()
 {
     if (mType == Types::Null) {
         mType = Types::Object;

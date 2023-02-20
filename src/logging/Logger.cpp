@@ -49,35 +49,55 @@ bool LoggerInterface::HasWriters() const
     return !mWriters.empty();
 }
 
-void LoggerInterface::write(const LogStreamInterface *apStream, const std::string &arMsg)
+void LoggerInterface::write(const LogStreamInterface *apStream, const std::string &arMsg, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
 {
     LogLevel current_level = apStream->GetLevel();
     std::lock_guard<std::recursive_mutex> lock(mMutex);
 
     for (std::shared_ptr<LogWriterInterface> &w : mWriters) {
-        w->Write(arMsg, current_level);
+        w->Write(arMsg, current_level, arChannel, arContext);
     }
 }
 
 
-LogStreamInterface::LogStreamInterface(LoggerInterface *apOwner, LogLevel aLevel)
+LogStreamInterface::LogStreamInterface(LoggerInterface *apOwner, LogLevel aLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
     : mpOwner(apOwner),
-      mLevel(aLevel)
+      mLevel(aLevel),
+      mChannel(arChannel),
+      mContext(arContext)
+{
+}
+
+LogStreamInterface::LogStreamInterface(const LogStreamInterface &arFrom)
+    : mpOwner(arFrom.mpOwner),
+      mLevel(arFrom.mLevel),
+      mChannel(arFrom.mChannel),
+      mContext(arFrom.mContext)
+{
+}
+
+LogStreamInterface::LogStreamInterface(LogStreamInterface &&arFrom)
+    : mpOwner(std::move(arFrom.mpOwner)),
+      mLevel(std::move(arFrom.mLevel)),
+      mChannel(std::move(arFrom.mChannel)),
+      mContext(std::move(arFrom.mContext))
 {
 }
 
 LogStreamInterface& LogStreamInterface::operator=(const LogStreamInterface &&arOther)
 {
     if (&arOther != this) {
-        mpOwner = arOther.mpOwner;
-        mLevel = arOther.mLevel;
+        mpOwner = std::move(arOther.mpOwner);
+        mLevel = std::move(arOther.mLevel);
+        mChannel = std::move(arOther.mChannel);
+        mContext = std::move(arOther.mContext);
     }
     return *this;
 }
 
 void LogStreamInterface::ownerWrite(const std::string &arMsg)
 {
-    mpOwner->write(this, arMsg);
+    mpOwner->write(this, arMsg, mChannel, mContext);
 }
 
 LoggerInterface& LoggerInterface::GetDefault()
@@ -94,15 +114,15 @@ void LoggerInterface::SetDefault(LoggerInterface* apLogger)
     mpDefaultInstance = std::shared_ptr<LoggerInterface>(apLogger, [](LoggerInterface*){});
 }
 
-LogStream::LogStream(LoggerInterface *apOwner, LogLevel aLevel)
-    : LogStreamInterface(apOwner, aLevel)
+LogStream::LogStream(LoggerInterface *apOwner, LogLevel aLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
+    : LogStreamInterface(apOwner, aLevel, arChannel, arContext)
 {
 }
 
 LogStream::LogStream(LogStream &&arFrom)
-    : LogStreamInterface(arFrom.mpOwner, arFrom.mLevel)
+    : LogStreamInterface(arFrom),
+      mBuffer(std::move(arFrom.mBuffer))
 {
-    mBuffer = std::move(arFrom.mBuffer);
 }
 
 LogStream& LogStream::operator=(LogStream &&arOther)
@@ -131,7 +151,7 @@ void LogStream::Flush()
 
 OutStreamBuf::OutStreamBuf(LoggerInterface *apOwner, LogLevel aLevel)
     : std::streambuf(),
-      LogStreamInterface(apOwner, aLevel)
+      LogStreamInterface(apOwner, aLevel, std::string(), rsp::utils::DynamicData())
 {
 }
 
@@ -157,6 +177,9 @@ int OutStreamBuf::sync()
     auto l = mBuffer.length();
     if (l > 0) {
         DEBUG("Message: (" << l << ") " << mBuffer);
+        if (mBuffer[l-1] == '\n') {
+            mBuffer.pop_back();
+        }
         ownerWrite(mBuffer);
         mBuffer = ""; //.erase();
     }
@@ -192,42 +215,42 @@ Logger::~Logger()
 
 LogStream Logger::Emergency()
 {
-    return LogStream(this, LogLevel::Emergency);
+    return LogStream(this, LogLevel::Emergency, mChannel, mContext);
 }
 
 LogStream Logger::Alert()
 {
-    return LogStream(this, LogLevel::Alert);
+    return LogStream(this, LogLevel::Alert, mChannel, mContext);
 }
 
 LogStream Logger::Critical()
 {
-    return LogStream(this, LogLevel::Critical);
+    return LogStream(this, LogLevel::Critical, mChannel, mContext);
 }
 
 LogStream Logger::Error()
 {
-    return LogStream(this, LogLevel::Error);
+    return LogStream(this, LogLevel::Error, mChannel, mContext);
 }
 
 LogStream Logger::Warning()
 {
-    return LogStream(this, LogLevel::Warning);
+    return LogStream(this, LogLevel::Warning, mChannel, mContext);
 }
 
 LogStream Logger::Notice()
 {
-    return LogStream(this, LogLevel::Notice);
+    return LogStream(this, LogLevel::Notice, mChannel, mContext);
 }
 
 LogStream Logger::Info()
 {
-    return LogStream(this, LogLevel::Info);
+    return LogStream(this, LogLevel::Info, mChannel, mContext);
 }
 
 LogStream Logger::Debug()
 {
-    return LogStream(this, LogLevel::Debug);
+    return LogStream(this, LogLevel::Debug, mChannel, mContext);
 }
 
 } /* namespace rsp */

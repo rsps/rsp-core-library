@@ -13,6 +13,7 @@
 
 #include <syslog.h>
 #include <string>
+#include <utils/DynamicData.h>
 
 namespace rsp::logging {
 
@@ -87,7 +88,7 @@ public:
      * \param arMsg
      * \param aCurrentLevel
      */
-    virtual void Write(const std::string &arMsg, LogLevel aCurrentLevel) = 0;
+    virtual void Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) = 0;
 
     /**
      * Set the log acceptance level of this writer.

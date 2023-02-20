@@ -18,6 +18,7 @@
 #include <sstream>
 #include <mutex>
 #include <iostream>
+#include <utils/DynamicData.h>
 #include "LogWriter.h"
 
 namespace rsp::logging {
@@ -81,13 +82,19 @@ public:
 
     void RemoveLogWriter(Handle_t aHandle);
 
+    LoggerInterface& SetChannel(const std::string &arChannel) { mChannel = arChannel; return *this; }
+    LoggerInterface& SetContext(rsp::utils::DynamicData &arContext) { mContext = arContext; return *this; }
+
 protected:
     static std::shared_ptr<LoggerInterface> mpDefaultInstance;
     std::recursive_mutex mMutex{};
     std::vector<std::shared_ptr<LogWriterInterface>> mWriters{};
+    std::string mChannel{};
+    rsp::utils::DynamicData mContext{};
 
     friend class LogStreamInterface;
-    virtual void write(const LogStreamInterface *apStream, const std::string &arMsg);
+    virtual void write(const LogStreamInterface *apStream, const std::string &arMsg,
+                       const std::string &arChannel, const rsp::utils::DynamicData &arContext);
 };
 
 /**
@@ -102,19 +109,25 @@ protected:
 class LogStreamInterface
 {
 public:
-    LogStreamInterface(LoggerInterface *apOwner, LogLevel aLevel);
-    LogStreamInterface(const LogStreamInterface & aFrom)
-        : mpOwner(aFrom.mpOwner), mLevel(aFrom.mLevel) {}
+    LogStreamInterface(LoggerInterface *apOwner, LogLevel aLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext);
+    LogStreamInterface(const LogStreamInterface &arFrom);
+    LogStreamInterface(LogStreamInterface &&arFrom);
+
     virtual ~LogStreamInterface() {}
 
     LogLevel GetLevel() const { return mLevel; }
     void SetLevel(LogLevel aLevel) { mLevel = aLevel; }
+
+    LogStreamInterface& SetChannel(const std::string &arChannel) { mChannel = arChannel; return *this; }
+    LogStreamInterface& SetContext(rsp::utils::DynamicData& arContext) { mContext = arContext; return *this; }
 
     LogStreamInterface& operator= (const LogStreamInterface&) = delete;
     LogStreamInterface& operator= (const LogStreamInterface&&);
 protected:
     LoggerInterface *mpOwner;
     LogLevel mLevel;
+    std::string mChannel{};
+    rsp::utils::DynamicData mContext{};
 
     void ownerWrite(const std::string &arMsg);
 };
@@ -127,14 +140,15 @@ protected:
 class LogStream : public LogStreamInterface
 {
 public:
-    LogStream(LoggerInterface *apOwner, LogLevel aLevel);
+    LogStream(LoggerInterface *apOwner, LogLevel aLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext);
     LogStream(const LogStream &aFrom) = delete; /* No copy, move is OK */
     LogStream(LogStream &&aFrom);
     ~LogStream();
 
     LogStream& operator=(LogStream &&arOther);
 
-    template< class type> LogStream& operator<<(const type &arValue) {
+    template< class type>
+    LogStream& operator<<(const type &arValue) {
         mBuffer << arValue;
         return *this;
     }

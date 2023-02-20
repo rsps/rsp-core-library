@@ -29,7 +29,7 @@ using namespace rsp::logging;
 const char *cFileName = "__logger-test.log";
 
 struct MyType {
-    int Value = 42;
+    int Value = 666;
 };
 
 std::ostream& operator<< (std::ostream& os, const MyType &arType);
@@ -79,32 +79,35 @@ TEST_CASE("Logging") {
     CHECK_THROWS_AS(logging::LoggerInterface::GetDefault(), const utils::NotSetException &);
     logging::LoggerInterface::SetDefault(&log);
 
+    log.SetChannel("Test Channel");
+    log.SetContext(DynamicData().Add("Test Context").Add(42));
+
     log.AddLogWriter(std::make_shared<logging::FileLogWriter>(cFileName, logging::LogLevel::Info));
     log.AddLogWriter(std::make_shared<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors));
 
-    log.Info() << "Test of logger" << std::endl;
+    log.Info() << "Test of logger";
     std::this_thread::sleep_for(std::chrono::milliseconds(7));
-    log.Alert() << "Alert" << std::endl;
+    log.Alert() << "Alert";
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
-    log.Error() << "Error" << std::endl;
+    log.Error() << "Error";
     std::this_thread::sleep_for(std::chrono::milliseconds(3));
-    log.Warning() << "Warning" << std::endl;
+    log.Warning() << "Warning";
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
-    log.Info() << "Info" << std::endl;
+    log.Info() << "Info";
     std::this_thread::sleep_for(std::chrono::milliseconds(4));
-    log.Debug() << "Debug" << std::endl;
+    log.Debug() << "Debug";
 
     MyType type;
-    log.Info() << type << std::endl;
+    log.Info() << type;
 
     std::clog << LogLevel::Critical << "Critical to std::clog" << std::endl;
 
-    log.Emergency() << "Sleeping for 1 second" << std::flush;
+    log.Emergency() << "Sleeping for 1 second";
     auto end = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 
     std::thread t([&]() {
         for (int i=0; i < 12 ; i++) {
-            std::clog << LogLevel::Info << "Writing from tread " << i << std::endl;
+            std::clog << LogLevel::Info << "Writing from thread " << i << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(90));
         }
     });
@@ -127,44 +130,44 @@ TEST_CASE("Logging") {
     std::string line;
 
     std::getline(fin, line);
-    CHECK(StrUtils::EndsWith(line, "Test of logger") == true);
+
+    CHECK(StrUtils::Contains(line, "Test of logger") == true);
 
     CHECK(mConsoleErrorBuffer.size() == 3);
     CHECK(mConsoleInfoBuffer.size() == 0);
 
     std::getline(fin, line);
-    CHECK(StrUtils::EndsWith(line, "Alert") == true);
-    CHECK(StrUtils::StartsWith(mConsoleErrorBuffer[0], std::string(AnsiEscapeCodes::ec::fg::Red) + "Alert") == true);
+    CHECK(StrUtils::EndsWith(line, "] <Test Channel> (alert) Alert  [\"Test Context\",42]"));
 
     std::getline(fin, line);
-    CHECK(StrUtils::EndsWith(line, "Error") == true);
+    CHECK(StrUtils::Contains(line, "Error") == true);
 
     std::getline(fin, line);
-    CHECK(StrUtils::EndsWith(line, "Warning") == true);
+    CHECK(StrUtils::Contains(line, "Warning") == true);
 
     std::getline(fin, line);
-    CHECK(StrUtils::EndsWith(line, "Info") == true);
+    CHECK(StrUtils::Contains(line, "Info") == true);
 
     std::getline(fin, line);
-    CHECK(StrUtils::EndsWith(line, "Debug") == false);
+    CHECK(StrUtils::Contains(line, "Debug") == false);
 
-    CHECK(StrUtils::EndsWith(line, "42") == true);
+    CHECK(StrUtils::Contains(line, "666") == true);
 
     std::getline(fin, line);
     CHECK_MESSAGE(StrUtils::EndsWith(line, "(critical) Critical to std::clog") == true, line);
-    CHECK(StrUtils::StartsWith(mConsoleErrorBuffer[1], std::string(AnsiEscapeCodes::ec::fg::Red) + "Critical to std::clog") == true);
+    CHECK(StrUtils::Contains(mConsoleErrorBuffer[1], std::string(AnsiEscapeCodes::ec::fg::Red) + "Critical to std::clog") == true);
 
     std::getline(fin, line);
     CHECK(StrUtils::Contains(line, "(emergency) Sleeping for 1 second") == true);
-    CHECK(StrUtils::StartsWith(mConsoleErrorBuffer[2], std::string(AnsiEscapeCodes::ec::fg::Red) + "Sleeping for 1 second") == true);
+    CHECK(StrUtils::StartsWith(mConsoleErrorBuffer[2], std::string(AnsiEscapeCodes::ec::fg::Red) + "<Test Channel> Sleeping for 1 second") == true);
 
-    for (int i = 0 ; i < 21 ; i++) {
+    for (int i = 0 ; i < 22 ; i++) {
         std::getline(fin, line);
         CHECK(StrUtils::Contains(line, "] (info) Writing from ") == true);
     }
 
     std::getline(fin, line);
-    CHECK(StrUtils::EndsWith(line, "(info) Wakeup...") == true);
+    CHECK(StrUtils::Contains(line, "(info) Wakeup...") == true);
 
     std::getline(fin, line);
     CHECK(fin.eof() == true);

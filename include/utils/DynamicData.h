@@ -33,6 +33,7 @@ public:
     explicit EDynamicTypeError(const std::string &aMsg) : EDynamicDataException("Json Type Error: " + aMsg) {}
 };
 
+
 class DynamicData: public Variant
 {
 public:
@@ -210,6 +211,10 @@ public:
     {
         return !((*this) == arOther);
     }
+
+    const std::string GetName() const { return mName; }
+    const std::vector<DynamicData>& GetItems() const { return mItems; }
+
 protected:
     std::string mName{}; // Name if this value is an object member
     std::vector<DynamicData> mItems{}; // Owned list, used if this is of type object or array.

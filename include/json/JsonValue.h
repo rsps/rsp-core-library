@@ -259,8 +259,6 @@ protected:
     void arrayToStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) const;
     void objectToStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) const;
     void toStringStream(std::stringstream &arResult, PrintFormat &arPf, unsigned int aLevel, bool aForceToUCS2) const;
-
-    static bool mEncodeToUCS2;
 };
 
 std::ostream& operator<< (std::ostream& os, const JsonValue &arValue);
