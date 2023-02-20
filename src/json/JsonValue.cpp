@@ -170,7 +170,7 @@ std::size_t JsonValue::GetCount() const
             if ((mPointer == static_cast<uintptr_t>(JsonTypes::Object)) || (mPointer == static_cast<uintptr_t>(JsonTypes::Array))) {
                 return mItems.size();
             }
-            THROW_WITH_BACKTRACE1(EJsonTypeError, "Variant of type " + typeToText() + " must be of JsonType Object or Array");
+            THROW_WITH_BACKTRACE1(EJsonTypeError, "Variant of type " + TypeToText() + " must be of JsonType Object or Array");
             break;
     }
 }
@@ -336,7 +336,7 @@ JsonTypes JsonValue::GetJsonType() const
         case Types::String:
             return JsonTypes::String;
         default:
-            THROW_WITH_BACKTRACE1(EJsonTypeError, "Variant of type " + typeToText() + " is not a valid JSON type");
+            THROW_WITH_BACKTRACE1(EJsonTypeError, "Variant of type " + TypeToText() + " is not a valid JSON type");
     }
     return JsonTypes::Null; // We should never get here...
 }
