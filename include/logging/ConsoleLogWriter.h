@@ -11,8 +11,8 @@
 #ifndef SRC_LOGGING_CONSOLELOGWRITER_H_
 #define SRC_LOGGING_CONSOLELOGWRITER_H_
 
+#include <logging/LogWriterInterface.h>
 #include <array>
-#include "LogWriter.h"
 
 namespace rsp::logging {
 

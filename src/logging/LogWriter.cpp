@@ -8,38 +8,11 @@
  * \author      Steffen Brummer
  */
 
+#include <logging/LogWriterInterface.h>
 #include <map>
 #include <iostream>
-#include <logging/LogWriter.h>
 
 namespace rsp::logging {
-
-static const std::map<LogLevel, std::string> cLevelToText = {
-    { LogLevel::Emergency, "emergency" },
-    { LogLevel::Alert, "alert" },
-    { LogLevel::Critical, "critical" },
-    { LogLevel::Error, "error" },
-    { LogLevel::Warning, "warning" },
-    { LogLevel::Notice, "notice" },
-    { LogLevel::Info, "info" },
-    { LogLevel::Debug, "debug" }
-};
-
-LogLevel ToLogLevel(std::string aLevelString)
-{
-    for (auto m : cLevelToText) {
-        if (m.second == aLevelString) {
-            return m.first;
-        }
-    }
-
-    return cDefautLogLevel;
-}
-
-std::string ToString(LogLevel aLevel)
-{
-    return cLevelToText.at(aLevel);
-}
 
 } /* namespace logging */
 

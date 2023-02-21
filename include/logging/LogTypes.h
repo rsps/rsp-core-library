@@ -3,17 +3,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \copyright   Copyright 2023 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_LOGGING_LOGWRITER_H_
-#define SRC_LOGGING_LOGWRITER_H_
+#ifndef INCLUDE_LOGGING_LOGTYPES_H_
+#define INCLUDE_LOGGING_LOGTYPES_H_
 
-#include <syslog.h>
 #include <string>
-#include <utils/DynamicData.h>
+#include <syslog.h>
 
 namespace rsp::logging {
 
@@ -32,6 +31,8 @@ enum class LogLevel {
     Debug      = LOG_DEBUG,  /**< Debug */
     __END__
 };
+
+constexpr LogLevel cDefautLogLevel = LogLevel::Info;
 
 /**
  * The syslog program types.
@@ -56,8 +57,6 @@ enum class LogType
     Uucp   = LOG_UUCP,  /**< Uucp */
 };
 
-constexpr LogLevel cDefautLogLevel = LogLevel::Info;
-
 /**
  * C++ string to LogLevel operator
  *
@@ -75,32 +74,19 @@ logging::LogLevel ToLogLevel(std::string aLevelString);
 std::string ToString(LogLevel aLevel);
 
 /**
- * \class LogWriterInterface
- * \brief Interface definition for a log writer
+ * \fn std::ostream operator <<&(std::ostream, const LogLevel)
+ * \brief Output stream operator for LogLevel
+ *
+ * \param o ostream to write to
+ * \param aLevel
+ * \return ostream
  */
-class LogWriterInterface {
-public:
-    virtual ~LogWriterInterface() {}
+std::ostream& operator<<(std::ostream &o, LogLevel aLevel);
 
-    /**
-     * Write a string to the destination in a thread safe manner.
-     *
-     * \param arMsg
-     * \param aCurrentLevel
-     */
-    virtual void Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) = 0;
 
-    /**
-     * Set the log acceptance level of this writer.
-     *
-     * \param aLevel
-     */
-    void SetAcceptLogLevel(LogLevel aLevel) { mAcceptLevel = aLevel; }
+} /* namespace rsp::logging */
 
-protected:
-    LogLevel mAcceptLevel = LogLevel::Info;
-};
 
-} /* namespace logging */
 
-#endif /* SRC_LOGGING_LOGWRITER_H_ */
+
+#endif /* INCLUDE_LOGGING_LOGTYPES_H_ */

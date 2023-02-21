@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \copyright   Copyright 2023 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
@@ -77,47 +77,48 @@ TEST_CASE("Logging") {
     logging::Logger log(true);
 
     CHECK_THROWS_AS(logging::LoggerInterface::GetDefault(), const utils::NotSetException &);
-    logging::LoggerInterface::SetDefault(&log);
+    CHECK_NOTHROW(logging::LoggerInterface::SetDefault(&log));
 
-    log.SetChannel("Test Channel");
-    log.SetContext(DynamicData().Add("Test Context").Add(42));
+    CHECK_NOTHROW(log.SetChannel("Test Channel"));
+    CHECK_NOTHROW(log.SetContext(DynamicData().Add("Test Context").Add(42)));
 
-    log.AddLogWriter(std::make_shared<logging::FileLogWriter>(cFileName, logging::LogLevel::Info));
-    log.AddLogWriter(std::make_shared<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors));
+    CHECK_NOTHROW(log.AddLogWriter(std::make_shared<logging::FileLogWriter>(cFileName, logging::LogLevel::Info)));
+    CHECK_NOTHROW(log.AddLogWriter(std::make_shared<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors)));
 
-    log.Info() << "Test of logger";
-    std::this_thread::sleep_for(std::chrono::milliseconds(7));
-    log.Alert() << "Alert";
-    std::this_thread::sleep_for(std::chrono::milliseconds(2));
-    log.Error() << "Error";
-    std::this_thread::sleep_for(std::chrono::milliseconds(3));
-    log.Warning() << "Warning";
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-    log.Info() << "Info";
-    std::this_thread::sleep_for(std::chrono::milliseconds(4));
-    log.Debug() << "Debug";
+    CHECK_NOTHROW(log.Info() << "Test of logger");
+    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(7)));
+    CHECK_NOTHROW(log.Alert() << "Alert");
+    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(2)));
+    CHECK_NOTHROW(log.Error() << "Error");
+    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(3)));
+    CHECK_NOTHROW(log.Warning() << "Warning");
+    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(5)));
+    CHECK_NOTHROW(log.Info() << "Info");
+    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(4)));
+    CHECK_NOTHROW(log.Debug() << "Debug");
+    CHECK_NOTHROW(log.Debug() << LogLevel::Info << "Dbg-Info");
 
     MyType type;
-    log.Info() << type;
+    CHECK_NOTHROW(log.Info() << type);
 
-    std::clog << LogLevel::Critical << "Critical to std::clog" << std::endl;
+    CHECK_NOTHROW(std::clog << LogLevel::Critical << "Critical to std::clog" << std::endl);
 
-    log.Emergency() << "Sleeping for 1 second";
+    CHECK_NOTHROW(log.Emergency() << "Sleeping for 1 second");
     auto end = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 
     std::thread t([&]() {
         for (int i=0; i < 12 ; i++) {
-            std::clog << LogLevel::Info << "Writing from thread " << i << std::endl;
+            CHECK_NOTHROW(std::clog << LogLevel::Info << "Writing from thread " << i << std::endl);
             std::this_thread::sleep_for(std::chrono::milliseconds(90));
         }
     });
 
     do {
-        std::clog << LogLevel::Info << "Writing from main" << std::endl;
+        CHECK_NOTHROW(std::clog << LogLevel::Info << "Writing from main" << std::endl);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     while (std::chrono::high_resolution_clock::now() < end);
-    std::clog << "Wakeup..." << std::endl;
+    CHECK_NOTHROW(std::clog << "Wakeup..." << std::endl);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     t.join();
@@ -130,7 +131,6 @@ TEST_CASE("Logging") {
     std::string line;
 
     std::getline(fin, line);
-
     CHECK(StrUtils::Contains(line, "Test of logger") == true);
 
     CHECK(mConsoleErrorBuffer.size() == 3);
@@ -150,7 +150,9 @@ TEST_CASE("Logging") {
 
     std::getline(fin, line);
     CHECK(StrUtils::Contains(line, "Debug") == false);
+    CHECK(StrUtils::Contains(line, "Dbg-Info") == true);
 
+    std::getline(fin, line);
     CHECK(StrUtils::Contains(line, "666") == true);
 
     std::getline(fin, line);

@@ -11,9 +11,9 @@
 #ifndef SRC_LOGGING_FILELOGWRITER_H_
 #define SRC_LOGGING_FILELOGWRITER_H_
 
+#include <logging/LogWriterInterface.h>
 #include <fstream>
 #include <mutex>
-#include "LogWriter.h"
 
 namespace rsp::logging {
 
