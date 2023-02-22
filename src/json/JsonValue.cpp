@@ -13,6 +13,7 @@
 #include <json/JsonValue.h>
 #include <iomanip>
 #include <logging/Logger.h>
+#include <utils/EnumUtils.h>
 #include <utils/StrUtils.h>
 
 using namespace rsp::logging;
@@ -299,15 +300,18 @@ void JsonValue::toStringStream(std::stringstream &arResult, PrintFormat &arPf, u
 
 std::string JsonValue::GetJsonTypeAsString(JsonTypes aType)
 {
-    switch (aType) {
-        case JsonTypes::Array: return "Array";
-        case JsonTypes::Bool: return "Bool";
-        default:
-        case JsonTypes::Null: return "Null";
-        case JsonTypes::Number: return "Number";
-        case JsonTypes::Object: return "Object";
-        case JsonTypes::String: return "String";
-    }
+    const char *names[] = {
+        "Null",
+        "Bool",
+        "Number",
+        "String",
+        "Object",
+        "Array"
+    };
+
+    rsp::utils::assert_enum_list<sizeof(names), JsonTypes>();
+
+    return names[static_cast<int>(aType)];
 }
 
 JsonTypes JsonValue::GetJsonType() const

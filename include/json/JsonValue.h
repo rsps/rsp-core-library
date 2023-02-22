@@ -18,7 +18,7 @@ namespace rsp::json {
 
 class JsonDecoder;
 
-enum class JsonTypes : unsigned int { Null, Bool, Number, String, Object, Array };
+enum class JsonTypes : unsigned int { Null, Bool, Number, String, Object, Array, __END__ };
 
 std::ostream& operator<<(std::ostream& os, JsonTypes aType);
 

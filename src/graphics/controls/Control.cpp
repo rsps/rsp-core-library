@@ -10,6 +10,7 @@
 
 #include <graphics/controls/Control.h>
 #include <logging/Logger.h>
+#include <utils/EnumUtils.h>
 
 using namespace rsp::logging;
 
@@ -21,6 +22,7 @@ Color Control::mTouchAreaColor = false;
 std::string to_string(Control::States aState)
 {
     const char *names[] = {
+        "NOT SET",
         "Disabled",
         "Normal",
         "Pressed",
@@ -28,6 +30,9 @@ std::string to_string(Control::States aState)
         "Checked",
         "CheckedPressed"
     };
+
+    rsp::utils::assert_enum_list<sizeof(names), Control::States>();
+
     return names[static_cast<int>(aState)];
 }
 
