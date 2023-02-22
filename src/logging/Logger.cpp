@@ -16,22 +16,33 @@
 #include <thread>
 #include <utils/CoreException.h>
 
-//#define DEBUG(a) DLOG(a)
-#define DEBUG(a)
-
 namespace rsp::logging {
 
 Logger::Logger(bool aCaptureClog)
-    : mpClogBackup((!aCaptureClog ? nullptr : std::clog.rdbuf(new OutStreamBuffer(this, cDefautLogLevel))), [](std::streambuf*){})
+    : mpClogBackup(makeCLogStream(aCaptureClog))
 {
 }
 
 Logger::~Logger()
 {
     if (mpClogBackup) {
-        std::clog.rdbuf(mpClogBackup.get()); // Restore backup before delete, to avoid segfault.
+        OutStreamBuffer *buf = dynamic_cast<OutStreamBuffer*>(std::clog.rdbuf(mpClogBackup.get())); // Restore backup before delete, to avoid segfault.
         mpClogBackup.reset();
+        if (buf) {
+            // If the old stream_buf was our OutStreamBuffer, then delete it. It could be set elsewhere.
+            delete buf;
+        }
     }
+}
+
+std::shared_ptr<std::streambuf> Logger::makeCLogStream(bool aCaptureLog)
+{
+    std::streambuf *old = nullptr;
+    if (aCaptureLog) {
+        old = std::clog.rdbuf(new OutStreamBuffer(this, cDefautLogLevel));
+    }
+    // Create shared_ptr with "do nothing" deallocator
+    return std::shared_ptr<std::streambuf>(old, [](std::streambuf*){});
 }
 
 LogStream Logger::Emergency()

@@ -8,17 +8,15 @@
  * \author      Steffen Brummer
  */
 
+#include <thread>
 #include <logging/OutStreamBuffer.h>
 #include <logging/Logger.h>
 
-//#define DEBUG(a) DLOG(a)
-#define DEBUG(a)
-
 namespace rsp::logging {
 
-OutStreamBuffer::OutStreamBuffer(LoggerInterface *apOwner, LogLevel aLevel)
+OutStreamBuffer::OutStreamBuffer(LoggerInterface *apLogger, LogLevel aLevel)
     : std::streambuf(),
-      LogStream(apOwner, aLevel, std::string(), rsp::utils::DynamicData())
+      LogStream(apLogger, aLevel, std::string(), rsp::utils::DynamicData())
 {
 }
 
@@ -38,19 +36,21 @@ int OutStreamBuffer::overflow(int c)
 int OutStreamBuffer::sync()
 {
     if (mMutex.try_lock()) {
-        DEBUG("OutStreamBuffer mutex was not locked!!! " << std::this_thread::get_id());
+        DEBUG("mutex was not locked!!! " << std::this_thread::get_id());
     }
 
-    std::size_t l = std::size_t(mBuffer.rdbuf()->in_avail());
-    if (l > 0) {
-        DEBUG("Message: (" << l << ") " << mBuffer);
-        std::string result = mBuffer.str();
-        if (result[l-1] == '\n') {
-            result.pop_back();
-        }
-        ownerWrite(result);
-        mBuffer.clear();
+    // Remove one ending newline, writeToLogger enforces a newline on every write
+    std::string result = mBuffer.str();
+    if (result[result.length()-1] == '\n') {
+        result.pop_back();
     }
+
+    if (result.length() > 0) {
+        DEBUG("Message: (" << result.length() << ") " << result);
+        writeToLogger(result);
+    }
+    mBuffer.str(std::string());
+
     mMutex.unlock();
     DEBUG("Unlocked by " << std::this_thread::get_id());
     return 0;

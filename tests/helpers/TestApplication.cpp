@@ -30,7 +30,7 @@ TestApplication::~TestApplication()
 void TestApplication::execute()
 {
     if (!mCallback) {
-        GetLog().Info() <<  mCmd.GetAppName() << " says \"Hello World.\"" << std::endl;
+        GetLog().Info() <<  mCmd.GetAppName() << " says \"Hello World.\"";
         Terminate(true);
     }
     else if (mCallback(*this)) {
@@ -43,11 +43,11 @@ void TestApplication::handleOptions()
     ApplicationBase::handleOptions();
 
     if ( mCmd.HasOption("-c") || mCmd.HasOption("--configure")) {
-        Console::Info() << "Configuration prints here..." << std::endl;
+        Console::Info() << "Configuration prints here...";
     }
 }
 
 void TestApplication::showHelp()
 {
-    Console::Info() << "Usage: " << mCmd.GetAppName() << " --help\tShows this help" << std::endl;
+    Console::Info() << "Usage: " << mCmd.GetAppName() << " --help\tShows this help";
 }

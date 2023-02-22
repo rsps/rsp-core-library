@@ -18,10 +18,15 @@
 
 namespace rsp::logging {
 
+#define DEBUG(a)
+//#define DEBUG(a) DLOG("OutStreamBuffer - " << a)
+
 /**
  * \class OutStreamBuf
  *
- * \brief An ostreambuf implementation allowing for std::ostream operations.
+ * \brief A streambuf implementation of LogStream can be used to replace std::cout/cerr/clog streambuf's.
+ *
+ * This is not intended to be used directly, instead simply instantiate a Logger with the aCaptureClog argument.
  */
 class OutStreamBuffer : public std::streambuf, public LogStream
 {

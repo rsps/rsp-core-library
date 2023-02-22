@@ -20,6 +20,7 @@
 #include <iostream>
 #include <utils/DynamicData.h>
 #include "LoggerInterface.h"
+#include "SetLevel.h"
 
 namespace rsp::logging {
 
@@ -74,6 +75,8 @@ protected:
     // Use shared_ptr to use compilers default move operations.
     // It is instantiated with "do nothing" deallocator in Logger constructor initialization.
     std::shared_ptr<std::streambuf> mpClogBackup;
+
+    std::shared_ptr<std::streambuf> makeCLogStream(bool aCaptureLog);
 };
 
 } /* namespace logging */

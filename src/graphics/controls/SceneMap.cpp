@@ -47,7 +47,7 @@ void SceneMap::SetActiveScene(std::uint32_t aId)
     }
 
     mpActiveScene = (operator[](aId))();
-    Logger::GetDefault().Info() << "SceneChange: " << mpActiveScene->GetName() << std::endl;
+    Logger::GetDefault().Info() << "SceneChange: " << mpActiveScene->GetName();
     mpActiveScene->Init();
     mOnCreated(mpActiveScene);
 }

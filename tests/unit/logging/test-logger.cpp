@@ -36,7 +36,7 @@ std::ostream& operator<< (std::ostream& os, const MyType &arType);
 
 std::ostream& operator<< (std::ostream& os, const MyType &arType)
 {
-    os << arType.Value;
+    os << "MyType: " << arType.Value;
     return os;
 }
 
@@ -96,25 +96,25 @@ TEST_CASE("Logging") {
     CHECK_NOTHROW(log.Info() << "Info");
     CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(4)));
     CHECK_NOTHROW(log.Debug() << "Debug");
-    CHECK_NOTHROW(log.Debug() << LogLevel::Info << "Dbg-Info");
+    CHECK_NOTHROW(log.Debug() << SetLevel(LogLevel::Info) << "Dbg-Info");
 
     MyType type;
     CHECK_NOTHROW(log.Info() << type);
 
-    CHECK_NOTHROW(std::clog << LogLevel::Critical << "Critical to std::clog" << std::endl);
+    CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Critical) << "Critical to std::clog" << std::endl);
 
     CHECK_NOTHROW(log.Emergency() << "Sleeping for 1 second");
     auto end = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 
     std::thread t([&]() {
         for (int i=0; i < 12 ; i++) {
-            CHECK_NOTHROW(std::clog << LogLevel::Info << "Writing from thread " << i << std::endl);
+            CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Info) << "Writing from thread " << i << std::endl);
             std::this_thread::sleep_for(std::chrono::milliseconds(90));
         }
     });
 
     do {
-        CHECK_NOTHROW(std::clog << LogLevel::Info << "Writing from main" << std::endl);
+        CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Info) << "Writing from main" << std::endl);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     while (std::chrono::high_resolution_clock::now() < end);
@@ -131,48 +131,48 @@ TEST_CASE("Logging") {
     std::string line;
 
     std::getline(fin, line);
-    CHECK(StrUtils::Contains(line, "Test of logger") == true);
+    CHECK_MESSAGE(StrUtils::Contains(line, "Test of logger") == true, line);
 
     CHECK(mConsoleErrorBuffer.size() == 3);
     CHECK(mConsoleInfoBuffer.size() == 0);
 
     std::getline(fin, line);
-    CHECK(StrUtils::EndsWith(line, "] <Test Channel> (alert) Alert  [\"Test Context\",42]"));
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "] <Test Channel> (alert) Alert  [\"Test Context\",42]"), line);
 
     std::getline(fin, line);
-    CHECK(StrUtils::Contains(line, "Error") == true);
+    CHECK_MESSAGE(StrUtils::Contains(line, "Error") == true, line);
 
     std::getline(fin, line);
-    CHECK(StrUtils::Contains(line, "Warning") == true);
+    CHECK_MESSAGE(StrUtils::Contains(line, "Warning") == true, line);
 
     std::getline(fin, line);
-    CHECK(StrUtils::Contains(line, "Info") == true);
+    CHECK_MESSAGE(StrUtils::Contains(line, "Info") == true, line);
 
     std::getline(fin, line);
-    CHECK(StrUtils::Contains(line, "Debug") == false);
-    CHECK(StrUtils::Contains(line, "Dbg-Info") == true);
+    CHECK_MESSAGE(StrUtils::Contains(line, "Debug") == false, line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "Dbg-Info") == true, line);
 
     std::getline(fin, line);
-    CHECK(StrUtils::Contains(line, "666") == true);
+    CHECK_MESSAGE(StrUtils::Contains(line, "MyType: 666") == true, line);
 
     std::getline(fin, line);
     CHECK_MESSAGE(StrUtils::EndsWith(line, "(critical) Critical to std::clog") == true, line);
-    CHECK(StrUtils::Contains(mConsoleErrorBuffer[1], std::string(AnsiEscapeCodes::ec::fg::Red) + "Critical to std::clog") == true);
+    CHECK_MESSAGE(StrUtils::Contains(mConsoleErrorBuffer[1], std::string(AnsiEscapeCodes::ec::fg::Red) + "Critical to std::clog") == true, mConsoleErrorBuffer[1]);
 
     std::getline(fin, line);
-    CHECK(StrUtils::Contains(line, "(emergency) Sleeping for 1 second") == true);
-    CHECK(StrUtils::StartsWith(mConsoleErrorBuffer[2], std::string(AnsiEscapeCodes::ec::fg::Red) + "<Test Channel> Sleeping for 1 second") == true);
+    CHECK_MESSAGE(StrUtils::Contains(line, "(emergency) Sleeping for 1 second") == true, line);
+    CHECK_MESSAGE(StrUtils::StartsWith(mConsoleErrorBuffer[2], std::string(AnsiEscapeCodes::ec::fg::Red) + "<Test Channel> Sleeping for 1 second") == true, mConsoleErrorBuffer[2]);
 
     for (int i = 0 ; i < 22 ; i++) {
         std::getline(fin, line);
-        CHECK(StrUtils::Contains(line, "] (info) Writing from ") == true);
+        CHECK_MESSAGE(StrUtils::Contains(line, "] (info) Writing from ") == true, line);
     }
 
     std::getline(fin, line);
-    CHECK(StrUtils::Contains(line, "(info) Wakeup...") == true);
+    CHECK_MESSAGE(StrUtils::Contains(line, "(info) Wakeup...") == true, line);
 
     std::getline(fin, line);
-    CHECK(fin.eof() == true);
+    CHECK_MESSAGE(fin.eof() == true, line);
 
     CHECK(&(logging::LoggerInterface::GetDefault()) == &log);
 }

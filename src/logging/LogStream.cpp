@@ -13,8 +13,8 @@
 
 namespace rsp::logging {
 
-LogStream::LogStream(LoggerInterface *apOwner, LogLevel aLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
-    : mpOwner(apOwner),
+LogStream::LogStream(LoggerInterface *apLogger, LogLevel aLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
+    : mpLogger(apLogger),
       mLevel(aLevel),
       mChannel(arChannel),
       mContext(arContext)
@@ -22,7 +22,7 @@ LogStream::LogStream(LoggerInterface *apOwner, LogLevel aLevel, const std::strin
 }
 
 LogStream::LogStream(LogStream &&arOther)
-    : mpOwner(std::move(arOther.mpOwner)),
+    : mpLogger(std::move(arOther.mpLogger)),
       mLevel(std::move(arOther.mLevel)),
       mChannel(std::move(arOther.mChannel)),
       mContext(std::move(arOther.mContext)),
@@ -42,7 +42,7 @@ LogStream::~LogStream()
 LogStream& LogStream::operator=(LogStream &&arOther)
 {
     if (&arOther != this) {
-        mpOwner = std::move(arOther.mpOwner);
+        mpLogger = std::move(arOther.mpLogger);
         mLevel = std::move(arOther.mLevel);
         mChannel = std::move(arOther.mChannel);
         mContext = std::move(arOther.mContext);
@@ -54,14 +54,14 @@ LogStream& LogStream::operator=(LogStream &&arOther)
 void LogStream::flush()
 {
     if (mBuffer.rdbuf()->in_avail() > 0) {
-        ownerWrite(mBuffer.str());
+        writeToLogger(mBuffer.str());
         mBuffer.clear();
     }
 }
 
-void LogStream::ownerWrite(const std::string &arMsg)
+void LogStream::writeToLogger(const std::string &arMsg)
 {
-    mpOwner->write(*this, arMsg, mChannel, mContext);
+    mpLogger->write(*this, arMsg, mChannel, mContext);
 }
 
 LogLevel LogStream::GetLevel() const
@@ -92,9 +92,9 @@ LogStream& LogStream::operator<<(std::ostream&(*apFunc)(std::ostream&))
     return *this;
 }
 
-LogStream& LogStream::operator <<(LogLevel aLevel)
+LogStream& LogStream::operator <<(rsp::logging::SetLevel aLevel)
 {
-    SetLevel(aLevel);
+    SetLevel(aLevel.mValue);
     return *this;
 }
 

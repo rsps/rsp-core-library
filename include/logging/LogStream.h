@@ -15,6 +15,7 @@
 #include <sstream>
 #include <utils/DynamicData.h>
 #include "LogTypes.h"
+#include "SetLevel.h"
 
 namespace rsp::logging {
 
@@ -39,32 +40,75 @@ public:
     LogStream& operator=(const LogStream &arOther) = delete;
     LogStream& operator=(LogStream &&arOther);
 
+    /**
+     * \brief Get the current stream acceptance log level
+     *
+     * \return LogLevel
+     */
     LogLevel GetLevel() const;
+
+    /**
+     * \brief Set the current stream acceptance log level
+     *
+     * \param aLevel
+     */
     void SetLevel(LogLevel aLevel);
 
+    /**
+     * \brief Set the current stream channel
+     *
+     * \param arChannel
+     * \return self
+     */
     LogStream& SetChannel(const std::string &arChannel);
+
+    /**
+     * \brief Set the current stream context
+     *
+     * \param arContext
+     * \return self
+     */
     LogStream& SetContext(rsp::utils::DynamicData& arContext);
 
+    /**
+     * \brief Template to declare streaming operators for individual types
+     *
+     * \tparam type
+     * \param arValue
+     * \return self
+     */
     template< class type>
     LogStream& operator<<(const type &arValue) {
         mBuffer << arValue;
         return *this;
     }
 
+    /**
+     * \brief Streaming operator for functions
+     *
+     * \param apFunc
+     * \return self
+     */
     LogStream& operator<<(std::ostream&(*apFunc)(std::ostream&));
-    LogStream& operator<<(LogLevel aLevel);
+
+    /**
+     * \brief Streaming operator for SetLevel objects
+     *
+     * \param aLevel
+     * \return
+     */
+    LogStream& operator<<(rsp::logging::SetLevel aLevel);
 
 protected:
-    LoggerInterface *mpOwner;
+    LoggerInterface *mpLogger;
     LogLevel mLevel;
     std::string mChannel;
     rsp::utils::DynamicData mContext;
     std::stringstream mBuffer{};
 
     void flush();
-    void ownerWrite(const std::string &arMsg);
+    void writeToLogger(const std::string &arMsg);
 };
-
 
 } /* namespace rsp::logging */
 

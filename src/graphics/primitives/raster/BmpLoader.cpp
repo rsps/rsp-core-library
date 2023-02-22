@@ -118,7 +118,7 @@ void BmpLoader::ReadHeader(rsp::posix::FileIO &arFile)
     // Read the 54 byte header
     arFile.ExactRead(reinterpret_cast<char *>(&mBmpHeader), sizeof(mBmpHeader));
 
-    Logger::GetDefault().Debug() << mBmpHeader << std::endl;;
+    Logger::GetDefault().Debug() << mBmpHeader;
 
     mBytesPerPixel = mBmpHeader.v1.bitsPerPixel / 8; // Might be 1 or 4
     if ((mBmpHeader.v1.bitsPerPixel % 8) > 0) {
@@ -147,11 +147,11 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
 {
     // Figure out amount to read per row
     std::size_t paddedRowSize = static_cast<std::size_t>(((static_cast<std::size_t>(std::abs(mBmpHeader.v1.width) * mBmpHeader.v1.bitsPerPixel) + 7) / 8) + 3u) & static_cast<std::size_t>(~3);
-    Logger::GetDefault().Debug() << "Padded Row size: " << paddedRowSize << std::endl;
+    Logger::GetDefault().Debug() << "Padded Row size: " << paddedRowSize;
 
     // Initialize container for reading
     std::vector<std::uint8_t> pixelRows(paddedRowSize * static_cast<std::size_t>(std::abs(mBmpHeader.v1.heigth)));
-    Logger::GetDefault().Debug() << "Container size: " << pixelRows.size() << std::endl;
+    Logger::GetDefault().Debug() << "Container size: " << pixelRows.size();
 
     // Skip past the offset
     arFile.Seek(mBmpHeader.dataOffset);

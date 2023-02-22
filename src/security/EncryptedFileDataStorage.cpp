@@ -33,24 +33,24 @@ void EncryptedFileDataStorage::Read(rsp::utils::IDataContent &arContent)
     encrypted.resize(encrypted_content_size);
     mFile.ExactRead(encrypted.data(), encrypted.size());
 
-    Logger::GetDefault().Debug() << "\nEncrypted Data: (" << encrypted.size() << ")\n" << encrypted << std::endl;
-    Logger::GetDefault().Debug() << "IV: " << mIv << ", Key: " << mKey << std::endl;
+    Logger::GetDefault().Debug() << "\nEncrypted Data: (" << encrypted.size() << ")\n" << encrypted;
+    Logger::GetDefault().Debug() << "IV: " << mIv << ", Key: " << mKey;
 
     Decrypt d;
     d.Init(mIv, mKey);
     d.Update(encrypted.data(), encrypted.size());
     SecureBuffer plain = d.Finalize();
 
-//    Logger::GetDefault().Debug() << "\nPlain Data: (" << plain.size() << ")\n" << plain << std::endl;
+//    Logger::GetDefault().Debug() << "\nPlain Data: (" << plain.size() << ")\n" << plain;
 
     std::size_t sz = arContent.GetSize();
 
     if (plain.size() < sz) {
-        Logger::GetDefault().Warning() << "Size of stored encrypted data is smaller than expected: " << plain.size() << " vs. " << sz << std::endl;
+        Logger::GetDefault().Warning() << "Size of stored encrypted data is smaller than expected: " << plain.size() << " vs. " << sz;
         sz = plain.size();
     }
     else if (plain.size() > sz) {
-        Logger::GetDefault().Warning() << "Size of stored encrypted data is larger than expected: " << plain.size() << " vs. " << sz << std::endl;
+        Logger::GetDefault().Warning() << "Size of stored encrypted data is larger than expected: " << plain.size() << " vs. " << sz;
     }
 
     std::size_t i = 0;
@@ -64,14 +64,14 @@ void EncryptedFileDataStorage::Read(rsp::utils::IDataContent &arContent)
 
 void EncryptedFileDataStorage::Write(const rsp::utils::IDataContent &arContent)
 {
-    Logger::GetDefault().Debug() << "IV: " << mIv << ", Key: " << mKey << std::endl;
+    Logger::GetDefault().Debug() << "IV: " << mIv << ", Key: " << mKey;
 
     Encrypt e;
     e.Init(mIv, mKey);
     e.Update(arContent.GetData(), arContent.GetSize());
     SecureBuffer sb = e.Finalize();
 
-    Logger::GetDefault().Debug() << "\nEncrypted Data: (" << sb.size() << ")\n" << sb << std::endl;
+    Logger::GetDefault().Debug() << "\nEncrypted Data: (" << sb.size() << ")\n" << sb;
     mFile.ExactWrite(sb.data(), sb.size());
 }
 

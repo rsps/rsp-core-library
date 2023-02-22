@@ -282,7 +282,7 @@ bool Control::ProcessInput(TouchEvent &arInput)
             if (mTouchArea.IsHit(arInput.mPress)) {
                 doLift(arInput.mCurrent);
                 if (mTouchArea.IsHit(arInput.mCurrent)) {
-                    Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput << std::endl;
+                    Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput;
                     if (IsCheckable()) {
                         if (IsChecked()) {
                             mState = States::normal;

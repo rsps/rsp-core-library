@@ -83,7 +83,7 @@ size_t CurlHttpRequest::stringReadFunction(void *ptr, size_t size, size_t nmemb,
     if (sz > apBuf->Remaining) {
         sz = apBuf->Remaining;
     }
-//    Logger::GetDefault().Debug() << "Copying " << sz << " characters to network buffer" << std::endl;
+//    Logger::GetDefault().Debug() << "Copying " << sz << " characters to network buffer";
     std::memcpy(ptr, apBuf->Data, sz);
     apBuf->Data += sz;
     apBuf->Remaining -= sz;
@@ -210,7 +210,7 @@ void CurlHttpRequest::requestDone()
     getCurlInfo(CURLINFO_RESPONSE_CODE, &resp_code);
     mResponse.setStatusCode(static_cast<int>(resp_code));
 
-    Logger::GetDefault().Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << resp_code << std::endl;
+    Logger::GetDefault().Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << resp_code;
 
     EasyCurl::requestDone();
 }
@@ -311,7 +311,7 @@ void CurlHttpRequest::populateOptions()
     }
     for (auto const& tuple : mRequestOptions.Headers) {
         std::string header = tuple.first + ": " + tuple.second;
-        Logger::GetDefault().Debug() << "Add header: " << header << std::endl;
+        Logger::GetDefault().Debug() << "Add header: " << header;
         auto *temp = curl_slist_append(mpHeaders, header.c_str());
         if (temp == nullptr) {
             curl_slist_free_all(mpHeaders);

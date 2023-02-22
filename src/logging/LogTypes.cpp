@@ -12,14 +12,15 @@
 #include <string>
 #include <logging/LogTypes.h>
 #include <logging/OutStreamBuffer.h>
-#include <logging/Logger.h>
+#include <utils/EnumUtils.h>
 
 namespace rsp::logging {
 
-//#define DEBUG(a) DLOG(a)
-#define DEBUG(a)
-
-static const std::map<LogLevel, std::string> cLevelToText = {
+struct LogNameEntry {
+    LogLevel level;
+    const char *name;
+};
+static LogNameEntry cLogLevelNames[] = {
     { LogLevel::Emergency, "emergency" },
     { LogLevel::Alert, "alert" },
     { LogLevel::Critical, "critical" },
@@ -32,9 +33,11 @@ static const std::map<LogLevel, std::string> cLevelToText = {
 
 LogLevel ToLogLevel(std::string aLevelString)
 {
-    for (auto m : cLevelToText) {
-        if (m.second == aLevelString) {
-            return m.first;
+    rsp::utils::assert_enum_list<sizeof(cLogLevelNames), LogLevel, LogNameEntry>();
+
+    for (auto m : cLogLevelNames) {
+        if (m.name == aLevelString) {
+            return m.level;
         }
     }
 
@@ -43,7 +46,9 @@ LogLevel ToLogLevel(std::string aLevelString)
 
 std::string ToString(LogLevel aLevel)
 {
-    return cLevelToText.at(aLevel);
+    rsp::utils::assert_enum_list<sizeof(cLogLevelNames), LogLevel, LogNameEntry>();
+
+    return cLogLevelNames[static_cast<int>(aLevel)].name;
 }
 
 std::ostream& operator<<(std::ostream &o, LogLevel aLevel)
@@ -51,18 +56,6 @@ std::ostream& operator<<(std::ostream &o, LogLevel aLevel)
     o << ToString(aLevel);
     return o;
 }
-
-// TODO: Make this into a stream manipulator function
-//std::ostream& operator<<(std::ostream &o, LogLevel aLevel)
-//{
-//    OutStreamBuffer *stream = static_cast<OutStreamBuffer *>(o.rdbuf());
-//
-//    stream->Lock();
-//    DEBUG("Locked by " << std::this_thread::get_id());
-//    stream->SetLevel(aLevel);
-//
-//    return o;
-//}
 
 
 } /* namespace rsp::logging */
