@@ -89,6 +89,7 @@ std::string TrimCopy(std::string const& aStr);
  * \return source string with lower case characters
  */
 std::string& ToLower(std::string &arStr);
+std::string ToLower(const std::string &arStr);
 
 /**
  * \brief Convert all characters in string to upper case
@@ -97,6 +98,7 @@ std::string& ToLower(std::string &arStr);
  * \return source string with upper case characters
  */
 std::string& ToUpper(std::string &arStr);
+std::string ToUpper(const std::string &arStr);
 
 /**
  * Get the user current home directory.

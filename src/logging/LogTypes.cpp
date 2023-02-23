@@ -12,48 +12,38 @@
 #include <string>
 #include <logging/LogTypes.h>
 #include <logging/OutStreamBuffer.h>
-#include <utils/EnumUtils.h>
+#include <magic_enum.hpp>
 
 namespace rsp::logging {
 
-struct LogNameEntry {
-    LogLevel level;
-    const char *name;
-};
-static LogNameEntry cLogLevelNames[] = {
-    { LogLevel::Emergency, "emergency" },
-    { LogLevel::Alert, "alert" },
-    { LogLevel::Critical, "critical" },
-    { LogLevel::Error, "error" },
-    { LogLevel::Warning, "warning" },
-    { LogLevel::Notice, "notice" },
-    { LogLevel::Info, "info" },
-    { LogLevel::Debug, "debug" }
-};
+//struct LogNameEntry {
+//    LogLevel level;
+//    const char *name;
+//};
+//static LogNameEntry cLogLevelNames[] = {
+//    { LogLevel::Emergency, "emergency" },
+//    { LogLevel::Alert, "alert" },
+//    { LogLevel::Critical, "critical" },
+//    { LogLevel::Error, "error" },
+//    { LogLevel::Warning, "warning" },
+//    { LogLevel::Notice, "notice" },
+//    { LogLevel::Info, "info" },
+//    { LogLevel::Debug, "debug" }
+//};
 
 LogLevel ToLogLevel(std::string aLevelString)
 {
-    rsp::utils::assert_enum_list<sizeof(cLogLevelNames), LogLevel, LogNameEntry>();
-
-    for (auto m : cLogLevelNames) {
-        if (m.name == aLevelString) {
-            return m.level;
-        }
-    }
-
-    return cDefautLogLevel;
+    return magic_enum::enum_cast<LogLevel>(aLevelString).value();
 }
 
 std::string ToString(LogLevel aLevel)
 {
-    rsp::utils::assert_enum_list<sizeof(cLogLevelNames), LogLevel, LogNameEntry>();
-
-    return cLogLevelNames[static_cast<int>(aLevel)].name;
+    return std::string(magic_enum::enum_name<LogLevel>(aLevel));
 }
 
 std::ostream& operator<<(std::ostream &o, LogLevel aLevel)
 {
-    o << ToString(aLevel);
+    o << magic_enum::enum_name<LogLevel>(aLevel);
     return o;
 }
 

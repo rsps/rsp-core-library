@@ -10,7 +10,7 @@
 
 #include <graphics/controls/Control.h>
 #include <logging/Logger.h>
-#include <utils/EnumUtils.h>
+#include <magic_enum.hpp>
 
 using namespace rsp::logging;
 
@@ -21,19 +21,7 @@ Color Control::mTouchAreaColor = false;
 
 std::string to_string(Control::States aState)
 {
-    const char *names[] = {
-        "NOT SET",
-        "Disabled",
-        "Normal",
-        "Pressed",
-        "Dragged",
-        "Checked",
-        "CheckedPressed"
-    };
-
-    rsp::utils::assert_enum_list<sizeof(names), Control::States>();
-
-    return names[static_cast<int>(aState)];
+    return std::string(magic_enum::enum_name<Control::States>(aState));
 }
 
 std::ostream& operator <<(std::ostream &os, const Control::States aState)

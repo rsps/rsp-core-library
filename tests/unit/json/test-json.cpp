@@ -323,5 +323,33 @@ null }
         CHECK(js_value.IsArray());
         CHECK_EQ(js_value[1].AsInt(), 2);
     }
+
+    SUBCASE("Streaming") {
+        auto raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"}})";
+        std::stringstream ss;
+        CHECK_NOTHROW(ss << Json::Decode(raw));
+
+        CHECK_EQ(ss.str(), raw);
+
+        ss.str("");
+        ss << JsonTypes::Number;
+        CHECK_EQ(ss.str(), "Number");
+    }
 }
 
+template <typename E, E V, int I> void func_print() {
+    MESSAGE(__PRETTY_FUNCTION__);
+}
+
+template <typename E, int END, int N = 0>
+constexpr void func_print_all() {
+    func_print<E, E(N), N>();
+    if constexpr (N < END) {
+        func_print_all<E, END, N+1>();
+    }
+}
+
+TEST_CASE("Enum Traversal") {
+    func_print<JsonTypes, JsonTypes::Number, int(JsonTypes::Number)>();
+    func_print_all<JsonTypes, 10>();
+}

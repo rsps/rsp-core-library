@@ -15,7 +15,6 @@
 #include <string>
 #include "CoreException.h"
 #include <utils/StructElement.h>
-#include <utils/EnumUtils.h>
 
 namespace rsp::utils {
 
@@ -51,8 +50,7 @@ public:
      * \enum Types
      * \brief Type declaration used for each native type.
      */
-//    enum class Types : std::uint32_t {Null, Bool, Int, Int64, Uint64, Uint32, Uint16, Float, Double, Pointer, String, Object, Array};
-    MAKE_ENUM(Types, : std::uint32_t, Null, Bool, Int, Int64, Uint64, Uint32, Uint16, Float, Double, Pointer, String, Object, Array);
+    enum class Types : std::uint32_t {Null, Bool, Int, Int64, Uint64, Uint32, Uint16, Float, Double, Pointer, String, Object, Array};
 
     /**
      * \fn  Variant()

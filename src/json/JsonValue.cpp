@@ -13,8 +13,8 @@
 #include <json/JsonValue.h>
 #include <iomanip>
 #include <logging/Logger.h>
-#include <utils/EnumUtils.h>
 #include <utils/StrUtils.h>
+#include <magic_enum.hpp>
 
 using namespace rsp::logging;
 
@@ -26,7 +26,7 @@ namespace rsp::json {
 
 std::ostream& operator<<(std::ostream& os, JsonTypes aType)
 {
-    os << JsonValue::GetJsonTypeAsString(aType);
+    os << magic_enum::enum_name<JsonTypes>(aType);
     return os;
 }
 
@@ -300,18 +300,7 @@ void JsonValue::toStringStream(std::stringstream &arResult, PrintFormat &arPf, u
 
 std::string JsonValue::GetJsonTypeAsString(JsonTypes aType)
 {
-    const char *names[] = {
-        "Null",
-        "Bool",
-        "Number",
-        "String",
-        "Object",
-        "Array"
-    };
-
-    rsp::utils::assert_enum_list<sizeof(names), JsonTypes>();
-
-    return names[static_cast<int>(aType)];
+    return std::string(magic_enum::enum_name<JsonTypes>(aType));
 }
 
 JsonTypes JsonValue::GetJsonType() const
@@ -512,7 +501,7 @@ bool JsonValue::operator ==(const JsonValue &arOther) const
             return (AsBool() == arOther.AsBool());
 
         case JsonTypes::Number:
-            return (AsDouble() == arOther.AsDouble());
+            return (AsInt() == arOther.AsInt());
 
         case JsonTypes::String:
             return (AsString() == arOther.AsString());
@@ -525,7 +514,7 @@ bool JsonValue::operator ==(const JsonValue &arOther) const
             }
             return true;
 
-        case JsonTypes::Array:
+        case JsonTypes::Array: {
             int i = 0;
             for (const JsonValue &jv : mItems) {
                 if (!(jv == arOther[i])) {
@@ -533,6 +522,7 @@ bool JsonValue::operator ==(const JsonValue &arOther) const
                 }
             }
             return true;
+        }
     }
     return false;
 }

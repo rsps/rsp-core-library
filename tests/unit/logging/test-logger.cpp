@@ -137,7 +137,7 @@ TEST_CASE("Logging") {
     CHECK(mConsoleInfoBuffer.size() == 0);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::EndsWith(line, "] <Test Channel> (alert) Alert  [\"Test Context\",42]"), line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "] <Test Channel> (Alert) Alert  [\"Test Context\",42]"), line);
 
     std::getline(fin, line);
     CHECK_MESSAGE(StrUtils::Contains(line, "Error") == true, line);
@@ -156,20 +156,20 @@ TEST_CASE("Logging") {
     CHECK_MESSAGE(StrUtils::Contains(line, "MyType: 666") == true, line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::EndsWith(line, "(critical) Critical to std::clog") == true, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "(Critical) Critical to std::clog") == true, line);
     CHECK_MESSAGE(StrUtils::Contains(mConsoleErrorBuffer[1], std::string(AnsiEscapeCodes::ec::fg::Red) + "Critical to std::clog") == true, mConsoleErrorBuffer[1]);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "(emergency) Sleeping for 1 second") == true, line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "(Emergency) Sleeping for 1 second") == true, line);
     CHECK_MESSAGE(StrUtils::StartsWith(mConsoleErrorBuffer[2], std::string(AnsiEscapeCodes::ec::fg::Red) + "<Test Channel> Sleeping for 1 second") == true, mConsoleErrorBuffer[2]);
 
     for (int i = 0 ; i < 22 ; i++) {
         std::getline(fin, line);
-        CHECK_MESSAGE(StrUtils::Contains(line, "] (info) Writing from ") == true, line);
+        CHECK_MESSAGE(StrUtils::Contains(line, "] (Info) Writing from ") == true, line);
     }
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "(info) Wakeup...") == true, line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "(Info) Wakeup...") == true, line);
 
     std::getline(fin, line);
     CHECK_MESSAGE(fin.eof() == true, line);
