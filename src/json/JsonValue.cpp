@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
+#include <magic_enum.hpp>
 
 using namespace rsp::logging;
 
@@ -25,7 +26,7 @@ namespace rsp::json {
 
 std::ostream& operator<<(std::ostream& os, JsonTypes aType)
 {
-    os << JsonValue::GetJsonTypeAsString(aType);
+    os << magic_enum::enum_name<JsonTypes>(aType);
     return os;
 }
 
@@ -170,7 +171,7 @@ std::size_t JsonValue::GetCount() const
             if ((mPointer == static_cast<uintptr_t>(JsonTypes::Object)) || (mPointer == static_cast<uintptr_t>(JsonTypes::Array))) {
                 return mItems.size();
             }
-            THROW_WITH_BACKTRACE1(EJsonTypeError, "Variant of type " + typeToText() + " must be of JsonType Object or Array");
+            THROW_WITH_BACKTRACE1(EJsonTypeError, "Variant of type " + TypeToText() + " must be of JsonType Object or Array");
             break;
     }
 }
@@ -199,7 +200,7 @@ bool JsonValue::MemberExists(std::string_view aKey) const
 JsonValue& JsonValue::Add(JsonValue aValue)
 {
     forceArray();
-    Logger::GetDefault().Info() << "JsonArray::Add(): " << aValue.Encode() << std::endl;
+    Logger::GetDefault().Info() << "JsonArray::Add(): " << aValue.Encode();
     mItems.emplace_back(aValue);
     return *this;
 }
@@ -207,7 +208,7 @@ JsonValue& JsonValue::Add(JsonValue aValue)
 JsonValue& JsonValue::Add(std::string_view aKey, JsonValue aValue)
 {
     forceObject();
-    Logger::GetDefault().Info() << "JsonObject::Add(): \"" << aKey << "\": " << aValue.Encode() << std::endl;
+    Logger::GetDefault().Info() << "JsonObject::Add(): \"" << aKey << "\": " << aValue.Encode();
     aValue.mName = aKey;
     mItems.push_back(aValue);
     return *this;
@@ -299,15 +300,7 @@ void JsonValue::toStringStream(std::stringstream &arResult, PrintFormat &arPf, u
 
 std::string JsonValue::GetJsonTypeAsString(JsonTypes aType)
 {
-    switch (aType) {
-        case JsonTypes::Array: return "Array";
-        case JsonTypes::Bool: return "Bool";
-        default:
-        case JsonTypes::Null: return "Null";
-        case JsonTypes::Number: return "Number";
-        case JsonTypes::Object: return "Object";
-        case JsonTypes::String: return "String";
-    }
+    return std::string(magic_enum::enum_name<JsonTypes>(aType));
 }
 
 JsonTypes JsonValue::GetJsonType() const
@@ -336,7 +329,7 @@ JsonTypes JsonValue::GetJsonType() const
         case Types::String:
             return JsonTypes::String;
         default:
-            THROW_WITH_BACKTRACE1(EJsonTypeError, "Variant of type " + typeToText() + " is not a valid JSON type");
+            THROW_WITH_BACKTRACE1(EJsonTypeError, "Variant of type " + TypeToText() + " is not a valid JSON type");
     }
     return JsonTypes::Null; // We should never get here...
 }
@@ -508,7 +501,7 @@ bool JsonValue::operator ==(const JsonValue &arOther) const
             return (AsBool() == arOther.AsBool());
 
         case JsonTypes::Number:
-            return (AsDouble() == arOther.AsDouble());
+            return (AsInt() == arOther.AsInt());
 
         case JsonTypes::String:
             return (AsString() == arOther.AsString());
@@ -521,7 +514,7 @@ bool JsonValue::operator ==(const JsonValue &arOther) const
             }
             return true;
 
-        case JsonTypes::Array:
+        case JsonTypes::Array: {
             int i = 0;
             for (const JsonValue &jv : mItems) {
                 if (!(jv == arOther[i])) {
@@ -529,6 +522,7 @@ bool JsonValue::operator ==(const JsonValue &arOther) const
                 }
             }
             return true;
+        }
     }
     return false;
 }

@@ -78,6 +78,17 @@ add_compile_options(
 #     -v -dD
 )
 
+include(FetchContent)
+find_package(Git REQUIRED)
+
+# Include external projects Doctest from github.
+FetchContent_Declare(
+    magic_enum
+    GIT_REPOSITORY "https://github.com/Neargye/magic_enum"
+    GIT_TAG "v0.8.2"
+)
+FetchContent_MakeAvailable(magic_enum)
+
 add_library("rsp-core-lib" STATIC)
 
 if (FREETYPE_FONTS)
@@ -117,6 +128,7 @@ target_include_directories(rsp-core-lib
         ${PROJECT_BINARY_DIR}/src
         ${FREETYPE_INCLUDE_DIRS}
         ${CURL_INCLUDE_DIRS}
+        ${magic_enum_SOURCE_DIR}/include
 )
 
 target_compile_options(rsp-core-lib PUBLIC

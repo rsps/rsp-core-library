@@ -165,7 +165,7 @@ void FreeTypeRawFont::SetSize(int aWidthPx, int aHeightPx)
         THROW_WITH_BACKTRACE2(FontException, "FT_Set_Pixel_Sizes() failed", error);
     }
     mSizePx = std::min(aWidthPx, aHeightPx);
-    Logger::GetDefault().Debug() << "Font.SetSize(" << aWidthPx << ", " << aHeightPx << ") -> " << mSizePx << std::endl;
+    Logger::GetDefault().Debug() << "Font.SetSize(" << aWidthPx << ", " << aHeightPx << ") -> " << mSizePx;
 }
 
 void FreeTypeRawFont::SetStyle(FontStyles aStyle)

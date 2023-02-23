@@ -32,10 +32,15 @@ SysLogWriter::~SysLogWriter()
     closelog();
 }
 
-void SysLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel)
+void SysLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData&)
 {
     if (arMsg.length() && (mAcceptLevel >= aCurrentLevel)) {
-        syslog(static_cast<int>(aCurrentLevel), "%s", arMsg.c_str());
+        if (arChannel.length()) {
+            syslog(static_cast<int>(aCurrentLevel), "<%s> %s", arChannel.c_str(), arMsg.c_str());
+        }
+        else {
+            syslog(static_cast<int>(aCurrentLevel), "%s", arMsg.c_str());
+        }
     }
 }
 

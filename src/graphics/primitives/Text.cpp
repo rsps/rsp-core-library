@@ -57,7 +57,7 @@ void Text::scaleToFit()
     int attempts = 5;
     int w_limit = mArea.GetWidth() * 90 / 100; // >90%
     int h_limit = mArea.GetHeight() * 90 / 100; // > 90%
-    Logger::GetDefault().Debug() << "scaleToFit w_limit: " << w_limit << " h_limit: " << h_limit << " line count: " << mLineCount << std::endl;
+    Logger::GetDefault().Debug() << "scaleToFit w_limit: " << w_limit << " h_limit: " << h_limit << " line count: " << mLineCount;
 
     do {
         mFont.SetSize(width, height);
@@ -65,7 +65,7 @@ void Text::scaleToFit()
         mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
         calcBoundingRect(mpGlyphs);
 
-        Logger::GetDefault().Debug() << "Area: " << mArea << ", Bounding Rect: " << mBoundingRect << std::endl;
+        Logger::GetDefault().Debug() << "Area: " << mArea << ", Bounding Rect: " << mBoundingRect;
 
         done = 0;
         if ((mBoundingRect.GetWidth() < w_limit) || (mBoundingRect.GetWidth() > mArea.GetWidth())) {
@@ -82,7 +82,7 @@ void Text::scaleToFit()
         }
     }
     while( (done != 2) && --attempts);
-    Logger::GetDefault().Debug() << "scaleToFit done: " << done << " attempts: " << attempts << std::endl;
+    Logger::GetDefault().Debug() << "scaleToFit done: " << done << " attempts: " << attempts;
 }
 
 void Text::calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs)

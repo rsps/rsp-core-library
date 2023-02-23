@@ -10,6 +10,7 @@
 
 #include <graphics/controls/Control.h>
 #include <logging/Logger.h>
+#include <magic_enum.hpp>
 
 using namespace rsp::logging;
 
@@ -20,15 +21,7 @@ Color Control::mTouchAreaColor = false;
 
 std::string to_string(Control::States aState)
 {
-    const char *names[] = {
-        "Disabled",
-        "Normal",
-        "Pressed",
-        "Dragged",
-        "Checked",
-        "CheckedPressed"
-    };
-    return names[static_cast<int>(aState)];
+    return std::string(magic_enum::enum_name<Control::States>(aState));
 }
 
 std::ostream& operator <<(std::ostream &os, const Control::States aState)
@@ -282,7 +275,7 @@ bool Control::ProcessInput(TouchEvent &arInput)
             if (mTouchArea.IsHit(arInput.mPress)) {
                 doLift(arInput.mCurrent);
                 if (mTouchArea.IsHit(arInput.mCurrent)) {
-                    Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput << std::endl;
+                    Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput;
                     if (IsCheckable()) {
                         if (IsChecked()) {
                             mState = States::normal;

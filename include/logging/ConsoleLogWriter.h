@@ -11,8 +11,8 @@
 #ifndef SRC_LOGGING_CONSOLELOGWRITER_H_
 #define SRC_LOGGING_CONSOLELOGWRITER_H_
 
+#include <logging/LogWriterInterface.h>
 #include <array>
-#include "LogWriter.h"
 
 namespace rsp::logging {
 
@@ -45,7 +45,7 @@ public:
     ConsoleLogWriter(const ConsoleLogWriter&) = delete;
     ~ConsoleLogWriter();
 
-    void Write(const std::string &arMsg, LogLevel aCurrentLevel) override;
+    void Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
 
     ConsoleLogWriter& operator= (const ConsoleLogWriter&) = delete;
 

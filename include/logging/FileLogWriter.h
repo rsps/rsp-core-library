@@ -11,9 +11,9 @@
 #ifndef SRC_LOGGING_FILELOGWRITER_H_
 #define SRC_LOGGING_FILELOGWRITER_H_
 
+#include <logging/LogWriterInterface.h>
 #include <fstream>
 #include <mutex>
-#include "LogWriter.h"
 
 namespace rsp::logging {
 
@@ -42,7 +42,7 @@ public:
     ~FileLogWriter() override;
 
 
-    void Write(const std::string &arMsg, LogLevel aCurrentLevel) override;
+    void Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
 
 protected:
     std::ofstream mOutput;

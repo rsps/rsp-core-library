@@ -26,7 +26,7 @@ namespace rsp::network {
  */
 enum class HttpRequestType
 {
-    NONE, GET, POST, PUT, HEAD, PATCH, DELETE, __count__
+    NONE, GET, POST, PUT, HEAD, PATCH, DELETE
 };
 
 /**

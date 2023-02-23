@@ -54,7 +54,7 @@ Thread& Thread::Stop()
 
 void Thread::run()
 {
-    Logger::GetDefault().Info() << "Running thread '" << mName << "'" << std::endl;
+    Logger::GetDefault().Info() << "Running thread '" << mName << "'";
     try {
         try {
             while (!mTerminated) {
@@ -62,7 +62,7 @@ void Thread::run()
             }
         }
         catch (const std::exception &e) {
-            Logger::GetDefault().Error() << "Thread '" << GetName() << "'" << " excepted with: " << e.what() << std::endl;
+            Logger::GetDefault().Error() << "Thread '" << GetName() << "'" << " excepted with: " << e.what();
             throw ThreadException(GetName(), e.what());
         }
     }
