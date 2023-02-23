@@ -34,6 +34,14 @@ public:
 };
 
 
+/**
+ * \class DynamicData
+ * \brief Dynamic container for all sorts of data: Can hold any type as well as arrays and objects.
+ *
+ * Custom types needs to be added as Variant::Pointer elements, so they will have external ownership and are
+ * not streamable.
+ *
+ */
 class DynamicData: public Variant
 {
 public:

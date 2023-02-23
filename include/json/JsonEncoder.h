@@ -13,9 +13,22 @@
 
 namespace rsp::json {
 
+/**
+ * \class JsonEncoder
+ * \brief Visitor pattern, DynamicData to JSON encoder
+ */
 class JsonEncoder
 {
 public:
+    /**
+     * \brief Encodes all data in the DynamicData object into valid JSON.
+     *
+     * \param arData DynamicData object
+     * \param aPrettyPrint Human readable output format
+     * \param aForceToUCS2
+     * \param aArrayLineLength Allows for multiple elements per line if PrettyPrint is enabled.
+     * \return string
+     */
     static std::string Encode(const rsp::utils::DynamicData &arData, bool aPrettyPrint = false, bool aForceToUCS2 = false, unsigned int aArrayLineLength = 0);
 
 protected:
