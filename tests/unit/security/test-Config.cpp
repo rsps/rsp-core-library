@@ -31,9 +31,9 @@ class MyConfig : public Config<ConfigData>
 public:
     using Config<ConfigData>::Config;
 
-    JsonValue ToJson() const override
+    DynamicData ToData() const override
     {
-        JsonValue result;
+        DynamicData result;
 
         result.Add("ApplicationName", Get().ApplicationName);
         result.Add("PlacementCount", Get().PlacementCount);
@@ -43,12 +43,12 @@ public:
         return result;
     }
 
-    void FromJson(const JsonValue &arJson) override
+    void FromData(const DynamicData &arData) override
     {
-        Get().ApplicationName = arJson["ApplicationName"].AsString();
-        Get().PlacementCount = arJson["PlacementCount"];
-        Get().Power = arJson["Power"];
-        Get().Pi = arJson["Pi"];
+        Get().ApplicationName = arData["ApplicationName"].AsString();
+        Get().PlacementCount = arData["PlacementCount"];
+        Get().Power = arData["Power"];
+        Get().Pi = arData["Pi"];
     }
 
     void Validate() override
@@ -78,7 +78,7 @@ TEST_CASE("Config")
     SUBCASE("Json")
     {
         std::string json;
-        CHECK_NOTHROW(json = config.ToJson().Encode());
+        CHECK_NOTHROW(json = JsonEncoder().Encode(config.ToData()));
 
 //        MESSAGE(json);
         CHECK_EQ(json, R"({"ApplicationName":"ConfigurationApp","PlacementCount":3,"Power":280,"Pi":3.1415926535897931})");
@@ -87,15 +87,15 @@ TEST_CASE("Config")
         CHECK_THROWS_AS(config.Validate(), ValidatorException);
 
         json = R"({"ApplicationName":"ConfigurationApp","PlacementCount":"NotANumber","Power":280,"Pi":3.1415926535897931,"ExtraValue":1.2345})";
-        Json js;
-        CHECK_NOTHROW(js = Json::Decode(json));
-        CHECK_NOTHROW(config.FromJson(js));
+        DynamicData js;
+        CHECK_NOTHROW(js = JsonDecoder(json).Decode());
+        CHECK_NOTHROW(config.FromData(js));
         CHECK_THROWS_AS(config.Validate(), ValidatorException);
 
         json = R"({"ApplicationName":"ConfigurationApp","PlacementCount":"3","Power":280,"Pi":3.1415926535897931,"ExtraValue":1.2345})";
         CHECK_NOTHROW(js.Clear());
-        CHECK_NOTHROW(js = js.Decode(json));
-        CHECK_NOTHROW(config.FromJson(js));
+        CHECK_NOTHROW(js = JsonDecoder(json).Decode());
+        CHECK_NOTHROW(config.FromData(js));
     }
 
     SUBCASE("Storage")

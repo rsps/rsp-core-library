@@ -11,7 +11,7 @@
 #ifndef INCLUDE_SECURITY_CONFIG_H_
 #define INCLUDE_SECURITY_CONFIG_H_
 
-#include <json/Jsonable.h>
+#include <utils/DynamicData.h>
 #include <security/SignedContainer.h>
 #include <utils/Validator.h>
 
@@ -28,7 +28,7 @@ namespace rsp::security {
  * json network data.
  */
 template <typename T>
-class Config : public SignedContainer<T>, public rsp::json::Jsonable
+class Config : public SignedContainer<T>, public rsp::utils::DynamicData::Serializable
 {
 public:
     using SignedContainer<T>::SignedContainer;

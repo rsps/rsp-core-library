@@ -15,6 +15,7 @@
 #include <utils/StrUtils.h>
 
 using namespace rsp::json;
+using namespace rsp::utils;
 
 //#define JLOG(a) DLOG(a)
 #define JLOG(a)
@@ -25,24 +26,6 @@ JsonDecoder::JsonDecoder(std::string_view aJson)
       mEnd(end())
 {
 //    JLOG("JsonString Created: " << std::distance(begin(), mIt) << ", " << getLength());
-}
-
-JsonDecoder::JsonDecoder(const JsonDecoder &arJson)
-    : std::string(arJson),
-      mIt(begin()),
-      mEnd(end())
-{
-//    JLOG("JsonString Copied: " << std::distance(begin(), mIt) << ", " << getLength());
-}
-
-JsonDecoder& JsonDecoder::operator=(const JsonDecoder &arJson)
-{
-    if (&arJson != this) {
-        std::string::operator=(arJson);
-        mIt = begin();
-        mEnd = end();
-    }
-    return *this;
 }
 
 /**
@@ -198,7 +181,7 @@ std::string JsonDecoder::getString()
     return result;
 }
 
-JsonValue JsonDecoder::getObject()
+DynamicData JsonDecoder::getObject()
 {
     JLOG("getObject: " << debug(false, true));
     findSubString('{', '}');
@@ -207,7 +190,7 @@ JsonValue JsonDecoder::getObject()
 
     skipWhiteSpace();
 
-    JsonValue result(JsonTypes::Object);
+    DynamicData result;
 
     while (mIt != mEnd) {
         auto name = getString();
@@ -217,7 +200,7 @@ JsonValue JsonDecoder::getObject()
             THROW_WITH_BACKTRACE1(EJsonParseError, "Object key/value delimiter not found." + debug(false, true));
         }
         mIt++;
-        result.Add(name, GetValue());
+        result.Add(name, Decode());
         skipWhiteSpace();
         element_required = false;
         if (mIt != mEnd && *mIt == ',') {
@@ -226,7 +209,7 @@ JsonValue JsonDecoder::getObject()
         }
     }
     if (element_required) {
-        THROW_WITH_BACKTRACE1(EJsonParseError, "Excessive key/value delimiter found after " + result.mItems.back().mName + ":" + result.mItems.back().AsString());
+        THROW_WITH_BACKTRACE1(EJsonParseError, "Excessive key/value delimiter found after " + result.GetItems().back().GetName() + ":" + result.GetItems().back().AsString());
     }
     JLOG("Skip next char: " << *mIt);
     mIt++;
@@ -237,7 +220,7 @@ JsonValue JsonDecoder::getObject()
     return result;
 }
 
-JsonValue JsonDecoder::getArray()
+DynamicData JsonDecoder::getArray()
 {
     JLOG("getArray: " << debug(false, true));
     findSubString('[', ']');
@@ -246,10 +229,10 @@ JsonValue JsonDecoder::getArray()
 
     skipWhiteSpace();
 
-    JsonValue result(JsonTypes::Array);
+    DynamicData result;
 
     while (mIt != mEnd) {
-        result.Add(GetValue());
+        result.Add(Decode());
         skipWhiteSpace();
 //        JLOG("getArray: " << debug());
         element_required = false;
@@ -273,7 +256,7 @@ JsonValue JsonDecoder::getArray()
  *
  * Exceptions are thrown if content has illegal number formatting.
  */
-JsonValue JsonDecoder::getNumber()
+DynamicData JsonDecoder::getNumber()
 {
     JLOG("getNumber: " << debug(false, true));
     bool is_float = false;
@@ -403,20 +386,20 @@ JsonValue JsonDecoder::getNumber()
     }
 
     if (is_float) {
-        return JsonValue(rsp::utils::StrUtils::ToDouble(result));
+        return DynamicData(rsp::utils::StrUtils::ToDouble(result));
     }
     else if (is_negative) {
-        return JsonValue(static_cast<std::int64_t>(std::strtoll(result.c_str(), nullptr, 10)));
+        return DynamicData(static_cast<std::int64_t>(std::strtoll(result.c_str(), nullptr, 10)));
     }
     else {
-        return JsonValue(static_cast<std::uint64_t>(std::strtoull(result.c_str(), nullptr, 10)));
+        return DynamicData(static_cast<std::uint64_t>(std::strtoull(result.c_str(), nullptr, 10)));
     }
 }
 
-JsonValue JsonDecoder::GetValue()
+DynamicData JsonDecoder::Decode()
 {
-    JLOG("GetValue: " << debug(false, true));
-    JsonValue result;
+    JLOG("Decode: " << debug(false, true));
+    DynamicData result;
 
     skipWhiteSpace();
 

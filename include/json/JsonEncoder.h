@@ -15,38 +15,45 @@ namespace rsp::json {
 
 /**
  * \class JsonEncoder
- * \brief Visitor pattern, DynamicData to JSON encoder
+ * \brief DynamicData to JSON encoder
  */
-class JsonEncoder
+class JsonEncoder : public rsp::utils::DynamicData::Encoder
 {
 public:
-    /**
-     * \brief Encodes all data in the DynamicData object into valid JSON.
-     *
-     * \param arData DynamicData object
-     * \param aPrettyPrint Human readable output format
-     * \param aForceToUCS2
-     * \param aArrayLineLength Allows for multiple elements per line if PrettyPrint is enabled.
-     * \return string
-     */
-    static std::string Encode(const rsp::utils::DynamicData &arData, bool aPrettyPrint = false, bool aForceToUCS2 = false, unsigned int aArrayLineLength = 0);
-
-protected:
     class PrintFormat {
     public:
         unsigned int indent = 0;
         unsigned int arll = 0;
         std::string nl{};
         std::string sp{};
+        bool ForceToUCS2 = false;
     };
 
-    const PrintFormat& mrPf;
+    /**
+     * \brief Constructor that takes a PrintFormat preset
+     * \param arPf
+     */
+    JsonEncoder(const PrintFormat &arPf);
+
+    /**
+     * \brief Constructor with most used formatting arguments
+     * \param aPrettyPrint Human readable output format
+     * \param aArrayLineLength Allows for multiple elements per line if PrettyPrint is enabled.
+     * \param aForceToUCS2 Force extended UTF8 characters into u+0000 JSON format.
+     */
+    JsonEncoder(bool aPrettyPrint = false, unsigned int aArrayLineLength = 0, bool aForceToUCS2 = false);
+
+    /**
+     * \brief Encodes all data in the DynamicData object into valid JSON.
+     *
+     * \param arData DynamicData object
+     * \return string
+     */
+    std::string Encode(const rsp::utils::DynamicData &arData) override;
+
+protected:
+    PrintFormat mPf{};
     std::stringstream mResult{};
-    bool mForceToUCS2 = false;
-
-    JsonEncoder(const PrintFormat &arPf, bool aForceToUCS2);
-
-    std::string getResult() const { return mResult.str(); }
 
     void stringToStringStream(const rsp::utils::DynamicData &arData, unsigned int aLevel);
     void arrayToStringStream(const rsp::utils::DynamicData &arData, unsigned int aLevel);

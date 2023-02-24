@@ -14,28 +14,28 @@ using namespace rsp::utils;
 
 namespace rsp::json {
 
-std::string JsonEncoder::Encode(const rsp::utils::DynamicData &arData, bool aPrettyPrint, bool aForceToUCS2,
-    unsigned int aArrayLineLength)
+JsonEncoder::JsonEncoder(const PrintFormat &arPf)
+    : mPf(arPf)
 {
-    PrintFormat pf;
+}
+
+JsonEncoder::JsonEncoder(bool aPrettyPrint, unsigned int aArrayLineLength, bool aForceToUCS2)
+{
     if (aPrettyPrint) {
-        pf.indent = 4;
-        pf.arll = aArrayLineLength;
-        pf.nl = "\n";
-        pf.sp = " ";
+        mPf.indent = 4;
+        mPf.arll = aArrayLineLength;
+        mPf.nl = "\n";
+        mPf.sp = " ";
+        mPf.ForceToUCS2 = aForceToUCS2;
     }
-
-    JsonEncoder je(pf, aForceToUCS2);
-    je.toStringStream(arData, 0);
-    return je.getResult();
-
 }
 
-JsonEncoder::JsonEncoder(const PrintFormat &arPf, bool aForceToUCS2)
-    : mrPf(arPf),
-      mForceToUCS2(aForceToUCS2)
+std::string JsonEncoder::Encode(const rsp::utils::DynamicData &arData)
 {
+    toStringStream(arData, 0);
+    return mResult.str();
 }
+
 
 void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int aLevel)
 {
@@ -66,7 +66,7 @@ void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int a
                 s.replace(i, 1, "\\t");
                 break;
             default:
-                if (mForceToUCS2 && static_cast<uint8_t>(c) > 127) {
+                if (mPf.ForceToUCS2 && static_cast<uint8_t>(c) > 127) {
                     int v = 0;
                     char buf[12];
                     switch (static_cast<uint8_t>(c) & 0xE0) {
@@ -88,7 +88,7 @@ void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int a
                             break;
 
                         default:
-                            THROW_WITH_BACKTRACE1(EJsonParseError, "DynamicData of type string has illegal character: " + c);
+                            THROW_WITH_BACKTRACE1(EJsonParseError, "DynamicData of type string has illegal JSON character: " + c);
                             break;
                     }
                 }
@@ -101,18 +101,18 @@ void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int a
 
 void JsonEncoder::arrayToStringStream(const DynamicData &arData, unsigned int aLevel)
 {
-    std::string in(static_cast<std::string::size_type>(mrPf.indent) * (aLevel + 1), ' ');
+    std::string in(static_cast<std::string::size_type>(mPf.indent) * (aLevel + 1), ' ');
     std::string c = ",";
     int min_witdh = 0;
 
-    mResult << "[" << mrPf.nl;
+    mResult << "[" << mPf.nl;
 
     auto& items = arData.GetItems();
     auto rest = items.size();
     mResult << in;
     unsigned int item_count = 0;
 
-    if (mrPf.arll && mrPf.indent && rest) {
+    if (mPf.arll && mPf.indent && rest) {
         switch (items[0].GetType()) {
             case DynamicData::Types::Int:
             case DynamicData::Types::Uint32:
@@ -144,24 +144,24 @@ void JsonEncoder::arrayToStringStream(const DynamicData &arData, unsigned int aL
             in.clear();
         }
         mResult << c;
-        if ((rest == 0) || (++item_count >= mrPf.arll)) {
-            mResult << mrPf.nl << in;
+        if ((rest == 0) || (++item_count >= mPf.arll)) {
+            mResult << mPf.nl << in;
             item_count = 0;
         }
         else {
             mResult << " ";
         }
     }
-    std::string in1(static_cast<std::string::size_type>(mrPf.indent) * aLevel, ' ');
+    std::string in1(static_cast<std::string::size_type>(mPf.indent) * aLevel, ' ');
     mResult << in1 << "]";
 }
 
 void JsonEncoder::objectToStringStream(const DynamicData &arData, unsigned int aLevel)
 {
-    std::string in(static_cast<std::string::size_type>(mrPf.indent) * (aLevel+1), ' ');
+    std::string in(static_cast<std::string::size_type>(mPf.indent) * (aLevel+1), ' ');
     std::string c = ",";
 
-    mResult << "{" << mrPf.nl;
+    mResult << "{" << mPf.nl;
 
     auto& items = arData.GetItems();
 
@@ -170,15 +170,15 @@ void JsonEncoder::objectToStringStream(const DynamicData &arData, unsigned int a
     auto rest = items.size();
     for (const DynamicData &value : items) {
         JLOG("  " << value.mName << ": " << value.AsString());
-        mResult << in << "\"" << value.GetName() << "\":" << mrPf.sp;
+        mResult << in << "\"" << value.GetName() << "\":" << mPf.sp;
 
         toStringStream(value, aLevel+1);
         if (--rest == 0) {
             c = "";
         }
-        mResult << c << mrPf.nl;
+        mResult << c << mPf.nl;
     }
-    std::string in1(static_cast<std::string::size_type>(mrPf.indent) * aLevel, ' ');
+    std::string in1(static_cast<std::string::size_type>(mPf.indent) * aLevel, ' ');
     mResult << in1 << "}";
 }
 

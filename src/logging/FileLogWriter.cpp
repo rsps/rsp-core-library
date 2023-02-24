@@ -47,7 +47,7 @@ void FileLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, cons
         }
         mOutput << "(" << ToString(aCurrentLevel) << ") " << arMsg;
         if (!arContext.IsNull()) {
-            mOutput << "  " << rsp::json::JsonEncoder::Encode(arContext);
+            mOutput << "  " << rsp::json::JsonEncoder().Encode(arContext);
         }
         mOutput << std::endl;
     }

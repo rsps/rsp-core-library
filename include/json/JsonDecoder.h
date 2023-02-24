@@ -12,10 +12,10 @@
 #ifndef INCLUDE_JSON_JSONDECODER_H_
 #define INCLUDE_JSON_JSONDECODER_H_
 
-#include <json/JsonValue.h>
 #include <string>
 #include <string_view>
 #include <vector>
+#include <utils/DynamicData.h>
 
 namespace rsp::json {
 
@@ -32,15 +32,12 @@ public:
      * \param std::string
      */
     JsonDecoder(std::string_view aJson);
-    JsonDecoder(const JsonDecoder &arJson);
-
-    JsonDecoder& operator=(const JsonDecoder &arJson);
 
     /**
      * Decode a value object from the content. The result can be a complex hierarchy of value objects.
      * \return JsonValue*
      */
-    JsonValue GetValue();
+    rsp::utils::DynamicData Decode();
 
 protected:
     std::string::iterator mIt; // Current index iterator, this is always moving forward.
@@ -52,9 +49,9 @@ protected:
     void pop();
     void skipWhiteSpace();
     std::string getString();
-    JsonValue getObject();
-    JsonValue getArray();
-    JsonValue getNumber();
+    rsp::utils::DynamicData getObject();
+    rsp::utils::DynamicData getArray();
+    rsp::utils::DynamicData getNumber();
 
     unsigned int getOffset() { return static_cast<unsigned int>(mIt - begin()); };
     unsigned int getLength() { return static_cast<unsigned int>(mEnd - mIt); };

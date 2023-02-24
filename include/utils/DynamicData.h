@@ -33,6 +33,7 @@ public:
     explicit EDynamicTypeError(const std::string &aMsg) : EDynamicDataException("Json Type Error: " + aMsg) {}
 };
 
+#define OPTIONAL(a) try { a; } catch(...) {}
 
 /**
  * \class DynamicData
@@ -45,6 +46,38 @@ public:
 class DynamicData: public Variant
 {
 public:
+    /**
+     * \interface Decoder
+     * \brief Interface to use by DynamicData decoders
+     */
+    struct Decoder
+    {
+        virtual ~Decoder() {};
+        virtual DynamicData Decode(const std::string &arStream) = 0;
+    };
+
+    /**
+     * \interface Decoder
+     * \brief Interface to use by DynamicData decoders
+     */
+    struct Encoder
+    {
+        virtual ~Encoder() {};
+        virtual std::string Encode(const DynamicData &arData) = 0;
+    };
+
+    /**
+     * \interface Serializable
+     * \brief Interface to use by data objects that are able to convert to/from DynamicData
+     */
+    class Serializable
+    {
+    public:
+        virtual ~Serializable() {};
+        virtual DynamicData ToData() const = 0;
+        virtual void FromData(const DynamicData &arData) = 0;
+    };
+
     typedef unsigned int  size_type;
 
     /**

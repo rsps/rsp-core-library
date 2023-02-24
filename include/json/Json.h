@@ -12,11 +12,52 @@
 #define INCLUDE_JSON_JSON_H_
 
 #include <json/JsonExceptions.h>
-#include <json/JsonValue.h>
+#include <json/JsonDecoder.h>
+#include <json/JsonEncoder.h>
+#include <json/JsonStream.h>
 
 namespace rsp::json {
 
-typedef JsonValue Json;
+class Json : public rsp::utils::DynamicData
+{
+public:
+    enum class Types : unsigned int { Null, Bool, Number, String, Object, Array };
+
+    Json(const rsp::utils::DynamicData &arData);
+    Json(rsp::utils::DynamicData&& arData);
+
+    /**
+     * \brief Encode a DynamicData object to a JSON formatted string
+     * \param aPrettyPrint Set to make the string human readable
+     * \param aForceToUCS2 Set to use UCS2 codepoints for all characters above ASCII.
+     * \return JSON formatted string
+     */
+    static std::string Encode(const rsp::utils::DynamicData &arData, bool aPrettyPrint = false, bool aForceToUCS2 = false, unsigned int aArrayLineLength = 0);
+    std::string Encode(bool aPrettyPrint = false, bool aForceToUCS2 = false, unsigned int aArrayLineLength = 0) const;
+
+    /**
+     * \brief Decode a string into a DynamicData object
+     * \param aJson JSON formatted string
+     * \return JsonValue object
+     */
+    static rsp::utils::DynamicData Decode(std::string_view aJson);
+
+    /**
+     * \brief Get the type of the value content
+     * \return JsonTypes
+     */
+    static Types GetJsonType(const rsp::utils::DynamicData &arData);
+
+    /**
+     * \brief Get the type as a string. Useful for error logging.
+     * \return string
+     */
+    static std::string GetJsonTypeAsString(Types aType);
+};
+
+std::ostream& operator<<(std::ostream& os, Json::Types aType);
+std::ostream& operator<<(std::ostream& os, const Json &arJson);
+
 
 } /* namespace rsp::json */
 

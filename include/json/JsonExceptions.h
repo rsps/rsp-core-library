@@ -43,11 +43,6 @@ public:
     explicit EJsonTypeError(const std::string &aMsg) : EJsonException("Json Type Error: " + aMsg) {}
 };
 
-class EMemberNotExisting: public EJsonException {
-public:
-    explicit EMemberNotExisting(const std::string &arName) : EJsonException("Json object does not have a member named: " + arName) {}
-};
-
 
 } /* namespace rsp::json */
 

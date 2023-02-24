@@ -65,7 +65,7 @@ void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, c
     }
     ss << arMsg;
     if (!arContext.IsNull()) {
-        ss << "  " << rsp::json::JsonEncoder::Encode(arContext);
+        ss << "  " << rsp::json::JsonEncoder().Encode(arContext);
     }
     if (mpColors) {
         ss << std::string(AnsiEscapeCodes::ec::ConsoleDefault);

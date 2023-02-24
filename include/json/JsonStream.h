@@ -16,13 +16,31 @@
 
 namespace rsp::json {
 
+#define QUOTED(a) "\"" #a "\""
+
+struct Indent
+{
+    unsigned mValue;
+    Indent(unsigned aValue) : mValue(aValue) {}
+};
+struct Comma {};
+struct Key
+{
+    const char *mpValue;
+    Key(const std::string &arValue) : mpValue(arValue.c_str()) {}
+    Key(const char *apValue) : mpValue(apValue) {}
+};
+struct OBegin {};
+struct OEnd {};
+struct ABegin {};
+struct AEnd {};
+
 /**
  * \class JsonStream
- * \brief std::stringstream derivative to help with formatting data in human readable JSON format
+ * \brief std::ostringstream derivative to help with formatting data in human readable JSON format
  */
-class JsonStream : public std::stringstream {
+class JsonStream : public std::ostringstream {
 public:
-    enum class Attributes { in0, in1, in2, in3, in4, in5, in6, in7, in8, in9, cnl, nl, sp };
     /**
      * \fn JsonStream(bool aPrettyPrint, int aLevel)
      * \brief Contructs a stream object
@@ -30,18 +48,30 @@ public:
      * \param aPrettyPrint Set to format output in human readable format
      * \param aLevel Starting indentation level.
      */
-    JsonStream(bool aPrettyPrint, int aLevel);
+    JsonStream(bool aPrettyPrint = false, unsigned aLevel = 0);
 
-protected:
-    friend std::ostream& operator<< (std::ostream& os, const Attributes aAttrib);
-    int mRootLevel;
-    std::string mCommaNewLine{};
-    std::string mNewLine{};
-    std::string mSpace{};
+    bool mPrettyPrint;
+    unsigned mRootLevel;
+    std::string indentation{};
+    std::string space{};
+    std::string newLine{};
 };
 
-std::ostream& operator<< (std::ostream& os, const JsonStream::Attributes aAttrib);
+JsonStream& operator<<(JsonStream& o, const Indent &arIndent);
+JsonStream& operator<<(JsonStream& o, const Comma &arComma);
+JsonStream& operator<<(JsonStream& o, const Key &arKey);
+JsonStream& operator<<(JsonStream& o, const OBegin &arObjectBegin);
+JsonStream& operator<<(JsonStream& o, const OEnd &arObjectEnd);
+JsonStream& operator<<(JsonStream& o, const ABegin &arArrayBegin);
+JsonStream& operator<<(JsonStream& o, const AEnd &arArrayEnd);
+JsonStream& operator<<(JsonStream& o, const std::string &arStr);
+JsonStream& operator<<(JsonStream& o, const char *apStr);
 
+template <class T>
+JsonStream& operator<<(JsonStream& o, T v) {
+    static_cast<std::ostringstream&>(o) << v;
+    return o;
+}
 
 } // namespace rsp::json
 
