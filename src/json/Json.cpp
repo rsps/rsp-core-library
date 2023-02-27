@@ -34,6 +34,11 @@ std::ostream& operator <<(std::ostream &os, const Json &arJson)
     return os << arJson.Encode();
 }
 
+Json::Json(std::string_view aJson)
+    : DynamicData(JsonDecoder(aJson).Decode())
+{
+}
+
 Json::Json(const DynamicData &arData)
     : DynamicData(arData)
 {
@@ -61,9 +66,15 @@ DynamicData Json::Decode(std::string_view aJson)
     return js.Decode();
 }
 
+
 std::string Json::GetJsonTypeAsString(Json::Types aType)
 {
     return std::string(magic_enum::enum_name<Json::Types>(aType));
+}
+
+std::string Json::GetJsonTypeAsString()
+{
+    return GetJsonTypeAsString(GetJsonType());
 }
 
 Json::Types Json::GetJsonType(const DynamicData &arData)
@@ -93,6 +104,11 @@ Json::Types Json::GetJsonType(const DynamicData &arData)
             break;
     }
     THROW_WITH_BACKTRACE1(EJsonTypeError, "Variant of type " + arData.TypeToText() + " is not a valid JSON type");
+}
+
+Json::Types Json::GetJsonType()
+{
+    return GetJsonType(*this);
 }
 
 } // namespace rsp::json

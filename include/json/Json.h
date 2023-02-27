@@ -23,6 +23,7 @@ class Json : public rsp::utils::DynamicData
 public:
     enum class Types : unsigned int { Null, Bool, Number, String, Object, Array };
 
+    Json(std::string_view aJson);
     Json(const rsp::utils::DynamicData &arData);
     Json(rsp::utils::DynamicData&& arData);
 
@@ -47,12 +48,14 @@ public:
      * \return JsonTypes
      */
     static Types GetJsonType(const rsp::utils::DynamicData &arData);
+    Types GetJsonType();
 
     /**
      * \brief Get the type as a string. Useful for error logging.
      * \return string
      */
     static std::string GetJsonTypeAsString(Types aType);
+    std::string GetJsonTypeAsString();
 };
 
 std::ostream& operator<<(std::ostream& os, Json::Types aType);
