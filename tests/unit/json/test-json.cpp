@@ -337,9 +337,23 @@ null }
     }
 
     SUBCASE("Streaming") {
-        auto raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"}})";
+        bool pretty = false;
+        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"}})";
+
+        SUBCASE("Ugly") {
+        }
+        SUBCASE("Pretty") {
+            raw = R"({
+    "Member1": 1234,
+    "Member2": {
+        "NestedMember": "NestedValue"
+    }
+})";
+            pretty = true;
+        }
+
         std::stringstream ss;
-        CHECK_NOTHROW(ss << Json(Json::Decode(raw)));
+        CHECK_NOTHROW(ss << Json(raw).Encode(pretty));
 
         CHECK_EQ(ss.str(), raw);
 
@@ -347,7 +361,7 @@ null }
         ss << Json::Types::Number;
         CHECK_EQ(ss.str(), "Number");
 
-        JsonStream js;
+        JsonStream js(pretty);
         js << Indent(1) << OBegin()
             << Key("Member1") << 1234 << Comma()
             << Key("Member2") << Indent(2) << OBegin()
@@ -355,29 +369,6 @@ null }
                 << Indent(1) << OEnd()
             << Indent(0) << OEnd();
         CHECK_EQ(js.str(), raw);
-    }
-
-    SUBCASE("Pretty Stream") {
-        std::string raw = R"(
-{
-    "Member1": 1234,
-    "Member2": {
-        "NestedMember": "NestedValue"
-    }
-})";
-        StrUtils::Trim(raw);
-        std::stringstream ss;
-        CHECK_NOTHROW(ss << Json::Encode(Json::Decode(raw), true));
-        CHECK_EQ(ss.str(), raw);
-
-        JsonStream js2(true);
-        js2 << Indent(1) << OBegin()
-            << Key("Member1") << 1234 << Comma()
-            << Key("Member2") << Indent(2) << OBegin()
-                << Key("NestedMember") << "NestedValue"
-                << Indent(1) << OEnd()
-            << Indent(0) << OEnd();
-        CHECK_EQ(js2.str(), raw);
     }
 }
 
