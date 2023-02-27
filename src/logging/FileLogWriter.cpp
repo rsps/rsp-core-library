@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <utils/DateTime.h>
 #include <logging/FileLogWriter.h>
+#include <json/JsonEncoder.h>
 
 using namespace rsp::utils;
 
@@ -36,11 +37,19 @@ FileLogWriter::~FileLogWriter()
     mOutput.close();
 }
 
-void FileLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel)
+void FileLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
 {
     if (arMsg.length() && (mAcceptLevel >= aCurrentLevel)) {
         DateTime dt;
-        mOutput << "[" << dt.ToLogging() << "] (" << ToString(aCurrentLevel) << ") " << arMsg << std::flush;
+        mOutput << "[" << dt.ToLogging() << "] ";
+        if (arChannel.length()) {
+            mOutput << "<" << arChannel << "> ";
+        }
+        mOutput << "(" << ToString(aCurrentLevel) << ") " << arMsg;
+        if (!arContext.IsNull()) {
+            mOutput << "  " << rsp::json::JsonEncoder().Encode(arContext);
+        }
+        mOutput << std::endl;
     }
 }
 

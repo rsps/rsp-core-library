@@ -11,7 +11,7 @@
 #ifndef SRC_LOGGING_SYSLOGWRITER_H_
 #define SRC_LOGGING_SYSLOGWRITER_H_
 
-#include "LogWriter.h"
+#include <logging/LogWriterInterface.h>
 
 namespace rsp::logging {
 
@@ -25,7 +25,7 @@ public:
     SysLogWriter(std::string aIdent, LogLevel aAcceptLevel, LogType aType);
     ~SysLogWriter();
 
-    void Write(const std::string &arMsg, LogLevel aCurrentLevel) override;
+    void Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
 
 protected:
     std::string mIdent;

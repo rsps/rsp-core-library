@@ -50,7 +50,7 @@ public:
      * \enum Types
      * \brief Type declaration used for each native type.
      */
-    enum class Types : std::uint32_t {Null, Bool, Int, Int64, Uint64, Uint32, Uint16, Float, Double, Pointer, String};
+    enum class Types : std::uint32_t {Null, Bool, Int, Int64, Uint64, Uint32, Uint16, Float, Double, Pointer, String, Object, Array};
 
     /**
      * \fn  Variant()
@@ -130,6 +130,12 @@ public:
     Types GetType() const { return mType; }
 
     /**
+     * \brief Get a textual representation of the Variant content type
+     * \return string
+     */
+    std::string TypeToText() const;
+
+    /**
      * \fn  operator <T>()const
      * \brief Operator overloads for all native types.
      */
@@ -189,12 +195,9 @@ protected:
         uintptr_t mPointer;
     };
     std::string mString{};
-
-    friend std::ostream& operator<< (std::ostream& os, Variant aValue);
-    std::string typeToText() const;
 };
 
-std::ostream& operator<< (std::ostream& os, Variant aValue);
+std::ostream& operator<< (std::ostream& os, const Variant& arValue);
 
 } /* namespace rsp::utils */
 

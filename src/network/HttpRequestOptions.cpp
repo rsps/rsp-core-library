@@ -9,23 +9,15 @@
  */
 
 #include <network/HttpRequestOptions.h>
+#include <utils/StrUtils.h>
+#include <magic_enum.hpp>
 
 namespace rsp::network {
 
 
 std::ostream& operator<<(std::ostream &o, HttpRequestType aType)
 {
-    const char *cmap[int(HttpRequestType::__count__)] = {
-        "NONE",
-        "GET",
-        "POST",
-        "PUT",
-        "HEAD",
-        "PATCH",
-        "DELETE"
-    };
-
-    return o << cmap[int(aType)];
+    return o << magic_enum::enum_name<HttpRequestType>(aType);
 }
 
 std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)

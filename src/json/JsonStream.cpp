@@ -13,45 +13,75 @@
 
 namespace rsp::json {
 
-JsonStream::JsonStream(bool aPrettyPrint, int aLevel)
-    : mRootLevel(-1)
+JsonStream::JsonStream(bool aPrettyPrint, unsigned aLevel)
+    : mPrettyPrint(aPrettyPrint),
+      mRootLevel(aLevel)
 {
-    if (aPrettyPrint) {
-        mRootLevel = aLevel;
-        mNewLine = "\n";
-        mCommaNewLine = ",\n";
-        mSpace = " ";
-    }
-    else {
-        mCommaNewLine = ",";
+    if (mPrettyPrint) {
+        indentation = std::string( (mRootLevel) * 4, ' ');
+        space = " ";
+        newLine = "\n";
     }
 }
 
-std::ostream& operator<< (std::ostream& os, const JsonStream::Attributes aAttrib) {
-
-    JsonStream* js = static_cast<JsonStream*>(&os);
-
-    switch (aAttrib) {
-        case JsonStream::Attributes::cnl:
-            os << js->mCommaNewLine;
-            break;
-        case JsonStream::Attributes::nl:
-            os << js->mNewLine;
-            break;
-        case JsonStream::Attributes::sp:
-            os << js->mSpace;
-            break;
-
-        default:
-            if (js->mRootLevel >= 0) {
-                os << std::string( (static_cast<unsigned int>(js->mRootLevel) + static_cast<unsigned int>(aAttrib)) * 4, ' ');
-            }
-            break;
+JsonStream& operator <<(JsonStream &o, const Indent &arIndent)
+{
+    if (o.mPrettyPrint) {
+        o.indentation = std::string( (o.mRootLevel + arIndent.mValue) * 4, ' ');
     }
-    return os;
+    return o;
 }
 
+JsonStream& operator <<(JsonStream &o, const Comma &arComma)
+{
+    static_cast<std::ostringstream&>(o) << ',' << o.newLine << o.indentation;
+    return o;
+}
 
-} // namespace rsp::json
+JsonStream& operator <<(JsonStream &o, const Key &arKey)
+{
+    static_cast<std::ostringstream&>(o) << "\"" << arKey.mpValue << "\":" << o.space;
+    return o;
+}
+
+JsonStream& operator <<(JsonStream &o, const OBegin &)
+{
+    static_cast<std::ostringstream&>(o) << "{" << o.newLine << o.indentation;
+    return o;
+}
+
+JsonStream& operator <<(JsonStream &o, const OEnd &)
+{
+    static_cast<std::ostringstream&>(o) << o.newLine << o.indentation << "}";
+    return o;
+}
+
+JsonStream& operator <<(JsonStream &o, const ABegin &)
+{
+    static_cast<std::ostringstream&>(o) << "[" << o.newLine << o.indentation;
+    return o;
+}
+
+JsonStream& operator <<(JsonStream &o, const AEnd &)
+{
+    static_cast<std::ostringstream&>(o) << o.newLine << o.indentation << "]";
+    return o;
+}
+
+JsonStream& operator <<(JsonStream &o, const std::string &arStr)
+{
+    static_cast<std::ostringstream&>(o) << "\"" << arStr << "\"";
+    return o;
+}
+
+JsonStream& operator<<(JsonStream& o, const char *apStr)
+{
+    static_cast<std::ostringstream&>(o) << "\"" << apStr << "\"";
+    return o;
+}
+
+}
+
+ // namespace rsp::json
 
 

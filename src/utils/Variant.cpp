@@ -258,7 +258,7 @@ bool Variant::AsBool() const
             return (mString.length() > 0);
 
         default:
-            THROW_WITH_BACKTRACE2(EConversionError, typeToText(), "bool");
+            THROW_WITH_BACKTRACE2(EConversionError, TypeToText(), "bool");
             break;
     }
     return false;
@@ -289,7 +289,7 @@ std::int64_t Variant::AsInt() const
             return static_cast<std::int64_t>(std::strtol(mString.c_str(), nullptr, 0));
 
         default:
-            THROW_WITH_BACKTRACE2(EConversionError, typeToText(), "int");
+            THROW_WITH_BACKTRACE2(EConversionError, TypeToText(), "int");
             break;
     }
     return 0;
@@ -320,7 +320,7 @@ double Variant::AsDouble() const
             return StrUtils::ToDouble(mString);
 
         default:
-            THROW_WITH_BACKTRACE2(EConversionError, typeToText(), "double");
+            THROW_WITH_BACKTRACE2(EConversionError, TypeToText(), "double");
             break;
     }
     return 0.0f;
@@ -350,6 +350,8 @@ std::string Variant::AsString() const
             return StrUtils::ToString(mDouble);
 
         case Types::Pointer:
+        case Types::Object:
+        case Types::Array:
         {
             char buf[40];
             sprintf(buf, "%p", reinterpret_cast<void*>(mPointer));
@@ -360,7 +362,7 @@ std::string Variant::AsString() const
             return mString;
 
         default:
-            THROW_WITH_BACKTRACE2(EConversionError, typeToText(), "string");
+            THROW_WITH_BACKTRACE2(EConversionError, TypeToText(), "string");
             break;
     }
     return "";
@@ -376,13 +378,13 @@ void* Variant::AsPointer() const
             return reinterpret_cast<void*>(mPointer);
 
         default:
-            THROW_WITH_BACKTRACE2(EConversionError, typeToText(), "pointer");
+            THROW_WITH_BACKTRACE2(EConversionError, TypeToText(), "pointer");
             break;
     }
     return nullptr;
 }
 
-std::string Variant::typeToText() const
+std::string Variant::TypeToText() const
 {
     switch (mType) {
         default: return std::string("Unknown type (") + std::to_string(static_cast<int>(mType)) + ")";
@@ -397,12 +399,14 @@ std::string Variant::typeToText() const
         case Types::Double: return "double";
         case Types::Pointer: return "pointer";
         case Types::String: return "string";
+        case Types::Object: return "object";
+        case Types::Array: return "array";
     }
 }
 
-std::ostream& operator<< (std::ostream& os, Variant aValue)
+std::ostream& operator<< (std::ostream& os, const Variant& arValue)
 {
-    os << aValue.typeToText() << ":" << aValue.AsString();
+    os << arValue.TypeToText() << ":" << arValue.AsString();
     return os;
 }
 

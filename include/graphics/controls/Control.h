@@ -46,12 +46,14 @@ public:
      * \brief Enum type defining the available states
      */
     enum class States {
-        disabled = 1,
-        normal = 2,
-        pressed = 4,
-        dragged = 8,
-        checked = 16,
-        checkedPressed = 32
+        NONE,
+        disabled,
+        normal,
+        pressed,
+        dragged,
+        checked,
+        checkedPressed,
+        __END__
     };
 
     Control(const rsp::utils::TypeInfo &arTypeInfo) : mTypeInfo(arTypeInfo) {}

@@ -10,12 +10,11 @@
 
 #include <string>
 #include <doctest.h>
-#include <json/JsonValue.h>
 #include <utils/StructElement.h>
+#include <utils/DynamicData.h>
 #include <linux/input.h>
 
 using namespace rsp::utils;
-using namespace rsp::json;
 
 TEST_CASE("StructElement") {
 
@@ -48,7 +47,7 @@ TEST_CASE("StructElement") {
         CHECK_NOTHROW(s = data.mString.Get(defaultItem<std::string>::default_value()));
         CHECK(s.empty());
 
-        JsonValue js;
+        DynamicData js;
         CHECK_NOTHROW(js = data.mInteger);
         CHECK(js.IsNull());
 

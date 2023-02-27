@@ -51,7 +51,7 @@ std::ostream& operator<<(std::ostream& os, const FourCC &arChunk)
 
 void PngLoader::LoadImg(const std::string &arImgName)
 {
-    Logger::GetDefault().Debug() << "PngLoader reading file: " << arImgName << std::endl;
+    Logger::GetDefault().Debug() << "PngLoader reading file: " << arImgName;
 
     //Pass reference to the first element in string, and read as binary
     posix::FileIO file(arImgName, std::ios_base::in);
@@ -86,7 +86,7 @@ void PngLoader::LoadImg(const std::string &arImgName)
                 break;
 
             default:
-                Logger::GetDefault().Warning() << "Chunk type '" << chunk.GetType() << "' was ignored" << std::endl;
+                Logger::GetDefault().Warning() << "Chunk type '" << chunk.GetType() << "' was ignored";
                 break;
         }
     }

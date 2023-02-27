@@ -18,7 +18,9 @@
 #include <sstream>
 #include <mutex>
 #include <iostream>
-#include "LogWriter.h"
+#include <utils/DynamicData.h>
+#include "LoggerInterface.h"
+#include "SetLevel.h"
 
 namespace rsp::logging {
 
@@ -46,134 +48,6 @@ constexpr const char* stem(std::string_view path)
 #define DUMP(a, b) { std::cout << rsp::logging::stem(__FILE__) << ":" << __LINE__ << " " << __FUNCTION__ << "(" << a << ") -> " << b << std::endl; }
 
 
-class LogStreamInterface;
-class LogStream;
-
-/**
- * \class Abstract LoggerInterface
- *
- * \brief This is the interface for logging functionality.
- *
- * The logging design is a public logger interface with multiple writers attached to it.
- * A writer can be limited in which log level should trigger its output.
- */
-class LoggerInterface
-{
-public:
-    virtual ~LoggerInterface() { mpDefaultInstance.reset(); }
-
-    static void SetDefault(LoggerInterface* apLogger);
-    static LoggerInterface& GetDefault();
-
-    virtual LogStream Emergency() = 0;
-    virtual LogStream Alert() = 0;
-    virtual LogStream Critical() = 0;
-    virtual LogStream Error() = 0;
-    virtual LogStream Warning() = 0;
-    virtual LogStream Notice() = 0;
-    virtual LogStream Info() = 0;
-    virtual LogStream Debug() = 0;
-
-    bool HasWriters() const;
-
-    typedef uintptr_t Handle_t;
-    Handle_t AddLogWriter(std::shared_ptr<LogWriterInterface> aWriter);
-
-    void RemoveLogWriter(Handle_t aHandle);
-
-protected:
-    static std::shared_ptr<LoggerInterface> mpDefaultInstance;
-    std::recursive_mutex mMutex{};
-    std::vector<std::shared_ptr<LogWriterInterface>> mWriters{};
-
-    friend class LogStreamInterface;
-    virtual void write(const LogStreamInterface *apStream, const std::string &arMsg);
-};
-
-/**
- * \class LogStreamInterface
- *
- * \brief This is the base class for log streams.
- *
- * LogStreams are used as temporary objects, holding logged information together until
- * flushed or destroyed.
- * It ensures thread safe write of the log data.
- */
-class LogStreamInterface
-{
-public:
-    LogStreamInterface(LoggerInterface *apOwner, LogLevel aLevel);
-    LogStreamInterface(const LogStreamInterface & aFrom)
-        : mpOwner(aFrom.mpOwner), mLevel(aFrom.mLevel) {}
-    virtual ~LogStreamInterface() {}
-
-    LogLevel GetLevel() const { return mLevel; }
-    void SetLevel(LogLevel aLevel) { mLevel = aLevel; }
-
-    LogStreamInterface& operator= (const LogStreamInterface&) = delete;
-    LogStreamInterface& operator= (const LogStreamInterface&&);
-protected:
-    LoggerInterface *mpOwner;
-    LogLevel mLevel;
-
-    void ownerWrite(const std::string &arMsg);
-};
-
-/**
- * \class LogStream
- *
- * \brief A templated LogStream implementation
- */
-class LogStream : public LogStreamInterface
-{
-public:
-    LogStream(LoggerInterface *apOwner, LogLevel aLevel);
-    LogStream(const LogStream &aFrom) = delete; /* No copy, move is OK */
-    LogStream(LogStream &&aFrom);
-    ~LogStream();
-
-    LogStream& operator=(LogStream &&arOther);
-
-    template< class type> LogStream& operator<<(const type &arValue) {
-        mBuffer << arValue;
-        return *this;
-    }
-
-    LogStream& operator<<( std::ostream&(*apFunc)(std::ostream&) )
-    {
-        mBuffer << apFunc;
-        return *this;
-    }
-
-    void Flush();
-
-protected:
-    std::stringstream mBuffer{};
-};
-
-/**
- * \class OutStreamBuf
- *
- * \brief An ostreambuf implementation allowing for std::ostream operations.
- */
-class OutStreamBuf : public std::streambuf, public LogStreamInterface
-{
-public:
-    OutStreamBuf(LoggerInterface *apOwner, LogLevel aLevel);
-
-    void Lock() { mMutex.lock(); }
-
-protected:
-    std::string mBuffer{};
-    std::mutex mMutex{};
-
-    int overflow(int c) override;
-    int sync() override;
-};
-
-std::ostream& operator<< (std::ostream& os, LogLevel aLevel);
-
-
 /**
  * \class Logger
  *
@@ -199,8 +73,10 @@ public:
 
 protected:
     // Use shared_ptr to use compilers default move operations.
-    // It is instantiated with do nothing deallocator in Logger constructor initialization.
+    // It is instantiated with "do nothing" deallocator in Logger constructor initialization.
     std::shared_ptr<std::streambuf> mpClogBackup;
+
+    std::shared_ptr<std::streambuf> makeCLogStream(bool aCaptureLog);
 };
 
 } /* namespace logging */

@@ -71,6 +71,18 @@ std::string& ToUpper(std::string &arStr)
     return arStr;
 }
 
+std::string ToLower(const std::string &arStr)
+{
+    std::string result = arStr;
+    return ToLower(result);
+}
+
+std::string ToUpper(const std::string &arStr)
+{
+    std::string result = arStr;
+    return ToUpper(result);
+}
+
 
 std::string GetHomeDir()
 {

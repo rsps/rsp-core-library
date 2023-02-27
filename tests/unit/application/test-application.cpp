@@ -21,7 +21,7 @@ using namespace rsp::application;
 
 const char *cLogFileName = "MyApplication.log";
 
-TEST_CASE("Application Instance")
+TEST_CASE("Application")
 {
     const char *arguments[] = {
         "./MyApplication",
@@ -64,7 +64,7 @@ TEST_CASE("Application Instance")
         TestApplication app(1, arguments);
 
         app.SetCallback([](TestApplication &arApp) -> bool {
-            arApp.GetLog().Notice() << "Logged from callback." << std::endl;
+            arApp.GetLog().Notice() << "Logged from callback.";
             return true;
         });
         ApplicationBase::Get<TestApplication>().Run();
@@ -82,7 +82,7 @@ TEST_CASE("Application Instance")
         class MyClass {
         public:
             bool MyFunction(TestApplication &arApp) {
-                arApp.GetLog().Notice() << "Logged from callback to member function." << std::endl;
+                arApp.GetLog().Notice() << "Logged from callback to member function.";
                 return true;
             }
         };

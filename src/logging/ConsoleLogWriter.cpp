@@ -10,8 +10,10 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <utils/AnsiEscapeCodes.h>
 #include <logging/ConsoleLogWriter.h>
+#include <json/JsonEncoder.h>
 
 using namespace rsp::utils;
 
@@ -21,11 +23,11 @@ class DefaultConsoleStream : public ConsoleLogStreamsInterface
 {
 public:
     void Error(const std::string &arMsg) override {
-        std::cerr << arMsg << std::flush;
+        std::cerr << arMsg << std::endl;
     }
 
     void Info(const std::string &arMsg) override {
-        std::cout << arMsg << std::flush;
+        std::cout << arMsg << std::endl;
     }
 };
 
@@ -48,25 +50,32 @@ ConsoleLogWriter::~ConsoleLogWriter()
     }
 }
 
-void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel)
+void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
 {
     if (!arMsg.length() || (mAcceptLevel < aCurrentLevel)) {
         return;
     }
 
-    std::string s;
+    std::stringstream ss;
     if (mpColors) {
-        s = (*mpColors)[std::size_t(aCurrentLevel)] + arMsg + std::string(AnsiEscapeCodes::ec::ConsoleDefault);
+        ss << (*mpColors)[std::size_t(aCurrentLevel)];
     }
-    else {
-        s = arMsg;
+    if (arChannel.length()) {
+        ss << "<" << arChannel << "> ";
+    }
+    ss << arMsg;
+    if (!arContext.IsNull()) {
+        ss << "  " << rsp::json::JsonEncoder().Encode(arContext);
+    }
+    if (mpColors) {
+        ss << std::string(AnsiEscapeCodes::ec::ConsoleDefault);
     }
 
     if (aCurrentLevel < LogLevel::Warning) {
-        mpConsole->Error(s); // Write to std::cerr
+        mpConsole->Error(ss.str()); // Write to std::cerr
     }
     else {
-        mpConsole->Info(s);
+        mpConsole->Info(ss.str());
     }
 }
 

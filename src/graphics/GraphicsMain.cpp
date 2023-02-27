@@ -59,7 +59,7 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
 
         // New inputs?
         if (mrTouchParser.Poll(event)) {
-            Logger::GetDefault().Debug() << "Touch Event: " << event << std::endl;
+            Logger::GetDefault().Debug() << "Touch Event: " << event;
             mrScenes.ActiveScene().ProcessInput(event);
         }
 
