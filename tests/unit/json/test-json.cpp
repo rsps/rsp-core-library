@@ -25,7 +25,7 @@ TEST_CASE("Json") {
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
-    std::string json_object{ R"(
+    std::string_view json_object{ R"(
 {
     "NullValue": null,
     "BooleanValue": true,
@@ -128,8 +128,13 @@ null }
     }
 
     SUBCASE("Decode Object") {
-        DynamicData v;
-        CHECK_NOTHROW(v = Json::Decode(json_object));
+        Json v;
+        SUBCASE("Static") {
+            CHECK_NOTHROW(v = Json::Decode(json_object));
+        }
+        SUBCASE("Dynamic") {
+            CHECK_NOTHROW(v = Json(json_object));
+        }
 
         CHECK(Json::GetJsonType(v) == Json::Types::Object);
         CHECK(v.GetCount() == 7);
@@ -184,13 +189,20 @@ null }
     }
 
     SUBCASE("Encode Object") {
-        std::string orig = json_object;
+        std::string orig(json_object);
         DynamicData v = JsonDecoder(json_object).Decode();
 
         CHECK(Json::GetJsonType(v) == Json::Types::Object);
         CHECK(v.GetCount() == 7);
 
-        std::string result = Json::Encode(v, true);
+        std::string result;
+        SUBCASE("Static") {
+            result = Json::Encode(v, true);
+        }
+        SUBCASE("Dynamic") {
+            Json js(v);
+            result = js.Encode(true);
+        }
 
         StrUtils::Trim(result);
         StrUtils::Trim(orig);
@@ -226,7 +238,7 @@ null }
     }
 
     SUBCASE("Copy") {
-        std::string orig = json_object;
+        std::string orig(json_object);
         StrUtils::Trim(orig);
         auto p = Json::Decode(json_object);
 
@@ -251,7 +263,7 @@ null }
     }
 
     SUBCASE("Move") {
-        std::string orig = json_object;
+        std::string orig(json_object);
         StrUtils::Trim(orig);
         auto p = JsonDecoder(json_object).Decode();
         auto dst = std::move(p);
@@ -316,6 +328,8 @@ null }
 
         double dbl_value = o.TryGet("FloatValue", 0.54321);
         CHECK_EQ(dbl_value, 1.234567);
+        dbl_value = o.TryGet("FloatValueX", 0.54321);
+        CHECK_EQ(dbl_value, 0.54321);
 
         DynamicData js_value = o.TryGet("NonExisting", DynamicData().Add(1).Add(2));
         CHECK(js_value.IsArray());
@@ -334,10 +348,13 @@ null }
         CHECK_EQ(ss.str(), "Number");
 
         JsonStream js;
-        js << Indent(1) << OBegin() << Key("Member1") << 1234 << Comma()
-            << Key("Member2") << Indent(2) << OBegin() << Key("NestedMember") << "NestedValue" << Indent(1) << OEnd() << Indent(0) << OEnd();
+        js << Indent(1) << OBegin()
+            << Key("Member1") << 1234 << Comma()
+            << Key("Member2") << Indent(2) << OBegin()
+                << Key("NestedMember") << "NestedValue"
+                << Indent(1) << OEnd()
+            << Indent(0) << OEnd();
         CHECK_EQ(js.str(), raw);
-
     }
 
     SUBCASE("Pretty Stream") {
@@ -357,8 +374,8 @@ null }
         js2 << Indent(1) << OBegin()
             << Key("Member1") << 1234 << Comma()
             << Key("Member2") << Indent(2) << OBegin()
-            << Key("NestedMember") << "NestedValue"
-            << Indent(1) << OEnd()
+                << Key("NestedMember") << "NestedValue"
+                << Indent(1) << OEnd()
             << Indent(0) << OEnd();
         CHECK_EQ(js2.str(), raw);
     }

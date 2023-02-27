@@ -23,6 +23,7 @@ class Json : public rsp::utils::DynamicData
 public:
     enum class Types : unsigned int { Null, Bool, Number, String, Object, Array };
 
+    Json() : DynamicData() {}
     Json(std::string_view aJson);
     Json(const rsp::utils::DynamicData &arData);
     Json(rsp::utils::DynamicData&& arData);
