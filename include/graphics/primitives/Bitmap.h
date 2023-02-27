@@ -65,15 +65,9 @@ public:
     Bitmap& Assign(const PixelData &arPixelData);
 
 
-    inline void SetPixel(const Point &arPoint, const Color &arColor) override
-    {
-        if (!IsInsideCanvas(arPoint)) {
-            return;
-        }
-        mImagePixels.SetPixelAt(arPoint.GetX(), arPoint.GetY(), arColor);
-    }
+    void SetPixel(const Point &arPoint, const Color &arColor) override;
 
-    std::uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const;
+    std::uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const override;
 
     /**
      * \brief Get a read only reference to the pixel data.

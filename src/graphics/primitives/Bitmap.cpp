@@ -48,9 +48,17 @@ Bitmap::Bitmap(GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel)
 {
 }
 
+void Bitmap::SetPixel(const Point &arPoint, const Color &arColor)
+{
+    if (!IsHit(arPoint)) {
+        return;
+    }
+    mImagePixels.SetPixelAt(arPoint.GetX(), arPoint.GetY(), arColor);
+}
+
 std::uint32_t Bitmap::GetPixel(const Point &aPoint, const bool aFront) const
 {
-    if (!IsInsideCanvas(aPoint)) {
+    if (!IsHit(aPoint)) {
         return 0;
     }
     return mImagePixels.GetPixelAt(aPoint.mX, aPoint.mY, Color::White);

@@ -62,8 +62,7 @@ void Label::doSetArea(const Rect &arRect)
 void Label::paint(Canvas &arCanvas, const Style &arStyle)
 {
     Control::paint(arCanvas, arStyle);
-    mText.GetFont().SetColor(arStyle.mForegroundColor);
-    arCanvas.DrawText(mText);
+    arCanvas.DrawText(mText, arStyle.mForegroundColor);
 }
 
 Label& Label::SetFontSize(int aSizePx)

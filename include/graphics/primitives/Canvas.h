@@ -29,10 +29,6 @@ class Bitmap;
 class Canvas
 {
   public:
-    Canvas()
-        : mHeight(0), mWidth(0), mBytesPerPixel(0), mClipRect() {}
-    Canvas(GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel)
-        : mHeight(aHeight), mWidth(aWidth), mBytesPerPixel(aBytesPerPixel), mClipRect(0, 0, aWidth, aHeight) {}
     /**
      * \brief Virtual destructor for the abstract class.
      */
@@ -50,7 +46,7 @@ class Canvas
      * \param aSweepAngle
      * \param aColor
      */
-    virtual void DrawArc(const Point &arCenter, GuiUnit_t aRadius1, GuiUnit_t aRadius2, int aStartAngel, int aSweepAngle, const Color &arColor);
+    virtual void DrawArc(const Point &arCenter, GuiUnit_t aRadius1, GuiUnit_t aRadius2, int aStartAngel, int aSweepAngle, const Color &arColor) = 0;
     /**
      * \brief Draw a full circle
      *
@@ -58,7 +54,7 @@ class Canvas
      * \param aRadius
      * \param aColor
      */
-    virtual void DrawCircle(const Point &arCenter, GuiUnit_t aRadius, const Color &arColor);
+    virtual void DrawCircle(const Point &arCenter, GuiUnit_t aRadius, const Color &arColor) = 0;
 
     /**
      * \brief Draw a straight line from A to B.
@@ -67,7 +63,7 @@ class Canvas
      * \param aB
      * \param aColor
      */
-    virtual void DrawLine(const Point &arA, const Point &arB, const Color &arColor);
+    virtual void DrawLine(const Point &arA, const Point &arB, const Color &arColor) = 0;
 
     /**
      * \brief Draw a rectangle
@@ -79,7 +75,7 @@ class Canvas
      * \param aColor
      * \param aFilled
      */
-    virtual void DrawRectangle(const Rect &arRect, const Color &arColor, bool aFilled = false);
+    virtual void DrawRectangle(const Rect &arRect, const Color &arColor, bool aFilled = false) = 0;
 
     /**
      * \brief Copies the bitmap content into the canvas.
@@ -88,7 +84,7 @@ class Canvas
      * \param arBitmap The source bitmap to copy from
      * \param aColor Foreground color used if the bitmap is monochrome or alpha.
      */
-    virtual void DrawImage(const Point &arLeftTop, const Bitmap &arBitmap, Color aColor = Color::White);
+    virtual void DrawImage(const Point &arLeftTop, const Bitmap &arBitmap, Color aColor = Color::White) = 0;
 
     /**
      * \brief Copies the section part of the bitmap content into the canvas.
@@ -98,7 +94,7 @@ class Canvas
      * \param arSection Rectangular section of the source bitmap
      * \param aColor Foreground color used if the bitmap is monochrome or alpha.
      */
-    virtual void DrawImageSection(const Point &arLeftTop, const Bitmap &arBitmap, const Rect &arSection, Color aColor = Color::White);
+    virtual void DrawImageSection(const Point &arLeftTop, const Bitmap &arBitmap, const Rect &arSection, const Color &arColor = Color::White) = 0;
 
     /**
      * \brief Copies part of a pixel data buffer into this canvas.
@@ -107,7 +103,7 @@ class Canvas
      * \param arSection
      * \param aColor
      */
-    virtual void DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData, const Rect &arSection, Color aColor);
+    virtual void DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData, const Rect &arSection, Color aColor) = 0;
 
     /**
      * \brief Draws the given Text object in the given color on the canvas.
@@ -115,14 +111,14 @@ class Canvas
      * \param aRect
      * \param arColor
      */
-    virtual void DrawText(const Text &arText, Color aColor, Color aBackColor = Color::None);
+    virtual void DrawText(const Text &arText, Color aColor, Color aBackColor = Color::None) = 0;
 
     /**
      * \brief Draws the given Text object in the color of the objects own font.
      *
      * \param arText
      */
-    void DrawText(Text &arText);
+//    virtual void DrawText(Text &arText) = 0;
 
     /**
      * \brief Get the color value of a single pixel.
@@ -142,79 +138,49 @@ class Canvas
      * \param aPoint
      * \param aColor
      */
-    virtual inline void SetPixel(const Point& arPoint, const Color &arColor) = 0;
+    virtual void SetPixel(const Point& arPoint, const Color &arColor) = 0;
 
     /**
      * \brief Get the width of the canvas.
      *
      * \return uint32_t
      */
-    GuiUnit_t GetWidth() const
-    {
-        return mWidth;
-    }
+    virtual GuiUnit_t GetWidth() const = 0;
 
     /**
      * \brief Get the height of the canvas.
      *
      * \return uint32_t
      */
-    GuiUnit_t GetHeight() const
-    {
-        return mHeight;
-    }
+    virtual GuiUnit_t GetHeight() const = 0;
 
     /**
      * \brief Get the color depth of the canvas.
      *
      * \return uint32_t
      */
-    unsigned int GetColorDepth() const
-    {
-        return mBytesPerPixel;
-    }
+    virtual std::uint32_t GetColorDepth() const = 0;
 
     /**
-     * \brief Checks if coordinates is inside screens boundary
-     *
-     * \param aPoint
-     * \return bool
+     * \brief Check if point is inside this canvas
+     * \param arPoint
+     * \return True if point is inside
      */
-    inline bool IsInsideCanvas(const Point &arPoint) const
-    {
-        return mClipRect.IsHit(arPoint);
-//        if (arPoint.GetX() >= 0 &&
-//            arPoint.GetX() <  mWidth &&
-//            arPoint.GetY() >= 0 &&
-//            arPoint.GetY() <  mHeight) {
-//            return true;
-//        }
-//        return false;
-    }
+    virtual bool IsHit(const Point &arPoint) const = 0;
 
-    Canvas& SetClipRect(const Rect &arClipRect);
-    Rect& GetClipRect() { return mClipRect; }
+    /**
+     * \brief Set the clipping rect for this canvas
+     * \param arClipRect
+     * \return self
+     */
+    virtual Canvas& SetClipRect(const Rect &arClipRect) = 0;
 
+    /**
+     * \brief Get the clipping rect for this canvas
+     * \return Rect
+     */
+    virtual Rect& GetClipRect() = 0;//{ return mClipRect; }
 
-protected:
-    GuiUnit_t mHeight;
-    GuiUnit_t mWidth;
-    unsigned int mBytesPerPixel;
-    Rect mClipRect;
-
-    void plot4Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
-    {
-        SetPixel(Point(aCenterX + aX, aCenterY + aY), arColor);
-        SetPixel(Point(aCenterX - aX, aCenterY + aY), arColor);
-        SetPixel(Point(aCenterX + aX, aCenterY - aY), arColor);
-        SetPixel(Point(aCenterX - aX, aCenterY - aY), arColor);
-    }
-
-    void plot8Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
-    {
-        plot4Points(aCenterX, aCenterY, aX, aY, arColor);
-        plot4Points(aCenterX, aCenterY, aY, aX, arColor);
-    }
 };
 
 } // namespace rsp::graphics

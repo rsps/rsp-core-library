@@ -12,6 +12,7 @@
 #define POINT_H
 
 #include <ostream>
+#include "GuiUnit.h"
 
 namespace rsp::graphics
 {
@@ -20,8 +21,6 @@ class Rect;
 class Canvas;
 class Bitmap;
 class Framebuffer;
-
-typedef std::int32_t GuiUnit_t;
 
 /**
  * \brief Point class

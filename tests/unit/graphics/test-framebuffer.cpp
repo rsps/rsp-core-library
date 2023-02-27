@@ -24,7 +24,7 @@ using namespace rsp::utils;
 
 inline void CheckPixel(const Point &aPoint, const Color &aColour, const Framebuffer &fb)
 {
-    if (fb.IsInsideCanvas(aPoint)) {
+    if (fb.IsHit(aPoint)) {
         CHECK_EQ(fb.GetPixel(aPoint), aColour);
     } else {
         CHECK_EQ(fb.GetPixel(aPoint), 0);
@@ -223,10 +223,10 @@ TEST_CASE("Framebuffer")
         Point botRight(width - 1, height - 1);
 
         // Assert
-        CHECK(testImgMap.IsInsideCanvas(topLeft));
-        CHECK(testImgMap.IsInsideCanvas(topRight));
-        CHECK(testImgMap.IsInsideCanvas(botLeft));
-        CHECK(testImgMap.IsInsideCanvas(botRight));
+        CHECK(testImgMap.IsHit(topLeft));
+        CHECK(testImgMap.IsHit(topRight));
+        CHECK(testImgMap.IsHit(botLeft));
+        CHECK(testImgMap.IsHit(botRight));
         CHECK_EQ(testImgMap.GetHeight(), height);
         CHECK_EQ(testImgMap.GetWidth(), width);
         CHECK_EQ(testImgMap.GetPixelData().GetDataSize(), (width * height * 3));

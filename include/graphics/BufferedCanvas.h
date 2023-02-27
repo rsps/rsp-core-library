@@ -10,7 +10,7 @@
 #ifndef BUFFEREDCANVAS_H
 #define BUFFEREDCANVAS_H
 
-#include "graphics/primitives/Canvas.h"
+#include <graphics/primitives/SW/SoftwareCanvas.h>
 
 namespace rsp::graphics
 {
@@ -19,7 +19,7 @@ namespace rsp::graphics
  *
  * Abstract class with function declarations for buffering operations.
  */
-class BufferedCanvas : public Canvas
+class BufferedCanvas : public SoftwareCanvas
 {
   public:
     virtual ~BufferedCanvas()
