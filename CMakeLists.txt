@@ -10,6 +10,7 @@ OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enable
 OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
 OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
 OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
+OPTION(SDL2 "Use SDL2 for graphic accelleration." ON)
 
 if(ARCH_ARM)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
@@ -49,37 +50,15 @@ include(GNUInstallDirs)
 
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 
-add_compile_options(
-    -pedantic
-    -Wall
-    -Wextra
-    -Wold-style-cast
-    -Wcast-align
-    -Wcast-qual
-    -Wctor-dtor-privacy
-    -Wdisabled-optimization
-    -Wformat=2
-    -Winit-self
-    -Wlogical-op
-    -Wmissing-declarations
-    -Wmissing-include-dirs
-    -Wnoexcept
-    -Woverloaded-virtual
-    -Wredundant-decls
-    -Wsign-conversion
-    -Wsign-promo
-    -Wstrict-null-sentinel
-    -Wstrict-overflow=3
-#    -Wswitch-default
-    -Wundef
-    -Wno-unused
-    -Weffc++
-    -Werror
-#     -v -dD
-)
-
 include(FetchContent)
 find_package(Git REQUIRED)
+
+if (SDL2)
+    include("cmake/libSDL2pp.cmake")
+endif()
+
+include("cmake/strict-compile-options.cmake")
+
 
 # Include external projects Doctest from github.
 FetchContent_Declare(
@@ -115,6 +94,8 @@ target_link_libraries ("rsp-core-lib"
     ${FONT_LIB}
     ${CRYPTO_LIB}
     ${NETWORK_LIB}
+    ${SDL2PP_LIBRARIES}
+    ${SDL2_LIBRARIES}
 )
 
 # Define headers for this library. PUBLIC headers are used for
