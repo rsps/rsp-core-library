@@ -23,8 +23,6 @@
 #include <TestHelpers.h>
 #include <TestTouchParser.h>
 
-#include <graphics/G2D.h>
-
 using namespace rsp::graphics;
 using namespace rsp::utils;
 using namespace std::literals::chrono_literals;
@@ -81,11 +79,7 @@ TEST_CASE("Graphics Main Test")
     // Make framebuffer
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
 
-#ifdef __arm__
-    G2D fb(p.empty() ? nullptr : p.string().c_str());
-#else
     Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
-#endif
 
     // Set default scene size to screen size
     Scene::SetScreenSize(fb.GetWidth(), fb.GetHeight());

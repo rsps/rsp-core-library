@@ -47,6 +47,8 @@ public:
 
     PixelData& Init(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData);
 
+    void Fill(Color aColor);
+
     const std::uint8_t* GetData() const { return mpData; }
     std::vector<std::uint8_t>& GetData() { return mData; }
 

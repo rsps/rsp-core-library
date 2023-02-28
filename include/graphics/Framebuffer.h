@@ -12,8 +12,9 @@
 
 #include <linux/fb.h>
 
-#include "graphics/BufferedCanvas.h"
-#include "graphics/primitives/Canvas.h"
+#include <graphics/primitives/Rect.h>
+#include <graphics/primitives/Texture.h>
+#include "BufferedCanvas.h"
 
 namespace rsp::graphics
 {
@@ -24,34 +25,24 @@ class Framebuffer : public BufferedCanvas
     Framebuffer(const char *apDevPath = nullptr);
     virtual ~Framebuffer();
 
-    /**
-     * \brief Sets a single pixel to the given Color
-     * \param aPoint Reference to the coordinate for the pixel to be set
-     * \param aColor Reference to the color the pixel is set to
-     */
-    void SetPixel(const Point &arPoint, const Color &arColor) override;
-
-    /**
-     * \brief Gets a single pixel to the given Color
-     * \param aPoint Reference to the coordinate for the pixel to get
-     * \param aFront Gets pixels from the backbuffer by default, set true to read front buffer
-     */
-    uint32_t GetPixel(const Point &aPoint, bool aFront = false) const override;
+    void BlitTexture(const Texture &arTexture);
 
     /**
      * \brief Swaps front and back buffers
-     * \param aSwapOp The type of swap operations to be executed, default is copy
-     * \param aColor In case of Clear operation a color is needed, default is black
      */
-    void SwapBuffer(const SwapOperations aSwapOp = SwapOperations::Copy, Color aColor = Color::Black) override;
+    void SwapBuffer() override;
+
+    void Fill(rsp::graphics::Color aColor = Color::Black) override;
+
+    GuiUnit_t GetWidth();
+    GuiUnit_t GetHeight();
 
   protected:
     int mFramebufferFile;
     int mTtyFb = 0;
-    struct fb_fix_screeninfo mFixedInfo {
-    };
-    struct fb_var_screeninfo mVariableInfo {
-    };
+    struct fb_fix_screeninfo mFixedInfo{};
+    struct fb_var_screeninfo mVariableInfo{};
+    Rect mClipRect{};
 
     void clear(Color aColor);
     void copy();

@@ -46,12 +46,9 @@ Framebuffer::Framebuffer(const char *apDevPath)
     // get variable screen info
     ioctl(mFramebufferFile, FBIOGET_FSCREENINFO, &mFixedInfo);
 
-    // set Canvas specific variables
-    mWidth = static_cast<GuiUnit_t>(mVariableInfo.xres);
-    mHeight = static_cast<GuiUnit_t>(mVariableInfo.yres);
-    mBytesPerPixel = mVariableInfo.bits_per_pixel / 8;
-    mClipRect.SetWidth(mWidth);
-    mClipRect.SetHeight(mHeight);
+//    mBytesPerPixel = mVariableInfo.bits_per_pixel / 8;
+    mClipRect.SetWidth(static_cast<GuiUnit_t>(mVariableInfo.xres));
+    mClipRect.SetHeight(static_cast<GuiUnit_t>(mVariableInfo.yres));
 
     // std::clog << "Framebuffer opened. Width=" << mWidth << " Height=" << mHeight << " BytesPerPixel=" << mBytesPerPixel << std::endl;
 
@@ -72,7 +69,7 @@ Framebuffer::Framebuffer(const char *apDevPath)
     // calculate size of screen
     std::size_t screensize = mVariableInfo.yres * mFixedInfo.line_length;
 
-    mpFrontBuffer = static_cast<uint32_t *>(mmap(0, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
+    mpFrontBuffer = static_cast<uint32_t *>(mmap(nullptr, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
     if (mpFrontBuffer == reinterpret_cast<uint32_t *>(-1)) /*MAP_FAILED*/ {
         THROW_SYSTEM("Framebuffer shared memory mapping failed");
     }
@@ -101,7 +98,7 @@ Framebuffer::~Framebuffer()
     // No need to call munmap on the shared memory region, this is done automatically on termination.
 }
 
-void Framebuffer::SwapBuffer(const SwapOperations aSwapOp, Color aColor)
+void Framebuffer::SwapBuffer()
 {
     // swap buffer
     if (mVariableInfo.yoffset == 0) {
@@ -122,54 +119,10 @@ void Framebuffer::SwapBuffer(const SwapOperations aSwapOp, Color aColor)
     std::uint32_t *tmp = mpFrontBuffer;
     mpFrontBuffer = mpBackBuffer;
     mpBackBuffer = tmp;
-
-    switch (aSwapOp) {
-    case SwapOperations::Copy:
-        copy();
-        break;
-
-    case SwapOperations::Clear:
-        clear(aColor);
-        break;
-
-    case SwapOperations::NoOp:
-    default:
-        break;
-    }
 }
 
-void Framebuffer::SetPixel(const Point &arPoint, const Color &arColor)
+void Framebuffer::Fill(rsp::graphics::Color aColor)
 {
-    if (!IsHit(arPoint)) {
-        return;
-    }
-    std::uint32_t location = ((static_cast<std::uint32_t>(arPoint.mX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
-        + static_cast<std::uint32_t>(arPoint.mY) * mFixedInfo.line_length) / sizeof(std::uint32_t);
-    if (arColor.GetAlpha() == 255) {
-        mpBackBuffer[location] = arColor;
-    }
-    else {
-        mpBackBuffer[location] = Color::Blend(mpBackBuffer[location], arColor);
-    }
-}
-
-uint32_t Framebuffer::GetPixel(const Point &aPoint, bool aFront) const
-{
-    if (!IsHit(aPoint)) {
-        return 0;
-    }
-    std::uint32_t location = ((static_cast<std::uint32_t>(aPoint.mX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
-        + (static_cast<std::uint32_t>(aPoint.mY) * mFixedInfo.line_length)) / sizeof(std::uint32_t);
-    if (aFront) {
-        return mpFrontBuffer[location];
-    } else {
-        return mpBackBuffer[location];
-    }
-}
-
-void Framebuffer::clear(Color aColor)
-{
-    // draw to back buffer
     for (std::uint32_t y = 0; y < mVariableInfo.yres; y++) {
         for (std::uint32_t x = 0; x < mVariableInfo.xres; x++) {
             std::size_t location = ((x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length) / sizeof(std::uint32_t);
@@ -178,15 +131,18 @@ void Framebuffer::clear(Color aColor)
     }
 }
 
-void Framebuffer::copy()
+void Framebuffer::BlitTexture(const Texture &arTexture)
 {
-    // copy front buffer to back buffer
-    for (std::uint32_t y = 0; y < mVariableInfo.yres; y++) {
-        for (std::uint32_t x = 0; x < mVariableInfo.xres; x++) {
-            std::size_t location = ((x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length) / sizeof(std::uint32_t);
-            mpBackBuffer[location] = mpFrontBuffer[location];
-        }
-    }
+}
+
+GuiUnit_t Framebuffer::GetWidth()
+{
+    return static_cast<GuiUnit_t>(mVariableInfo.xres);
+}
+
+GuiUnit_t Framebuffer::GetHeight()
+{
+    return static_cast<GuiUnit_t>(mVariableInfo.yres);
 }
 
 } // namespace rsp::graphics

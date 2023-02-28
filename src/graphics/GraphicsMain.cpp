@@ -27,8 +27,10 @@ GraphicsMain::GraphicsMain(BufferedCanvas &arBufferedCanvas, TouchParser &arTouc
       mrTouchParser(arTouchParser),
       mrScenes(arScenes)
 {
-    mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-    mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+    mrBufferedCanvas.SwapBuffer();
+    mrBufferedCanvas.Fill();
+    mrBufferedCanvas.SwapBuffer();
+    mrBufferedCanvas.Fill();
 }
 
 GraphicsMain::~GraphicsMain()

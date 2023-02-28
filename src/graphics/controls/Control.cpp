@@ -164,7 +164,7 @@ bool Control::Render(Canvas &arCanvas)
 
     if (mDirty && mVisible) {
         GFXLOG("Painting: " << GetName());
-        arCanvas.SetClipRect(mArea);
+        arCanvas.GetClipRect() = mArea;
         paint(arCanvas, mStyles[mState]);
     }
 
@@ -173,7 +173,7 @@ bool Control::Render(Canvas &arCanvas)
         if (child->Render(arCanvas)) {
             result = true;
         }
-        arCanvas.SetClipRect(mArea); // Reset canvas clip rect
+        arCanvas.GetClipRect() = mArea; // Reset canvas clip rect
     }
 
     mDirty = false;
@@ -193,7 +193,7 @@ void Control::paint(Canvas &arCanvas, const Style &arStyle)
     if ((mTouchAreaColor != Color::None) && !mTouchArea.empty()) {
         Rect r = mTouchArea;
         r.AddSize(1, 1);
-        arCanvas.SetClipRect(r);
+        arCanvas.GetClipRect() = r;
         arCanvas.DrawRectangle(mTouchArea, mTouchAreaColor);
     }
 }

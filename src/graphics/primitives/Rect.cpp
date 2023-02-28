@@ -186,13 +186,13 @@ Rect& Rect::Move(int aX, int aY)
     return *this;
 }
 
-bool Rect::IsHit(const Point &aPoint) const
+bool Rect::IsHit(GuiUnit_t aX, GuiUnit_t aY) const
 {
     // Only works with non-rotated rectangles
-    if (aPoint.mX >= mLeftTop.mX &&
-        aPoint.mX <  (mLeftTop.mX + mWidth) &&
-        aPoint.mY >= mLeftTop.mY &&
-        aPoint.mY <  (mLeftTop.mY + mHeight)) {
+    if (aX >= mLeftTop.mX &&
+        aX <  (mLeftTop.mX + mWidth) &&
+        aY >= mLeftTop.mY &&
+        aY <  (mLeftTop.mY + mHeight)) {
         return true;
     }
 

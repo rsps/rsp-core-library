@@ -45,6 +45,7 @@ Text& Text::Reload()
     }
 
     loadGlyphs();
+    drawText();
     return *this;
 }
 
@@ -172,6 +173,40 @@ void Text::alignGlyphs()
         glyph.mLeft += hoffset;
     }
     mBoundingRect.MoveTo(mArea.GetTopLeft() + Point(hoffset, voffset));
+}
+
+void Text::drawText()
+{
+    mPixelData.Init(mBoundingRect.GetWidth(), mBoundingRect.GetHeight(), PixelData::ColorDepth::RGBA, nullptr);
+    mPixelData.Fill(mFont.GetBackgroundColor());
+    auto &glyphs = GetGlyphs();
+    if (!glyphs) {
+        return;
+    }
+    auto color = mFont.GetColor();
+    Point tl = GetArea().GetTopLeft();
+    for (unsigned i=0; i < glyphs->GetCount() ; ++i) {
+        Glyph &glyph = glyphs->GetGlyph(i);
+        auto py = glyph.mTop + tl.GetY();
+        for (int y = 0; y < glyph.mHeight; y++) {
+            const uint8_t* p_row = glyph.GetPixelRow(y);
+            auto px = glyph.mLeft + tl.GetX();
+            for (int x = 0; x < glyph.mWidth; x++) {
+                auto c = *p_row++;
+                if (!c) {
+                    px++;
+                    continue;
+                }
+//                auto p = Point(x + glyph.mLeft + tl.mX, y + glyph.mTop + tl.mY);
+                if (GetArea().IsHit(px, py)) {
+                    color.SetAlpha(c);
+                    mPixelData.SetPixelAt(px, py, color);
+                }
+                px++;
+            }
+            py++;
+        }
+    }
 }
 
 }

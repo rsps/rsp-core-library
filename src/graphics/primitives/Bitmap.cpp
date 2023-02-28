@@ -31,38 +31,12 @@ Bitmap::Bitmap(const std::string &arImgName)
     Load(arImgName);
 }
 
-Bitmap::Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel)
-    : Canvas(aHeight, aWidth, aBytesPerPixel),
-      mImagePixels(aWidth, aHeight, PixelData::ColorDepth::RGB, reinterpret_cast<const std::uint8_t*>(apPixels))
+Bitmap::Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, PixelData::ColorDepth aDepth)
+    : Canvas(aHeight, aWidth, aDepth)
 {
-    for (GuiUnit_t y = 0; y < mHeight; y++) {
-        for (GuiUnit_t x = 0; x < mWidth; x++) {
-            mImagePixels.SetPixelAt(x, y, Color(*apPixels++));
-        }
-    }
+    mPixelData.Init(aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
 }
 
-Bitmap::Bitmap(GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel)
-    : Canvas(aHeight, aWidth, aBytesPerPixel),
-      mImagePixels(aWidth, aHeight, PixelData::ColorDepth::RGB)
-{
-}
-
-void Bitmap::SetPixel(const Point &arPoint, const Color &arColor)
-{
-    if (!IsHit(arPoint)) {
-        return;
-    }
-    mImagePixels.SetPixelAt(arPoint.GetX(), arPoint.GetY(), arColor);
-}
-
-std::uint32_t Bitmap::GetPixel(const Point &aPoint, const bool aFront) const
-{
-    if (!IsHit(aPoint)) {
-        return 0;
-    }
-    return mImagePixels.GetPixelAt(aPoint.mX, aPoint.mY, Color::White);
-}
 
 Bitmap& Bitmap::Load(const std::string &arImgName)
 {
@@ -71,36 +45,21 @@ Bitmap& Bitmap::Load(const std::string &arImgName)
     auto loader = ImgLoader::GetRasterLoader(filename.extension());
     // Get raw data
     loader->LoadImg(filename);
-    mImagePixels = loader->GetPixelData();
-    mWidth = mImagePixels.GetWidth();
-    mHeight = mImagePixels.GetHeight();
-    mClipRect = Rect(0, 0, mWidth, mHeight);
+    mPixelData = loader->GetPixelData();
+    mClipRect = Rect(0, 0, mPixelData.GetWidth(), mPixelData.GetHeight());
     return *this;
 }
 
-Bitmap& Bitmap::Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel)
+Bitmap& Bitmap::Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, PixelData::ColorDepth aDepth)
 {
-    mHeight = aHeight;
-    mWidth = aWidth;
-    mBytesPerPixel = aBytesPerPixel;
-
-    mImagePixels.Init(aWidth, aHeight, PixelData::ColorDepth::RGB, reinterpret_cast<const std::uint8_t*>(apPixels));
-
-    for (GuiUnit_t y = 0; y < mHeight; y++) {
-        for (GuiUnit_t x = 0; x < mWidth; x++) {
-            mImagePixels.SetPixelAt(x, y, Color(*apPixels++));
-        }
-    }
+    mPixelData.Init(aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
 
     return *this;
 }
 
 Bitmap& Bitmap::Assign(const PixelData &arPixelData)
 {
-    mHeight = arPixelData.GetHeight();
-    mWidth = arPixelData.GetWidth();
-    mBytesPerPixel = (static_cast<unsigned int>(arPixelData.GetColorDepth()) + 7u) / 8u;
-    mImagePixels.Init(mWidth, mHeight, arPixelData.GetColorDepth(), arPixelData.GetData());
+    mPixelData = arPixelData;
     return *this;
 }
 

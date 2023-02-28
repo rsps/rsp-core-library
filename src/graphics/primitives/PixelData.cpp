@@ -298,6 +298,9 @@ void PixelData::SaveToCFile(const std::filesystem::path &arFileName)
 
 PixelData PixelData::ChangeColorDepth(ColorDepth aDepth) const
 {
+    if (aDepth == mColorDepth) {
+        return PixelData(*this);
+    }
     PixelData pd(GetWidth(), GetHeight(), aDepth);
     for (GuiUnit_t y = 0; y < GetHeight() ; ++y) {
         for (GuiUnit_t x = 0; x < GetWidth() ; ++x) {
@@ -306,6 +309,18 @@ PixelData PixelData::ChangeColorDepth(ColorDepth aDepth) const
         }
     }
     return pd;
+}
+
+void PixelData::Fill(Color aColor)
+{
+    if (mColorDepth != ColorDepth::RGBA) {
+        return;
+    }
+    if (mData.size() == 0) {
+        return;
+    }
+
+    std::fill_n(mData.begin(), mData.size(), arColor.GetAlpha());
 }
 
 } /* namespace rsp::graphics */

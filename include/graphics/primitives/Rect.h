@@ -257,7 +257,9 @@ class Rect
      * \param aPoint
      * \return bool
      */
-    bool IsHit(const Point &aPoint) const;
+    bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const;
+    bool IsHit(const Point &arPoint) const { return IsHit(arPoint.mX, arPoint.mY); }
+
     /**
      * \brief Limits the dimensions of the rectangle by checking if height and width are above zero
      *

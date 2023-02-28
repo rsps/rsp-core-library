@@ -14,8 +14,10 @@
 #include <string>
 #include "Font.h"
 #include "Rect.h"
+#include "Canvas.h"
 
 namespace rsp::graphics {
+
 
 /**
  * \class Text
@@ -27,7 +29,7 @@ namespace rsp::graphics {
  * the rebuild of the glyphs is a manual process.
  * To rebuild the glyphs the Reload method must be called.
  */
-class Text
+class Text : public Canvas
 {
 public:
     enum class HAlign : uint8_t {
@@ -44,7 +46,7 @@ public:
     /**
      * \brief Constructs an empty text element with the default font.
      */
-    Text() : mFont(), mArea() {}
+    Text() : Canvas(), mFont(), mArea() {}
 
     /**
      * \brief Constructs an empty text element with the given font.
@@ -229,6 +231,7 @@ protected:
     void loadGlyphs();
     void alignGlyphs();
     void calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs);
+    void drawText();
 };
 
 } /* namespace rsp::graphics */

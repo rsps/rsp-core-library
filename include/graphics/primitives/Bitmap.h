@@ -32,56 +32,17 @@ namespace rsp::graphics
 class Bitmap: public Canvas
 {
 public:
-    Bitmap() {}
+    using Canvas::Canvas;
 
-    /**
-     * \brief Load bitmap from given file.
-     *
-     * \param aImgName
-     */
     Bitmap(const std::string &arImgName);
-
-    /**
-     * \brief Create a bitmap of given pixel data
-     *
-     * \param apPixels
-     * \param aHeight
-     * \param aWidth
-     * \param aBytesPerPixel
-     */
-    Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel);
-
-    /**
-     * \brief Create an empty in memory bitmap
-     *
-     * \param aHeight
-     * \param aWidth
-     * \param aBytesPerPixel
-     */
-    Bitmap(GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel);
+    Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, PixelData::ColorDepth aDepth);
 
     Bitmap& Load(const std::string &arImgName);
-    Bitmap& Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, unsigned int aBytesPerPixel);
+    Bitmap& Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, PixelData::ColorDepth aDepth);
     Bitmap& Assign(const PixelData &arPixelData);
-
-
-    void SetPixel(const Point &arPoint, const Color &arColor) override;
-
-    std::uint32_t GetPixel(const Point &aPoint, const bool aFront = false) const override;
-
-    /**
-     * \brief Get a read only reference to the pixel data.
-     *
-     * \return const std::vector<uint32_t>&
-     */
-    const PixelData& GetPixelData() const
-    {
-        return mImagePixels;
-    }
 
 protected:
     static std::unordered_map<std::string,std::function<std::shared_ptr<ImgLoader>()>> msFiletypeMap;
-    PixelData mImagePixels { };
 };
 
 std::ostream& operator<<(std::ostream &os, const Bitmap &arBmp);
