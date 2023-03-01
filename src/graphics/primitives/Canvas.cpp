@@ -129,9 +129,9 @@ void Canvas::plot8Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, G
     plot4Points(aCenterX, aCenterY, aY, aX, arColor);
 }
 
-void Canvas::Fill(Color &arColor)
+void Canvas::Fill(Color aColor)
 {
-    mPixelData.Fill(arColor);
+    mPixelData.Fill(aColor);
 }
 
 } /* namespace rsp::graphics */

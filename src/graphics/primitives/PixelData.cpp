@@ -319,8 +319,9 @@ void PixelData::Fill(Color aColor)
     if (mData.size() == 0) {
         return;
     }
+    std::uint32_t *p = reinterpret_cast<std::uint32_t*>(mData.data());
 
-    std::fill_n(mData.begin(), mData.size(), arColor.GetAlpha());
+    std::fill_n(p, mData.size() / sizeof(std::uint32_t), aColor);
 }
 
 } /* namespace rsp::graphics */

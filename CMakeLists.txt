@@ -55,6 +55,8 @@ find_package(Git REQUIRED)
 
 if (SDL2)
     include("cmake/libSDL2pp.cmake")
+    set(SDL_BUILD_OPTIONS -DUSE_SDL)
+    set(SDL_LIB ${SDL2PP_LIBRARIES} ${SDL2_LIBRARIES})
 endif()
 
 include("cmake/strict-compile-options.cmake")
@@ -94,8 +96,7 @@ target_link_libraries ("rsp-core-lib"
     ${FONT_LIB}
     ${CRYPTO_LIB}
     ${NETWORK_LIB}
-    ${SDL2PP_LIBRARIES}
-    ${SDL2_LIBRARIES}
+    ${SDL_LIB}
 )
 
 # Define headers for this library. PUBLIC headers are used for
@@ -117,6 +118,7 @@ target_compile_options(rsp-core-lib PUBLIC
     ${FREETYPE_BUILD_OPTIONS}
     ${OPENSSL_BUILD_OPTIONS}
     ${LIBCURL_BUILD_OPTIONS}
+    ${SDL_BUILD_OPTIONS}
 )
 
 if (NOT RELEASE_BUILD)

@@ -52,7 +52,7 @@ public:
     {
     }
 
-    void Fill(Color &arColor);
+    void Fill(Color aColor);
 
     /**
      * \brief Draw a a full or partial eclipse

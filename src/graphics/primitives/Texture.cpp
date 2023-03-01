@@ -9,8 +9,44 @@
  */
 
 #include <graphics/primitives/Texture.h>
+#ifdef USE_SDL
+    #include "SDL/SDLTexture.h"
+#else
+    #include "SW/SWTexture.h"
+#endif
 
 namespace rsp::graphics {
 
+Texture::Texture(const Renderer &arRenderer, const PixelData &arPixelData)
+#ifdef USE_SDL
+    : mpImpl(new SDLTexture(arRenderer, arPixelData))
+#else
+    : mpImpl(new SWTexture(arRenderer, arPixelData))
+#endif
+{
+}
+
+Texture::Texture(Texture &&arOther)
+    : mpImpl(std::move(arOther.mpImpl))
+{
+}
+
+Texture& Texture::operator =(Texture &&arOther)
+{
+    if (this != &arOther) {
+        mpImpl = std::move(arOther.mpImpl);
+    }
+    return *this;
+}
+
+Texture& Texture::operator =(const PixelData &arPixelData)
+{
+    mpImpl->assign(arPixelData);
+    return *this;
+}
+
+void Texture::assign(const PixelData &arPixelData)
+{
+}
 
 } /* namespace rsp::graphics */

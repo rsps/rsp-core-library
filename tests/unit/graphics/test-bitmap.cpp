@@ -26,12 +26,12 @@ TEST_CASE("Bitmap")
 
     SUBCASE("Create")
     {
-        CHECK_NOTHROW(Bitmap tmp(200, 200, 4));
+        CHECK_NOTHROW(Bitmap tmp(200, 200, PixelData::ColorDepth::RGBA));
     }
 
     SUBCASE("Drawing")
     {
-        Bitmap bitmap(200, 200, 4);
+        Bitmap bitmap(200, 200, PixelData::ColorDepth::RGBA);
 
         Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
         Point pt(100, 100);

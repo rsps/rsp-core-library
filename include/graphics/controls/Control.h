@@ -16,6 +16,7 @@
 #include <graphics/primitives/Canvas.h>
 #include <graphics/primitives/Color.h>
 #include <graphics/primitives/Rect.h>
+#include <graphics/primitives/Renderer.h>
 #include <graphics/TouchEvent.h>
 #include <logging/Logger.h>
 #include <utils/ConstTypeInfo.h>
@@ -52,8 +53,7 @@ public:
         pressed,
         dragged,
         checked,
-        checkedPressed,
-        __END__
+        checkedPressed
     };
 
     Control(const rsp::utils::TypeInfo &arTypeInfo) : mTypeInfo(arTypeInfo) {}
@@ -146,14 +146,13 @@ public:
      *        needs to be shown in sync with the GUI rendering.
      *        The method calls the refresh method on all elements.
      */
-    virtual void UpdateData();
+    virtual void UpdateData(Renderer &arRenderer);
 
     /**
      * \brief Virtual method for rendering the object
      * \param aCanvas The canvas the object is rendered on
-     * \return bool True if anything was rendered
      */
-    virtual bool Render(Canvas &arCanvas);
+    virtual void Render(Renderer &arRenderer);
 
     /**
      * \brief Sets the area of the object as a rectangle in parent coordinates
@@ -266,6 +265,7 @@ protected:
     Rect mArea{}; // Area of Control in screen coordinates
     Rect mTouchArea{}; // Touch area of Control in screen coordinates
     std::map<States, Style> mStyles{};
+    std::map<States, Texture> mTextures{};
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};
     bool mTransparent = false;
@@ -275,9 +275,10 @@ protected:
     bool mCheckable = false;
     States mState = States::normal;
     rsp::utils::TypeInfo mTypeInfo;
+    static bool mMustRender;
 
     virtual void paint(Canvas &arCanvas, const Style &arStyle);
-    virtual void refresh() {};
+    virtual void refresh() {}
     virtual void doSetArea(const Rect &arRect);
 
 private:

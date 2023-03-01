@@ -17,7 +17,8 @@ using namespace rsp::logging;
 namespace rsp::graphics
 {
 
-Color Control::mTouchAreaColor = false;
+Color Control::mTouchAreaColor = Color::None;
+bool Control::mMustRender = true;
 
 std::string to_string(Control::States aState)
 {
@@ -54,12 +55,12 @@ void Control::Invalidate()
         return;
     }
     mDirty = true;
-    for (Control* child : mChildren) {
-        child->Invalidate();
-    }
-    if (mTransparent && mpParent) {
-        mpParent->Invalidate();
-    }
+//    for (Control* child : mChildren) {
+//        child->Invalidate();
+//    }
+//    if (mTransparent && mpParent) {
+//        mpParent->Invalidate();
+//    }
 }
 
 Control& Control::SetArea(Rect aRect)
@@ -149,53 +150,56 @@ Control& Control::SetBitmapPosition(const Point &arPoint)
     return *this;
 }
 
-void Control::UpdateData()
+void Control::UpdateData(Renderer &arRenderer)
 {
     refresh();
+    if (mDirty) {
+        mTextures.clear();
+        Canvas canvas(mArea.GetWidth(), mArea.GetHeight());
+        for (auto &tuple : mStyles) {
+            canvas.Fill(Color::None);
+            paint(canvas, tuple.second);
+            mTextures.emplace(tuple.first, Texture(arRenderer, canvas.GetPixelData()));
+        }
+        mDirty = false;
+    }
     for (Control* child : mChildren) {
-        child->UpdateData();
+        child->UpdateData(arRenderer);
     }
 }
 
-bool Control::Render(Canvas &arCanvas)
+void Control::Render(Renderer &arRenderer)
 {
     GFXLOG("Rendering: " << GetName() << " (" << this << ")");
-    bool result = mDirty;
 
-    if (mDirty && mVisible) {
-        GFXLOG("Painting: " << GetName());
-        arCanvas.GetClipRect() = mArea;
-        paint(arCanvas, mStyles[mState]);
+    if (!mVisible) {
+        return;
+    }
+
+    if (mTextures.find(mState) != mTextures.end()) {
+        arRenderer.RenderTexture(mTextures[mState], mArea);
     }
 
     for (Control* child : mChildren) {
         GFXLOG("Rendering "<< GetName() << "'s child: " << child->GetName());
-        if (child->Render(arCanvas)) {
-            result = true;
-        }
-        arCanvas.GetClipRect() = mArea; // Reset canvas clip rect
+        child->Render(arRenderer);
     }
-
-    mDirty = false;
-
-    return result;
-}
-
-void Control::paint(Canvas &arCanvas, const Style &arStyle)
-{
-    if (!mTransparent) {
-        arCanvas.DrawRectangle(mArea, arStyle.mBackgroundColor, true);
-    }
-
-    arStyle.mBackground.Paint(GetOrigin(), arCanvas);
-    arStyle.mForeground.Paint(GetOrigin(), arCanvas);
 
     if ((mTouchAreaColor != Color::None) && !mTouchArea.empty()) {
         Rect r = mTouchArea;
         r.AddSize(1, 1);
-        arCanvas.GetClipRect() = r;
-        arCanvas.DrawRectangle(mTouchArea, mTouchAreaColor);
+        arRenderer.DrawRect(mTouchArea, mTouchAreaColor);
     }
+}
+
+void Control::paint(Canvas &arCanvas, const Style &arStyle)
+{
+    if (!mTransparent && (arStyle.mBackgroundColor != Color::None)) {
+        arCanvas.Fill(arStyle.mBackgroundColor);
+    }
+
+    arStyle.mBackground.Paint(Point(), arCanvas);
+    arStyle.mForeground.Paint(Point(), arCanvas);
 }
 
 Control& Control::SetDraggable(bool aValue)
