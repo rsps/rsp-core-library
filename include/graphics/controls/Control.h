@@ -146,7 +146,13 @@ public:
      *        needs to be shown in sync with the GUI rendering.
      *        The method calls the refresh method on all elements.
      */
-    virtual void UpdateData(Renderer &arRenderer);
+    virtual void UpdateData();
+
+    /**
+     * \brief Called when a Scene is activated, use it to create textures needed for this control.
+     * \param arRenderer
+     */
+    virtual void MakeTextures(Renderer &arRenderer);
 
     /**
      * \brief Virtual method for rendering the object
@@ -265,7 +271,7 @@ protected:
     Rect mArea{}; // Area of Control in screen coordinates
     Rect mTouchArea{}; // Touch area of Control in screen coordinates
     std::map<States, Style> mStyles{};
-    std::map<States, Texture> mTextures{};
+    std::map<States, std::unique_ptr<Texture>> mTextures{};
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};
     bool mTransparent = false;

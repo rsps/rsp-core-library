@@ -11,6 +11,7 @@
 #ifndef INCLUDE_UTILS_CPPOBJECTFILE_H_
 #define INCLUDE_UTILS_CPPOBJECTFILE_H_
 
+#include <cstddef>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>

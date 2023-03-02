@@ -13,7 +13,7 @@
 #include <graphics/controls/SceneMap.h>
 #include <messaging/Subscriber.h>
 #include <messaging/Broker.h>
-#include "BufferedCanvas.h"
+#include <graphics/primitives/Renderer.h>
 #include "TouchParser.h"
 
 namespace rsp::graphics
@@ -22,10 +22,11 @@ namespace rsp::graphics
 class GraphicsMain
 {
 public:
-    GraphicsMain(BufferedCanvas &arCanvas, TouchParser &arTouchParser, SceneMap &arScenes);
-    GraphicsMain(const GraphicsMain &) = default;
-    GraphicsMain &operator=(const GraphicsMain &) = default;
+    GraphicsMain(Renderer &arRenderer, SceneMap &arScenes);
+    GraphicsMain(const GraphicsMain&) = default;
     ~GraphicsMain();
+
+    GraphicsMain& operator=(const GraphicsMain&) = default;
 
     /**
      * \brief Runs the Gui loop. The overall CPU usage can be reduced by setting a lower frame rate.
@@ -60,8 +61,7 @@ public:
     int GetFPS() { return mFps; }
 
 protected:
-    BufferedCanvas &mrBufferedCanvas;
-    TouchParser &mrTouchParser;
+    Renderer &mrRenderer;
     SceneMap &mrScenes;
     bool mTerminated = false;
     std::uint32_t mNextScene = 0;

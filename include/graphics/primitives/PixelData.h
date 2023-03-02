@@ -49,6 +49,8 @@ public:
 
     void Fill(Color aColor);
 
+    uintptr_t GetId() { return uintptr_t(mpData); }
+
     const std::uint8_t* GetData() const { return mpData; }
     std::vector<std::uint8_t>& GetData() { return mData; }
 

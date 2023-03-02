@@ -15,6 +15,7 @@
 #include <utils/Timer.h>
 #include <algorithm>
 #include <logging/Logger.h>
+#include <graphics/primitives/StaticTextures.h>
 
 using namespace rsp::messaging;
 using namespace rsp::logging;
@@ -22,15 +23,11 @@ using namespace rsp::logging;
 namespace rsp::graphics
 {
 
-GraphicsMain::GraphicsMain(BufferedCanvas &arBufferedCanvas, TouchParser &arTouchParser, SceneMap &arScenes)
-    : mrBufferedCanvas(arBufferedCanvas),
-      mrTouchParser(arTouchParser),
+GraphicsMain::GraphicsMain(Renderer &arRenderer, SceneMap &arScenes)
+    : mrRenderer(arRenderer),
       mrScenes(arScenes)
 {
-    mrBufferedCanvas.SwapBuffer();
-    mrBufferedCanvas.Fill();
-    mrBufferedCanvas.SwapBuffer();
-    mrBufferedCanvas.Fill();
+    mrRenderer.Fill(Color::None).Present();
 }
 
 GraphicsMain::~GraphicsMain()
@@ -41,8 +38,9 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
 {
     TouchEvent event;
     rsp::utils::StopWatch sw;
-
     int64_t frame_time = 1000 / aMaxFPS;
+
+    StaticTextures::Get().Load(mrRenderer);
 
     while (!mTerminated) {
 
@@ -54,13 +52,14 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
 
         // New scene requested?
         if (mNextScene) {
-            mrTouchParser.Flush(); // New scene should not inherit un-handled touch events...
+            mrRenderer.FlushEvents(); // New scene should not inherit un-handled touch events...
             mrScenes.SetActiveScene(mNextScene);
+            mrScenes.ActiveScene().MakeTextures(mrRenderer);
             mNextScene = 0;
         }
 
         // New inputs?
-        if (mrTouchParser.Poll(event)) {
+        if (mrRenderer.PollEvents(event)) {
             Logger::GetDefault().Debug() << "Touch Event: " << event;
             mrScenes.ActiveScene().ProcessInput(event);
         }
@@ -69,11 +68,10 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
 //        mrScenes.ActiveScene().Invalidate();
 
         // Render invalidated things
-        bool changed = mrScenes.ActiveScene().Render(mrBufferedCanvas);
+        bool changed = mrScenes.ActiveScene().Render(mrRenderer);
         if (mpOverlay) {
             mpOverlay->UpdateData();
-            changed |= mpOverlay->Render(mrBufferedCanvas);
-            mrBufferedCanvas.SetClipRect(mrScenes.ActiveScene().GetArea());
+            changed |= mpOverlay->Render(mrRenderer);
         }
         if (changed) {
             mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);

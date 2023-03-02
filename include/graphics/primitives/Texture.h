@@ -11,32 +11,31 @@
 #ifndef INCLUDE_GRAPHICS_PRIMITIVES_TEXTURE_H_
 #define INCLUDE_GRAPHICS_PRIMITIVES_TEXTURE_H_
 
-#include <memory>
 #include "Color.h"
 #include "PixelData.h"
 
 namespace rsp::graphics {
 
-class Renderer;
-
 /**
- * \brief Raster image in video memory for fast rendering operations.
+ * \brief Interface for raster images kept in video memory for fast rendering operations.
  */
 class Texture
 {
 public:
-    Texture() {}
-    Texture(const Renderer &arRenderer, const PixelData &arPixelData);
-    Texture(Texture &&arOther);
     virtual ~Texture() {}
 
-    Texture& operator=(Texture &&arOther);
-    Texture& operator=(const PixelData &arPixelData);
+    /**
+     * \brief Update this texture with content from the given pixel data
+     * \param arPixelData
+     * \return self
+     */
+    virtual void Update(const PixelData &arPixelData) = 0;
 
-protected:
-    std::unique_ptr<Texture> mpImpl{};
-
-    virtual void assign(const PixelData &arPixelData);
+    /**
+     * \brief Fill this texture with the given color
+     * \param aColor
+     */
+    virtual void Fill(Color aColor) = 0;
 };
 
 } /* namespace rsp::graphics */

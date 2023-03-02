@@ -73,12 +73,6 @@ class TouchEvent
     Point mPress{}; // Absolute coordinate of latest press
 };
 
-struct TouchEvents
-{
-    const TouchEvent *mpEvents;
-    std::size_t mCount;
-};
-
 std::ostream &operator<<(std::ostream &os, const TouchEvent &arTouchEvent);
 
 } // namespace rsp::graphics

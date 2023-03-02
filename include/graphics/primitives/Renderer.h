@@ -12,10 +12,12 @@
 #define INCLUDE_GRAPHICS_PRIMITIVES_RENDERER_H_
 
 #include <memory>
-#include "Point.h"
+#include "Color.h"
+#include "GuiUnit.h"
 #include "PixelData.h"
 #include "Rect.h"
 #include "Texture.h"
+#include <graphics/TouchEvent.h>
 
 namespace rsp::graphics {
 
@@ -23,36 +25,29 @@ namespace rsp::graphics {
 class Renderer
 {
 public:
-    Renderer();
+    static Renderer& Make();
+
     virtual ~Renderer() {}
 
-    virtual GuiUnit_t GetHeight() const
-    {
-        return mpImpl->GetHeight();
-    }
+    virtual GuiUnit_t GetHeight() const = 0;
+    virtual GuiUnit_t GetWidth() const = 0;
+    virtual PixelData::ColorDepth GetColorDepth() const = 0;
 
-    virtual GuiUnit_t GetWidth() const
-    {
-        return mpImpl->GetWidth();
-    }
+    virtual std::unique_ptr<Texture> CreateTexture(GuiUnit_t aWidth, GuiUnit_t aHeight) = 0;
+    virtual std::unique_ptr<Texture> CreateStaticTexture(const PixelData &arPixelData) = 0;
 
-    virtual PixelData::ColorDepth GetColorDepth() const
-    {
-        return mpImpl->GetColorDepth();
-    }
+    virtual Renderer& RenderTexture(const Texture &arTexture, const Rect &arDestination) = 0;
 
-    virtual void RenderTexture(const Texture &arTexture, const Rect &arDestination)
-    {
-        mpImpl->RenderTexture(arTexture, arDestination);
-    }
+    virtual Renderer& DrawRect(const Rect &arRect, Color aColor) = 0;
+    virtual Renderer& Fill(Color aColor) = 0;
 
-    virtual void DrawRect(const Rect &arTouchArea, Color aTouchAreaColor)
-    {
-        mpImpl->DrawRect(arTouchArea, aTouchAreaColor);
-    }
+    virtual void Present() = 0;
+
+    virtual bool PollEvents(TouchEvent &arTouchEvent) = 0;
+    virtual Renderer& FlushEvents() = 0;
 
 protected:
-    std::unique_ptr<Renderer> mpImpl;
+    Renderer() {};
 };
 
 } /* namespace rsp::graphics */

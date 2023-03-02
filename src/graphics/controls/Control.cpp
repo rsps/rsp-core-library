@@ -150,21 +150,30 @@ Control& Control::SetBitmapPosition(const Point &arPoint)
     return *this;
 }
 
-void Control::UpdateData(Renderer &arRenderer)
+void Control::UpdateData()
 {
     refresh();
     if (mDirty) {
-        mTextures.clear();
         Canvas canvas(mArea.GetWidth(), mArea.GetHeight());
-        for (auto &tuple : mStyles) {
-            canvas.Fill(Color::None);
-            paint(canvas, tuple.second);
-            mTextures.emplace(tuple.first, Texture(arRenderer, canvas.GetPixelData()));
-        }
+        paint(canvas, mStyles.at(mState));
+        mTextures.at(mState)->Update(canvas.GetPixelData());
+//        for (auto &tuple : mStyles) {
+//            canvas.Fill(Color::None);
+//            paint(canvas, tuple.second);
+//            mTextures[tuple.first]->Update(canvas.GetPixelData());
+//        }
         mDirty = false;
     }
     for (Control* child : mChildren) {
-        child->UpdateData(arRenderer);
+        child->UpdateData();
+    }
+}
+
+void Control::MakeTextures(Renderer &arRenderer)
+{
+    mTextures.clear();
+    for (auto &tuple : mStyles) {
+        mTextures.emplace(tuple.first, arRenderer.CreateTexture(mArea.GetWidth(), mArea.GetHeight()));
     }
 }
 
@@ -177,7 +186,7 @@ void Control::Render(Renderer &arRenderer)
     }
 
     if (mTextures.find(mState) != mTextures.end()) {
-        arRenderer.RenderTexture(mTextures[mState], mArea);
+        arRenderer.RenderTexture(*mTextures[mState], mArea);
     }
 
     for (Control* child : mChildren) {
@@ -195,6 +204,9 @@ void Control::Render(Renderer &arRenderer)
 void Control::paint(Canvas &arCanvas, const Style &arStyle)
 {
     if (!mTransparent && (arStyle.mBackgroundColor != Color::None)) {
+        arCanvas.Fill(arStyle.mBackgroundColor);
+    }
+    else {
         arCanvas.Fill(arStyle.mBackgroundColor);
     }
 

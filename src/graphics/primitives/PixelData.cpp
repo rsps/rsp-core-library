@@ -321,7 +321,7 @@ void PixelData::Fill(Color aColor)
     }
     std::uint32_t *p = reinterpret_cast<std::uint32_t*>(mData.data());
 
-    std::fill_n(p, mData.size() / sizeof(std::uint32_t), aColor);
+    std::fill_n(p, mData.size() / sizeof(std::uint32_t), aColor.AsUint());
 }
 
 } /* namespace rsp::graphics */
