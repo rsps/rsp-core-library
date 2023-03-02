@@ -43,6 +43,8 @@ public:
      */
     Singleton(Singleton<T> &other) = delete;
 
+    virtual ~Singleton() {}
+
     /**
      * \brief Prohibit singleton assignment.
      */

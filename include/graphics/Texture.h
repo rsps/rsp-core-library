@@ -8,11 +8,11 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_PRIMITIVES_TEXTURE_H_
-#define INCLUDE_GRAPHICS_PRIMITIVES_TEXTURE_H_
+#ifndef INCLUDE_GRAPHICS_TEXTURE_H_
+#define INCLUDE_GRAPHICS_TEXTURE_H_
 
-#include "Color.h"
-#include "PixelData.h"
+#include <graphics/Color.h>
+#include <graphics/PixelData.h>
 
 namespace rsp::graphics {
 
@@ -40,4 +40,4 @@ public:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_PRIMITIVES_TEXTURE_H_ */
+#endif /* INCLUDE_GRAPHICS_TEXTURE_H_ */

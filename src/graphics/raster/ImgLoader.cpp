@@ -8,10 +8,10 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/primitives/raster/ImgLoader.h>
-#include <memory>
 #include "BmpLoader.h"
+#include <graphics/raster/ImgLoader.h>
 #include "PngLoader.h"
+#include <memory>
 
 namespace rsp::graphics {
 

@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/controls/Control.h"
 #include <doctest.h>
+#include <graphics/Control.h>
 
 using namespace rsp::graphics;
 

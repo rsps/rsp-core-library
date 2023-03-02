@@ -9,8 +9,8 @@
  */
 
 #include <doctest.h>
-#include <graphics/primitives/Bitmap.h>
-#include <graphics/primitives/Color.h>
+#include <graphics/Bitmap.h>
+#include <graphics/Color.h>
 #include <utils/CoreException.h>
 #include <TestHelpers.h>
 

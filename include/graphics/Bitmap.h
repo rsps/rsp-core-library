@@ -10,8 +10,8 @@
 #ifndef BITMAP_H
 #define BITMAP_H
 
-#include <graphics/primitives/Canvas.h>
-#include <graphics/primitives/raster/ImgLoader.h>
+#include <graphics/Canvas.h>
+#include <graphics/raster/ImgLoader.h>
 #include <memory>
 
 #include <functional>

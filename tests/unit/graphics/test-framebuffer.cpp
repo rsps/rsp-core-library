@@ -10,8 +10,8 @@
 
 #include <chrono>
 #include <doctest.h>
+#include <graphics/Bitmap.h>
 #include <graphics/Framebuffer.h>
-#include <graphics/primitives/Bitmap.h>
 #include <thread>
 #include <filesystem>
 #include <posix/FileSystem.h>

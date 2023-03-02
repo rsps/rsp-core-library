@@ -15,7 +15,7 @@
 
 #include <string>
 #include <map>
-#include <graphics/primitives/Font.h>
+#include <graphics/Font.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H

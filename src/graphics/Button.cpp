@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/controls/Button.h>
+#include <graphics/Button.h>
 
 namespace rsp::graphics {
 

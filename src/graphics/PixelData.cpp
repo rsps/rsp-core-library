@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/primitives/PixelData.h>
+#include <graphics/PixelData.h>
 #include <posix/FileSystem.h>
 #include <utils/CppObjectFile.h>
 #include <logging/Logger.h>
@@ -201,16 +201,7 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
 
 PixelData::PixelData(const PixelData &arOther)
 {
-    mColorDepth = arOther.mColorDepth;
-    mWidth = arOther.mWidth;
-    mHeight = arOther.mHeight;
-    mData = arOther.mData;
-    if (mData.size() > 0) {
-        mpData = mData.data();
-    }
-    else {
-        mpData = arOther.mpData;
-    }
+    Assign(arOther);
 }
 
 PixelData::PixelData(const PixelData &&arOther)
@@ -227,7 +218,7 @@ PixelData::PixelData(const PixelData &&arOther)
     }
 }
 
-PixelData& PixelData::operator =(const PixelData &arOther)
+PixelData& PixelData::Assign(const PixelData& arOther)
 {
     if (this != &arOther) {
         mColorDepth = arOther.mColorDepth;
@@ -242,6 +233,11 @@ PixelData& PixelData::operator =(const PixelData &arOther)
         }
     }
     return *this;
+}
+
+PixelData& PixelData::operator =(const PixelData &arOther)
+{
+    return Assign(arOther);
 }
 
 PixelData& PixelData::operator =(const PixelData &&arOther)

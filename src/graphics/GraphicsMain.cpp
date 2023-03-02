@@ -9,13 +9,13 @@
  */
 
 #include <graphics/GraphicsMain.h>
+#include <graphics/StaticTextures.h>
 #include <chrono>
 #include <thread>
 #include <utils/StopWatch.h>
 #include <utils/Timer.h>
 #include <algorithm>
 #include <logging/Logger.h>
-#include <graphics/primitives/StaticTextures.h>
 
 using namespace rsp::messaging;
 using namespace rsp::logging;
@@ -64,17 +64,17 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
             mrScenes.ActiveScene().ProcessInput(event);
         }
 
-        mrScenes.ActiveScene().UpdateData();
+        bool changed = mrScenes.ActiveScene().UpdateData();
 //        mrScenes.ActiveScene().Invalidate();
 
         // Render invalidated things
-        bool changed = mrScenes.ActiveScene().Render(mrRenderer);
+        mrScenes.ActiveScene().Render(mrRenderer);
         if (mpOverlay) {
-            mpOverlay->UpdateData();
-            changed |= mpOverlay->Render(mrRenderer);
+            changed |= mpOverlay->UpdateData();
+            mpOverlay->Render(mrRenderer);
         }
         if (changed) {
-            mrBufferedCanvas.SwapBuffer(BufferedCanvas::SwapOperations::Copy);
+            mrRenderer.Present();
         }
 
         int64_t delay = std::max(std::int64_t(0), frame_time - sw.Elapsed<std::chrono::milliseconds>());

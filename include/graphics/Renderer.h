@@ -8,15 +8,15 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_PRIMITIVES_RENDERER_H_
-#define INCLUDE_GRAPHICS_PRIMITIVES_RENDERER_H_
+#ifndef INCLUDE_GRAPHICS_RENDERER_H_
+#define INCLUDE_GRAPHICS_RENDERER_H_
 
+#include <graphics/Color.h>
+#include <graphics/GuiUnit.h>
+#include <graphics/PixelData.h>
+#include <graphics/Rect.h>
+#include <graphics/Texture.h>
 #include <memory>
-#include "Color.h"
-#include "GuiUnit.h"
-#include "PixelData.h"
-#include "Rect.h"
-#include "Texture.h"
 #include <graphics/TouchEvent.h>
 
 namespace rsp::graphics {
@@ -25,7 +25,9 @@ namespace rsp::graphics {
 class Renderer
 {
 public:
-    static Renderer& Make();
+    enum class Types { Software, SDL };
+
+    static Renderer& Make(Types aType);
 
     virtual ~Renderer() {}
 
@@ -52,4 +54,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_PRIMITIVES_RENDERER_H_ */
+#endif /* INCLUDE_GRAPHICS_RENDERER_H_ */

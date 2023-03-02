@@ -10,8 +10,8 @@
 #ifndef FIRSTSCENE_H
 #define FIRSTSCENE_H
 
-#include <graphics/controls/Button.h>
-#include <graphics/controls/Scene.h>
+#include <graphics/Button.h>
+#include <graphics/Scene.h>
 
 namespace rsp::graphics {
 

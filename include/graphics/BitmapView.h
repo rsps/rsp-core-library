@@ -8,12 +8,12 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_PRIMITIVES_BITMAPVIEW_H_
-#define INCLUDE_GRAPHICS_PRIMITIVES_BITMAPVIEW_H_
+#ifndef INCLUDE_GRAPHICS_BITMAPVIEW_H_
+#define INCLUDE_GRAPHICS_BITMAPVIEW_H_
 
-#include "Bitmap.h"
-#include "Color.h"
-#include "PixelData.h"
+#include <graphics/Bitmap.h>
+#include <graphics/Color.h>
+#include <graphics/PixelData.h>
 
 namespace rsp::graphics {
 
@@ -59,4 +59,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_PRIMITIVES_BITMAPVIEW_H_ */
+#endif /* INCLUDE_GRAPHICS_BITMAPVIEW_H_ */

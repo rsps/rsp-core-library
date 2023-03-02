@@ -13,9 +13,9 @@
 #include <cstring>
 #include <iostream>
 #include <vector>
-#include <graphics/primitives/raster/ImgLoader.h>
 #include <posix/FileIO.h>
 #include <endian.h>
+#include <graphics/raster/ImgLoader.h>
 
 namespace rsp::graphics
 {

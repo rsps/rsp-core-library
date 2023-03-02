@@ -11,7 +11,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "Control.h"
+#include <graphics/Control.h>
 #include <vector>
 
 namespace rsp::graphics {

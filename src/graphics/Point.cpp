@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/primitives/Point.h>
+#include <graphics/Point.h>
 
 namespace rsp::graphics
 {

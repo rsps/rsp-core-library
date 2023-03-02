@@ -8,11 +8,11 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_CONTROLS_STYLE_H_
-#define INCLUDE_GRAPHICS_CONTROLS_STYLE_H_
+#ifndef INCLUDE_GRAPHICS_STYLE_H_
+#define INCLUDE_GRAPHICS_STYLE_H_
 
-#include <graphics/primitives/BitmapView.h>
-#include <graphics/primitives/Color.h>
+#include <graphics/BitmapView.h>
+#include <graphics/Color.h>
 
 namespace rsp::graphics {
 
@@ -34,4 +34,4 @@ public:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_CONTROLS_STYLE_H_ */
+#endif /* INCLUDE_GRAPHICS_STYLE_H_ */

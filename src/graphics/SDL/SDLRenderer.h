@@ -8,10 +8,10 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_GRAPHICS_PRIMITIVES_SDL_SDLRENDERER_H_
-#define SRC_GRAPHICS_PRIMITIVES_SDL_SDLRENDERER_H_
+#ifndef SRC_GRAPHICS_SDL_SDLRENDERER_H_
+#define SRC_GRAPHICS_SDL_SDLRENDERER_H_
 
-#include <graphics/primitives/Renderer.h>
+#include <graphics/Renderer.h>
 
 namespace rsp::graphics {
 
@@ -21,4 +21,4 @@ class SDLRenderer: public Renderer
 
 } /* namespace rsp::graphics */
 
-#endif /* SRC_GRAPHICS_PRIMITIVES_SDL_SDLRENDERER_H_ */
+#endif /* SRC_GRAPHICS_SDL_SDLRENDERER_H_ */

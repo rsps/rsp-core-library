@@ -14,12 +14,12 @@
 #define KB_Y 450
 
 #include <array>
-#include <graphics/controls/Button.h>
-#include <graphics/controls/Keyboard.h>
-#include <graphics/controls/Label.h>
-#include <graphics/controls/Scene.h>
+#include <graphics/Button.h>
+#include <graphics/Keyboard.h>
+#include <graphics/Label.h>
+#include <graphics/Scene.h>
 #include <graphics/TouchEvent.h>
-#include <graphics/primitives/Bitmap.h>
+#include <graphics/Bitmap.h>
 
 namespace rsp::graphics {
 

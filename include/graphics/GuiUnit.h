@@ -8,8 +8,10 @@
  * \author      steffen
  */
 
-#ifndef INCLUDE_GRAPHICS_PRIMITIVES_GUIUNIT_H_
-#define INCLUDE_GRAPHICS_PRIMITIVES_GUIUNIT_H_
+#ifndef INCLUDE_GRAPHICS_GUIUNIT_H_
+#define INCLUDE_GRAPHICS_GUIUNIT_H_
+
+#include <cstdint>
 
 namespace rsp::graphics {
 
@@ -17,4 +19,4 @@ typedef std::int32_t GuiUnit_t;
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_PRIMITIVES_GUIUNIT_H_ */
+#endif /* INCLUDE_GRAPHICS_GUIUNIT_H_ */

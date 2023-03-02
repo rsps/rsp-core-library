@@ -6,47 +6,56 @@
  * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
+ * \author      Steffen Brummer
  */
-#ifndef FRAMEBUFFERCANVAS_H
-#define FRAMEBUFFERCANVAS_H
+#ifndef FRAMEBUFFER_H
+#define FRAMEBUFFER_H
 
+#include <graphics/Rect.h>
+#include <graphics/Texture.h>
 #include <linux/fb.h>
 
-#include <graphics/primitives/Rect.h>
-#include <graphics/primitives/Texture.h>
-#include "BufferedCanvas.h"
 
 namespace rsp::graphics
 {
 
-class Framebuffer : public BufferedCanvas
+class Framebuffer
 {
-  public:
+public:
     Framebuffer(const char *apDevPath = nullptr);
     virtual ~Framebuffer();
 
-    void BlitTexture(const Texture &arTexture);
+    Framebuffer(const Framebuffer&) = default;
+    Framebuffer(Framebuffer&&) = default;
+    Framebuffer& operator=(const Framebuffer&) = default;
+    Framebuffer& operator=(Framebuffer&&) = default;
+
+    void SwapBuffer();
 
     /**
-     * \brief Swaps front and back buffers
+     * \brief Sets a single pixel to the given Color
+     * \param aPoint Reference to the coordinate for the pixel to be set
+     * \param aColor Reference to the color the pixel is set to
      */
-    void SwapBuffer() override;
+    void SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) override;
 
-    void Fill(rsp::graphics::Color aColor = Color::Black) override;
+    /**
+     * \brief Gets a single pixel to the given Color
+     * \param aPoint Reference to the coordinate for the pixel to get
+     * \param aFront Gets pixels from the backbuffer by default, set true to read front buffer
+     */
+    uint32_t GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront = false) const override;
 
-    GuiUnit_t GetWidth();
-    GuiUnit_t GetHeight();
-
-  protected:
+protected:
     int mFramebufferFile;
     int mTtyFb = 0;
     struct fb_fix_screeninfo mFixedInfo{};
     struct fb_var_screeninfo mVariableInfo{};
+    uint32_t *mpFrontBuffer = nullptr;
+    uint32_t *mpBackBuffer = nullptr;
     Rect mClipRect{};
-
-    void clear(Color aColor);
-    void copy();
 };
 
 } // namespace rsp::graphics
-#endif // FRAMEBUFFERCANVAS_H
+
+#endif // FRAMEBUFFER_H

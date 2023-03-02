@@ -10,8 +10,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include <graphics/primitives/Bitmap.h>
-#include "Control.h"
+#include <graphics/Control.h>
+#include <graphics/Bitmap.h>
 
 namespace rsp::graphics
 {

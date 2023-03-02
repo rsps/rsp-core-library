@@ -8,22 +8,18 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_GRAPHICS_PRIMITIVES_SW_SWTEXTURE_H_
-#define SRC_GRAPHICS_PRIMITIVES_SW_SWTEXTURE_H_
+#ifndef SRC_GRAPHICS_SW_SWTEXTURE_H_
+#define SRC_GRAPHICS_SW_SWTEXTURE_H_
 
-#include <graphics/primitives/Texture.h>
+#include <graphics/Texture.h>
 
 namespace rsp::graphics {
 
 class SWTexture: public Texture
 {
 public:
-    SWTexture(const Renderer &arRenderer, const PixelData &arPixelData);
-
-protected:
-    void assign(const rsp::graphics::PixelData &arPixelData) override;
 };
 
 } /* namespace rsp::graphics */
 
-#endif /* SRC_GRAPHICS_PRIMITIVES_SW_SWTEXTURE_H_ */
+#endif /* SRC_GRAPHICS_SW_SWTEXTURE_H_ */

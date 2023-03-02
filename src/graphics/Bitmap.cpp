@@ -8,9 +8,9 @@
  * \author      Simon Glashoff
  */
 
+#include <graphics/Bitmap.h>
 #include <algorithm>
 #include <filesystem>
-#include <graphics/primitives/Bitmap.h>
 #include <utils/CoreException.h>
 #include <logging/Logger.h>
 
@@ -34,7 +34,7 @@ Bitmap::Bitmap(const std::string &arImgName)
 Bitmap::Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, PixelData::ColorDepth aDepth)
     : Canvas(aHeight, aWidth, aDepth)
 {
-    mPixelData.Init(aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
+    Init(aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
 }
 
 
@@ -45,21 +45,21 @@ Bitmap& Bitmap::Load(const std::string &arImgName)
     auto loader = ImgLoader::GetRasterLoader(filename.extension());
     // Get raw data
     loader->LoadImg(filename);
-    mPixelData = loader->GetPixelData();
-    mClipRect = Rect(0, 0, mPixelData.GetWidth(), mPixelData.GetHeight());
+    Assign(loader->GetPixelData());
+    mClipRect = GetRect();
     return *this;
 }
 
 Bitmap& Bitmap::Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, PixelData::ColorDepth aDepth)
 {
-    mPixelData.Init(aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
+    Init(aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
 
     return *this;
 }
 
 Bitmap& Bitmap::Assign(const PixelData &arPixelData)
 {
-    mPixelData = arPixelData;
+    Assign(arPixelData);
     return *this;
 }
 

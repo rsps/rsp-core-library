@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/primitives/Rect.h>
+#include <graphics/Rect.h>
 #include <utils/CoreException.h>
 
 using namespace rsp::utils;

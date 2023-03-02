@@ -7,13 +7,13 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_GRAPHICS_PRIMITIVES_FONTRAWINTERFACE_H_
-#define INCLUDE_GRAPHICS_PRIMITIVES_FONTRAWINTERFACE_H_
+#ifndef INCLUDE_GRAPHICS_FONTRAWINTERFACE_H_
+#define INCLUDE_GRAPHICS_FONTRAWINTERFACE_H_
 
+#include <graphics/Rect.h>
 #include <string>
 #include <memory>
 #include <vector>
-#include <graphics/primitives/Rect.h>
 
 namespace rsp::graphics {
 
@@ -111,4 +111,4 @@ protected:
 
 }
 
-#endif /* INCLUDE_GRAPHICS_PRIMITIVES_FONTRAWINTERFACE_H_ */
+#endif /* INCLUDE_GRAPHICS_FONTRAWINTERFACE_H_ */

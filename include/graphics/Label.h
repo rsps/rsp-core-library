@@ -11,8 +11,9 @@
 #ifndef INCLUDE_GRAPHICS_CONTROLS_LABEL_H
 #define INCLUDE_GRAPHICS_CONTROLS_LABEL_H
 
-#include "Control.h"
-#include <graphics/primitives/Text.h>
+#include <string>
+#include <graphics/Control.h>
+#include <graphics/Text.h>
 
 namespace rsp::graphics {
 

@@ -10,7 +10,7 @@
 
 #include <chrono>
 #include <doctest.h>
-#include <graphics/controls/Control.h>
+#include <graphics/Control.h>
 #include <utils/Random.h>
 #include <TestHelpers.h>
 

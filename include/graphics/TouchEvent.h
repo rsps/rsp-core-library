@@ -10,9 +10,9 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include <graphics/Point.h>
 #include <iostream>
 #include <chrono>
-#include <graphics/primitives/Point.h>
 
 namespace rsp::graphics
 {

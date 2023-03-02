@@ -12,12 +12,5 @@
 
 namespace rsp::graphics {
 
-SDLTexture::SDLTexture(const Renderer &arRenderer, const PixelData &arPixelData)
-{
-}
-
-void SDLTexture::assign(const rsp::graphics::PixelData &arPixelData)
-{
-}
 
 } /* namespace rsp::graphics */

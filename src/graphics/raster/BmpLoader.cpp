@@ -8,13 +8,13 @@
  * \author      Simon Glashoff
  */
 
+#include "BmpLoader.h"
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
 #include <string>
 #include <logging/Logger.h>
 #include <utils/CoreException.h>
-#include "BmpLoader.h"
 
 using namespace rsp::logging;
 

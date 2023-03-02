@@ -11,8 +11,8 @@
 #ifndef POINT_H
 #define POINT_H
 
+#include <graphics/GuiUnit.h>
 #include <ostream>
-#include "GuiUnit.h"
 
 namespace rsp::graphics
 {
@@ -20,7 +20,7 @@ namespace rsp::graphics
 class Rect;
 class Canvas;
 class Bitmap;
-class Framebuffer;
+class PixelData;
 
 /**
  * \brief Point class
@@ -169,7 +169,7 @@ class Point
 
   protected:
     // Allow friends to access members for speed optimizations.
-    friend Framebuffer;
+    friend PixelData;
     friend Canvas;
     friend Bitmap;
     friend Rect;

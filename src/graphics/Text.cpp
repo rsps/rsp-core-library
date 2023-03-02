@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/primitives/Text.h>
+#include <graphics/Text.h>
 #include <logging/Logger.h>
 
 using namespace rsp::logging;
@@ -177,8 +177,8 @@ void Text::alignGlyphs()
 
 void Text::drawText()
 {
-    mPixelData.Init(mBoundingRect.GetWidth(), mBoundingRect.GetHeight(), PixelData::ColorDepth::RGBA, nullptr);
-    mPixelData.Fill(mFont.GetBackgroundColor());
+    Init(mBoundingRect.GetWidth(), mBoundingRect.GetHeight(), PixelData::ColorDepth::RGBA, nullptr);
+    Fill(mFont.GetBackgroundColor());
     auto &glyphs = GetGlyphs();
     if (!glyphs) {
         return;
@@ -200,7 +200,7 @@ void Text::drawText()
 //                auto p = Point(x + glyph.mLeft + tl.mX, y + glyph.mTop + tl.mY);
                 if (GetArea().IsHit(px, py)) {
                     color.SetAlpha(c);
-                    mPixelData.SetPixelAt(px, py, color);
+                    SetPixelAt(px, py, color);
                 }
                 px++;
             }

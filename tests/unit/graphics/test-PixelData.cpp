@@ -9,7 +9,7 @@
  */
 
 #include <doctest.h>
-#include <graphics/primitives/PixelData.h>
+#include <graphics/PixelData.h>
 #include <TestHelpers.h>
 #include <posix/FileSystem.h>
 

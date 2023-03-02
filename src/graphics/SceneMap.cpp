@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/controls/SceneMap.h>
+#include <graphics/SceneMap.h>
 #include <stdexcept>
 #include <logging/Logger.h>
 

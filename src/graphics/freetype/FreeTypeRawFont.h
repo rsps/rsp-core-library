@@ -7,15 +7,15 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef SRC_GRAPHICS_PRIMITIVES_FREETYPE_FREETYPERAWFONT_H_
-#define SRC_GRAPHICS_PRIMITIVES_FREETYPE_FREETYPERAWFONT_H_
+#ifndef SRC_GRAPHICS_FREETYPE_FREETYPERAWFONT_H_
+#define SRC_GRAPHICS_FREETYPE_FREETYPERAWFONT_H_
 
 #ifdef USE_FREETYPE
 
 #include <map>
 #include <vector>
 #include <string>
-#include <graphics/primitives/FontRawInterface.h>
+#include <graphics/FontRawInterface.h>
 #include "FreeTypeLibrary.h"
 
 namespace rsp::graphics {
@@ -76,5 +76,5 @@ protected:
 
 #endif /* USE_FREETYPE */
 
-#endif /* SRC_GRAPHICS_PRIMITIVES_FREETYPE_FREETYPERAWFONT_H_ */
+#endif /* SRC_GRAPHICS_FREETYPE_FREETYPERAWFONT_H_ */
 

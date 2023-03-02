@@ -9,10 +9,10 @@
  * \author      Steffen Brummer
  */
 
+#include "PngLoader.h"
 #include <logging/Logger.h>
 #include <utils/CoreException.h>
 #include <utils/Crc32.h>
-#include "PngLoader.h"
 
 using namespace rsp::utils;
 using namespace rsp::logging;

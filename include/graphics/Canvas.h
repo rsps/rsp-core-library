@@ -10,10 +10,10 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include "Color.h"
-#include "Point.h"
-#include "Rect.h"
-#include "PixelData.h"
+#include <graphics/Color.h>
+#include <graphics/PixelData.h>
+#include <graphics/Point.h>
+#include <graphics/Rect.h>
 
 namespace rsp::graphics
 {
@@ -23,36 +23,10 @@ namespace rsp::graphics
  *
  * Class function declarations for low level drawing operations, storage is internal memory.
  */
-class Canvas
+class Canvas : public PixelData
 {
 public:
-    Canvas()
-    {
-    }
-
-    Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, PixelData::ColorDepth aDepth = PixelData::ColorDepth::RGBA)
-        : mPixelData(aWidth, aHeight, aDepth)
-    {
-    }
-
-    Canvas(const PixelData &arPixelData)
-        : mPixelData(arPixelData)
-    {
-    }
-
-    Canvas(PixelData &&arPixelData)
-        : mPixelData(arPixelData)
-    {
-    }
-
-    /**
-     * \brief Virtual destructor for the abstract class.
-     */
-    virtual ~Canvas()
-    {
-    }
-
-    void Fill(Color aColor);
+    using PixelData::PixelData;
 
     /**
      * \brief Draw a a full or partial eclipse
@@ -105,8 +79,8 @@ public:
      */
     void DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData, const Rect &arSection, Color aColor);
 
-    PixelData& GetPixelData() { return mPixelData; }
-    const PixelData& GetPixelData() const { return mPixelData; }
+    PixelData& GetPixelData() { return *this; }
+    const PixelData& GetPixelData() const { return *this; }
 
     /**
      * \brief Get a reference to the clipping rect for this canvas
@@ -116,7 +90,6 @@ public:
     const Rect& GetClipRect() const { return mClipRect; }
 
 protected:
-    PixelData mPixelData{};
     Rect mClipRect{};
 
     void plot4Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor);

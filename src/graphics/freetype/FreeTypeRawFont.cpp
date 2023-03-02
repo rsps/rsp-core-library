@@ -11,7 +11,7 @@
 #ifdef USE_FREETYPE
 
 #include "FreeTypeRawFont.h"
-#include <graphics/primitives/Font.h>
+#include <graphics/Font.h>
 #include <logging/Logger.h>
 
 #include <ft2build.h>

@@ -9,7 +9,7 @@
  */
 
 #include <doctest.h>
-#include <graphics/primitives/Color.h>
+#include <graphics/Color.h>
 
 using namespace rsp::graphics;
 

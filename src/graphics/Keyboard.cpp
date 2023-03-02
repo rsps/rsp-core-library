@@ -8,21 +8,20 @@
  * \author      Steffen Brummer
  */
 
+#include <graphics/Keyboard.h>
+#include "pixmaps/BigSpecial.h"
+#include "pixmaps/Erase.h"
+#include "pixmaps/Key.h"
+#include "pixmaps/LowerCase.h"
+#include "pixmaps/SmallSpecial.h"
+#include "pixmaps/Space.h"
+#include "pixmaps/UpperCase.h"
 #include <cctype>
 #include <functional>
 #include <string>
 #include <locale>
 #include <codecvt>
 #include <utils/Function.h>
-#include <graphics/controls/Keyboard.h>
-
-#include "pixmaps/BigSpecial.h"
-#include "pixmaps/SmallSpecial.h"
-#include "pixmaps/Erase.h"
-#include "pixmaps/Key.h"
-#include "pixmaps/LowerCase.h"
-#include "pixmaps/UpperCase.h"
-#include "pixmaps/Space.h"
 
 using namespace rsp::utils;
 

@@ -8,12 +8,12 @@
  * \author      Steffen Brummer
  */
 
+#include <graphics/Font.h>
+#include <graphics/FontRawInterface.h>
 #include <string>
 #include <locale>
 #include <codecvt>
 #include <algorithm>
-#include <graphics/primitives/Font.h>
-#include <graphics/primitives/FontRawInterface.h>
 #include <logging/Logger.h>
 
 namespace rsp::graphics {

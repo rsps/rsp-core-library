@@ -9,8 +9,8 @@
  */
 
 #include <doctest.h>
-#include <graphics/primitives/Point.h>
-#include <graphics/primitives/Rect.h>
+#include <graphics/Point.h>
+#include <graphics/Rect.h>
 #include <utils/CoreException.h>
 
 #include <iostream>

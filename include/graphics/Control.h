@@ -10,19 +10,19 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include <graphics/Canvas.h>
+#include <graphics/Color.h>
+#include <graphics/Rect.h>
+#include <graphics/Renderer.h>
 #include <map>
 #include <vector>
 #include <string_view>
-#include <graphics/primitives/Canvas.h>
-#include <graphics/primitives/Color.h>
-#include <graphics/primitives/Rect.h>
-#include <graphics/primitives/Renderer.h>
+#include <graphics/Style.h>
 #include <graphics/TouchEvent.h>
 #include <logging/Logger.h>
 #include <utils/ConstTypeInfo.h>
 #include <utils/CoreException.h>
 #include <utils/Function.h>
-#include "Style.h"
 
 //#define GFXLOG(a) DLOG(a)
 #define GFXLOG(a)
@@ -146,7 +146,7 @@ public:
      *        needs to be shown in sync with the GUI rendering.
      *        The method calls the refresh method on all elements.
      */
-    virtual void UpdateData();
+    virtual bool UpdateData();
 
     /**
      * \brief Called when a Scene is activated, use it to create textures needed for this control.

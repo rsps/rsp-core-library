@@ -7,12 +7,5 @@
 
 namespace rsp::graphics {
 
-SWTexture::SWTexture(const Renderer &arRenderer, const PixelData &arPixelData)
-{
-}
-
-void SWTexture::assign(const rsp::graphics::PixelData &arPixelData)
-{
-}
 
 } /* namespace rsp::graphics */

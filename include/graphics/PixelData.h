@@ -8,17 +8,18 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_PRIMITIVES_PIXELDATA_H_
-#define INCLUDE_GRAPHICS_PRIMITIVES_PIXELDATA_H_
+#ifndef INCLUDE_GRAPHICS_PIXELDATA_H_
+#define INCLUDE_GRAPHICS_PIXELDATA_H_
 
+#include <graphics/Color.h>
+#include <graphics/Point.h>
+#include <graphics/Rect.h>
 #include <cstdint>
 #include <cstddef>
 #include <filesystem>
 #include <vector>
-#include <graphics/primitives/Color.h>
 #include <utils/CoreException.h>
 #include <logging/Logger.h>
-#include "Point.h"
 
 namespace rsp::graphics {
 
@@ -35,13 +36,15 @@ public:
     enum class ColorDepth { Monochrome = 1, Alpha = 8, RGB = 24, RGBA = 32 };
 
     PixelData() noexcept {}
-    PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth);
+    PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth = PixelData::ColorDepth::RGBA);
     PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData);
 
     PixelData(const PixelData& arOther);
     PixelData(const PixelData&& arOther);
     PixelData& operator=(const PixelData& arOther);
     PixelData& operator=(const PixelData&& arOther);
+
+    PixelData& Assign(const PixelData& arOther);
 
     PixelData ChangeColorDepth(ColorDepth aDepth) const;
 
@@ -61,6 +64,9 @@ public:
     GuiUnit_t GetWidth() const { return mWidth; }
     GuiUnit_t GetHeight() const { return mHeight; }
     ColorDepth GetColorDepth() const { return mColorDepth; }
+    Rect GetRect() const { return Rect(0, 0, mWidth, mHeight); }
+    bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const { return (aX < mWidth && aY < mHeight); }
+    bool IsHit(const Point &arPoint) const { return IsHit(arPoint.mX, arPoint.mY); }
 
     /**
      * \brief Get the color value for the pixel at given position
@@ -74,8 +80,10 @@ public:
      * \return Color
      */
     Color GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const;
+    Color GetPixel(const Point &arPoint, Color aColor = Color::None) const { return GetPixelAt(arPoint.mX, arPoint.mY, aColor); }
 
     PixelData& SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor);
+    PixelData& GetPixel(const Point &arPoint, Color aColor) { return SetPixelAt(arPoint.mX, arPoint.mY, aColor); }
 
     void SaveToCFile(const std::filesystem::path &arFileName);
 
@@ -94,4 +102,4 @@ std::ostream& operator<<(std::ostream& os, const PixelData::ColorDepth arDepth);
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_PRIMITIVES_PIXELDATA_H_ */
+#endif /* INCLUDE_GRAPHICS_PIXELDATA_H_ */

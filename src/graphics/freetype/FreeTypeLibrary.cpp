@@ -13,7 +13,7 @@
 #include "FreeTypeLibrary.h"
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
-#include <graphics/primitives/FontRawInterface.h>
+#include <graphics/FontRawInterface.h>
 
 using namespace rsp::utils;
 using namespace rsp::logging;

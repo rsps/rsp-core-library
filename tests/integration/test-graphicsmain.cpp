@@ -15,7 +15,7 @@
 
 #include <doctest.h>
 #include <posix/FileSystem.h>
-#include <graphics/controls/Label.h>
+#include <graphics/Label.h>
 #include <graphics/Framebuffer.h>
 #include <graphics/GraphicsMain.h>
 #include <utils/Timer.h>

@@ -10,11 +10,11 @@
 #ifndef IMGLOADER_H
 #define IMGLOADER_H
 
+#include <graphics/PixelData.h>
 #include <cstring>
 #include <iostream>
 #include <vector>
 #include <memory>
-#include <graphics/primitives/PixelData.h>
 #include <utils/CoreException.h>
 
 namespace rsp::graphics

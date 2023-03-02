@@ -8,14 +8,14 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_CONTROLS_BUTTON_H_
-#define INCLUDE_GRAPHICS_CONTROLS_BUTTON_H_
+#ifndef INCLUDE_GRAPHICS_BUTTON_H_
+#define INCLUDE_GRAPHICS_BUTTON_H_
 
+#include <graphics/Control.h>
+#include <graphics/Label.h>
 #include <map>
-#include <graphics/primitives/Bitmap.h>
-#include <graphics/primitives/Text.h>
-#include "Control.h"
-#include "Label.h"
+#include <graphics/Bitmap.h>
+#include <graphics/Text.h>
 
 namespace rsp::graphics {
 
@@ -29,4 +29,4 @@ public:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_CONTROLS_BUTTON_H_ */
+#endif /* INCLUDE_GRAPHICS_BUTTON_H_ */

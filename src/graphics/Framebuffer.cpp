@@ -131,18 +131,56 @@ void Framebuffer::Fill(rsp::graphics::Color aColor)
     }
 }
 
-void Framebuffer::BlitTexture(const Texture &arTexture)
+
+void Framebuffer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 {
+    if ((aX >= mVariableInfo.xres) || (aY >= mVariableInfo.yres)) {
+        return;
+    }
+    std::uint32_t location = ((static_cast<std::uint32_t>(aX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
+        + static_cast<std::uint32_t>(aY) * mFixedInfo.line_length) / sizeof(std::uint32_t);
+    if (arColor.GetAlpha() == 255) {
+        mpBackBuffer[location] = arColor;
+    }
+    else {
+        mpBackBuffer[location] = Color::Blend(mpBackBuffer[location], arColor);
+    }
 }
 
-GuiUnit_t Framebuffer::GetWidth()
+uint32_t Framebuffer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
 {
-    return static_cast<GuiUnit_t>(mVariableInfo.xres);
+    if ((aX >= mVariableInfo.xres) || (aY >= mVariableInfo.yres)) {
+        return 0;
+    }
+    std::uint32_t location = ((static_cast<std::uint32_t>(aX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
+        + (static_cast<std::uint32_t>(aY) * mFixedInfo.line_length)) / sizeof(std::uint32_t);
+    if (aFront) {
+        return mpFrontBuffer[location];
+    } else {
+        return mpBackBuffer[location];
+    }
 }
 
-GuiUnit_t Framebuffer::GetHeight()
+void Framebuffer::clear(Color aColor)
 {
-    return static_cast<GuiUnit_t>(mVariableInfo.yres);
+    // draw to back buffer
+    for (std::uint32_t y = 0; y < mVariableInfo.yres; y++) {
+        for (std::uint32_t x = 0; x < mVariableInfo.xres; x++) {
+            std::size_t location = ((x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length) / sizeof(std::uint32_t);
+            mpBackBuffer[location] = aColor;
+        }
+    }
+}
+
+void Framebuffer::copy()
+{
+    // copy front buffer to back buffer
+    for (std::uint32_t y = 0; y < mVariableInfo.yres; y++) {
+        for (std::uint32_t x = 0; x < mVariableInfo.xres; x++) {
+            std::size_t location = ((x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length) / sizeof(std::uint32_t);
+            mpBackBuffer[location] = mpFrontBuffer[location];
+        }
+    }
 }
 
 } // namespace rsp::graphics

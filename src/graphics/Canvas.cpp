@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/primitives/Canvas.h>
+#include <graphics/Canvas.h>
 
 namespace rsp::graphics
 {
@@ -46,19 +46,19 @@ void Canvas::DrawRectangle(const Rect &arRect, const Color &arColor, bool aFille
     if (aFilled) {
         for (GuiUnit_t y = r.mLeftTop.mY; y < h_end; y++) {
             for (GuiUnit_t x = r.mLeftTop.mX; x < w_end; x++) {
-                mPixelData.SetPixelAt(x, y, arColor);
+                SetPixelAt(x, y, arColor);
             }
         }
     }
     else {
         Point rb = r.GetBottomRight();
         for (GuiUnit_t x = r.mLeftTop.mX; x < w_end; x++) {
-            mPixelData.SetPixelAt(x, r.mLeftTop.mY, arColor); // top
-            mPixelData.SetPixelAt(x, rb.mY-1, arColor); // bottom
+            SetPixelAt(x, r.mLeftTop.mY, arColor); // top
+            SetPixelAt(x, rb.mY-1, arColor); // bottom
         }
         for (GuiUnit_t y = r.mLeftTop.mY; y < h_end; y++) {
-            mPixelData.SetPixelAt(r.mLeftTop.mX, y, arColor); // left
-            mPixelData.SetPixelAt(rb.mX-1, y, arColor); // right
+            SetPixelAt(r.mLeftTop.mX, y, arColor); // left
+            SetPixelAt(rb.mX-1, y, arColor); // right
         }
     }
 }
@@ -76,7 +76,7 @@ void Canvas::DrawLine(const Point &arA, const Point &arB, const Color &arColor)
     int px = static_cast<int>(arA.mX);
     int py = static_cast<int>(arA.mY);
 
-    mPixelData.SetPixelAt(px, py, arColor);
+    SetPixelAt(px, py, arColor);
     if (absDeltaX >= absDeltaY) {
         for (int i = 0; i < absDeltaX; i++) {
             y += absDeltaY;
@@ -85,7 +85,7 @@ void Canvas::DrawLine(const Point &arA, const Point &arB, const Color &arColor)
                 py += signumY;
             }
             px += signumX;
-            mPixelData.SetPixelAt(px, py, arColor);
+            SetPixelAt(px, py, arColor);
         }
     }
     else {
@@ -96,19 +96,18 @@ void Canvas::DrawLine(const Point &arA, const Point &arB, const Color &arColor)
                 px += signumX;
             }
             py += signumY;
-            mPixelData.SetPixelAt(px, py, arColor);
+            SetPixelAt(px, py, arColor);
         }
     }
 }
 
-void Canvas::DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData,
-    const Rect &arSection, Color aColor)
+void Canvas::DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData, const Rect &arSection, Color aColor)
 {
     auto oy = arLeftTop.GetY();
     for (int y = arSection.GetTop(); y < arSection.GetHeight(); y++) {
         auto ox = arLeftTop.GetX();
         for (int x = arSection.GetLeft(); x < arSection.GetWidth(); x++) {
-            mPixelData.SetPixelAt(ox, oy, arPixelData.GetPixelAt(x, y, aColor));
+            SetPixelAt(ox, oy, arPixelData.GetPixelAt(x, y, aColor));
             ox++;
         }
         oy++;
@@ -117,21 +116,16 @@ void Canvas::DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData,
 
 void Canvas::plot4Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 {
-    mPixelData.SetPixelAt(aCenterX + aX, aCenterY + aY, arColor);
-    mPixelData.SetPixelAt(aCenterX - aX, aCenterY + aY, arColor);
-    mPixelData.SetPixelAt(aCenterX + aX, aCenterY - aY, arColor);
-    mPixelData.SetPixelAt(aCenterX - aX, aCenterY - aY, arColor);
+    SetPixelAt(aCenterX + aX, aCenterY + aY, arColor);
+    SetPixelAt(aCenterX - aX, aCenterY + aY, arColor);
+    SetPixelAt(aCenterX + aX, aCenterY - aY, arColor);
+    SetPixelAt(aCenterX - aX, aCenterY - aY, arColor);
 }
 
 void Canvas::plot8Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 {
     plot4Points(aCenterX, aCenterY, aX, aY, arColor);
     plot4Points(aCenterX, aCenterY, aY, aX, arColor);
-}
-
-void Canvas::Fill(Color aColor)
-{
-    mPixelData.Fill(aColor);
 }
 
 } /* namespace rsp::graphics */

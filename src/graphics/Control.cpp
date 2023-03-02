@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/controls/Control.h>
+#include <graphics/Control.h>
 #include <logging/Logger.h>
 #include <magic_enum.hpp>
 
@@ -150,8 +150,9 @@ Control& Control::SetBitmapPosition(const Point &arPoint)
     return *this;
 }
 
-void Control::UpdateData()
+bool Control::UpdateData()
 {
+    bool result = false;
     refresh();
     if (mDirty) {
         Canvas canvas(mArea.GetWidth(), mArea.GetHeight());
@@ -163,10 +164,14 @@ void Control::UpdateData()
 //            mTextures[tuple.first]->Update(canvas.GetPixelData());
 //        }
         mDirty = false;
+        result = true;
     }
     for (Control* child : mChildren) {
-        child->UpdateData();
+        if (child->UpdateData()) {
+            result = true;
+        }
     }
+    return result;
 }
 
 void Control::MakeTextures(Renderer &arRenderer)

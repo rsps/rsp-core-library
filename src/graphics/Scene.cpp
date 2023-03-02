@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/controls/Scene.h>
+#include <graphics/Scene.h>
 #include <functional>
 
 namespace rsp::graphics

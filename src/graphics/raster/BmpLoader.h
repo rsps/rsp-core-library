@@ -10,12 +10,12 @@
 #ifndef BMPLOADER_H
 #define BMPLOADER_H
 
+#include <graphics/Color.h>
+#include <graphics/raster/ImgLoader.h>
 #include <cstring>
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <graphics/primitives/Color.h>
-#include <graphics/primitives/raster/ImgLoader.h>
 #include <posix/FileIO.h>
 
 namespace rsp::graphics

@@ -10,7 +10,7 @@
 
 #include <doctest.h>
 #include <graphics/Framebuffer.h>
-#include <graphics/controls/Image.h>
+#include <graphics/Image.h>
 #include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <TestHelpers.h>

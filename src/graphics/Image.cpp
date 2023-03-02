@@ -10,8 +10,8 @@
 
 #include <algorithm>
 #include <string>
-#include "graphics/controls/Image.h"
-#include "graphics/primitives/Rect.h"
+#include <graphics/Image.h>
+#include <graphics/Rect.h>
 #include <utils/CoreException.h>
 
 using namespace rsp::utils;

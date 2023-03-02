@@ -8,16 +8,16 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_CONTROLS_SCENEMAP_H_
-#define INCLUDE_GRAPHICS_CONTROLS_SCENEMAP_H_
+#ifndef INCLUDE_GRAPHICS_SCENEMAP_H_
+#define INCLUDE_GRAPHICS_SCENEMAP_H_
 
+#include <graphics/Scene.h>
 #include <map>
 #include <string>
 #include <functional>
 #include <utils/CoreException.h>
 #include <utils/Function.h>
 #include <logging/Logger.h>
-#include "Scene.h"
 
 namespace rsp::graphics {
 
@@ -74,4 +74,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_CONTROLS_SCENEMAP_H_ */
+#endif /* INCLUDE_GRAPHICS_SCENEMAP_H_ */

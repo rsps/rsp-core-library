@@ -10,13 +10,13 @@
 #ifndef FONT_H
 #define FONT_H
 
+#include <graphics/Color.h>
+#include <graphics/FontRawInterface.h>
+#include <graphics/Rect.h>
 #include <vector>
 #include <string>
 #include <memory>
 #include <utils/CoreException.h>
-#include <graphics/primitives/Color.h>
-#include <graphics/primitives/Rect.h>
-#include <graphics/primitives/FontRawInterface.h>
 
 namespace rsp::graphics {
 

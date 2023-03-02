@@ -8,13 +8,13 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_PRIMITIVES_TEXT_H_
-#define INCLUDE_GRAPHICS_PRIMITIVES_TEXT_H_
+#ifndef INCLUDE_GRAPHICS_TEXT_H_
+#define INCLUDE_GRAPHICS_TEXT_H_
 
+#include <graphics/Canvas.h>
+#include <graphics/Font.h>
+#include <graphics/Rect.h>
 #include <string>
-#include "Font.h"
-#include "Rect.h"
-#include "Canvas.h"
 
 namespace rsp::graphics {
 
@@ -68,11 +68,6 @@ public:
 
     Text& operator=(const Text&) = default;
     Text& operator=(Text&&) = default;
-
-    /**
-     * Simple destructor.
-     */
-    virtual ~Text() {};
 
 
     operator std::string() const { return mValue; }
@@ -236,4 +231,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_PRIMITIVES_TEXT_H_ */
+#endif /* INCLUDE_GRAPHICS_TEXT_H_ */

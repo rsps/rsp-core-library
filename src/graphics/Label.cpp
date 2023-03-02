@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
+#include <graphics/Label.h>
 #include <string>
-#include <graphics/controls/Label.h>
 
 namespace rsp::graphics {
 
@@ -62,7 +62,7 @@ void Label::doSetArea(const Rect &arRect)
 void Label::paint(Canvas &arCanvas, const Style &arStyle)
 {
     Control::paint(arCanvas, arStyle);
-    arCanvas.DrawText(mText, arStyle.mForegroundColor);
+    arCanvas.DrawPixelData(mText.GetArea().GetTopLeft(), mText.GetPixelData(), mText.GetPixelData().GetRect(), arStyle.mForegroundColor);
 }
 
 Label& Label::SetFontSize(int aSizePx)

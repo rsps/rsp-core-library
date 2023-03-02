@@ -1,3 +1,3 @@
-#include <graphics/primitives/PixelData.h>
+#include <graphics/PixelData.h>
 
 extern const rsp::graphics::PixelData cKey;

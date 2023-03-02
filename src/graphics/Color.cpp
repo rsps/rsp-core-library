@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/primitives/Color.h>
+#include <graphics/Color.h>
 #include <logging/Logger.h>
 
 namespace rsp::graphics {

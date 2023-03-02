@@ -9,8 +9,8 @@
  */
 
 #include <graphics/Framebuffer.h>
-#include <graphics/primitives/Font.h>
-#include <graphics/controls/Scene.h>
+#include <graphics/Font.h>
+#include <graphics/Scene.h>
 #include <messaging/Subscriber.h>
 #include <messaging/Publisher.h>
 #include <posix/FileSystem.h>

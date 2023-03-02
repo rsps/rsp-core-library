@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
+#include <graphics/BitmapView.h>
 #include <algorithm>
-#include <graphics/primitives/BitmapView.h>
 
 namespace rsp::graphics {
 
