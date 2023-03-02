@@ -18,6 +18,15 @@ namespace rsp::graphics {
 class SWTexture: public Texture
 {
 public:
+    SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, PixelData::ColorDepth aDepth);
+
+    const PixelData& GetPixelData() const { return mPixelData; }
+
+    void Fill(rsp::graphics::Color aColor) override;
+    void Update(const PixelData &arPixelData) override;
+
+protected:
+    PixelData mPixelData;
 };
 
 } /* namespace rsp::graphics */

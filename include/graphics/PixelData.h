@@ -83,7 +83,7 @@ public:
     Color GetPixel(const Point &arPoint, Color aColor = Color::None) const { return GetPixelAt(arPoint.mX, arPoint.mY, aColor); }
 
     PixelData& SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor);
-    PixelData& GetPixel(const Point &arPoint, Color aColor) { return SetPixelAt(arPoint.mX, arPoint.mY, aColor); }
+    PixelData& SetPixel(const Point &arPoint, Color aColor) { return SetPixelAt(arPoint.mX, arPoint.mY, aColor); }
 
     void SaveToCFile(const std::filesystem::path &arFileName);
 

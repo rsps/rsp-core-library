@@ -25,10 +25,6 @@ namespace rsp::graphics {
 class Renderer
 {
 public:
-    enum class Types { Software, SDL };
-
-    static Renderer& Make(Types aType);
-
     virtual ~Renderer() {}
 
     virtual GuiUnit_t GetHeight() const = 0;
@@ -47,9 +43,6 @@ public:
 
     virtual bool PollEvents(TouchEvent &arTouchEvent) = 0;
     virtual Renderer& FlushEvents() = 0;
-
-protected:
-    Renderer() {};
 };
 
 } /* namespace rsp::graphics */

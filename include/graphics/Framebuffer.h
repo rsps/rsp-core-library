@@ -37,14 +37,16 @@ public:
      * \param aPoint Reference to the coordinate for the pixel to be set
      * \param aColor Reference to the color the pixel is set to
      */
-    void SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) override;
+    void SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor);
 
     /**
      * \brief Gets a single pixel to the given Color
      * \param aPoint Reference to the coordinate for the pixel to get
      * \param aFront Gets pixels from the backbuffer by default, set true to read front buffer
      */
-    uint32_t GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront = false) const override;
+    uint32_t GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront = false) const;
+
+    inline bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const { return (aX < GuiUnit_t(mVariableInfo.xres)) && (aY < GuiUnit_t(mVariableInfo.yres)); }
 
 protected:
     int mFramebufferFile;

@@ -121,20 +121,10 @@ void Framebuffer::SwapBuffer()
     mpBackBuffer = tmp;
 }
 
-void Framebuffer::Fill(rsp::graphics::Color aColor)
-{
-    for (std::uint32_t y = 0; y < mVariableInfo.yres; y++) {
-        for (std::uint32_t x = 0; x < mVariableInfo.xres; x++) {
-            std::size_t location = ((x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length) / sizeof(std::uint32_t);
-            mpBackBuffer[location] = aColor;
-        }
-    }
-}
-
 
 void Framebuffer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 {
-    if ((aX >= mVariableInfo.xres) || (aY >= mVariableInfo.yres)) {
+    if (!IsHit(aX, aY)) {
         return;
     }
     std::uint32_t location = ((static_cast<std::uint32_t>(aX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
@@ -149,7 +139,7 @@ void Framebuffer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 
 uint32_t Framebuffer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
 {
-    if ((aX >= mVariableInfo.xres) || (aY >= mVariableInfo.yres)) {
+    if (!IsHit(aX, aY)) {
         return 0;
     }
     std::uint32_t location = ((static_cast<std::uint32_t>(aX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
@@ -158,28 +148,6 @@ uint32_t Framebuffer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
         return mpFrontBuffer[location];
     } else {
         return mpBackBuffer[location];
-    }
-}
-
-void Framebuffer::clear(Color aColor)
-{
-    // draw to back buffer
-    for (std::uint32_t y = 0; y < mVariableInfo.yres; y++) {
-        for (std::uint32_t x = 0; x < mVariableInfo.xres; x++) {
-            std::size_t location = ((x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length) / sizeof(std::uint32_t);
-            mpBackBuffer[location] = aColor;
-        }
-    }
-}
-
-void Framebuffer::copy()
-{
-    // copy front buffer to back buffer
-    for (std::uint32_t y = 0; y < mVariableInfo.yres; y++) {
-        for (std::uint32_t x = 0; x < mVariableInfo.xres; x++) {
-            std::size_t location = ((x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length) / sizeof(std::uint32_t);
-            mpBackBuffer[location] = mpFrontBuffer[location];
-        }
     }
 }
 
