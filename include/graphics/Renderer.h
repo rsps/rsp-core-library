@@ -16,11 +16,11 @@
 #include <graphics/PixelData.h>
 #include <graphics/Rect.h>
 #include <graphics/Texture.h>
+#include <functional>
 #include <memory>
-#include <graphics/TouchEvent.h>
+#include <optional>
 
 namespace rsp::graphics {
-
 
 class Renderer
 {
@@ -31,18 +31,15 @@ public:
     virtual GuiUnit_t GetWidth() const = 0;
     virtual PixelData::ColorDepth GetColorDepth() const = 0;
 
-    virtual std::unique_ptr<Texture> CreateTexture(GuiUnit_t aWidth, GuiUnit_t aHeight) = 0;
+    virtual std::unique_ptr<Texture> CreateTexture(GuiUnit_t aWidth = 0, GuiUnit_t aHeight = 0) = 0;
     virtual std::unique_ptr<Texture> CreateStaticTexture(const PixelData &arPixelData) = 0;
 
-    virtual Renderer& RenderTexture(const Texture &arTexture, const Rect &arDestination) = 0;
+    virtual Renderer& Render(const Texture &arTexture, const Rect * const apDestination = nullptr) = 0;
 
     virtual Renderer& DrawRect(const Rect &arRect, Color aColor) = 0;
     virtual Renderer& Fill(Color aColor) = 0;
 
     virtual void Present() = 0;
-
-    virtual bool PollEvents(TouchEvent &arTouchEvent) = 0;
-    virtual Renderer& FlushEvents() = 0;
 };
 
 } /* namespace rsp::graphics */

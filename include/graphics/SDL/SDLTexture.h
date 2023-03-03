@@ -8,17 +8,18 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_GRAPHICS_SDL_SDLRENDERER_H_
-#define SRC_GRAPHICS_SDL_SDLRENDERER_H_
+#ifndef INCLUDE_GRAPHICS_SDL_SDLTEXTURE_H_
+#define INCLUDE_GRAPHICS_SDL_SDLTEXTURE_H_
 
-#include <graphics/Renderer.h>
+#include <graphics/Texture.h>
 
 namespace rsp::graphics {
 
-class SDLRenderer: public Renderer
+class SDLTexture: public Texture
 {
+public:
 };
 
 } /* namespace rsp::graphics */
 
-#endif /* SRC_GRAPHICS_SDL_SDLRENDERER_H_ */
+#endif /* INCLUDE_GRAPHICS_SDL_SDLTEXTURE_H_ */

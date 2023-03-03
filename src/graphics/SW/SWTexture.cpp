@@ -3,7 +3,7 @@
  * \author      steffen
  */
 
-#include "SWTexture.h"
+#include <graphics/SW/SWTexture.h>
 
 namespace rsp::graphics {
 

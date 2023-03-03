@@ -11,23 +11,23 @@
 #ifndef TESTS_HELPERS_TESTTOUCHPARSER_H_
 #define TESTS_HELPERS_TESTTOUCHPARSER_H_
 
-#include <graphics/TouchParser.h>
+#include <graphics/GfxEvents.h>
 
-class TestTouchParser: public rsp::graphics::TouchParser
+class TestTouchParser: public rsp::graphics::GfxEvents
 {
 public:
-    TestTouchParser(): TouchParser(std::string()) {};
+    TestTouchParser() {};
     TestTouchParser(const TestTouchParser&) = delete;
     TestTouchParser& operator=(const TestTouchParser&) = delete;
 
-    TestTouchParser& SetEvents(const rsp::graphics::TouchEvent *apTouchEvents, std::size_t aCount);
+    TestTouchParser& SetEvents(const rsp::graphics::GfxEvent *apTouchEvents, std::size_t aCount);
 
-    bool Poll(rsp::graphics::TouchEvent &arInput) override;
+    bool Poll(rsp::graphics::GfxEvent &arInput) override;
 
     void Flush() override;
 
 protected:
-    const rsp::graphics::TouchEvent *mpTouchEvents = nullptr;
+    const rsp::graphics::GfxEvent *mpTouchEvents = nullptr;
     std::size_t mEventCount = 0;
     std::size_t mIndex = 0;
 };

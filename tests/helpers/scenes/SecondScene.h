@@ -13,7 +13,7 @@
 
 #include <graphics/Button.h>
 #include <graphics/Scene.h>
-#include <graphics/TouchEvent.h>
+#include <graphics/GfxEvents.h>
 
 namespace rsp::graphics {
 
@@ -22,23 +22,23 @@ class SecondScene : public SceneBase<SecondScene>
 public:
     using Clicked_t = rsp::utils::Function<void(void)>;
 
-    static std::array<TouchEvent, 13>& GetTouchEvents() {
+    static std::array<GfxEvent, 13>& GetTouchEvents() {
         static std::array events {
-            TouchEvent(50, TouchEvent::Types::Press, Point(100, 100)),
-            TouchEvent(51, TouchEvent::Types::Lift, Point(100, 100)),  // Click outside any buttons
+            GfxEvent(50, EventTypes::Press, Point(100, 100)),
+            GfxEvent(51, EventTypes::Lift, Point(100, 100)),  // Click outside any buttons
 
-            TouchEvent(60, TouchEvent::Types::Press, Point(100, 150)),
-            TouchEvent(61, TouchEvent::Types::Lift, Point(100, 150)),  // Click top left corner of TopBtn
-            TouchEvent(62, TouchEvent::Types::Press, Point(299, 249)),
-            TouchEvent(63, TouchEvent::Types::Lift, Point(299, 249)),  // Click bottom right corner of TopBtn
+            GfxEvent(60, EventTypes::Press, Point(100, 150)),
+            GfxEvent(61, EventTypes::Lift, Point(100, 150)),  // Click top left corner of TopBtn
+            GfxEvent(62, EventTypes::Press, Point(299, 249)),
+            GfxEvent(63, EventTypes::Lift, Point(299, 249)),  // Click bottom right corner of TopBtn
 
-            TouchEvent(70, TouchEvent::Types::Press, Point(100, 300)), // Press top left corner of BotBtn
-            TouchEvent(71, TouchEvent::Types::Drag, Point(150, 320)),  // Drag over BotBtn
-            TouchEvent(72, TouchEvent::Types::Drag, Point(200, 340)),  // Drag over BotBtn
-            TouchEvent(73, TouchEvent::Types::Drag, Point(250, 360)),  // Drag over BotBtn
-            TouchEvent(74, TouchEvent::Types::Drag, Point(300, 380)),  // Drag over BotBtn
-            TouchEvent(75, TouchEvent::Types::Drag, Point(310, 390)),  // Drag outside BotBtn
-            TouchEvent(76, TouchEvent::Types::Lift, Point(310, 390))   // Lift outside BotBtn
+            GfxEvent(70, EventTypes::Press, Point(100, 300)), // Press top left corner of BotBtn
+            GfxEvent(71, EventTypes::Drag, Point(150, 320)),  // Drag over BotBtn
+            GfxEvent(72, EventTypes::Drag, Point(200, 340)),  // Drag over BotBtn
+            GfxEvent(73, EventTypes::Drag, Point(250, 360)),  // Drag over BotBtn
+            GfxEvent(74, EventTypes::Drag, Point(300, 380)),  // Drag over BotBtn
+            GfxEvent(75, EventTypes::Drag, Point(310, 390)),  // Drag outside BotBtn
+            GfxEvent(76, EventTypes::Lift, Point(310, 390))   // Lift outside BotBtn
         };
         return events;
     }

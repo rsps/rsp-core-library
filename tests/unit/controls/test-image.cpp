@@ -9,8 +9,8 @@
  */
 
 #include <doctest.h>
-#include <graphics/Framebuffer.h>
 #include <graphics/Image.h>
+#include <graphics/SW/SWRenderer.h>
 #include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <TestHelpers.h>
@@ -27,7 +27,7 @@ TEST_CASE("Image Test")
 
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
+    SWRenderer renderer(p);
     Rect testRect(20, 20, 200, 100);
     Bitmap normal("testImages/Red.bmp");
     Random::Seed(1234);
@@ -45,34 +45,34 @@ TEST_CASE("Image Test")
         testImage.Invalidate();
 
         // Act
-        testImage.Render(fb);
-        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        testImage.Render(renderer);
+        renderer.Present();
 
 //        MESSAGE("insidePoint: " << insidePoint);
 //        MESSAGE("Origin: " << testImage.GetOrigin());
 //        MESSAGE("Destination: " << testImage.GetStyle(Control::States::normal).mBackground.GetDestination());
         // Assert
-        CHECK_EQ(fb.GetPixel(insidePoint, true), red.AsUint());
-        CHECK_NE(fb.GetPixel({19, 19}, true), red.AsUint());
-        CHECK_NE(fb.GetPixel({20, 19}, true), red.AsUint());
-        CHECK_NE(fb.GetPixel({19, 20}, true), red.AsUint());
-        CHECK_NE(fb.GetPixel({119, 19}, true), red.AsUint());
-        CHECK_NE(fb.GetPixel({220, 19}, true), red.AsUint());
-        CHECK_NE(fb.GetPixel({119, 120}, true), red.AsUint());
-        CHECK_EQ(fb.GetPixel({20, 20}, true), red.AsUint());
-        CHECK_EQ(fb.GetPixel({219, 20}, true), red.AsUint());
-        CHECK_EQ(fb.GetPixel({20, 119}, true), red.AsUint());
-        CHECK_EQ(fb.GetPixel({219, 119}, true), red.AsUint());
+        CHECK_EQ(renderer.GetPixel(insidePoint.GetX(), insidePoint.GetY(), true), red.AsUint());
+        CHECK_NE(renderer.GetPixel(19,   19, true), red.AsUint());
+        CHECK_NE(renderer.GetPixel(20,   19, true), red.AsUint());
+        CHECK_NE(renderer.GetPixel(19,   20, true), red.AsUint());
+        CHECK_NE(renderer.GetPixel(119,  19, true), red.AsUint());
+        CHECK_NE(renderer.GetPixel(220,  19, true), red.AsUint());
+        CHECK_NE(renderer.GetPixel(119, 120, true), red.AsUint());
+        CHECK_EQ(renderer.GetPixel(20,   20, true), red.AsUint());
+        CHECK_EQ(renderer.GetPixel(219,  20, true), red.AsUint());
+        CHECK_EQ(renderer.GetPixel(20,  119, true), red.AsUint());
+        CHECK_EQ(renderer.GetPixel(219, 119, true), red.AsUint());
         SUBCASE("Do not render if Image valid")
         {
             // Arrange
-            fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+            renderer.Present();
 
             // Act
-            testImage.Render(fb);
+            testImage.Render(renderer);
 
             // Assert
-            CHECK_NE(fb.GetPixel(insidePoint), red.AsUint());
+            CHECK_NE(renderer.GetPixel(insidePoint.GetX(), insidePoint.GetY()), red.AsUint());
         }
     }
 }

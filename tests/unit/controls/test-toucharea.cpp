@@ -101,7 +101,7 @@ TEST_CASE("Input Processing")
     Rect aRect(10, 10, 200, 200);
     TestControl area;
     area.SetArea(aRect).SetTouchArea(aRect).SetDraggable(true);
-    TouchEvent event;
+    GfxEvent event;
 
     event.mCurrent = Point(aRect.GetLeft() + Random::Roll(0, aRect.GetWidth() - 1),
                          aRect.GetTop() + Random::Roll(0, aRect.GetHeight() - 1));
@@ -129,7 +129,7 @@ TEST_CASE("Input Processing")
     SUBCASE("Pressed Callback - Press Hit-Input")
     {
         // Arrange
-        event.mType = TouchEvent::Types::Press;
+        event.mType = EventTypes::Press;
         event.mPress = event.mCurrent;
 
         CHECK_FALSE(pressed);
@@ -144,7 +144,7 @@ TEST_CASE("Input Processing")
         SUBCASE("Pressed Callback - Press Miss-Input")
         {
             // Arrange
-            event.mType = TouchEvent::Types::Press;
+            event.mType = EventTypes::Press;
             event.mCurrent += aRect.GetBottomRight();
             event.mPress = event.mCurrent;
             pressed = false;
@@ -161,7 +161,7 @@ TEST_CASE("Input Processing")
         SUBCASE("Pressed Callback - Lift Hit-Input")
         {
             // Arrange
-            event.mType = TouchEvent::Types::Lift;
+            event.mType = EventTypes::Lift;
 
             // Act
             area.ProcessInput(event);
@@ -175,7 +175,7 @@ TEST_CASE("Input Processing")
         SUBCASE("Pressed Callback - Lift Miss-Input")
         {
             // Arrange
-            event.mType = TouchEvent::Types::Lift;
+            event.mType = EventTypes::Lift;
             event.mCurrent += aRect.GetBottomRight();
             lifted = false;
 
@@ -192,7 +192,7 @@ TEST_CASE("Input Processing")
         SUBCASE("Pressed Callback - Drag Hit-input")
         {
             // Arrange
-            event.mType = TouchEvent::Types::Drag;
+            event.mType = EventTypes::Drag;
 
             // Act
             area.ProcessInput(event);
@@ -205,7 +205,7 @@ TEST_CASE("Input Processing")
         SUBCASE("Pressed Callback - Drag Miss-input")
         {
             // Arrange
-            event.mType = TouchEvent::Types::Drag;
+            event.mType = EventTypes::Drag;
             event.mCurrent += aRect.GetBottomRight();
             moved = false;
 
@@ -225,11 +225,11 @@ TEST_CASE("Input Processing")
         {
             // Act
             MESSAGE("Start");
-            event.mType = TouchEvent::Types::Press;
+            event.mType = EventTypes::Press;
             event.mPress = event.mCurrent;
             area.ProcessInput(event);
             MESSAGE("Processed Press");
-            event.mType = TouchEvent::Types::Lift;
+            event.mType = EventTypes::Lift;
             area.ProcessInput(event);
             MESSAGE("Processed Lift");
 
@@ -245,16 +245,16 @@ TEST_CASE("Input Processing")
         {
             // Act
             // Miss with press
-            event.mType = TouchEvent::Types::Press;
+            event.mType = EventTypes::Press;
             event.mCurrent += aRect.GetBottomRight();
             event.mPress = event.mCurrent;
             area.ProcessInput(event);
             // Drag into rect area
-            event.mType = TouchEvent::Types::Drag;
+            event.mType = EventTypes::Drag;
             event.mCurrent -= aRect.GetBottomRight();
             area.ProcessInput(event);
             // Do a lift
-            event.mType = TouchEvent::Types::Lift;
+            event.mType = EventTypes::Lift;
             area.ProcessInput(event);
 
             // Assert
@@ -269,15 +269,15 @@ TEST_CASE("Input Processing")
         {
             // Act
             // Hit with press
-            event.mType = TouchEvent::Types::Press;
+            event.mType = EventTypes::Press;
             event.mPress = event.mCurrent;
             area.ProcessInput(event);
             // Drag out of rect area
-            event.mType = TouchEvent::Types::Drag;
+            event.mType = EventTypes::Drag;
             event.mCurrent += aRect.GetBottomRight();
             area.ProcessInput(event);
             // Do a lift
-            event.mType = TouchEvent::Types::Lift;
+            event.mType = EventTypes::Lift;
             area.ProcessInput(event);
 
             // Assert
@@ -292,12 +292,12 @@ TEST_CASE("Input Processing")
         {
             // Act
             // Miss with press
-            event.mType = TouchEvent::Types::Press;
+            event.mType = EventTypes::Press;
             event.mCurrent += aRect.GetBottomRight();
             event.mPress = event.mCurrent;
             area.ProcessInput(event);
             // Do a lift
-            event.mType = TouchEvent::Types::Lift;
+            event.mType = EventTypes::Lift;
             area.ProcessInput(event);
 
             // Assert

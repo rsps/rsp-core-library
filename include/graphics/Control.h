@@ -18,7 +18,7 @@
 #include <vector>
 #include <string_view>
 #include <graphics/Style.h>
-#include <graphics/TouchEvent.h>
+#include <graphics/GfxEvents.h>
 #include <logging/Logger.h>
 #include <utils/ConstTypeInfo.h>
 #include <utils/CoreException.h>
@@ -35,8 +35,6 @@ class EControlCast : public rsp::utils::CoreException
 public:
     EControlCast(const std::string &arName, const std::string &arType) : rsp::utils::CoreException(arName + " is not of type " + arType) {};
 };
-
-class TouchControl;
 
 class Control
 {
@@ -229,7 +227,7 @@ public:
      * \param arInput Reference to the input being processed
      * \return True if handled
      */
-    bool ProcessInput(TouchEvent &arInput);
+    bool ProcessInput(GfxEvent &arInput);
 
     /**
      * \brief OnPress callback reference

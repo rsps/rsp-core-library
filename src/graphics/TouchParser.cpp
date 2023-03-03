@@ -8,9 +8,10 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/TouchParser.h>
+#include <graphics/SW/TouchParser.h>
 #include <utils/CoreException.h>
 #include <linux/input.h>
+#include <magic_enum.hpp>
 
 namespace rsp::graphics
 {
@@ -30,17 +31,9 @@ std::ostream& operator<<(std::ostream &os, const RawTouchEvent &arRTE)
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const TouchEvent &arTE)
+std::ostream &operator<<(std::ostream &os, const GfxEvent &arGfxEvent)
 {
-    const char* const cTypeNames[] = {
-        "None",
-        "Press",
-        "Drag",
-        "Lift"
-    };
-
-    os << cTypeNames[static_cast<int>(arTE.mType)] << "(" << arTE.mCurrent << ")";
-
+    os << std::string(magic_enum::enum_name<EventTypes>(arGfxEvent.mType)) << "(" << arGfxEvent.mCurrent << ")";
     return os;
 }
 
@@ -56,13 +49,13 @@ TouchParser::~TouchParser()
     mTouchDevice.Close();
 }
 
-bool TouchParser::Poll(TouchEvent &arInput)
+bool TouchParser::Poll(GfxEvent &arInput)
 {
     try {
         arInput.mType = readType();
-        if (arInput.mType != TouchEvent::Types::None) {
+        if (arInput.mType != EventTypes::None) {
             readBody(arInput);
-            if (arInput.mType == TouchEvent::Types::Press) {
+            if (arInput.mType == EventTypes::Press) {
                 arInput.mPress = arInput.mCurrent;
             }
             return true;
@@ -81,7 +74,7 @@ void TouchParser::readRawTouchEvent()
     }
 }
 
-TouchEvent::Types TouchParser::readType()
+EventTypes TouchParser::readType()
 {
     readRawTouchEvent();
     if (mRawTouchEvent.code == ABS_MT_SLOT) {
@@ -92,20 +85,20 @@ TouchEvent::Types TouchParser::readType()
     if (mRawTouchEvent.type == EV_ABS) {
         if (mRawTouchEvent.code == ABS_MT_TRACKING_ID) {
             if (mRawTouchEvent.value == -1) {
-                return TouchEvent::Types::Lift;
+                return EventTypes::Lift;
             }
             else {
-                return TouchEvent::Types::Press;
+                return EventTypes::Press;
             }
         } else if (mRawTouchEvent.code == ABS_MT_POSITION_X || mRawTouchEvent.code == ABS_MT_POSITION_Y) {
-            return TouchEvent::Types::Drag;
+            return EventTypes::Drag;
         }
     }
 
-    return TouchEvent::Types::None;
+    return EventTypes::None;
 }
 
-void TouchParser::readBody(TouchEvent &arInput)
+void TouchParser::readBody(GfxEvent &arInput)
 {
     while (mRawTouchEvent.type != EV_SYN) {
 
@@ -126,7 +119,7 @@ void TouchParser::readBody(TouchEvent &arInput)
 
 void TouchParser::Flush()
 {
-    TouchEvent dummy;
+    GfxEvent dummy;
     while(Poll(dummy)) {
         continue;
     }

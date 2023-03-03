@@ -23,8 +23,9 @@ using namespace rsp::logging;
 namespace rsp::graphics
 {
 
-GraphicsMain::GraphicsMain(Renderer &arRenderer, SceneMap &arScenes)
+GraphicsMain::GraphicsMain(Renderer &arRenderer, GfxEvents &arEvents, SceneMap &arScenes)
     : mrRenderer(arRenderer),
+      mrEvents(arEvents),
       mrScenes(arScenes)
 {
     mrRenderer.Fill(Color::None).Present();
@@ -36,7 +37,7 @@ GraphicsMain::~GraphicsMain()
 
 void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
 {
-    TouchEvent event;
+    GfxEvent event;
     rsp::utils::StopWatch sw;
     int64_t frame_time = 1000 / aMaxFPS;
 
@@ -52,14 +53,14 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
 
         // New scene requested?
         if (mNextScene) {
-            mrRenderer.FlushEvents(); // New scene should not inherit un-handled touch events...
+            mrEvents.Flush(); // New scene should not inherit un-handled touch events...
             mrScenes.SetActiveScene(mNextScene);
             mrScenes.ActiveScene().MakeTextures(mrRenderer);
             mNextScene = 0;
         }
 
         // New inputs?
-        if (mrRenderer.PollEvents(event)) {
+        if (mrEvents.Poll(event)) {
             Logger::GetDefault().Debug() << "Touch Event: " << event;
             mrScenes.ActiveScene().ProcessInput(event);
         }

@@ -18,20 +18,20 @@
 #include <graphics/Keyboard.h>
 #include <graphics/Label.h>
 #include <graphics/Scene.h>
-#include <graphics/TouchEvent.h>
+#include <graphics/GfxEvents.h>
 #include <graphics/Bitmap.h>
 
 namespace rsp::graphics {
 
 #define CLICK(_time, _key) \
-    TouchEvent(_time, TouchEvent::Types::Press, _key), \
-    TouchEvent(_time+20, TouchEvent::Types::Lift, _key)
+    GfxEvent(_time, EventTypes::Press, _key), \
+    GfxEvent(_time+20, EventTypes::Lift, _key)
 
 
 class InputScene : public SceneBase<InputScene>
 {
 public:
-    static std::array<TouchEvent, 44>& GetTouchEvents() {
+    static std::array<GfxEvent, 44>& GetTouchEvents() {
         static std::array events {
             CLICK(300, _SHIFT),
             CLICK(400, _H),

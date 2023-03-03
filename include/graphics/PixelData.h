@@ -61,12 +61,12 @@ public:
 
     std::size_t GetDataSize() const;
 
-    GuiUnit_t GetWidth() const { return mWidth; }
-    GuiUnit_t GetHeight() const { return mHeight; }
+    GuiUnit_t GetWidth() const { return mRect.GetWidth(); }
+    GuiUnit_t GetHeight() const { return mRect.GetHeight(); }
     ColorDepth GetColorDepth() const { return mColorDepth; }
-    Rect GetRect() const { return Rect(0, 0, mWidth, mHeight); }
-    bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const { return (aX < mWidth && aY < mHeight); }
-    bool IsHit(const Point &arPoint) const { return IsHit(arPoint.mX, arPoint.mY); }
+    const Rect& GetRect() const { return mRect; }
+    bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const { return mRect.IsHit(aX, aY); }
+    bool IsHit(const Point &arPoint) const { return mRect.IsHit(arPoint); }
 
     /**
      * \brief Get the color value for the pixel at given position
@@ -79,7 +79,7 @@ public:
      * \param aColor
      * \return Color
      */
-    Color GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const;
+    Color GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor = Color::None) const;
     Color GetPixel(const Point &arPoint, Color aColor = Color::None) const { return GetPixelAt(arPoint.mX, arPoint.mY, aColor); }
 
     PixelData& SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor);
@@ -89,8 +89,7 @@ public:
 
 protected:
     ColorDepth mColorDepth = ColorDepth::RGB;
-    GuiUnit_t mWidth = 0;
-    GuiUnit_t mHeight = 0;
+    Rect mRect{};
     const std::uint8_t *mpData = nullptr;
     std::vector<std::uint8_t> mData{};
 

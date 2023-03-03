@@ -191,7 +191,7 @@ void Control::Render(Renderer &arRenderer)
     }
 
     if (mTextures.find(mState) != mTextures.end()) {
-        arRenderer.RenderTexture(*mTextures[mState], mArea);
+        arRenderer.Render(*mTextures[mState], &mArea);
     }
 
     for (Control* child : mChildren) {
@@ -255,7 +255,7 @@ Control& Control::SetTransparent(bool aValue)
     return *this;
 }
 
-bool Control::ProcessInput(TouchEvent &arInput)
+bool Control::ProcessInput(GfxEvent &arInput)
 {
     if (!IsVisible()) {
         return false;
@@ -265,7 +265,7 @@ bool Control::ProcessInput(TouchEvent &arInput)
     }
 
     switch (arInput.mType) {
-        case TouchEvent::Types::Press:
+        case EventTypes::Press:
             if (mArea.IsHit(arInput.mCurrent)) {
                 for(Control *child : mChildren) {
                     if (child->ProcessInput(arInput)) {
@@ -285,7 +285,7 @@ bool Control::ProcessInput(TouchEvent &arInput)
             }
             break;
 
-        case TouchEvent::Types::Lift:
+        case EventTypes::Lift:
             if (mArea.IsHit(arInput.mPress)) {
                 for(Control *child : mChildren) {
                     if (child->ProcessInput(arInput)) {
@@ -318,7 +318,7 @@ bool Control::ProcessInput(TouchEvent &arInput)
             }
             break;
 
-        case TouchEvent::Types::Drag:
+        case EventTypes::Drag:
             if (mArea.IsHit(arInput.mPress)) {
                 for(Control *child : mChildren) {
                     if (child->ProcessInput(arInput)) {

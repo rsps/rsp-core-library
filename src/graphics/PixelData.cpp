@@ -40,16 +40,14 @@ std::ostream& operator<<(std::ostream& os, const PixelData::ColorDepth arDepth)
 
 PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData)
     : mColorDepth(aDepth),
-      mWidth(aWidth),
-      mHeight(aHeight),
+      mRect(0, 0, aWidth, aHeight),
       mpData(apData)
 {
 }
 
 PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
     : mColorDepth(aDepth),
-      mWidth(aWidth),
-      mHeight(aHeight)
+      mRect(0, 0, aWidth, aHeight)
 {
     mData.resize(GetDataSize());
     mpData = mData.data();
@@ -58,8 +56,7 @@ PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
 PixelData& PixelData::Init(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData)
 {
     mColorDepth = aDepth;
-    mWidth = aWidth;
-    mHeight = aHeight;
+    mRect = Rect(0, 0, aWidth, aHeight);
     if (apData) {
         mData.clear();
         mpData = apData;
@@ -77,19 +74,19 @@ std::size_t PixelData::GetDataSize() const
 
     switch (mColorDepth) {
         case ColorDepth::Monochrome:
-            result = (((mWidth + 7) >> 3) * mHeight);
+            result = (((GetWidth() + 7) >> 3) * GetHeight());
             break;
 
         case ColorDepth::Alpha:
-            result = (mWidth * mHeight);
+            result = (GetWidth() * GetHeight());
             break;
 
         case ColorDepth::RGB:
-            result = (mWidth * mHeight) * 3;
+            result = (GetWidth() * GetHeight()) * 3;
             break;
 
         case ColorDepth::RGBA:
-            result = (mWidth * mHeight) * 4;
+            result = (GetWidth() * GetHeight()) * 4;
             break;
 
         default:
@@ -102,31 +99,31 @@ std::size_t PixelData::GetDataSize() const
 
 Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const
 {
-    if (aX >= mWidth || aY >= mHeight) {
-        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(mWidth) + "," + std::to_string(aY) + "<" + std::to_string(mHeight) + ")");
+    if (aX >= GetWidth() || aY >= GetHeight()) {
+        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(GetWidth()) + "," + std::to_string(aY) + "<" + std::to_string(GetHeight()) + ")");
     }
     Color result(aColor);
     int offset;
     switch (mColorDepth) {
         case ColorDepth::Monochrome:
-            offset = (((mWidth + 7) >> 3) * aY) + (aX >> 3);
+            offset = (((GetWidth() + 7) >> 3) * aY) + (aX >> 3);
             result.SetAlpha( ((mpData[offset] & (1 << (aX % 8))) > 0) ? 255 : 0);
             break;
 
         case ColorDepth::Alpha:
-            offset = (aY * mWidth) + aX;
+            offset = (aY * GetWidth()) + aX;
             result.SetAlpha(mpData[offset]);
             break;
 
         case ColorDepth::RGB:
-            offset = ((aY * mWidth) + aX) * 3;
+            offset = ((aY * GetWidth()) + aX) * 3;
             result.SetRed(mpData[offset + 0]);
             result.SetGreen(mpData[offset + 1]);
             result.SetBlue(mpData[offset + 2]);
             break;
 
         case ColorDepth::RGBA:
-            offset = ((aY * mWidth) + aX) * 4;
+            offset = ((aY * GetWidth()) + aX) * 4;
             result.SetRed(mpData[offset + 0]);
             result.SetGreen(mpData[offset + 1]);
             result.SetBlue(mpData[offset + 2]);
@@ -137,14 +134,14 @@ Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const
             THROW_WITH_BACKTRACE(EIllegalColorDepth);
             break;
     }
-//    DUMP(aX << ", " << aY << ", " << aColor, result << " from " << mWidth << ", " << mHeight << ", " << mColorDepth);
+//    DUMP(aX << ", " << aY << ", " << aColor, result << " from " << GetWidth() << ", " << GetHeight() << ", " << mColorDepth);
     return result;
 }
 
 PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
 {
-    if (aX >= mWidth || aY >= mHeight) {
-        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(mWidth) + "," + std::to_string(aY) + "<" + std::to_string(mHeight) + ")");
+    if (aX >= GetWidth() || aY >= GetHeight()) {
+        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(GetWidth()) + "," + std::to_string(aY) + "<" + std::to_string(GetHeight()) + ")");
     }
 
     if (mData.size() == 0) {
@@ -162,7 +159,7 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
     int offset;
     switch (mColorDepth) {
         case ColorDepth::Monochrome:
-            offset = (((mWidth + 7) >> 3) * aY) + (aX >> 3);
+            offset = (((GetWidth() + 7) >> 3) * aY) + (aX >> 3);
             if (aColor.GetAlpha() > 0) {
                 pdata[offset] |= (1 << (aX % 8));
             }
@@ -172,19 +169,19 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
             break;
 
         case ColorDepth::Alpha:
-            offset = (aY * mWidth) + aX;
+            offset = (aY * GetWidth()) + aX;
             pdata[offset] = aColor.GetAlpha();
             break;
 
         case ColorDepth::RGB:
-            offset = ((aY * mWidth) + aX) * 3;
+            offset = ((aY * GetWidth()) + aX) * 3;
             pdata[offset + 0] = aColor.GetRed();
             pdata[offset + 1] = aColor.GetGreen();
             pdata[offset + 2] = aColor.GetBlue();
             break;
 
         case ColorDepth::RGBA:
-            offset = ((aY * mWidth) + aX) * 4;
+            offset = ((aY * GetWidth()) + aX) * 4;
             pdata[offset + 0] = aColor.GetRed();
             pdata[offset + 1] = aColor.GetGreen();
             pdata[offset + 2] = aColor.GetBlue();
@@ -207,8 +204,7 @@ PixelData::PixelData(const PixelData &arOther)
 PixelData::PixelData(const PixelData &&arOther)
 {
     mColorDepth = arOther.mColorDepth;
-    mWidth = arOther.mWidth;
-    mHeight = arOther.mHeight;
+    mRect = std::move(arOther.mRect);
     mData = std::move(arOther.mData);
     if (mData.size() > 0) {
         mpData = mData.data();
@@ -222,8 +218,7 @@ PixelData& PixelData::Assign(const PixelData& arOther)
 {
     if (this != &arOther) {
         mColorDepth = arOther.mColorDepth;
-        mWidth = arOther.mWidth;
-        mHeight = arOther.mHeight;
+        mRect = arOther.mRect;
         mData = arOther.mData;
         if (mData.size() > 0) {
             mpData = mData.data();
@@ -244,8 +239,7 @@ PixelData& PixelData::operator =(const PixelData &&arOther)
 {
     if (this != &arOther) {
         mColorDepth = arOther.mColorDepth;
-        mWidth = arOther.mWidth;
-        mHeight = arOther.mHeight;
+        mRect = std::move(arOther.mRect);
         mData = std::move(arOther.mData);
         if (mData.size() > 0) {
             mpData = mData.data();
@@ -260,8 +254,7 @@ PixelData& PixelData::operator =(const PixelData &&arOther)
 void PixelData::initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
 {
     mColorDepth = aDepth;
-    mWidth = aWidth;
-    mHeight = aHeight;
+    mRect = Rect(0, 0, aWidth, aHeight);
     auto sz = GetDataSize();
     if (mData.size() != sz) {
         mData.resize(sz);
@@ -282,7 +275,7 @@ void PixelData::SaveToCFile(const std::filesystem::path &arFileName)
     fo << "using namespace rsp::graphics;\n" << std::endl;
 
     fo << "const PixelData c"
-        << fo.Name() << "(" << mWidth << "u, " << mHeight << "u, PixelData::ColorDepth::"
+        << fo.Name() << "(" << GetWidth() << "u, " << GetHeight() << "u, PixelData::ColorDepth::"
         << mColorDepth << ", " << "c" << fo.Name() << "PixData);\n" << std::endl;
 
     std::filesystem::path hfile = arFileName;

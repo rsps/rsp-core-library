@@ -16,7 +16,7 @@
 #include <doctest.h>
 #include <posix/FileSystem.h>
 #include <graphics/Label.h>
-#include <graphics/Framebuffer.h>
+#include <graphics/SW/SWRenderer.h>
 #include <graphics/GraphicsMain.h>
 #include <utils/Timer.h>
 #include <scenes/Scenes.h>
@@ -41,7 +41,7 @@ public:
         SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
     }
 
-    void UpdateData() override {
+    bool UpdateData() override {
         int fps = mrGfx.GetFPS();
         mIterations++;
         mTotalFps += fps;
@@ -53,6 +53,7 @@ public:
         }
         SetCaption("FPS: " + std::to_string(fps) + ", " + std::to_string(mTotalFps / mIterations) + ", " + std::to_string(mMinFps) + ", " + std::to_string(mMaxFps));
         refresh();
+        return true;
     }
 
 protected:
@@ -74,33 +75,39 @@ TEST_CASE("Graphics Main Test")
     CHECK_NOTHROW(Font::RegisterFont(cFontFile));
     CHECK_NOTHROW(Font::SetDefaultFont(cFontName));
 
-    TimerQueue::Create();
+    CHECK_NOTHROW(TimerQueue::Create());
 
     // Make framebuffer
-    std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+    std::filesystem::path p;
+    CHECK_NOTHROW(p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"}));
 
-    Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
+    CHECK_NOTHROW(SWRenderer dummy_renderer(p));
+    SWRenderer renderer(p);
 
     // Set default scene size to screen size
-    Scene::SetScreenSize(fb.GetWidth(), fb.GetHeight());
+    CHECK_NOTHROW(Scene::SetScreenSize(renderer.GetWidth(), renderer.GetHeight()));
 
     // Make scenes
     CHECK_NOTHROW(SecondScene scn2);
     CHECK_NOTHROW(InputScene scn3);
+    CHECK_NOTHROW(Scenes dummy_scenes);
     Scenes scenes;
 
     // Make TouchParser
     TestTouchParser tp;
 
-    GraphicsMain gfx(fb, tp, scenes);
+    CHECK_NOTHROW(GraphicsMain dummy_gfx(renderer, tp, scenes));
+    GraphicsMain gfx(renderer, tp, scenes);
 
     Overlay overlay(gfx);
 
     gfx.RegisterOverlay(&overlay);
 
     SUBCASE("Clear") {
-        fb.SwapBuffer(Framebuffer::SwapOperations::Clear);
-        fb.SwapBuffer(Framebuffer::SwapOperations::Clear);
+        renderer.Fill(Color::None);
+        renderer.Present();
+        renderer.Fill(Color::None);
+        renderer.Present();
     }
 
     SUBCASE("Second Scene") {
@@ -135,8 +142,8 @@ TEST_CASE("Graphics Main Test")
         const uint32_t cGreenColor = 0xFF24b40b;
         Point toppoint = scenes.ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1);
         Point botpoint = scenes.ActiveSceneAs<SecondScene>().GetBotRect().GetTopLeft() + Point(1,1);
-        CHECK_EQ(fb.GetPixel(toppoint, true), cGreenColor);
-        CHECK_EQ(fb.GetPixel(botpoint, true), cGreenColor);
+        CHECK_EQ(renderer.GetPixel(toppoint, true), cGreenColor);
+        CHECK_EQ(renderer.GetPixel(botpoint, true), cGreenColor);
         CHECK_EQ(topBtnClicked, 2);
     }
 

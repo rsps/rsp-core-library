@@ -10,10 +10,10 @@
 #ifndef TOUCHPARSER_H
 #define TOUCHPARSER_H
 
-#include <graphics/TouchEvent.h>
-#include "posix/FileIO.h"
 #include <fstream>
 #include <iostream>
+#include <posix/FileIO.h>
+#include <graphics/GfxEvents.h>
 
 namespace rsp::graphics
 {
@@ -44,7 +44,7 @@ std::ostream &operator<<(std::ostream &os, const RawTouchEvent &arTouchEvent);
  * flag readable to select or epoll. Reading the value could then return
  * 0 bytes if empty, so this could be done in one read operation.
  */
-class TouchParser
+class TouchParser: public GfxEvents
 {
 public:
     TouchParser(const std::string &arPath = "/dev/input/event1");
@@ -55,19 +55,19 @@ public:
      * \param Reference to the touch event object to be populated
      * \return bool True if the event is successfully filled
      */
-    virtual bool Poll(TouchEvent &arInput);
+    bool Poll(GfxEvent &arInput) override;
 
     /**
      * \brief Flush the input buffer for remaining raw touch events
      */
-    virtual void Flush();
+    void Flush() override;
 
 protected:
     rsp::posix::FileIO mTouchDevice{};
     RawTouchEvent mRawTouchEvent{};
 
-    TouchEvent::Types readType();
-    void readBody(TouchEvent &arInput);
+    EventTypes readType();
+    void readBody(GfxEvent &arInput);
     void readRawTouchEvent();
 };
 

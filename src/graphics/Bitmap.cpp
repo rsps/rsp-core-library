@@ -59,7 +59,8 @@ Bitmap& Bitmap::Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aW
 
 Bitmap& Bitmap::Assign(const PixelData &arPixelData)
 {
-    Assign(arPixelData);
+    PixelData::operator=(arPixelData);
+//    Init(arPixelData.GetWidth(), arPixelData.GetHeight(), arPixelData.GetColorDepth(), arPixelData.GetData());
     return *this;
 }
 

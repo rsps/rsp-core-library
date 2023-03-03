@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include "SDLRenderer.h"
+#include <graphics/SDL/SDLRenderer.h>
 
 namespace rsp::graphics {
 

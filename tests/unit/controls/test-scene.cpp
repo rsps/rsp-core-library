@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/Framebuffer.h>
+#include <graphics/SW/SWRenderer.h>
 #include <graphics/Font.h>
 #include <graphics/Scene.h>
 #include <messaging/Subscriber.h>
@@ -59,13 +59,13 @@ TEST_CASE("Scene Test")
 
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
+    SWRenderer renderer(p);
 
     CHECK_NOTHROW(Scenes scenes_dummy);
     Scenes scenes;
 
-    CHECK_NOTHROW(TouchEvent event_dummy);
-    TouchEvent event;
+    CHECK_NOTHROW(GfxEvent event_dummy);
+    GfxEvent event;
 
     scenes.GetAfterCreate() = [](Scene *apScene) {
         CHECK_EQ(apScene->GetId(), SecondScene::ID);
@@ -90,9 +90,9 @@ TEST_CASE("Scene Test")
     SUBCASE("Scene Process Input")
     {
         // Arrange
-        event.mType = TouchEvent::Types::Press;
+        event.mType = EventTypes::Press;
         CHECK_NOTHROW(scenes.ActiveScene());
-        scenes.ActiveScene().Render(fb);
+        scenes.ActiveScene().Render(renderer);
 
         SUBCASE("Process input for Top elements")
         {
@@ -130,7 +130,7 @@ TEST_CASE("Scene Test")
         CHECK(scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().IsInvalid());
 
         // Act
-        scenes.ActiveScene().Render(fb);
+        scenes.ActiveScene().Render(renderer);
 
         // Assert
         CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetTopBtn().IsInvalid());
@@ -155,10 +155,10 @@ TEST_CASE("Scene Test")
         event.mCurrent = insideBotPoint;
 
         // Act
-        event.mType = TouchEvent::Types::Press;
+        event.mType = EventTypes::Press;
         event.mPress = event.mCurrent;
         scenes.ActiveScene().ProcessInput(event);
-        event.mType = TouchEvent::Types::Lift;
+        event.mType = EventTypes::Lift;
         scenes.ActiveScene().ProcessInput(event);
 
          // Assert
@@ -166,7 +166,7 @@ TEST_CASE("Scene Test")
         CHECK(sub.calledCount == 1);
         CHECK(sub.message == "Button was clicked.");
     }
-    CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Copy));
+    CHECK_NOTHROW(renderer.Present());
 }
 
 TEST_SUITE_END();

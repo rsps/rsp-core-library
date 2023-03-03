@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include "SDLTexture.h"
+#include <graphics/SDL/SDLTexture.h>
 
 namespace rsp::graphics {
 

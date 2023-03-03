@@ -8,11 +8,10 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/Framebuffer.h"
-
 #include <chrono>
 #include <cstring>
 #include <fcntl.h>
+#include <graphics/SW/Framebuffer.h>
 #include <iostream>
 #include <linux/kd.h>
 #include <sys/ioctl.h>
@@ -98,7 +97,7 @@ Framebuffer::~Framebuffer()
     // No need to call munmap on the shared memory region, this is done automatically on termination.
 }
 
-void Framebuffer::SwapBuffer()
+void Framebuffer::swapBuffer()
 {
     // swap buffer
     if (mVariableInfo.yoffset == 0) {

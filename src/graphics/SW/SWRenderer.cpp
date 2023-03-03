@@ -8,14 +8,13 @@
  * \author      Steffen Brummer
  */
 
-#include "SWRenderer.h"
-#include "SWTexture.h"
+#include <graphics/SW/SWRenderer.h>
+#include <graphics/SW/SWTexture.h>
 
 namespace rsp::graphics {
 
-SWRenderer::SWRenderer(const std::string &arRenderDevice, const std::string &arTouchDevice)
-    : Framebuffer(arRenderDevice.c_str()),
-      mTouchParser(arTouchDevice)
+SWRenderer::SWRenderer(const std::string &arRenderDevice)
+    : Framebuffer(arRenderDevice.c_str())
 {
 }
 
@@ -53,14 +52,14 @@ Renderer& SWRenderer::Fill(Color aColor)
     return *this;
 }
 
-Renderer& SWRenderer::FlushEvents()
-{
-    mTouchParser.Flush();
-    return *this;
-}
-
 std::unique_ptr<Texture> SWRenderer::CreateTexture(GuiUnit_t aWidth, GuiUnit_t aHeight)
 {
+    if (!aWidth) {
+        aWidth = GetWidth();
+    }
+    if (!aHeight) {
+        aHeight = GetHeight();
+    }
     return std::make_unique<SWTexture>(aWidth, aHeight, GetColorDepth());
 }
 
@@ -73,16 +72,23 @@ std::unique_ptr<Texture> SWRenderer::CreateStaticTexture(const PixelData &arPixe
     return t;
 }
 
-Renderer& SWRenderer::RenderTexture(const Texture &arTexture, const Rect &arDestination)
+Renderer& SWRenderer::Render(const Texture &arTexture, const Rect * const apDestination)
 {
+    Rect dst = (apDestination) ? *apDestination : Rect(0, 0, GetWidth(), GetHeight());
+
     const SWTexture& t = dynamic_cast<const SWTexture&>(arTexture);
 
     const PixelData &pd = t.GetPixelData();
+    GuiUnit_t h_end = std::min(pd.GetHeight(), dst.GetHeight());
+    GuiUnit_t w_end = std::min(pd.GetWidth(), dst.GetWidth());
+    GuiUnit_t dy = dst.GetTop();
 
     for (GuiUnit_t y = 0; y < pd.GetHeight(); ++y) {
+        GuiUnit_t dx = dst.GetLeft();
         for (GuiUnit_t x = 0; x < pd.GetWidth(); ++x) {
-            SetPixel(x, y, pd.GetPixelAt(x, y, Color::None));
+            SetPixel(dx, dy, pd.GetPixelAt(x, y, Color::None));
         }
+        ++dy;
     }
 
     return *this;
@@ -90,7 +96,7 @@ Renderer& SWRenderer::RenderTexture(const Texture &arTexture, const Rect &arDest
 
 void SWRenderer::Present()
 {
-    SwapBuffer();
+    swapBuffer();
 }
 
 GuiUnit_t SWRenderer::GetHeight() const
@@ -116,11 +122,6 @@ PixelData::ColorDepth SWRenderer::GetColorDepth() const
             ;
     }
     THROW_WITH_BACKTRACE(EIllegalColorDepth);
-}
-
-bool SWRenderer::PollEvents(TouchEvent &arTouchEvent)
-{
-    return mTouchParser.Poll(arTouchEvent);
 }
 
 } /* namespace rsp::graphics */

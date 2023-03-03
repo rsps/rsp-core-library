@@ -109,6 +109,13 @@ public:
     Font& GetFont() { return mFont; }
 
     /**
+     * \brief Shortcut to Font::SetColor
+     * \param aColor
+     * \return self
+     */
+    Text& SetColor(Color aColor) { mFont.SetColor(aColor); return *this; }
+
+    /**
      * Get the current value of the ScaleToFit member.
      *
      * \return bool

@@ -30,14 +30,13 @@ public:
     Framebuffer& operator=(const Framebuffer&) = default;
     Framebuffer& operator=(Framebuffer&&) = default;
 
-    void SwapBuffer();
-
     /**
      * \brief Sets a single pixel to the given Color
      * \param aPoint Reference to the coordinate for the pixel to be set
      * \param aColor Reference to the color the pixel is set to
      */
     void SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor);
+    void SetPixel(const Point &arP, const Color &arColor) { SetPixel(arP.GetX(), arP.GetY(), arColor); }
 
     /**
      * \brief Gets a single pixel to the given Color
@@ -45,8 +44,9 @@ public:
      * \param aFront Gets pixels from the backbuffer by default, set true to read front buffer
      */
     uint32_t GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront = false) const;
+    uint32_t GetPixel(const Point &arP, bool aFront = false) { return GetPixel(arP.GetX(), arP.GetY(), aFront); }
 
-    inline bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const { return (aX < GuiUnit_t(mVariableInfo.xres)) && (aY < GuiUnit_t(mVariableInfo.yres)); }
+    inline bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const { return Rect(0, 0, GuiUnit_t(mVariableInfo.xres), GuiUnit_t(mVariableInfo.yres)).IsHit(aX, aY); }
 
 protected:
     int mFramebufferFile;
@@ -56,6 +56,8 @@ protected:
     uint32_t *mpFrontBuffer = nullptr;
     uint32_t *mpBackBuffer = nullptr;
     Rect mClipRect{};
+
+    void swapBuffer();
 };
 
 } // namespace rsp::graphics

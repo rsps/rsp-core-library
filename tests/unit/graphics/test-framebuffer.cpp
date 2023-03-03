@@ -10,8 +10,10 @@
 
 #include <chrono>
 #include <doctest.h>
+#include <graphics/Font.h>
 #include <graphics/Bitmap.h>
-#include <graphics/Framebuffer.h>
+#include <graphics/Text.h>
+#include <graphics/SW/SWRenderer.h>
 #include <thread>
 #include <filesystem>
 #include <posix/FileSystem.h>
@@ -22,12 +24,12 @@
 using namespace rsp::graphics;
 using namespace rsp::utils;
 
-inline void CheckPixel(const Point &aPoint, const Color &aColour, const Framebuffer &fb)
+inline void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Framebuffer &fb)
 {
-    if (fb.IsHit(aPoint)) {
-        CHECK_EQ(fb.GetPixel(aPoint), aColour);
+    if (fb.IsHit(aX, aY)) {
+        CHECK_EQ(fb.GetPixel(aX, aY), aColor.AsUint());
     } else {
-        CHECK_EQ(fb.GetPixel(aPoint), 0);
+        CHECK_EQ(fb.GetPixel(aX, aY), 0);
     }
 }
 
@@ -35,6 +37,7 @@ TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("Framebuffer")
 {
+    using namespace std::chrono;
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
@@ -42,10 +45,13 @@ TEST_CASE("Framebuffer")
 
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
 
-    Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
+    SWRenderer renderer(p);
+    Canvas canvas(renderer.GetWidth(), renderer.GetHeight());
+    auto _tx = renderer.CreateTexture();
+    SWTexture* texture = dynamic_cast<SWTexture*>(_tx.get());
+    CHECK(texture != nullptr);
 
-    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now().time_since_epoch());
+    milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
     srand(ms.count()); // generates random seed val
     Color col( Random::Roll(56u, 200u), Random::Roll(56u, 200u), Random::Roll(56u, 200u), 0xff);
@@ -53,18 +59,24 @@ TEST_CASE("Framebuffer")
 
     SUBCASE("Clear")
     {
-        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        renderer.Fill(Color::None);
+        renderer.Present();
+        renderer.Fill(Color::None);
+        renderer.Present();
+        canvas.Fill(Color::None);
+        texture->Fill(Color::None);
     }
 
     SUBCASE("Drawing Lines")
     {
         // Arrange
-        Point pointA(Random::Roll(0, fb.GetWidth()), Random::Roll(0, fb.GetHeight()));
-        Point pointB(Random::Roll(0, fb.GetWidth()), Random::Roll(0, fb.GetHeight()));
+        Point pointA(Random::Roll(0, renderer.GetWidth()-1), Random::Roll(0, renderer.GetHeight()-1));
+        Point pointB(Random::Roll(0, renderer.GetWidth()-1), Random::Roll(0, renderer.GetHeight()-1));
 
         // Act
-        CHECK_NOTHROW(fb.DrawLine(pointA, pointB, col));
+        CHECK_NOTHROW(canvas.DrawLine(pointA, pointB, col));
+        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(renderer.Render(*texture, &canvas.GetRect()));
 
         // Assert
         int deltaX = static_cast<int>(pointB.GetX() - pointA.GetX());
@@ -85,7 +97,9 @@ TEST_CASE("Framebuffer")
                     py += signumY;
                 }
                 px += signumX;
-                CHECK_EQ(fb.GetPixel(Point(px, py), false), col.AsUint());
+                CHECK_EQ(canvas.GetPixelAt(px, py, Color::None), col.AsUint());
+                CHECK_EQ(texture->GetPixelData().GetPixelAt(px, py, Color::None), col.AsUint());
+                CHECK_EQ(renderer.GetPixel(px, py, false), col.AsUint());
             }
         } else {
             for (int i = 0; i < absDeltaY; i++) {
@@ -95,90 +109,99 @@ TEST_CASE("Framebuffer")
                     px += signumX;
                 }
                 py += signumY;
-                CHECK_EQ(fb.GetPixel(Point(px, py), false), col.AsUint());
+                CHECK_EQ(renderer.GetPixel(px, py, false), col.AsUint());
             }
         }
 
         SUBCASE("Lines are Inclusive")
         {
-            CHECK_EQ(fb.GetPixel(pointA, false), col.AsUint());
-            CHECK_EQ(fb.GetPixel(pointB, false), col.AsUint());
+            CHECK_EQ(renderer.GetPixel(pointA.GetX(), pointA.GetY(), false), col.AsUint());
+            CHECK_EQ(renderer.GetPixel(pointB.GetX(), pointB.GetY(), false), col.AsUint());
         }
-        fb.SwapBuffer();
+
+        CHECK_NOTHROW(renderer.Present());
     }
 
     SUBCASE("Drawing Rectangles")
     {
         // Arrange
         // Generate random values in the LEFT and TOP halves of the screen
-        Point leftTop(Random::Roll(0, fb.GetWidth() / 2), Random::Roll(0, fb.GetHeight() / 2));
+        Point leftTop(Random::Roll(0, renderer.GetWidth() / 2), Random::Roll(0, renderer.GetHeight() / 2));
         // Generate random values in the RIGHT and BOTTOM halves of the screen
         Point rightBottom(
-            Random::Roll(0, fb.GetWidth() / 2) + (fb.GetWidth() / 2),
-            Random::Roll(0, fb.GetHeight() / 2) + (fb.GetHeight() / 2));
+            Random::Roll(0, renderer.GetWidth() / 2) + (renderer.GetWidth() / 2),
+            Random::Roll(0, renderer.GetHeight() / 2) + (renderer.GetHeight() / 2));
         Rect rect(leftTop, rightBottom.GetX() - leftTop.GetX(), rightBottom.GetY() - leftTop.GetY());
 
         // Act
-        CHECK_NOTHROW(fb.DrawRectangle(rect, col));
+        CHECK_NOTHROW(canvas.DrawRectangle(rect, col));
+        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(renderer.Render(*texture));
 
         // Assert
         // Expect all four side to hold values
         for (GuiUnit_t i = 0; i < rect.GetWidth(); i++) {
             // Check top side
-            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(leftTop.GetX() + i, leftTop.GetY()), false));
+            CHECK_EQ(col.AsUint(), renderer.GetPixel(leftTop.GetX() + i, leftTop.GetY(), false));
             // Check bottom side
-            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(leftTop.GetX() + i, rightBottom.GetY()-1), false));
+            CHECK_EQ(col.AsUint(), renderer.GetPixel(leftTop.GetX() + i, rightBottom.GetY()-1, false));
         }
         for (GuiUnit_t i = 0; i < rect.GetHeight(); i++) {
             // Check left side
-            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(leftTop.GetX(), rightBottom.GetY()-1 - i), false));
+            CHECK_EQ(col.AsUint(), renderer.GetPixel(leftTop.GetX(), rightBottom.GetY()-1 - i, false));
             // Check right side
-            CHECK_EQ(col.AsUint(), fb.GetPixel(Point(rightBottom.GetX()-1, rightBottom.GetY()-1 - i), false));
+            CHECK_EQ(col.AsUint(), renderer.GetPixel(rightBottom.GetX()-1, rightBottom.GetY()-1 - i, false));
         }
-        fb.SwapBuffer();
+        CHECK_NOTHROW(renderer.Present());
 
         Rect small(10, 10, 1, 1);
         Color white(Color::White);
-        CHECK_NOTHROW(fb.DrawRectangle(small, white));
-        CHECK_EQ(fb.GetPixel(Point(10, 10)), white);
-        CHECK_NE(fb.GetPixel(Point(11, 10)), white);
-        CHECK_NE(fb.GetPixel(Point(10, 11)), white);
-        CHECK_NE(fb.GetPixel(Point(11, 11)), white);
-        fb.SwapBuffer();
+        CHECK_NOTHROW(canvas.DrawRectangle(small, white));
+        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(renderer.Render(*texture));
+        CHECK_EQ(renderer.GetPixel(10, 10), white);
+        CHECK_NE(renderer.GetPixel(11, 10), white);
+        CHECK_NE(renderer.GetPixel(10, 11), white);
+        CHECK_NE(renderer.GetPixel(11, 11), white);
+        CHECK_NOTHROW(renderer.Present());
 
         Rect medium(20, 20, 10, 10);
-        CHECK_NOTHROW(fb.DrawRectangle(medium, white));
-        CHECK_EQ(fb.GetPixel(Point(20, 20)), white);
-        CHECK_EQ(fb.GetPixel(Point(20, 29)), white);
-        CHECK_NE(fb.GetPixel(Point(20, 30)), white);
-        CHECK_EQ(fb.GetPixel(Point(29, 20)), white);
-        CHECK_NE(fb.GetPixel(Point(30, 20)), white);
-        CHECK_EQ(fb.GetPixel(Point(29, 29)), white);
-        CHECK_NE(fb.GetPixel(Point(30, 30)), white);
-        fb.SwapBuffer();
+        CHECK_NOTHROW(canvas.DrawRectangle(medium, white));
+        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(renderer.Render(*texture));
+        CHECK_EQ(renderer.GetPixel(20, 20), white);
+        CHECK_EQ(renderer.GetPixel(20, 29), white);
+        CHECK_NE(renderer.GetPixel(20, 30), white);
+        CHECK_EQ(renderer.GetPixel(29, 20), white);
+        CHECK_NE(renderer.GetPixel(30, 20), white);
+        CHECK_EQ(renderer.GetPixel(29, 29), white);
+        CHECK_NE(renderer.GetPixel(30, 30), white);
+        CHECK_NOTHROW(renderer.Present());
     }
 
     SUBCASE("Drawing Circles")
     {
         // Arrange
-        Point centerPoint(Random::Roll(0, fb.GetWidth()), Random::Roll(0, fb.GetHeight()));
-        GuiUnit_t radius = Random::Roll(0, fb.GetWidth() / 2);
+        Point centerPoint(Random::Roll(0, renderer.GetWidth()), Random::Roll(0, renderer.GetHeight()));
+        GuiUnit_t radius = Random::Roll(0, renderer.GetWidth() / 2);
 
         // Act
-        CHECK_NOTHROW(fb.DrawCircle(centerPoint, radius, col));
+        CHECK_NOTHROW(canvas.DrawCircle(centerPoint, radius, col));
+        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(renderer.Render(*texture));
 
         // Assert
         int error = -static_cast<int>(radius);
         GuiUnit_t y = 0;
         while (radius >= y) {
-            CheckPixel(Point(centerPoint.GetX() + radius, centerPoint.GetY() + y), col, fb);
-            CheckPixel(Point(centerPoint.GetX() - radius, centerPoint.GetY() + y), col, fb);
-            CheckPixel(Point(centerPoint.GetX() + radius, centerPoint.GetY() - y), col, fb);
-            CheckPixel(Point(centerPoint.GetX() - radius, centerPoint.GetY() - y), col, fb);
-            CheckPixel(Point(centerPoint.GetX() + y, centerPoint.GetY() + radius), col, fb);
-            CheckPixel(Point(centerPoint.GetX() - y, centerPoint.GetY() + radius), col, fb);
-            CheckPixel(Point(centerPoint.GetX() + y, centerPoint.GetY() - radius), col, fb);
-            CheckPixel(Point(centerPoint.GetX() - y, centerPoint.GetY() - radius), col, fb);
+            CheckPixel(centerPoint.GetX() + radius, centerPoint.GetY() + y, col, renderer);
+            CheckPixel(centerPoint.GetX() - radius, centerPoint.GetY() + y, col, renderer);
+            CheckPixel(centerPoint.GetX() + radius, centerPoint.GetY() - y, col, renderer);
+            CheckPixel(centerPoint.GetX() - radius, centerPoint.GetY() - y, col, renderer);
+            CheckPixel(centerPoint.GetX() + y, centerPoint.GetY() + radius, col, renderer);
+            CheckPixel(centerPoint.GetX() - y, centerPoint.GetY() + radius, col, renderer);
+            CheckPixel(centerPoint.GetX() + y, centerPoint.GetY() - radius, col, renderer);
+            CheckPixel(centerPoint.GetX() - y, centerPoint.GetY() - radius, col, renderer);
             error += static_cast<int>(y);
             y++;
             error += static_cast<int>(y);
@@ -189,7 +212,7 @@ TEST_CASE("Framebuffer")
                 error += -static_cast<int>(radius);
             }
         }
-        fb.SwapBuffer();
+        CHECK_NOTHROW(renderer.Present());
     }
 
     SUBCASE("Set/Get pixel outside screen")
@@ -199,12 +222,12 @@ TEST_CASE("Framebuffer")
         Point outSideYAxis(0, -1);
 
         // Act
-        CHECK_NOTHROW(fb.SetPixel(outSideXAxis, col));
-        CHECK_NOTHROW(fb.SetPixel(outSideYAxis, col));
+        CHECK_NOTHROW(renderer.SetPixel(outSideXAxis.GetX(), outSideXAxis.GetY(), col));
+        CHECK_NOTHROW(renderer.SetPixel(outSideYAxis.GetX(), outSideYAxis.GetY(), col));
 
         // Assert
-        CHECK_EQ(fb.GetPixel(outSideXAxis), 0);
-        CHECK_EQ(fb.GetPixel(outSideYAxis), 0);
+        CHECK_EQ(renderer.GetPixel(outSideXAxis.GetX(), outSideXAxis.GetY()), 0);
+        CHECK_EQ(renderer.GetPixel(outSideYAxis.GetX(), outSideYAxis.GetY()), 0);
     }
 
     SUBCASE("Drawing Images")
@@ -234,12 +257,14 @@ TEST_CASE("Framebuffer")
         SUBCASE("Draw image from file")
         {
             // Act
-            CHECK_NOTHROW(fb.DrawImage(topLeftImgCorner, testImgMap));
+            CHECK_NOTHROW(canvas.DrawPixelData(topLeftImgCorner, testImgMap, testImgMap.GetRect(), Color::White));
+            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(renderer.Render(*texture));
 
             // Assert
-            CHECK_EQ(fb.GetPixel(topLeftImgCorner + Point(4, 4), false), Color(0xFF020F92));
+            CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + 4, topLeftImgCorner.GetY() + 4, false), Color(0xFF020F92));
 
-            CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+            CHECK_NOTHROW(renderer.Present());
         }
         SUBCASE("Draw edited image file")
         {
@@ -256,24 +281,26 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(testImgMap.DrawLine(topLeft, botRight, Color::Red));
             CHECK_NOTHROW(testImgMap.DrawLine(botLeft, topRight, Color::Red));
 
-            CHECK_NOTHROW(fb.DrawImage(topLeftImgCorner, testImgMap));
-            CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+            CHECK_NOTHROW(canvas.DrawPixelData(topLeftImgCorner, testImgMap, testImgMap.GetRect(), Color::White));
+            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(renderer.Render(*texture, &canvas.GetRect()));
+            CHECK_NOTHROW(renderer.Present());
 
             // Assert
-            CHECK_EQ(testImgMap.GetPixel(Point(width / 2, 0)), 0xFF777777);
-            CHECK_EQ(testImgMap.GetPixel(Point(0, height / 2)), 0xFF777777);
-            CHECK_EQ(testImgMap.GetPixel(Point(width - 12, height / 2)), 0xFFCFCFCF);
-            CHECK_EQ(testImgMap.GetPixel(Point(width / 2, height - 4)), 0xFF8F8F8F);
+            CHECK_EQ(testImgMap.GetPixelAt(width / 2, 0), 0xFF777777);
+            CHECK_EQ(testImgMap.GetPixelAt(0, height / 2), 0xFF777777);
+            CHECK_EQ(testImgMap.GetPixelAt(width - 12, height / 2), 0xFFCFCFCF);
+            CHECK_EQ(testImgMap.GetPixelAt(width / 2, height - 4), 0xFF8F8F8F);
 
-            CHECK_EQ(fb.GetPixel(topLeftImgCorner + Point(width / 2, 0), true), 0xFF777777);
-            CHECK_EQ(fb.GetPixel(topLeftImgCorner + Point(0, height / 2), true), 0xFF777777);
-            CHECK_EQ(fb.GetPixel(topLeftImgCorner + Point(width - 12, height / 2), true), 0xFFCFCFCF);
-            CHECK_EQ(fb.GetPixel(topLeftImgCorner + Point(width / 2, height - 4), true), 0xFF8F8F8F);
+            CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + width / 2 , topLeftImgCorner.GetY() +          0, true), 0xFF777777);
+            CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + 0         , topLeftImgCorner.GetY() + height / 2, true), 0xFF777777);
+            CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + width - 12, topLeftImgCorner.GetY() + height / 2, true), 0xFFCFCFCF);
+            CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + width / 2 , topLeftImgCorner.GetY() + height - 4, true), 0xFF8F8F8F);
         }
         SUBCASE("Draw memory created image")
         {
             // Arrange
-            Bitmap emptyMap(height, width, 4);
+            Bitmap emptyMap(height, width, PixelData::ColorDepth::RGBA);
             Point randomPoint(Random::Roll(0, width-1), Random::Roll(0, height-1));
 
 //            MESSAGE("randomPoint: " << randomPoint);
@@ -282,13 +309,15 @@ TEST_CASE("Framebuffer")
 
             // Act
             CHECK_NOTHROW(emptyMap.DrawRectangle(Rect(0, 0, width, height), col, true) ); //.SetPixel(randomPoint, col));
-            CHECK_NOTHROW(fb.DrawImage(topLeftImgCorner, emptyMap));
-            CHECK_NOTHROW(fb.SetPixel(topLeftImgCorner + randomPoint, Color::White));
-            CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+            CHECK_NOTHROW(canvas.DrawPixelData(topLeftImgCorner, emptyMap));
+            CHECK_NOTHROW(canvas.SetPixel(topLeftImgCorner + randomPoint, Color::White));
+            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(renderer.Render(*texture));
+            CHECK_NOTHROW(renderer.Present());
 
             // Assert
-            CHECK_EQ(fb.GetPixel(topLeftImgCorner, true), col.AsUint());
-            CHECK_EQ(fb.GetPixel(topLeftImgCorner + randomPoint, true), Color::White);
+            CHECK_EQ(renderer.GetPixel(topLeftImgCorner, true), col.AsUint());
+            CHECK_EQ(renderer.GetPixel(topLeftImgCorner + randomPoint, true), Color::White);
         }
     }
 
@@ -296,31 +325,35 @@ TEST_CASE("Framebuffer")
     {
         // Arrange
         Point topLeft(0, 0);
-        Point randomPoint(Random::Roll(0, fb.GetWidth()), Random::Roll(0, fb.GetHeight()));
+        Point randomPoint(Random::Roll(0, renderer.GetWidth()), Random::Roll(0, renderer.GetHeight()));
         std::string largeImg = "testImages/largeTestImg.bmp";
         Bitmap largeImgMap(largeImg);
         // Make sure screen is empty
-        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        CHECK_NOTHROW(renderer.Present());
 
         // Act
-        CHECK_NOTHROW(fb.DrawImage(topLeft, largeImgMap));
+        CHECK_NOTHROW(texture->Update(largeImgMap));
+        CHECK_NOTHROW(renderer.Render(*texture));
+        CHECK_NOTHROW(renderer.Present());
 
         // Assert
-        CHECK(largeImgMap.GetHeight() > fb.GetHeight());
-        CHECK(largeImgMap.GetWidth() > fb.GetWidth());
-        CHECK(fb.GetPixel(randomPoint) != 0);
+        CHECK(largeImgMap.GetHeight() > renderer.GetHeight());
+        CHECK(largeImgMap.GetWidth() > renderer.GetWidth());
+        CHECK(renderer.GetPixel(randomPoint) != 0);
 
-        SUBCASE("Spill large imgage into screen")
+        SUBCASE("Spill large image into screen")
         {
             // Arrange
             topLeft = {-100, -100};
 
             // Act
-            CHECK_NOTHROW(fb.DrawImage(topLeft, largeImgMap));
+            CHECK_NOTHROW(canvas.DrawPixelData(topLeft, largeImgMap));
+            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(renderer.Render(*texture));
 
             // Assert
-            CHECK_NE(fb.GetPixel(randomPoint), 0);
-            CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+            CHECK_NE(renderer.GetPixel(randomPoint), 0);
+            CHECK_NOTHROW(renderer.Present());
         }
     }
 
@@ -334,8 +367,10 @@ TEST_CASE("Framebuffer")
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
-            CHECK_NOTHROW(fb.DrawImage(Point(topLeftPoint.GetX(), topLeftPoint.GetY() - static_cast<GuiUnit_t>(i)), imgSimple));
-            CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+            CHECK_NOTHROW(canvas.DrawPixelData(topLeftPoint + Point(0, static_cast<GuiUnit_t>(-i)), imgSimple));
+            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(renderer.Render(*texture));
+            CHECK_NOTHROW(renderer.Present());
         }
         int fps = (1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
 
@@ -361,8 +396,10 @@ TEST_CASE("Framebuffer")
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
-            CHECK_NOTHROW(fb.DrawImage(Point(topLeftPoint.GetX(), topLeftPoint.GetY() - static_cast<GuiUnit_t>(i)), imgSimple, mcl[(i / 20) % 5]));
-            CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+            CHECK_NOTHROW(canvas.DrawPixelData(topLeftPoint + Point(0, static_cast<GuiUnit_t>(-i)), imgSimple, imgSimple.GetRect(), mcl[(i / 20) % 5]));
+            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(renderer.Render(*texture));
+            CHECK_NOTHROW(renderer.Present());
 //            std::this_thread::sleep_for(std::chrono::milliseconds(25));
         }
         int fps = (1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
@@ -378,64 +415,67 @@ TEST_CASE("Framebuffer")
         Font::RegisterFont(cFontFile);
         Rect r(100, 200, 280, 200);
 
-        CHECK_NOTHROW(fb.DrawRectangle(r, Color::White));
         Text text("Exo 2", "Hello World");
-        CHECK_NOTHROW(text.GetFont().SetSize(30));
-        CHECK_NOTHROW(text.SetArea(r).GetFont().SetColor(Color::Red));
-        CHECK_NOTHROW(fb.DrawText(text.Reload()));
-        CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-        CHECK_NOTHROW(fb.DrawRectangle(r, Color::Grey));
-        CHECK_NOTHROW(text.SetScaleToFit().SetValue("Hello\nWorld"));
-        CHECK_NOTHROW(fb.DrawText(text.Reload(), Color::Green));
-        CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        SUBCASE("Text Attributes") {
+            SUBCASE("Constructor") {
+                CHECK_NOTHROW(canvas.DrawRectangle(r, Color::White));
+                CHECK_NOTHROW(text.GetFont().SetSize(30));
+                CHECK_NOTHROW(text.SetArea(r).GetFont().SetColor(Color::Red));
+            }
+            SUBCASE("SetValue") {
+                CHECK_NOTHROW(canvas.DrawRectangle(r, Color::Grey));
+                CHECK_NOTHROW(text.SetScaleToFit().SetValue("Hello\nWorld").SetColor(Color::Green));
+            }
+            SUBCASE("MOON") {
+                CHECK_NOTHROW(canvas.DrawRectangle(r, Color::Purple));
+                CHECK_NOTHROW(text.SetValue("Hello\nWorld\nHELLO\nMOON").SetColor(Color::Grey));
+            }
+            SUBCASE("RED") {
+                CHECK_NOTHROW(canvas.DrawRectangle(r, Color::White));
+                CHECK_NOTHROW(text.SetValue("RED").SetColor(Color::Red));
+            }
+            SUBCASE("GREEN") {
+                CHECK_NOTHROW(canvas.DrawRectangle(r, Color::White));
+                CHECK_NOTHROW(text.SetValue("GREEN").SetColor(Color::Green));
+            }
+            SUBCASE("BLUE") {
+                CHECK_NOTHROW(canvas.DrawRectangle(r, Color::White));
+                CHECK_NOTHROW(text.SetValue("BLUE").SetColor(Color::Blue));
+            }
 
-        CHECK_NOTHROW(fb.DrawRectangle(r, Color::Purple));
-        CHECK_NOTHROW(text.SetValue("Hello\nWorld\nHELLO\nMOON"));
-        CHECK_NOTHROW(fb.DrawText(text.Reload(), Color::Grey));
-        CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-        CHECK_NOTHROW(fb.DrawRectangle(r, Color::White));
-        CHECK_NOTHROW(text.SetValue("RED"));
-        CHECK_NOTHROW(fb.DrawText(text.Reload(), Color::Red));
-        CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-        CHECK_NOTHROW(fb.DrawRectangle(r, Color::White));
-        CHECK_NOTHROW(text.SetValue("GREEN"));
-        CHECK_NOTHROW(fb.DrawText(text.Reload(), Color::Green));
-        CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-        CHECK_NOTHROW(fb.DrawRectangle(r, Color::White));
-        CHECK_NOTHROW(text.SetValue("BLUE"));
-        CHECK_NOTHROW(fb.DrawText(text.Reload(), Color::Blue));
-        CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-        const Color rainbow[] = { Color::White, Color::Red, Color::Yellow, Color::Green, Color::Aqua, Color::Lime, Color::Blue, Color::Silver };
-
-        MESSAGE("FPS Test");
-        CHECK_NOTHROW(text.SetScaleToFit(true).SetLineSpacing(50));
-//        Rect screen(0, 0, 480, 800);
-        rsp::utils::StopWatch sw;
-        for (int i = 0 ; i < 1000 ; i++) {
-//            fb.DrawRectangle(screen, rainbow[i & 0x07], true);
-            int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
-            std::stringstream ss;
-            ss << "FPS:\n" << fps;
-            CHECK_NOTHROW(text.SetValue(ss.str()));
-            CHECK_NOTHROW(fb.DrawText(text.Reload(), Color::Black));
-            CHECK_NOTHROW(text.SetScaleToFit(false)); // Only scale first time to speed it up
-            CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear, rainbow[i & 0x07]));
+            CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(renderer.Render(*texture));
+            CHECK_NOTHROW(renderer.Present());
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
-        MESSAGE(text.GetValue());
+
+        SUBCASE("Rainbow") {
+            const Color rainbow[] = { Color::White, Color::Red, Color::Yellow, Color::Green, Color::Aqua, Color::Lime, Color::Blue, Color::Silver };
+
+            MESSAGE("FPS Test");
+            CHECK_NOTHROW(text.SetScaleToFit(true).SetLineSpacing(50).SetColor(Color::Black));
+    //        Rect screen(0, 0, 480, 800);
+            rsp::utils::StopWatch sw;
+            for (int i = 0 ; i < 1000 ; i++) {
+    //            fb.DrawRectangle(screen, rainbow[i & 0x07], true);
+                int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
+                std::stringstream ss;
+                ss << "FPS:\n" << fps;
+                CHECK_NOTHROW(text.SetValue(ss.str()));
+                CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+                CHECK_NOTHROW(texture->Update(canvas));
+                CHECK_NOTHROW(renderer.Render(*texture));
+                CHECK_NOTHROW(renderer.Present());
+
+                CHECK_NOTHROW(text.SetScaleToFit(false)); // Only scale first time to speed it up
+            }
+            MESSAGE(text.GetValue());
+        }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
+        CHECK_NOTHROW(renderer.Present());
     }
 
     SUBCASE("Text Alignment")
@@ -445,11 +485,13 @@ TEST_CASE("Framebuffer")
 //        Rect r(10, 10, 60, 80);
         Rect r(10, 10, 460, 780);
 
-        CHECK_NOTHROW(fb.DrawRectangle(r, Color::White));
+        CHECK_NOTHROW(canvas.DrawRectangle(r, Color::White));
         Text text("Exo 2", "Hello\nWorld");
         CHECK_NOTHROW(text.SetArea(r).GetFont().SetSize(50).SetColor(Color::Yellow));
-        CHECK_NOTHROW(fb.DrawText(text.Reload()));
-        CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+        CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(renderer.Render(*texture));
+        CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
         const Text::VAlign cVertical[] = { Text::VAlign::Top, Text::VAlign::Center, Text::VAlign::Bottom };
@@ -457,9 +499,12 @@ TEST_CASE("Framebuffer")
 
         for (int h = 0 ; h < 3 ; h++) {
             for (int v = 0 ; v < 3 ; v++) {
-                CHECK_NOTHROW(fb.DrawRectangle(r, Color::White));
-                CHECK_NOTHROW(fb.DrawText(text.SetVAlignment(cVertical[v]).SetHAlignment(cHorizontal[h]).Reload()));
-                CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+                CHECK_NOTHROW(canvas.DrawRectangle(r, Color::White));
+                CHECK_NOTHROW(text.SetVAlignment(cVertical[v]).SetHAlignment(cHorizontal[h]));
+                CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+                CHECK_NOTHROW(texture->Update(canvas));
+                CHECK_NOTHROW(renderer.Render(*texture));
+                CHECK_NOTHROW(renderer.Present());
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
         }
@@ -471,39 +516,48 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-VariableFont_wght.ttf"));
         Rect r(10, 10, 460, 280);
 
-        CHECK_NOTHROW(fb.DrawRectangle(r, Color::White));
+        CHECK_NOTHROW(canvas.DrawRectangle(r, Color::White));
         Text text("Exo 2", "Regular");
         CHECK_NOTHROW(text.SetArea(r).SetScaleToFit(true).GetFont().SetSize(50).SetColor(Color::Yellow));
-        CHECK_NOTHROW(fb.DrawText(text.Reload()));
-        CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+        CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(renderer.Render(*texture));
+        CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         CHECK_NOTHROW(text.SetValue("Bold").GetFont().SetStyle(FontStyles::Bold));
-        CHECK_NOTHROW(fb.DrawText(text.Reload()));
-        CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+        CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(renderer.Render(*texture));
+        CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         CHECK_NOTHROW(text.SetValue("Italic").GetFont().SetStyle(FontStyles::Italic));
-        CHECK_NOTHROW(fb.DrawText(text.Reload()));
-        CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+        CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(renderer.Render(*texture));
+        CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         CHECK_NOTHROW(text.SetValue("Bold Italic").GetFont().SetStyle(FontStyles::BoldItalic));
-        CHECK_NOTHROW(fb.DrawText(text.Reload()));
-        CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+        CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(renderer.Render(*texture));
+        CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     SUBCASE("Swapbuffer")
     {
-        fb.SwapBuffer();
+        CHECK_NOTHROW(renderer.Present());
     }
 
     SUBCASE("Draw Fullscreen") {
         std::string testImage = "testImages/Asset2WithAlpha.bmp";
         Bitmap testImgMap(testImage);
-        CHECK_NOTHROW(fb.DrawImage(Point(0,0), testImgMap));
-        CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+        CHECK_NOTHROW(texture->Update(testImgMap));
+        CHECK_NOTHROW(renderer.Render(*texture));
+        CHECK_NOTHROW(renderer.Present());
     }
 
     SUBCASE("Draw Transparent") {
@@ -515,13 +569,15 @@ TEST_CASE("Framebuffer")
             blue.SetAlpha(static_cast<std::uint8_t>(a));
             green.SetAlpha(static_cast<std::uint8_t>(a));
             red.SetAlpha(static_cast<std::uint8_t>(a));
-            CHECK_NOTHROW(fb.DrawRectangle(Rect(135,170, 100, 100), red, true));
-            CHECK_NOTHROW(fb.DrawRectangle(Rect(100,100, 100, 100), blue, true));
-            CHECK_NOTHROW(fb.DrawRectangle(Rect(170,100, 100, 100), green, true));
-            CHECK_NOTHROW(fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear));
+            CHECK_NOTHROW(canvas.DrawRectangle(Rect(135,170, 100, 100), red, true));
+            CHECK_NOTHROW(canvas.DrawRectangle(Rect(100,100, 100, 100), blue, true));
+            CHECK_NOTHROW(canvas.DrawRectangle(Rect(170,100, 100, 100), green, true));
+            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(renderer.Render(*texture));
+            CHECK_NOTHROW(renderer.Present());
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
-        CHECK(fb.GetPixel(Point(185, 185), true) == Color(0xFF0B612D));
+        CHECK(renderer.GetPixel(Point(185, 185), true) == Color(0xFF0B612D));
     }
 
 }

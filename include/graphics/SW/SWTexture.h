@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_GRAPHICS_SW_SWTEXTURE_H_
-#define SRC_GRAPHICS_SW_SWTEXTURE_H_
+#ifndef INCLUDE_GRAPHICS_SW_SWTEXTURE_H_
+#define INCLUDE_GRAPHICS_SW_SWTEXTURE_H_
 
 #include <graphics/Texture.h>
 
@@ -31,4 +31,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* SRC_GRAPHICS_SW_SWTEXTURE_H_ */
+#endif /* INCLUDE_GRAPHICS_SW_SWTEXTURE_H_ */
