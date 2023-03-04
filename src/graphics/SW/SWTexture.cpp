@@ -9,22 +9,18 @@ namespace rsp::graphics {
 
 void SWTexture::Fill(Color aColor)
 {
-    mPixelData.Fill(aColor);
+//    mPixelData.Fill(aColor);
 }
 
 SWTexture::SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, PixelData::ColorDepth aDepth)
-    : mPixelData(aWidth, aHeight, aDepth)
+//    : mPixelData(aWidth, aHeight, aDepth)
 {
 }
 
-void SWTexture::Update(const PixelData &arPixelData)
+void SWTexture::Update(const PixelData &arPixelData, Color aColor)
 {
-    if (mPixelData.GetColorDepth() == arPixelData.GetColorDepth()) {
-        mPixelData = arPixelData;
-    }
-    else {
-        mPixelData = arPixelData.ChangeColorDepth(mPixelData.GetColorDepth());
-    }
+    mpPixelData = &arPixelData;
+//    mPixelData.CopyFrom(Point(0,0), arPixelData, arPixelData.GetRect(), aColor);
 }
 
 } /* namespace rsp::graphics */

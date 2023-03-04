@@ -20,13 +20,19 @@ class SWTexture: public Texture
 public:
     SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, PixelData::ColorDepth aDepth);
 
-    const PixelData& GetPixelData() const { return mPixelData; }
+    SWTexture(const SWTexture&) = default;
+    SWTexture(SWTexture&&) = default;
+
+    SWTexture& operator=(const SWTexture&) = default;
+    SWTexture& operator=(SWTexture&&) = default;
+
+    const PixelData& GetPixelData() const { return *mpPixelData; }
 
     void Fill(rsp::graphics::Color aColor) override;
-    void Update(const PixelData &arPixelData) override;
+    void Update(const PixelData &arPixelData, Color aColor) override;
 
 protected:
-    PixelData mPixelData;
+    const PixelData *mpPixelData = nullptr;
 };
 
 } /* namespace rsp::graphics */

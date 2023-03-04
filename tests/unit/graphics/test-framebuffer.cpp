@@ -75,8 +75,8 @@ TEST_CASE("Framebuffer")
 
         // Act
         CHECK_NOTHROW(canvas.DrawLine(pointA, pointB, col));
-        CHECK_NOTHROW(texture->Update(canvas));
-        CHECK_NOTHROW(renderer.Render(*texture, &canvas.GetRect()));
+        CHECK_NOTHROW(texture->Update(canvas, col));
+        CHECK_NOTHROW(renderer.Render(*texture));
 
         // Assert
         int deltaX = static_cast<int>(pointB.GetX() - pointA.GetX());
@@ -97,8 +97,8 @@ TEST_CASE("Framebuffer")
                     py += signumY;
                 }
                 px += signumX;
-                CHECK_EQ(canvas.GetPixelAt(px, py, Color::None), col.AsUint());
-                CHECK_EQ(texture->GetPixelData().GetPixelAt(px, py, Color::None), col.AsUint());
+                CHECK_EQ(canvas.GetPixelAt(px, py).AsUint(), col.AsUint());
+                CHECK_EQ(texture->GetPixelData().GetPixelAt(px, py).AsUint(), col.AsUint());
                 CHECK_EQ(renderer.GetPixel(px, py, false), col.AsUint());
             }
         } else {
@@ -109,6 +109,8 @@ TEST_CASE("Framebuffer")
                     px += signumX;
                 }
                 py += signumY;
+                CHECK_EQ(canvas.GetPixelAt(px, py), col.AsUint());
+                CHECK_EQ(texture->GetPixelData().GetPixelAt(px, py), col.AsUint());
                 CHECK_EQ(renderer.GetPixel(px, py, false), col.AsUint());
             }
         }
@@ -135,15 +137,17 @@ TEST_CASE("Framebuffer")
 
         // Act
         CHECK_NOTHROW(canvas.DrawRectangle(rect, col));
-        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(texture->Update(canvas, col));
         CHECK_NOTHROW(renderer.Render(*texture));
 
         // Assert
         // Expect all four side to hold values
         for (GuiUnit_t i = 0; i < rect.GetWidth(); i++) {
             // Check top side
+            CHECK_EQ(canvas.GetPixelAt(rect.GetLeft() + i, rect.GetTop()).AsUint(), col.AsUint());
             CHECK_EQ(col.AsUint(), renderer.GetPixel(leftTop.GetX() + i, leftTop.GetY(), false));
             // Check bottom side
+            CHECK_EQ(canvas.GetPixelAt(rect.GetLeft() + i, rect.GetBottom() - 1).AsUint(), col.AsUint());
             CHECK_EQ(col.AsUint(), renderer.GetPixel(leftTop.GetX() + i, rightBottom.GetY()-1, false));
         }
         for (GuiUnit_t i = 0; i < rect.GetHeight(); i++) {
@@ -157,7 +161,7 @@ TEST_CASE("Framebuffer")
         Rect small(10, 10, 1, 1);
         Color white(Color::White);
         CHECK_NOTHROW(canvas.DrawRectangle(small, white));
-        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(texture->Update(canvas, white));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_EQ(renderer.GetPixel(10, 10), white);
         CHECK_NE(renderer.GetPixel(11, 10), white);
@@ -167,7 +171,7 @@ TEST_CASE("Framebuffer")
 
         Rect medium(20, 20, 10, 10);
         CHECK_NOTHROW(canvas.DrawRectangle(medium, white));
-        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(texture->Update(canvas, white));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_EQ(renderer.GetPixel(20, 20), white);
         CHECK_EQ(renderer.GetPixel(20, 29), white);
@@ -187,7 +191,7 @@ TEST_CASE("Framebuffer")
 
         // Act
         CHECK_NOTHROW(canvas.DrawCircle(centerPoint, radius, col));
-        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(texture->Update(canvas, col));
         CHECK_NOTHROW(renderer.Render(*texture));
 
         // Assert
@@ -258,7 +262,7 @@ TEST_CASE("Framebuffer")
         {
             // Act
             CHECK_NOTHROW(canvas.DrawPixelData(topLeftImgCorner, testImgMap, testImgMap.GetRect(), Color::White));
-            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(texture->Update(canvas, Color::White));
             CHECK_NOTHROW(renderer.Render(*texture));
 
             // Assert
@@ -282,15 +286,15 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(testImgMap.DrawLine(botLeft, topRight, Color::Red));
 
             CHECK_NOTHROW(canvas.DrawPixelData(topLeftImgCorner, testImgMap, testImgMap.GetRect(), Color::White));
-            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(texture->Update(canvas, Color::White));
             CHECK_NOTHROW(renderer.Render(*texture, &canvas.GetRect()));
             CHECK_NOTHROW(renderer.Present());
 
             // Assert
-            CHECK_EQ(testImgMap.GetPixelAt(width / 2, 0), 0xFF777777);
-            CHECK_EQ(testImgMap.GetPixelAt(0, height / 2), 0xFF777777);
-            CHECK_EQ(testImgMap.GetPixelAt(width - 12, height / 2), 0xFFCFCFCF);
-            CHECK_EQ(testImgMap.GetPixelAt(width / 2, height - 4), 0xFF8F8F8F);
+            CHECK_EQ(testImgMap.GetPixelAt(width / 2, 0).AsUint(), 0xFF777777);
+            CHECK_EQ(testImgMap.GetPixelAt(0, height / 2).AsUint(), 0xFF777777);
+            CHECK_EQ(testImgMap.GetPixelAt(width - 12, height / 2).AsUint(), 0xFFCFCFCF);
+            CHECK_EQ(testImgMap.GetPixelAt(width / 2, height - 4).AsUint(), 0xFF8F8F8F);
 
             CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + width / 2 , topLeftImgCorner.GetY() +          0, true), 0xFF777777);
             CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + 0         , topLeftImgCorner.GetY() + height / 2, true), 0xFF777777);
@@ -311,7 +315,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(emptyMap.DrawRectangle(Rect(0, 0, width, height), col, true) ); //.SetPixel(randomPoint, col));
             CHECK_NOTHROW(canvas.DrawPixelData(topLeftImgCorner, emptyMap));
             CHECK_NOTHROW(canvas.SetPixel(topLeftImgCorner + randomPoint, Color::White));
-            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(texture->Update(canvas, Color::White));
             CHECK_NOTHROW(renderer.Render(*texture));
             CHECK_NOTHROW(renderer.Present());
 
@@ -325,21 +329,22 @@ TEST_CASE("Framebuffer")
     {
         // Arrange
         Point topLeft(0, 0);
-        Point randomPoint(Random::Roll(0, renderer.GetWidth()), Random::Roll(0, renderer.GetHeight()));
+        Point randomPoint(Random::Roll(0, renderer.GetWidth()-1), Random::Roll(0, renderer.GetHeight()-1));
         std::string largeImg = "testImages/largeTestImg.bmp";
         Bitmap largeImgMap(largeImg);
         // Make sure screen is empty
         CHECK_NOTHROW(renderer.Present());
 
         // Act
-        CHECK_NOTHROW(texture->Update(largeImgMap));
+        CHECK_NOTHROW(texture->Update(largeImgMap, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_NOTHROW(renderer.Present());
 
         // Assert
         CHECK(largeImgMap.GetHeight() > renderer.GetHeight());
         CHECK(largeImgMap.GetWidth() > renderer.GetWidth());
-        CHECK(renderer.GetPixel(randomPoint) != 0);
+        CHECK_NE(largeImgMap.GetPixel(randomPoint), 0);
+        CHECK_NE(renderer.GetPixel(randomPoint, true), 0);
 
         SUBCASE("Spill large image into screen")
         {
@@ -348,11 +353,11 @@ TEST_CASE("Framebuffer")
 
             // Act
             CHECK_NOTHROW(canvas.DrawPixelData(topLeft, largeImgMap));
-            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(texture->Update(canvas, Color::White));
             CHECK_NOTHROW(renderer.Render(*texture));
 
             // Assert
-            CHECK_NE(renderer.GetPixel(randomPoint), 0);
+            CHECK_NE(renderer.GetPixel(randomPoint, true), 0);
             CHECK_NOTHROW(renderer.Present());
         }
     }
@@ -367,8 +372,9 @@ TEST_CASE("Framebuffer")
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
+            CHECK_NOTHROW(canvas.Fill(Color::Black));
             CHECK_NOTHROW(canvas.DrawPixelData(topLeftPoint + Point(0, static_cast<GuiUnit_t>(-i)), imgSimple));
-            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(texture->Update(canvas, Color::White));
             CHECK_NOTHROW(renderer.Render(*texture));
             CHECK_NOTHROW(renderer.Present());
         }
@@ -396,8 +402,9 @@ TEST_CASE("Framebuffer")
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
+            CHECK_NOTHROW(canvas.Fill(Color::Black));
             CHECK_NOTHROW(canvas.DrawPixelData(topLeftPoint + Point(0, static_cast<GuiUnit_t>(-i)), imgSimple, imgSimple.GetRect(), mcl[(i / 20) % 5]));
-            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(texture->Update(canvas, Color::White));
             CHECK_NOTHROW(renderer.Render(*texture));
             CHECK_NOTHROW(renderer.Present());
 //            std::this_thread::sleep_for(std::chrono::milliseconds(25));
@@ -414,18 +421,20 @@ TEST_CASE("Framebuffer")
         const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
         Font::RegisterFont(cFontFile);
         Rect r(100, 200, 280, 200);
+        bool scale = true;
 
         Text text("Exo 2", "Hello World");
+        CHECK_NOTHROW(text.SetArea(r).GetFont().SetSize(30));
 
         SUBCASE("Text Attributes") {
             SUBCASE("Constructor") {
                 CHECK_NOTHROW(canvas.DrawRectangle(r, Color::White));
-                CHECK_NOTHROW(text.GetFont().SetSize(30));
-                CHECK_NOTHROW(text.SetArea(r).GetFont().SetColor(Color::Red));
+                CHECK_NOTHROW(text.GetFont().SetColor(Color::Red));
+                scale = false;
             }
             SUBCASE("SetValue") {
                 CHECK_NOTHROW(canvas.DrawRectangle(r, Color::Grey));
-                CHECK_NOTHROW(text.SetScaleToFit().SetValue("Hello\nWorld").SetColor(Color::Green));
+                CHECK_NOTHROW(text.SetValue("Hello\nWorld").SetColor(Color::Green));
             }
             SUBCASE("MOON") {
                 CHECK_NOTHROW(canvas.DrawRectangle(r, Color::Purple));
@@ -444,8 +453,8 @@ TEST_CASE("Framebuffer")
                 CHECK_NOTHROW(text.SetValue("BLUE").SetColor(Color::Blue));
             }
 
-            CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
-            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.SetScaleToFit(scale).Reload()));
+            CHECK_NOTHROW(texture->Update(canvas, Color::White));
             CHECK_NOTHROW(renderer.Render(*texture));
             CHECK_NOTHROW(renderer.Present());
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -455,17 +464,19 @@ TEST_CASE("Framebuffer")
             const Color rainbow[] = { Color::White, Color::Red, Color::Yellow, Color::Green, Color::Aqua, Color::Lime, Color::Blue, Color::Silver };
 
             MESSAGE("FPS Test");
-            CHECK_NOTHROW(text.SetScaleToFit(true).SetLineSpacing(50).SetColor(Color::Black));
+            CHECK_NOTHROW(text.SetScaleToFit(true).SetLineSpacing(50).GetFont().SetColor(Color::White).SetBackgroundColor(Color::Black));
     //        Rect screen(0, 0, 480, 800);
             rsp::utils::StopWatch sw;
-            for (int i = 0 ; i < 1000 ; i++) {
+            for (int i = 0 ; i < 500 ; i++) {
     //            fb.DrawRectangle(screen, rainbow[i & 0x07], true);
+                CHECK_NOTHROW(canvas.Fill(rainbow[i & 0x07]));
+//                CHECK_NOTHROW(text.GetFont().SetBackgroundColor(rainbow[i & 0x07]));
                 int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
                 std::stringstream ss;
                 ss << "FPS:\n" << fps;
-                CHECK_NOTHROW(text.SetValue(ss.str()));
-                CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
-                CHECK_NOTHROW(texture->Update(canvas));
+                CHECK_NOTHROW(text.SetValue(ss.str()).Reload());
+                CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text));
+                CHECK_NOTHROW(texture->Update(canvas, Color::None));
                 CHECK_NOTHROW(renderer.Render(*texture));
                 CHECK_NOTHROW(renderer.Present());
 
@@ -475,7 +486,7 @@ TEST_CASE("Framebuffer")
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        CHECK_NOTHROW(renderer.Present());
+//        CHECK_NOTHROW(renderer.Present());
     }
 
     SUBCASE("Text Alignment")
@@ -489,7 +500,7 @@ TEST_CASE("Framebuffer")
         Text text("Exo 2", "Hello\nWorld");
         CHECK_NOTHROW(text.SetArea(r).GetFont().SetSize(50).SetColor(Color::Yellow));
         CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
-        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(texture->Update(canvas, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -499,10 +510,11 @@ TEST_CASE("Framebuffer")
 
         for (int h = 0 ; h < 3 ; h++) {
             for (int v = 0 ; v < 3 ; v++) {
+                CHECK_NOTHROW(canvas.Fill(Color::Black));
                 CHECK_NOTHROW(canvas.DrawRectangle(r, Color::White));
                 CHECK_NOTHROW(text.SetVAlignment(cVertical[v]).SetHAlignment(cHorizontal[h]));
                 CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
-                CHECK_NOTHROW(texture->Update(canvas));
+                CHECK_NOTHROW(texture->Update(canvas, Color::White));
                 CHECK_NOTHROW(renderer.Render(*texture));
                 CHECK_NOTHROW(renderer.Present());
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -515,33 +527,37 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-Italic-VariableFont_wght.ttf"));
         CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-VariableFont_wght.ttf"));
         Rect r(10, 10, 460, 280);
+        auto r2 = r;
+        r2.AddSize(2, 2).Move(-1, -1);
 
-        CHECK_NOTHROW(canvas.DrawRectangle(r, Color::White));
+        CHECK_NOTHROW(canvas.Fill(Color::Black));
+        CHECK_NOTHROW(canvas.DrawRectangle(r2, Color::White));
         Text text("Exo 2", "Regular");
-        CHECK_NOTHROW(text.SetArea(r).SetScaleToFit(true).GetFont().SetSize(50).SetColor(Color::Yellow));
+        CHECK_NOTHROW(text.SetArea(r).SetScaleToFit(true).GetFont().SetSize(50).SetColor(Color::Yellow).SetBackgroundColor(Color::Black));
+
         CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
-        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(texture->Update(canvas, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         CHECK_NOTHROW(text.SetValue("Bold").GetFont().SetStyle(FontStyles::Bold));
         CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
-        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(texture->Update(canvas, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         CHECK_NOTHROW(text.SetValue("Italic").GetFont().SetStyle(FontStyles::Italic));
         CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
-        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(texture->Update(canvas, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         CHECK_NOTHROW(text.SetValue("Bold Italic").GetFont().SetStyle(FontStyles::BoldItalic));
         CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
-        CHECK_NOTHROW(texture->Update(canvas));
+        CHECK_NOTHROW(texture->Update(canvas, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -555,7 +571,7 @@ TEST_CASE("Framebuffer")
     SUBCASE("Draw Fullscreen") {
         std::string testImage = "testImages/Asset2WithAlpha.bmp";
         Bitmap testImgMap(testImage);
-        CHECK_NOTHROW(texture->Update(testImgMap));
+        CHECK_NOTHROW(texture->Update(testImgMap, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_NOTHROW(renderer.Present());
     }
@@ -569,15 +585,16 @@ TEST_CASE("Framebuffer")
             blue.SetAlpha(static_cast<std::uint8_t>(a));
             green.SetAlpha(static_cast<std::uint8_t>(a));
             red.SetAlpha(static_cast<std::uint8_t>(a));
+            CHECK_NOTHROW(canvas.Fill(Color::Black));
             CHECK_NOTHROW(canvas.DrawRectangle(Rect(135,170, 100, 100), red, true));
             CHECK_NOTHROW(canvas.DrawRectangle(Rect(100,100, 100, 100), blue, true));
             CHECK_NOTHROW(canvas.DrawRectangle(Rect(170,100, 100, 100), green, true));
-            CHECK_NOTHROW(texture->Update(canvas));
+            CHECK_NOTHROW(texture->Update(canvas, Color::White));
             CHECK_NOTHROW(renderer.Render(*texture));
             CHECK_NOTHROW(renderer.Present());
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
-        CHECK(renderer.GetPixel(Point(185, 185), true) == Color(0xFF0B612D));
+        CHECK(renderer.GetPixel(Point(185, 185), true) == 0xFF0B612D);
     }
 
 }

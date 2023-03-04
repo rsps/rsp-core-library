@@ -98,7 +98,7 @@ public:
      * \param arRect
      * \return Reference to this for fluent calls.
      */
-    Text& SetArea(const Rect &arRect) { mArea = arRect; mDirty = true; return *this; }
+    Text& SetArea(const Rect &arRect);
 
     /**
      * Returns a reference to the internal font object.

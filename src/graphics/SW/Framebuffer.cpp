@@ -45,9 +45,10 @@ Framebuffer::Framebuffer(const char *apDevPath)
     // get variable screen info
     ioctl(mFramebufferFile, FBIOGET_FSCREENINFO, &mFixedInfo);
 
+    mRect.SetWidth(static_cast<GuiUnit_t>(mVariableInfo.xres));
+    mRect.SetHeight(static_cast<GuiUnit_t>(mVariableInfo.yres));
 //    mBytesPerPixel = mVariableInfo.bits_per_pixel / 8;
-    mClipRect.SetWidth(static_cast<GuiUnit_t>(mVariableInfo.xres));
-    mClipRect.SetHeight(static_cast<GuiUnit_t>(mVariableInfo.yres));
+    mClipRect = mRect;
 
     // std::clog << "Framebuffer opened. Width=" << mWidth << " Height=" << mHeight << " BytesPerPixel=" << mBytesPerPixel << std::endl;
 
@@ -118,12 +119,14 @@ void Framebuffer::swapBuffer()
     std::uint32_t *tmp = mpFrontBuffer;
     mpFrontBuffer = mpBackBuffer;
     mpBackBuffer = tmp;
+
+    std::memset(mpBackBuffer, 0, mVariableInfo.yres * mFixedInfo.line_length);
 }
 
 
 void Framebuffer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 {
-    if (!IsHit(aX, aY)) {
+    if (!mRect.IsHit(aX, aY)) {
         return;
     }
     std::uint32_t location = ((static_cast<std::uint32_t>(aX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
@@ -138,7 +141,7 @@ void Framebuffer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 
 uint32_t Framebuffer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
 {
-    if (!IsHit(aX, aY)) {
+    if (!mRect.IsHit(aX, aY)) {
         return 0;
     }
     std::uint32_t location = ((static_cast<std::uint32_t>(aX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)

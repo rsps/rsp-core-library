@@ -99,7 +99,7 @@ std::size_t PixelData::GetDataSize() const
 
 Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const
 {
-    if (aX >= GetWidth() || aY >= GetHeight()) {
+    if (!GetRect().IsHit(aX, aY)) {
         THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(GetWidth()) + "," + std::to_string(aY) + "<" + std::to_string(GetHeight()) + ")");
     }
     Color result(aColor);
@@ -124,10 +124,11 @@ Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const
 
         case ColorDepth::RGBA:
             offset = ((aY * GetWidth()) + aX) * 4;
-            result.SetRed(mpData[offset + 0]);
-            result.SetGreen(mpData[offset + 1]);
-            result.SetBlue(mpData[offset + 2]);
-            result.SetAlpha(mpData[offset + 3]);
+            result = *reinterpret_cast<const std::uint32_t*>(mpData + offset);
+//            result.SetRed(mpData[offset + 0]);
+//            result.SetGreen(mpData[offset + 1]);
+//            result.SetBlue(mpData[offset + 2]);
+//            result.SetAlpha(mpData[offset + 3]);
             break;
 
         default:
@@ -140,8 +141,9 @@ Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const
 
 PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
 {
-    if (aX >= GetWidth() || aY >= GetHeight()) {
-        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(GetWidth()) + "," + std::to_string(aY) + "<" + std::to_string(GetHeight()) + ")");
+    if (!GetRect().IsHit(aX, aY)) {
+        return *this;
+//        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(GetWidth()) + "," + std::to_string(aY) + "<" + std::to_string(GetHeight()) + ")");
     }
 
     if (mData.size() == 0) {
@@ -182,10 +184,16 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
 
         case ColorDepth::RGBA:
             offset = ((aY * GetWidth()) + aX) * 4;
-            pdata[offset + 0] = aColor.GetRed();
-            pdata[offset + 1] = aColor.GetGreen();
-            pdata[offset + 2] = aColor.GetBlue();
-            pdata[offset + 3] = aColor.GetAlpha();
+            if (!mBlend || aColor.GetAlpha() == 255) {
+                *reinterpret_cast<std::uint32_t*>(pdata + offset) = aColor.AsUint();
+            }
+            else {
+                *reinterpret_cast<std::uint32_t*>(pdata + offset) = Color::Blend(*reinterpret_cast<std::uint32_t*>(pdata + offset), aColor);
+            }
+//            pdata[offset + 0] = aColor.GetRed();
+//            pdata[offset + 1] = aColor.GetGreen();
+//            pdata[offset + 2] = aColor.GetBlue();
+//            pdata[offset + 3] = aColor.GetAlpha();
             break;
 
         default:
@@ -285,32 +293,61 @@ void PixelData::SaveToCFile(const std::filesystem::path &arFileName)
     header << "extern const rsp::graphics::PixelData c" << fo.Name() << ";" << std::endl;
 }
 
-PixelData PixelData::ChangeColorDepth(ColorDepth aDepth) const
+PixelData PixelData::ChangeColorDepth(ColorDepth aDepth, Color aColor) const
 {
     if (aDepth == mColorDepth) {
         return PixelData(*this);
     }
-    PixelData pd(GetWidth(), GetHeight(), aDepth);
-    for (GuiUnit_t y = 0; y < GetHeight() ; ++y) {
-        for (GuiUnit_t x = 0; x < GetWidth() ; ++x) {
-            Color pixel = GetPixelAt(x, y, Color::Black);
-            pd.SetPixelAt(x, y, pixel);
-        }
+    PixelData result(GetWidth(), GetHeight(), aDepth);
+    result.CopyFrom(Point(0,0), *this, GetRect(), aColor);
+    return result;
+}
+
+PixelData& PixelData::CopyFrom(const Point &arLeftTop, const PixelData &arOther, const Rect &arSection, Color aColor)
+{
+    Rect r = arSection;
+    if (arLeftTop.GetX() < 0 || arLeftTop.GetY() < 0) {
+        r.MoveTo(arLeftTop);
     }
-    return pd;
+    r &= GetRect();
+    auto oy = arLeftTop.GetY();
+    for (int y = r.GetTop(); y < r.GetHeight(); y++) {
+        auto ox = arLeftTop.GetX();
+        for (int x = r.GetLeft(); x < r.GetWidth(); x++) {
+            SetPixelAt(ox, oy, arOther.GetPixelAt(x, y, aColor));
+            ox++;
+        }
+        oy++;
+    }
+    return *this;
 }
 
 void PixelData::Fill(Color aColor)
 {
-    if (mColorDepth != ColorDepth::RGBA) {
-        return;
-    }
     if (mData.size() == 0) {
         return;
     }
-    std::uint32_t *p = reinterpret_cast<std::uint32_t*>(mData.data());
+    switch (mColorDepth) {
+        case ColorDepth::RGBA: {
+            std::uint32_t *p = reinterpret_cast<std::uint32_t*>(mData.data());
+            std::fill_n(p, mData.size() / sizeof(std::uint32_t), aColor.AsUint());
+            break;
+        }
 
-    std::fill_n(p, mData.size() / sizeof(std::uint32_t), aColor.AsUint());
+        case ColorDepth::Alpha:
+            std::fill_n(mData.data(), mData.size(), aColor.GetAlpha());
+            break;
+
+        case ColorDepth::Monochrome:
+        case ColorDepth::RGB:
+        default:
+            for (GuiUnit_t y=0 ; y < GetHeight() ; ++y) {
+                for (GuiUnit_t x = 0 ; x < GetWidth() ; ++x) {
+                    SetPixelAt(x, y, aColor);
+                }
+            }
+            break;
+    }
 }
 
 } /* namespace rsp::graphics */

@@ -26,7 +26,9 @@ namespace rsp::graphics
 class Canvas : public PixelData
 {
 public:
-    using PixelData::PixelData;
+    Canvas() noexcept : PixelData() {}
+    Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth = PixelData::ColorDepth::RGBA);
+    Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData);
 
     /**
      * \brief Draw a a full or partial eclipse
@@ -87,8 +89,17 @@ public:
      * \brief Get a reference to the clipping rect for this canvas
      * \return Reference to Rect
      */
-    Rect& GetClipRect() { return mClipRect; }
     const Rect& GetClipRect() const { return mClipRect; }
+
+    /**
+     * \brief Set the clipping rect for this canvas
+     *
+     * If the clipping rect is larger than the size of the canvas, it will be trimmed to this size
+     *
+     * \param arClipRect New clipping rect
+     * \return self
+     */
+    Canvas& SetClipRect(const Rect &arClipRect);
 
 protected:
     Rect mClipRect{};

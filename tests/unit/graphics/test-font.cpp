@@ -18,7 +18,7 @@ using namespace rsp::graphics;
 
 TEST_SUITE_BEGIN("Graphics");
 
-TEST_CASE("Font Primitive")
+TEST_CASE("Font")
 {
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);

@@ -26,8 +26,21 @@ Text::Text(const std::string &arFontName, const std::string &arText)
     SetValue(arText);
 }
 
+Text& Text::SetArea(const Rect &arRect)
+{
+    if (mArea != arRect) {
+        mArea = arRect;
+        mDirty = true;
+        Init(mArea.GetWidth(), mArea.GetHeight(), PixelData::ColorDepth::RGBA, nullptr);
+    }
+    return *this;
+}
+
 Text& Text::Reload()
 {
+    if (!mDirty) {
+        return *this;
+    }
     mLineCount = 1;
     mLineMaxChar = 1; // Avoid division by zero
     int count = 0;
@@ -46,6 +59,7 @@ Text& Text::Reload()
 
     loadGlyphs();
     drawText();
+    mDirty = false;
     return *this;
 }
 
@@ -131,7 +145,6 @@ void Text::loadGlyphs()
         mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
         calcBoundingRect(mpGlyphs);
     }
-    mDirty = false;
 }
 
 void Text::alignGlyphs()
@@ -177,28 +190,27 @@ void Text::alignGlyphs()
 
 void Text::drawText()
 {
-    Init(mBoundingRect.GetWidth(), mBoundingRect.GetHeight(), PixelData::ColorDepth::RGBA, nullptr);
     Fill(mFont.GetBackgroundColor());
     auto &glyphs = GetGlyphs();
     if (!glyphs) {
+        std::cout << "No glyphs to paint!!" << std::endl;
         return;
     }
     auto color = mFont.GetColor();
-    Point tl = GetArea().GetTopLeft();
     for (unsigned i=0; i < glyphs->GetCount() ; ++i) {
         Glyph &glyph = glyphs->GetGlyph(i);
-        auto py = glyph.mTop + tl.GetY();
+        auto py = glyph.mTop;
         for (int y = 0; y < glyph.mHeight; y++) {
             const uint8_t* p_row = glyph.GetPixelRow(y);
-            auto px = glyph.mLeft + tl.GetX();
+            auto px = glyph.mLeft;
             for (int x = 0; x < glyph.mWidth; x++) {
                 auto c = *p_row++;
                 if (!c) {
                     px++;
                     continue;
                 }
-//                auto p = Point(x + glyph.mLeft + tl.mX, y + glyph.mTop + tl.mY);
-                if (GetArea().IsHit(px, py)) {
+
+                if (mRect.IsHit(px, py)) {
                     color.SetAlpha(c);
                     SetPixelAt(px, py, color);
                 }

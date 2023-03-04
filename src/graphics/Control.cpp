@@ -156,8 +156,9 @@ bool Control::UpdateData()
     refresh();
     if (mDirty) {
         Canvas canvas(mArea.GetWidth(), mArea.GetHeight());
-        paint(canvas, mStyles.at(mState));
-        mTextures.at(mState)->Update(canvas.GetPixelData());
+        auto &style = mStyles.at(mState);
+        paint(canvas, style);
+        mTextures.at(mState)->Update(canvas.GetPixelData(), style.mForegroundColor);
 //        for (auto &tuple : mStyles) {
 //            canvas.Fill(Color::None);
 //            paint(canvas, tuple.second);

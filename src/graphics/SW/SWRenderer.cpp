@@ -67,7 +67,7 @@ std::unique_ptr<Texture> SWRenderer::CreateStaticTexture(const PixelData &arPixe
 {
     auto t = std::make_unique<SWTexture>(arPixelData.GetWidth(), arPixelData.GetHeight(), GetColorDepth());
 
-    t->Update(arPixelData);
+    t->Update(arPixelData, Color::Black);
 
     return t;
 }
@@ -83,10 +83,10 @@ Renderer& SWRenderer::Render(const Texture &arTexture, const Rect * const apDest
     GuiUnit_t w_end = std::min(pd.GetWidth(), dst.GetWidth());
     GuiUnit_t dy = dst.GetTop();
 
-    for (GuiUnit_t y = 0; y < pd.GetHeight(); ++y) {
+    for (GuiUnit_t y = 0; y < h_end; ++y) {
         GuiUnit_t dx = dst.GetLeft();
-        for (GuiUnit_t x = 0; x < pd.GetWidth(); ++x) {
-            SetPixel(dx, dy, pd.GetPixelAt(x, y, Color::None));
+        for (GuiUnit_t x = 0; x < w_end; ++x) {
+            SetPixel(dx++, dy, pd.GetPixelAt(x, y, Color::None));
         }
         ++dy;
     }

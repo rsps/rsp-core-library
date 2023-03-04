@@ -27,9 +27,10 @@ public:
     /**
      * \brief Update this texture with content from the given pixel data
      * \param arPixelData
+     * \param aColor Color to use if pixel data is monochrome or alpha
      * \return self
      */
-    virtual void Update(const PixelData &arPixelData) = 0;
+    virtual void Update(const PixelData &arPixelData, Color aColor) = 0;
 
     /**
      * \brief Fill this texture with the given color

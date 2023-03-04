@@ -46,7 +46,7 @@ public:
     uint32_t GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront = false) const;
     uint32_t GetPixel(const Point &arP, bool aFront = false) { return GetPixel(arP.GetX(), arP.GetY(), aFront); }
 
-    inline bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const { return Rect(0, 0, GuiUnit_t(mVariableInfo.xres), GuiUnit_t(mVariableInfo.yres)).IsHit(aX, aY); }
+    bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const { return mRect.IsHit(aX, aY); }
 
 protected:
     int mFramebufferFile;
@@ -56,6 +56,7 @@ protected:
     uint32_t *mpFrontBuffer = nullptr;
     uint32_t *mpBackBuffer = nullptr;
     Rect mClipRect{};
+    Rect mRect{};
 
     void swapBuffer();
 };

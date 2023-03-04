@@ -45,8 +45,9 @@ public:
     PixelData& operator=(const PixelData&& arOther);
 
     PixelData& Assign(const PixelData& arOther);
+    PixelData& CopyFrom(const Point &arLeftTop, const PixelData &arOther, const Rect &arSection, Color aColor);
 
-    PixelData ChangeColorDepth(ColorDepth aDepth) const;
+    PixelData ChangeColorDepth(ColorDepth aDepth, Color aColor = Color::Black) const;
 
     PixelData& Init(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData);
 
@@ -79,8 +80,8 @@ public:
      * \param aColor
      * \return Color
      */
-    Color GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor = Color::None) const;
-    Color GetPixel(const Point &arPoint, Color aColor = Color::None) const { return GetPixelAt(arPoint.mX, arPoint.mY, aColor); }
+    Color GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor = Color::Black) const;
+    Color GetPixel(const Point &arPoint, Color aColor = Color::Black) const { return GetPixelAt(arPoint.mX, arPoint.mY, aColor); }
 
     PixelData& SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor);
     PixelData& SetPixel(const Point &arPoint, Color aColor) { return SetPixelAt(arPoint.mX, arPoint.mY, aColor); }
@@ -92,6 +93,7 @@ protected:
     Rect mRect{};
     const std::uint8_t *mpData = nullptr;
     std::vector<std::uint8_t> mData{};
+    bool mBlend = true;
 
     friend class ImgLoader;
     void initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth);

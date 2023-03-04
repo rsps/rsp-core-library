@@ -13,6 +13,18 @@
 namespace rsp::graphics
 {
 
+Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
+    : PixelData(aWidth, aHeight, aDepth),
+      mClipRect(mRect)
+{
+}
+
+Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData)
+    : PixelData(aWidth, aHeight, aDepth, aData),
+      mClipRect(mRect)
+{
+}
+
 void Canvas::DrawArc(const Point &arCenter, GuiUnit_t aRadius1, GuiUnit_t aRadius2,
     int aStartAngel, int aSweepAngle, const Color &arColor)
 {
@@ -21,6 +33,7 @@ void Canvas::DrawArc(const Point &arCenter, GuiUnit_t aRadius1, GuiUnit_t aRadiu
 
 void Canvas::DrawCircle(const Point &arCenter, GuiUnit_t aRadius, const Color &arColor)
 {
+    mBlend = true;
     int error = -static_cast<int>(aRadius);
     GuiUnit_t y = 0;
 
@@ -36,13 +49,15 @@ void Canvas::DrawCircle(const Point &arCenter, GuiUnit_t aRadius, const Color &a
             error += -static_cast<int>(aRadius);
         }
     }
+    mBlend = false;
 }
 
 void Canvas::DrawRectangle(const Rect &arRect, const Color &arColor, bool aFilled)
 {
+    mBlend = true;
     Rect r = arRect & mClipRect;
-    GuiUnit_t h_end = r.mLeftTop.mY + r.mHeight;
-    GuiUnit_t w_end = r.mLeftTop.mX + r.mWidth;
+    GuiUnit_t h_end = r.GetTop() + r.GetHeight();
+    GuiUnit_t w_end = r.GetLeft() + r.GetWidth();
     if (aFilled) {
         for (GuiUnit_t y = r.mLeftTop.mY; y < h_end; y++) {
             for (GuiUnit_t x = r.mLeftTop.mX; x < w_end; x++) {
@@ -61,10 +76,12 @@ void Canvas::DrawRectangle(const Rect &arRect, const Color &arColor, bool aFille
             SetPixelAt(rb.mX-1, y, arColor); // right
         }
     }
+    mBlend = false;
 }
 
 void Canvas::DrawLine(const Point &arA, const Point &arB, const Color &arColor)
 {
+    mBlend = true;
     int deltaX = static_cast<int>(arB.mX - arA.mX);
     int deltaY = static_cast<int>(arB.mY - arA.mY);
     int absDeltaX = abs(deltaX);
@@ -99,19 +116,20 @@ void Canvas::DrawLine(const Point &arA, const Point &arB, const Color &arColor)
             SetPixelAt(px, py, arColor);
         }
     }
+    mBlend = false;
 }
 
 void Canvas::DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData, const Rect &arSection, Color aColor)
 {
-    auto oy = arLeftTop.GetY();
-    for (int y = arSection.GetTop(); y < arSection.GetHeight(); y++) {
-        auto ox = arLeftTop.GetX();
-        for (int x = arSection.GetLeft(); x < arSection.GetWidth(); x++) {
-            SetPixelAt(ox, oy, arPixelData.GetPixelAt(x, y, aColor));
-            ox++;
-        }
-        oy++;
-    }
+    mBlend = true;
+    CopyFrom(arLeftTop, arPixelData, arSection, aColor);
+    mBlend = false;
+}
+
+Canvas& Canvas::SetClipRect(const Rect &arClipRect)
+{
+    mClipRect = GetRect() & arClipRect;
+    return *this;
 }
 
 void Canvas::plot4Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
