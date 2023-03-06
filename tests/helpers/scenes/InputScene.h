@@ -64,12 +64,12 @@ public:
     {
         SetTransparent(true); // No need to paint background color, we have full screen image.
 
-        GetStyle(Control::States::normal).mBackground.SetPixelData(mBackground);
+        GetStyle(Control::States::Normal).mBackground.SetPixelData(mBackground);
 
         mLabel.GetText().GetFont().SetSize(34);
         mLabel.SetArea(Rect(80, 150, 320, 160));
-        mLabel.GetStyle(States::normal).mForegroundColor = Color::Black;
-        mLabel.GetStyle(States::normal).mBackgroundColor = Color::White;
+        mLabel.GetStyle(States::Normal).mForegroundColor = Color::Black;
+        mLabel.GetStyle(States::Normal).mBackgroundColor = Color::White;
 
         mKeyboard.SetArea(Rect(KB_X, KB_Y, 460, 350));
         mKeyboard.GetInfo().mName = "Keyboard";

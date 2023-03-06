@@ -11,8 +11,10 @@
 #ifndef INCLUDE_GRAPHICS_STYLE_H_
 #define INCLUDE_GRAPHICS_STYLE_H_
 
+#include <memory>
 #include <graphics/BitmapView.h>
 #include <graphics/Color.h>
+#include <graphics/Texture.h>
 
 namespace rsp::graphics {
 
@@ -29,6 +31,7 @@ public:
     Color mBackgroundColor = Color::None;
     BitmapView mBackground{};
     BitmapView mForeground{};
+    std::unique_ptr<Texture> mpTexture{};
 };
 
 

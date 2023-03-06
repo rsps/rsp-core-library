@@ -27,7 +27,7 @@ TEST_CASE("Exceptions") {
 
     SUBCASE("Backtrace") {
         BackTrace bt = MyFunc();
-        MESSAGE("Backtrace: " << bt);
+        MESSAGE("Backtrace:\n" << bt);
     }
 
     SUBCASE("Test backtraced exceptions") {
@@ -71,20 +71,20 @@ TEST_CASE("Exceptions") {
         };
 
         MESSAGE(result1.str());
-        CHECK(StrUtils::EndsWith(result1.str(), "This is an example!\n") == true);
-        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:34") == true);
+        CHECK(StrUtils::Contains(result1.str(), "This is an example!\n") == true);
+        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:45") == true);
 
         MESSAGE(result2.str());
-        CHECK(StrUtils::EndsWith(result2.str(), "This is an example!\n") == true);
-        CHECK(StrUtils::Contains(result2.str(), "test-exceptions.cpp:43") == true);
+        CHECK(StrUtils::Contains(result2.str(), "This is an example!\n") == true);
+        CHECK(StrUtils::Contains(result2.str(), "test-exceptions.cpp:54") == true);
 
         MESSAGE(result3.str());
-        CHECK(StrUtils::EndsWith(result3.str(), "This is an example!\n") == true);
-        CHECK(StrUtils::Contains(result3.str(), "test-exceptions.cpp:49") == true);
+        CHECK(StrUtils::Contains(result3.str(), "This is an example!\n") == true);
+        CHECK(StrUtils::Contains(result3.str(), "test-exceptions.cpp:60") == true);
 
         MESSAGE(result4.str());
-        CHECK(StrUtils::EndsWith(result4.str(), "This is an example!\n") == true);
-        CHECK(StrUtils::Contains(result4.str(), "test-exceptions.cpp:55") == true);
+        CHECK(StrUtils::Contains(result4.str(), "This is an example!\n") == true);
+        CHECK(StrUtils::Contains(result4.str(), "test-exceptions.cpp:66") == true);
     }
 
 
@@ -99,8 +99,8 @@ TEST_CASE("Exceptions") {
         }
 
         MESSAGE(result1.str());
-        CHECK(StrUtils::EndsWith(result1.str(), "File IO error: Input/output error\n") == true);
-        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:84") == true);
+        CHECK(StrUtils::Contains(result1.str(), "File IO error: Input/output error\n") == true);
+        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:95") == true);
     }
 
     SUBCASE("Assertions") {
@@ -113,8 +113,8 @@ TEST_CASE("Exceptions") {
         }
 
         MESSAGE(result1.str());
-        CHECK(StrUtils::EndsWith(result1.str(), "true == false\n") == true);
-        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:98") == true);
+        CHECK(StrUtils::Contains(result1.str(), "true == false\n") == true);
+        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:109") == true);
 
         CHECK_NOTHROW(ASSERT(true));
     }

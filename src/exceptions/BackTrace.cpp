@@ -53,7 +53,7 @@ BackTrace::BackTrace(size_t aEntriesToDiscard)
         return;
     }
 
-    for (int j = 0; j < stack_depth; j++) {
+    for (int j = aEntriesToDiscard; j < stack_depth; j++) {
         const char* symbol_name = strings[j];
         std::string s(symbol_name);
 

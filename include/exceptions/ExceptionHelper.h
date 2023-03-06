@@ -18,6 +18,7 @@
 #include <iostream>
 #include <sstream>
 #include <type_traits>
+#include <exceptions/TracedException.h>
 
 namespace rsp::exceptions {
 
@@ -68,7 +69,7 @@ public:
 #define RETHROW_WITH_BACKTRACE(aMsg, aOriginalException) THROW_WITH_BACKTRACE1(std::decay< decltype(aOriginalException) >::type, (std::string(aMsg) + " <- " + aOriginalException.what()).c_str())
 
 
-#define THROW_SYSTEM(aMsg) THROW_WITH_BACKTRACE3(std::system_error, errno, std::generic_category(), aMsg)
+#define THROW_SYSTEM(aMsg) THROW_WITH_BACKTRACE3(rsp::exceptions::SystemError, errno, std::generic_category(), aMsg)
 
 #define THROW_RUNTIME(aMsg) THROW_WITH_BACKTRACE1(std::runtime_error, aMsg)
 #define RETHROW_RUNTIME(aMsg, aOriginalException) THROW_WITH_BACKTRACE1(std::runtime_error, std::string(aMsg) + " <- " + aOriginalException.what())

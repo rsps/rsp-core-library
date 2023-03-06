@@ -52,16 +52,16 @@ public:
         //  Set member variables values
         mTopBtn.SetArea(GetTopRect());
         mTopBtn.SetTouchArea(GetTopRect());
-        mTopBtn.GetStyle(Control::States::normal).mBackground.SetPixelData(mNormal);
-        mTopBtn.GetStyle(Control::States::pressed).mBackground.SetPixelData(mPressed);
+        mTopBtn.GetStyle(Control::States::Normal).mBackground.SetPixelData(mNormal);
+        mTopBtn.GetStyle(Control::States::Pressed).mBackground.SetPixelData(mPressed);
         mTopBtn.SetDraggable(true);
         mTopBtn.GetInfo().mName = "TopBtn";
 
         mBotBtn.SetArea(GetBotRect());
         mBotBtn.SetTouchArea(GetBotRect());
-        mBotBtn.GetStyle(Control::States::normal).mBackground.SetPixelData(mNormal);
-        mBotBtn.GetStyle(Control::States::pressed).mBackground.SetPixelData(mPressed);
-        mBotBtn.GetStyle(Control::States::dragged).mBackground.SetPixelData(mPressed);
+        mBotBtn.GetStyle(Control::States::Normal).mBackground.SetPixelData(mNormal);
+        mBotBtn.GetStyle(Control::States::Pressed).mBackground.SetPixelData(mPressed);
+        mBotBtn.GetStyle(Control::States::Dragged).mBackground.SetPixelData(mPressed);
         mBotBtn.SetDraggable(true);
         mBotBtn.GetInfo().mName = "BotBtn";
 

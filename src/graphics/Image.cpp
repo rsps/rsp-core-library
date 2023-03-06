@@ -12,24 +12,21 @@
 #include <string>
 #include <graphics/Image.h>
 #include <graphics/Rect.h>
-#include <exceptions/CoreException.h>
-
-using namespace rsp::utils;
 
 namespace rsp::graphics
 {
 
 void Image::ClearSection()
 {
-    for (auto &tuple : mStyles) {
-        tuple.second.mBackground.ClearSection();
+    for (auto &style : mStyles) {
+        style.mBackground.ClearSection();
     }
 }
 
 void Image::SetSection(const Rect &arSection)
 {
-    for (auto &tuple : mStyles) {
-        tuple.second.mBackground.SetSection(arSection);
+    for (auto &style : mStyles) {
+        style.mBackground.SetSection(arSection);
     }
 }
 

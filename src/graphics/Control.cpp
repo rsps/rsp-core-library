@@ -143,8 +143,8 @@ Control& Control::AddChild(Control *apChild)
 
 Control& Control::SetBitmapPosition(const Point &arPoint)
 {
-    for (auto &tuple : mStyles) {
-        tuple.second.mBackground.SetDestination(arPoint);
+    for (auto &style : mStyles) {
+        style.mBackground.SetDestination(arPoint);
     }
     Invalidate();
     return *this;
@@ -156,14 +156,11 @@ bool Control::UpdateData()
     refresh();
     if (mDirty) {
         Canvas canvas(mArea.GetWidth(), mArea.GetHeight());
-        auto &style = mStyles.at(mState);
+        auto &style = mStyles[mState];
         paint(canvas, style);
-        mTextures.at(mState)->Update(canvas.GetPixelData(), style.mForegroundColor);
-//        for (auto &tuple : mStyles) {
-//            canvas.Fill(Color::None);
-//            paint(canvas, tuple.second);
-//            mTextures[tuple.first]->Update(canvas.GetPixelData());
-//        }
+        if (style.mpTexture) {
+            style.mpTexture->Update(canvas.GetPixelData(), style.mForegroundColor);
+        }
         mDirty = false;
         result = true;
     }
@@ -177,9 +174,8 @@ bool Control::UpdateData()
 
 void Control::MakeTextures(Renderer &arRenderer)
 {
-    mTextures.clear();
-    for (auto &tuple : mStyles) {
-        mTextures.emplace(tuple.first, arRenderer.CreateTexture(mArea.GetWidth(), mArea.GetHeight()));
+    for (Style &style : mStyles) {
+        style.mpTexture = arRenderer.CreateTexture(mArea.GetWidth(), mArea.GetHeight());
     }
 }
 
@@ -191,8 +187,8 @@ void Control::Render(Renderer &arRenderer)
         return;
     }
 
-    if (mTextures.find(mState) != mTextures.end()) {
-        arRenderer.Render(*mTextures[mState], &mArea);
+    if (mStyles[mState].mpTexture) {
+        arRenderer.Render(*mStyles[mState].mpTexture, &mArea);
     }
 
     for (Control* child : mChildren) {
@@ -261,7 +257,7 @@ bool Control::ProcessInput(GfxEvent &arInput)
     if (!IsVisible()) {
         return false;
     }
-    if ((GetState() == Control::States::disabled) && mTouchArea.IsHit(arInput.mCurrent)) {
+    if ((GetState() == Control::States::Disabled) && mTouchArea.IsHit(arInput.mCurrent)) {
         return true;
     }
 
@@ -276,11 +272,11 @@ bool Control::ProcessInput(GfxEvent &arInput)
             }
             if (mTouchArea.IsHit(arInput.mCurrent)) {
                 doPress(arInput.mCurrent);
-                if (GetState() == Control::States::checked) {
-                    SetState(Control::States::checkedPressed);
+                if (GetState() == Control::States::Checked) {
+                    SetState(Control::States::CheckedPressed);
                 }
                 else {
-                    SetState(Control::States::pressed);
+                    SetState(Control::States::Pressed);
                 }
                 return true;
             }
@@ -300,20 +296,20 @@ bool Control::ProcessInput(GfxEvent &arInput)
                     Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput;
                     if (IsCheckable()) {
                         if (IsChecked()) {
-                            mState = States::normal;
+                            mState = States::Normal;
                         }
                         else {
-                            mState = States::checked;
+                            mState = States::Checked;
                         }
                         Invalidate();
                     }
                     else {
-                        SetState(Control::States::normal);
+                        SetState(Control::States::Normal);
                     }
                     doClick(arInput.mCurrent);
                 }
                 else {
-                    SetState(Control::States::normal);
+                    SetState(Control::States::Normal);
                 }
                 return true;
             }
@@ -330,7 +326,7 @@ bool Control::ProcessInput(GfxEvent &arInput)
             if (mTouchArea.IsHit(arInput.mPress)) {
                 if (IsDraggable()) {
                     doMove(arInput.mCurrent);
-                    SetState(Control::States::dragged);
+                    SetState(Control::States::Dragged);
                 }
                 return true;
             }

@@ -24,13 +24,13 @@ public:
     {
         Rect topRect(100, 400, 200, 100);
         mTopBtnImg.SetArea(topRect);
-        mTopBtnImg.GetStyle(Control::States::normal).mBackground.SetPixelData(mNormal);
-        mTopBtnImg.GetStyle(Control::States::pressed).mBackground.SetPixelData(mPressed);
+        mTopBtnImg.GetStyle(Control::States::Normal).mBackground.SetPixelData(mNormal);
+        mTopBtnImg.GetStyle(Control::States::Pressed).mBackground.SetPixelData(mPressed);
 
         Rect botRect(100, 600, 200, 100);
         mBotBtnImg.SetArea(botRect);
-        mBotBtnImg.GetStyle(Control::States::normal).mBackground.SetPixelData(mNormal);
-        mBotBtnImg.GetStyle(Control::States::pressed).mBackground.SetPixelData(mPressed);
+        mBotBtnImg.GetStyle(Control::States::Normal).mBackground.SetPixelData(mNormal);
+        mBotBtnImg.GetStyle(Control::States::Pressed).mBackground.SetPixelData(mPressed);
 
         // Add them to the lists?
         AddChild(&mTopBtnImg);

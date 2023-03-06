@@ -88,15 +88,15 @@ TEST_CASE("Control States")
     SUBCASE("Default State")
     {
         // Act & Assert
-        CHECK(myControl.GetState() == Control::States::normal);
+        CHECK(myControl.GetState() == Control::States::Normal);
     }
     SUBCASE("Change State")
     {
         // Act
-        myControl.SetState(Control::States::pressed);
+        myControl.SetState(Control::States::Pressed);
 
         // Assert
-        CHECK(myControl.GetState() == Control::States::pressed);
+        CHECK(myControl.GetState() == Control::States::Pressed);
         CHECK(myControl.IsInvalid());
         myControl.MakeValid();
 
@@ -107,7 +107,7 @@ TEST_CASE("Control States")
             myControl.AddChild(&childControl);
 
             // Act
-            myControl.SetState(Control::States::normal);
+            myControl.SetState(Control::States::Normal);
 
             // Assert
             CHECK(childControl.IsInvalid());

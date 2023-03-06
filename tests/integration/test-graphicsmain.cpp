@@ -36,8 +36,8 @@ public:
         SetTransparent(false);
         mText.GetFont().SetSize(12); //.SetBackgroundColor(Color::Black);
         SetArea(Rect(0, 0, 150, 15));
-        GetStyle(States::normal).mForegroundColor = Color::Yellow;
-        GetStyle(States::normal).mBackgroundColor = Color::Black;
+        GetStyle(States::Normal).mForegroundColor = Color::Yellow;
+        GetStyle(States::Normal).mBackgroundColor = Color::Black;
         SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
     }
 

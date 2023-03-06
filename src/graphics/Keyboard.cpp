@@ -51,12 +51,11 @@ Key& Key::Setup(Rect aTouchArea, Rect aArea, int aSymbol)
 
 Key& Key::SetStyle(Control::States aState, BitmapView &arForeground, BitmapView &arBackground, Color aFrontColor, Color aBackColor)
 {
-    Style style;
+    Style& style = GetStyle(aState);
     style.mForeground = arForeground.SetPixelColor(aFrontColor);
     style.mForegroundColor = aFrontColor;
     style.mBackground = arBackground.SetPixelColor(aBackColor);
     style.mBackgroundColor = aBackColor;
-    GetStyle(aState) = style;
     return *this;
 }
 
@@ -133,39 +132,39 @@ Keyboard::Keyboard()
     BitmapView empty;
 
     mBtnShift.Setup(Rect(0, 152, 80, 71), small_special.GetBoundingRect({18, 167}), cKEY_SHIFT)
-        .SetStyle(Control::States::normal, lowercase.SetDestination({11, 7}), small_special, Color(0x494A63), Color::White)
-        .SetStyle(Control::States::pressed, lowercase, small_special, Color::White, Color(0x494A63))
-        .SetStyle(Control::States::checked, uppercase.SetDestination({11, 3}), small_special, Color(0x494A63), Color::White)
-        .SetStyle(Control::States::checkedPressed, uppercase, small_special, Color::White, Color(0x494A63))
+        .SetStyle(Control::States::Normal, lowercase.SetDestination({11, 7}), small_special, Color(0x494A63), Color::White)
+        .SetStyle(Control::States::Pressed, lowercase, small_special, Color::White, Color(0x494A63))
+        .SetStyle(Control::States::Checked, uppercase.SetDestination({11, 3}), small_special, Color(0x494A63), Color::White)
+        .SetStyle(Control::States::CheckedPressed, uppercase, small_special, Color::White, Color(0x494A63))
         .SetCheckable(true)
         .SetName("Shift");
 
     mBtnLetters.Setup(cSpecialLeft, big_special.GetBoundingRect({18, 236}), cKEY_LETTERS)
-        .SetStyle(Control::States::normal, empty, big_special, Color::Black, Color::White)
-        .SetStyle(Control::States::pressed, empty, big_special, Color::White, Color(0x494A63))
+        .SetStyle(Control::States::Normal, empty, big_special, Color::Black, Color::White)
+        .SetStyle(Control::States::Pressed, empty, big_special, Color::White, Color(0x494A63))
         .SetName("Letters");
     mBtnLetters.SetCaption("ABC").SetFontSize(22);
 
     mBtnNumbers.Setup(cSpecialLeft, big_special.GetBoundingRect({18, 236}), cKEY_NUMBERS)
-        .SetStyle(Control::States::normal, empty, big_special, Color::Black, Color::White)
-        .SetStyle(Control::States::pressed, empty, big_special, Color::White, Color(0x494A63))
+        .SetStyle(Control::States::Normal, empty, big_special, Color::Black, Color::White)
+        .SetStyle(Control::States::Pressed, empty, big_special, Color::White, Color(0x494A63))
         .SetName("Numbers");
     mBtnNumbers.SetCaption("123").SetFontSize(22);
 
     mBtnSpecials.Setup(cSpecialRight, big_special.GetBoundingRect({366, 236}), cKEY_SPECIALS)
-        .SetStyle(Control::States::normal, empty, big_special, Color::Black, Color::White)
-        .SetStyle(Control::States::pressed, empty, big_special, Color::White, Color(0x494A63))
+        .SetStyle(Control::States::Normal, empty, big_special, Color::Black, Color::White)
+        .SetStyle(Control::States::Pressed, empty, big_special, Color::White, Color(0x494A63))
         .SetName("Special");
     mBtnSpecials.SetCaption("+-/").SetFontSize(22);
 
     mBtnErase.Setup(Rect(374, 152, 80, 71), small_special.GetBoundingRect({390, 167}), '\b')
-        .SetStyle(Control::States::normal, erase.SetDestination({9, 9}), small_special, Color(0x494A63), Color::White)
-        .SetStyle(Control::States::pressed, erase, small_special, Color::White, Color(0x494A63))
+        .SetStyle(Control::States::Normal, erase.SetDestination({9, 9}), small_special, Color(0x494A63), Color::White)
+        .SetStyle(Control::States::Pressed, erase, small_special, Color::White, Color(0x494A63))
         .SetName("Erase");
 
     mBtnSpace.Setup(Rect(98, 224, 258, 64), space.GetBoundingRect({106, 236}), ' ')
-        .SetStyle(Control::States::normal, empty, space, Color(), Color::White)
-        .SetStyle(Control::States::pressed, empty, space, Color(), Color(0x494A63))
+        .SetStyle(Control::States::Normal, empty, space, Color(), Color::White)
+        .SetStyle(Control::States::Pressed, empty, space, Color(), Color(0x494A63))
         .SetName("Space");
 
     addBtn(mBtnShift);
@@ -178,8 +177,8 @@ Keyboard::Keyboard()
     int index = 0;
     for(Key& arBtn : mKeys) {
         arBtn.Setup(cKeyTouchAreas[index], key.GetBoundingRect(cKeyPositions[index]))
-            .SetStyle(Control::States::normal, empty, empty, Color::White, Color::None)
-            .SetStyle(Control::States::pressed, empty, key, Color::None, Color(0x494A63));
+            .SetStyle(Control::States::Normal, empty, empty, Color::White, Color::None)
+            .SetStyle(Control::States::Pressed, empty, key, Color::None, Color(0x494A63));
         addBtn(arBtn);
         index++;
     }

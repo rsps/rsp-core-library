@@ -33,7 +33,7 @@ TEST_CASE("Image Test")
     Random::Seed(1234);
 
     Image testImage;
-    testImage.GetStyle(Control::States::normal).mBackground.SetPixelData(normal);
+    testImage.GetStyle(Control::States::Normal).mBackground.SetPixelData(normal);
     testImage.SetArea(testRect);
 
     SUBCASE("Render Image if Invalid")

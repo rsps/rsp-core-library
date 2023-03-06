@@ -43,15 +43,16 @@ public:
 
     /**
      * \brief Enum type defining the available states
+     * Not class scoped on purpose, they are used as array indexes
      */
-    enum class States {
-        NONE,
-        disabled,
-        normal,
-        pressed,
-        dragged,
-        checked,
-        checkedPressed
+    enum States {
+        Disabled,
+        Normal,
+        Pressed,
+        Dragged,
+        Checked,
+        CheckedPressed,
+        __COUNT__
     };
 
     Control(const rsp::utils::TypeInfo &arTypeInfo) : mTypeInfo(arTypeInfo) {}
@@ -119,7 +120,7 @@ public:
 
     virtual Control& SetCheckable(bool aValue);
     virtual bool IsCheckable() { return mCheckable; }
-    virtual bool IsChecked() { return (mState == States::checked) || (mState == States::checkedPressed); }
+    virtual bool IsChecked() { return (mState == States::Checked) || (mState == States::CheckedPressed); }
 
     virtual bool IsVisible() {return mVisible; }
     virtual Control& Show(bool aVisible = true);
@@ -268,8 +269,7 @@ public:
 protected:
     Rect mArea{}; // Area of Control in screen coordinates
     Rect mTouchArea{}; // Touch area of Control in screen coordinates
-    std::map<States, Style> mStyles{};
-    std::map<States, std::unique_ptr<Texture>> mTextures{};
+    Style mStyles[States::__COUNT__];
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};
     bool mTransparent = false;
@@ -277,7 +277,7 @@ protected:
     bool mDraggable = false;
     bool mVisible = true;
     bool mCheckable = false;
-    States mState = States::normal;
+    States mState = States::Normal;
     rsp::utils::TypeInfo mTypeInfo;
     static bool mMustRender;
 
