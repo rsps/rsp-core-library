@@ -18,6 +18,7 @@
 #include <ostream>
 #include <sstream>
 #include <exceptions/BackTrace.h>
+#include <filesystem>
 
 #define MAX_DEPTH 32
 
@@ -26,7 +27,7 @@ namespace rsp::exceptions {
 
 std::ostream& operator <<(std::ostream &o, const StackEntry &arEntry)
 {
-    o << arEntry.mFileName << "(" << arEntry.mLineNumber << ") " << arEntry.mFunction;
+    o << arEntry.mFileName << "  " << arEntry.mFunction << " (" << arEntry.mLineNumber << ")";
     return o;
 }
 
@@ -56,21 +57,25 @@ BackTrace::BackTrace(size_t aEntriesToDiscard)
         const char* symbol_name = strings[j];
         std::string s(symbol_name);
 
-        std::string function("N/A");
-        std::string file("N/A");
-        std::string line("N/A");
+        std::string file;
+        std::string function;
+        std::string offset;
 
         size_t start = s.find_first_of('(', 0);
         if (start != s.npos) {
             file = s.substr(0, start);
+            file = std::filesystem::path(file).stem();
+
             size_t end = s.find_first_of("+)", start);
             std::string mangled = s.substr(start+1, end-1-start);
             function = demangle(mangled);
-            line = s.substr(end, s.length());
+            offset = s.substr(end, s.length());
         }
 
-        mStackEntries.emplace_back(file, function, line);
+        mStackEntries.emplace_back(file, function, offset);
     }
+
+    free(strings);
 }
 
 std::string BackTrace::demangle(const std::string &arMangled) const
