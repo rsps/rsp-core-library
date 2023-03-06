@@ -9,8 +9,8 @@
  */
 
 #include <doctest.h>
+#include <exceptions/CoreException.h>
 #include <utils/StrUtils.h>
-#include <utils/CoreException.h>
 
 using namespace rsp::utils;
 
@@ -44,7 +44,7 @@ TEST_CASE("StrUtils") {
     CHECK(StrUtils::Format("%02d-%8.8s", 10, str.c_str()) == "10-From Str");
 
     CHECK_EQ(StrUtils::ToDouble("123.123456789"), 123.123456789);
-    CHECK_THROWS_AS(StrUtils::ToDouble("banana123.123456789"), const DecimalConversionError&);
+    CHECK_THROWS_AS(StrUtils::ToDouble("banana123.123456789"), const rsp::exceptions::DecimalConversionError&);
 
     CHECK_EQ(StrUtils::ToString(123.12345678), "123.12345678");
     CHECK_EQ(StrUtils::ToString(123.12345678, 5), "123.12");

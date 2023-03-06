@@ -12,7 +12,7 @@
 #include <string>
 #include <graphics/Image.h>
 #include <graphics/Rect.h>
-#include <utils/CoreException.h>
+#include <exceptions/CoreException.h>
 
 using namespace rsp::utils;
 

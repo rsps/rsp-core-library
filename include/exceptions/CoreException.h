@@ -12,33 +12,24 @@
 #ifndef RSPCOREEXCEPTION_H
 #define RSPCOREEXCEPTION_H
 
-#include <exception>
-#include <stdexcept>
+#include <exceptions/ExceptionHelper.h>
 #include <system_error>
-#include "ExceptionHelper.h"
+#include "TracedException.h"
 
-namespace rsp::utils
-{
+namespace rsp::exceptions {
 
-class CoreException: public std::runtime_error
+
+class CoreException: public RuntimeError
 {
 public:
-    explicit CoreException(const char *aMsg)
-        : std::runtime_error(""), mMsg(aMsg)
+    explicit CoreException(const char *apMsg)
+        : RuntimeError(std::string(apMsg))
     {
     }
     CoreException(const std::string &arMsg)
-        : std::runtime_error(""), mMsg(arMsg)
+        : RuntimeError(arMsg)
     {
     }
-
-    const char* what() const noexcept override
-    {
-        return mMsg.c_str();
-    }
-
-protected:
-    std::string mMsg;
 };
 
 class NotImplementedException: public CoreException
@@ -84,7 +75,7 @@ public:
 #ifndef NDEBUG
 #define ASSERT(a)                  \
     if (!(a)) {                       \
-        THROW_WITH_BACKTRACE1(rsp::utils::AssertException, #a); \
+        THROW_WITH_BACKTRACE1(rsp::exceptions::AssertException, #a); \
     }
 #else
 #define ASSERT(a)

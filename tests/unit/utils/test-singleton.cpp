@@ -12,6 +12,7 @@
 #include <utils/Singleton.h>
 
 using namespace rsp::utils;
+using namespace rsp::exceptions;
 
 TEST_CASE("Singleton") {
 

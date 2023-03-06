@@ -54,7 +54,7 @@ void LoggerInterface::write(const LogStream &arStream, const std::string &arMsg,
 LoggerInterface& LoggerInterface::GetDefault()
 {
     if (!mpDefaultInstance) {
-        THROW_WITH_BACKTRACE1(rsp::utils::NotSetException, "Logger instance not set.");
+        THROW_WITH_BACKTRACE1(exceptions::NotSetException, "Logger instance not set.");
     }
 
     return *mpDefaultInstance;

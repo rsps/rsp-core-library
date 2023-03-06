@@ -111,13 +111,13 @@ TEST_CASE("Graphics Main Test")
     }
 
     SUBCASE("Second Scene") {
-        gfx.ChangeScene(SecondScene::ID);
+        CHECK_NOTHROW(gfx.ChangeScene(SecondScene::ID));
 
         int topBtnClicked = 0;
         scenes.GetAfterCreate() = [&gfx, &topBtnClicked, &tp](Scene *apScene) {
             CHECK_EQ(apScene->GetId(), SecondScene::ID);
 
-            tp.SetEvents(SecondScene::GetTouchEvents().data(), SecondScene::GetTouchEvents().size());
+            CHECK_NOTHROW(tp.SetEvents(SecondScene::GetTouchEvents().data(), SecondScene::GetTouchEvents().size()));
 
             int topBtnId = static_cast<int>(apScene->GetAs<SecondScene>().GetTopBtn().GetId());
             apScene->GetAs<SecondScene>().GetTopBtn().OnClick() = [&topBtnClicked, topBtnId](const Point& arPoint, uint32_t id) {
@@ -137,7 +137,7 @@ TEST_CASE("Graphics Main Test")
         };
 
         MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
-        gfx.Run(1000, true);
+        CHECK_NOTHROW(gfx.Run(1000, true));
 
         const uint32_t cGreenColor = 0xFF24b40b;
         Point toppoint = scenes.ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1);
@@ -220,16 +220,16 @@ TEST_CASE("Graphics Main Test")
                     gfx.Terminate();
                     break;
             }
-            arTimer.SetTimeout(timeout).Enable();
+            CHECK_NOTHROW(arTimer.SetTimeout(timeout).Enable());
         };
-        t1.Enable();
+        CHECK_NOTHROW(t1.Enable());
 
         MESSAGE("Running GFX loop with " << 1000 << " FPS");
-        gfx.Run(1000, true);
+        CHECK_NOTHROW(gfx.Run(1000, true));
     }
 
-    gfx.RegisterOverlay(nullptr);
+    CHECK_NOTHROW(gfx.RegisterOverlay(nullptr));
 
-    TimerQueue::Destroy();
+    CHECK_NOTHROW(TimerQueue::Destroy());
 }
 

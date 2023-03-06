@@ -11,8 +11,8 @@
 #ifndef SRC_UTILS_CLOCK_CAST_H_
 #define SRC_UTILS_CLOCK_CAST_H_
 
+#include <exceptions/CoreException.h>
 #include <chrono>
-#include <utils/CoreException.h>
 
 namespace rsp::utils
 {

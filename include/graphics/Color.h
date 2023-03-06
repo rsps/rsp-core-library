@@ -11,8 +11,8 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+#include <exceptions/CoreException.h>
 #include <stdint.h>
-#include <utils/CoreException.h>
 
 namespace rsp::graphics
 {

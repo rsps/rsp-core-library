@@ -73,5 +73,6 @@ TEST_CASE("Timer")
     CHECK_EQ(triggered2_count, 5);
     CHECK_EQ(t2.GetTimeout(), 20ms);
 
+    CHECK_NOTHROW(TimerQueue::Destroy());
 }
 

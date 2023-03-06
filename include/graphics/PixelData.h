@@ -11,6 +11,7 @@
 #ifndef INCLUDE_GRAPHICS_PIXELDATA_H_
 #define INCLUDE_GRAPHICS_PIXELDATA_H_
 
+#include <exceptions/CoreException.h>
 #include <graphics/Color.h>
 #include <graphics/Point.h>
 #include <graphics/Rect.h>
@@ -18,15 +19,14 @@
 #include <cstddef>
 #include <filesystem>
 #include <vector>
-#include <utils/CoreException.h>
 #include <logging/Logger.h>
 
 namespace rsp::graphics {
 
-class EIllegalColorDepth : public rsp::utils::CoreException
+class EIllegalColorDepth : public exceptions::CoreException
 {
 public:
-    EIllegalColorDepth() : rsp::utils::CoreException("Unsupported Color Depth") {}
+    EIllegalColorDepth() : CoreException("Unsupported Color Depth") {}
 };
 
 

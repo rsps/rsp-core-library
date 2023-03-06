@@ -18,6 +18,13 @@
 
 namespace rsp::graphics {
 
+class TextureNotFound : public exceptions::CoreException
+{
+public:
+    TextureNotFound(uintptr_t aId) : CoreException("Texture " + std::to_string(aId) + " does not exist") {};
+};
+
+
 class StaticTextures : public rsp::utils::Singleton<StaticTextures>
 {
 public:
@@ -25,7 +32,15 @@ public:
 
     virtual void Load(Renderer &arRenderer) {};
 
-    const Texture& GetTexture(uintptr_t aId) const { return *(mTextures.at(aId)); }
+    const Texture& GetTexture(uintptr_t aId) const
+    {
+        try {
+            return *(mTextures.at(aId));
+        }
+        catch (const std::out_of_range &e) {
+            THROW_WITH_BACKTRACE1(TextureNotFound, aId);
+        }
+    }
 
 protected:
     std::map<uintptr_t, std::unique_ptr<Texture>> mTextures{};

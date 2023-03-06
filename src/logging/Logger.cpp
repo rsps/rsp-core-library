@@ -8,13 +8,13 @@
  * \author      Steffen Brummer
  */
 
+#include <exceptions/CoreException.h>
 #include <iostream>
 #include <sstream>
 #include <map>
 #include <logging/Logger.h>
 #include <logging/OutStreamBuffer.h>
 #include <thread>
-#include <utils/CoreException.h>
 
 namespace rsp::logging {
 

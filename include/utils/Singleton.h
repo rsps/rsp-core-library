@@ -15,7 +15,7 @@
 #ifdef MT
 #include <mutex>
 #endif
-#include <utils/CoreException.h>
+#include <exceptions/CoreException.h>
 
 namespace rsp::utils {
 
@@ -51,6 +51,22 @@ public:
     void operator=(const Singleton &) = delete;
 
     /**
+     * \brief Check if this singleton is instantiated
+     * \return bool
+     */
+    static bool HasInstance() {
+        return (mpInstance) ? true : false;
+    }
+
+    /**
+     * \brief Check is this singleton instance is self owned
+     * \return bool
+     */
+    static bool OwnsInstance() {
+        return mOwnsInstance;
+    }
+
+    /**
      * \fn void Create()
      * \brief Generic factory method.
      */
@@ -59,7 +75,7 @@ public:
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
         if (mpInstance) {
-            THROW_WITH_BACKTRACE(ESingletonViolation);
+            THROW_WITH_BACKTRACE(exceptions::ESingletonViolation);
         }
         mpInstance = new T();
         mOwnsInstance = true;
@@ -79,7 +95,7 @@ public:
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
         if (mpInstance && mOwnsInstance) {
-            THROW_WITH_BACKTRACE(ESingletonViolation);
+            THROW_WITH_BACKTRACE(exceptions::ESingletonViolation);
         }
         mpInstance = apObject;
     }
@@ -92,7 +108,7 @@ public:
      */
     static T& Get() {
         if (!mpInstance) {
-            THROW_WITH_BACKTRACE(ENoInstance);
+            THROW_WITH_BACKTRACE(exceptions::ENoInstance);
         }
         return *mpInstance;
     }

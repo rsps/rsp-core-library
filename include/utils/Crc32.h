@@ -11,8 +11,8 @@
 #ifndef SRC_UTILS_CRC32_H_
 #define SRC_UTILS_CRC32_H_
 
+#include <exceptions/CoreException.h>
 #include <cstdint>
-#include "CoreException.h"
 
 namespace rsp::utils {
 
@@ -21,7 +21,7 @@ namespace rsp::utils {
  * \brief Exception thrown on CRC mismatch
  *
  */
-class ECrcError : public CoreException {
+class ECrcError : public exceptions::CoreException {
 public:
     ECrcError(const char *apMsg) : CoreException(apMsg) {};
 };

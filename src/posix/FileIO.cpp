@@ -8,6 +8,7 @@
  * \author      Steffen Brummer
  */
 
+#include <exceptions/ExceptionHelper.h>
 #include <iostream>
 
 #include <fcntl.h>
@@ -17,7 +18,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <utils/ExceptionHelper.h>
 
 namespace rsp::posix
 {

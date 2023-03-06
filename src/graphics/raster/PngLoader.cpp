@@ -9,9 +9,9 @@
  * \author      Steffen Brummer
  */
 
+#include <exceptions/CoreException.h>
 #include "PngLoader.h"
 #include <logging/Logger.h>
-#include <utils/CoreException.h>
 #include <utils/Crc32.h>
 
 using namespace rsp::utils;
@@ -75,7 +75,7 @@ void PngLoader::LoadImg(const std::string &arImgName)
                 break;
 
             case fourcc("PLTE"):
-                THROW_WITH_BACKTRACE1(NotImplementedException, "Palette chunks are not supported yet");
+                THROW_WITH_BACKTRACE1(rsp::exceptions::NotImplementedException, "Palette chunks are not supported yet");
                 break;
 
             case fourcc("IEND"):

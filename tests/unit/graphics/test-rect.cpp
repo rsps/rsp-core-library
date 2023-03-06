@@ -9,13 +9,11 @@
  */
 
 #include <doctest.h>
+#include <exceptions/CoreException.h>
 #include <graphics/Point.h>
 #include <graphics/Rect.h>
-#include <utils/CoreException.h>
-
 #include <iostream>
 
-using namespace rsp::utils;
 using namespace rsp::graphics;
 
 constexpr int cLeft = 100;

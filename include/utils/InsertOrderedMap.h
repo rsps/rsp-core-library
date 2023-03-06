@@ -10,11 +10,11 @@
 #ifndef INCLUDE_UTILS_INSERTORDEREDMAP_H_
 #define INCLUDE_UTILS_INSERTORDEREDMAP_H_
 
+#include <exceptions/CoreException.h>
 #include <map>
 #include <vector>
 #include <functional>
 #include <sstream>
-#include "CoreException.h"
 
 namespace rsp::utils {
 
@@ -109,7 +109,7 @@ public:
         catch(const std::exception &e) {
             std::stringstream ss;
             ss << "Failed to lookup key (" << aKey << "): " << e.what();
-            THROW_WITH_BACKTRACE1(CoreException, ss.str());
+            THROW_WITH_BACKTRACE1(exceptions::CoreException, ss.str());
         }
         return *result;
     }
@@ -123,7 +123,7 @@ public:
         catch(const std::exception &e) {
             std::stringstream ss;
             ss << "Failed to lookup key (" << aKey << "): " << e.what();
-            THROW_WITH_BACKTRACE1(CoreException, ss.str());
+            THROW_WITH_BACKTRACE1(exceptions::CoreException, ss.str());
         }
         return *result;
     }

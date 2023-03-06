@@ -10,17 +10,17 @@
 #ifndef IMGLOADER_H
 #define IMGLOADER_H
 
+#include <exceptions/CoreException.h>
 #include <graphics/PixelData.h>
 #include <cstring>
 #include <iostream>
 #include <vector>
 #include <memory>
-#include <utils/CoreException.h>
 
 namespace rsp::graphics
 {
 
-class ImgLoaderException: public rsp::utils::CoreException
+class ImgLoaderException: public exceptions::CoreException
 {
 public:
     explicit ImgLoaderException(const std::string arMsg)

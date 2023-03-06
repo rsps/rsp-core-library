@@ -11,12 +11,12 @@
 #ifndef RSP_UTILS_NULLABLE_H_
 #define RSP_UTILS_NULLABLE_H_
 
+#include <exceptions/CoreException.h>
 #include <type_traits>
 #include <string>
 #include <stdexcept>
 #include <cmath>
 #include <cstdlib>
-#include <utils/CoreException.h>
 
 namespace rsp::utils {
 
@@ -24,7 +24,7 @@ namespace rsp::utils {
  * \class ENullableException
  * \brief Base class for some helpful Nullable excetpions.
  */
-class ENullableException : public CoreException {
+class ENullableException : public exceptions::CoreException {
 public:
     explicit ENullableException(const char *aMsg) : CoreException(aMsg) {}
 };

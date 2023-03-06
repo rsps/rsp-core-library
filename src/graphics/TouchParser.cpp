@@ -8,18 +8,18 @@
  * \author      Simon Glashoff
  */
 
+#include <exceptions/CoreException.h>
 #include <graphics/SW/TouchParser.h>
-#include <utils/CoreException.h>
 #include <linux/input.h>
 #include <magic_enum.hpp>
 
 namespace rsp::graphics
 {
 
-class NoInputData : public rsp::utils::CoreException
+class NoInputData : public exceptions::CoreException
 {
 public:
-    NoInputData() : rsp::utils::CoreException("Touch input queue empty") {};
+    NoInputData() : CoreException("Touch input queue empty") {};
 };
 
 std::ostream& operator<<(std::ostream &os, const RawTouchEvent &arRTE)

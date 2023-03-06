@@ -6,10 +6,10 @@
 #ifndef INCLUDE_UTILS_DYNAMICDATA_H_
 #define INCLUDE_UTILS_DYNAMICDATA_H_
 
+#include <exceptions/CoreException.h>
 #include <vector>
 #include <string>
 #include <string_view>
-#include <utils/CoreException.h>
 #include "Variant.h"
 
 namespace rsp::utils {
@@ -18,7 +18,7 @@ namespace rsp::utils {
  * \class EDynamicDataException
  * \brief Base class for all exceptions thrown by the DynamicData module.
  */
-class EDynamicDataException : public CoreException {
+class EDynamicDataException : public exceptions::CoreException {
 public:
     explicit EDynamicDataException(const std::string &aMsg) : CoreException(aMsg) {}
 };

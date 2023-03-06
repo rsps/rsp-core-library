@@ -204,7 +204,7 @@ double ToDouble(const std::string &arString)
     // maybe use some manipulators
     stream >> d;
     if(!stream) {
-        THROW_WITH_BACKTRACE1(DecimalConversionError, std::string("StrUtils::ToDouble conversion error. From " + arString + " to double"));
+        THROW_WITH_BACKTRACE1(exceptions::DecimalConversionError, std::string("StrUtils::ToDouble conversion error. From " + arString + " to double"));
     }
     return d;
 }

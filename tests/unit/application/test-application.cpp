@@ -12,9 +12,8 @@
 #include <filesystem>
 #include <doctest.h>
 #include <application/CommandLine.h>
+#include <exceptions/CoreException.h>
 #include <utils/StrUtils.h>
-#include <utils/CoreException.h>
-
 #include "../../helpers/TestApplication.h"
 
 using namespace rsp::application;
@@ -44,7 +43,7 @@ TEST_CASE("Application")
     SUBCASE("Instantiate TestApplication") {
         std::remove(cLogFileName);
 
-        CHECK_THROWS_AS(ApplicationBase::Get<TestApplication>(), const rsp::utils::ENoInstance &);
+        CHECK_THROWS_AS(ApplicationBase::Get<TestApplication>(), const rsp::exceptions::ENoInstance &);
 
         TestApplication app(2, arguments);
 

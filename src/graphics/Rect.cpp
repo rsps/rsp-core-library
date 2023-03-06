@@ -8,10 +8,10 @@
  * \author      Simon Glashoff
  */
 
+#include <exceptions/CoreException.h>
 #include <graphics/Rect.h>
-#include <utils/CoreException.h>
 
-using namespace rsp::utils;
+using namespace rsp::exceptions;
 
 namespace rsp::graphics
 {

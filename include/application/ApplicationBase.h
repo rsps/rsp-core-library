@@ -11,9 +11,9 @@
 #ifndef INCLUDE_APPLICATION_APPLICATIONBASE_H_
 #define INCLUDE_APPLICATION_APPLICATIONBASE_H_
 
-#include <utils/CoreException.h>
 #include <logging/Logger.h>
 #include <application/CommandLine.h>
+#include <exceptions/CoreException.h>
 
 namespace rsp::application {
 
@@ -77,7 +77,7 @@ public:
     template<class T>
     static T& Get() {
         if (!mpInstance) {
-            THROW_WITH_BACKTRACE(rsp::utils::ENoInstance);
+            THROW_WITH_BACKTRACE(exceptions::ENoInstance);
         }
         return *static_cast<T*>(mpInstance);
     }

@@ -10,6 +10,7 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include <exceptions/CoreException.h>
 #include <graphics/Canvas.h>
 #include <graphics/Color.h>
 #include <graphics/Rect.h>
@@ -21,19 +22,18 @@
 #include <graphics/GfxEvents.h>
 #include <logging/Logger.h>
 #include <utils/ConstTypeInfo.h>
-#include <utils/CoreException.h>
 #include <utils/Function.h>
 
-//#define GFXLOG(a) DLOG(a)
-#define GFXLOG(a)
+#define GFXLOG(a) DLOG(a)
+//#define GFXLOG(a)
 
 namespace rsp::graphics
 {
 
-class EControlCast : public rsp::utils::CoreException
+class EControlCast : public exceptions::CoreException
 {
 public:
-    EControlCast(const std::string &arName, const std::string &arType) : rsp::utils::CoreException(arName + " is not of type " + arType) {};
+    EControlCast(const std::string &arName, const std::string &arType) : CoreException(arName + " is not of type " + arType) {};
 };
 
 class Control

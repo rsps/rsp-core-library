@@ -8,10 +8,10 @@
  * \author      Simon Glashoff
  */
 
+#include <exceptions/CoreException.h>
 #include <graphics/Bitmap.h>
 #include <algorithm>
 #include <filesystem>
-#include <utils/CoreException.h>
 #include <logging/Logger.h>
 
 using namespace rsp::utils;

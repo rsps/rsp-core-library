@@ -10,9 +10,9 @@
 #ifndef INCLUDE_SECURITY_CRYPTBASE_H_
 #define INCLUDE_SECURITY_CRYPTBASE_H_
 
+#include <exceptions/CoreException.h>
 #include <string_view>
 #include <vector>
-#include <utils/CoreException.h>
 #include "SecureBuffer.h"
 
 namespace rsp::security {
@@ -79,7 +79,7 @@ protected:
 /**
  * \brief Base class for crypto exceptions.
  */
-class CryptException: public rsp::utils::CoreException
+class CryptException: public exceptions::CoreException
 {
 public:
     explicit CryptException(const char *aMsg, const char *aErr)

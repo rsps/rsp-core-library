@@ -15,12 +15,12 @@
 #include <memory>
 #include <time.h>
 #include <doctest.h>
+#include <exceptions/CoreException.h>
 #include <logging/Logger.h>
 #include <logging/ConsoleLogWriter.h>
 #include <logging/FileLogWriter.h>
 #include <utils/StrUtils.h>
 #include <utils/AnsiEscapeCodes.h>
-#include <utils/CoreException.h>
 
 using namespace rsp;
 using namespace rsp::utils;
@@ -76,7 +76,7 @@ TEST_CASE("Logging") {
 
     logging::Logger log(true);
 
-    CHECK_THROWS_AS(logging::LoggerInterface::GetDefault(), const utils::NotSetException &);
+    CHECK_THROWS_AS(logging::LoggerInterface::GetDefault(), const exceptions::NotSetException &);
     CHECK_NOTHROW(logging::LoggerInterface::SetDefault(&log));
 
     CHECK_NOTHROW(log.SetChannel("Test Channel"));

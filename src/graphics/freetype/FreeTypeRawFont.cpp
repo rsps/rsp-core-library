@@ -43,11 +43,11 @@ static const char* FreeTypeErrorToString(int aCode)
 }
 
 FontException::FontException(const char *aMsg, FT_Error aCode)
-    : rsp::utils::CoreException(aMsg)
+    : CoreException(aMsg)
 {
-    mMsg += ": (" + std::to_string(aCode) + ") ";
+    mWhat += ": (" + std::to_string(aCode) + ") ";
     const char *err = FreeTypeErrorToString(aCode);
-    mMsg.append((err) ? err : "N");
+    mWhat.append((err) ? err : "N");
 }
 
 inline static uint unsign(int aValue)

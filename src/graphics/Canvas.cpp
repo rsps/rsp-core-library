@@ -28,7 +28,7 @@ Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std
 void Canvas::DrawArc(const Point &arCenter, GuiUnit_t aRadius1, GuiUnit_t aRadius2,
     int aStartAngel, int aSweepAngle, const Color &arColor)
 {
-    THROW_WITH_BACKTRACE1(rsp::utils::NotImplementedException, "Canvas::DrawArc has not been implemented yet.");
+    THROW_WITH_BACKTRACE1(exceptions::NotImplementedException, "Canvas::DrawArc has not been implemented yet.");
 }
 
 void Canvas::DrawCircle(const Point &arCenter, GuiUnit_t aRadius, const Color &arColor)

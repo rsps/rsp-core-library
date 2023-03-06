@@ -11,16 +11,16 @@
 #ifndef I_HTTPRESPONSE_H
 #define I_HTTPRESPONSE_H
 
+#include <exceptions/CoreException.h>
 #include <ostream>
 #include <map>
 #include <string>
 #include <network/IHttpRequest.h>
-#include <utils/CoreException.h>
 
 namespace rsp::network {
 
 
-class EHeaderNotFound : public rsp::utils::CoreException
+class EHeaderNotFound : public exceptions::CoreException
 {
 public:
     explicit EHeaderNotFound(const std::string &arMsg)

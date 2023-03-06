@@ -11,9 +11,9 @@
 #ifndef INCLUDE_UTILS_VALIDATOR_H_
 #define INCLUDE_UTILS_VALIDATOR_H_
 
+#include <exceptions/CoreException.h>
 #include <string>
 #include <sstream>
-#include "CoreException.h"
 #include "InRange.h"
 
 namespace rsp::utils {
@@ -21,7 +21,7 @@ namespace rsp::utils {
 /**
  * \brief Base class for validator exceptions.
  */
-class ValidatorException : public CoreException
+class ValidatorException : public exceptions::CoreException
 {
 public:
     using CoreException::CoreException;
@@ -44,7 +44,7 @@ public:
     {
         std::stringstream ss;
         ss << aLow << " < " << aValue << " < " << aHigh << ")";
-        mMsg += ss.str();
+        mWhat += ss.str();
     }
 };
 

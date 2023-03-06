@@ -99,6 +99,9 @@ target_link_libraries ("rsp-core-lib"
     ${SDL_LIB}
 )
 
+# Keep symbol information for exception stack traces
+SET (CMAKE_ENABLE_EXPORTS TRUE)
+
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
 # paths.

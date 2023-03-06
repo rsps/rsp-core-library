@@ -10,13 +10,13 @@
 #ifndef FONT_H
 #define FONT_H
 
+#include <exceptions/CoreException.h>
 #include <graphics/Color.h>
 #include <graphics/FontRawInterface.h>
 #include <graphics/Rect.h>
 #include <vector>
 #include <string>
 #include <memory>
-#include <utils/CoreException.h>
 
 namespace rsp::graphics {
 
@@ -24,12 +24,12 @@ namespace rsp::graphics {
  * \class FontException
  * \brief Exception type used to throw exceptions from the font classes.
  */
-class FontException : public rsp::utils::CoreException
+class FontException : public exceptions::CoreException
 {
 public:
     explicit FontException(const char *aMsg, int aCode);
-    FontException(const char *aMsg) : rsp::utils::CoreException(aMsg) {};
-    FontException(const std::string &arMsg) : rsp::utils::CoreException(arMsg.c_str()) {};
+    FontException(const char *aMsg) : CoreException(aMsg) {};
+    FontException(const std::string &arMsg) : CoreException(arMsg.c_str()) {};
 };
 
 /**

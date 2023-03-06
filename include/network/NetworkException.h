@@ -11,7 +11,7 @@
 #ifndef NETWORKEXCEPTION_H
 #define NETWORKEXCEPTION_H
 
-#include <utils/CoreException.h>
+#include <exceptions/CoreException.h>
 #include <string>
 
 namespace rsp::network
@@ -23,11 +23,11 @@ namespace rsp::network
  * \brief Base exception for handling network related issues in the rsp::network namespace
  *
  */
-class NetworkException: public rsp::utils::CoreException
+class NetworkException: public exceptions::CoreException
 {
 public:
     explicit NetworkException(const std::string &aMsg)
-        : rsp::utils::CoreException(aMsg)
+        : CoreException(aMsg)
     {
     }
 };

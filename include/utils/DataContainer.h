@@ -11,10 +11,10 @@
 #ifndef INCLUDE_UTILS_DATACONTAINER_H_
 #define INCLUDE_UTILS_DATACONTAINER_H_
 
+#include <exceptions/CoreException.h>
 #include <memory>
 #include <type_traits>
 #include <posix/FileIO.h>
-#include "CoreException.h"
 #include "EnumFlags.h"
 
 namespace rsp::utils {
@@ -22,7 +22,7 @@ namespace rsp::utils {
 /**
  * \brief Base class for DataContainer exceptions.
  */
-struct DataContainerException : public CoreException
+struct DataContainerException : public exceptions::CoreException
 {
     explicit DataContainerException(const std::string &arMsg)
       : CoreException(arMsg)

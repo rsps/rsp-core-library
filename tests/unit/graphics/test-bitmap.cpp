@@ -9,9 +9,9 @@
  */
 
 #include <doctest.h>
+#include <exceptions/CoreException.h>
 #include <graphics/Bitmap.h>
 #include <graphics/Color.h>
-#include <utils/CoreException.h>
 #include <TestHelpers.h>
 
 using namespace rsp::utils;

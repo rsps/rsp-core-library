@@ -12,12 +12,23 @@
 #include <sstream>
 #include <utils/StrUtils.h>
 #undef NDEBUG
-#include <utils/CoreException.h>
+#include <exceptions/CoreException.h>
+#include <exceptions/BackTrace.h>
 
 using namespace rsp::utils;
+using namespace rsp::exceptions;
 
-TEST_CASE("Core Exceptions") {
+static BackTrace MyFunc()
+{
+    return BackTrace(0);
+}
 
+TEST_CASE("Exceptions") {
+
+    SUBCASE("Backtrace") {
+        BackTrace bt = MyFunc();
+        MESSAGE("Backtrace: " << bt);
+    }
 
     SUBCASE("Test backtraced exceptions") {
 

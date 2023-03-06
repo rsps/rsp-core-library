@@ -10,9 +10,9 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include <exceptions/ExceptionHelper.h>
 #include <type_traits>
 #include <typeinfo>
-#include <utils/ExceptionHelper.h>
 
 namespace rsp::messaging
 {

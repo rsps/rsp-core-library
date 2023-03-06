@@ -1,3 +1,4 @@
+
 /*!
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,7 +11,7 @@
 #ifdef USE_OPENSSL
 
 #include <security/Sha.h>
-#include <utils/CoreException.h>
+#include <exceptions/CoreException.h>
 
 #include <openssl/evp.h>
 #include <openssl/sha.h>

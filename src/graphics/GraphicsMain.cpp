@@ -41,7 +41,9 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
     rsp::utils::StopWatch sw;
     int64_t frame_time = 1000 / aMaxFPS;
 
-    StaticTextures::Get().Load(mrRenderer);
+    if (StaticTextures::HasInstance()) {
+        StaticTextures::Get().Load(mrRenderer);
+    }
 
     while (!mTerminated) {
 

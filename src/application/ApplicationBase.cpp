@@ -25,7 +25,7 @@ ApplicationBase::ApplicationBase(int argc, const char **argv)
       mCmd(argc, argv)
 {
     if (mpInstance) {
-        THROW_WITH_BACKTRACE(ESingletonViolation);
+        THROW_WITH_BACKTRACE(rsp::exceptions::ESingletonViolation);
     }
 
     rsp::logging::LoggerInterface::SetDefault(&mLogger);

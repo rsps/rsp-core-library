@@ -11,26 +11,26 @@
 #ifndef INCLUDE_GRAPHICS_SCENEMAP_H_
 #define INCLUDE_GRAPHICS_SCENEMAP_H_
 
+#include <exceptions/CoreException.h>
 #include <graphics/Scene.h>
 #include <map>
 #include <string>
 #include <functional>
-#include <utils/CoreException.h>
 #include <utils/Function.h>
 #include <logging/Logger.h>
 
 namespace rsp::graphics {
 
-class SceneNotFound : public rsp::utils::CoreException
+class SceneNotFound : public rsp::exceptions::CoreException
 {
 public:
-    SceneNotFound(const std::string &arName) : rsp::utils::CoreException("Scene " + arName + " does not exist") {};
+    SceneNotFound(const std::string &arName) : rsp::exceptions::CoreException("Scene " + arName + " does not exist") {};
 };
 
-class ActiveSceneNotSet : public rsp::utils::CoreException
+class ActiveSceneNotSet : public rsp::exceptions::CoreException
 {
 public:
-    ActiveSceneNotSet() : rsp::utils::CoreException("No scene has been set activate") {};
+    ActiveSceneNotSet() : rsp::exceptions::CoreException("No scene has been set activate") {};
 };
 
 class SceneMap

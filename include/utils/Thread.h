@@ -11,25 +11,24 @@
 #ifndef INCLUDE_UTILS_THREAD_H_
 #define INCLUDE_UTILS_THREAD_H_
 
+#include <exceptions/CoreException.h>
 #include <exception>
 #include <string>
 #include <string_view>
 #include <thread>
 #include "Function.h"
-#include "CoreException.h"
 
 namespace rsp::utils {
 
 /**
  * \brief Base class for thread exceptions.
  */
-class ThreadException : public CoreException
+class ThreadException : public exceptions::CoreException
 {
 public:
     ThreadException(std::string_view aName, const char *aMsg)
-        : CoreException("")
+        : CoreException(std::string("Exception thrown in thread '" + std::string(aName) + "': " + aMsg))
     {
-        mMsg = std::string("Exception thrown in thread '" + std::string(aName) + "': " + aMsg);
     }
 };
 

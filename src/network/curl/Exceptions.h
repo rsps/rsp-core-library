@@ -30,7 +30,7 @@ public:
     explicit ECurlVersion(const std::string &aMsg, std::string_view aVersion)
         : NetworkException(aMsg)
     {
-        mMsg.append(": ").append(aVersion);
+        mWhat.append(": ").append(aVersion);
     }
 };
 
@@ -47,7 +47,7 @@ public:
         : NetworkException(aMsg)
     {
         if (aCode != CURLE_OK) {
-            mMsg.append(" (")
+            mWhat.append(" (")
                 .append(std::to_string(static_cast<unsigned long>(aCode)))
                 .append(") ")
                 .append(curl_easy_strerror(aCode));
@@ -62,7 +62,7 @@ public:
         : NetworkException(aMsg)
     {
         if (aCode != CURLM_OK) {
-            mMsg.append(" (")
+            mWhat.append(" (")
                 .append(std::to_string(static_cast<unsigned long>(aCode)))
                 .append(") ")
                 .append(curl_multi_strerror(aCode));

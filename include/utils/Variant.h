@@ -11,9 +11,9 @@
 #ifndef RSP_UTILS_VARIANT_H_
 #define RSP_UTILS_VARIANT_H_
 
+#include <exceptions/CoreException.h>
 #include <utils/Nullable.h>
 #include <string>
-#include "CoreException.h"
 #include <utils/StructElement.h>
 
 namespace rsp::utils {
@@ -23,7 +23,7 @@ namespace rsp::utils {
  * \brief Base exception for Variant class.
  *
  */
-class EVariantException : public CoreException {
+class EVariantException : public exceptions::CoreException {
 public:
     explicit EVariantException(const char *apMsg) : CoreException(apMsg) {}
 };

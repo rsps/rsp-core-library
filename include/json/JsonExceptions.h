@@ -10,7 +10,7 @@
 #ifndef INCLUDE_JSON_JSONEXCEPTIONS_H_
 #define INCLUDE_JSON_JSONEXCEPTIONS_H_
 
-#include <utils/CoreException.h>
+#include <exceptions/CoreException.h>
 
 namespace rsp::json {
 
@@ -18,9 +18,9 @@ namespace rsp::json {
  * \class EJsonException
  * \brief Base class for all exceptions thrown by the json module.
  */
-class EJsonException : public rsp::utils::CoreException {
+class EJsonException : public exceptions::CoreException {
 public:
-    explicit EJsonException(const std::string &aMsg) : rsp::utils::CoreException(aMsg) {}
+    explicit EJsonException(const std::string &aMsg) : CoreException(aMsg) {}
 };
 
 class EJsonParseError : public EJsonException {

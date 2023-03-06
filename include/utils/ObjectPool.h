@@ -11,15 +11,15 @@
 #ifndef INCLUDE_UTILS_OBJECTPOOL_H_
 #define INCLUDE_UTILS_OBJECTPOOL_H_
 
+#include <exceptions/CoreException.h>
 #include <unordered_set>
 #include <vector>
 #include <algorithm>
 #include <iostream>
-#include <utils/CoreException.h>
 
 namespace rsp::utils {
 
-class EObjectPoolException: public CoreException
+class EObjectPoolException: public exceptions::CoreException
 {
 public:
     explicit EObjectPoolException(const char *aMsg)

@@ -9,12 +9,12 @@
  */
 
 #include <graphics/SceneMap.h>
-#include <stdexcept>
 #include <logging/Logger.h>
 
 using namespace rsp::logging;
 
 namespace rsp::graphics {
+
 
 SceneMap::SceneCreator SceneMap::operator [](std::uint32_t aId)
 {

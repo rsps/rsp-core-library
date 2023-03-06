@@ -8,6 +8,7 @@
  * \author      Simon Glashoff
  */
 
+#include <exceptions/ExceptionHelper.h>
 #include <chrono>
 #include <cstring>
 #include <fcntl.h>
@@ -18,7 +19,6 @@
 #include <sys/mman.h>
 #include <thread>
 #include <unistd.h>
-#include <utils/ExceptionHelper.h>
 
 namespace rsp::graphics
 {

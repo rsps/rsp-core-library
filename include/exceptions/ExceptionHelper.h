@@ -19,7 +19,7 @@
 #include <sstream>
 #include <type_traits>
 
-namespace rsp::utils {
+namespace rsp::exceptions {
 
 /**
  * @see https://stackoverflow.com/questions/16945787/how-is-it-possible-to-overload-the-throw-function-while-writing-a-custom-excepti
@@ -60,10 +60,10 @@ public:
     }
 };
 
-#define THROW_WITH_BACKTRACE(EXCEPTION) throw rsp::utils::backtraced_exception< EXCEPTION >(__FILE__, __LINE__)
-#define THROW_WITH_BACKTRACE1(EXCEPTION, ARG1) throw rsp::utils::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1)
-#define THROW_WITH_BACKTRACE2(EXCEPTION, ARG1, ARG2) throw rsp::utils::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2)
-#define THROW_WITH_BACKTRACE3(EXCEPTION, ARG1, ARG2, ARG3) throw rsp::utils::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2, ARG3)
+#define THROW_WITH_BACKTRACE(EXCEPTION) throw rsp::exceptions::backtraced_exception< EXCEPTION >(__FILE__, __LINE__)
+#define THROW_WITH_BACKTRACE1(EXCEPTION, ARG1) throw rsp::exceptions::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1)
+#define THROW_WITH_BACKTRACE2(EXCEPTION, ARG1, ARG2) throw rsp::exceptions::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2)
+#define THROW_WITH_BACKTRACE3(EXCEPTION, ARG1, ARG2, ARG3) throw rsp::exceptions::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2, ARG3)
 
 #define RETHROW_WITH_BACKTRACE(aMsg, aOriginalException) THROW_WITH_BACKTRACE1(std::decay< decltype(aOriginalException) >::type, (std::string(aMsg) + " <- " + aOriginalException.what()).c_str())
 

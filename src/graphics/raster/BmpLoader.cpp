@@ -8,13 +8,13 @@
  * \author      Simon Glashoff
  */
 
+#include <exceptions/CoreException.h>
 #include "BmpLoader.h"
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
 #include <string>
 #include <logging/Logger.h>
-#include <utils/CoreException.h>
 
 using namespace rsp::logging;
 
@@ -242,7 +242,7 @@ Color BmpLoader::ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::ui
             break;
 
         default:
-            THROW_WITH_BACKTRACE1(rsp::utils::NotImplementedException, "BmpLoader does not support images with a color depth of " + std::to_string(int(mBmpHeader.v1.bitsPerPixel)) + " bpp");
+            THROW_WITH_BACKTRACE1(rsp::exceptions::NotImplementedException, "BmpLoader does not support images with a color depth of " + std::to_string(int(mBmpHeader.v1.bitsPerPixel)) + " bpp");
             break;
     }
 

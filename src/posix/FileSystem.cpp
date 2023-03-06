@@ -14,6 +14,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <exceptions/ExceptionHelper.h>
 #include <linux/limits.h>
 #include <fts.h>
 #include <glob.h>
@@ -32,7 +33,6 @@
 #include <regex>
 #include <utils/StrUtils.h>
 
-#include <utils/ExceptionHelper.h>
 
 using namespace rsp::utils;
 
