@@ -61,9 +61,6 @@ public:
     Control(const Control &arOther) = default;
     Control &operator=(const Control &arOther) = default;
 
-    void setName(const std::string &arName) override;
-    void setId(uint32_t aId) override;
-
     template<class T>
     T& GetAs()
     {
@@ -257,6 +254,9 @@ protected:
     bool mCheckable = false;
     States mState = States::Normal;
     static bool mMustRender;
+
+    void setName(const std::string &arName) override;
+    void setId(uint32_t aId) override;
 
     virtual void paint(Canvas &arCanvas, const Style &arStyle);
     virtual void refresh() {}

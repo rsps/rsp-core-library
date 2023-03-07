@@ -33,13 +33,13 @@ std::ostream& operator <<(std::ostream &os, const Control::States aState)
 
 void Control::setName(const std::string &arName)
 {
-    TypeInfo::SetName(arName);
+    TypeInfo::setName(arName);
     Invalidate();
 }
 
 void Control::setId(uint32_t aId)
 {
-    TypeInfo::SetId(aId);
+    TypeInfo::setId(aId);
     Invalidate();
 }
 
@@ -161,7 +161,7 @@ bool Control::UpdateData()
     bool result = false;
     refresh();
     if (mDirty) {
-        GFXLOG("Drawing: " << GetName() << " (" << this << ")");
+        GFXLOG("Drawing: " << GetName() << " (" << mArea << ")");
         Canvas canvas(mArea.GetWidth(), mArea.GetHeight());
         auto &style = mStyles[mState];
         paint(canvas, style);
