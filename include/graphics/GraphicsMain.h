@@ -47,12 +47,16 @@ public:
      */
     GraphicsMain& ChangeScene(std::uint32_t aId) { mNextScene = aId; return *this; }
 
+    template <class T>
+    GraphicsMain& ChangeScene() { return ChangeScene(rsp::utils::ID<T>()); }
+
+
     /**
      * \brief Register a widget that is rendered after all other controls have been rendered.
      * \param apWidget
      * \return self
      */
-    GraphicsMain& RegisterOverlay(Control *apWidget) { mpOverlay = apWidget; return *this; }
+    GraphicsMain& RegisterOverlay(Control *apWidget);
 
     /**
      * \brief Get current frame rates per seconds.

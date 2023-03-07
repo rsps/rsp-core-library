@@ -10,8 +10,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include <graphics/Control.h>
-#include <graphics/Bitmap.h>
+#include "Control.h"
+#include "Bitmap.h"
 
 namespace rsp::graphics
 {
@@ -19,10 +19,7 @@ namespace rsp::graphics
 class Image : public Control
 {
 public:
-    TYPEINFO(Image)
-
-    Image() : Control(rsp::utils::MakeTypeInfo<Image>()) {}
-    Image(const rsp::utils::TypeInfo &arInfo) : Control(arInfo) {};
+    Image() {  initTypeInfo<Image>(); }
 
     void ClearSection();
     void SetSection(const Rect &arSection);
@@ -32,4 +29,5 @@ protected:
 };
 
 } // namespace rsp::graphics
+
 #endif // IMAGE_H

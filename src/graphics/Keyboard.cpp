@@ -8,7 +8,13 @@
  * \author      Steffen Brummer
  */
 
+#include <cctype>
+#include <functional>
+#include <string>
+#include <locale>
+#include <codecvt>
 #include <graphics/Keyboard.h>
+#include <utils/Function.h>
 #include "pixmaps/BigSpecial.h"
 #include "pixmaps/Erase.h"
 #include "pixmaps/Key.h"
@@ -16,12 +22,6 @@
 #include "pixmaps/SmallSpecial.h"
 #include "pixmaps/Space.h"
 #include "pixmaps/UpperCase.h"
-#include <cctype>
-#include <functional>
-#include <string>
-#include <locale>
-#include <codecvt>
-#include <utils/Function.h>
 
 using namespace rsp::utils;
 
@@ -30,6 +30,7 @@ namespace rsp::graphics {
 
 Key::Key()
 {
+    initTypeInfo<Key>();
     mText.GetFont().SetSize(34);
     SetTransparent(true);
 }
@@ -44,7 +45,7 @@ Key& Key::Setup(Rect aTouchArea, Rect aArea, int aSymbol)
             std::cout << "Set key symbol: " << static_cast<char>(aSymbol) << " on TextArea(" << mText.GetArea() << ")" << std::endl;
             SetCaption(std::string(1, aSymbol));
         }
-        SetId(aSymbol);
+        TypeInfo::SetId(aSymbol);
     }
     return *this;
 }
@@ -118,8 +119,8 @@ static Point cKeyPositions[26] = {
 };
 
 Keyboard::Keyboard()
-    : Control(rsp::utils::MakeTypeInfo<Keyboard>())
 {
+    initTypeInfo<Keyboard>();
     SetTransparent(true);
 
     BitmapView big_special(cBigSpecial);

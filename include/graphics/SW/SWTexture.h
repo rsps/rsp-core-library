@@ -26,13 +26,13 @@ public:
     SWTexture& operator=(const SWTexture&) = default;
     SWTexture& operator=(SWTexture&&) = default;
 
-    const PixelData& GetPixelData() const { return *mpPixelData; }
+    const PixelData& GetPixelData() const { return mPixelData; }
 
     void Fill(rsp::graphics::Color aColor) override;
     void Update(const PixelData &arPixelData, Color aColor) override;
 
 protected:
-    const PixelData *mpPixelData = nullptr;
+    PixelData mPixelData;
 };
 
 } /* namespace rsp::graphics */

@@ -40,11 +40,10 @@ public:
     PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData);
 
     PixelData(const PixelData& arOther);
-    PixelData(const PixelData&& arOther);
+    PixelData(PixelData&& arOther);
     PixelData& operator=(const PixelData& arOther);
-    PixelData& operator=(const PixelData&& arOther);
+    PixelData& operator=(PixelData&& arOther);
 
-    PixelData& Assign(const PixelData& arOther);
     PixelData& CopyFrom(const Point &arLeftTop, const PixelData &arOther, const Rect &arSection, Color aColor);
 
     PixelData ChangeColorDepth(ColorDepth aDepth, Color aColor = Color::Black) const;
@@ -97,6 +96,9 @@ protected:
 
     friend class ImgLoader;
     void initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth);
+
+    void assign(const PixelData& arOther);
+    void move(PixelData&& arOther);
 };
 
 std::ostream& operator<<(std::ostream& os, const PixelData::ColorDepth arDepth);

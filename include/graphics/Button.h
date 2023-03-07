@@ -11,20 +11,18 @@
 #ifndef INCLUDE_GRAPHICS_BUTTON_H_
 #define INCLUDE_GRAPHICS_BUTTON_H_
 
-#include <graphics/Control.h>
-#include <graphics/Label.h>
 #include <map>
-#include <graphics/Bitmap.h>
-#include <graphics/Text.h>
+#include "Bitmap.h"
+#include "Control.h"
+#include "Label.h"
+#include "Text.h"
 
 namespace rsp::graphics {
 
 class Button: public Label
 {
 public:
-    TYPEINFO(Button)
-    Button() : Label(rsp::utils::MakeTypeInfo<Button>()) {}
-    Button(const rsp::utils::TypeInfo &arInfo) : Label(arInfo) {};
+    Button() { initTypeInfo<Button>(); }
 };
 
 } /* namespace rsp::graphics */

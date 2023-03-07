@@ -278,6 +278,7 @@ class Rect
 };
 
 std::ostream &operator<<(std::ostream &aStream, const Rect &arRect);
+std::string to_string(const Rect &arRect);
 
 } // namespace rsp::graphics
 

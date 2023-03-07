@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_CONTROLS_LABEL_H
-#define INCLUDE_GRAPHICS_CONTROLS_LABEL_H
+#ifndef INCLUDE_GRAPHICS_LABEL_H
+#define INCLUDE_GRAPHICS_LABEL_H
 
 #include <string>
 #include <graphics/Control.h>
@@ -20,10 +20,7 @@ namespace rsp::graphics {
 class Label : public Control
 {
 public:
-    TYPEINFO(Label)
-
-    Label() : Control(rsp::utils::MakeTypeInfo<Label>()) {}
-    Label(const rsp::utils::TypeInfo &arInfo) : Control(arInfo) {};
+    Label() { initTypeInfo<Label>(); }
 
     Label& SetCaption(const std::string &arCaption);
     Label& SetTextPosition(const Point &arPoint);
@@ -43,6 +40,6 @@ protected:
     void doSetArea(const Rect &arRect) override;
 };
 
-} // namespace rsp::graphics
+} /* namespace rsp::graphics */
 
-#endif // INCLUDE_GRAPHICS_CONTROLS_LABEL_H
+#endif // INCLUDE_GRAPHICS_LABEL_H

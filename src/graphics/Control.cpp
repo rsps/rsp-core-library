@@ -31,11 +31,16 @@ std::ostream& operator <<(std::ostream &os, const Control::States aState)
     return os;
 }
 
-Control& Control::SetId(uint32_t aId)
+void Control::setName(const std::string &arName)
 {
-    GetInfo().mId = aId;
+    TypeInfo::SetName(arName);
     Invalidate();
-    return *this;
+}
+
+void Control::setId(uint32_t aId)
+{
+    TypeInfo::SetId(aId);
+    Invalidate();
 }
 
 void Control::SetState(States aState)
@@ -152,9 +157,11 @@ Control& Control::SetBitmapPosition(const Point &arPoint)
 
 bool Control::UpdateData()
 {
+    GFXLOG("Updating Data: " << GetName() << " (" << mArea << ")");
     bool result = false;
     refresh();
     if (mDirty) {
+        GFXLOG("Drawing: " << GetName() << " (" << this << ")");
         Canvas canvas(mArea.GetWidth(), mArea.GetHeight());
         auto &style = mStyles[mState];
         paint(canvas, style);
@@ -174,8 +181,13 @@ bool Control::UpdateData()
 
 void Control::MakeTextures(Renderer &arRenderer)
 {
+    GFXLOG("Making Textures: " << GetName() << " (" << mArea << ")");
     for (Style &style : mStyles) {
         style.mpTexture = arRenderer.CreateTexture(mArea.GetWidth(), mArea.GetHeight());
+    }
+
+    for (Control* child : mChildren) {
+        child->MakeTextures(arRenderer);
     }
 }
 
@@ -192,7 +204,6 @@ void Control::Render(Renderer &arRenderer)
     }
 
     for (Control* child : mChildren) {
-        GFXLOG("Rendering "<< GetName() << "'s child: " << child->GetName());
         child->Render(arRenderer);
     }
 

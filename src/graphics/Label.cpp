@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/Label.h>
 #include <string>
+#include <graphics/Label.h>
 
 namespace rsp::graphics {
 
@@ -79,4 +79,4 @@ void Label::refresh()
     }
 }
 
-} //namespace rsp::graphics
+} /* namespace rsp::graphics */

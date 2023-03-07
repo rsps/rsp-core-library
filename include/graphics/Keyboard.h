@@ -11,16 +11,16 @@
 #ifndef INCLUDE_GRAPHICS_KEYBOARD_H_
 #define INCLUDE_GRAPHICS_KEYBOARD_H_
 
-#include <graphics/Button.h>
-#include <graphics/Control.h>
 #include <map>
 #include <array>
 #include <string>
-#include <graphics/Bitmap.h>
-#include <graphics/BitmapView.h>
-#include <graphics/Color.h>
-#include <graphics/Point.h>
-#include <graphics/Rect.h>
+#include "Bitmap.h"
+#include "BitmapView.h"
+#include "Button.h"
+#include "Color.h"
+#include "Control.h"
+#include "Point.h"
+#include "Rect.h"
 
 namespace rsp::graphics {
 
@@ -120,7 +120,6 @@ namespace rsp::graphics {
 class Key : public Button
 {
 public:
-    TYPEINFO(Key)
     Key();
     Key& Setup(Rect aTouchArea, Rect aArea, int aSymbol = 0);
     Key& SetStyle(Control::States aState, BitmapView &arForeground, BitmapView &arBackground, Color aFrontColor, Color aBackColor);
@@ -129,8 +128,6 @@ public:
 class Keyboard: public Control
 {
 public:
-    TYPEINFO(Keyboard)
-
     using KeyboardCallback_t = rsp::utils::Function<void(const std::string &)>;
 
     static constexpr int cKEY_SHIFT    = 1000000;

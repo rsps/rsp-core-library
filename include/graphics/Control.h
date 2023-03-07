@@ -10,25 +10,24 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include <exceptions/CoreException.h>
-#include <graphics/Canvas.h>
-#include <graphics/Color.h>
-#include <graphics/Rect.h>
-#include <graphics/Renderer.h>
 #include <map>
 #include <vector>
 #include <string_view>
-#include <graphics/Style.h>
-#include <graphics/GfxEvents.h>
+#include <exceptions/CoreException.h>
 #include <logging/Logger.h>
 #include <utils/ConstTypeInfo.h>
 #include <utils/Function.h>
+#include "Canvas.h"
+#include "Color.h"
+#include "Rect.h"
+#include "Renderer.h"
+#include "Style.h"
+#include "GfxEvents.h"
 
 #define GFXLOG(a) DLOG(a)
 //#define GFXLOG(a)
 
-namespace rsp::graphics
-{
+namespace rsp::graphics {
 
 class EControlCast : public exceptions::CoreException
 {
@@ -36,7 +35,8 @@ public:
     EControlCast(const std::string &arName, const std::string &arType) : CoreException(arName + " is not of type " + arType) {};
 };
 
-class Control
+
+class Control : public rsp::utils::TypeInfo
 {
 public:
     using TouchCallback_t = rsp::utils::Function<void(const Point&, uint32_t)>;
@@ -55,42 +55,22 @@ public:
         __COUNT__
     };
 
-    Control(const rsp::utils::TypeInfo &arTypeInfo) : mTypeInfo(arTypeInfo) {}
+    Control() { initTypeInfo<Control>(); }
     virtual ~Control() {}
 
     Control(const Control &arOther) = default;
     Control &operator=(const Control &arOther) = default;
 
-    /**
-     * \brief Get the name of the specific scene.
-     *
-     * \return string with name of scene
-     */
-    const std::string& GetName() const
-    {
-        return mTypeInfo.mName;
-    }
-    Control& SetName(const std::string &arName)
-    {
-        mTypeInfo.mName = arName;
-        return *this;
-    }
-
-    std::uint32_t GetId() const
-    {
-        return mTypeInfo.mId;
-    }
-    Control& SetId(uint32_t aId);
-    Control& SetId(int aId) { return SetId(static_cast<uint32_t>(aId)); }
-    Control& SetId(char aId) { return SetId(static_cast<uint32_t>(aId)); }
+    void setName(const std::string &arName) override;
+    void setId(uint32_t aId) override;
 
     template<class T>
     T& GetAs()
     {
-        if (GetId() != T::ID) {
-            THROW_WITH_BACKTRACE2(EControlCast, GetName(), std::string(T::NAME));
-        }
-        return *static_cast<T*>(this);
+//        if (GetId() != T::ID) {
+//            THROW_WITH_BACKTRACE2(EControlCast, GetName(), std::string(T::NAME));
+//        }
+        return *reinterpret_cast<T*>(this);
     }
 
     /**
@@ -221,8 +201,6 @@ public:
 
     Control& SetBitmapPosition(const Point &arPoint);
 
-    rsp::utils::TypeInfo& GetInfo() { return mTypeInfo; }
-
     /**
      * \brief Processes input for press or click callbacks
      * \param arInput Reference to the input being processed
@@ -278,7 +256,6 @@ protected:
     bool mVisible = true;
     bool mCheckable = false;
     States mState = States::Normal;
-    rsp::utils::TypeInfo mTypeInfo;
     static bool mMustRender;
 
     virtual void paint(Canvas &arCanvas, const Style &arStyle);
@@ -297,10 +274,6 @@ private:
     virtual void doLift(const Point &arPoint);
     virtual void doClick(const Point &arPoint);
 };
-
-#define TYPEINFO(__a) \
-        static constexpr std::uint32_t ID = rsp::utils::crc32::HashOf<__a>(); \
-        static constexpr std::string_view NAME = rsp::utils::NameOf<__a>();
 
 std::string to_string(Control::States aState);
 std::ostream& operator<<(std::ostream& os, const Control::States aState);

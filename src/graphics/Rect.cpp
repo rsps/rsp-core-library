@@ -8,6 +8,7 @@
  * \author      Simon Glashoff
  */
 
+#include <sstream>
 #include <exceptions/CoreException.h>
 #include <graphics/Rect.h>
 
@@ -18,11 +19,18 @@ namespace rsp::graphics
 
 std::ostream& operator <<(std::ostream &aStream, const Rect &arRect)
 {
-    aStream << "Left: " << arRect.GetLeft() << ", "
-        << "Top: " << arRect.GetTop() << ", "
-        << "Width: " << arRect.GetWidth() << ", "
-        << "Height: " << arRect.GetHeight();
+    aStream << "{x: " << arRect.GetLeft() << ", "
+        << "y: " << arRect.GetTop() << ", "
+        << "w: " << arRect.GetWidth() << ", "
+        << "h: " << arRect.GetHeight() << "}";
     return aStream;
+}
+
+std::string to_string(const Rect &arRect)
+{
+    std::stringstream ss;
+    ss << arRect;
+    return ss.str();
 }
 
 Rect::Rect(GuiUnit_t aLeft, GuiUnit_t aTop, GuiUnit_t aWidth, GuiUnit_t aHeight)

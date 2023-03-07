@@ -72,7 +72,7 @@ public:
         mLabel.GetStyle(States::Normal).mBackgroundColor = Color::White;
 
         mKeyboard.SetArea(Rect(KB_X, KB_Y, 460, 350));
-        mKeyboard.GetInfo().mName = "Keyboard";
+        mKeyboard.SetName("Keyboard");
         mKeyboard.OnKeyClick() = rsp::utils::Method(this, &InputScene::onInputChange);
 
         AddChild(&mLabel);

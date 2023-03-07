@@ -55,7 +55,7 @@ public:
         mTopBtn.GetStyle(Control::States::Normal).mBackground.SetPixelData(mNormal);
         mTopBtn.GetStyle(Control::States::Pressed).mBackground.SetPixelData(mPressed);
         mTopBtn.SetDraggable(true);
-        mTopBtn.GetInfo().mName = "TopBtn";
+        mTopBtn.SetName("TopBtn");
 
         mBotBtn.SetArea(GetBotRect());
         mBotBtn.SetTouchArea(GetBotRect());
@@ -63,7 +63,7 @@ public:
         mBotBtn.GetStyle(Control::States::Pressed).mBackground.SetPixelData(mPressed);
         mBotBtn.GetStyle(Control::States::Dragged).mBackground.SetPixelData(mPressed);
         mBotBtn.SetDraggable(true);
-        mBotBtn.GetInfo().mName = "BotBtn";
+        mBotBtn.SetName("BotBtn");
 
         //  Add them to the lists?
         AddChild(&mTopBtn);

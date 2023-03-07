@@ -53,6 +53,59 @@ PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
     mpData = mData.data();
 }
 
+PixelData::PixelData(const PixelData &arOther)
+{
+    assign(arOther);
+}
+
+PixelData::PixelData(PixelData &&arOther)
+{
+    move(std::move(arOther));
+}
+
+PixelData& PixelData::operator=(const PixelData &arOther)
+{
+    if (this != &arOther) {
+        assign(arOther);
+    }
+    return *this;
+}
+
+PixelData& PixelData::operator=(PixelData &&arOther)
+{
+    if (this != &arOther) {
+        move(std::move(arOther));
+    }
+    return *this;
+}
+
+void PixelData::assign(const PixelData& arOther)
+{
+    mColorDepth = arOther.mColorDepth;
+    mRect = arOther.mRect;
+    mData = arOther.mData;
+    if (mData.size() > 0) {
+        mpData = mData.data();
+    }
+    else {
+        mpData = arOther.mpData;
+    }
+}
+
+void PixelData::move(PixelData &&arOther)
+{
+    mColorDepth = arOther.mColorDepth;
+    mRect = std::move(arOther.mRect);
+    mData = std::move(arOther.mData);
+    if (mData.size() > 0) {
+        mpData = mData.data();
+    }
+    else {
+        mpData = arOther.mpData;
+    }
+}
+
+
 PixelData& PixelData::Init(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData)
 {
     mColorDepth = aDepth;
@@ -100,7 +153,7 @@ std::size_t PixelData::GetDataSize() const
 Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const
 {
     if (!GetRect().IsHit(aX, aY)) {
-        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(GetWidth()) + "," + std::to_string(aY) + "<" + std::to_string(GetHeight()) + ")");
+        THROW_WITH_BACKTRACE1(exceptions::OutOfRange, "Pixel coordinates out of range (" + std::to_string(aX) + ", " + std::to_string(aY) + " not in " + to_string(GetRect()) + ")");
     }
     Color result(aColor);
     int offset;
@@ -201,61 +254,6 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
             break;
     }
 
-    return *this;
-}
-
-PixelData::PixelData(const PixelData &arOther)
-{
-    Assign(arOther);
-}
-
-PixelData::PixelData(const PixelData &&arOther)
-{
-    mColorDepth = arOther.mColorDepth;
-    mRect = std::move(arOther.mRect);
-    mData = std::move(arOther.mData);
-    if (mData.size() > 0) {
-        mpData = mData.data();
-    }
-    else {
-        mpData = arOther.mpData;
-    }
-}
-
-PixelData& PixelData::Assign(const PixelData& arOther)
-{
-    if (this != &arOther) {
-        mColorDepth = arOther.mColorDepth;
-        mRect = arOther.mRect;
-        mData = arOther.mData;
-        if (mData.size() > 0) {
-            mpData = mData.data();
-        }
-        else {
-            mpData = arOther.mpData;
-        }
-    }
-    return *this;
-}
-
-PixelData& PixelData::operator =(const PixelData &arOther)
-{
-    return Assign(arOther);
-}
-
-PixelData& PixelData::operator =(const PixelData &&arOther)
-{
-    if (this != &arOther) {
-        mColorDepth = arOther.mColorDepth;
-        mRect = std::move(arOther.mRect);
-        mData = std::move(arOther.mData);
-        if (mData.size() > 0) {
-            mpData = mData.data();
-        }
-        else {
-            mpData = arOther.mpData;
-        }
-    }
     return *this;
 }
 

@@ -101,21 +101,21 @@ TEST_CASE("Graphics Main Test")
 
     Overlay overlay(gfx);
 
-    gfx.RegisterOverlay(&overlay);
+    CHECK_NOTHROW(gfx.RegisterOverlay(&overlay));
 
     SUBCASE("Clear") {
-        renderer.Fill(Color::None);
-        renderer.Present();
-        renderer.Fill(Color::None);
-        renderer.Present();
+        CHECK_NOTHROW(renderer.Fill(Color::None));
+        CHECK_NOTHROW(renderer.Present());
+        CHECK_NOTHROW(renderer.Fill(Color::None));
+        CHECK_NOTHROW(renderer.Present());
     }
 
     SUBCASE("Second Scene") {
-        CHECK_NOTHROW(gfx.ChangeScene(SecondScene::ID));
+        CHECK_NOTHROW(gfx.ChangeScene<SecondScene>());
 
         int topBtnClicked = 0;
         scenes.GetAfterCreate() = [&gfx, &topBtnClicked, &tp](Scene *apScene) {
-            CHECK_EQ(apScene->GetId(), SecondScene::ID);
+            CHECK_EQ(apScene->GetId(), rsp::utils::ID<SecondScene>());
 
             CHECK_NOTHROW(tp.SetEvents(SecondScene::GetTouchEvents().data(), SecondScene::GetTouchEvents().size()));
 
@@ -140,18 +140,18 @@ TEST_CASE("Graphics Main Test")
         CHECK_NOTHROW(gfx.Run(1000, true));
 
         const uint32_t cGreenColor = 0xFF24b40b;
-        Point toppoint = scenes.ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1);
-        Point botpoint = scenes.ActiveSceneAs<SecondScene>().GetBotRect().GetTopLeft() + Point(1,1);
+        Point toppoint = scenes.ActiveScene<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1);
+        Point botpoint = scenes.ActiveScene<SecondScene>().GetBotRect().GetTopLeft() + Point(1,1);
         CHECK_EQ(renderer.GetPixel(toppoint, true), cGreenColor);
         CHECK_EQ(renderer.GetPixel(botpoint, true), cGreenColor);
         CHECK_EQ(topBtnClicked, 2);
     }
 
     SUBCASE("Input Scene") {
-        gfx.ChangeScene(InputScene::ID);
+        CHECK_NOTHROW(gfx.ChangeScene<InputScene>());
 
         scenes.GetAfterCreate() = [&tp](Scene *apScene) {
-            CHECK_EQ(apScene->GetId(), InputScene::ID);
+            CHECK_EQ(apScene->GetId(), rsp::utils::ID<InputScene>());
 
             tp.SetEvents(InputScene::GetTouchEvents().data(), InputScene::GetTouchEvents().size());
         };
@@ -162,61 +162,61 @@ TEST_CASE("Graphics Main Test")
             auto timeout = 200ms;
             switch (progress++) {
                 case 0:
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
+                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
                     break;
                 case 1:
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Center);
+                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Center);
                     break;
                 case 2:
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Right);
+                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Right);
                     break;
                 case 3:
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Left);
+                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Left);
                     break;
                 case 4:
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Center);
+                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Center);
                     break;
                 case 5:
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Right);
+                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Right);
                     break;
                 case 6:
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Center).SetHAlignment(Text::HAlign::Center);
+                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Center).SetHAlignment(Text::HAlign::Center);
                     break;
                 case 7:
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(16);
+                    scenes.ActiveScene<InputScene>().GetLabel().SetFontSize(16);
                     timeout = 500ms;
                     break;
                 case 8:
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(22);
+                    scenes.ActiveScene<InputScene>().GetLabel().SetFontSize(22);
                     timeout = 500ms;
                     break;
                 case 9:
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(26);
+                    scenes.ActiveScene<InputScene>().GetLabel().SetFontSize(26);
                     timeout = 500ms;
                     break;
                 case 10:
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(40);
+                    scenes.ActiveScene<InputScene>().GetLabel().SetFontSize(40);
                     timeout = 500ms;
-                    CHECK_EQ(scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue(), "Hello 128€?sdgp");
+                    CHECK_EQ(scenes.ActiveScene<InputScene>().GetLabel().GetText().GetValue(), "Hello 128€?sdgp");
                     break;
                 case 11:
                     Control::SetTouchAreaColor(Color::Yellow);
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetFont().SetBackgroundColor(Color::Silver);
-                    scenes.ActiveSceneAs<InputScene>().Invalidate();
+                    scenes.ActiveScene<InputScene>().GetLabel().GetText().GetFont().SetBackgroundColor(Color::Silver);
+                    scenes.ActiveScene<InputScene>().Invalidate();
                     timeout = 800ms;
                     break;
                 case 12:
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetCaption("æøåößđŋµÅÖ");
+                    scenes.ActiveScene<InputScene>().GetLabel().SetCaption("æøåößđŋµÅÖ");
                     timeout = 800ms;
                     break;
                 case 13:
                     Control::SetTouchAreaColor(Color::None);
-                    scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetFont().SetBackgroundColor(Color::None);
-                    scenes.ActiveSceneAs<InputScene>().Invalidate();
+                    scenes.ActiveScene<InputScene>().GetLabel().GetText().GetFont().SetBackgroundColor(Color::None);
+                    scenes.ActiveScene<InputScene>().Invalidate();
                     timeout = 200ms;
                     break;
                 default:
-                    CHECK_EQ(scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue(), "æøåößđŋµÅÖ");
+                    CHECK_EQ(scenes.ActiveScene<InputScene>().GetLabel().GetText().GetValue(), "æøåößđŋµÅÖ");
                     gfx.Terminate();
                     break;
             }
@@ -224,7 +224,7 @@ TEST_CASE("Graphics Main Test")
         };
         CHECK_NOTHROW(t1.Enable());
 
-        MESSAGE("Running GFX loop with " << 1000 << " FPS");
+        MESSAGE("Running GFX loop with " << 1000 << " FPS limitation");
         CHECK_NOTHROW(gfx.Run(1000, true));
     }
 

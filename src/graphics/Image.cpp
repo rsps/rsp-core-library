@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <string>
 #include <graphics/Image.h>
-#include <graphics/Rect.h>
 
 namespace rsp::graphics
 {

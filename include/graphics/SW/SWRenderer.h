@@ -27,8 +27,8 @@ public:
     GuiUnit_t GetHeight() const override;
     PixelData::ColorDepth GetColorDepth() const override;
 
-    std::unique_ptr<Texture> CreateTexture(GuiUnit_t aWidth = 0, GuiUnit_t aHeight = 0) override;
-    std::unique_ptr<Texture> CreateStaticTexture(const PixelData &arPixelData) override;
+    std::shared_ptr<Texture> CreateTexture(GuiUnit_t aWidth = 0, GuiUnit_t aHeight = 0) override;
+    std::shared_ptr<Texture> CreateStaticTexture(const PixelData &arPixelData) override;
 
     Renderer& DrawRect(const Rect &arRect, Color aColor) override;
     Renderer& Fill(Color aColor) override;

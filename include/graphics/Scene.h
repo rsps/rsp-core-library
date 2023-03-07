@@ -11,7 +11,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include <graphics/Control.h>
+#include "Control.h"
 #include <vector>
 
 namespace rsp::graphics {
@@ -21,8 +21,7 @@ class Scene: public Control
 public:
     static void SetScreenSize(GuiUnit_t aWidth, GuiUnit_t aHeight);
 
-    Scene(const rsp::utils::TypeInfo &arInfo, const Rect &arRect = mScreenSize)
-        : Control(arInfo)
+    Scene(const Rect &arRect = mScreenSize)
     {
         SetArea(arRect);
     }
@@ -53,16 +52,15 @@ template<class T>
 class SceneBase: public Scene
 {
 public:
-    TYPEINFO(T)
-
     SceneBase()
-        : Scene(rsp::utils::MakeTypeInfo<T>())
     {
+        initTypeInfo<T>();
     }
 
     SceneBase(const Rect &arRect)
-        : Scene(arRect, rsp::utils::MakeTypeInfo<T>())
+        : Scene(arRect)
     {
+        initTypeInfo<T>();
     }
 };
 

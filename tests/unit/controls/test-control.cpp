@@ -17,7 +17,7 @@ using namespace rsp::graphics;
 class TestControl : public Control
 {
 public:
-    TestControl() : Control(rsp::utils::MakeTypeInfo<TestControl>()) { mDirty = false; }
+    TestControl() { initTypeInfo<TestControl>(); mDirty = false; }
 
     void MakeValid() { mDirty = false; }
 };

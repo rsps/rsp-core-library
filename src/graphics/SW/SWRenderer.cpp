@@ -52,7 +52,7 @@ Renderer& SWRenderer::Fill(Color aColor)
     return *this;
 }
 
-std::unique_ptr<Texture> SWRenderer::CreateTexture(GuiUnit_t aWidth, GuiUnit_t aHeight)
+std::shared_ptr<Texture> SWRenderer::CreateTexture(GuiUnit_t aWidth, GuiUnit_t aHeight)
 {
     if (!aWidth) {
         aWidth = GetWidth();
@@ -60,12 +60,12 @@ std::unique_ptr<Texture> SWRenderer::CreateTexture(GuiUnit_t aWidth, GuiUnit_t a
     if (!aHeight) {
         aHeight = GetHeight();
     }
-    return std::make_unique<SWTexture>(aWidth, aHeight, GetColorDepth());
+    return std::make_shared<SWTexture>(aWidth, aHeight, GetColorDepth());
 }
 
-std::unique_ptr<Texture> SWRenderer::CreateStaticTexture(const PixelData &arPixelData)
+std::shared_ptr<Texture> SWRenderer::CreateStaticTexture(const PixelData &arPixelData)
 {
-    auto t = std::make_unique<SWTexture>(arPixelData.GetWidth(), arPixelData.GetHeight(), GetColorDepth());
+    auto t = std::make_shared<SWTexture>(arPixelData.GetWidth(), arPixelData.GetHeight(), GetColorDepth());
 
     t->Update(arPixelData, Color::Black);
 

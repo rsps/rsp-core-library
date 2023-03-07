@@ -31,8 +31,8 @@ public:
     virtual GuiUnit_t GetWidth() const = 0;
     virtual PixelData::ColorDepth GetColorDepth() const = 0;
 
-    virtual std::unique_ptr<Texture> CreateTexture(GuiUnit_t aWidth = 0, GuiUnit_t aHeight = 0) = 0;
-    virtual std::unique_ptr<Texture> CreateStaticTexture(const PixelData &arPixelData) = 0;
+    virtual std::shared_ptr<Texture> CreateTexture(GuiUnit_t aWidth = 0, GuiUnit_t aHeight = 0) = 0;
+    virtual std::shared_ptr<Texture> CreateStaticTexture(const PixelData &arPixelData) = 0;
 
     virtual Renderer& Render(const Texture &arTexture, const Rect * const apDestination = nullptr) = 0;
 

@@ -13,14 +13,13 @@ void SWTexture::Fill(Color aColor)
 }
 
 SWTexture::SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, PixelData::ColorDepth aDepth)
-//    : mPixelData(aWidth, aHeight, aDepth)
+    : mPixelData(aWidth, aHeight, aDepth)
 {
 }
 
 void SWTexture::Update(const PixelData &arPixelData, Color aColor)
 {
-    mpPixelData = &arPixelData;
-//    mPixelData.CopyFrom(Point(0,0), arPixelData, arPixelData.GetRect(), aColor);
+    mPixelData.CopyFrom(Point(0,0), arPixelData, arPixelData.GetRect(), aColor);
 }
 
 } /* namespace rsp::graphics */

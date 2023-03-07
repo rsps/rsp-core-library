@@ -44,7 +44,7 @@ public:
 
     #define AddFactory(T) \
         GFXLOG("Adding scene factory: " << T::NAME << " with id: " << T::ID); \
-        mScenes[T::ID] = []() { \
+        mScenes[rsp::utils::ID<T>()] = []() { \
             Scene* result = new T(); \
             GFXLOG("Created scene: " << result->GetName()); \
             return result; \
@@ -55,11 +55,14 @@ public:
     SceneCreator operator[](std::uint32_t aId);
 
     bool HasActiveScene() { return (mpActiveScene != nullptr); }
-    void SetActiveScene(std::uint32_t aId);
-    Scene& ActiveScene();
 
+    void SetActiveScene(std::uint32_t aId);
+    template <class T>
+    void SetActiveScene() { SetActiveScene(rsp::utils::ID<T>()); }
+
+    Scene& ActiveScene();
     template<class T>
-    T& ActiveSceneAs() { return ActiveScene().GetAs<T>(); }
+    T& ActiveScene() { return dynamic_cast<T&>(ActiveScene()); }
 
 
     SceneNotify& GetAfterCreate() { return mOnCreated; }

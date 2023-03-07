@@ -28,7 +28,7 @@ static void Randomize()
 class TestControl : public Control
 {
 public:
-    TestControl() : Control(rsp::utils::MakeTypeInfo<TestControl>()) {}
+    TestControl() { initTypeInfo<TestControl>(); }
 };
 
 TEST_SUITE_BEGIN("Graphics");

@@ -78,20 +78,63 @@ constexpr uint32_t HashOf() noexcept
 
 } /* namespace crc32 */
 
-struct TypeInfo
+
+template <class T>
+constexpr std::uint32_t ID()
 {
-    std::string mName;
-    union {
-        uint32_t mId;
-        char32_t mIdChar;
-    };
+    return crc32::HashOf<T>();
+}
+
+class TypeInfo
+{
+public:
+    virtual ~TypeInfo() {}
+
+    /**
+     * \brief Get the name of the specific scene.
+     *
+     * \return string with name of scene
+     */
+    const std::string& GetName() const
+    {
+        return mName;
+    }
+
+    void SetName(const std::string &arName) { setName(arName); }
+    void SetName(const char *apName) { setName(std::string(apName)); }
+
+    std::uint32_t GetId() const { return mId; }
+
+    void SetId(uint32_t aId) { setId(aId); }
+    void SetId(int aId) { setId(static_cast<uint32_t>(aId)); }
+    void SetId(char aId) { setId(static_cast<uint32_t>(aId)); }
+
+//    static constexpr std::uint32_t ID = rsp::utils::crc32::HashOf<T>();
+//    static constexpr std::string_view NAME = rsp::utils::NameOf<T>();
+
+protected:
+    template <class T>
+    void initTypeInfo()
+    {
+        mName = std::string(NameOf<T>());
+        mId = ID<T>();
+    }
+
+    virtual void setId(uint32_t aId)
+    {
+        mId = aId;
+    }
+
+    virtual void setName(const std::string &arName)
+    {
+        mName = arName;
+    }
+
+private:
+    std::string mName{};
+    uint32_t mId = 0;
 };
 
-template<typename T>
-TypeInfo MakeTypeInfo() noexcept
-{
-    return {std::string(NameOf<T>()), crc32::HashOf<T>()};
-}
 
 } /* namespace rsp::utils */
 
