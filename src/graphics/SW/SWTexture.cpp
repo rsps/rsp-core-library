@@ -9,12 +9,13 @@ namespace rsp::graphics {
 
 void SWTexture::Fill(Color aColor)
 {
-//    mPixelData.Fill(aColor);
+    mPixelData.Fill(aColor);
 }
 
 SWTexture::SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, PixelData::ColorDepth aDepth)
     : mPixelData(aWidth, aHeight, aDepth)
 {
+    mPixelData.SetBlend(false);
 }
 
 void SWTexture::Update(const PixelData &arPixelData, Color aColor)

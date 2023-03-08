@@ -156,7 +156,7 @@ Keyboard::Keyboard()
         .SetStyle(Control::States::Normal, empty, big_special, Color::Black, Color::White)
         .SetStyle(Control::States::Pressed, empty, big_special, Color::White, Color(0x494A63))
         .SetName("Special");
-    mBtnSpecials.SetCaption("+-/").SetFontSize(22);
+    mBtnSpecials.SetCaption("+*#").SetFontSize(22);
 
     mBtnErase.Setup(Rect(374, 152, 80, 71), small_special.GetBoundingRect({390, 167}), '\b')
         .SetStyle(Control::States::Normal, erase.SetDestination({9, 9}), small_special, Color(0x494A63), Color::White)
@@ -205,7 +205,7 @@ void Keyboard::setSymbols(const std::string &arSymbols)
         btn.SetId(uint32_t(symbol));
         std::wstring ws(1, wchar_t(symbol));
         std::string utf8 = std::wstring_convert<std::codecvt_utf8<wchar_t>>{}.to_bytes(ws);
-        btn.SetCaption(utf8);
+        btn.SetCaption(utf8).SetName(utf8);
     }
 }
 

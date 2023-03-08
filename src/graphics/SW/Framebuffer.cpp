@@ -120,7 +120,7 @@ void Framebuffer::swapBuffer()
     mpFrontBuffer = mpBackBuffer;
     mpBackBuffer = tmp;
 
-    std::memset(mpBackBuffer, 0, mVariableInfo.yres * mFixedInfo.line_length);
+//    std::memset(mpBackBuffer, 0, mVariableInfo.yres * mFixedInfo.line_length);
 }
 
 
@@ -133,9 +133,11 @@ void Framebuffer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
         + static_cast<std::uint32_t>(aY) * mFixedInfo.line_length) / sizeof(std::uint32_t);
     if (arColor.GetAlpha() == 255) {
         mpBackBuffer[location] = arColor;
+//        mpFrontBuffer[location] = arColor;
     }
     else {
         mpBackBuffer[location] = Color::Blend(mpBackBuffer[location], arColor);
+//        mpFrontBuffer[location] = mpBackBuffer[location];
     }
 }
 

@@ -109,9 +109,6 @@ public:
     void SetId(int aId) { setId(static_cast<uint32_t>(aId)); }
     void SetId(char aId) { setId(static_cast<uint32_t>(aId)); }
 
-//    static constexpr std::uint32_t ID = rsp::utils::crc32::HashOf<T>();
-//    static constexpr std::string_view NAME = rsp::utils::NameOf<T>();
-
 protected:
     template <class T>
     void initTypeInfo()

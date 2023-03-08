@@ -56,16 +56,7 @@ void Control::SetState(States aState)
 
 void Control::Invalidate()
 {
-    if (mDirty) {
-        return;
-    }
     mDirty = true;
-//    for (Control* child : mChildren) {
-//        child->Invalidate();
-//    }
-//    if (mTransparent && mpParent) {
-//        mpParent->Invalidate();
-//    }
 }
 
 Control& Control::SetArea(Rect aRect)
@@ -157,16 +148,16 @@ Control& Control::SetBitmapPosition(const Point &arPoint)
 
 bool Control::UpdateData()
 {
-    GFXLOG("Updating Data: " << GetName() << " (" << mArea << ")");
+    GFXLOG("Updating Data: " << GetName() << " " << mArea);
     bool result = false;
     refresh();
     if (mDirty) {
-        GFXLOG("Drawing: " << GetName() << " (" << mArea << ")");
+        GFXLOG("Drawing: " << GetName() << " " << mArea);
         Canvas canvas(mArea.GetWidth(), mArea.GetHeight());
         auto &style = mStyles[mState];
         paint(canvas, style);
-        if (style.mpTexture) {
-            style.mpTexture->Update(canvas.GetPixelData(), style.mForegroundColor);
+        if (mpTexture) {
+            mpTexture->Update(canvas.GetPixelData(), style.mForegroundColor);
         }
         mDirty = false;
         result = true;
@@ -181,10 +172,8 @@ bool Control::UpdateData()
 
 void Control::MakeTextures(Renderer &arRenderer)
 {
-    GFXLOG("Making Textures: " << GetName() << " (" << mArea << ")");
-    for (Style &style : mStyles) {
-        style.mpTexture = arRenderer.CreateTexture(mArea.GetWidth(), mArea.GetHeight());
-    }
+    GFXLOG("Making Textures: " << GetName() << " " << mArea);
+    mpTexture = arRenderer.CreateTexture(mArea.GetWidth(), mArea.GetHeight());
 
     for (Control* child : mChildren) {
         child->MakeTextures(arRenderer);
@@ -193,14 +182,13 @@ void Control::MakeTextures(Renderer &arRenderer)
 
 void Control::Render(Renderer &arRenderer)
 {
-    GFXLOG("Rendering: " << GetName() << " (" << this << ")");
-
     if (!mVisible) {
         return;
     }
 
-    if (mStyles[mState].mpTexture) {
-        arRenderer.Render(*mStyles[mState].mpTexture, &mArea);
+    if (mpTexture) {
+        GFXLOG("Rendering: " << GetName() << " " << mArea);
+        arRenderer.Render(*mpTexture, &mArea);
     }
 
     for (Control* child : mChildren) {
@@ -216,8 +204,8 @@ void Control::Render(Renderer &arRenderer)
 
 void Control::paint(Canvas &arCanvas, const Style &arStyle)
 {
-    if (!mTransparent && (arStyle.mBackgroundColor != Color::None)) {
-        arCanvas.Fill(arStyle.mBackgroundColor);
+    if (mTransparent) {
+        arCanvas.Fill(Color::None);
     }
     else {
         arCanvas.Fill(arStyle.mBackgroundColor);

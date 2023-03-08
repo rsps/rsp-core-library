@@ -121,9 +121,7 @@ void Canvas::DrawLine(const Point &arA, const Point &arB, const Color &arColor)
 
 void Canvas::DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData, const Rect &arSection, Color aColor)
 {
-    mBlend = true;
     CopyFrom(arLeftTop, arPixelData, arSection, aColor);
-    mBlend = false;
 }
 
 Canvas& Canvas::SetClipRect(const Rect &arClipRect)

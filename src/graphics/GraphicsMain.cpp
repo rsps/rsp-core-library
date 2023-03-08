@@ -83,7 +83,6 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
         int64_t delay = std::max(std::int64_t(0), frame_time - sw.Elapsed<std::chrono::milliseconds>());
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         mFps = 1000 / std::max(std::int64_t(1), sw.Elapsed<std::chrono::milliseconds>());
-        Terminate();
     }
 }
 

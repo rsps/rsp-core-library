@@ -33,7 +33,7 @@ public:
     Renderer& DrawRect(const Rect &arRect, Color aColor) override;
     Renderer& Fill(Color aColor) override;
 
-    Renderer& Render(const Texture &arTexture, const Rect * const apDestination = nullptr) override;
+    Renderer& Render(const Texture &arTexture, const Rect * const apDestination = nullptr, const Rect * const apSource = nullptr) override;
 
     void Present() override;
 };

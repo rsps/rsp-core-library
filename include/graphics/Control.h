@@ -254,6 +254,7 @@ protected:
     bool mCheckable = false;
     States mState = States::Normal;
     static bool mMustRender;
+    std::shared_ptr<Texture> mpTexture{};
 
     void setName(const std::string &arName) override;
     void setId(uint32_t aId) override;

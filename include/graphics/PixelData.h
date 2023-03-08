@@ -87,6 +87,8 @@ public:
 
     void SaveToCFile(const std::filesystem::path &arFileName);
 
+    bool SetBlend(bool aValue);
+
 protected:
     ColorDepth mColorDepth = ColorDepth::RGB;
     Rect mRect{};

@@ -365,18 +365,22 @@ TEST_CASE("Framebuffer")
     SUBCASE("Moving image")
     {
         // Arrange
-        Point topLeftPoint(100, 200);
         Bitmap imgSimple("testImages/testImage.bmp");
         int iterations = 100;
+
+        auto sprite = renderer.CreateTexture(imgSimple.GetWidth(), imgSimple.GetHeight());
+        sprite->Update(imgSimple, Color::Black);
+        Rect dst = imgSimple.GetRect();
+        dst.MoveTo(Point(100, 200));
+        texture->Fill(Color::Green); // Background
 
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
-            CHECK_NOTHROW(canvas.Fill(Color::Black));
-            CHECK_NOTHROW(canvas.DrawPixelData(topLeftPoint + Point(0, static_cast<GuiUnit_t>(-i)), imgSimple));
-            CHECK_NOTHROW(texture->Update(canvas, Color::White));
-            CHECK_NOTHROW(renderer.Render(*texture));
+//            CHECK_NOTHROW(renderer.Render(*texture));
+            CHECK_NOTHROW(renderer.Render(*sprite, &dst));
             CHECK_NOTHROW(renderer.Present());
+            dst.SetTop(100 - i);
         }
         int fps = (1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
 
@@ -388,7 +392,6 @@ TEST_CASE("Framebuffer")
     SUBCASE("Moving monochrome image")
     {
         // Arrange
-        Point topLeftPoint(100, 200);
         Bitmap imgSimple("testImages/Monochrome.bmp");
         int iterations = 100;
         Color mcl[5] = {
@@ -399,14 +402,18 @@ TEST_CASE("Framebuffer")
             Color::Yellow
         };
 
+        auto sprite = renderer.CreateTexture(imgSimple.GetWidth(), imgSimple.GetHeight());
+//        sprite->Update(imgSimple, Color::Black);
+        Rect dst = imgSimple.GetRect();
+        dst.MoveTo(Point(100, 200));
+
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
-            CHECK_NOTHROW(canvas.Fill(Color::Black));
-            CHECK_NOTHROW(canvas.DrawPixelData(topLeftPoint + Point(0, static_cast<GuiUnit_t>(-i)), imgSimple, imgSimple.GetRect(), mcl[(i / 20) % 5]));
-            CHECK_NOTHROW(texture->Update(canvas, Color::White));
-            CHECK_NOTHROW(renderer.Render(*texture));
+            CHECK_NOTHROW(sprite->Update(imgSimple, mcl[(i / 20) % 5]));
+            CHECK_NOTHROW(renderer.Render(*sprite, &dst));
             CHECK_NOTHROW(renderer.Present());
+            dst.SetTop(100 - i);
 //            std::this_thread::sleep_for(std::chrono::milliseconds(25));
         }
         int fps = (1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
@@ -453,7 +460,7 @@ TEST_CASE("Framebuffer")
                 CHECK_NOTHROW(text.SetValue("BLUE").SetColor(Color::Blue));
             }
 
-            CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.SetScaleToFit(scale).Reload()));
+            CHECK_NOTHROW(text.SetScaleToFit(scale).Reload().Paint(canvas, text.GetFont().GetColor()));
             CHECK_NOTHROW(texture->Update(canvas, Color::White));
             CHECK_NOTHROW(renderer.Render(*texture));
             CHECK_NOTHROW(renderer.Present());
@@ -464,23 +471,18 @@ TEST_CASE("Framebuffer")
             const Color rainbow[] = { Color::White, Color::Red, Color::Yellow, Color::Green, Color::Aqua, Color::Lime, Color::Blue, Color::Silver };
 
             MESSAGE("FPS Test");
-            CHECK_NOTHROW(text.SetScaleToFit(true).SetLineSpacing(50).GetFont().SetColor(Color::White).SetBackgroundColor(Color::Black));
-    //        Rect screen(0, 0, 480, 800);
+            CHECK_NOTHROW(text.SetScaleToFit(true).SetLineSpacing(50).SetValue("FPS:\n0").Reload().SetScaleToFit(false));
+
             rsp::utils::StopWatch sw;
-            for (int i = 0 ; i < 500 ; i++) {
-    //            fb.DrawRectangle(screen, rainbow[i & 0x07], true);
+            for (int i = 0 ; i < 50 ; i++) {
                 CHECK_NOTHROW(canvas.Fill(rainbow[i & 0x07]));
-//                CHECK_NOTHROW(text.GetFont().SetBackgroundColor(rainbow[i & 0x07]));
                 int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
                 std::stringstream ss;
                 ss << "FPS:\n" << fps;
-                CHECK_NOTHROW(text.SetValue(ss.str()).Reload());
-                CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text));
+                CHECK_NOTHROW(text.SetValue(ss.str()).Reload().Paint(canvas, Color::Black));
                 CHECK_NOTHROW(texture->Update(canvas, Color::None));
                 CHECK_NOTHROW(renderer.Render(*texture));
                 CHECK_NOTHROW(renderer.Present());
-
-                CHECK_NOTHROW(text.SetScaleToFit(false)); // Only scale first time to speed it up
             }
             MESSAGE(text.GetValue());
         }
@@ -498,8 +500,8 @@ TEST_CASE("Framebuffer")
 
         CHECK_NOTHROW(canvas.DrawRectangle(r, Color::White));
         Text text("Exo 2", "Hello\nWorld");
-        CHECK_NOTHROW(text.SetArea(r).GetFont().SetSize(50).SetColor(Color::Yellow));
-        CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+        CHECK_NOTHROW(text.SetArea(r).GetFont().SetSize(50));
+        CHECK_NOTHROW(text.Reload().Paint(canvas, Color::Yellow));
         CHECK_NOTHROW(texture->Update(canvas, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_NOTHROW(renderer.Present());
@@ -513,7 +515,7 @@ TEST_CASE("Framebuffer")
                 CHECK_NOTHROW(canvas.Fill(Color::Black));
                 CHECK_NOTHROW(canvas.DrawRectangle(r, Color::White));
                 CHECK_NOTHROW(text.SetVAlignment(cVertical[v]).SetHAlignment(cHorizontal[h]));
-                CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+                CHECK_NOTHROW(text.Reload().Paint(canvas, Color::Yellow));
                 CHECK_NOTHROW(texture->Update(canvas, Color::White));
                 CHECK_NOTHROW(renderer.Render(*texture));
                 CHECK_NOTHROW(renderer.Present());
@@ -533,30 +535,30 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(canvas.Fill(Color::Black));
         CHECK_NOTHROW(canvas.DrawRectangle(r2, Color::White));
         Text text("Exo 2", "Regular");
-        CHECK_NOTHROW(text.SetArea(r).SetScaleToFit(true).GetFont().SetSize(50).SetColor(Color::Yellow).SetBackgroundColor(Color::Black));
+        CHECK_NOTHROW(text.SetArea(r).SetScaleToFit(true).GetFont().SetSize(50));
 
-        CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+        CHECK_NOTHROW(text.Reload().Paint(canvas, Color::Yellow));
         CHECK_NOTHROW(texture->Update(canvas, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         CHECK_NOTHROW(text.SetValue("Bold").GetFont().SetStyle(FontStyles::Bold));
-        CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+        CHECK_NOTHROW(text.Reload().Paint(canvas, Color::Yellow));
         CHECK_NOTHROW(texture->Update(canvas, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         CHECK_NOTHROW(text.SetValue("Italic").GetFont().SetStyle(FontStyles::Italic));
-        CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+        CHECK_NOTHROW(text.Reload().Paint(canvas, Color::Yellow));
         CHECK_NOTHROW(texture->Update(canvas, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         CHECK_NOTHROW(text.SetValue("Bold Italic").GetFont().SetStyle(FontStyles::BoldItalic));
-        CHECK_NOTHROW(canvas.DrawPixelData(text.GetArea().GetTopLeft(), text.Reload()));
+        CHECK_NOTHROW(text.Reload().Paint(canvas, Color::Yellow));
         CHECK_NOTHROW(texture->Update(canvas, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));
         CHECK_NOTHROW(renderer.Present());

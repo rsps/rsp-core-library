@@ -43,26 +43,17 @@ Control& Label::SetOrigin(const Point &arPoint)
 {
     Point difference = arPoint - mArea.GetTopLeft();
     Control::SetOrigin(arPoint);
-    Rect r = mText.GetArea();
-    r.MoveTo(r.GetTopLeft() + difference);
-    mText.SetArea(r);
+//    Rect r = mText.GetArea();
+//    r.MoveTo(r.GetTopLeft() + difference);
+//    mText.SetArea(r);
     return *this;
 }
 
 void Label::doSetArea(const Rect &arRect)
 {
     Rect r = arRect;
-    if (mpParent) {
-        r.MoveTo(r.GetTopLeft() + mpParent->GetOrigin());
-    }
+    r.MoveTo(Point());
     mText.SetArea(r);
-}
-
-
-void Label::paint(Canvas &arCanvas, const Style &arStyle)
-{
-    Control::paint(arCanvas, arStyle);
-    arCanvas.DrawPixelData(mText.GetArea().GetTopLeft(), mText.GetPixelData(), mText.GetPixelData().GetRect(), arStyle.mForegroundColor);
 }
 
 Label& Label::SetFontSize(int aSizePx)
@@ -77,6 +68,12 @@ void Label::refresh()
         mText.Reload();
         Invalidate();
     }
+}
+
+void Label::paint(Canvas &arCanvas, const Style &arStyle)
+{
+    Control::paint(arCanvas, arStyle);
+    mText.Paint(arCanvas, arStyle.mForegroundColor);
 }
 
 } /* namespace rsp::graphics */

@@ -34,6 +34,7 @@ public:
 
 protected:
     Text mText{};
+    Point mTextOrigin{};
 
     void paint(Canvas &arCanvas, const Style &arStyle) override;
     void refresh() override;

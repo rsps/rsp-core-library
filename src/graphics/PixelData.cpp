@@ -348,4 +348,11 @@ void PixelData::Fill(Color aColor)
     }
 }
 
+bool PixelData::SetBlend(bool aValue)
+{
+    bool result = mBlend;
+    mBlend = aValue;
+    return result;
+}
+
 } /* namespace rsp::graphics */

@@ -16,14 +16,23 @@ using namespace rsp::logging;
 namespace rsp::graphics {
 
 Text::Text(const std::string &arFontName)
-    : mFont(arFontName), mArea()
+    : mFont(arFontName)
 {
 }
 
 Text::Text(const std::string &arFontName, const std::string &arText)
-    : mFont(arFontName), mArea()
+    : mFont(arFontName)
 {
     SetValue(arText);
+}
+
+Text& Text::SetValue(const std::string &arValue)
+{
+    if (mValue != arValue) {
+        mValue = arValue;
+        mDirty = true;
+    }
+    return *this;
 }
 
 Text& Text::SetArea(const Rect &arRect)
@@ -31,7 +40,6 @@ Text& Text::SetArea(const Rect &arRect)
     if (mArea != arRect) {
         mArea = arRect;
         mDirty = true;
-        Init(mArea.GetWidth(), mArea.GetHeight(), PixelData::ColorDepth::RGBA, nullptr);
     }
     return *this;
 }
@@ -58,8 +66,16 @@ Text& Text::Reload()
     }
 
     loadGlyphs();
-    drawText();
     mDirty = false;
+    return *this;
+}
+
+Text& Text::SetScaleToFit(bool aValue)
+{
+    if (mScaleToFit != aValue) {
+        mScaleToFit = aValue;
+        mDirty = true;
+    }
     return *this;
 }
 
@@ -106,34 +122,34 @@ void Text::calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs)
     alignGlyphs();
     return;
 
-    int w = 0;
-    int h = apGlyphs->mLineHeight;
-    int line_count = 1;
-    int line_width = 0;
-    for (unsigned i=0 ; i < apGlyphs->GetCount(); ++i) {
-        const Glyph &glyph = apGlyphs->GetGlyph(i);
-        if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
-            line_count++;
-            if (w > line_width) {
-                line_width = w;
-            }
-            w = 0;
-        }
-        else {
-            w += glyph.mAdvanceX; //.mWidth;
-        }
-    }
-    if (w > line_width) {
-        line_width = w;
-    }
-
-    mBoundingRect = Rect(0, 0, line_width, (h * line_count) + ((line_count - 1) * mLineSpacing));
-    alignGlyphs();
-
-    if (apGlyphs->GetCount()) {
-        const Glyph &glyph = apGlyphs->GetGlyph(0);
-        mBoundingRect.MoveTo(Point(glyph.mLeft, glyph.mTop));
-    }
+//    int w = 0;
+//    int h = apGlyphs->mLineHeight;
+//    int line_count = 1;
+//    int line_width = 0;
+//    for (unsigned i=0 ; i < apGlyphs->GetCount(); ++i) {
+//        const Glyph &glyph = apGlyphs->GetGlyph(i);
+//        if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
+//            line_count++;
+//            if (w > line_width) {
+//                line_width = w;
+//            }
+//            w = 0;
+//        }
+//        else {
+//            w += glyph.mAdvanceX; //.mWidth;
+//        }
+//    }
+//    if (w > line_width) {
+//        line_width = w;
+//    }
+//
+//    mBoundingRect = Rect(0, 0, line_width, (h * line_count) + ((line_count - 1) * mLineSpacing));
+//    alignGlyphs();
+//
+//    if (apGlyphs->GetCount()) {
+//        const Glyph &glyph = apGlyphs->GetGlyph(0);
+//        mBoundingRect.MoveTo(Point(glyph.mLeft, glyph.mTop));
+//    }
 }
 
 void Text::loadGlyphs()
@@ -188,37 +204,33 @@ void Text::alignGlyphs()
     mBoundingRect.MoveTo(mArea.GetTopLeft() + Point(hoffset, voffset));
 }
 
-void Text::drawText()
+void Text::Paint(Canvas &arCanvas, Color aColor)
 {
-    Fill(mFont.GetBackgroundColor());
     auto &glyphs = GetGlyphs();
     if (!glyphs) {
         std::cout << "No glyphs to paint!!" << std::endl;
         return;
     }
-    auto color = mFont.GetColor();
     for (unsigned i=0; i < glyphs->GetCount() ; ++i) {
         Glyph &glyph = glyphs->GetGlyph(i);
-        auto py = glyph.mTop;
+        GuiUnit_t py = GuiUnit_t(glyph.mTop);
         for (int y = 0; y < glyph.mHeight; y++) {
             const uint8_t* p_row = glyph.GetPixelRow(y);
-            auto px = glyph.mLeft;
+            GuiUnit_t px = GuiUnit_t(glyph.mLeft);
             for (int x = 0; x < glyph.mWidth; x++) {
                 auto c = *p_row++;
                 if (!c) {
                     px++;
                     continue;
                 }
-
-                if (mRect.IsHit(px, py)) {
-                    color.SetAlpha(c);
-                    SetPixelAt(px, py, color);
-                }
+                aColor.SetAlpha(c);
+                arCanvas.SetPixelAt(px, py, aColor);
                 px++;
             }
             py++;
         }
     }
+
 }
 
 }

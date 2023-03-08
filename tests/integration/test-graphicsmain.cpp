@@ -39,9 +39,18 @@ public:
         GetStyle(States::Normal).mForegroundColor = Color::Yellow;
         GetStyle(States::Normal).mBackgroundColor = Color::Black;
         SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
+        SetName("Overlay");
     }
 
-    bool UpdateData() override {
+protected:
+    GraphicsMain &mrGfx;
+    int mIterations = 0;
+    int mTotalFps = 0;
+    int mMinFps = 10000000;
+    int mMaxFps = 0;
+
+    void refresh() override
+    {
         int fps = mrGfx.GetFPS();
         mIterations++;
         mTotalFps += fps;
@@ -52,16 +61,8 @@ public:
             mMaxFps = fps;
         }
         SetCaption("FPS: " + std::to_string(fps) + ", " + std::to_string(mTotalFps / mIterations) + ", " + std::to_string(mMinFps) + ", " + std::to_string(mMaxFps));
-        refresh();
-        return true;
+        Label::refresh();
     }
-
-protected:
-    GraphicsMain &mrGfx;
-    int mIterations = 0;
-    int mTotalFps = 0;
-    int mMinFps = 10000000;
-    int mMaxFps = 0;
 };
 
 TEST_CASE("Graphics Main Test")

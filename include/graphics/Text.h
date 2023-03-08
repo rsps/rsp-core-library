@@ -11,10 +11,11 @@
 #ifndef INCLUDE_GRAPHICS_TEXT_H_
 #define INCLUDE_GRAPHICS_TEXT_H_
 
-#include <graphics/Canvas.h>
-#include <graphics/Font.h>
-#include <graphics/Rect.h>
 #include <string>
+#include "Canvas.h"
+#include "Font.h"
+#include "Rect.h"
+#include "Style.h"
 
 namespace rsp::graphics {
 
@@ -29,7 +30,7 @@ namespace rsp::graphics {
  * the rebuild of the glyphs is a manual process.
  * To rebuild the glyphs the Reload method must be called.
  */
-class Text : public Canvas
+class Text
 {
 public:
     enum class HAlign : uint8_t {
@@ -46,7 +47,7 @@ public:
     /**
      * \brief Constructs an empty text element with the default font.
      */
-    Text() : Canvas(), mFont(), mArea() {}
+    Text() : mFont(), mArea() {}
 
     /**
      * \brief Constructs an empty text element with the given font.
@@ -84,7 +85,7 @@ public:
      * \param arValue
      * \return Reference to this for fluent calls.
      */
-    Text& SetValue(const std::string &arValue) { mValue = arValue; mDirty = true; return *this; }
+    Text& SetValue(const std::string &arValue);
 
     /**
      * Getter for the area where the text is drawn on a canvas.
@@ -106,7 +107,8 @@ public:
      *
      * \return Reference to Font.
      */
-    Font& GetFont() { return mFont; }
+    Font& GetFont() { mDirty = true; return mFont; }
+    const Font& GetFont() const { return mFont; }
 
     /**
      * \brief Shortcut to Font::SetColor
@@ -127,7 +129,7 @@ public:
      * \param aValue
      * \return Reference to this for fluent calls.
      */
-    Text& SetScaleToFit(bool aValue = true) { mScaleToFit = aValue; mDirty = true; return *this; }
+    Text& SetScaleToFit(bool aValue = true);
 
     /**
      * Get the current value of the line spacing.
@@ -215,9 +217,17 @@ public:
      */
     const Rect& GetBoundingRect() const { return mBoundingRect; }
 
+    /**
+     * \brief Paint glyphs on the given canvas
+     *
+     * \param arCanvas
+     * \param arStyle
+     */
+    void Paint(Canvas &arCanvas, Color aColor);
+
 protected:
     Font mFont;
-    Rect mArea;
+    Rect mArea{};
     Rect mBoundingRect{};
     std::string mValue{};
     bool mScaleToFit = false;
@@ -233,7 +243,6 @@ protected:
     void loadGlyphs();
     void alignGlyphs();
     void calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs);
-    void drawText();
 };
 
 } /* namespace rsp::graphics */
