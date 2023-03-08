@@ -64,7 +64,7 @@ TEST_CASE("Framebuffer")
         renderer.Fill(Color::None);
         renderer.Present();
         canvas.Fill(Color::None);
-        texture->Fill(Color::None);
+//        texture->Fill(Color::None);
     }
 
     SUBCASE("Drawing Lines")
@@ -372,7 +372,7 @@ TEST_CASE("Framebuffer")
         sprite->Update(imgSimple, Color::Black);
         Rect dst = imgSimple.GetRect();
         dst.MoveTo(Point(100, 200));
-        texture->Fill(Color::Green); // Background
+//        texture->Fill(Color::Green); // Background
 
         // Act
         rsp::utils::StopWatch sw;
