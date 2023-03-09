@@ -36,7 +36,7 @@ public:
      * \brief Fill this texture with the given color
      * \param aColor
      */
-    virtual void Fill(Color aColor) = 0;
+//    virtual void Fill(Color aColor) = 0;
 };
 
 } /* namespace rsp::graphics */
