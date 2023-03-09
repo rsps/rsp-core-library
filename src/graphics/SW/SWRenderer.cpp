@@ -11,6 +11,7 @@
 #include <cstring>
 #include <graphics/SW/SWRenderer.h>
 #include <graphics/SW/SWTexture.h>
+#include <graphics/GfxHal.h>
 
 namespace rsp::graphics {
 
