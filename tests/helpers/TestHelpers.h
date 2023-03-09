@@ -23,7 +23,8 @@ public:
     static void ParseArguments(const char ** apArgv);
 
     static std::string ToHex(const std::string &arString);
-    static std::string ToHex(const std::uint8_t *apData, std::uint32_t aSize);
+//    static std::string ToHex(const std::uint8_t *apData, std::uint32_t aSize);
+    static std::string ToHex(const uint8_t *apData, std::uint32_t aSize, std::uint32_t aSizeOf);
 
     static bool ValidateJson(const std::string &arJson);
     static bool ValidateJsonFile(const std::string &arJsonFile);
@@ -31,5 +32,11 @@ public:
 protected:
     static rsp::logging::LogLevel mLogLevel;
 };
+
+template <class T>
+std::string ToHex(const T* apData, std::uint32_t aSize)
+{
+    return TestHelpers::ToHex(reinterpret_cast<const uint8_t*>(apData), aSize, sizeof(T));
+}
 
 #endif /* TESTS_HELPERS_TESTHELPERS_H_ */

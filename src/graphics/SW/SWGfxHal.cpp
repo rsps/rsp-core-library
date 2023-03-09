@@ -8,8 +8,6 @@
  * \author      Steffen Brummer
  */
 
-#ifdef USE_GFX_SW
-
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
@@ -19,15 +17,24 @@ namespace rsp::graphics {
 
 GfxHal& GfxHal::Get()
 {
-    static SWGfxHal instance;
-    return instance;
+    if (!sw::SWGfxHal::HasInstance()) {
+        sw::SWGfxHal::Create();
+    }
+
+    return rsp::utils::Singleton<sw::SWGfxHal>::Get();
 }
+
+} /* namespace rsp::graphics */
+
+#ifdef USE_GFX_SW
+
+namespace rsp::graphics::sw {
 
 
 void SWGfxHal::Alloc(VideoSurface &arSurface, int aWidth, int aHeight)
 {
-    arSurface.mpPhysAddr = std::unique_ptr<uint32_t>(new uint32_t[aWidth * aHeight], [](uint32_t *p){ delete[] p; });
-    arSurface.mRowPitch = aWidth;
+    arSurface.mpPhysAddr = std::unique_ptr<uint32_t[]>(new uint32_t[aWidth * aHeight]);
+    arSurface.mRowPitch = aWidth * GuiUnit_t(sizeof(uint32_t));
     arSurface.mWidth = aWidth;
     arSurface.mHeight = aHeight;
 }
@@ -45,14 +52,14 @@ void SWGfxHal::Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalPtr<
         sr &= *aSrcRect;
     }
 
-    uint32_t *src = arSrc.mpPhysAddr.get() + sr.GetLeft();
-    uint32_t *dst = arDst.mpPhysAddr.get() + dr.GetLeft();
+    uint8_t *src = reinterpret_cast<uint8_t*>(&arSrc.mpPhysAddr.get()[sr.GetLeft()]);
+    uint8_t *dst = reinterpret_cast<uint8_t*>(&arDst.mpPhysAddr.get()[dr.GetLeft()]);
 
     int y_end = std::min(dr.GetHeight(), sr.GetHeight());
-    int w = std::min(dr.GetWidth(), sr.GetWidth());
+    size_t w = size_t(std::min(dr.GetWidth(), sr.GetWidth())) * sizeof(uint32_t);
 
     for (int y = dr.GetTop(); y < y_end ; ++y) {
-        std::memcpy((dst + (y * GuiUnit_t(arDst.mRowPitch))), (src + (y * GuiUnit_t(arSrc.mRowPitch))), size_t(w));
+        std::memcpy((dst + (y * arDst.mRowPitch)), (src + (y * arSrc.mRowPitch)), w);
     }
 }
 
@@ -60,10 +67,10 @@ void SWGfxHal::DrawRect(VideoSurface &arDst, const Rect &arRect, uint32_t aColor
 {
     Rect r = arRect & Rect(0, 0, arDst.mWidth, arDst.mHeight);
 
-    GuiUnit_t pitch = GuiUnit_t(arDst.mRowPitch);
+    GuiUnit_t pitch = arDst.mRowPitch;
 
-    uint32_t *left = arDst.mpPhysAddr.get() + (((r.GetTop() * pitch) + r.GetLeft()) * sizeof(uint32_t));
-    uint32_t *right = arDst.mpPhysAddr.get() + (((r.GetTop() * pitch) + r.GetRight() - 1) * sizeof(uint32_t));
+    uint32_t *left = arDst.mpPhysAddr.get() + (((r.GetTop() * pitch) + r.GetLeft()) * GuiUnit_t(sizeof(uint32_t)));
+    uint32_t *right = arDst.mpPhysAddr.get() + (((r.GetTop() * pitch) + r.GetRight() - 1) * GuiUnit_t(sizeof(uint32_t)));
     for (int y = r.GetTop() ; y < r.GetBottom() ; ++y) {
         *left = aColor;
         *right = aColor;

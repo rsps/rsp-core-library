@@ -53,39 +53,49 @@ void TestHelpers::ParseArguments(const char **apArgv)
 
 std::string TestHelpers::ToHex(const std::string &arString)
 {
-    return ToHex(reinterpret_cast<const std::uint8_t*>(arString.c_str()), arString.size());
+    return ToHex(reinterpret_cast<const std::uint8_t*>(arString.c_str()), arString.size(), 1);
 }
 
-std::string TestHelpers::ToHex(const std::uint8_t *apData, std::uint32_t aSize)
+std::string TestHelpers::ToHex(const uint8_t *apData, std::uint32_t aSize, std::uint32_t aSizeOf)
 {
     std::stringstream out;
     std::string delim = ", ";
     std::string line;
+    size_t mod = 16 / aSizeOf;
 
     for (std::size_t i = 0 ; i < aSize ; i++) {
-        if ((i % 16) == 0) {
+        if ((i % mod) == 0) {
             out << "    ";
         }
         if (i == (aSize - 1)) {
             delim = "  ";
         }
-        if (char(*apData) >= '0' && char(*apData) <= 'z') {
-            line += char(*apData);
+        if (aSizeOf == 1) {
+            char ch = *reinterpret_cast<const char*>(apData);
+            if (ch >= '0' && ch <= 'z') {
+                line += ch;
+            }
+            else {
+                line += '.';
+            }
         }
-        else {
-            line += '.';
+        uint32_t value = 0;
+        for (uint32_t n=0 ; n < aSizeOf ; ++n) {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+            value = value + (uint32_t(*apData++) << (8*n));
+#else
+            value = (value << 8) + *apData++;
+#endif
         }
 
-        out << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<unsigned int>(*apData) << delim;
+        out << "0x" << std::setw(int(2*aSizeOf)) << std::setfill('0') << std::hex << value << delim;
 
-        apData++;
-
-        if ((i % 16) == 15) {
+        if ((i % mod) == (mod - 1)) {
             out << "  " << line << "\n";
             line.clear();
         }
     }
-    if ((aSize % 16) != 15) {
+    if ((aSize % mod) != (mod - 1)) {
         out << std::string((16 - (aSize % 16)) * 6, ' ') << "  " << line << "\n";
     }
     out << std::dec;

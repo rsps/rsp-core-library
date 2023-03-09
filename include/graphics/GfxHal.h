@@ -15,6 +15,7 @@
 #include <memory>
 #include <functional>
 #include "Color.h"
+#include "GuiUnit.h"
 #include "Rect.h"
 
 namespace rsp::graphics {
@@ -44,11 +45,11 @@ protected:
  */
 struct VideoSurface
 {
-    std::unique_ptr<uint32_t> mpPhysAddr{}; // Pointer to 32-bit ARGB pixels
-    uint32_t mRowPitch = 0; // Number of bytes per row in physical memory (alignment vs. width)
-    uint32_t mWidth = 0;
-    uint32_t mHeight = 0;
-    uint32_t mRotation = 0; // Rotation of this surface. Only supports: 0, 90, 180, 270
+    std::unique_ptr<uint32_t[]> mpPhysAddr{}; // Pointer to 32-bit ARGB pixels
+    GuiUnit_t mRowPitch = 0; // Number of bytes per row in physical memory (alignment vs. width)
+    GuiUnit_t mWidth = 0;
+    GuiUnit_t mHeight = 0;
+    int mRotation = 0; // Rotation of this surface. Only supports: 0, 90, 180, 270
 };
 
 /**
@@ -66,6 +67,7 @@ public:
      * \return self
      */
     static GfxHal& Get();
+
     virtual ~GfxHal() {}
 
     /**

@@ -11,13 +11,14 @@
 #ifndef SRC_GRAPHICS_SW_SWGFXHAL_H_
 #define SRC_GRAPHICS_SW_SWGFXHAL_H_
 
+#include <graphics/GfxHal.h>
+#include <utils/Singleton.h>
+
 #ifdef USE_GFX_SW
 
-#include <graphics/GfxHal.h>
+namespace rsp::graphics::sw {
 
-namespace rsp::graphics {
-
-class SWGfxHal: public GfxHal
+class SWGfxHal: public rsp::graphics::GfxHal, public rsp::utils::Singleton<SWGfxHal>
 {
 public:
     void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalPtr<Rect> aDstRect, OptionalPtr<Rect> aSrcRect) override;

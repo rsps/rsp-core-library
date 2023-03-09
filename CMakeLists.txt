@@ -10,7 +10,7 @@ OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enable
 OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
 OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
 OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
-OPTION(SDL2 "Use SDL2 for graphic accelleration." ON)
+OPTION(SDL2 "Use SDL2 for graphic accelleration." OFF)
 
 if(ARCH_ARM)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
