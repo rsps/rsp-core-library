@@ -55,8 +55,10 @@ find_package(Git REQUIRED)
 
 if (SDL2)
     include("cmake/libSDL2pp.cmake")
-    set(SDL_BUILD_OPTIONS -DUSE_SDL)
+    set(SDL_BUILD_OPTIONS -DUSE_GFX_SDL)
     set(SDL_LIB ${SDL2PP_LIBRARIES} ${SDL2_LIBRARIES})
+else()
+    set(SDL_BUILD_OPTIONS -DUSE_GFX_SW)
 endif()
 
 include("cmake/strict-compile-options.cmake")

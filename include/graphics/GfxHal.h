@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <memory>
+#include <functional>
 #include "Color.h"
 #include "Rect.h"
 
@@ -28,12 +29,13 @@ template <class T>
 class OptionalPtr
 {
 public:
-    OptionalPtr(T* apValue = nullptr) : mPtr(apValue) {}
-    OptionalPtr(T &aValue) : mPtr(&aValue) {}
+    OptionalPtr(const T* apValue = nullptr) : mPtr(apValue) {}
+    OptionalPtr(const T &aValue) : mPtr(&aValue) {}
     operator bool() const { return (mPtr); }
-    const T& Get() const { return *mPtr; }
+    const T& operator->() const { return *mPtr; }
+    const T& operator*() const { return *mPtr; }
 protected:
-    T* mPtr;
+    const T* mPtr;
 };
 
 /**
@@ -83,11 +85,11 @@ public:
     /**
      * \brief Draw a rectangle with single pixel line width in a given color
      *
-     * \param arSurface Destination surface
+     * \param arDst Destination surface
      * \param arRect
      * \param aColor
      */
-    virtual void DrawRect(VideoSurface &arSurface, const Rect &arRect, uint32_t aColor) = 0;
+    virtual void DrawRect(VideoSurface &arDst, const Rect &arRect, uint32_t aColor) = 0;
 
     /**
      * \brief Fill an area with the given color
