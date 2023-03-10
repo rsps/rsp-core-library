@@ -21,11 +21,17 @@ namespace rsp::graphics::sw {
 class SWGfxHal: public rsp::graphics::GfxHal, public rsp::utils::Singleton<SWGfxHal>
 {
 public:
-    void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalPtr<Rect> aDstRect, OptionalPtr<Rect> aSrcRect) override;
-    void DrawRect(VideoSurface &arDst, const Rect &arRect, uint32_t aColor) override;
-    void Fill(VideoSurface &arDst, uint32_t aColor, OptionalPtr<Rect> aDest) override;
     void Alloc(VideoSurface &arSurface, int aWidth, int aHeight) override;
+    void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalPtr<Rect> aDstRect, OptionalPtr<Rect> aSrcRect) override;
+    void DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect) override;
+    void Fill(VideoSurface &arDst, uint32_t aColor, OptionalPtr<Rect> aDest) override;
+    void SetBlendOperation(GfxBlendOperation aOp) override { mBlendOperation = aOp; }
+    void SetColorKey(uint32_t aColor) override { mColorKey = aColor; }
     void Sync() override;
+
+protected:
+    GfxBlendOperation mBlendOperation = GfxBlendOperation::Copy;
+    uint32_t mColorKey = 0;
 };
 
 } /* namespace rsp::graphics */

@@ -25,6 +25,8 @@ namespace rsp::graphics {
 class Renderer
 {
 public:
+    static Renderer& Get();
+
     virtual ~Renderer() {}
 
     virtual GuiUnit_t GetHeight() const = 0;
@@ -32,7 +34,7 @@ public:
     virtual PixelData::ColorDepth GetColorDepth() const = 0;
 
     virtual std::shared_ptr<Texture> CreateTexture(GuiUnit_t aWidth = 0, GuiUnit_t aHeight = 0) = 0;
-    virtual std::shared_ptr<Texture> CreateStaticTexture(const PixelData &arPixelData) = 0;
+    virtual std::shared_ptr<const Texture> CreateStaticTexture(const PixelData &arPixelData) = 0;
 
     virtual Renderer& Render(const Texture &arTexture, const Rect * const apDestination = nullptr, const Rect * const apSource = nullptr) = 0;
 

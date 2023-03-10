@@ -65,7 +65,7 @@ std::shared_ptr<Texture> SWRenderer::CreateTexture(GuiUnit_t aWidth, GuiUnit_t a
     return std::make_shared<SWTexture>(aWidth, aHeight, GetColorDepth());
 }
 
-std::shared_ptr<Texture> SWRenderer::CreateStaticTexture(const PixelData &arPixelData)
+std::shared_ptr<const Texture> SWRenderer::CreateStaticTexture(const PixelData &arPixelData)
 {
     auto t = std::make_shared<SWTexture>(arPixelData.GetWidth(), arPixelData.GetHeight(), GetColorDepth());
 

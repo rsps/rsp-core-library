@@ -46,10 +46,16 @@ protected:
 struct VideoSurface
 {
     std::unique_ptr<uint32_t[]> mpPhysAddr{}; // Pointer to 32-bit ARGB pixels
-    GuiUnit_t mRowPitch = 0; // Number of bytes per row in physical memory (alignment vs. width)
+    uintptr_t mRowPitch = 0; // Number of bytes per row in physical memory (alignment vs. width)
     GuiUnit_t mWidth = 0;
     GuiUnit_t mHeight = 0;
     int mRotation = 0; // Rotation of this surface. Only supports: 0, 90, 180, 270
+};
+
+enum class GfxBlendOperation {
+    Copy,
+    SourceAlpha,
+    AlphaKey
 };
 
 /**
@@ -85,13 +91,23 @@ public:
     virtual void Alloc(VideoSurface &arSurface, int aWidth, int aHeight) = 0;
 
     /**
+     * \brief Copy an area onto another
+     *
+     * \param arDst Destination surface
+     * \param arSrc Source surface
+     * \param aDstRect Optional area on destination surface, if null the entire destination is filled
+     * \param aSrcRect Optional area from source surface, if null, the entire source is copied
+     */
+    virtual void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalPtr<Rect> aDstRect = nullptr, OptionalPtr<Rect> aSrcRect = nullptr) = 0;
+
+    /**
      * \brief Draw a rectangle with single pixel line width in a given color
      *
      * \param arDst Destination surface
-     * \param arRect
      * \param aColor
+     * \param arRect
      */
-    virtual void DrawRect(VideoSurface &arDst, const Rect &arRect, uint32_t aColor) = 0;
+    virtual void DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect) = 0;
 
     /**
      * \brief Fill an area with the given color
@@ -103,14 +119,16 @@ public:
     virtual void Fill(VideoSurface &arDst, uint32_t aColor, OptionalPtr<Rect> aDest = nullptr) = 0;
 
     /**
-     * \brief Copy an area onto another
-     *
-     * \param arDst Destination surface
-     * \param arSrc Source surface
-     * \param aDstRect Optional area on destination surface, if null the entire destination is filled
-     * \param aSrcRect Optional area from source surface, if null, the entire source is copied
+     * \brief Set the blend operation to use during drawing operations
+     * \param aOp
      */
-    virtual void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalPtr<Rect> aDstRect = nullptr, OptionalPtr<Rect> aSrcRect = nullptr) = 0;
+    virtual void SetBlendOperation(GfxBlendOperation aOp) = 0;
+
+    /**
+     * \brief Set the color to use if blend operation is set to a *Key operation
+     * \param aColor
+     */
+    virtual void SetColorKey(uint32_t aColor) = 0;
 
     /**
      * \brief Execute all queued operations, returns when finished

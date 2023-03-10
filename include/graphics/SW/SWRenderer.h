@@ -15,10 +15,11 @@
 #include <graphics/Renderer.h>
 #include <graphics/SW/Framebuffer.h>
 #include <graphics/SW/SWTexture.h>
+#include <utils/Singleton.h>
 
 namespace rsp::graphics {
 
-class SWRenderer: public Renderer, public Framebuffer
+class SWRenderer: public Renderer, public Framebuffer, public rsp::utils::Singleton<SWRenderer>
 {
 public:
     SWRenderer(const std::string &arRenderDevice);
@@ -28,7 +29,7 @@ public:
     PixelData::ColorDepth GetColorDepth() const override;
 
     std::shared_ptr<Texture> CreateTexture(GuiUnit_t aWidth = 0, GuiUnit_t aHeight = 0) override;
-    std::shared_ptr<Texture> CreateStaticTexture(const PixelData &arPixelData) override;
+    std::shared_ptr<const Texture> CreateStaticTexture(const PixelData &arPixelData) override;
 
     Renderer& DrawRect(const Rect &arRect, Color aColor) override;
     Renderer& Fill(Color aColor) override;
