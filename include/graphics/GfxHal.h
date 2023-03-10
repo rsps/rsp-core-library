@@ -53,9 +53,9 @@ struct VideoSurface
 };
 
 enum class GfxBlendOperation {
-    Copy,
-    SourceAlpha,
-    AlphaKey
+    Copy,        // Copy source to destination
+    SourceAlpha, // Blend source with destination, using source alpha value
+    AlphaKey     // Omit drawing pixels with same color value as ColorKey (transparent color)
 };
 
 /**

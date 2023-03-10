@@ -132,44 +132,47 @@ TEST_CASE("GfxHal")
         }
     }
 
-    SUBCASE("SourceAlpha") {
+    SUBCASE("ColorKey") {
         CHECK_NOTHROW(gfx.Fill(src, 0xFFFFFFFF, Rect(0, 0, 4, 25)));
         CHECK_MESSAGE(Crc32::Calc(src.mpPhysAddr.get(), 400) == 2307493135u, "src\n" << ToHex(src.mpPhysAddr.get(), 100));
+
+        CHECK_NOTHROW(gfx.Fill(src, 0xFF555555, Rect(1, 1, 2, 23)));
+        CHECK_MESSAGE(Crc32::Calc(src.mpPhysAddr.get(), 400) == 1190816953u, "src\n" << ToHex(src.mpPhysAddr.get(), 100));
 
         CHECK_NOTHROW(gfx.Fill(dst, 0xFF000000, Rect(0, 0, 4, 25)));
         CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 4178597885u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
 
         gfx.SetBlendOperation(GfxBlendOperation::AlphaKey);
-        gfx.SetColorKey(0xAAFFFFFF);
+        gfx.SetColorKey(0x22555555);
 
         SUBCASE("Blit") {
             CHECK_NOTHROW(gfx.Blit(dst, src));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 1438074527u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 558079074u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
         }
 
         SUBCASE("DrawRect") {
-            CHECK_NOTHROW(gfx.DrawRect(dst, 0xFFFFFFFF, Rect(0, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 2139666970u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
+            CHECK_NOTHROW(gfx.DrawRect(dst, 0xFF222222, Rect(0, 0, 4, 25)));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 2681254777u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
 
-            CHECK_NOTHROW(gfx.DrawRect(dst, 0x11111111, Rect(1, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 3478134949u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
+            CHECK_NOTHROW(gfx.DrawRect(dst, 0x11555555, Rect(1, 0, 4, 25)));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 2681254777u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
 
             CHECK_NOTHROW(gfx.DrawRect(dst, 0x66666666, Rect(1, 1, 2, 23)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 241229489u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 2050463010u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
     }
 
         SUBCASE("Fill") {
             CHECK_NOTHROW(gfx.Fill(dst, 0xFFFFFFFF, Rect(0, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 1438074527u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 2307493135u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
 
-            CHECK_NOTHROW(gfx.Fill(dst, 0x11111111, Rect(1, 1, 2, 23)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 3809450037u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
+            CHECK_NOTHROW(gfx.Fill(dst, 0x11555555, Rect(1, 1, 2, 23)));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 2307493135u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
 
             CHECK_NOTHROW(gfx.Fill(dst, 0x66666666, Rect(-1, -1, 2, 8)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 2382716139u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 1645115526u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
 
             CHECK_NOTHROW(gfx.Fill(dst, 0xCCCCCCCC, Rect(3, 18, 2, 8)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 2470040709u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), 400) == 1253784020u, "dst\n" << ToHex(dst.mpPhysAddr.get(), 100));
 
         }
     }

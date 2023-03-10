@@ -26,7 +26,7 @@ public:
     void DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect) override;
     void Fill(VideoSurface &arDst, uint32_t aColor, OptionalPtr<Rect> aDest) override;
     void SetBlendOperation(GfxBlendOperation aOp) override { mBlendOperation = aOp; }
-    void SetColorKey(uint32_t aColor) override { mColorKey = aColor; }
+    void SetColorKey(uint32_t aColor) override { mColorKey = (aColor & 0x00FFFFFF); }
     void Sync() override;
 
 protected:
