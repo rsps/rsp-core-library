@@ -5,7 +5,7 @@ find_package(Git REQUIRED)
 FetchContent_Declare(
     DocTest
     GIT_REPOSITORY "https://github.com/onqtam/doctest"
-    GIT_TAG "v2.4.9"
+    GIT_TAG "v2.4.10"
 )
 FetchContent_MakeAvailable(DocTest)
 

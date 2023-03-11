@@ -107,7 +107,7 @@ TEST_CASE("Json") {
 
         v3 = JsonDecoder("\"Euro sign: \\u20AC\"").Decode();
 //            CHECK("Euro sign: €" == "Euro sign: \\u20AC");
-        CHECK(v3.GetType() == Variant::Types::String);
+        CHECK_EQ(int(v3.GetType()), int(Variant::Types::String));
         CHECK("Euro sign: €" == v3.AsString());
     }
 
@@ -151,7 +151,7 @@ null }
 
         CHECK(v.MemberExists("IntValue"));
         CHECK(v["IntValue"].IsNull() == false);
-        CHECK(v["IntValue"].GetType() == Variant::Types::Uint64);
+        CHECK(int(v["IntValue"].GetType()) == int(Variant::Types::Uint64));
         CHECK(static_cast<int>(v["IntValue"]) == 42);
 
         CHECK(v.MemberExists("FloatValue"));
@@ -213,7 +213,7 @@ null }
         // Validate UCS2 code-points in output:
         orig = "\"Euro sign: \\u20ac\"";
         DynamicData v1 = Json::Decode(orig);
-        CHECK(v1.GetType() == DynamicData::Types::String);
+        CHECK(int(v1.GetType()) == int(DynamicData::Types::String));
         CHECK("Euro sign: €" == v1.AsString());
         result = Json::Encode(v1, true, true);
         CHECK(result == orig);
@@ -250,7 +250,7 @@ null }
         CHECK(p.IsObject() == dst.IsObject());
         CHECK(dst.IsObject() == true);
         CHECK(p.GetCount() == dst.GetCount());
-        CHECK(p.GetType() == dst.GetType());
+        CHECK(int(p.GetType()) == int(dst.GetType()));
         CHECK(Json::GetJsonTypeAsString(Json::GetJsonType(p)) == Json::GetJsonTypeAsString(Json::GetJsonType(dst)));
         CHECK(p["IntValue"].AsInt() != dst["IntValue"].AsInt());
 
@@ -291,7 +291,7 @@ null }
 
         CHECK(o.MemberExists("IntValue"));
         CHECK(o["IntValue"].IsNull() == false);
-        CHECK(o["IntValue"].GetType() == Variant::Types::Uint64);
+        CHECK(int(o["IntValue"].GetType()) == int(Variant::Types::Uint64));
         CHECK(static_cast<int>(o["IntValue"]) == 42);
 
         DynamicData js1(o);
