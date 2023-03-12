@@ -91,7 +91,7 @@ static inline void paintPixel(GfxBlendOperation op, uint32_t *dst, uint32_t aCol
     }
 }
 
-void SWGfxHal::Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<Rect> aDstRect, Optional<Rect> aSrcRect)
+void SWGfxHal::Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<const Rect> aDstRect, Optional<const Rect> aSrcRect)
 {
     Rect dr(0, 0, arDst.mWidth, arDst.mHeight);
     Rect sr(0, 0, arSrc.mWidth, arSrc.mHeight);
@@ -206,7 +206,7 @@ void SWGfxHal::DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect
     }
 }
 
-void SWGfxHal::Fill(VideoSurface &arDst, uint32_t aColor, Optional<Rect> aDstRect)
+void SWGfxHal::Fill(VideoSurface &arDst, uint32_t aColor, Optional<const Rect> aDstRect)
 {
     Rect dr(0, 0, arDst.mWidth, arDst.mHeight);
     if (aDstRect) {

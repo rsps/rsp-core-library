@@ -31,35 +31,13 @@ namespace rsp::graphics::sw {
 
 Renderer& SWRenderer::DrawRect(Color aColor, const Rect &arRect)
 {
-    Rect r = arRect & Rect(0, 0, GetWidth(), GetHeight());
-
-    auto top = r.GetTop();
-    auto left = r.GetLeft();
-    auto right = r.GetRight() - 1;
-    auto bottom = r.GetBottom() - 1;
-    GuiUnit_t h_end = top + r.GetHeight();
-    GuiUnit_t w_end = left + r.GetWidth();
-
-    for (GuiUnit_t x = left; x < w_end; x++) {
-        SetPixel(x, top, aColor); // top
-        SetPixel(x, bottom, aColor); // bottom
-    }
-    for (GuiUnit_t y = top; y < h_end; y++) {
-        SetPixel(left, y, aColor); // left
-        SetPixel(right, y, aColor); // right
-    }
-
+    mrGfxHal.DrawRect(mScreenSurfaces[mCurrentSurface], aColor, arRect);
     return *this;
 }
 
 Renderer& SWRenderer::Fill(Color aColor, Optional<const Rect> aDestination)
 {
-    for (std::uint32_t y = 0; y < mVariableInfo.yres; y++) {
-        for (std::uint32_t x = 0; x < mVariableInfo.xres; x++) {
-            std::size_t location = ((x + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8) + y * mFixedInfo.line_length) / sizeof(std::uint32_t);
-            mpBackBuffer[location] = aColor;
-        }
-    }
+    mrGfxHal.Fill(mScreenSurfaces[mCurrentSurface], aColor, aDestination);
     return *this;
 }
 
@@ -71,12 +49,12 @@ std::shared_ptr<Texture> SWRenderer::CreateTexture(GuiUnit_t aWidth, GuiUnit_t a
     if (!aHeight) {
         aHeight = GetHeight();
     }
-    return std::make_shared<SWTexture>(aWidth, aHeight, GetColorDepth());
+    return std::make_shared<SWTexture>(aWidth, aHeight);
 }
 
 std::shared_ptr<const Texture> SWRenderer::CreateStaticTexture(const PixelData &arPixelData)
 {
-    auto t = std::make_shared<SWTexture>(arPixelData.GetWidth(), arPixelData.GetHeight(), GetColorDepth());
+    auto t = std::make_shared<SWTexture>(arPixelData.GetWidth(), arPixelData.GetHeight());
 
     t->Update(arPixelData, Color::Black);
 
@@ -85,55 +63,37 @@ std::shared_ptr<const Texture> SWRenderer::CreateStaticTexture(const PixelData &
 
 Renderer& SWRenderer::Render(const Texture &arTexture, Optional<const Rect> aDestination, Optional<const Rect> aSource)
 {
-    Rect dst = (aDestination) ? *aDestination : Rect(0, 0, GetWidth(), GetHeight());
-    Rect src = (aSource) ? *aSource : Rect(0, 0, GetWidth(), GetHeight());
-
     const SWTexture& t = dynamic_cast<const SWTexture&>(arTexture);
 
-    const PixelData &pd = t.GetPixelData();
-    GuiUnit_t h_end = std::min({ pd.GetHeight(), dst.GetHeight(), src.GetHeight() });
-    GuiUnit_t w_end = std::min({ pd.GetWidth(), dst.GetWidth(), src.GetWidth() });
-    GuiUnit_t dy = dst.GetTop();
-
-    for (GuiUnit_t y = src.GetTop(); y < h_end; ++y) {
-        GuiUnit_t dx = dst.GetLeft();
-        for (GuiUnit_t x = src.GetLeft(); x < w_end; ++x) {
-            SetPixel(dx++, dy, pd.GetPixelAt(x, y, Color::None));
-        }
-        ++dy;
-    }
-
-//    swapBuffer();
-
+    mrGfxHal.Blit(mScreenSurfaces[mCurrentSurface], t.getSurface(), aDestination, aSource);
     return *this;
 }
 
 void SWRenderer::Present()
 {
+    mrGfxHal.Sync();
     swapBuffer();
-    std::memset(mpBackBuffer, 0, mVariableInfo.yres * mFixedInfo.line_length);
 }
 
 GuiUnit_t SWRenderer::GetHeight() const
 {
-    return GuiUnit_t(mVariableInfo.yres);
+    return Framebuffer::GetHeight();
 }
 
 GuiUnit_t SWRenderer::GetWidth() const
 {
-    return GuiUnit_t(mVariableInfo.xres);
+    return Framebuffer::GetWidth();
 }
 
 PixelData::ColorDepth SWRenderer::GetColorDepth() const
 {
     switch (mVariableInfo.bits_per_pixel) {
-        case 1:
-            return PixelData::ColorDepth::Monochrome;
-        case 24:
-            return PixelData::ColorDepth::RGB;
         case 32:
             return PixelData::ColorDepth::RGBA;
+
         default:
+        case 1:
+        case 24:
             ;
     }
     THROW_WITH_BACKTRACE(EIllegalColorDepth);

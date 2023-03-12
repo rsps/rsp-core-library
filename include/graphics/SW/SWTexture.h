@@ -11,28 +11,29 @@
 #ifndef INCLUDE_GRAPHICS_SW_SWTEXTURE_H_
 #define INCLUDE_GRAPHICS_SW_SWTEXTURE_H_
 
+#include <graphics/GfxHal.h>
+#include <graphics/PixelData.h>
 #include <graphics/Texture.h>
 
 namespace rsp::graphics::sw {
 
+class SWRenderer;
+
+
 class SWTexture: public Texture
 {
 public:
-    SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, PixelData::ColorDepth aDepth);
+    SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight);
 
-    SWTexture(const SWTexture&) = default;
-    SWTexture(SWTexture&&) = default;
-
-    SWTexture& operator=(const SWTexture&) = default;
-    SWTexture& operator=(SWTexture&&) = default;
-
-    const PixelData& GetPixelData() const { return *mpPixelData; }
-
-//    void Fill(rsp::graphics::Color aColor) override;
+    void Fill(Color aColor, GfxHal::Optional<const Rect> arRect) override;
     void Update(const PixelData &arPixelData, Color aColor) override;
 
 protected:
-    const PixelData *mpPixelData = nullptr;
+    GfxHal &mrGfxHal;
+    VideoSurface mSurface{};
+
+    friend SWRenderer;
+    const VideoSurface& getSurface() const { return mSurface; }
 };
 
 } /* namespace rsp::graphics::sw */

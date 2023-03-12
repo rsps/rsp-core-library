@@ -52,6 +52,7 @@ public:
     uint32_t GetPixel(const Point &arP, bool aFront = false) { return GetPixel(arP.GetX(), arP.GetY(), aFront); }
 
 protected:
+    GfxHal &mrGfxHal;
     int mFramebufferFile;
     int mTtyFb = 0;
     struct fb_fix_screeninfo mFixedInfo{};

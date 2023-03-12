@@ -12,7 +12,7 @@
 #define INCLUDE_GRAPHICS_TEXTURE_H_
 
 #include <graphics/Color.h>
-#include <graphics/PixelData.h>
+#include <graphics/GfxHal.h>
 
 namespace rsp::graphics {
 
@@ -36,7 +36,7 @@ public:
      * \brief Fill this texture with the given color
      * \param aColor
      */
-//    virtual void Fill(Color aColor) = 0;
+    virtual void Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr) = 0;
 };
 
 } /* namespace rsp::graphics */

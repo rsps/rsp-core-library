@@ -7,21 +7,20 @@
 
 namespace rsp::graphics::sw {
 
-//void SWTexture::Fill(Color aColor)
-//{
-////    mPixelData.Fill(aColor);
-//}
-
-SWTexture::SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, PixelData::ColorDepth aDepth)
-//    : mPixelData(aWidth, aHeight, aDepth)
+SWTexture::SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight)
+    : mrGfxHal(GfxHal::Get())
 {
-//    mPixelData.SetBlend(false);
+    mrGfxHal.Alloc(mSurface, aWidth, aHeight);
+}
+
+void SWTexture::Fill(Color aColor, GfxHal::Optional<const Rect> aRect)
+{
+    mrGfxHal.Fill(mSurface, aColor, aRect);
 }
 
 void SWTexture::Update(const PixelData &arPixelData, Color aColor)
 {
-//    mPixelData.CopyFrom(Point(0,0), arPixelData, arPixelData.GetRect(), aColor);
-    mpPixelData = &arPixelData;
+    arPixelData.CopyToSurface(mSurface);
 }
 
 } /* namespace rsp::graphics::sw */

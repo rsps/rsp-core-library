@@ -27,7 +27,9 @@ namespace rsp::graphics {
  */
 struct VideoSurface
 {
-    std::unique_ptr<uint32_t[]> mpPhysAddr{}; // Pointer to 32-bit ARGB pixels
+    using PixelPtr_t = std::unique_ptr<uint32_t[], std::function<void(uint32_t[])> >;
+
+    PixelPtr_t mpPhysAddr{}; // Pointer to 32-bit ARGB pixels
     uintptr_t mRowPitch = 0; // Number of bytes per row in physical memory (alignment vs. width)
     GuiUnit_t mWidth = 0;
     GuiUnit_t mHeight = 0;
@@ -83,7 +85,7 @@ public:
      * \param aDstRect Optional area on destination surface, if null the entire destination is filled
      * \param aSrcRect Optional area from source surface, if null, the entire source is copied
      */
-    virtual void Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<Rect> aDstRect = nullptr, Optional<Rect> aSrcRect = nullptr) = 0;
+    virtual void Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<const Rect> aDstRect = nullptr, Optional<const Rect> aSrcRect = nullptr) = 0;
 
     /**
      * \brief Draw a rectangle with single pixel line width in a given color
@@ -101,7 +103,7 @@ public:
      * \param aColor
      * \param aDest Optional area to fill on destination, if not given the entire surface is filled
      */
-    virtual void Fill(VideoSurface &arDst, uint32_t aColor, Optional<Rect> aDest = nullptr) = 0;
+    virtual void Fill(VideoSurface &arDst, uint32_t aColor, Optional<const Rect> aDest = nullptr) = 0;
 
     /**
      * \brief Set the value of a single pixel, with respect to the selected blend operation.

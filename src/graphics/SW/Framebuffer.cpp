@@ -27,7 +27,8 @@ namespace rsp::graphics
 const char* Framebuffer::mpDevicePath = nullptr;
 
 Framebuffer::Framebuffer()
-    : mFramebufferFile(-1)
+    : mrGfxHal(GfxHal::Get()),
+      mFramebufferFile(-1)
 {
     if (mpDevicePath) {
         mFramebufferFile = open(mpDevicePath, O_RDWR);
@@ -79,10 +80,10 @@ Framebuffer::Framebuffer()
         THROW_SYSTEM("Framebuffer shared memory mapping failed");
     }
 
-    mScreenSurfaces[0].mpPhysAddr = std::unique_ptr<uint32_t[], std::function<void(uint32_t[])> >(fb, [screensize](uint32_t apPtr[]) {
-        munmap(apPtr, screensize * 2);
+    mScreenSurfaces[0].mpPhysAddr = VideoSurface::PixelPtr_t(fb, [screensize](uint32_t *p) noexcept {
+        munmap(p, screensize*2);
     });
-    mScreenSurfaces[1].mpPhysAddr = std::unique_ptr<uint32_t>(fb + (screensize / sizeof(std::uint32_t)), [](uint32_t *apPtr) {});
+    mScreenSurfaces[1].mpPhysAddr = VideoSurface::PixelPtr_t(fb + (screensize / sizeof(std::uint32_t)), [](uint32_t apPtr[]) noexcept {});
 
     if (mVariableInfo.yoffset > 0) {
         mCurrentSurface = 1;
@@ -125,15 +126,15 @@ void Framebuffer::swapBuffer()
 
 void Framebuffer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 {
-    GfxHal::Get().SetPixel(mScreenSurfaces[mCurrentSurface], aX, aY, arColor);
+    mrGfxHal.SetPixel(mScreenSurfaces[mCurrentSurface], aX, aY, arColor);
 }
 
 uint32_t Framebuffer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
 {
     if (aFront) {
-        return GfxHal::Get().GetPixel(mScreenSurfaces[(mCurrentSurface) ? 0 : 1], aX, aY);
+        return mrGfxHal.GetPixel(mScreenSurfaces[(mCurrentSurface) ? 0 : 1], aX, aY);
     }
-    return GfxHal::Get().GetPixel(mScreenSurfaces[mCurrentSurface], aX, aY);
+    return mrGfxHal.GetPixel(mScreenSurfaces[mCurrentSurface], aX, aY);
 }
 
 } // namespace rsp::graphics
