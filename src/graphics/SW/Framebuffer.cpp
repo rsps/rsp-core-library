@@ -12,24 +12,27 @@
 #include <chrono>
 #include <cstring>
 #include <fcntl.h>
-#include <graphics/SW/Framebuffer.h>
+#include <graphics/Framebuffer.h>
 #include <iostream>
 #include <linux/kd.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <thread>
 #include <unistd.h>
+#include <memory>
 
 namespace rsp::graphics
 {
 
-Framebuffer::Framebuffer(const char *apDevPath)
+const char* Framebuffer::mpDevicePath = nullptr;
+
+Framebuffer::Framebuffer()
     : mFramebufferFile(-1)
 {
-    if (apDevPath) {
-        mFramebufferFile = open(apDevPath, O_RDWR);
+    if (mpDevicePath) {
+        mFramebufferFile = open(mpDevicePath, O_RDWR);
         if (mFramebufferFile == -1) {
-            std::clog << "Failed to open framebuffer at " << apDevPath << " trying /dev/fb0" << std::endl;
+            std::clog << "Failed to open framebuffer at " << mpDevicePath << " trying /dev/fb0" << std::endl;
         }
     }
     if (mFramebufferFile == -1) {
@@ -45,10 +48,12 @@ Framebuffer::Framebuffer(const char *apDevPath)
     // get variable screen info
     ioctl(mFramebufferFile, FBIOGET_FSCREENINFO, &mFixedInfo);
 
-    mRect.SetWidth(static_cast<GuiUnit_t>(mVariableInfo.xres));
-    mRect.SetHeight(static_cast<GuiUnit_t>(mVariableInfo.yres));
-//    mBytesPerPixel = mVariableInfo.bits_per_pixel / 8;
-    mClipRect = mRect;
+    mScreenSurfaces[0].mWidth = static_cast<GuiUnit_t>(mVariableInfo.xres);
+    mScreenSurfaces[0].mHeight = static_cast<GuiUnit_t>(mVariableInfo.yres);
+    mScreenSurfaces[0].mRowPitch = static_cast<uintptr_t>(mFixedInfo.line_length);
+    mScreenSurfaces[1].mWidth    = mScreenSurfaces[0].mWidth;
+    mScreenSurfaces[1].mHeight   = mScreenSurfaces[0].mHeight;
+    mScreenSurfaces[1].mRowPitch = mScreenSurfaces[0].mRowPitch;
 
     // std::clog << "Framebuffer opened. Width=" << mWidth << " Height=" << mHeight << " BytesPerPixel=" << mBytesPerPixel << std::endl;
 
@@ -69,33 +74,32 @@ Framebuffer::Framebuffer(const char *apDevPath)
     // calculate size of screen
     std::size_t screensize = mVariableInfo.yres * mFixedInfo.line_length;
 
-    mpFrontBuffer = static_cast<uint32_t *>(mmap(nullptr, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
-    if (mpFrontBuffer == reinterpret_cast<uint32_t *>(-1)) /*MAP_FAILED*/ {
+    uint32_t *fb = static_cast<uint32_t *>(mmap(nullptr, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
+    if (fb == reinterpret_cast<uint32_t *>(-1)) /*MAP_FAILED*/ {
         THROW_SYSTEM("Framebuffer shared memory mapping failed");
     }
 
-    mpBackBuffer = mpFrontBuffer + screensize / sizeof(std::uint32_t);
+    mScreenSurfaces[0].mpPhysAddr = std::unique_ptr<uint32_t[], std::function<void(uint32_t[])> >(fb, [screensize](uint32_t apPtr[]) {
+        munmap(apPtr, screensize * 2);
+    });
+    mScreenSurfaces[1].mpPhysAddr = std::unique_ptr<uint32_t>(fb + (screensize / sizeof(std::uint32_t)), [](uint32_t *apPtr) {});
 
     if (mVariableInfo.yoffset > 0) {
-        std::uint32_t *tmp = mpFrontBuffer;
-        mpFrontBuffer = mpBackBuffer;
-        mpBackBuffer = tmp;
+        mCurrentSurface = 1;
     }
 }
 
 Framebuffer::~Framebuffer()
 {
     // At exit we MUST release the tty again
-    if (mTtyFb > 0) {
-        if (ioctl(mTtyFb, KDSETMODE, KD_TEXT) == -1) {
-            std::cout << "ioctl KDSETMODE KD_TEXT failed errno:" << strerror(errno) << std::endl;
-        }
+    if ((mTtyFb > 0) &&
+        (ioctl(mTtyFb, KDSETMODE, KD_TEXT) == -1)) {
+        std::cout << "ioctl KDSETMODE KD_TEXT failed errno:" << strerror(errno) << std::endl;
     }
     // Close the handle to the framebuffer device
     if (mFramebufferFile > 0) {
         close(mFramebufferFile);
     }
-    // No need to call munmap on the shared memory region, this is done automatically on termination.
 }
 
 void Framebuffer::swapBuffer()
@@ -103,8 +107,10 @@ void Framebuffer::swapBuffer()
     // swap buffer
     if (mVariableInfo.yoffset == 0) {
         mVariableInfo.yoffset = mVariableInfo.yres;
+        mCurrentSurface = 1;
     } else {
         mVariableInfo.yoffset = 0;
+        mCurrentSurface = 0;
     }
 
     // Sync to next vblank
@@ -112,47 +118,22 @@ void Framebuffer::swapBuffer()
 
     // Pan to back buffer
     if (ioctl(mFramebufferFile, FBIOPAN_DISPLAY, &mVariableInfo) == -1) {
-        std::cout << "ioctl FBIOPAN_DISPLAY failed errno:" << strerror(errno) << std::endl;
+        THROW_SYSTEM("ioctl FBIOPAN_DISPLAY failed");
     }
-
-    // update pointers
-    std::uint32_t *tmp = mpFrontBuffer;
-    mpFrontBuffer = mpBackBuffer;
-    mpBackBuffer = tmp;
-
-//    std::memset(mpBackBuffer, 0, mVariableInfo.yres * mFixedInfo.line_length);
 }
 
 
 void Framebuffer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 {
-    if (!mRect.IsHit(aX, aY)) {
-        return;
-    }
-    std::uint32_t location = ((static_cast<std::uint32_t>(aX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
-        + static_cast<std::uint32_t>(aY) * mFixedInfo.line_length) / sizeof(std::uint32_t);
-    if (arColor.GetAlpha() == 255) {
-        mpBackBuffer[location] = arColor;
-//        mpFrontBuffer[location] = arColor;
-    }
-    else {
-        mpBackBuffer[location] = Color::Blend(mpBackBuffer[location], arColor);
-//        mpFrontBuffer[location] = mpBackBuffer[location];
-    }
+    GfxHal::Get().SetPixel(mScreenSurfaces[mCurrentSurface], aX, aY, arColor);
 }
 
 uint32_t Framebuffer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
 {
-    if (!mRect.IsHit(aX, aY)) {
-        return 0;
-    }
-    std::uint32_t location = ((static_cast<std::uint32_t>(aX) + mVariableInfo.xoffset) * (mVariableInfo.bits_per_pixel / 8)
-        + (static_cast<std::uint32_t>(aY) * mFixedInfo.line_length)) / sizeof(std::uint32_t);
     if (aFront) {
-        return mpFrontBuffer[location];
-    } else {
-        return mpBackBuffer[location];
+        return GfxHal::Get().GetPixel(mScreenSurfaces[(mCurrentSurface) ? 0 : 1], aX, aY);
     }
+    return GfxHal::Get().GetPixel(mScreenSurfaces[mCurrentSurface], aX, aY);
 }
 
 } // namespace rsp::graphics

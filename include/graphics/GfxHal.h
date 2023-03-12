@@ -14,30 +14,12 @@
 #include <stdint.h>
 #include <memory>
 #include <functional>
+#include <utils/OptionalPtr.h>
 #include "Color.h"
 #include "GuiUnit.h"
 #include "Rect.h"
 
 namespace rsp::graphics {
-
-/**
- * \class OptionalPtr
- * \brief Helper to support optional pointers or references
- *
- * \tparam T
- */
-template <class T>
-class OptionalPtr
-{
-public:
-    OptionalPtr(const T* apValue = nullptr) : mPtr(apValue) {}
-    OptionalPtr(const T &aValue) : mPtr(&aValue) {}
-    operator bool() const { return (mPtr); }
-    const T& operator->() const { return *mPtr; }
-    const T& operator*() const { return *mPtr; }
-protected:
-    const T* mPtr;
-};
 
 /**
  * \struct VideoSurface
@@ -55,7 +37,7 @@ struct VideoSurface
 enum class GfxBlendOperation {
     Copy,        // Copy source to destination
     SourceAlpha, // Blend source with destination, using source alpha value
-    AlphaKey     // Omit drawing pixels with same color value as ColorKey (transparent color)
+    ColorKey     // Omit drawing pixels with same color value as ColorKey (transparent color)
 };
 
 /**
@@ -68,6 +50,9 @@ enum class GfxBlendOperation {
 class GfxHal
 {
 public:
+    template <class T>
+    using Optional = rsp::utils::OptionalPtr<T>;
+
     /**
      * \brief Get an instance. Can be a static factory or just a facade.
      * \return self
@@ -98,7 +83,7 @@ public:
      * \param aDstRect Optional area on destination surface, if null the entire destination is filled
      * \param aSrcRect Optional area from source surface, if null, the entire source is copied
      */
-    virtual void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalPtr<Rect> aDstRect = nullptr, OptionalPtr<Rect> aSrcRect = nullptr) = 0;
+    virtual void Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<Rect> aDstRect = nullptr, Optional<Rect> aSrcRect = nullptr) = 0;
 
     /**
      * \brief Draw a rectangle with single pixel line width in a given color
@@ -116,7 +101,26 @@ public:
      * \param aColor
      * \param aDest Optional area to fill on destination, if not given the entire surface is filled
      */
-    virtual void Fill(VideoSurface &arDst, uint32_t aColor, OptionalPtr<Rect> aDest = nullptr) = 0;
+    virtual void Fill(VideoSurface &arDst, uint32_t aColor, Optional<Rect> aDest = nullptr) = 0;
+
+    /**
+     * \brief Set the value of a single pixel, with respect to the selected blend operation.
+     * \param arSurface Destination surface
+     * \param aX
+     * \param aY
+     * \param aColor
+     */
+    virtual void SetPixel(VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, uint32_t aColor) = 0;
+
+    /**
+     * \brief Get the value of a single pixel.
+     * \param arSurface Source surface
+     * \param aX
+     * \param aY
+     * \return Color value
+     */
+    virtual uint32_t GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, bool aFrontBuffer = false) const = 0;
+
 
     /**
      * \brief Set the blend operation to use during drawing operations

@@ -13,7 +13,7 @@
 
 #include <graphics/Texture.h>
 
-namespace rsp::graphics {
+namespace rsp::graphics::sw {
 
 class SWTexture: public Texture
 {
@@ -35,6 +35,6 @@ protected:
     const PixelData *mpPixelData = nullptr;
 };
 
-} /* namespace rsp::graphics */
+} /* namespace rsp::graphics::sw */
 
 #endif /* INCLUDE_GRAPHICS_SW_SWTEXTURE_H_ */

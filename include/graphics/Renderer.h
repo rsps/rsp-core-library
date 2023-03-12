@@ -16,6 +16,7 @@
 #include <graphics/PixelData.h>
 #include <graphics/Rect.h>
 #include <graphics/Texture.h>
+#include <utils/OptionalPtr.h>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -25,6 +26,9 @@ namespace rsp::graphics {
 class Renderer
 {
 public:
+    template <class T>
+    using Optional = rsp::utils::OptionalPtr<T>;
+
     static Renderer& Get();
 
     virtual ~Renderer() {}
@@ -36,10 +40,10 @@ public:
     virtual std::shared_ptr<Texture> CreateTexture(GuiUnit_t aWidth = 0, GuiUnit_t aHeight = 0) = 0;
     virtual std::shared_ptr<const Texture> CreateStaticTexture(const PixelData &arPixelData) = 0;
 
-    virtual Renderer& Render(const Texture &arTexture, const Rect * const apDestination = nullptr, const Rect * const apSource = nullptr) = 0;
+    virtual Renderer& Render(const Texture &arTexture, Optional<const Rect> aDestination = nullptr, Optional<const Rect> aSource = nullptr) = 0;
 
-    virtual Renderer& DrawRect(const Rect &arRect, Color aColor) = 0;
-    virtual Renderer& Fill(Color aColor) = 0;
+    virtual Renderer& DrawRect(Color aColor, const Rect &arRect) = 0;
+    virtual Renderer& Fill(Color aColor, Optional<const Rect> aDestination = nullptr) = 0;
 
     virtual void Present() = 0;
 };

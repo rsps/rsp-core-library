@@ -12,6 +12,7 @@
 #include <cstring>
 #include <graphics/GfxHal.h>
 #include <utils/Crc32.h>
+#include <utils/StopWatch.h>
 #include <TestHelpers.h>
 
 using namespace rsp::graphics;
@@ -147,7 +148,7 @@ TEST_CASE("GfxHal")
         CHECK_NOTHROW(gfx.Fill(dst, 0xFF000000, Rect(0, 0, 4, 25)));
         CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 4178597885u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
 
-        gfx.SetBlendOperation(GfxBlendOperation::AlphaKey);
+        gfx.SetBlendOperation(GfxBlendOperation::ColorKey);
         gfx.SetColorKey(0x22555555);
 
         SUBCASE("Blit") {
@@ -184,6 +185,42 @@ TEST_CASE("GfxHal")
 
     CHECK_NOTHROW(dst.mpPhysAddr = nullptr);
     CHECK_NOTHROW(src.mpPhysAddr = nullptr);
+
+    SUBCASE("Performance") {
+        CHECK_NOTHROW(gfx.Alloc(src, 480, 800));
+        CHECK_NOTHROW(gfx.Alloc(dst, 480, 800));
+
+        CHECK_NOTHROW(
+        for (uint32_t y = 0 ; y < 800 ; ++y) {
+            uint32_t line = y * (src.mRowPitch / sizeof(uint32_t));
+            for (uint32_t x = 0 ; x < 480 ; ++x) {
+                src.mpPhysAddr.get()[line + x] = 0xFF7F00FF;
+            }
+        });
+
+        SUBCASE("Copy") {
+            gfx.SetBlendOperation(GfxBlendOperation::Copy);
+            gfx.SetColorKey(0);
+        }
+
+        SUBCASE("SourceAlpha") {
+            gfx.SetBlendOperation(GfxBlendOperation::SourceAlpha);
+            gfx.SetColorKey(0);
+        }
+
+        SUBCASE("ColorKey") {
+            gfx.SetBlendOperation(GfxBlendOperation::ColorKey);
+            gfx.SetColorKey(0);
+        }
+
+        StopWatch sw;
+        for (int i = 0; i < 1000 ; i++) {
+            CHECK_NOTHROW(gfx.Blit(dst, src));
+        }
+        float mps = ((480 * 800) / (sw.Elapsed<std::chrono::milliseconds>() + 1));
+        MESSAGE(mps << " MP/s");
+    }
+
 }
 
 TEST_SUITE_END();

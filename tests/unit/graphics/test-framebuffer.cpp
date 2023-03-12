@@ -10,9 +10,11 @@
 
 #include <chrono>
 #include <doctest.h>
-#include <graphics/Font.h>
 #include <graphics/Bitmap.h>
+#include <graphics/Font.h>
+#include <graphics/Framebuffer.h>
 #include <graphics/Text.h>
+#include <graphics/Renderer.h>
 #include <graphics/SW/SWRenderer.h>
 #include <thread>
 #include <filesystem>
@@ -26,7 +28,7 @@ using namespace rsp::utils;
 
 inline void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Framebuffer &fb)
 {
-    if (fb.IsHit(aX, aY)) {
+    if (Rect(0, 0, fb.GetWidth(), fb.GetHeight()).IsHit(aX, aY)) {
         CHECK_EQ(fb.GetPixel(aX, aY), aColor.AsUint());
     } else {
         CHECK_EQ(fb.GetPixel(aX, aY), 0);
@@ -44,11 +46,13 @@ TEST_CASE("Framebuffer")
     Random::Seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
 
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+    Framebuffer::mpDevicePath = p.c_str();
 
-    SWRenderer renderer(p);
+    sw::SWRenderer& renderer = dynamic_cast<sw::SWRenderer&>(Renderer::Get());
+
     Canvas canvas(renderer.GetWidth(), renderer.GetHeight());
     auto _tx = renderer.CreateTexture();
-    SWTexture* texture = dynamic_cast<SWTexture*>(_tx.get());
+    sw::SWTexture* texture = dynamic_cast<sw::SWTexture*>(_tx.get());
     CHECK(texture != nullptr);
 
     milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());

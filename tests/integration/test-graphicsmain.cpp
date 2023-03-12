@@ -81,9 +81,10 @@ TEST_CASE("Graphics Main Test")
     // Make framebuffer
     std::filesystem::path p;
     CHECK_NOTHROW(p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"}));
+    Framebuffer::mpDevicePath = p.c_str();
 
-    CHECK_NOTHROW(SWRenderer dummy_renderer(p));
-    SWRenderer renderer(p);
+    CHECK_NOTHROW(sw::SWRenderer dummy_renderer);
+    sw::SWRenderer& renderer = dynamic_cast<sw::SWRenderer&>(Renderer::Get());
 
     // Set default scene size to screen size
     CHECK_NOTHROW(Scene::SetScreenSize(renderer.GetWidth(), renderer.GetHeight()));

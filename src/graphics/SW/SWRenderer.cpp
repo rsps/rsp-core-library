@@ -8,6 +8,8 @@
  * \author      Steffen Brummer
  */
 
+#ifdef USE_GFX_SW
+
 #include <cstring>
 #include <graphics/SW/SWRenderer.h>
 #include <graphics/SW/SWTexture.h>
@@ -15,12 +17,19 @@
 
 namespace rsp::graphics {
 
-SWRenderer::SWRenderer(const std::string &arRenderDevice)
-    : Framebuffer(arRenderDevice.c_str())
+Renderer& Renderer::Get()
 {
+    if (!sw::SWRenderer::HasInstance()) {
+        sw::SWRenderer::Create();
+    }
+    return rsp::utils::Singleton<sw::SWRenderer>::Get();
 }
 
-Renderer& SWRenderer::DrawRect(const Rect &arRect, Color aColor)
+} /* namespace rsp::graphics */
+
+namespace rsp::graphics::sw {
+
+Renderer& SWRenderer::DrawRect(Color aColor, const Rect &arRect)
 {
     Rect r = arRect & Rect(0, 0, GetWidth(), GetHeight());
 
@@ -43,7 +52,7 @@ Renderer& SWRenderer::DrawRect(const Rect &arRect, Color aColor)
     return *this;
 }
 
-Renderer& SWRenderer::Fill(Color aColor)
+Renderer& SWRenderer::Fill(Color aColor, Optional<const Rect> aDestination)
 {
     for (std::uint32_t y = 0; y < mVariableInfo.yres; y++) {
         for (std::uint32_t x = 0; x < mVariableInfo.xres; x++) {
@@ -74,10 +83,10 @@ std::shared_ptr<const Texture> SWRenderer::CreateStaticTexture(const PixelData &
     return t;
 }
 
-Renderer& SWRenderer::Render(const Texture &arTexture, const Rect * const apDestination, const Rect * const apSource)
+Renderer& SWRenderer::Render(const Texture &arTexture, Optional<const Rect> aDestination, Optional<const Rect> aSource)
 {
-    Rect dst = (apDestination) ? *apDestination : Rect(0, 0, GetWidth(), GetHeight());
-    Rect src = (apSource) ? *apSource : Rect(0, 0, GetWidth(), GetHeight());
+    Rect dst = (aDestination) ? *aDestination : Rect(0, 0, GetWidth(), GetHeight());
+    Rect src = (aSource) ? *aSource : Rect(0, 0, GetWidth(), GetHeight());
 
     const SWTexture& t = dynamic_cast<const SWTexture&>(arTexture);
 
@@ -130,4 +139,6 @@ PixelData::ColorDepth SWRenderer::GetColorDepth() const
     THROW_WITH_BACKTRACE(EIllegalColorDepth);
 }
 
-} /* namespace rsp::graphics */
+} /* namespace rsp::graphics::sw */
+
+#endif /* USE_GFX_SW */

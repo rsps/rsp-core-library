@@ -27,7 +27,10 @@ TEST_CASE("Image Test")
 
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    SWRenderer renderer(p);
+    Framebuffer::mpDevicePath = p.c_str();
+
+    sw::SWRenderer renderer;
+
     Rect testRect(20, 20, 200, 100);
     Bitmap normal("testImages/Red.bmp");
     Random::Seed(1234);

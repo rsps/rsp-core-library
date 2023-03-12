@@ -12,7 +12,7 @@
 #define FRAMEBUFFER_H
 
 #include <graphics/Rect.h>
-#include <graphics/Texture.h>
+#include <graphics/GfxHal.h>
 #include <linux/fb.h>
 
 
@@ -22,13 +22,18 @@ namespace rsp::graphics
 class Framebuffer
 {
 public:
-    Framebuffer(const char *apDevPath = nullptr);
+    static const char *mpDevicePath;
+
+    Framebuffer();
     virtual ~Framebuffer();
 
     Framebuffer(const Framebuffer&) = default;
     Framebuffer(Framebuffer&&) = default;
     Framebuffer& operator=(const Framebuffer&) = default;
     Framebuffer& operator=(Framebuffer&&) = default;
+
+    GuiUnit_t GetWidth() const { return mScreenSurfaces[0].mWidth; }
+    GuiUnit_t GetHeight() const { return mScreenSurfaces[0].mHeight; }
 
     /**
      * \brief Sets a single pixel to the given Color
@@ -46,17 +51,13 @@ public:
     uint32_t GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront = false) const;
     uint32_t GetPixel(const Point &arP, bool aFront = false) { return GetPixel(arP.GetX(), arP.GetY(), aFront); }
 
-    bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const { return mRect.IsHit(aX, aY); }
-
 protected:
     int mFramebufferFile;
     int mTtyFb = 0;
     struct fb_fix_screeninfo mFixedInfo{};
     struct fb_var_screeninfo mVariableInfo{};
-    uint32_t *mpFrontBuffer = nullptr;
-    uint32_t *mpBackBuffer = nullptr;
-    Rect mClipRect{};
-    Rect mRect{};
+    VideoSurface mScreenSurfaces[2]{};
+    int mCurrentSurface = 0;
 
     void swapBuffer();
 };

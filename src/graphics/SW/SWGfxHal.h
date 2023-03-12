@@ -22,12 +22,14 @@ class SWGfxHal: public rsp::graphics::GfxHal, public rsp::utils::Singleton<SWGfx
 {
 public:
     void Alloc(VideoSurface &arSurface, int aWidth, int aHeight) override;
-    void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalPtr<Rect> aDstRect, OptionalPtr<Rect> aSrcRect) override;
+    void Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<Rect> aDstRect, Optional<Rect> aSrcRect) override;
     void DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect) override;
-    void Fill(VideoSurface &arDst, uint32_t aColor, OptionalPtr<Rect> aDest) override;
+    void Fill(VideoSurface &arDst, uint32_t aColor, Optional<Rect> aDest) override;
     void SetBlendOperation(GfxBlendOperation aOp) override { mBlendOperation = aOp; }
     void SetColorKey(uint32_t aColor) override { mColorKey = (aColor & 0x00FFFFFF); }
     void Sync() override;
+    uint32_t GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, bool aFrontBuffer) const override;
+    void SetPixel(VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, uint32_t aColor) override;
 
 protected:
     GfxBlendOperation mBlendOperation = GfxBlendOperation::Copy;

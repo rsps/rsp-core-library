@@ -11,18 +11,18 @@
 #ifndef INCLUDE_GRAPHICS_SW_SWRENDERER_H_
 #define INCLUDE_GRAPHICS_SW_SWRENDERER_H_
 
+#include <graphics/Framebuffer.h>
 #include <string>
 #include <graphics/Renderer.h>
-#include <graphics/SW/Framebuffer.h>
 #include <graphics/SW/SWTexture.h>
 #include <utils/Singleton.h>
 
-namespace rsp::graphics {
+namespace rsp::graphics::sw {
 
 class SWRenderer: public Renderer, public Framebuffer, public rsp::utils::Singleton<SWRenderer>
 {
 public:
-    SWRenderer(const std::string &arRenderDevice);
+    SWRenderer() {}
 
     GuiUnit_t GetWidth() const override;
     GuiUnit_t GetHeight() const override;
@@ -31,14 +31,14 @@ public:
     std::shared_ptr<Texture> CreateTexture(GuiUnit_t aWidth = 0, GuiUnit_t aHeight = 0) override;
     std::shared_ptr<const Texture> CreateStaticTexture(const PixelData &arPixelData) override;
 
-    Renderer& DrawRect(const Rect &arRect, Color aColor) override;
-    Renderer& Fill(Color aColor) override;
+    Renderer& DrawRect(Color aColor, const Rect &arRect) override;
+    Renderer& Fill(Color aColor, Optional<const Rect> aDestination = nullptr) override;
 
-    Renderer& Render(const Texture &arTexture, const Rect * const apDestination = nullptr, const Rect * const apSource = nullptr) override;
+    Renderer& Render(const Texture &arTexture, Optional<const Rect> aDestination = nullptr, Optional<const Rect> aSource = nullptr) override;
 
     void Present() override;
 };
 
-} /* namespace rsp::graphics */
+} /* namespace rsp::graphics::sw */
 
 #endif /* INCLUDE_GRAPHICS_SW_SWRENDERER_H_ */

@@ -5,7 +5,7 @@
 
 #include <graphics/SW/SWTexture.h>
 
-namespace rsp::graphics {
+namespace rsp::graphics::sw {
 
 //void SWTexture::Fill(Color aColor)
 //{
@@ -24,4 +24,4 @@ void SWTexture::Update(const PixelData &arPixelData, Color aColor)
     mpPixelData = &arPixelData;
 }
 
-} /* namespace rsp::graphics */
+} /* namespace rsp::graphics::sw */

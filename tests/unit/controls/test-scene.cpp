@@ -59,7 +59,8 @@ TEST_CASE("Scene Test")
 
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    SWRenderer renderer(p);
+    Framebuffer::mpDevicePath = p.c_str();
+    sw::SWRenderer& renderer = dynamic_cast<sw::SWRenderer&>(Renderer::Get());
 
     CHECK_NOTHROW(Scenes scenes_dummy);
     Scenes scenes;

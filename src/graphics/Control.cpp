@@ -198,7 +198,7 @@ void Control::Render(Renderer &arRenderer)
     if ((mTouchAreaColor != Color::None) && !mTouchArea.empty()) {
         Rect r = mTouchArea;
         r.AddSize(1, 1);
-        arRenderer.DrawRect(mTouchArea, mTouchAreaColor);
+        arRenderer.DrawRect(mTouchAreaColor, mTouchArea);
     }
 }
 
