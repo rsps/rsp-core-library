@@ -22,6 +22,12 @@
 
 namespace rsp::graphics {
 
+enum class GfxBlendOperation {
+    Copy,        // Copy source to destination
+    SourceAlpha, // Blend source with destination, using source alpha value
+    ColorKey     // Omit drawing pixels with same color value as ColorKey (transparent color)
+};
+
 /**
  * \struct VideoSurface
  * \brief Data structure with information about a 2D area in video memory
@@ -35,12 +41,8 @@ struct VideoSurface
     GuiUnit_t mWidth = 0;
     GuiUnit_t mHeight = 0;
     int mRotation = 0; // Rotation of this surface. Only supports: 0, 90, 180, 270
-};
-
-enum class GfxBlendOperation {
-    Copy,        // Copy source to destination
-    SourceAlpha, // Blend source with destination, using source alpha value
-    ColorKey     // Omit drawing pixels with same color value as ColorKey (transparent color)
+    GfxBlendOperation mBlendOperation = GfxBlendOperation::Copy;
+    uint32_t mColorKey = Color::None;
 };
 
 /**
@@ -133,30 +135,10 @@ public:
      */
     virtual uint32_t GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, bool aFrontBuffer = false) const = 0;
 
-
-    /**
-     * \brief Set the blend operation to use during drawing operations
-     * \param aOp
-     */
-    virtual void SetBlendOperation(GfxBlendOperation aOp) = 0;
-
-    /**
-     * \brief Set the color to use if blend operation is set to a *Key operation
-     * \param aColor
-     */
-    virtual void SetColorKey(uint32_t aColor) = 0;
-
     /**
      * \brief Execute all queued operations, returns when finished
      */
     virtual void Sync() = 0;
-
-protected:
-    GfxHal() {}
-    GfxHal(const GfxHal&) = delete;
-    GfxHal(GfxHal&&) = delete;
-    GfxHal& operator=(const GfxHal&) = delete;
-    GfxHal& operator=(GfxHal&&) = delete;
 };
 
 

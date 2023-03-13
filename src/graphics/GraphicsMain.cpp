@@ -57,7 +57,6 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
         if (mNextScene) {
             mrEvents.Flush(); // New scene should not inherit un-handled touch events...
             mrScenes.SetActiveScene(mNextScene);
-            mrScenes.ActiveScene().MakeTextures(mrRenderer);
             mNextScene = 0;
         }
 
@@ -89,9 +88,6 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
 GraphicsMain& GraphicsMain::RegisterOverlay(Control *apWidget)
 {
     mpOverlay = apWidget;
-    if (mpOverlay) {
-        mpOverlay->MakeTextures(mrRenderer);
-    }
     return *this;
 }
 

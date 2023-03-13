@@ -40,4 +40,10 @@ void SWTexture::Update(const PixelData &arPixelData, Color aColor)
     mrGfxHal.CopyFrom(mSurface, arPixelData, aColor);
 }
 
+void SWTexture::SetBlendOperation(GfxBlendOperation aOp, Color aColorKey)
+{
+    mSurface.mBlendOperation = aOp;
+    mSurface.mColorKey = aColorKey;
+}
+
 } /* namespace rsp::graphics::sw */

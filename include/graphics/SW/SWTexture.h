@@ -27,6 +27,7 @@ public:
 
     void Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr) override;
     void Update(const PixelData &arPixelData, Color aColor) override;
+    void SetBlendOperation(rsp::graphics::GfxBlendOperation aOp, rsp::graphics::Color aColorKey = Color::None) override;
 
 protected:
     GfxHal &mrGfxHal;

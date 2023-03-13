@@ -433,10 +433,10 @@ TEST_CASE("Framebuffer")
             Color::Yellow
         };
 
-        GfxHal::Get().SetBlendOperation(GfxBlendOperation::SourceAlpha);
 
         auto sprite = Texture::Create(imgSimple.GetWidth(), imgSimple.GetHeight()+5);
         sprite->Fill(Color::Black);
+        sprite->SetBlendOperation(GfxBlendOperation::SourceAlpha);
         Point pos(100, 200);
 
         // Act
@@ -469,10 +469,10 @@ TEST_CASE("Framebuffer")
         Point pos(100, 200);
         bool scale = true;
 
-        GfxHal::Get().SetBlendOperation(GfxBlendOperation::Copy);
         Text text("Exo 2", "Hello World");
         CHECK_NOTHROW(text.SetArea(r).GetFont().SetSize(30));
         auto panel = Texture::Create(text, Color::Black);
+        panel->SetBlendOperation(GfxBlendOperation::Copy);
 
         SUBCASE("Text Attributes") {
             CHECK_NOTHROW(panel->Fill(Color::Black));
@@ -613,7 +613,7 @@ TEST_CASE("Framebuffer")
         std::string testImage = "testImages/Asset2WithAlpha.bmp";
         Bitmap testImgMap(testImage);
 
-        GfxHal::Get().SetBlendOperation(GfxBlendOperation::Copy);
+        texture->SetBlendOperation(GfxBlendOperation::Copy);
 
         CHECK_NOTHROW(texture->Update(testImgMap, Color::White));
         CHECK_NOTHROW(renderer.Render(*texture));

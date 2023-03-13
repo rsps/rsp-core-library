@@ -41,6 +41,13 @@ public:
      * \param aColor
      */
     virtual void Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr) = 0;
+
+    /**
+     * \brief Set the blend operation to use when updating this texture. Defaults to "Copy".
+     * \param aOp
+     * \param aColorKey
+     */
+    virtual void SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None) = 0;
 };
 
 } /* namespace rsp::graphics */

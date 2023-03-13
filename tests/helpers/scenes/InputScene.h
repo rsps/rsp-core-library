@@ -62,11 +62,11 @@ public:
     InputScene()
         : mBackground("testImages/rgb/Background.bmp")
     {
-        SetTransparent(true); // No need to paint background color, we have full screen image.
+        SetTransparent(false); // No need to paint background color, we have full screen image.
 
         GetStyle(Control::States::Normal).mBackground.SetPixelData(mBackground);
 
-        mLabel.GetText().GetFont().SetSize(34);
+        mLabel.GetText().GetFont().SetSize(34).SetColor(Color::Black).SetBackgroundColor(Color::White);
         mLabel.SetArea(Rect(80, 150, 320, 160));
         mLabel.GetStyle(States::Normal).mForegroundColor = Color::Black;
         mLabel.GetStyle(States::Normal).mBackgroundColor = Color::White;

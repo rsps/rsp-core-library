@@ -14,6 +14,7 @@
 #include <memory>
 #include <graphics/BitmapView.h>
 #include <graphics/Color.h>
+#include <graphics/Texture.h>
 
 namespace rsp::graphics {
 
@@ -30,6 +31,7 @@ public:
     Color mBackgroundColor = Color::None;
     BitmapView mBackground{};
     BitmapView mForeground{};
+    std::shared_ptr<Texture> mpTexture{};
 };
 
 

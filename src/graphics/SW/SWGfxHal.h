@@ -26,15 +26,9 @@ public:
     void CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint32_t aColor, Optional<const Rect> aDstRect, Optional<const Rect> aSrcRect) override;
     void DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect) override;
     void Fill(VideoSurface &arDst, uint32_t aColor, Optional<const Rect> aDest) override;
-    void SetBlendOperation(GfxBlendOperation aOp) override { mBlendOperation = aOp; }
-    void SetColorKey(uint32_t aColor) override { mColorKey = (aColor & 0x00FFFFFF); }
     void Sync() override;
     uint32_t GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, bool aFrontBuffer) const override;
     void SetPixel(VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, uint32_t aColor) override;
-
-protected:
-    GfxBlendOperation mBlendOperation = GfxBlendOperation::Copy;
-    uint32_t mColorKey = 0;
 };
 
 } /* namespace rsp::graphics */

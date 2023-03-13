@@ -125,12 +125,6 @@ public:
     virtual bool UpdateData();
 
     /**
-     * \brief Called when a Scene is activated, use it to create textures needed for this control.
-     * \param arRenderer
-     */
-    virtual void MakeTextures(Renderer &arRenderer);
-
-    /**
      * \brief Virtual method for rendering the object
      * \param aCanvas The canvas the object is rendered on
      */
@@ -254,7 +248,6 @@ protected:
     bool mCheckable = false;
     States mState = States::Normal;
     static bool mMustRender;
-    std::shared_ptr<Texture> mpTexture{};
 
     void setName(const std::string &arName) override;
     void setId(uint32_t aId) override;

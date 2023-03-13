@@ -110,7 +110,7 @@ void SWGfxHal::Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<con
     size_t w = size_t(std::min(dr.GetWidth(), sr.GetWidth()));
     GuiUnit_t src_y = sr.GetTop();
 
-    switch(mBlendOperation) {
+    switch(arDst.mBlendOperation) {
         default:
         case GfxBlendOperation::Copy: {
             for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
@@ -135,7 +135,7 @@ void SWGfxHal::Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<con
                 uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
                 uint32_t *source = offset(src, arSrc.mRowPitch, sr.GetLeft(), src_y++);
                 for(size_t x = 0; x < w ; ++x) {
-                    if ((source[x] & 0x00FFFFFF) != mColorKey) {
+                    if (source[x] != arDst.mColorKey) {
                         dest[x] = source[x];
                     }
                 }
@@ -163,7 +163,7 @@ void SWGfxHal::CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint3
     size_t w = size_t(std::min(dr.GetWidth(), sr.GetWidth()));
     GuiUnit_t src_y = sr.GetTop();
 
-    switch(mBlendOperation) {
+    switch(arDst.mBlendOperation) {
         default:
         case GfxBlendOperation::Copy: {
             for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
@@ -195,7 +195,7 @@ void SWGfxHal::CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint3
                 GuiUnit_t src_x = sr.GetLeft();
                 for(size_t x = 0; x < w ; ++x) {
                     uint32_t cl = arPixelData.GetPixelAt(src_x++, src_y, aColor);
-                    if ((cl & 0x00FFFFFF) != mColorKey) {
+                    if (cl != arDst.mColorKey) {
                         dest[x] = cl;
                     }
                 }
@@ -215,8 +215,8 @@ void SWGfxHal::DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect
     auto top = arRect.GetTop();
     auto bottom = arRect.GetBottom()-1;
 
-    if (mBlendOperation == GfxBlendOperation::ColorKey) {
-        if ((aColor & 0x00FFFFFF) == mColorKey) {
+    if (arDst.mBlendOperation == GfxBlendOperation::ColorKey) {
+        if (aColor == arDst.mColorKey) {
             return;
         }
     }
@@ -226,7 +226,7 @@ void SWGfxHal::DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect
         if (top >= 0 && top < arDst.mHeight) {
             auto *lp = offset(arDst.mpPhysAddr.get(), pitch, left, top);
             for (GuiUnit_t i = left; i < right ; ++i) {
-                paintPixel(mBlendOperation, lp, aColor);
+                paintPixel(arDst.mBlendOperation, lp, aColor);
                 lp++;
             }
         }
@@ -235,7 +235,7 @@ void SWGfxHal::DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect
         if (bottom >= 0 && bottom < arDst.mHeight && left < arDst.mWidth && right > 0) {
             auto *lp = offset(arDst.mpPhysAddr.get(), pitch, left, bottom);
             for (GuiUnit_t i = left; i < right ; ++i) {
-                paintPixel(mBlendOperation, lp, aColor);
+                paintPixel(arDst.mBlendOperation, lp, aColor);
                 lp++;
             }
         }
@@ -250,7 +250,7 @@ void SWGfxHal::DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect
         if (left >= 0 && left < arDst.mWidth) {
             auto *lp = offset(arDst.mpPhysAddr.get(), pitch, left, top);
             for (GuiUnit_t i = top; i < bottom ; ++i) {
-                paintPixel(mBlendOperation, lp, aColor);
+                paintPixel(arDst.mBlendOperation, lp, aColor);
                 lp = reinterpret_cast<uint32_t*>(uintptr_t(lp) + pitch);
             }
         }
@@ -260,7 +260,7 @@ void SWGfxHal::DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect
         if (right >= 0 && right < arDst.mWidth) {
             auto *lp = offset(arDst.mpPhysAddr.get(), pitch, right, top);
             for (GuiUnit_t i = top; i < bottom ; ++i) {
-                paintPixel(mBlendOperation, lp, aColor);
+                paintPixel(arDst.mBlendOperation, lp, aColor);
                 lp = reinterpret_cast<uint32_t*>(uintptr_t(lp) + pitch);
             }
         }
@@ -274,8 +274,8 @@ void SWGfxHal::Fill(VideoSurface &arDst, uint32_t aColor, Optional<const Rect> a
         dr &= *aDstRect;
     }
 
-    if (mBlendOperation == GfxBlendOperation::ColorKey) {
-        if ((aColor & 0x00FFFFFF) == mColorKey) {
+    if (arDst.mBlendOperation == GfxBlendOperation::ColorKey) {
+        if (aColor == arDst.mColorKey) {
             return;
         }
     }
@@ -286,7 +286,7 @@ void SWGfxHal::Fill(VideoSurface &arDst, uint32_t aColor, Optional<const Rect> a
     for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
         uint32_t *dst = offset(arDst.mpPhysAddr.get(), arDst.mRowPitch, dr.GetLeft(), y);
         for (GuiUnit_t x = dr.GetLeft() ; x < x_end ; ++x) {
-            switch(mBlendOperation) {
+            switch(arDst.mBlendOperation) {
                 default:
                 case GfxBlendOperation::Copy: {
                     *dst = aColor;
@@ -325,7 +325,7 @@ void SWGfxHal::SetPixel(VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, uin
 {
     if (aX >= 0 && aX < arSurface.mWidth && aY >= 0 && aY < arSurface.mHeight) {
         uint32_t *dst = offset(arSurface.mpPhysAddr.get(), arSurface.mRowPitch, aX, aY);
-        paintPixel(mBlendOperation, dst, aColor);
+        paintPixel(arSurface.mBlendOperation, dst, aColor);
     }
 }
 

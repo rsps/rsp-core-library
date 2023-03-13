@@ -32,8 +32,6 @@ TEST_CASE("GfxHal")
 
     CHECK_NOTHROW(GfxHal::Get());
     GfxHal& gfx = GfxHal::Get();
-    gfx.SetBlendOperation(GfxBlendOperation::Copy);
-    gfx.SetColorKey(0);
 
     CHECK_NOTHROW(gfx.Alloc(src, cWidth, cHeight));
     CHECK_NOTHROW(gfx.Alloc(dst, cWidth, cHeight));
@@ -103,8 +101,7 @@ TEST_CASE("GfxHal")
         CHECK_NOTHROW(gfx.Fill(dst, 0xFF000000, Rect(0, 0, 4, 25)));
         CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 4178597885u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
 
-        gfx.SetBlendOperation(GfxBlendOperation::SourceAlpha);
-        gfx.SetColorKey(0xAAFFFFFF);
+        dst.mBlendOperation = GfxBlendOperation::SourceAlpha;
 
         SUBCASE("Blit") {
             CHECK_NOTHROW(gfx.Blit(dst, src));
@@ -148,8 +145,8 @@ TEST_CASE("GfxHal")
         CHECK_NOTHROW(gfx.Fill(dst, 0xFF000000, Rect(0, 0, 4, 25)));
         CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 4178597885u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
 
-        gfx.SetBlendOperation(GfxBlendOperation::ColorKey);
-        gfx.SetColorKey(0x22555555);
+        dst.mBlendOperation = GfxBlendOperation::ColorKey;
+        dst.mColorKey = 0xFF555555;
 
         SUBCASE("Blit") {
             CHECK_NOTHROW(gfx.Blit(dst, src));
@@ -199,18 +196,16 @@ TEST_CASE("GfxHal")
         });
 
         SUBCASE("Copy") {
-            gfx.SetBlendOperation(GfxBlendOperation::Copy);
-            gfx.SetColorKey(0);
+            dst.mBlendOperation = GfxBlendOperation::Copy;
         }
 
         SUBCASE("SourceAlpha") {
-            gfx.SetBlendOperation(GfxBlendOperation::SourceAlpha);
-            gfx.SetColorKey(0);
+            dst.mBlendOperation = GfxBlendOperation::SourceAlpha;
         }
 
         SUBCASE("ColorKey") {
-            gfx.SetBlendOperation(GfxBlendOperation::ColorKey);
-            gfx.SetColorKey(0);
+            dst.mBlendOperation = GfxBlendOperation::ColorKey;
+            dst.mColorKey = Color::White;
         }
 
         StopWatch sw;

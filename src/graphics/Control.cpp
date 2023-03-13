@@ -156,9 +156,10 @@ bool Control::UpdateData()
         Canvas canvas(mArea.GetWidth(), mArea.GetHeight());
         auto &style = mStyles[mState];
         paint(canvas, style);
-        if (mpTexture) {
-            mpTexture->Update(canvas.GetPixelData(), style.mForegroundColor);
+        if (!style.mpTexture) {
+            style.mpTexture = Texture::Create(mArea.GetWidth(), mArea.GetHeight());
         }
+        style.mpTexture->Update(canvas.GetPixelData(), style.mForegroundColor);
         mDirty = false;
         result = true;
     }
@@ -170,25 +171,17 @@ bool Control::UpdateData()
     return result;
 }
 
-void Control::MakeTextures(Renderer &arRenderer)
-{
-    GFXLOG("Making Textures: " << GetName() << " " << mArea);
-    mpTexture = arRenderer.CreateTexture(mArea.GetWidth(), mArea.GetHeight());
-
-    for (Control* child : mChildren) {
-        child->MakeTextures(arRenderer);
-    }
-}
-
 void Control::Render(Renderer &arRenderer)
 {
     if (!mVisible) {
         return;
     }
 
-    if (mpTexture) {
+    auto &style = mStyles[mState];
+
+    if (style.mpTexture) {
         GFXLOG("Rendering: " << GetName() << " " << mArea);
-        arRenderer.Render(*mpTexture, &mArea);
+        arRenderer.Render(*style.mpTexture, &mArea);
     }
 
     for (Control* child : mChildren) {
