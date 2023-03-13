@@ -11,6 +11,7 @@
 #ifndef INCLUDE_GRAPHICS_TEXTURE_H_
 #define INCLUDE_GRAPHICS_TEXTURE_H_
 
+#include <memory>
 #include <graphics/Color.h>
 #include <graphics/GfxHal.h>
 
@@ -22,6 +23,9 @@ namespace rsp::graphics {
 class Texture
 {
 public:
+    static std::shared_ptr<Texture> Create(const PixelData &arPixelData, Color aColor);
+    static std::shared_ptr<Texture> Create(GuiUnit_t aWidth, GuiUnit_t aHeight);
+
     virtual ~Texture() {}
 
     /**

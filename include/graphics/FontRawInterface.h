@@ -57,6 +57,7 @@ public:
     int mLineHeight = 0;
     int mBaseLine = 0;
     Rect mBoundingRect{};
+    std::vector<int> mLineWidths{};
 };
 
 /**

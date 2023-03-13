@@ -69,6 +69,14 @@ Renderer& SWRenderer::Render(const Texture &arTexture, Optional<const Rect> aDes
     return *this;
 }
 
+Renderer& SWRenderer::RenderTo(const Texture &arTexture, const Point &arPosition, Optional<const Rect> aSource)
+{
+    const SWTexture& t = dynamic_cast<const SWTexture&>(arTexture);
+    Rect dest(arPosition, t.getSurface().mWidth, t.getSurface().mHeight);
+    Render(arTexture, dest, aSource);
+    return *this;
+}
+
 void SWRenderer::Present()
 {
     mrGfxHal.Sync();

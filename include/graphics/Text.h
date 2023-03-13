@@ -30,7 +30,7 @@ namespace rsp::graphics {
  * the rebuild of the glyphs is a manual process.
  * To rebuild the glyphs the Reload method must be called.
  */
-class Text
+class Text : public Canvas
 {
 public:
     enum class HAlign : uint8_t {
@@ -47,7 +47,7 @@ public:
     /**
      * \brief Constructs an empty text element with the default font.
      */
-    Text() : mFont(), mArea() {}
+    Text() : mFont() {}
 
     /**
      * \brief Constructs an empty text element with the given font.
@@ -92,7 +92,7 @@ public:
      *
      * \return
      */
-    const Rect& GetArea() const { return mArea; }
+    const Rect& GetArea() const;
     /**
      * Setter for the text area.
      *
@@ -183,6 +183,13 @@ public:
     Text& SetHAlignment(HAlign aHAlign) { mHAlign = aHAlign; mDirty = true; return *this; }
 
     /**
+     * \brief Get the position of this text inside the given area, respecting alignments settings.
+     * \param arArea
+     * \return Point
+     */
+    Point GetPosition(const Rect &arArea) const;
+
+    /**
      * \brief Set the font size and mark text for refreshing
      * \param aSizePx
      * \return self
@@ -217,17 +224,8 @@ public:
      */
     const Rect& GetBoundingRect() const { return mBoundingRect; }
 
-    /**
-     * \brief Paint glyphs on the given canvas
-     *
-     * \param arCanvas
-     * \param arStyle
-     */
-    void Paint(Canvas &arCanvas, Color aColor);
-
 protected:
     Font mFont;
-    Rect mArea{};
     Rect mBoundingRect{};
     std::string mValue{};
     bool mScaleToFit = false;
@@ -243,6 +241,7 @@ protected:
     void loadGlyphs();
     void alignGlyphs();
     void calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs);
+    void draw();
 };
 
 } /* namespace rsp::graphics */

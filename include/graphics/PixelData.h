@@ -15,6 +15,7 @@
 #include <graphics/Color.h>
 #include <graphics/Point.h>
 #include <graphics/Rect.h>
+#include <graphics/GfxHal.h>
 #include <cstdint>
 #include <cstddef>
 #include <filesystem>

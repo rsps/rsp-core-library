@@ -5,6 +5,23 @@
 
 #include <graphics/SW/SWTexture.h>
 
+namespace rsp::graphics {
+
+std::shared_ptr<Texture> Texture::Create(const PixelData &arPixelData, Color aColor)
+{
+    auto result = std::make_shared<sw::SWTexture>(arPixelData.GetWidth(), arPixelData.GetHeight());
+    result->Update(arPixelData, aColor);
+    return result;
+}
+
+std::shared_ptr<Texture> Texture::Create(GuiUnit_t aWidth, GuiUnit_t aHeight)
+{
+    return std::make_shared<sw::SWTexture>(aWidth, aHeight);
+}
+
+} /* namespace rsp::graphics */
+
+
 namespace rsp::graphics::sw {
 
 SWTexture::SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight)
@@ -20,7 +37,7 @@ void SWTexture::Fill(Color aColor, GfxHal::Optional<const Rect> aRect)
 
 void SWTexture::Update(const PixelData &arPixelData, Color aColor)
 {
-    arPixelData.CopyToSurface(mSurface);
+    mrGfxHal.CopyFrom(mSurface, arPixelData, aColor);
 }
 
 } /* namespace rsp::graphics::sw */

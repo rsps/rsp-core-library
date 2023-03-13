@@ -35,6 +35,7 @@ public:
     Renderer& Fill(Color aColor, Optional<const Rect> aDestination = nullptr) override;
 
     Renderer& Render(const Texture &arTexture, Optional<const Rect> aDestination = nullptr, Optional<const Rect> aSource = nullptr) override;
+    Renderer& RenderTo(const Texture &arTexture, const Point &arPosition, Optional<const Rect> aSource = nullptr) override;
 
     void Present() override;
 };

@@ -85,7 +85,7 @@ Framebuffer::Framebuffer()
     });
     mScreenSurfaces[1].mpPhysAddr = VideoSurface::PixelPtr_t(fb + (screensize / sizeof(std::uint32_t)), [](uint32_t apPtr[]) noexcept {});
 
-    if (mVariableInfo.yoffset > 0) {
+    if (mVariableInfo.yoffset == 0) {
         mCurrentSurface = 1;
     }
 }
@@ -108,10 +108,10 @@ void Framebuffer::swapBuffer()
     // swap buffer
     if (mVariableInfo.yoffset == 0) {
         mVariableInfo.yoffset = mVariableInfo.yres;
-        mCurrentSurface = 1;
+        mCurrentSurface = 0;
     } else {
         mVariableInfo.yoffset = 0;
-        mCurrentSurface = 0;
+        mCurrentSurface = 1;
     }
 
     // Sync to next vblank

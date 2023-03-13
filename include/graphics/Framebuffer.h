@@ -57,8 +57,8 @@ protected:
     int mTtyFb = 0;
     struct fb_fix_screeninfo mFixedInfo{};
     struct fb_var_screeninfo mVariableInfo{};
-    VideoSurface mScreenSurfaces[2]{};
-    int mCurrentSurface = 0;
+    VideoSurface mScreenSurfaces[2]{}; // Double buffers
+    int mCurrentSurface = 0; // Index of current backbuffer
 
     void swapBuffer();
 };

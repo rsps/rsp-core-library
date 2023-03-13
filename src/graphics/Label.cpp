@@ -73,7 +73,7 @@ void Label::refresh()
 void Label::paint(Canvas &arCanvas, const Style &arStyle)
 {
     Control::paint(arCanvas, arStyle);
-    mText.Paint(arCanvas, arStyle.mForegroundColor);
+    arCanvas.DrawPixelData(mText.GetArea().GetTopLeft(), mText);
 }
 
 } /* namespace rsp::graphics */

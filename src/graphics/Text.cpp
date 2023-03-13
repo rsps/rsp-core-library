@@ -35,11 +35,16 @@ Text& Text::SetValue(const std::string &arValue)
     return *this;
 }
 
+const Rect& Text::GetArea() const
+{
+    return mRect;
+}
+
 Text& Text::SetArea(const Rect &arRect)
 {
-    if (mArea != arRect) {
-        mArea = arRect;
+    if (mRect != arRect) {
         mDirty = true;
+        Init(arRect.GetWidth(), arRect.GetHeight(), ColorDepth::RGBA, nullptr);
     }
     return *this;
 }
@@ -58,14 +63,13 @@ Text& Text::Reload()
             mLineCount++;
             count = 0;
         }
-        else {
-            if (++count > mLineMaxChar) {
-                mLineMaxChar = count;
-            }
+        else if (++count > mLineMaxChar) {
+            mLineMaxChar = count;
         }
     }
 
     loadGlyphs();
+    draw();
     mDirty = false;
     return *this;
 }
@@ -82,12 +86,12 @@ Text& Text::SetScaleToFit(bool aValue)
 void Text::scaleToFit()
 {
 //    int width = ((mArea.GetWidth() + (mLineMaxChar/2)) / mLineMaxChar); // Texts seems to be about 1/3 of desired width
-    int width = mArea.GetWidth() / mLineMaxChar; // Texts seems to be about 1/3 of desired width
-    int height = mArea.GetHeight() / mLineCount;
+    int width = GetWidth() / mLineMaxChar; // Texts seems to be about 1/3 of desired width
+    int height = GetHeight() / mLineCount;
     int done;
     int attempts = 5;
-    int w_limit = mArea.GetWidth() * 90 / 100; // >90%
-    int h_limit = mArea.GetHeight() * 90 / 100; // > 90%
+    int w_limit = GetWidth() * 90 / 100; // >90%
+    int h_limit = GetHeight() * 90 / 100; // > 90%
     Logger::GetDefault().Debug() << "scaleToFit w_limit: " << w_limit << " h_limit: " << h_limit << " line count: " << mLineCount;
 
     do {
@@ -96,17 +100,17 @@ void Text::scaleToFit()
         mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
         calcBoundingRect(mpGlyphs);
 
-        Logger::GetDefault().Debug() << "Area: " << mArea << ", Bounding Rect: " << mBoundingRect;
+        Logger::GetDefault().Debug() << "Area: " << mRect << ", Bounding Rect: " << mBoundingRect;
 
         done = 0;
-        if ((mBoundingRect.GetWidth() < w_limit) || (mBoundingRect.GetWidth() > mArea.GetWidth())) {
-            width += ((mArea.GetWidth() - mBoundingRect.GetWidth()) + (mLineMaxChar/2)) / mLineMaxChar;
+        if ((mBoundingRect.GetWidth() < w_limit) || (mBoundingRect.GetWidth() > GetWidth())) {
+            width += ((GetWidth() - mBoundingRect.GetWidth()) + (mLineMaxChar/2)) / mLineMaxChar;
         }
         else {
             done++;
         }
-        if ((mBoundingRect.GetHeight() < h_limit) || (mBoundingRect.GetHeight() > mArea.GetHeight())) {
-            height += (mArea.GetHeight() - mBoundingRect.GetHeight()) / mLineCount;
+        if ((mBoundingRect.GetHeight() < h_limit) || (mBoundingRect.GetHeight() > GetHeight())) {
+            height += (GetHeight() - mBoundingRect.GetHeight()) / mLineCount;
         }
         else {
             done++;
@@ -119,7 +123,7 @@ void Text::scaleToFit()
 void Text::calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs)
 {
     mBoundingRect = apGlyphs->mBoundingRect;
-    alignGlyphs();
+//    alignGlyphs();
     return;
 
 //    int w = 0;
@@ -166,7 +170,7 @@ void Text::loadGlyphs()
 void Text::alignGlyphs()
 {
     if (mVAlign == VAlign::Top && mHAlign == HAlign::Left) {
-        mBoundingRect.MoveTo(mArea.GetTopLeft());
+        mBoundingRect.MoveTo(mRect.GetTopLeft());
         return;
     }
 
@@ -178,10 +182,10 @@ void Text::alignGlyphs()
             voffset = 0;
             break;
         case VAlign::Center:
-            voffset = (mArea.GetHeight() - mBoundingRect.GetHeight()) / 2;
+            voffset = (GetHeight() - mBoundingRect.GetHeight()) / 2;
             break;
         case VAlign::Bottom:
-            voffset = (mArea.GetHeight() - mBoundingRect.GetHeight());
+            voffset = (GetHeight() - mBoundingRect.GetHeight());
             break;
     }
     switch(mHAlign) {
@@ -190,10 +194,10 @@ void Text::alignGlyphs()
             hoffset = 0;
             break;
         case HAlign::Center:
-            hoffset = (mArea.GetWidth() - mBoundingRect.GetWidth()) / 2;
+            hoffset = (GetWidth() - mBoundingRect.GetWidth()) / 2;
             break;
         case HAlign::Right:
-            hoffset = (mArea.GetWidth()- mBoundingRect.GetWidth());
+            hoffset = (GetWidth()- mBoundingRect.GetWidth());
             break;
     }
     for (unsigned i=0 ; i < mpGlyphs->GetCount() ; ++i) {
@@ -201,11 +205,44 @@ void Text::alignGlyphs()
         glyph.mTop += voffset;
         glyph.mLeft += hoffset;
     }
-    mBoundingRect.MoveTo(mArea.GetTopLeft() + Point(hoffset, voffset));
+    mBoundingRect.MoveTo(mRect.GetTopLeft() + Point(hoffset, voffset));
 }
 
-void Text::Paint(Canvas &arCanvas, Color aColor)
+Point Text::GetPosition(const Rect &arArea) const
 {
+    int voffset = 0;
+    int hoffset = 0;
+    switch(mVAlign) {
+        default:
+        case VAlign::Top:
+            voffset = 0;
+            break;
+        case VAlign::Center:
+            voffset = (arArea.GetHeight() - GetHeight()) / 2;
+            break;
+        case VAlign::Bottom:
+            voffset = (arArea.GetHeight() - GetHeight());
+            break;
+    }
+    switch(mHAlign) {
+        default:
+        case HAlign::Left:
+            hoffset = 0;
+            break;
+        case HAlign::Center:
+            hoffset = (arArea.GetWidth() - GetWidth()) / 2;
+            break;
+        case HAlign::Right:
+            hoffset = (arArea.GetWidth()- GetWidth());
+            break;
+    }
+    return Point(hoffset, voffset) + arArea.GetTopLeft();
+}
+
+void Text::draw()
+{
+    Fill(GetFont().GetBackgroundColor());
+    Color aColor = GetFont().GetColor();
     auto &glyphs = GetGlyphs();
     if (!glyphs) {
         std::cout << "No glyphs to paint!!" << std::endl;
@@ -224,7 +261,7 @@ void Text::Paint(Canvas &arCanvas, Color aColor)
                     continue;
                 }
                 aColor.SetAlpha(c);
-                arCanvas.SetPixelAt(px, py, aColor);
+                SetPixelAt(px, py, aColor);
                 px++;
             }
             py++;

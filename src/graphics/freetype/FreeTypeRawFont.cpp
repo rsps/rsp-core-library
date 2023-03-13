@@ -127,6 +127,7 @@ std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
         if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
             baseline += glyphs->mLineHeight + aLineSpacing;
             max_height += glyphs->mLineHeight + aLineSpacing;
+            glyphs->mLineWidths.push_back(line_left);
             line_left = 0;
         }
         else {
@@ -145,9 +146,6 @@ std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
         max_left++;
     }
     glyphs->mBoundingRect = Rect(min_left, 0, max_left, max_height);
-    if ((arText == "123") || (arText == "+-/")) {
-        DLOG(*glyphs);
-    }
     return glyphs;
 }
 

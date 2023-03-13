@@ -23,6 +23,7 @@ class SWGfxHal: public rsp::graphics::GfxHal, public rsp::utils::Singleton<SWGfx
 public:
     void Alloc(VideoSurface &arSurface, int aWidth, int aHeight) override;
     void Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<const Rect> aDstRect, Optional<const Rect> aSrcRect) override;
+    void CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint32_t aColor, Optional<const Rect> aDstRect, Optional<const Rect> aSrcRect) override;
     void DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect) override;
     void Fill(VideoSurface &arDst, uint32_t aColor, Optional<const Rect> aDest) override;
     void SetBlendOperation(GfxBlendOperation aOp) override { mBlendOperation = aOp; }

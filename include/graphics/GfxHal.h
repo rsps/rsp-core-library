@@ -18,6 +18,7 @@
 #include "Color.h"
 #include "GuiUnit.h"
 #include "Rect.h"
+#include "PixelData.h"
 
 namespace rsp::graphics {
 
@@ -86,6 +87,15 @@ public:
      * \param aSrcRect Optional area from source surface, if null, the entire source is copied
      */
     virtual void Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<const Rect> aDstRect = nullptr, Optional<const Rect> aSrcRect = nullptr) = 0;
+
+    /**
+     * \brief Copy an area of PixelData into a VideoSurface
+     * \param arDst Destination surface
+     * \param arPixelData
+     * \param aDstRect
+     * \param aSrcRect
+     */
+    virtual void CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint32_t aColor, Optional<const Rect> aDstRect = nullptr, Optional<const Rect> aSrcRect = nullptr) = 0;
 
     /**
      * \brief Draw a rectangle with single pixel line width in a given color

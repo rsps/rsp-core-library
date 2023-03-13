@@ -106,7 +106,7 @@ void SWGfxHal::Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<con
     uint32_t *src = arSrc.mpPhysAddr.get();
     uint32_t *dst = arDst.mpPhysAddr.get();
 
-    GuiUnit_t y_end = uintptr_t(std::min(dr.GetHeight(), sr.GetHeight()));
+    GuiUnit_t y_end = std::min(dr.GetHeight(), sr.GetHeight()) + dr.GetTop();
     size_t w = size_t(std::min(dr.GetWidth(), sr.GetWidth()));
     GuiUnit_t src_y = sr.GetTop();
 
@@ -114,7 +114,7 @@ void SWGfxHal::Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<con
         default:
         case GfxBlendOperation::Copy: {
             for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
-                std::memcpy(offset(dst, arDst.mRowPitch, 0, y), offset(src, arSrc.mRowPitch, 0, src_y++), w * sizeof(uint32_t));
+                std::memcpy(offset(dst, arDst.mRowPitch, dr.GetLeft(), y), offset(src, arSrc.mRowPitch, sr.GetLeft(), src_y++), w * sizeof(uint32_t));
             }
             break;
         }
@@ -139,6 +139,67 @@ void SWGfxHal::Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<con
                         dest[x] = source[x];
                     }
                 }
+            }
+            break;
+        }
+    }
+}
+
+void SWGfxHal::CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint32_t aColor, Optional<const Rect> aDstRect, Optional<const Rect> aSrcRect)
+{
+    Rect dr(0, 0, arDst.mWidth, arDst.mHeight);
+    Rect sr(arPixelData.GetRect());
+
+    if (aDstRect) {
+        dr &= *aDstRect;
+    }
+    if (aSrcRect) {
+        sr &= *aSrcRect;
+    }
+
+    uint32_t *dst = arDst.mpPhysAddr.get();
+
+    GuiUnit_t y_end = uintptr_t(std::min(dr.GetHeight(), sr.GetHeight()));
+    size_t w = size_t(std::min(dr.GetWidth(), sr.GetWidth()));
+    GuiUnit_t src_y = sr.GetTop();
+
+    switch(mBlendOperation) {
+        default:
+        case GfxBlendOperation::Copy: {
+            for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
+                uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
+                GuiUnit_t src_x = sr.GetLeft();
+                for(size_t x = 0; x < w ; ++x) {
+                    dest[x] = arPixelData.GetPixelAt(src_x++, src_y, aColor);
+                }
+                ++src_y;
+            }
+            break;
+        }
+
+        case GfxBlendOperation::SourceAlpha: {
+            for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
+                uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
+                GuiUnit_t src_x = sr.GetLeft();
+                for(size_t x = 0; x < w ; ++x) {
+                    dest[x] = alphaBlend(dest[x], arPixelData.GetPixelAt(src_x++, src_y, aColor));
+                }
+                ++src_y;
+            }
+            break;
+        }
+
+        case GfxBlendOperation::ColorKey: {
+            for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
+                uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
+                GuiUnit_t src_x = sr.GetLeft();
+                for(size_t x = 0; x < w ; ++x) {
+                    uint32_t cl = arPixelData.GetPixelAt(src_x++, src_y, aColor);
+                    if ((cl & 0x00FFFFFF) != mColorKey) {
+                        dest[x] = cl;
+                    }
+                }
+                ++src_y;
             }
             break;
         }

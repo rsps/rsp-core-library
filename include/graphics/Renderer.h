@@ -41,6 +41,7 @@ public:
     virtual std::shared_ptr<const Texture> CreateStaticTexture(const PixelData &arPixelData) = 0;
 
     virtual Renderer& Render(const Texture &arTexture, Optional<const Rect> aDestination = nullptr, Optional<const Rect> aSource = nullptr) = 0;
+    virtual Renderer& RenderTo(const Texture &arTexture, const Point &arPosition, Optional<const Rect> aSource = nullptr) = 0;
 
     virtual Renderer& DrawRect(Color aColor, const Rect &arRect) = 0;
     virtual Renderer& Fill(Color aColor, Optional<const Rect> aDestination = nullptr) = 0;

@@ -20,12 +20,12 @@ namespace rsp::graphics::sw {
 class SWRenderer;
 
 
-class SWTexture: public Texture
+class SWTexture: public rsp::graphics::Texture
 {
 public:
     SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight);
 
-    void Fill(Color aColor, GfxHal::Optional<const Rect> arRect) override;
+    void Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr) override;
     void Update(const PixelData &arPixelData, Color aColor) override;
 
 protected:
