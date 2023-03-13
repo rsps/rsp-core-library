@@ -220,7 +220,7 @@ Color BmpLoader::ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::ui
         case 32:
             apPixelData += (aY * aPaddedRowSize) + (aX * 4);
 //            std::cout << "CSType: " << mBmpHeader.v5.CSType[0] << mBmpHeader.v5.CSType[1] << mBmpHeader.v5.CSType[2] << mBmpHeader.v5.CSType[3] << std::endl;
-            if (std::memcmp(mBmpHeader.v5.CSType, "BGRs", 4) == 0) {
+            if (std::memcmp(mBmpHeader.v5.CSType, "BGRs", 4) != 0) {
                 pixel.SetRed(apPixelData[2]);
                 pixel.SetGreen(apPixelData[1]);
                 pixel.SetBlue(apPixelData[0]);
