@@ -49,12 +49,12 @@ Framebuffer::Framebuffer()
     // get variable screen info
     ioctl(mFramebufferFile, FBIOGET_FSCREENINFO, &mFixedInfo);
 
-    mScreenSurfaces[0].mWidth = static_cast<GuiUnit_t>(mVariableInfo.xres);
-    mScreenSurfaces[0].mHeight = static_cast<GuiUnit_t>(mVariableInfo.yres);
-    mScreenSurfaces[0].mRowPitch = static_cast<uintptr_t>(mFixedInfo.line_length);
-    mScreenSurfaces[1].mWidth    = mScreenSurfaces[0].mWidth;
-    mScreenSurfaces[1].mHeight   = mScreenSurfaces[0].mHeight;
-    mScreenSurfaces[1].mRowPitch = mScreenSurfaces[0].mRowPitch;
+    mScreenSurfaces[0]->mWidth = static_cast<GuiUnit_t>(mVariableInfo.xres);
+    mScreenSurfaces[0]->mHeight = static_cast<GuiUnit_t>(mVariableInfo.yres);
+    mScreenSurfaces[0]->mRowPitch = static_cast<uintptr_t>(mFixedInfo.line_length);
+    mScreenSurfaces[1]->mWidth    = mScreenSurfaces[0]->mWidth;
+    mScreenSurfaces[1]->mHeight   = mScreenSurfaces[0]->mHeight;
+    mScreenSurfaces[1]->mRowPitch = mScreenSurfaces[0]->mRowPitch;
 
     // std::clog << "Framebuffer opened. Width=" << mWidth << " Height=" << mHeight << " BytesPerPixel=" << mBytesPerPixel << std::endl;
 
@@ -80,10 +80,10 @@ Framebuffer::Framebuffer()
         THROW_SYSTEM("Framebuffer shared memory mapping failed");
     }
 
-    mScreenSurfaces[0].mpPhysAddr = VideoSurface::PixelPtr_t(fb, [screensize](uint32_t *p) noexcept {
+    mScreenSurfaces[0]->mpPhysAddr = VideoSurface::PixelPtr_t(fb, [screensize](uint32_t *p) noexcept {
         munmap(p, screensize*2);
     });
-    mScreenSurfaces[1].mpPhysAddr = VideoSurface::PixelPtr_t(fb + (screensize / sizeof(std::uint32_t)), [](uint32_t apPtr[]) noexcept {});
+    mScreenSurfaces[1]->mpPhysAddr = VideoSurface::PixelPtr_t(fb + (screensize / sizeof(std::uint32_t)), [](uint32_t apPtr[]) noexcept {});
 
     if (mVariableInfo.yoffset == 0) {
         mCurrentSurface = 1;
@@ -126,15 +126,15 @@ void Framebuffer::swapBuffer()
 
 void Framebuffer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 {
-    mrGfxHal.SetPixel(mScreenSurfaces[mCurrentSurface], aX, aY, arColor);
+    mrGfxHal.SetPixel(*mScreenSurfaces[mCurrentSurface], aX, aY, arColor);
 }
 
 uint32_t Framebuffer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
 {
     if (aFront) {
-        return mrGfxHal.GetPixel(mScreenSurfaces[(mCurrentSurface) ? 0 : 1], aX, aY);
+        return mrGfxHal.GetPixel(*mScreenSurfaces[(mCurrentSurface) ? 0 : 1], aX, aY);
     }
-    return mrGfxHal.GetPixel(mScreenSurfaces[mCurrentSurface], aX, aY);
+    return mrGfxHal.GetPixel(*mScreenSurfaces[mCurrentSurface], aX, aY);
 }
 
 } // namespace rsp::graphics

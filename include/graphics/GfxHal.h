@@ -36,6 +36,8 @@ struct VideoSurface
 {
     using PixelPtr_t = std::unique_ptr<uint32_t[], std::function<void(uint32_t[])> >;
 
+    VideoSurface(GuiUnit_t aWidth, GuiUnit_t aHeight);
+
     PixelPtr_t mpPhysAddr{}; // Pointer to 32-bit ARGB pixels
     uintptr_t mRowPitch = 0; // Number of bytes per row in physical memory (alignment vs. width)
     GuiUnit_t mWidth = 0;
@@ -140,6 +142,11 @@ public:
      */
     virtual void Sync() = 0;
 };
+
+inline VideoSurface::VideoSurface(GuiUnit_t aWidth, GuiUnit_t aHeight)
+{
+    GfxHal::Get().Alloc(*this, aWidth, aHeight);
+}
 
 
 

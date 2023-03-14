@@ -27,8 +27,9 @@ TEST_CASE("GfxHal")
     constexpr const uint32_t cSize   = (cWidth * cHeight);
     constexpr const uint32_t cByteSize   = (cSize * sizeof(uint32_t));
 
-    VideoSurface src;
-    VideoSurface dst;
+    std::shared_ptr<VideoSurface> surface1 = std::make_shared<VideoSurface>();
+    src;
+    std::shared_ptr<VideoSurface> dst;
 
     CHECK_NOTHROW(GfxHal::Get());
     GfxHal& gfx = GfxHal::Get();

@@ -31,49 +31,20 @@ namespace rsp::graphics::sw {
 
 Renderer& SWRenderer::DrawRect(Color aColor, const Rect &arRect)
 {
-    mrGfxHal.DrawRect(mScreenSurfaces[mCurrentSurface], aColor, arRect);
+    mrGfxHal.DrawRect(*mScreenSurfaces[mCurrentSurface], aColor, arRect);
     return *this;
 }
 
 Renderer& SWRenderer::Fill(Color aColor, Optional<const Rect> aDestination)
 {
-    mrGfxHal.Fill(mScreenSurfaces[mCurrentSurface], aColor, aDestination);
+    mrGfxHal.Fill(*mScreenSurfaces[mCurrentSurface], aColor, aDestination);
     return *this;
 }
 
-std::shared_ptr<Texture> SWRenderer::CreateTexture(GuiUnit_t aWidth, GuiUnit_t aHeight)
-{
-    if (!aWidth) {
-        aWidth = GetWidth();
-    }
-    if (!aHeight) {
-        aHeight = GetHeight();
-    }
-    return std::make_shared<SWTexture>(aWidth, aHeight);
-}
-
-std::shared_ptr<const Texture> SWRenderer::CreateStaticTexture(const PixelData &arPixelData)
-{
-    auto t = std::make_shared<SWTexture>(arPixelData.GetWidth(), arPixelData.GetHeight());
-
-    t->Update(arPixelData, Color::Black);
-
-    return t;
-}
-
-Renderer& SWRenderer::Render(const Texture &arTexture, Optional<const Rect> aDestination, Optional<const Rect> aSource)
+Renderer& SWRenderer::Render(const Texture &arTexture)
 {
     const SWTexture& t = dynamic_cast<const SWTexture&>(arTexture);
-
-    mrGfxHal.Blit(mScreenSurfaces[mCurrentSurface], t.getSurface(), aDestination, aSource);
-    return *this;
-}
-
-Renderer& SWRenderer::RenderTo(const Texture &arTexture, const Point &arPosition, Optional<const Rect> aSource)
-{
-    const SWTexture& t = dynamic_cast<const SWTexture&>(arTexture);
-    Rect dest(arPosition, t.getSurface().mWidth, t.getSurface().mHeight);
-    Render(arTexture, dest, aSource);
+    t.render(*mScreenSurfaces[mCurrentSurface]);
     return *this;
 }
 

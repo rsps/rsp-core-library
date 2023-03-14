@@ -66,7 +66,7 @@ void Label::refresh()
     if (mText.IsDirty()) {
         mText.GetFont().SetColor(mStyles[mState].mForegroundColor);
         mText.Reload();
-        mTextures.push_back(Texture::Create(mText, mStyles[mState].mBackgroundColor));
+        mTextures.push_back(Texture(mText, mStyles[mState].mBackgroundColor));
         Invalidate();
     }
 }

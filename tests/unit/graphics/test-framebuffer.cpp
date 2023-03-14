@@ -264,7 +264,8 @@ TEST_CASE("Framebuffer")
         {
             // Act
             auto raster = Texture::Create(testImgMap, Color::White);
-            CHECK_NOTHROW(renderer.RenderTo(*raster, topLeftImgCorner));
+            CHECK_NOTHROW(raster->SetDestination(topLeftImgCorner));
+            CHECK_NOTHROW(renderer.Render(*raster));
 
             // Assert
             CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + 4, topLeftImgCorner.GetY() + 4, false), Color(0xFF020F92));
@@ -287,7 +288,8 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(testImgMap.DrawLine(botLeft, topRight, Color::Red));
 
             auto raster = Texture::Create(testImgMap, Color::White);
-            CHECK_NOTHROW(renderer.RenderTo(*raster, topLeftImgCorner));
+            CHECK_NOTHROW(raster->SetDestination(topLeftImgCorner));
+            CHECK_NOTHROW(renderer.Render(*raster));
             CHECK_NOTHROW(renderer.Present());
 
             // Assert
@@ -376,7 +378,8 @@ TEST_CASE("Framebuffer")
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
             CHECK_NOTHROW(renderer.Fill(Color::Black));
-            CHECK_NOTHROW(renderer.RenderTo(*sprite, pos));
+            CHECK_NOTHROW(sprite->SetDestination(pos));
+            CHECK_NOTHROW(renderer.Render(*sprite));
             CHECK_NOTHROW(renderer.Present());
             pos.SetY(200 - i);
         }
@@ -405,7 +408,8 @@ TEST_CASE("Framebuffer")
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
-            CHECK_NOTHROW(renderer.RenderTo(*sprite, pos));
+            CHECK_NOTHROW(sprite->SetDestination(pos));
+            CHECK_NOTHROW(renderer.Render(*sprite));
             CHECK_NOTHROW(renderer.Present());
             pos.SetY(200 - i);
         }
@@ -435,8 +439,8 @@ TEST_CASE("Framebuffer")
 
 
         auto sprite = Texture::Create(imgSimple.GetWidth(), imgSimple.GetHeight()+5);
-        sprite->Fill(Color::Black);
-        sprite->SetBlendOperation(GfxBlendOperation::SourceAlpha);
+        CHECK_NOTHROW(sprite->Fill(Color::Black));
+        CHECK_NOTHROW(sprite->SetBlendOperation(GfxBlendOperation::SourceAlpha));
         Point pos(100, 200);
 
         // Act
@@ -445,7 +449,8 @@ TEST_CASE("Framebuffer")
             if ((i % 20) == 0) {
                 CHECK_NOTHROW(sprite->Update(imgSimple, mcl[(i / 20) % 5]));
             }
-            CHECK_NOTHROW(renderer.RenderTo(*sprite, pos));
+            CHECK_NOTHROW(sprite->SetDestination(pos));
+            CHECK_NOTHROW(renderer.Render(*sprite));
             CHECK_NOTHROW(renderer.Present());
             pos.SetY(200 - i);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -466,13 +471,12 @@ TEST_CASE("Framebuffer")
         const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
         Font::RegisterFont(cFontFile);
         Rect r(0, 0, 280, 200);
-        Point pos(100, 200);
         bool scale = true;
 
         Text text("Exo 2", "Hello World");
         CHECK_NOTHROW(text.SetArea(r).GetFont().SetSize(30));
         auto panel = Texture::Create(text, Color::Black);
-        panel->SetBlendOperation(GfxBlendOperation::Copy);
+        CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::Copy).SetDestination(Point(100, 200)));
 
         SUBCASE("Text Attributes") {
             CHECK_NOTHROW(panel->Fill(Color::Black));
@@ -505,7 +509,7 @@ TEST_CASE("Framebuffer")
 
             CHECK_NOTHROW(text.SetScaleToFit(scale).Reload());
             CHECK_NOTHROW(panel->Update(text, Color::White));
-            CHECK_NOTHROW(renderer.RenderTo(*panel, pos));
+            CHECK_NOTHROW(renderer.Render(*panel));
             CHECK_NOTHROW(renderer.Present());
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
@@ -525,7 +529,7 @@ TEST_CASE("Framebuffer")
                 CHECK_NOTHROW(panel->Fill(Color::None));
                 CHECK_NOTHROW(text.SetValue(ss.str()).Reload());
                 CHECK_NOTHROW(panel->Update(text, Color::None));
-                CHECK_NOTHROW(renderer.RenderTo(*panel, pos));
+                CHECK_NOTHROW(renderer.Render(*panel));
                 CHECK_NOTHROW(renderer.Present());
             }
             MESSAGE(text.GetValue());
@@ -562,7 +566,8 @@ TEST_CASE("Framebuffer")
                 CHECK_NOTHROW(text.Reload());
                 CHECK_NOTHROW(panel->Update(text, Color::White));
                 CHECK_NOTHROW(renderer.Fill(Color::Black));
-                CHECK_NOTHROW(renderer.RenderTo(*panel, text.GetPosition(r)));
+                CHECK_NOTHROW(panel->SetDestination(text.GetPosition(r)));
+                CHECK_NOTHROW(renderer.Render(*panel));
                 CHECK_NOTHROW(renderer.DrawRect(Color::White, r));
                 CHECK_NOTHROW(renderer.Present());
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -579,6 +584,7 @@ TEST_CASE("Framebuffer")
         r2.AddSize(2, 2).Move(-1, -1);
 
         auto panel = Texture::Create(r.GetWidth(), r.GetHeight());
+        CHECK_NOTHROW(panel->SetDestination(r.GetTopLeft()));
 
         Text text("Exo 2", "Regular");
         CHECK_NOTHROW(text.SetArea(r).SetScaleToFit(true).GetFont().SetSize(50).SetColor(Color::Yellow));
@@ -599,7 +605,7 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(panel->Update(text, Color::White));
         CHECK_NOTHROW(renderer.Fill(Color::Black));
         CHECK_NOTHROW(renderer.DrawRect(Color::White, r2));
-        CHECK_NOTHROW(renderer.RenderTo(*panel, r.GetTopLeft()));
+        CHECK_NOTHROW(renderer.Render(*panel));
         CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }

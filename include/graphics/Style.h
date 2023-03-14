@@ -31,7 +31,7 @@ public:
     Color mBackgroundColor = Color::None;
     BitmapView mBackground{};
     BitmapView mForeground{};
-    std::shared_ptr<Texture> mpTexture{};
+    Texture mTexture{};
 };
 
 

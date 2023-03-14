@@ -155,10 +155,10 @@ bool Control::UpdateData()
         Canvas canvas(mArea.GetWidth(), mArea.GetHeight());
         auto &style = mStyles[mState];
         paint(canvas, style);
-        if (!style.mpTexture) {
-            style.mpTexture = Texture::Create(mArea.GetWidth(), mArea.GetHeight());
+        if (!style.mTexture) {
+            style.mTexture = Texture(mArea.GetWidth(), mArea.GetHeight());
         }
-        style.mpTexture->Update(canvas.GetPixelData(), style.mForegroundColor);
+        style.mTexture.Update(canvas.GetPixelData(), style.mForegroundColor);
         mDirty = false;
         result = true;
     }
@@ -179,8 +179,8 @@ void Control::Render(Renderer &arRenderer)
     auto &style = mStyles[mState];
 
     GFXLOG("Rendering: " << GetName() << " " << mArea);
-    for(std::shared_ptr<Texture> &texture : mTextures) {
-        arRenderer.Render(*texture, mArea);
+    for(Texture &texture : mTextures) {
+        arRenderer.Render(texture);
     }
 
     for (Control* child : mChildren) {

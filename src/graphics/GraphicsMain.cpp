@@ -42,7 +42,7 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
     int64_t frame_time = 1000 / aMaxFPS;
 
     if (StaticTextures::HasInstance()) {
-        StaticTextures::Get().Load(mrRenderer);
+        StaticTextures::Get().Load();
     }
 
     while (!mTerminated) {

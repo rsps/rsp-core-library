@@ -14,27 +14,35 @@
 #include <graphics/GfxHal.h>
 #include <graphics/PixelData.h>
 #include <graphics/Texture.h>
+#include "SWRenderer.h"
 
 namespace rsp::graphics::sw {
 
 class SWRenderer;
 
 
-class SWTexture: public rsp::graphics::Texture
+class SWTexture: public rsp::graphics::Texture::Interface
 {
 public:
     SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight);
 
     void Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr) override;
     void Update(const PixelData &arPixelData, Color aColor) override;
-    void SetBlendOperation(rsp::graphics::GfxBlendOperation aOp, rsp::graphics::Color aColorKey = Color::None) override;
+    void SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None) override;
+    void SetSourceRect(const Rect &arRect) override;
+    void SetDestination(const Point &arPoint) override;
+    std::unique_ptr<Texture::Interface> Clone() const override;
 
 protected:
     GfxHal &mrGfxHal;
-    VideoSurface mSurface{};
+    std::shared_ptr<VideoSurface> mpSurface{};
+    Rect mSourceRect;
+    Rect mDestinationRect;
+
+    SWTexture(const SWTexture& arOther) = default;
 
     friend SWRenderer;
-    const VideoSurface& getSurface() const { return mSurface; }
+    void render(VideoSurface &arSurface) const;
 };
 
 } /* namespace rsp::graphics::sw */
