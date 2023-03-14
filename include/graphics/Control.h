@@ -247,7 +247,8 @@ protected:
     bool mVisible = true;
     bool mCheckable = false;
     States mState = States::Normal;
-    static bool mMustRender;
+    std::vector<std::shared_ptr<Texture> > mTextures;
+
 
     void setName(const std::string &arName) override;
     void setId(uint32_t aId) override;

@@ -18,7 +18,6 @@ namespace rsp::graphics
 {
 
 Color Control::mTouchAreaColor = Color::None;
-bool Control::mMustRender = true;
 
 std::string to_string(Control::States aState)
 {
@@ -179,9 +178,9 @@ void Control::Render(Renderer &arRenderer)
 
     auto &style = mStyles[mState];
 
-    if (style.mpTexture) {
-        GFXLOG("Rendering: " << GetName() << " " << mArea);
-        arRenderer.Render(*style.mpTexture, &mArea);
+    GFXLOG("Rendering: " << GetName() << " " << mArea);
+    for(std::shared_ptr<Texture> &texture : mTextures) {
+        arRenderer.Render(*texture, mArea);
     }
 
     for (Control* child : mChildren) {

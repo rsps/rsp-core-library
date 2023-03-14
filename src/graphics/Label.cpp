@@ -49,11 +49,10 @@ Control& Label::SetOrigin(const Point &arPoint)
     return *this;
 }
 
-void Label::doSetArea(const Rect &arRect)
+Label& Label::SetTextArea(const Rect &arArea)
 {
-    Rect r = arRect;
-    r.MoveTo(Point());
-    mText.SetArea(r);
+    mText.SetArea(arArea);
+    return *this;
 }
 
 Label& Label::SetFontSize(int aSizePx)
@@ -65,7 +64,9 @@ Label& Label::SetFontSize(int aSizePx)
 void Label::refresh()
 {
     if (mText.IsDirty()) {
+        mText.GetFont().SetColor(mStyles[mState].mForegroundColor);
         mText.Reload();
+        mTextures.push_back(Texture::Create(mText, mStyles[mState].mBackgroundColor));
         Invalidate();
     }
 }

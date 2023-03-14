@@ -14,6 +14,7 @@
 #include <string>
 #include <graphics/Control.h>
 #include <graphics/Text.h>
+#include <graphics/Texture.h>
 
 namespace rsp::graphics {
 
@@ -24,6 +25,7 @@ public:
 
     Label& SetCaption(const std::string &arCaption);
     Label& SetTextPosition(const Point &arPoint);
+    Label& SetTextArea(const Rect &arArea);
     Label& SetFontSize(int aSizePx);
     Label& SetVAlignment(Text::VAlign aVAlign);
     Label& SetHAlignment(Text::HAlign aHAlign);
@@ -38,7 +40,6 @@ protected:
 
     void paint(Canvas &arCanvas, const Style &arStyle) override;
     void refresh() override;
-    void doSetArea(const Rect &arRect) override;
 };
 
 } /* namespace rsp::graphics */
