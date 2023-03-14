@@ -15,7 +15,6 @@
 #include <graphics/GuiUnit.h>
 #include <graphics/PixelData.h>
 #include <graphics/Rect.h>
-#include <graphics/Texture.h>
 #include <utils/OptionalPtr.h>
 #include <functional>
 #include <memory>
@@ -36,8 +35,6 @@ public:
     virtual GuiUnit_t GetHeight() const = 0;
     virtual GuiUnit_t GetWidth() const = 0;
     virtual PixelData::ColorDepth GetColorDepth() const = 0;
-
-    virtual Renderer& Render(const Texture &arTexture) = 0;
 
     virtual Renderer& DrawRect(Color aColor, const Rect &arRect) = 0;
     virtual Renderer& Fill(Color aColor, Optional<const Rect> aDestination = nullptr) = 0;

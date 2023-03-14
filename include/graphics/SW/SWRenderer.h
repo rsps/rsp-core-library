@@ -30,9 +30,9 @@ public:
     Renderer& DrawRect(Color aColor, const Rect &arRect) override;
     Renderer& Fill(Color aColor, Optional<const Rect> aDestination = nullptr) override;
 
-    Renderer& Render(const Texture &arTexture) override;
-
     void Present() override;
+
+    VideoSurface& GetBackSurface() const;
 };
 
 } /* namespace rsp::graphics::sw */

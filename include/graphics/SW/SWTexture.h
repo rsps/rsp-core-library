@@ -32,6 +32,7 @@ public:
     void SetSourceRect(const Rect &arRect) override;
     void SetDestination(const Point &arPoint) override;
     std::unique_ptr<Texture::Interface> Clone() const override;
+    void Render(Renderer &arRenderer) override;
 
 protected:
     GfxHal &mrGfxHal;
@@ -40,9 +41,6 @@ protected:
     Rect mDestinationRect;
 
     SWTexture(const SWTexture& arOther) = default;
-
-    friend SWRenderer;
-    void render(VideoSurface &arSurface) const;
 };
 
 } /* namespace rsp::graphics::sw */

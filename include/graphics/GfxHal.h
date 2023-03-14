@@ -36,6 +36,7 @@ struct VideoSurface
 {
     using PixelPtr_t = std::unique_ptr<uint32_t[], std::function<void(uint32_t[])> >;
 
+    VideoSurface() {}
     VideoSurface(GuiUnit_t aWidth, GuiUnit_t aHeight);
 
     PixelPtr_t mpPhysAddr{}; // Pointer to 32-bit ARGB pixels

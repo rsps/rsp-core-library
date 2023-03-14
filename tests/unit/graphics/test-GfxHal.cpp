@@ -27,15 +27,12 @@ TEST_CASE("GfxHal")
     constexpr const uint32_t cSize   = (cWidth * cHeight);
     constexpr const uint32_t cByteSize   = (cSize * sizeof(uint32_t));
 
-    std::shared_ptr<VideoSurface> surface1 = std::make_shared<VideoSurface>();
-    src;
-    std::shared_ptr<VideoSurface> dst;
+    CHECK_NOTHROW(VideoSurface dummy(cWidth, cHeight));
+    VideoSurface src(cWidth, cHeight);
+    VideoSurface dst(cWidth, cHeight);
 
     CHECK_NOTHROW(GfxHal::Get());
     GfxHal& gfx = GfxHal::Get();
-
-    CHECK_NOTHROW(gfx.Alloc(src, cWidth, cHeight));
-    CHECK_NOTHROW(gfx.Alloc(dst, cWidth, cHeight));
 
     CHECK_NOTHROW(
     for (uint32_t i = 0 ; i < cSize ; ++i) {
@@ -158,7 +155,7 @@ TEST_CASE("GfxHal")
             CHECK_NOTHROW(gfx.DrawRect(dst, 0xFF222222, Rect(0, 0, 4, 25)));
             CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2681254777u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
 
-            CHECK_NOTHROW(gfx.DrawRect(dst, 0x11555555, Rect(1, 0, 4, 25)));
+            CHECK_NOTHROW(gfx.DrawRect(dst, 0xFF555555, Rect(1, 0, 4, 25)));
             CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2681254777u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.DrawRect(dst, 0x66666666, Rect(1, 1, 2, 23)));
@@ -169,7 +166,7 @@ TEST_CASE("GfxHal")
             CHECK_NOTHROW(gfx.Fill(dst, 0xFFFFFFFF, Rect(0, 0, 4, 25)));
             CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2307493135u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
 
-            CHECK_NOTHROW(gfx.Fill(dst, 0x11555555, Rect(1, 1, 2, 23)));
+            CHECK_NOTHROW(gfx.Fill(dst, 0xFF555555, Rect(1, 1, 2, 23)));
             CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2307493135u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.Fill(dst, 0x66666666, Rect(-1, -1, 2, 8)));
@@ -177,7 +174,6 @@ TEST_CASE("GfxHal")
 
             CHECK_NOTHROW(gfx.Fill(dst, 0xCCCCCCCC, Rect(3, 18, 2, 8)));
             CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 1253784020u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
-
         }
     }
 

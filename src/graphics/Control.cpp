@@ -180,7 +180,7 @@ void Control::Render(Renderer &arRenderer)
 
     GFXLOG("Rendering: " << GetName() << " " << mArea);
     for(Texture &texture : mTextures) {
-        arRenderer.Render(texture);
+        texture.Render(arRenderer);
     }
 
     for (Control* child : mChildren) {

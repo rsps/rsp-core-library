@@ -32,8 +32,8 @@ public:
     Framebuffer& operator=(const Framebuffer&) = default;
     Framebuffer& operator=(Framebuffer&&) = default;
 
-    GuiUnit_t GetWidth() const { return mScreenSurfaces[0]->mWidth; }
-    GuiUnit_t GetHeight() const { return mScreenSurfaces[0]->mHeight; }
+    GuiUnit_t GetWidth() const { return mScreenSurfaces[0].mWidth; }
+    GuiUnit_t GetHeight() const { return mScreenSurfaces[0].mHeight; }
 
     /**
      * \brief Sets a single pixel to the given Color
@@ -57,7 +57,7 @@ protected:
     int mTtyFb = 0;
     struct fb_fix_screeninfo mFixedInfo{};
     struct fb_var_screeninfo mVariableInfo{};
-    mutable std::shared_ptr<VideoSurface> mScreenSurfaces[2]{}; // Double buffers
+    mutable VideoSurface mScreenSurfaces[2]{}; // Double buffers
     int mCurrentSurface = 0; // Index of current backbuffer
 
     void swapBuffer();

@@ -15,6 +15,7 @@
 #include <graphics/Color.h>
 #include <graphics/GuiUnit.h>
 #include <graphics/PixelData.h>
+#include <graphics/Renderer.h>
 
 namespace rsp::graphics {
 
@@ -24,25 +25,27 @@ namespace rsp::graphics {
 class Texture
 {
 public:
+    /**
+     * \brief Constructors
+     */
     Texture() {}
-
-    virtual ~Texture() {}
-
     Texture(const PixelData &arPixelData, Color aColor)
         : mpImpl(Interface::Create(arPixelData, aColor))
     {
     }
-
     Texture(GuiUnit_t aWidth, GuiUnit_t aHeight)
         : mpImpl(Interface::Create(aWidth, aHeight))
     {
     }
 
+    /**
+     * \brief Copy, assignment and move operators
+     * \param arOther
+     */
     Texture(const Texture &arOther)
         : mpImpl(arOther.mpImpl->Clone())
     {
     }
-
     Texture& operator=(const Texture &arOther)
     {
         if (this != &arOther) {
@@ -50,7 +53,6 @@ public:
         }
         return *this;
     }
-
     Texture(Texture &&arOther) = default;
     Texture& operator=(Texture &&arOther) = default;
 
@@ -117,6 +119,17 @@ public:
         return *this;
     }
 
+    /**
+     * \brief Render this texture using the given renderer
+     * \param arRenderer
+     * \return self
+     */
+    Texture& Render(Renderer &arRenderer)
+    {
+        mpImpl->Render(arRenderer);
+        return *this;
+    }
+
     class Interface
     {
     public:
@@ -130,6 +143,7 @@ public:
         virtual void SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None) = 0;
         virtual void SetSourceRect(const Rect &arRect) = 0;
         virtual void SetDestination(const Point &arPoint) = 0;
+        virtual void Render(Renderer &arRenderer) = 0;
 
         virtual std::unique_ptr<Interface> Clone() const = 0;
     };

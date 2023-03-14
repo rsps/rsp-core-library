@@ -31,20 +31,13 @@ namespace rsp::graphics::sw {
 
 Renderer& SWRenderer::DrawRect(Color aColor, const Rect &arRect)
 {
-    mrGfxHal.DrawRect(*mScreenSurfaces[mCurrentSurface], aColor, arRect);
+    mrGfxHal.DrawRect(mScreenSurfaces[mCurrentSurface], aColor, arRect);
     return *this;
 }
 
 Renderer& SWRenderer::Fill(Color aColor, Optional<const Rect> aDestination)
 {
-    mrGfxHal.Fill(*mScreenSurfaces[mCurrentSurface], aColor, aDestination);
-    return *this;
-}
-
-Renderer& SWRenderer::Render(const Texture &arTexture)
-{
-    const SWTexture& t = dynamic_cast<const SWTexture&>(arTexture);
-    t.render(*mScreenSurfaces[mCurrentSurface]);
+    mrGfxHal.Fill(mScreenSurfaces[mCurrentSurface], aColor, aDestination);
     return *this;
 }
 
@@ -76,6 +69,11 @@ PixelData::ColorDepth SWRenderer::GetColorDepth() const
             ;
     }
     THROW_WITH_BACKTRACE(EIllegalColorDepth);
+}
+
+VideoSurface& SWRenderer::GetBackSurface() const
+{
+    return mScreenSurfaces[mCurrentSurface];
 }
 
 } /* namespace rsp::graphics::sw */

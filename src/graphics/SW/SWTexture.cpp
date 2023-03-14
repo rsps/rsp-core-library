@@ -65,15 +65,16 @@ void SWTexture::SetDestination(const Point &arPoint)
     mDestinationRect.MoveTo(arPoint);
 }
 
-void SWTexture::render(VideoSurface &arSurface) const
+void SWTexture::Render(rsp::graphics::Renderer &arRenderer)
 {
-    mrGfxHal.Blit(arSurface, *mpSurface, mDestinationRect, mSourceRect);
+    auto& r = dynamic_cast<sw::SWRenderer&>(arRenderer);
 
+    mrGfxHal.Blit(r.GetBackSurface(), *mpSurface, mDestinationRect, mSourceRect);
 }
 
 std::unique_ptr<Texture::Interface> SWTexture::Clone() const
 {
-    return std::make_unique<Texture>(*this);
+    return std::unique_ptr<SWTexture>(new SWTexture(*this));
 }
 
 } /* namespace rsp::graphics::sw */
