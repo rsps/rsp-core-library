@@ -246,7 +246,8 @@ public:
 protected:
     Rect mArea{}; // Area of Control in screen coordinates
     Rect mTouchArea{}; // Touch area of Control in screen coordinates
-    Style mStyles[magic_enum::enum_count<States>()];
+//    magic_enum::containers::array<States, Style> mStyles;
+    Style mStyles[magic_enum::enum_count<States>()]{};
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};
     bool mTransparent = false;
