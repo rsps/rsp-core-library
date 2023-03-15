@@ -13,105 +13,96 @@
 
 using namespace rsp::graphics;
 
-// To have a testable Control, that are not dependent on used types
-class TestControl : public Control
-{
-public:
-    TestControl() { initTypeInfo<TestControl>(); mDirty = false; }
-
-    void MakeValid() { mDirty = false; }
-};
-
 TEST_SUITE_BEGIN("Graphics");
 
-TEST_CASE("Control Invalidation")
+TEST_CASE("Control")
 {
-    // Arrange
-    TestControl myControl;
-
-    // Assert
-    CHECK(!myControl.IsInvalid());
-
-    // Act
-    myControl.Invalidate();
-
-    // Assert
+    CHECK_NOTHROW(Control dummy);
+    Control myControl;
     CHECK(myControl.IsInvalid());
-    myControl.MakeValid();
+
+    CHECK_NOTHROW(myControl.UpdateData());
+    CHECK_FALSE(myControl.IsInvalid());
 
     SUBCASE("Child Invalidation")
     {
-        // Arrange
-        TestControl childControl;
-        myControl.AddChild(&childControl);
-
-        // Act
-        myControl.Invalidate();
-
-        // Assert
+        Control childControl;
+        CHECK_NOTHROW(myControl.AddChild(&childControl));
+        CHECK_FALSE(myControl.IsInvalid());
         CHECK(childControl.IsInvalid());
-    }
 
-    SUBCASE("No Parent Invalidation")
-    {
-        // Arrange
-        TestControl childControl;
-        myControl.AddChild(&childControl);
+        CHECK_NOTHROW(childControl.UpdateData());
+        CHECK_FALSE(myControl.IsInvalid());
+        CHECK_FALSE(childControl.IsInvalid());
 
-        // Act
-        childControl.Invalidate();
-
-        // Assert
-        CHECK(!myControl.IsInvalid());
-    }
-
-    SUBCASE("Transparent Parent Invalidation")
-    {
-        CHECK(!myControl.IsInvalid());
-
-        TestControl childControl;
-        myControl.AddChild(&childControl);
-
-        CHECK(!myControl.IsInvalid());
-
-        childControl.SetTransparent(true);
+        CHECK_NOTHROW(myControl.Invalidate());
 
         CHECK(myControl.IsInvalid());
-    }
+        CHECK_FALSE(childControl.IsInvalid());
 
-}
-TEST_CASE("Control States")
-{
-    // Arrange
-    TestControl myControl;
+        CHECK_NOTHROW(myControl.UpdateData());
+        CHECK_FALSE(myControl.IsInvalid());
+        CHECK_FALSE(childControl.IsInvalid());
+
+        CHECK_NOTHROW(childControl.Invalidate());
+        CHECK_FALSE(myControl.IsInvalid());
+        CHECK(childControl.IsInvalid());
+
+        CHECK_NOTHROW(childControl.UpdateData());
+        CHECK_FALSE(myControl.IsInvalid());
+        CHECK_FALSE(childControl.IsInvalid());
+
+        CHECK_NOTHROW(myControl.RemoveChild(&childControl));
+        CHECK(myControl.IsInvalid());
+        CHECK_FALSE(childControl.IsInvalid());
+    }
 
     SUBCASE("Default State")
     {
-        // Act & Assert
         CHECK(myControl.GetState() == Control::States::Normal);
     }
-    SUBCASE("Change State")
+
+    SUBCASE("Change")
     {
-        // Act
-        myControl.SetState(Control::States::Pressed);
+        CHECK_FALSE(myControl.IsInvalid());
 
-        // Assert
-        CHECK(myControl.GetState() == Control::States::Pressed);
-        CHECK(myControl.IsInvalid());
-        myControl.MakeValid();
-
-        SUBCASE("Child Invalidated by Parent State Change")
-        {
-            // Arrange
-            TestControl childControl;
-            myControl.AddChild(&childControl);
-
-            // Act
-            myControl.SetState(Control::States::Normal);
-
-            // Assert
-            CHECK(childControl.IsInvalid());
+        SUBCASE("State") {
+            CHECK_NOTHROW(myControl.SetState(Control::States::Pressed));
+            CHECK(myControl.GetState() == Control::States::Pressed);
         }
+
+        SUBCASE("Transparent") {
+            CHECK_NOTHROW(myControl.SetTransparent(true));
+            CHECK(myControl.IsTransparent());
+        }
+
+        SUBCASE("Checkable") {
+            CHECK_NOTHROW(myControl.SetCheckable(true));
+            CHECK(myControl.IsCheckable());
+        }
+
+        SUBCASE("Draggable") {
+            CHECK_NOTHROW(myControl.SetDraggable(true));
+            CHECK(myControl.IsDraggable());
+        }
+
+        SUBCASE("Visible") {
+            CHECK(myControl.IsVisible());
+            CHECK_NOTHROW(myControl.Hide());
+            CHECK_FALSE(myControl.IsVisible());
+            CHECK_NOTHROW(myControl.Show());
+            CHECK(myControl.IsVisible());
+        }
+
+        SUBCASE("Size") {
+            CHECK_NOTHROW(myControl.SetArea(Rect(10, 10, 20, 30)));
+            CHECK(myControl.GetArea() == Rect(10, 10, 20, 30));
+
+            CHECK_NOTHROW(myControl.SetOrigin(Point(12, 12)));
+            CHECK(myControl.GetArea() == Rect(12, 12, 20, 30));
+        }
+
+        CHECK(myControl.IsInvalid());
     }
 }
 

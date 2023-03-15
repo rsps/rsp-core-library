@@ -13,6 +13,7 @@
 #include <map>
 #include <vector>
 #include <string_view>
+#include <magic_enum.hpp>
 #include <exceptions/CoreException.h>
 #include <logging/Logger.h>
 #include <utils/ConstTypeInfo.h>
@@ -51,23 +52,23 @@ public:
         Pressed,
         Dragged,
         Checked,
-        CheckedPressed,
-        __COUNT__
+        CheckedPressed
     };
 
     Control() { initTypeInfo<Control>(); }
-    virtual ~Control() {}
+    virtual ~Control();
 
     Control(const Control &arOther) = default;
     Control &operator=(const Control &arOther) = default;
 
     template<class T>
     T& GetAs()
+    try
     {
-//        if (GetId() != T::ID) {
-//            THROW_WITH_BACKTRACE2(EControlCast, GetName(), std::string(T::NAME));
-//        }
         return reinterpret_cast<T&>(*this);
+    }
+    catch(const std::bad_cast &e) {
+        THROW_WITH_BACKTRACE2(EControlCast, GetName(), std::string(rsp::utils::NameOf<T>()));
     }
 
     /**
@@ -179,9 +180,16 @@ public:
     /**
      * \brief Adds a child to the vector of child control pointer objects
      * \param apChild A pointer to the child
-     * \return A reference to this object
+     * \return self
      */
     Control& AddChild(Control *apChild);
+
+    /**
+     * \brief Removes a child from this object
+     * \param apChild
+     * \return self
+     */
+    Control& RemoveChild(Control *apChild);
 
     /**
      * \brief Get reference to the style data associated with the given state.
@@ -190,7 +198,7 @@ public:
      */
     Style& GetStyle(States aState) { return mStyles[aState]; }
 
-    Control& SetBitmapPosition(const Point &arPoint);
+    Control& SetTexturePosition(const Point &arPoint);
 
     /**
      * \brief Processes input for press or click callbacks
@@ -238,7 +246,7 @@ public:
 protected:
     Rect mArea{}; // Area of Control in screen coordinates
     Rect mTouchArea{}; // Touch area of Control in screen coordinates
-    Style mStyles[States::__COUNT__];
+    Style mStyles[magic_enum::enum_count<States>()];
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};
     bool mTransparent = false;
@@ -247,14 +255,24 @@ protected:
     bool mVisible = true;
     bool mCheckable = false;
     States mState = States::Normal;
-    TexturePtr_t mpContent{};
-
 
     void setName(const std::string &arName) override;
     void setId(uint32_t aId) override;
 
-    virtual void paint(Canvas &arCanvas, const Style &arStyle);
+    /**
+     * \brief Override this to refresh this objects data during UpdateData
+     */
     virtual void refresh() {}
+
+    /**
+     * \brief Override this to update this objects textures after it is invalidated
+     */
+    virtual void update() {}
+
+    /**
+     * \brief Override this to handle resizing events
+     * \param arRect
+     */
     virtual void doSetArea(const Rect &arRect);
 
 private:

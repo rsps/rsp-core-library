@@ -10,7 +10,6 @@
 
 #include <graphics/Control.h>
 #include <logging/Logger.h>
-#include <magic_enum.hpp>
 
 using namespace rsp::logging;
 
@@ -28,6 +27,13 @@ std::ostream& operator <<(std::ostream &os, const Control::States aState)
 {
     os << to_string(aState);
     return os;
+}
+
+Control::~Control()
+{
+    if (mpParent) {
+        mpParent->RemoveChild(this);
+    }
 }
 
 void Control::setName(const std::string &arName)
@@ -136,7 +142,19 @@ Control& Control::AddChild(Control *apChild)
     return *this;
 }
 
-Control& Control::SetBitmapPosition(const Point &arPoint)
+Control& Control::RemoveChild(Control *apChild)
+{
+    if (apChild) {
+        auto it = std::find(mChildren.begin(), mChildren.end(), apChild);
+        if (it != mChildren.end()) {
+            mChildren.erase(it);
+            Invalidate();
+        }
+    }
+    return *this;
+}
+
+Control& Control::SetTexturePosition(const Point &arPoint)
 {
     for (auto &style : mStyles) {
         for (TexturePtr_t &texture : style.mTextures) {
@@ -153,14 +171,7 @@ bool Control::UpdateData()
     bool result = false;
     refresh();
     if (mDirty) {
-        GFXLOG("Drawing: " << GetName() << " " << mArea);
-        Canvas canvas(mArea.GetWidth(), mArea.GetHeight());
-        auto &style = mStyles[mState];
-        paint(canvas, style);
-        if (!mpContent) {
-            mpContent = Texture::Create(mArea.GetWidth(), mArea.GetHeight());
-        }
-        mpContent->Update(canvas.GetPixelData(), style.mForegroundColor);
+        update();
         mDirty = false;
         result = true;
     }
@@ -178,14 +189,16 @@ void Control::Render(Renderer &arRenderer)
         return;
     }
 
+    GFXLOG("Rendering: " << GetName() << " " << mArea);
+
     auto &style = mStyles[mState];
 
-    GFXLOG("Rendering: " << GetName() << " " << mArea);
+    if (!mTransparent) {
+        arRenderer.Fill(style.mBackgroundColor, mArea);
+    }
+
     for (TexturePtr_t& texture : style.mTextures) {
         arRenderer.Render(*texture);
-    }
-    if (mpContent) {
-        arRenderer.Render(*mpContent);
     }
 
     for (Control* child : mChildren) {
@@ -197,14 +210,6 @@ void Control::Render(Renderer &arRenderer)
         r.AddSize(1, 1);
         arRenderer.DrawRect(mTouchAreaColor, mTouchArea);
     }
-}
-
-void Control::paint(Canvas &arCanvas, const Style &arStyle)
-{
-    if (mTransparent) {
-        return;
-    }
-    arCanvas.Fill(arStyle.mBackgroundColor);
 }
 
 Control& Control::SetDraggable(bool aValue)

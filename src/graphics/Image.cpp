@@ -25,11 +25,11 @@ void Image::SetSection(const Rect &arSection)
     mBitmap.SetSection(arSection);
 }
 
-void Image::paint(Canvas &arCanvas, const Style &arStyle)
-{
-    Control::paint(arCanvas, arStyle);
-
-    mBitmap.Paint(GetOrigin(), arCanvas);
-}
+//void Image::paint(Canvas &arCanvas, const Style &arStyle)
+//{
+//    Control::paint(arCanvas, arStyle);
+//
+//    mBitmap.Paint(GetOrigin(), arCanvas);
+//}
 
 } // namespace rsp::graphics

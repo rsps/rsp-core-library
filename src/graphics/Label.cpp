@@ -70,10 +70,10 @@ void Label::refresh()
     }
 }
 
-void Label::paint(Canvas &arCanvas, const Style &arStyle)
-{
-    Control::paint(arCanvas, arStyle);
-    arCanvas.DrawPixelData(Point(0,0), mText);
-}
+//void Label::paint(Canvas &arCanvas, const Style &arStyle)
+//{
+//    Control::paint(arCanvas, arStyle);
+//    arCanvas.DrawPixelData(Point(0,0), mText);
+//}
 
 } /* namespace rsp::graphics */

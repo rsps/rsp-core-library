@@ -29,8 +29,6 @@ public:
 
 protected:
     BitmapView mBitmap{};
-
-    void paint(Canvas &arCanvas, const Style &arStyle) override;
 };
 
 } // namespace rsp::graphics

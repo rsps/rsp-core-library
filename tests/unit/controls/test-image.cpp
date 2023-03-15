@@ -45,8 +45,8 @@ TEST_CASE("Image Test")
     {
         // Arrange
         Color red(0xFFc41616);
-        Point insidePoint(Random::Roll(testRect.GetLeft(), testRect.GetWidth()),
-                          Random::Roll(testRect.GetTop(), testRect.GetHeight()));
+        Point insidePoint(Random::Roll(testRect.GetLeft(), testRect.GetLeft() + testRect.GetWidth()),
+                          Random::Roll(testRect.GetTop(), testRect.GetTop() + testRect.GetHeight()));
         testImage.Invalidate();
 
         // Act

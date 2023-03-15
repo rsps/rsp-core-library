@@ -111,11 +111,11 @@ target_include_directories(rsp-core-lib
     PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
+        ${magic_enum_SOURCE_DIR}/include
     PRIVATE
         ${PROJECT_BINARY_DIR}/src
         ${FREETYPE_INCLUDE_DIRS}
         ${CURL_INCLUDE_DIRS}
-        ${magic_enum_SOURCE_DIR}/include
 )
 
 target_compile_options(rsp-core-lib PUBLIC
