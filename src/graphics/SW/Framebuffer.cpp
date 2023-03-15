@@ -76,7 +76,7 @@ Framebuffer::Framebuffer()
     std::size_t screensize = mVariableInfo.yres * mFixedInfo.line_length;
 
     uint32_t *fb = static_cast<uint32_t *>(mmap(nullptr, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
-    if (fb == reinterpret_cast<uint32_t *>(-1)) /*MAP_FAILED*/ {
+    if (uintptr_t(fb) == uintptr_t(-1)) /*MAP_FAILED*/ {
         THROW_SYSTEM("Framebuffer shared memory mapping failed");
     }
 

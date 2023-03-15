@@ -52,16 +52,16 @@ public:
         //  Set member variables values
         mTopBtn.SetArea(GetTopRect());
         mTopBtn.SetTouchArea(GetTopRect());
-        mTopBtn.GetStyle(Control::States::Normal).mBackground.SetPixelData(mNormal);
-        mTopBtn.GetStyle(Control::States::Pressed).mBackground.SetPixelData(mPressed);
+        mTopBtn.GetStyle(Control::States::Normal).mTextures.push_back(Texture::Create(mNormal));
+        mTopBtn.GetStyle(Control::States::Pressed).mTextures.push_back(Texture::Create(mPressed));
         mTopBtn.SetDraggable(true);
         mTopBtn.SetName("TopBtn");
 
         mBotBtn.SetArea(GetBotRect());
         mBotBtn.SetTouchArea(GetBotRect());
-        mBotBtn.GetStyle(Control::States::Normal).mBackground.SetPixelData(mNormal);
-        mBotBtn.GetStyle(Control::States::Pressed).mBackground.SetPixelData(mPressed);
-        mBotBtn.GetStyle(Control::States::Dragged).mBackground.SetPixelData(mPressed);
+        mBotBtn.GetStyle(Control::States::Normal).mTextures.push_back(Texture::Create(mNormal));
+        mBotBtn.GetStyle(Control::States::Pressed).mTextures.push_back(Texture::Create(mPressed));
+        mBotBtn.GetStyle(Control::States::Dragged).mTextures.push_back(Texture::Create(mPressed));
         mBotBtn.SetDraggable(true);
         mBotBtn.SetName("BotBtn");
 

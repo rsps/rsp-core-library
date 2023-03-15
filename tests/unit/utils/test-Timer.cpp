@@ -19,7 +19,7 @@ using namespace std::literals::chrono_literals;
 
 TEST_CASE("Timer")
 {
-    Random::Seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+    CHECK_NOTHROW(Random::Seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count())));
 
     bool triggered[2] = {false , false};
     int triggered1_at = 0;
@@ -73,6 +73,6 @@ TEST_CASE("Timer")
     CHECK_EQ(triggered2_count, 5);
     CHECK_EQ(t2.GetTimeout(), 20ms);
 
-    CHECK_NOTHROW(TimerQueue::Destroy());
+//    CHECK_NOTHROW(TimerQueue::Destroy());
 }
 

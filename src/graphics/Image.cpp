@@ -17,23 +17,19 @@ namespace rsp::graphics
 
 void Image::ClearSection()
 {
-    for (auto &style : mStyles) {
-        style.mBackground.ClearSection();
-    }
+    mBitmap.ClearSection();
 }
 
 void Image::SetSection(const Rect &arSection)
 {
-    for (auto &style : mStyles) {
-        style.mBackground.SetSection(arSection);
-    }
+    mBitmap.SetSection(arSection);
 }
 
 void Image::paint(Canvas &arCanvas, const Style &arStyle)
 {
     Control::paint(arCanvas, arStyle);
 
-    arStyle.mBackground.Paint(GetOrigin(), arCanvas);
+    mBitmap.Paint(GetOrigin(), arCanvas);
 }
 
 } // namespace rsp::graphics

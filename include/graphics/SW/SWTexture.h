@@ -14,33 +14,34 @@
 #include <graphics/GfxHal.h>
 #include <graphics/PixelData.h>
 #include <graphics/Texture.h>
-#include "SWRenderer.h"
 
 namespace rsp::graphics::sw {
 
 class SWRenderer;
 
 
-class SWTexture: public rsp::graphics::Texture::Interface
+class SWTexture: public rsp::graphics::Texture
 {
 public:
-    SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight);
+    SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestPos);
 
-    void Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr) override;
-    void Update(const PixelData &arPixelData, Color aColor) override;
-    void SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None) override;
-    void SetSourceRect(const Rect &arRect) override;
-    void SetDestination(const Point &arPoint) override;
-    std::unique_ptr<Texture::Interface> Clone() const override;
-    void Render(Renderer &arRenderer) override;
+    Texture& Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr) override;
+    Texture& Update(const PixelData &arPixelData, Color aColor) override;
+    Texture& SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None) override;
+    Texture& SetSourceRect(const Rect &arRect) override;
+    Texture& SetDestination(const Point &arPoint) override;
+    std::unique_ptr<Texture> Clone() const override;
+    const Rect& GetDestinationRect() const override { return mDestinationRect; }
+    const Rect& GetSourceRect() const override { return mSourceRect; }
 
 protected:
+    SWTexture(const SWTexture& arOther) = default;
+
     GfxHal &mrGfxHal;
+    friend SWRenderer;
     std::shared_ptr<VideoSurface> mpSurface{};
     Rect mSourceRect;
     Rect mDestinationRect;
-
-    SWTexture(const SWTexture& arOther) = default;
 };
 
 } /* namespace rsp::graphics::sw */

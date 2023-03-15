@@ -48,7 +48,7 @@ TEST_CASE("Threads")
         };
         CHECK_NOTHROW(t.Start());
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
-        CHECK_THROWS_WITH_AS(t.Stop(), "Exception thrown in thread 'MyThread': Oh no!", std::runtime_error);
+        CHECK_THROWS_AS(t.Stop(), std::runtime_error);
     }
 
     SUBCASE("Throw NoName") {

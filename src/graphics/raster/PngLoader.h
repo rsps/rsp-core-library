@@ -86,7 +86,7 @@ public:
         template <typename T>
         const T& GetAs() const
         {
-            return *reinterpret_cast<const T*>(mData.data());
+            return reinterpret_cast<const T&>(*mData.data());
         }
 
         const std::uint8_t* GetData() { return mData.data(); }

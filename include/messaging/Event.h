@@ -33,7 +33,7 @@ class Event
         if (typeid(T).hash_code() != mTypeHash) {
             THROW_WITH_BACKTRACE(std::bad_alloc);
         }
-        return *reinterpret_cast<T *>(this);
+        return reinterpret_cast<T&>(*this);
     }
 
 protected:

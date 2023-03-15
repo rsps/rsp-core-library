@@ -64,7 +64,7 @@ public:
     {
         SetTransparent(false); // No need to paint background color, we have full screen image.
 
-        GetStyle(Control::States::Normal).mBackground.SetPixelData(mBackground);
+        GetStyle(Control::States::Normal).mTextures.push_back(Texture::Create(mBackground));
 
         mLabel.GetText().GetFont().SetSize(34).SetColor(Color::Black).SetBackgroundColor(Color::White);
         mLabel.SetArea(Rect(80, 150, 320, 160));
@@ -85,7 +85,7 @@ public:
 protected:
     Label mLabel{};
     Keyboard mKeyboard{};
-    Bitmap mBackground{};
+    Bitmap mBackground;
 
     void onInputChange(const std::string &arInput)
     {

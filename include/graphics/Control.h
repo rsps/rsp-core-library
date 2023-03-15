@@ -67,7 +67,7 @@ public:
 //        if (GetId() != T::ID) {
 //            THROW_WITH_BACKTRACE2(EControlCast, GetName(), std::string(T::NAME));
 //        }
-        return *reinterpret_cast<T*>(this);
+        return reinterpret_cast<T&>(*this);
     }
 
     /**
@@ -247,7 +247,7 @@ protected:
     bool mVisible = true;
     bool mCheckable = false;
     States mState = States::Normal;
-    std::vector<Texture> mTextures{};
+    TexturePtr_t mpContent{};
 
 
     void setName(const std::string &arName) override;

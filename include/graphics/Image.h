@@ -11,7 +11,7 @@
 #define IMAGE_H
 
 #include "Control.h"
-#include "Bitmap.h"
+#include "BitmapView.h"
 
 namespace rsp::graphics
 {
@@ -24,7 +24,12 @@ public:
     void ClearSection();
     void SetSection(const Rect &arSection);
 
+    const BitmapView& GetBitmap() const { return mBitmap; }
+    BitmapView& GetBitmap() { return mBitmap; }
+
 protected:
+    BitmapView mBitmap{};
+
     void paint(Canvas &arCanvas, const Style &arStyle) override;
 };
 

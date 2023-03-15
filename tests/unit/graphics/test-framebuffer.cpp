@@ -51,8 +51,9 @@ TEST_CASE("Framebuffer")
     sw::SWRenderer& renderer = dynamic_cast<sw::SWRenderer&>(Renderer::Get());
 
     Canvas canvas(renderer.GetWidth(), renderer.GetHeight());
-    CHECK_NOTHROW(Texture dummy(renderer.GetWidth(), renderer.GetHeight()));
-    Texture texture(renderer.GetWidth(), renderer.GetHeight());
+    CHECK_NOTHROW(Texture::Create(renderer.GetWidth(), renderer.GetHeight()));
+    auto __tx = Texture::Create(renderer.GetWidth(), renderer.GetHeight());
+    auto &texture = *__tx;
 
     milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
@@ -79,7 +80,7 @@ TEST_CASE("Framebuffer")
         // Act
         CHECK_NOTHROW(canvas.DrawLine(pointA, pointB, col));
         CHECK_NOTHROW(texture.Update(canvas, col));
-        CHECK_NOTHROW(texture.Render(renderer));
+        CHECK_NOTHROW(renderer.Render(texture));
 
         // Assert
         int deltaX = static_cast<int>(pointB.GetX() - pointA.GetX());
@@ -139,7 +140,7 @@ TEST_CASE("Framebuffer")
         // Act
         CHECK_NOTHROW(canvas.DrawRectangle(rect, col));
         CHECK_NOTHROW(texture.Update(canvas, col));
-        CHECK_NOTHROW(texture.Render(renderer));
+        CHECK_NOTHROW(renderer.Render(texture));
 
         // Assert
         // Expect all four side to hold values
@@ -163,7 +164,7 @@ TEST_CASE("Framebuffer")
         Color white(Color::White);
         CHECK_NOTHROW(canvas.DrawRectangle(small, white));
         CHECK_NOTHROW(texture.Update(canvas, white));
-        CHECK_NOTHROW(texture.Render(renderer));
+        CHECK_NOTHROW(renderer.Render(texture));
         CHECK_EQ(renderer.GetPixel(10, 10), white);
         CHECK_NE(renderer.GetPixel(11, 10), white);
         CHECK_NE(renderer.GetPixel(10, 11), white);
@@ -173,7 +174,7 @@ TEST_CASE("Framebuffer")
         Rect medium(20, 20, 10, 10);
         CHECK_NOTHROW(canvas.DrawRectangle(medium, white));
         CHECK_NOTHROW(texture.Update(canvas, white));
-        CHECK_NOTHROW(texture.Render(renderer));
+        CHECK_NOTHROW(renderer.Render(texture));
         CHECK_EQ(renderer.GetPixel(20, 20), white);
         CHECK_EQ(renderer.GetPixel(20, 29), white);
         CHECK_NE(renderer.GetPixel(20, 30), white);
@@ -193,7 +194,7 @@ TEST_CASE("Framebuffer")
         // Act
         CHECK_NOTHROW(canvas.DrawCircle(centerPoint, radius, col));
         CHECK_NOTHROW(texture.Update(canvas, col));
-        CHECK_NOTHROW(texture.Render(renderer));
+        CHECK_NOTHROW(renderer.Render(texture));
 
         // Assert
         int error = -static_cast<int>(radius);
@@ -262,9 +263,9 @@ TEST_CASE("Framebuffer")
         SUBCASE("Draw image from file")
         {
             // Act
-            Texture raster(testImgMap, Color::White);
-            CHECK_NOTHROW(raster.SetDestination(topLeftImgCorner));
-            CHECK_NOTHROW(raster.Render(renderer));
+            auto raster = Texture::Create(testImgMap, Color::White);
+            CHECK_NOTHROW(raster->SetDestination(topLeftImgCorner));
+            CHECK_NOTHROW(renderer.Render(*raster));
 
             // Assert
             CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + 4, topLeftImgCorner.GetY() + 4, false), Color(0xFF020F92));
@@ -286,9 +287,9 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(testImgMap.DrawLine(topLeft, botRight, Color::Red));
             CHECK_NOTHROW(testImgMap.DrawLine(botLeft, topRight, Color::Red));
 
-            Texture raster(testImgMap, Color::White);
-            CHECK_NOTHROW(raster.SetDestination(topLeftImgCorner));
-            CHECK_NOTHROW(raster.Render(renderer));
+            auto raster = Texture::Create(testImgMap, Color::White);
+            CHECK_NOTHROW(raster->SetDestination(topLeftImgCorner));
+            CHECK_NOTHROW(renderer.Render(*raster));
             CHECK_NOTHROW(renderer.Present());
 
             // Assert
@@ -317,7 +318,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(canvas.DrawPixelData(topLeftImgCorner, emptyMap));
             CHECK_NOTHROW(canvas.SetPixel(topLeftImgCorner + randomPoint, Color::White));
             CHECK_NOTHROW(texture.Update(canvas, Color::White));
-            CHECK_NOTHROW(texture.Render(renderer));
+            CHECK_NOTHROW(renderer.Render(texture));
             CHECK_NOTHROW(renderer.Present());
 
             // Assert
@@ -339,7 +340,7 @@ TEST_CASE("Framebuffer")
 
         // Act
         CHECK_NOTHROW(texture.Update(largeImgMap, Color::White));
-        CHECK_NOTHROW(texture.Render(renderer));
+        CHECK_NOTHROW(renderer.Render(texture));
         CHECK_NOTHROW(renderer.Present());
 
         // Assert
@@ -356,7 +357,7 @@ TEST_CASE("Framebuffer")
             // Act
             CHECK_NOTHROW(canvas.DrawPixelData(topLeft, largeImgMap));
             CHECK_NOTHROW(texture.Update(canvas, Color::White));
-            CHECK_NOTHROW(texture.Render(renderer));
+            CHECK_NOTHROW(renderer.Render(texture));
 
             // Assert
             CHECK_NE(renderer.GetPixel(randomPoint, true), 0);
@@ -370,15 +371,15 @@ TEST_CASE("Framebuffer")
         Bitmap imgSimple("testImages/testImage.bmp");
         int iterations = 100;
 
-        Texture sprite(imgSimple, Color::Black);
+        auto sprite = Texture::Create(imgSimple, Color::Black);
         Point pos(100, 200);
 
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
             CHECK_NOTHROW(renderer.Fill(Color::Black));
-            CHECK_NOTHROW(sprite.SetDestination(pos));
-            CHECK_NOTHROW(sprite.Render(renderer));
+            CHECK_NOTHROW(sprite->SetDestination(pos));
+            CHECK_NOTHROW(renderer.Render(*sprite));
             CHECK_NOTHROW(renderer.Present());
             pos.SetY(200 - i);
         }
@@ -398,17 +399,17 @@ TEST_CASE("Framebuffer")
         Bitmap imgSimple("testImages/testImage.bmp");
         int iterations = 100;
 
-        Texture sprite(imgSimple.GetWidth(), imgSimple.GetHeight()+2);
-        sprite.Fill(Color::Black);
-        sprite.Update(imgSimple, Color::Black);
+        auto sprite = Texture::Create(imgSimple.GetWidth(), imgSimple.GetHeight()+2);
+        sprite->Fill(Color::Black);
+        sprite->Update(imgSimple, Color::Black);
 
         Point pos(100, 200);
 
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
-            CHECK_NOTHROW(sprite.SetDestination(pos));
-            CHECK_NOTHROW(sprite.Render(renderer));
+            CHECK_NOTHROW(sprite->SetDestination(pos));
+            CHECK_NOTHROW(renderer.Render(*sprite));
             CHECK_NOTHROW(renderer.Present());
             pos.SetY(200 - i);
         }
@@ -437,19 +438,19 @@ TEST_CASE("Framebuffer")
         };
 
 
-        Texture sprite(imgSimple.GetWidth(), imgSimple.GetHeight()+5);
-        CHECK_NOTHROW(sprite.Fill(Color::Black));
-        CHECK_NOTHROW(sprite.SetBlendOperation(GfxBlendOperation::SourceAlpha));
+        auto sprite = Texture::Create(imgSimple.GetWidth(), imgSimple.GetHeight()+5);
+        CHECK_NOTHROW(sprite->Fill(Color::Black));
+        CHECK_NOTHROW(sprite->SetBlendOperation(GfxBlendOperation::SourceAlpha));
         Point pos(100, 200);
 
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
             if ((i % 20) == 0) {
-                CHECK_NOTHROW(sprite.Update(imgSimple, mcl[(i / 20) % 5]));
+                CHECK_NOTHROW(sprite->Update(imgSimple, mcl[(i / 20) % 5]));
             }
-            CHECK_NOTHROW(sprite.SetDestination(pos));
-            CHECK_NOTHROW(sprite.Render(renderer));
+            CHECK_NOTHROW(sprite->SetDestination(pos));
+            CHECK_NOTHROW(renderer.Render(*sprite));
             CHECK_NOTHROW(renderer.Present());
             pos.SetY(200 - i);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -474,11 +475,11 @@ TEST_CASE("Framebuffer")
 
         Text text("Exo 2", "Hello World");
         CHECK_NOTHROW(text.SetArea(r).GetFont().SetSize(30));
-        Texture panel(text, Color::Black);
-        CHECK_NOTHROW(panel.SetBlendOperation(GfxBlendOperation::Copy).SetDestination(Point(100, 200)));
+        auto panel = Texture::Create(text, Color::Black);
+        CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::Copy).SetDestination(Point(100, 200)));
 
         SUBCASE("Text Attributes") {
-            CHECK_NOTHROW(panel.Fill(Color::Black));
+            CHECK_NOTHROW(panel->Fill(Color::Black));
 
             SUBCASE("Constructor") {
                 CHECK_NOTHROW(text.DrawRectangle(r, Color::White));
@@ -507,8 +508,8 @@ TEST_CASE("Framebuffer")
             }
 
             CHECK_NOTHROW(text.SetScaleToFit(scale).Reload());
-            CHECK_NOTHROW(panel.Update(text, Color::White));
-            CHECK_NOTHROW(panel.Render(renderer));
+            CHECK_NOTHROW(panel->Update(text, Color::White));
+            CHECK_NOTHROW(renderer.Render(*panel));
             CHECK_NOTHROW(renderer.Present());
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
@@ -525,10 +526,10 @@ TEST_CASE("Framebuffer")
                 int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
                 std::stringstream ss;
                 ss << "FPS:\n" << fps;
-                CHECK_NOTHROW(panel.Fill(Color::None));
+                CHECK_NOTHROW(panel->Fill(Color::None));
                 CHECK_NOTHROW(text.SetValue(ss.str()).Reload());
-                CHECK_NOTHROW(panel.Update(text, Color::None));
-                CHECK_NOTHROW(panel.Render(renderer));
+                CHECK_NOTHROW(panel->Update(text, Color::None));
+                CHECK_NOTHROW(renderer.Render(*panel));
                 CHECK_NOTHROW(renderer.Present());
             }
             MESSAGE(text.GetValue());
@@ -549,10 +550,10 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(text.Reload());
         CHECK_NOTHROW(text.SetArea(text.GetBoundingRect()));
 
-        Texture panel(text.GetBoundingRect().GetWidth(), text.GetBoundingRect().GetHeight());
+        auto panel = Texture::Create(text.GetBoundingRect().GetWidth(), text.GetBoundingRect().GetHeight());
 
-        CHECK_NOTHROW(panel.Update(text, Color::White));
-        CHECK_NOTHROW(panel.Render(renderer));
+        CHECK_NOTHROW(panel->Update(text, Color::White));
+        CHECK_NOTHROW(renderer.Render(*panel));
         CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
@@ -563,10 +564,10 @@ TEST_CASE("Framebuffer")
             for (int v = 0 ; v < 3 ; v++) {
                 CHECK_NOTHROW(text.SetVAlignment(cVertical[v]).SetHAlignment(cHorizontal[h]));
                 CHECK_NOTHROW(text.Reload());
-                CHECK_NOTHROW(panel.Update(text, Color::White));
+                CHECK_NOTHROW(panel->Update(text, Color::White));
                 CHECK_NOTHROW(renderer.Fill(Color::Black));
-                CHECK_NOTHROW(panel.SetDestination(text.GetPosition(r)));
-                CHECK_NOTHROW(panel.Render(renderer));
+                CHECK_NOTHROW(panel->SetDestination(text.GetPosition(r)));
+                CHECK_NOTHROW(renderer.Render(*panel));
                 CHECK_NOTHROW(renderer.DrawRect(Color::White, r));
                 CHECK_NOTHROW(renderer.Present());
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -582,8 +583,8 @@ TEST_CASE("Framebuffer")
         auto r2 = r;
         r2.AddSize(2, 2).Move(-1, -1);
 
-        Texture panel(r.GetWidth(), r.GetHeight());
-        CHECK_NOTHROW(panel.SetDestination(r.GetTopLeft()));
+        auto panel = Texture::Create(r.GetWidth(), r.GetHeight());
+        CHECK_NOTHROW(panel->SetDestination(r.GetTopLeft()));
 
         Text text("Exo 2", "Regular");
         CHECK_NOTHROW(text.SetArea(r).SetScaleToFit(true).GetFont().SetSize(50).SetColor(Color::Yellow));
@@ -601,10 +602,10 @@ TEST_CASE("Framebuffer")
         }
 
         CHECK_NOTHROW(text.Reload());
-        CHECK_NOTHROW(panel.Update(text, Color::White));
+        CHECK_NOTHROW(panel->Update(text, Color::White));
         CHECK_NOTHROW(renderer.Fill(Color::Black));
         CHECK_NOTHROW(renderer.DrawRect(Color::White, r2));
-        CHECK_NOTHROW(panel.Render(renderer));
+        CHECK_NOTHROW(renderer.Render(*panel));
         CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
@@ -621,7 +622,7 @@ TEST_CASE("Framebuffer")
         texture.SetBlendOperation(GfxBlendOperation::Copy);
 
         CHECK_NOTHROW(texture.Update(testImgMap, Color::White));
-        CHECK_NOTHROW(texture.Render(renderer));
+        CHECK_NOTHROW(renderer.Render(texture));
         CHECK_NOTHROW(renderer.Present());
     }
 
@@ -639,7 +640,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(canvas.DrawRectangle(Rect(100,100, 100, 100), blue, true));
             CHECK_NOTHROW(canvas.DrawRectangle(Rect(170,100, 100, 100), green, true));
             CHECK_NOTHROW(texture.Update(canvas, Color::White));
-            CHECK_NOTHROW(texture.Render(renderer));
+            CHECK_NOTHROW(renderer.Render(texture));
             CHECK_NOTHROW(renderer.Present());
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }

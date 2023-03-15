@@ -12,7 +12,7 @@
 #define INCLUDE_GRAPHICS_STYLE_H_
 
 #include <memory>
-#include <graphics/BitmapView.h>
+#include <vector>
 #include <graphics/Color.h>
 #include <graphics/Texture.h>
 
@@ -21,17 +21,9 @@ namespace rsp::graphics {
 class Style
 {
 public:
-    Style() {};
-    Style(const Style &arOther) = default;
-    Style(Style &&) = default;
-    Style& operator=(const Style &) = default;
-    Style& operator=(Style &&) = default;
-
     Color mForegroundColor = Color::White;
     Color mBackgroundColor = Color::None;
-    BitmapView mBackground{};
-    BitmapView mForeground{};
-    Texture mTexture{};
+    std::vector<TexturePtr_t> mTextures{};
 };
 
 

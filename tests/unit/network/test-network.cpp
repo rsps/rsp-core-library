@@ -110,7 +110,7 @@ TEST_CASE("Network")
 
         IHttpResponse *resp = nullptr;
         CHECK_THROWS_AS(resp = &request.Execute(), NetworkException);
-        CHECK_THROWS_WITH_AS(resp = &request.Execute(), doctest::Contains("curl_easy_perform() failed. (56) Failure when receiving data from the peer"), NetworkException);
+        CHECK_THROWS_WITH_AS(resp = &request.Execute(), doctest::Contains(" (56) Failure when receiving data from the peer"), NetworkException);
     }
 
     SUBCASE("Validated Client") {

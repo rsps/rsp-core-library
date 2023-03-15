@@ -15,9 +15,12 @@
 #include <graphics/Color.h>
 #include <graphics/GuiUnit.h>
 #include <graphics/PixelData.h>
-#include <graphics/Renderer.h>
 
 namespace rsp::graphics {
+
+class Texture;
+typedef std::unique_ptr<Texture> TexturePtr_t;
+
 
 /**
  * \brief Wrapper for raster images kept in video memory for fast rendering operations.
@@ -25,41 +28,16 @@ namespace rsp::graphics {
 class Texture
 {
 public:
-    /**
-     * \brief Constructors
-     */
-    Texture() {}
-    Texture(const PixelData &arPixelData, Color aColor)
-        : mpImpl(Interface::Create(arPixelData, aColor))
-    {
-    }
-    Texture(GuiUnit_t aWidth, GuiUnit_t aHeight)
-        : mpImpl(Interface::Create(aWidth, aHeight))
-    {
-    }
+    static TexturePtr_t Create(const PixelData &arPixelData, Color aColor = Color::None, Point aDestPos = {0,0});
+    static TexturePtr_t Create(GuiUnit_t aWidth, GuiUnit_t aHeight, Point aDestPos = {0,0});
+
+    virtual ~Texture() {}
 
     /**
-     * \brief Copy, assignment and move operators
-     * \param arOther
+     * \brief Fill this texture with the given color
+     * \param aColor
      */
-    Texture(const Texture &arOther)
-        : mpImpl(arOther.mpImpl->Clone())
-    {
-    }
-    Texture& operator=(const Texture &arOther)
-    {
-        if (this != &arOther) {
-            mpImpl = arOther.mpImpl->Clone();
-        }
-        return *this;
-    }
-    Texture(Texture &&arOther) = default;
-    Texture& operator=(Texture &&arOther) = default;
-
-    /**
-     * \brief Test if texture is assigned.
-     */
-    operator bool() const { return bool(mpImpl); }
+    virtual Texture& Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr) = 0;
 
     /**
      * \brief Update this texture with content from the given pixel data
@@ -67,21 +45,7 @@ public:
      * \param aColor Color to use if pixel data is monochrome or alpha
      * \return self
      */
-    Texture& Update(const PixelData &arPixelData, Color aColor = Color::None)
-    {
-        mpImpl->Update(arPixelData, aColor);
-        return *this;
-    }
-
-    /**
-     * \brief Fill this texture with the given color
-     * \param aColor
-     */
-    Texture& Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr)
-    {
-        mpImpl->Fill(aColor, arRect);
-        return *this;
-    }
+    virtual Texture& Update(const PixelData &arPixelData, Color aColor = Color::None) = 0;
 
     /**
      * \brief Set the blend operation to use when updating this texture. Defaults to "Copy".
@@ -89,67 +53,31 @@ public:
      * \param aColorKey
      * \return self
      */
-    Texture& SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None)
-    {
-        mpImpl->SetBlendOperation(aOp, aColorKey);
-        return *this;
-    }
+    virtual Texture& SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None) = 0;
 
     /**
-     * \brief Set the source area to use when reading from this texture. Defaults to entire texture.
+     * \brief Set/get the source area to use when reading from this texture. Defaults to entire texture.
      *
      * \param arRect
      * \return self
      */
-    Texture& SetSourceRect(const Rect &arRect)
-    {
-        mpImpl->SetSourceRect(arRect);
-        return *this;
-    }
+    virtual Texture& SetSourceRect(const Rect &arRect) = 0;
+    virtual const Rect& GetSourceRect() const = 0;
 
     /**
-     * \brief Set the destination to use when rendering this texture. Defaults to 0,0.
+     * \brief Set/get the destination to use when rendering this texture. Defaults to 0,0.
      *
      * \param arRect
      * \return self
      */
-    Texture& SetDestination(const Point &arPoint)
-    {
-        mpImpl->SetDestination(arPoint);
-        return *this;
-    }
+    virtual Texture& SetDestination(const Point &arPoint) = 0;
+    virtual const Rect& GetDestinationRect() const = 0;
 
     /**
-     * \brief Render this texture using the given renderer
-     * \param arRenderer
-     * \return self
+     * \brief Make a safe copy of this texture, possibly referencing the same internal raster storage.
+     * \return Texture ptr
      */
-    Texture& Render(Renderer &arRenderer)
-    {
-        mpImpl->Render(arRenderer);
-        return *this;
-    }
-
-    class Interface
-    {
-    public:
-        static std::unique_ptr<Interface> Create(const PixelData &arPixelData, Color aColor);
-        static std::unique_ptr<Interface> Create(GuiUnit_t aWidth, GuiUnit_t aHeight);
-
-        virtual ~Interface() {}
-
-        virtual void Update(const PixelData &arPixelData, Color aColor = Color::None) = 0;
-        virtual void Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr) = 0;
-        virtual void SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None) = 0;
-        virtual void SetSourceRect(const Rect &arRect) = 0;
-        virtual void SetDestination(const Point &arPoint) = 0;
-        virtual void Render(Renderer &arRenderer) = 0;
-
-        virtual std::unique_ptr<Interface> Clone() const = 0;
-    };
-
-protected:
-    std::unique_ptr<Interface> mpImpl{};
+    virtual TexturePtr_t Clone() const = 0;
 };
 
 } /* namespace rsp::graphics */

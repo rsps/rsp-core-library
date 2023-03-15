@@ -11,14 +11,15 @@
 #ifndef INCLUDE_GRAPHICS_RENDERER_H_
 #define INCLUDE_GRAPHICS_RENDERER_H_
 
-#include <graphics/Color.h>
-#include <graphics/GuiUnit.h>
-#include <graphics/PixelData.h>
-#include <graphics/Rect.h>
-#include <utils/OptionalPtr.h>
 #include <functional>
 #include <memory>
 #include <optional>
+#include <utils/OptionalPtr.h>
+#include "Color.h"
+#include "GuiUnit.h"
+#include "PixelData.h"
+#include "Rect.h"
+#include "Texture.h"
 
 namespace rsp::graphics {
 
@@ -38,6 +39,7 @@ public:
 
     virtual Renderer& DrawRect(Color aColor, const Rect &arRect) = 0;
     virtual Renderer& Fill(Color aColor, Optional<const Rect> aDestination = nullptr) = 0;
+    virtual Renderer& Render(const Texture &arTexture) = 0;
 
     virtual void Present() = 0;
 };

@@ -39,25 +39,25 @@ public:
     virtual void Load() {};
 
     template<class T>
-    const Texture GetTexture()
+    std::unique_ptr<const Texture> GetTexture()
     {
         return get(rsp::utils::ID<T>());
     }
 
 protected:
-    std::map<uint32_t, std::shared_ptr<Texture> > mTextures{};
+    std::map<uint32_t, std::unique_ptr<Texture> > mTextures{};
 
-    Texture get(uint32_t aId) const
+    std::unique_ptr<Texture> get(uint32_t aId) const
     {
         try {
-            return *mTextures.at(aId);
+            return mTextures.at(aId)->Clone();
         }
         catch (const std::out_of_range &e) {
             THROW_WITH_BACKTRACE1(TextureNotFound, aId);
         }
     }
 
-    void add(uint32_t aId, std::shared_ptr<Texture> apTexture)
+    void add(uint32_t aId, Texture* apTexture)
     {
         auto result = mTextures.emplace(aId, apTexture);
         if (result.second == false) {

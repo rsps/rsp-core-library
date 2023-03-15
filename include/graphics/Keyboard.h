@@ -121,8 +121,8 @@ class Key : public Button
 {
 public:
     Key();
-    Key& Setup(Rect aTouchArea, Rect aArea, int aSymbol = 0);
-    Key& SetStyle(Control::States aState, BitmapView &arForeground, BitmapView &arBackground, Color aFrontColor, Color aBackColor);
+    Key& Setup(Rect aTouchArea, Rect aArea, Point aPosition, int aSymbol = 0);
+    Key& SetStyle(Control::States aState, TexturePtr_t *apForeground, TexturePtr_t *apBackground, Color aFrontColor, Color aBackColor);
 };
 
 class Keyboard: public Control

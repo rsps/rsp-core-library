@@ -30,13 +30,15 @@ TEST_CASE("Image Test")
     Framebuffer::mpDevicePath = p.c_str();
 
     sw::SWRenderer renderer;
+    renderer.Fill(Color::Black);
+    renderer.Present();
+    renderer.Fill(Color::Black);
 
     Rect testRect(20, 20, 200, 100);
     Bitmap normal("testImages/Red.bmp");
-    Random::Seed(1234);
 
     Image testImage;
-    testImage.GetStyle(Control::States::Normal).mBackground.SetPixelData(normal);
+    testImage.GetBitmap().SetPixelData(normal);
     testImage.SetArea(testRect);
 
     SUBCASE("Render Image if Invalid")
@@ -48,8 +50,10 @@ TEST_CASE("Image Test")
         testImage.Invalidate();
 
         // Act
-        testImage.Render(renderer);
-        renderer.Present();
+        if (testImage.UpdateData()) {
+            testImage.Render(renderer);
+            renderer.Present();
+        }
 
 //        MESSAGE("insidePoint: " << insidePoint);
 //        MESSAGE("Origin: " << testImage.GetOrigin());
@@ -66,13 +70,16 @@ TEST_CASE("Image Test")
         CHECK_EQ(renderer.GetPixel(219,  20, true), red.AsUint());
         CHECK_EQ(renderer.GetPixel(20,  119, true), red.AsUint());
         CHECK_EQ(renderer.GetPixel(219, 119, true), red.AsUint());
+
         SUBCASE("Do not render if Image valid")
         {
             // Arrange
-            renderer.Present();
 
             // Act
-            testImage.Render(renderer);
+            if (testImage.UpdateData()) {
+                testImage.Render(renderer);
+                renderer.Present();
+            }
 
             // Assert
             CHECK_NE(renderer.GetPixel(insidePoint.GetX(), insidePoint.GetY()), red.AsUint());

@@ -139,7 +139,9 @@ Control& Control::AddChild(Control *apChild)
 Control& Control::SetBitmapPosition(const Point &arPoint)
 {
     for (auto &style : mStyles) {
-        style.mBackground.SetDestination(arPoint);
+        for (TexturePtr_t &texture : style.mTextures) {
+            texture->SetDestination(arPoint);
+        }
     }
     Invalidate();
     return *this;
@@ -155,10 +157,10 @@ bool Control::UpdateData()
         Canvas canvas(mArea.GetWidth(), mArea.GetHeight());
         auto &style = mStyles[mState];
         paint(canvas, style);
-        if (!style.mTexture) {
-            style.mTexture = Texture(mArea.GetWidth(), mArea.GetHeight());
+        if (!mpContent) {
+            mpContent = Texture::Create(mArea.GetWidth(), mArea.GetHeight());
         }
-        style.mTexture.Update(canvas.GetPixelData(), style.mForegroundColor);
+        mpContent->Update(canvas.GetPixelData(), style.mForegroundColor);
         mDirty = false;
         result = true;
     }
@@ -179,8 +181,11 @@ void Control::Render(Renderer &arRenderer)
     auto &style = mStyles[mState];
 
     GFXLOG("Rendering: " << GetName() << " " << mArea);
-    for(Texture &texture : mTextures) {
-        texture.Render(arRenderer);
+    for (TexturePtr_t& texture : style.mTextures) {
+        arRenderer.Render(*texture);
+    }
+    if (mpContent) {
+        arRenderer.Render(*mpContent);
     }
 
     for (Control* child : mChildren) {
@@ -197,14 +202,9 @@ void Control::Render(Renderer &arRenderer)
 void Control::paint(Canvas &arCanvas, const Style &arStyle)
 {
     if (mTransparent) {
-        arCanvas.Fill(Color::None);
+        return;
     }
-    else {
-        arCanvas.Fill(arStyle.mBackgroundColor);
-    }
-
-    arStyle.mBackground.Paint(Point(), arCanvas);
-    arStyle.mForeground.Paint(Point(), arCanvas);
+    arCanvas.Fill(arStyle.mBackgroundColor);
 }
 
 Control& Control::SetDraggable(bool aValue)

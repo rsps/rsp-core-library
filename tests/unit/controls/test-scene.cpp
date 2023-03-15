@@ -92,8 +92,8 @@ TEST_CASE("Scene Test")
     {
         // Arrange
         event.mType = EventTypes::Press;
-        CHECK_NOTHROW(scenes.ActiveScene());
-        scenes.ActiveScene().Render(renderer);
+        CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
+        CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));
 
         SUBCASE("Process input for Top elements")
         {
@@ -131,6 +131,7 @@ TEST_CASE("Scene Test")
         CHECK(scenes.ActiveScene<SecondScene>().GetBottomBtn().IsInvalid());
 
         // Act
+        CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
         CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));
 
         // Assert
