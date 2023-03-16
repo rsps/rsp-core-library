@@ -183,7 +183,7 @@ bool Control::UpdateData()
     return result;
 }
 
-void Control::Render(Renderer &arRenderer)
+void Control::Render(Renderer &arRenderer) const
 {
     if (!mVisible) {
         return;
@@ -197,7 +197,7 @@ void Control::Render(Renderer &arRenderer)
         arRenderer.Fill(style.mBackgroundColor, mArea);
     }
 
-    for (TexturePtr_t& texture : style.mTextures) {
+    for (const TexturePtr_t& texture : style.mTextures) {
         arRenderer.Render(*texture);
     }
 

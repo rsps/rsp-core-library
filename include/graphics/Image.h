@@ -12,6 +12,7 @@
 
 #include "Control.h"
 #include "BitmapView.h"
+#include "Texture.h"
 
 namespace rsp::graphics
 {
@@ -19,16 +20,23 @@ namespace rsp::graphics
 class Image : public Control
 {
 public:
-    Image() {  initTypeInfo<Image>(); }
+    Image();
+    Image(const BitmapView &arBitmap);
+    Image(const BitmapView &&arBitmap);
 
-    void ClearSection();
-    void SetSection(const Rect &arSection);
+    Image& operator=(const BitmapView &arBitmap);
+    Image& operator=(const BitmapView &&arBitmap);
 
-    const BitmapView& GetBitmap() const { return mBitmap; }
     BitmapView& GetBitmap() { return mBitmap; }
+
+    void Render(Renderer &arRenderer) const override;
 
 protected:
     BitmapView mBitmap{};
+    TexturePtr_t mpTexture = nullptr;
+
+    void doSetArea(const Rect &arRect) override;
+    void update() override;
 };
 
 } // namespace rsp::graphics

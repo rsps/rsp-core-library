@@ -31,14 +31,11 @@ public:
     BitmapView& operator=(BitmapView&&) = default;
 
     BitmapView& SetPixelData(const PixelData &arPixelData);
-    BitmapView& SetPixelData(const Bitmap &arBitmap);
+    const PixelData& GetPixelData() const;
 
     BitmapView& ClearSection();
     BitmapView& SetSection(const Rect &arSection);
     const Rect& GetSection() const { return mSection; }
-
-    BitmapView& SetDestination(const Point &arPoint);
-    const Point& GetDestination() const { return mDestination; }
 
     BitmapView& SetPixelColor(const Color &arColor);
     const Color& GetPixelColor() const { return mPixelColor; }
@@ -51,7 +48,6 @@ public:
     void Paint(const Point &arOffset, Canvas &arCanvas) const;
 
 protected:
-    Point mDestination{};
     Color mPixelColor = Color::White;
     Rect mSection{};
     const PixelData* mpPixelData = nullptr;

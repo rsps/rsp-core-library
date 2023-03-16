@@ -9,8 +9,9 @@
  */
 
 #include <doctest.h>
+#include <graphics/Framebuffer.h>
 #include <graphics/Image.h>
-#include <graphics/SW/SWRenderer.h>
+#include <graphics/Renderer.h>
 #include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <TestHelpers.h>
@@ -20,7 +21,7 @@ using namespace rsp::utils;
 
 TEST_SUITE_BEGIN("Graphics");
 
-TEST_CASE("Image Test")
+TEST_CASE("Image")
 {
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
@@ -29,17 +30,39 @@ TEST_CASE("Image Test")
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer::mpDevicePath = p.c_str();
 
-    sw::SWRenderer renderer;
-    renderer.Fill(Color::Black);
-    renderer.Present();
-    renderer.Fill(Color::Black);
+    auto& renderer = Renderer::Get();
+    CHECK_NOTHROW(renderer.Fill(Color::Grey));
 
-    Rect testRect(20, 20, 200, 100);
-    Bitmap normal("testImages/Red.bmp");
+    Canvas bmp(200, 100);
+    CHECK_NOTHROW(bmp.Fill(Color::Red));
 
-    Image testImage;
-    testImage.GetBitmap().SetPixelData(normal);
-    testImage.SetArea(testRect);
+    Point pos(20, 20);
+
+    SUBCASE("Default Constructor")
+    {
+        Image testImage;
+        CHECK_NOTHROW(testImage = bmp);
+        CHECK_NOTHROW(testImage.SetOrigin(pos));
+
+        CHECK(testImage.UpdateData());
+        CHECK_NOTHROW(testImage.Render(renderer));
+        CHECK_NOTHROW(renderer.Present());
+
+        Point insidePoint(Random::Roll(20, 220), Random::Roll(20, 120));
+
+        CHECK_EQ(renderer.GetPixel(insidePoint.GetX(), insidePoint.GetY(), true), Color::Red);
+        CHECK_NE(renderer.GetPixel(19,   19, true), Color::Red);
+        CHECK_NE(renderer.GetPixel(20,   19, true), Color::Red);
+        CHECK_NE(renderer.GetPixel(19,   20, true), Color::Red);
+        CHECK_NE(renderer.GetPixel(119,  19, true), Color::Red);
+        CHECK_NE(renderer.GetPixel(220,  19, true), Color::Red);
+        CHECK_NE(renderer.GetPixel(119, 120, true), Color::Red);
+        CHECK_EQ(renderer.GetPixel(20,   20, true), Color::Red);
+        CHECK_EQ(renderer.GetPixel(219,  20, true), Color::Red);
+        CHECK_EQ(renderer.GetPixel(20,  119, true), Color::Red);
+        CHECK_EQ(renderer.GetPixel(219, 119, true), Color::Red);
+
+    }
 
     SUBCASE("Render Image if Invalid")
     {

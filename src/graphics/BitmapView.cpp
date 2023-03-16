@@ -10,6 +10,7 @@
 
 #include <graphics/BitmapView.h>
 #include <algorithm>
+#include <exceptions/CoreException.h>
 
 namespace rsp::graphics {
 
@@ -32,11 +33,12 @@ BitmapView& BitmapView::SetPixelData(const PixelData &arPixelData)
     return *this;
 }
 
-BitmapView& BitmapView::SetPixelData(const Bitmap &arBitmap)
+const PixelData& BitmapView::GetPixelData() const
 {
-    mpPixelData = &(arBitmap.GetPixelData());
-    ClearSection();
-    return *this;
+    if (!mpPixelData) {
+        THROW_WITH_BACKTRACE1(exceptions::NotSetException, "PixelData not assigned to Image control");
+    }
+    return *mpPixelData;
 }
 
 BitmapView& BitmapView::ClearSection()
@@ -61,12 +63,6 @@ BitmapView& BitmapView::SetSection(const Rect &arSection)
     return *this;
 }
 
-BitmapView& BitmapView::SetDestination(const Point &arPoint)
-{
-    mDestination = arPoint;
-    return *this;
-}
-
 BitmapView& BitmapView::SetPixelColor(const Color &arColor)
 {
     mPixelColor = arColor;
@@ -78,7 +74,7 @@ void BitmapView::Paint(const Point &arOffset, Canvas &arCanvas) const
     if (!mpPixelData) {
         return;
     }
-    arCanvas.DrawPixelData(arOffset + mDestination, *mpPixelData, mSection, mPixelColor);
+    arCanvas.DrawPixelData(arOffset, *mpPixelData, mSection, mPixelColor);
 }
 
 GuiUnit_t BitmapView::GetWidth()

@@ -11,6 +11,9 @@
 #include <doctest.h>
 #include <graphics/Control.h>
 #include <graphics/Renderer.h>
+#include <graphics/SW/SWRenderer.h>
+#include <posix/FileSystem.h>
+#include <TestHelpers.h>
 
 using namespace rsp::graphics;
 
@@ -18,6 +21,12 @@ TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("Control")
 {
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
+
+    std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+    Framebuffer::mpDevicePath = p.c_str();
+
     CHECK_NOTHROW(Control dummy);
     Control myControl;
     CHECK(myControl.IsInvalid());
@@ -108,8 +117,32 @@ TEST_CASE("Control")
 
     SUBCASE("Render")
     {
-        Renderer::Get();
-    }
+        auto &renderer = Renderer::Get();
+        CHECK_NOTHROW(renderer.Fill(Color::Grey));
+
+        Canvas paper(150, 50);
+        paper.Fill(Color::Yellow);
+        auto texture = Texture::Create(paper);
+        texture->SetDestination({100, 300});
+
+        auto &style = myControl.GetStyle(Control::States::Normal);
+        style.mBackgroundColor = Color::Blue;
+        style.mTextures.push_back(texture->Clone());
+
+        CHECK_NOTHROW(myControl.SetTransparent(false).SetArea({200, 40, 100, 500}).Show().Invalidate());
+
+        CHECK(myControl.UpdateData());
+        CHECK_NOTHROW(myControl.Render(renderer));
+        CHECK_NOTHROW(renderer.Present());
+
+        CHECK_EQ(renderer.GetPixel(200, 40, true), Color::Blue);
+        CHECK_EQ(renderer.GetPixel(299, 539, true), Color::Blue);
+        CHECK_EQ(renderer.GetPixel(300, 540, true), Color::Grey);
+
+        CHECK_EQ(renderer.GetPixel(100, 300, true), Color::Yellow);
+        CHECK_EQ(renderer.GetPixel(249, 349, true), Color::Yellow);
+        CHECK_EQ(renderer.GetPixel(250, 350, true), Color::Blue);
+}
 }
 
 TEST_SUITE_END();

@@ -129,7 +129,7 @@ public:
      * \brief Virtual method for rendering the object
      * \param aCanvas The canvas the object is rendered on
      */
-    virtual void Render(Renderer &arRenderer);
+    virtual void Render(Renderer &arRenderer) const;
 
     /**
      * \brief Sets the area of the object as a rectangle in parent coordinates

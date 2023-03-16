@@ -42,6 +42,9 @@ public:
     virtual Renderer& Render(const Texture &arTexture) = 0;
 
     virtual void Present() = 0;
+
+    virtual Renderer& SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) = 0;
+    virtual uint32_t GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront = false) const = 0;
 };
 
 } /* namespace rsp::graphics */

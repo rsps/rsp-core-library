@@ -78,6 +78,17 @@ PixelData::ColorDepth SWRenderer::GetColorDepth() const
     THROW_WITH_BACKTRACE(EIllegalColorDepth);
 }
 
+Renderer& SWRenderer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
+{
+    Framebuffer::SetPixel(aX, aY, arColor);
+    return *this;
+}
+
+uint32_t SWRenderer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
+{
+    return Framebuffer::GetPixel(aX, aY, aFront);
+}
+
 } /* namespace rsp::graphics::sw */
 
 #endif /* USE_GFX_SW */

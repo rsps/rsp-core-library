@@ -26,7 +26,7 @@
 using namespace rsp::graphics;
 using namespace rsp::utils;
 
-inline void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Framebuffer &fb)
+inline void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer &fb)
 {
     if (Rect(0, 0, fb.GetWidth(), fb.GetHeight()).IsHit(aX, aY)) {
         CHECK_EQ(fb.GetPixel(aX, aY), aColor.AsUint());
@@ -48,7 +48,7 @@ TEST_CASE("Framebuffer")
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer::mpDevicePath = p.c_str();
 
-    sw::SWRenderer& renderer = dynamic_cast<sw::SWRenderer&>(Renderer::Get());
+    auto &renderer = Renderer::Get();
 
     Canvas canvas(renderer.GetWidth(), renderer.GetHeight());
     CHECK_NOTHROW(Texture::Create(renderer.GetWidth(), renderer.GetHeight()));

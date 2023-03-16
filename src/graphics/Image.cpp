@@ -15,21 +15,60 @@
 namespace rsp::graphics
 {
 
-void Image::ClearSection()
+Image::Image()
 {
-    mBitmap.ClearSection();
+    initTypeInfo<Image>();
 }
 
-void Image::SetSection(const Rect &arSection)
+Image::Image(const BitmapView &arBitmap)
+    : mBitmap(arBitmap)
 {
-    mBitmap.SetSection(arSection);
+    initTypeInfo<Image>();
+    SetArea(mBitmap.GetBoundingRect());
 }
 
-//void Image::paint(Canvas &arCanvas, const Style &arStyle)
-//{
-//    Control::paint(arCanvas, arStyle);
-//
-//    mBitmap.Paint(GetOrigin(), arCanvas);
-//}
+Image::Image(const BitmapView &&arBitmap)
+    : mBitmap(std::move(arBitmap))
+{
+    initTypeInfo<Image>();
+    SetArea(mBitmap.GetBoundingRect());
+}
+
+Image& Image::operator=(const BitmapView &arBitmap)
+{
+    mBitmap = arBitmap;
+    return *this;
+}
+
+Image& Image::operator=(const BitmapView &&arBitmap)
+{
+    mBitmap = std::move(arBitmap);
+    return *this;
+}
+
+void Image::Render(Renderer &arRenderer) const
+{
+    Control::Render(arRenderer);
+    arRenderer.Render(*mpTexture);
+}
+
+void Image::update()
+{
+    if (mpTexture) {
+        mpTexture->Update(mBitmap.GetPixelData(), mStyles[mState].mForegroundColor);
+
+        auto sr = Rect(0, 0, mBitmap.GetWidth(), mBitmap.GetHeight());
+        if (mpParent) {
+            sr &= mpParent->GetArea();
+        }
+        mpTexture->SetDestination(mArea.GetTopLeft())
+            .SetSourceRect(sr);
+    }
+}
+
+void Image::doSetArea(const rsp::graphics::Rect &arRect)
+{
+    mpTexture = Texture::Create(arRect.GetWidth(), arRect.GetHeight());
+}
 
 } // namespace rsp::graphics
