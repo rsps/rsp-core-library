@@ -10,6 +10,7 @@
 
 #include <doctest.h>
 #include <graphics/Control.h>
+#include <graphics/Renderer.h>
 
 using namespace rsp::graphics;
 
@@ -103,6 +104,11 @@ TEST_CASE("Control")
         }
 
         CHECK(myControl.IsInvalid());
+    }
+
+    SUBCASE("Render")
+    {
+        Renderer::Get();
     }
 }
 
