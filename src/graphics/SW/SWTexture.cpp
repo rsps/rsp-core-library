@@ -75,4 +75,14 @@ std::unique_ptr<Texture> SWTexture::Clone() const
     return std::unique_ptr<SWTexture>(new SWTexture(*this));
 }
 
+GuiUnit_t SWTexture::GetWidth() const
+{
+    return mpSurface->mWidth;
+}
+
+rsp::graphics::GuiUnit_t SWTexture::GetHeight() const
+{
+    return mpSurface->mHeight;
+}
+
 } /* namespace rsp::graphics::sw */

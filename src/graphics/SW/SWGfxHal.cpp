@@ -110,7 +110,7 @@ void SWGfxHal::Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<con
     size_t w = size_t(std::min(dr.GetWidth(), sr.GetWidth()));
     GuiUnit_t src_y = sr.GetTop();
 
-    switch(arDst.mBlendOperation) {
+    switch(arSrc.mBlendOperation) {
         default:
         case GfxBlendOperation::Copy: {
             for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
@@ -135,7 +135,7 @@ void SWGfxHal::Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<con
                 uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
                 uint32_t *source = offset(src, arSrc.mRowPitch, sr.GetLeft(), src_y++);
                 for(size_t x = 0; x < w ; ++x) {
-                    if (source[x] != arDst.mColorKey) {
+                    if (source[x] != arSrc.mColorKey) {
                         dest[x] = source[x];
                     }
                 }
@@ -163,9 +163,10 @@ void SWGfxHal::CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint3
     size_t w = size_t(std::min(dr.GetWidth(), sr.GetWidth()));
     GuiUnit_t src_y = sr.GetTop();
 
-    switch(arDst.mBlendOperation) {
+    switch(arPixelData.GetColorDepth()) {
         default:
-        case GfxBlendOperation::Copy: {
+        case PixelData::ColorDepth::RGB:
+        case PixelData::ColorDepth::RGBA: {
             for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
                 uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
                 GuiUnit_t src_x = sr.GetLeft();
@@ -177,25 +178,26 @@ void SWGfxHal::CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint3
             break;
         }
 
-        case GfxBlendOperation::SourceAlpha: {
-            for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
-                uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
-                GuiUnit_t src_x = sr.GetLeft();
-                for(size_t x = 0; x < w ; ++x) {
-                    dest[x] = alphaBlend(dest[x], arPixelData.GetPixelAt(src_x++, src_y, aColor));
-                }
-                ++src_y;
-            }
-            break;
-        }
+//        case PixelData::ColorDepth::RGBA: {
+//            for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
+//                uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
+//                GuiUnit_t src_x = sr.GetLeft();
+//                for(size_t x = 0; x < w ; ++x) {
+//                    dest[x] = alphaBlend(dest[x], arPixelData.GetPixelAt(src_x++, src_y, aColor));
+//                }
+//                ++src_y;
+//            }
+//            break;
+//        }
 
-        case GfxBlendOperation::ColorKey: {
+        case PixelData::ColorDepth::Monochrome:
+        case PixelData::ColorDepth::Alpha: {
             for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
                 uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
                 GuiUnit_t src_x = sr.GetLeft();
                 for(size_t x = 0; x < w ; ++x) {
                     uint32_t cl = arPixelData.GetPixelAt(src_x++, src_y, aColor);
-                    if (cl != arDst.mColorKey) {
+                    if (cl & 0xFF000000) {
                         dest[x] = cl;
                     }
                 }
@@ -274,35 +276,13 @@ void SWGfxHal::Fill(VideoSurface &arDst, uint32_t aColor, Optional<const Rect> a
         dr &= *aDstRect;
     }
 
-    if (arDst.mBlendOperation == GfxBlendOperation::ColorKey) {
-        if (aColor == arDst.mColorKey) {
-            return;
-        }
-    }
-
     GuiUnit_t y_end = dr.GetBottom();
     GuiUnit_t x_end = dr.GetRight();
 
     for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
         uint32_t *dst = offset(arDst.mpPhysAddr.get(), arDst.mRowPitch, dr.GetLeft(), y);
         for (GuiUnit_t x = dr.GetLeft() ; x < x_end ; ++x) {
-            switch(arDst.mBlendOperation) {
-                default:
-                case GfxBlendOperation::Copy: {
-                    *dst = aColor;
-                    break;
-                }
-
-                case GfxBlendOperation::SourceAlpha: {
-                    *dst = alphaBlend(*dst, aColor);
-                    break;
-                }
-
-                case GfxBlendOperation::ColorKey: {
-                    *dst = aColor;
-                    break;
-                }
-            }
+            *dst = aColor;
             ++dst;
         }
     }

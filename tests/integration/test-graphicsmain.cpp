@@ -83,8 +83,8 @@ TEST_CASE("Graphics Main Test")
     CHECK_NOTHROW(p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"}));
     Framebuffer::mpDevicePath = p.c_str();
 
-    CHECK_NOTHROW(sw::SWRenderer dummy_renderer);
-    sw::SWRenderer& renderer = dynamic_cast<sw::SWRenderer&>(Renderer::Get());
+    CHECK_NOTHROW(Renderer::Get());
+    auto& renderer = Renderer::Get();
 
     // Set default scene size to screen size
     CHECK_NOTHROW(Scene::SetScreenSize(renderer.GetWidth(), renderer.GetHeight()));
@@ -203,7 +203,7 @@ TEST_CASE("Graphics Main Test")
                     break;
                 case 11:
                     Control::SetTouchAreaColor(Color::Yellow);
-                    scenes.ActiveScene<InputScene>().GetLabel().GetText().GetFont().SetBackgroundColor(Color::Silver);
+                    scenes.ActiveScene<InputScene>().GetLabel().GetText();
                     scenes.ActiveScene<InputScene>().Invalidate();
                     timeout = 800ms;
                     break;
@@ -213,7 +213,7 @@ TEST_CASE("Graphics Main Test")
                     break;
                 case 13:
                     Control::SetTouchAreaColor(Color::None);
-                    scenes.ActiveScene<InputScene>().GetLabel().GetText().GetFont().SetBackgroundColor(Color::None);
+                    scenes.ActiveScene<InputScene>().GetLabel().GetText();
                     scenes.ActiveScene<InputScene>().Invalidate();
                     timeout = 200ms;
                     break;

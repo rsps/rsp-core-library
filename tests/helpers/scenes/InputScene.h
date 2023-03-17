@@ -66,7 +66,7 @@ public:
 
         GetStyle(Control::States::Normal).mTextures.push_back(Texture::Create(mBackground));
 
-        mLabel.GetText().GetFont().SetSize(34).SetColor(Color::Black).SetBackgroundColor(Color::White);
+        mLabel.GetText().GetFont().SetSize(34);
         mLabel.SetArea(Rect(80, 150, 320, 160));
         mLabel.GetStyle(States::Normal).mForegroundColor = Color::Black;
         mLabel.GetStyle(States::Normal).mBackgroundColor = Color::White;

@@ -37,19 +37,21 @@ Image::Image(const BitmapView &&arBitmap)
 Image& Image::operator=(const BitmapView &arBitmap)
 {
     mBitmap = arBitmap;
+    SetArea(mBitmap.GetBoundingRect());
     return *this;
 }
 
 Image& Image::operator=(const BitmapView &&arBitmap)
 {
     mBitmap = std::move(arBitmap);
+    SetArea(mBitmap.GetBoundingRect());
     return *this;
 }
 
 void Image::Render(Renderer &arRenderer) const
 {
     Control::Render(arRenderer);
-    arRenderer.Render(*mpTexture);
+    arRenderer.Blit(*mpTexture);
 }
 
 void Image::update()

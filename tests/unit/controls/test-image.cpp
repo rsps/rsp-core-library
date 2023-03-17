@@ -32,82 +32,49 @@ TEST_CASE("Image")
 
     auto& renderer = Renderer::Get();
     CHECK_NOTHROW(renderer.Fill(Color::Grey));
+    CHECK_NOTHROW(renderer.Present());
+    CHECK_NOTHROW(renderer.Fill(Color::Grey));
+
+    auto fill_color = Color::Purple;
 
     Canvas bmp(200, 100);
-    CHECK_NOTHROW(bmp.Fill(Color::Red));
+    CHECK_NOTHROW(bmp.Fill(fill_color));
 
     Point pos(20, 20);
+    Point insidePoint(Random::Roll(20, 219), Random::Roll(20, 119));
+
+    std::unique_ptr<Image> image;
 
     SUBCASE("Default Constructor")
     {
-        Image testImage;
-        CHECK_NOTHROW(testImage = bmp);
-        CHECK_NOTHROW(testImage.SetOrigin(pos));
-
-        CHECK(testImage.UpdateData());
-        CHECK_NOTHROW(testImage.Render(renderer));
-        CHECK_NOTHROW(renderer.Present());
-
-        Point insidePoint(Random::Roll(20, 220), Random::Roll(20, 120));
-
-        CHECK_EQ(renderer.GetPixel(insidePoint.GetX(), insidePoint.GetY(), true), Color::Red);
-        CHECK_NE(renderer.GetPixel(19,   19, true), Color::Red);
-        CHECK_NE(renderer.GetPixel(20,   19, true), Color::Red);
-        CHECK_NE(renderer.GetPixel(19,   20, true), Color::Red);
-        CHECK_NE(renderer.GetPixel(119,  19, true), Color::Red);
-        CHECK_NE(renderer.GetPixel(220,  19, true), Color::Red);
-        CHECK_NE(renderer.GetPixel(119, 120, true), Color::Red);
-        CHECK_EQ(renderer.GetPixel(20,   20, true), Color::Red);
-        CHECK_EQ(renderer.GetPixel(219,  20, true), Color::Red);
-        CHECK_EQ(renderer.GetPixel(20,  119, true), Color::Red);
-        CHECK_EQ(renderer.GetPixel(219, 119, true), Color::Red);
-
+        CHECK_NOTHROW(image = std::make_unique<Image>());
+        CHECK_NOTHROW(*image = bmp);
     }
 
-    SUBCASE("Render Image if Invalid")
+    SUBCASE("Copy Constructor")
     {
-        // Arrange
-        Color red(0xFFc41616);
-        Point insidePoint(Random::Roll(testRect.GetLeft(), testRect.GetLeft() + testRect.GetWidth()),
-                          Random::Roll(testRect.GetTop(), testRect.GetTop() + testRect.GetHeight()));
-        testImage.Invalidate();
-
-        // Act
-        if (testImage.UpdateData()) {
-            testImage.Render(renderer);
-            renderer.Present();
-        }
-
-//        MESSAGE("insidePoint: " << insidePoint);
-//        MESSAGE("Origin: " << testImage.GetOrigin());
-//        MESSAGE("Destination: " << testImage.GetStyle(Control::States::normal).mBackground.GetDestination());
-        // Assert
-        CHECK_EQ(renderer.GetPixel(insidePoint.GetX(), insidePoint.GetY(), true), red.AsUint());
-        CHECK_NE(renderer.GetPixel(19,   19, true), red.AsUint());
-        CHECK_NE(renderer.GetPixel(20,   19, true), red.AsUint());
-        CHECK_NE(renderer.GetPixel(19,   20, true), red.AsUint());
-        CHECK_NE(renderer.GetPixel(119,  19, true), red.AsUint());
-        CHECK_NE(renderer.GetPixel(220,  19, true), red.AsUint());
-        CHECK_NE(renderer.GetPixel(119, 120, true), red.AsUint());
-        CHECK_EQ(renderer.GetPixel(20,   20, true), red.AsUint());
-        CHECK_EQ(renderer.GetPixel(219,  20, true), red.AsUint());
-        CHECK_EQ(renderer.GetPixel(20,  119, true), red.AsUint());
-        CHECK_EQ(renderer.GetPixel(219, 119, true), red.AsUint());
-
-        SUBCASE("Do not render if Image valid")
-        {
-            // Arrange
-
-            // Act
-            if (testImage.UpdateData()) {
-                testImage.Render(renderer);
-                renderer.Present();
-            }
-
-            // Assert
-            CHECK_NE(renderer.GetPixel(insidePoint.GetX(), insidePoint.GetY()), red.AsUint());
-        }
+        CHECK_NOTHROW(image = std::make_unique<Image>(bmp));
     }
+
+    CHECK_NOTHROW(image->SetOrigin(pos));
+
+    CHECK(image->UpdateData());
+    // Check that UpdateData returns false if not invalid
+    CHECK_FALSE(image->UpdateData());
+    CHECK_NOTHROW(image->Render(renderer));
+    CHECK_NOTHROW(renderer.Present());
+
+    CHECK_EQ(renderer.GetPixel(insidePoint.GetX(), insidePoint.GetY(), true), fill_color);
+    CHECK_NE(renderer.GetPixel(19,   19, true), fill_color);
+    CHECK_NE(renderer.GetPixel(20,   19, true), fill_color);
+    CHECK_NE(renderer.GetPixel(19,   20, true), fill_color);
+    CHECK_NE(renderer.GetPixel(119,  19, true), fill_color);
+    CHECK_NE(renderer.GetPixel(220,  19, true), fill_color);
+    CHECK_NE(renderer.GetPixel(119, 120, true), fill_color);
+    CHECK_EQ(renderer.GetPixel(20,   20, true), fill_color);
+    CHECK_EQ(renderer.GetPixel(219,  20, true), fill_color);
+    CHECK_EQ(renderer.GetPixel(20,  119, true), fill_color);
+    CHECK_EQ(renderer.GetPixel(219, 119, true), fill_color);
 }
 
 TEST_SUITE_END();

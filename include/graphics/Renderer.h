@@ -39,12 +39,25 @@ public:
 
     virtual Renderer& DrawRect(Color aColor, const Rect &arRect) = 0;
     virtual Renderer& Fill(Color aColor, Optional<const Rect> aDestination = nullptr) = 0;
-    virtual Renderer& Render(const Texture &arTexture) = 0;
+    virtual Renderer& Blit(const Texture &arTexture) = 0;
 
     virtual void Present() = 0;
 
+    /**
+     * \brief Sets a single pixel to the given Color
+     * \param aPoint Reference to the coordinate for the pixel to be set
+     * \param aColor Reference to the color the pixel is set to
+     */
     virtual Renderer& SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) = 0;
+
+    /**
+     * \brief Gets a single pixel to the given Color
+     * \param aPoint Reference to the coordinate for the pixel to get
+     * \param aFront Gets pixels from the backbuffer by default, set true to read front buffer
+     */
     virtual uint32_t GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront = false) const = 0;
+    uint32_t GetPixel(const Point &arPoint, bool aFront = false) const { return GetPixel(arPoint.GetX(), arPoint.GetY(), aFront); }
+
 };
 
 } /* namespace rsp::graphics */

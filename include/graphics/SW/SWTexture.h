@@ -25,6 +25,9 @@ class SWTexture: public rsp::graphics::Texture
 public:
     SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestPos);
 
+    GuiUnit_t GetWidth() const override;
+    GuiUnit_t GetHeight() const override;
+
     Texture& Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr) override;
     Texture& Update(const PixelData &arPixelData, Color aColor) override;
     Texture& SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None) override;

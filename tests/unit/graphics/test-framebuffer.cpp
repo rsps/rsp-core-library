@@ -80,7 +80,7 @@ TEST_CASE("Framebuffer")
         // Act
         CHECK_NOTHROW(canvas.DrawLine(pointA, pointB, col));
         CHECK_NOTHROW(texture.Update(canvas, col));
-        CHECK_NOTHROW(renderer.Render(texture));
+        CHECK_NOTHROW(renderer.Blit(texture));
 
         // Assert
         int deltaX = static_cast<int>(pointB.GetX() - pointA.GetX());
@@ -140,7 +140,7 @@ TEST_CASE("Framebuffer")
         // Act
         CHECK_NOTHROW(canvas.DrawRectangle(rect, col));
         CHECK_NOTHROW(texture.Update(canvas, col));
-        CHECK_NOTHROW(renderer.Render(texture));
+        CHECK_NOTHROW(renderer.Blit(texture));
 
         // Assert
         // Expect all four side to hold values
@@ -164,7 +164,7 @@ TEST_CASE("Framebuffer")
         Color white(Color::White);
         CHECK_NOTHROW(canvas.DrawRectangle(small, white));
         CHECK_NOTHROW(texture.Update(canvas, white));
-        CHECK_NOTHROW(renderer.Render(texture));
+        CHECK_NOTHROW(renderer.Blit(texture));
         CHECK_EQ(renderer.GetPixel(10, 10), white);
         CHECK_NE(renderer.GetPixel(11, 10), white);
         CHECK_NE(renderer.GetPixel(10, 11), white);
@@ -174,7 +174,7 @@ TEST_CASE("Framebuffer")
         Rect medium(20, 20, 10, 10);
         CHECK_NOTHROW(canvas.DrawRectangle(medium, white));
         CHECK_NOTHROW(texture.Update(canvas, white));
-        CHECK_NOTHROW(renderer.Render(texture));
+        CHECK_NOTHROW(renderer.Blit(texture));
         CHECK_EQ(renderer.GetPixel(20, 20), white);
         CHECK_EQ(renderer.GetPixel(20, 29), white);
         CHECK_NE(renderer.GetPixel(20, 30), white);
@@ -194,7 +194,7 @@ TEST_CASE("Framebuffer")
         // Act
         CHECK_NOTHROW(canvas.DrawCircle(centerPoint, radius, col));
         CHECK_NOTHROW(texture.Update(canvas, col));
-        CHECK_NOTHROW(renderer.Render(texture));
+        CHECK_NOTHROW(renderer.Blit(texture));
 
         // Assert
         int error = -static_cast<int>(radius);
@@ -265,7 +265,7 @@ TEST_CASE("Framebuffer")
             // Act
             auto raster = Texture::Create(testImgMap, Color::White);
             CHECK_NOTHROW(raster->SetDestination(topLeftImgCorner));
-            CHECK_NOTHROW(renderer.Render(*raster));
+            CHECK_NOTHROW(renderer.Blit(*raster));
 
             // Assert
             CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + 4, topLeftImgCorner.GetY() + 4, false), Color(0xFF020F92));
@@ -289,7 +289,7 @@ TEST_CASE("Framebuffer")
 
             auto raster = Texture::Create(testImgMap, Color::White);
             CHECK_NOTHROW(raster->SetDestination(topLeftImgCorner));
-            CHECK_NOTHROW(renderer.Render(*raster));
+            CHECK_NOTHROW(renderer.Blit(*raster));
             CHECK_NOTHROW(renderer.Present());
 
             // Assert
@@ -318,7 +318,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(canvas.DrawPixelData(topLeftImgCorner, emptyMap));
             CHECK_NOTHROW(canvas.SetPixel(topLeftImgCorner + randomPoint, Color::White));
             CHECK_NOTHROW(texture.Update(canvas, Color::White));
-            CHECK_NOTHROW(renderer.Render(texture));
+            CHECK_NOTHROW(renderer.Blit(texture));
             CHECK_NOTHROW(renderer.Present());
 
             // Assert
@@ -340,7 +340,7 @@ TEST_CASE("Framebuffer")
 
         // Act
         CHECK_NOTHROW(texture.Update(largeImgMap, Color::White));
-        CHECK_NOTHROW(renderer.Render(texture));
+        CHECK_NOTHROW(renderer.Blit(texture));
         CHECK_NOTHROW(renderer.Present());
 
         // Assert
@@ -357,7 +357,7 @@ TEST_CASE("Framebuffer")
             // Act
             CHECK_NOTHROW(canvas.DrawPixelData(topLeft, largeImgMap));
             CHECK_NOTHROW(texture.Update(canvas, Color::White));
-            CHECK_NOTHROW(renderer.Render(texture));
+            CHECK_NOTHROW(renderer.Blit(texture));
 
             // Assert
             CHECK_NE(renderer.GetPixel(randomPoint, true), 0);
@@ -379,7 +379,7 @@ TEST_CASE("Framebuffer")
         for (int i = 0; i < iterations; i++) {
             CHECK_NOTHROW(renderer.Fill(Color::Black));
             CHECK_NOTHROW(sprite->SetDestination(pos));
-            CHECK_NOTHROW(renderer.Render(*sprite));
+            CHECK_NOTHROW(renderer.Blit(*sprite));
             CHECK_NOTHROW(renderer.Present());
             pos.SetY(200 - i);
         }
@@ -409,7 +409,7 @@ TEST_CASE("Framebuffer")
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
             CHECK_NOTHROW(sprite->SetDestination(pos));
-            CHECK_NOTHROW(renderer.Render(*sprite));
+            CHECK_NOTHROW(renderer.Blit(*sprite));
             CHECK_NOTHROW(renderer.Present());
             pos.SetY(200 - i);
         }
@@ -450,7 +450,7 @@ TEST_CASE("Framebuffer")
                 CHECK_NOTHROW(sprite->Update(imgSimple, mcl[(i / 20) % 5]));
             }
             CHECK_NOTHROW(sprite->SetDestination(pos));
-            CHECK_NOTHROW(renderer.Render(*sprite));
+            CHECK_NOTHROW(renderer.Blit(*sprite));
             CHECK_NOTHROW(renderer.Present());
             pos.SetY(200 - i);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -462,7 +462,7 @@ TEST_CASE("Framebuffer")
         MESSAGE("Fps: " << fps);
     }
 
-    SUBCASE("Draw text")
+    SUBCASE("Draw Text")
     {
         CHECK_NOTHROW(renderer.Fill(Color::Black));
         CHECK_NOTHROW(renderer.Present());
@@ -470,55 +470,64 @@ TEST_CASE("Framebuffer")
 
         const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
         Font::RegisterFont(cFontFile);
-        Rect r(0, 0, 280, 200);
-        bool scale = true;
+        Rect r(100, 200, 280, 200);
 
         Text text("Exo 2", "Hello World");
-        CHECK_NOTHROW(text.SetArea(r).GetFont().SetSize(30));
+        CHECK_NOTHROW(text.GetFont().SetSize(30));
+        CHECK_NOTHROW(text.SetArea(r).SetScaleToFit().Reload());
+
         auto panel = Texture::Create(text, Color::Black);
-        CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::Copy).SetDestination(Point(100, 200)));
+        CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::ColorKey));
 
         SUBCASE("Text Attributes") {
-            CHECK_NOTHROW(panel->Fill(Color::Black));
+            CHECK_NOTHROW(panel->Fill(Color::None));
+            Color text_color;
 
             SUBCASE("Constructor") {
-                CHECK_NOTHROW(text.DrawRectangle(r, Color::White));
-                CHECK_NOTHROW(text.GetFont().SetColor(Color::Red));
-                scale = false;
+                CHECK_NOTHROW(renderer.DrawRect(Color::White, r));
+                text_color = Color::Red;
             }
             SUBCASE("SetValue") {
-                CHECK_NOTHROW(text.DrawRectangle(r, Color::Grey));
-                CHECK_NOTHROW(text.SetValue("Hello\nWorld").SetColor(Color::Green));
+                CHECK_NOTHROW(renderer.DrawRect(Color::Grey, r));
+                text_color = Color::Green;
+                CHECK_NOTHROW(text.SetValue("Hello\nWorld\nHello"));
             }
             SUBCASE("MOON") {
-                CHECK_NOTHROW(text.DrawRectangle(r, Color::Purple));
-                CHECK_NOTHROW(text.SetValue("Hello\nWorld\nHELLO\nMOON").SetColor(Color::Grey));
+                CHECK_NOTHROW(renderer.DrawRect(Color::Purple, r));
+                text_color = Color::Grey;
+                CHECK_NOTHROW(text.SetValue("Hello\nWorld\nHELLO\nMOON"));
             }
             SUBCASE("RED") {
-                CHECK_NOTHROW(text.DrawRectangle(r, Color::White));
-                CHECK_NOTHROW(text.SetValue("RED").SetColor(Color::Red));
+                CHECK_NOTHROW(renderer.DrawRect(Color::White, r));
+                text_color = Color::Red;
+                CHECK_NOTHROW(text.SetValue("RED"));
             }
             SUBCASE("GREEN") {
-                CHECK_NOTHROW(text.DrawRectangle(r, Color::White));
-                CHECK_NOTHROW(text.SetValue("GREEN").SetColor(Color::Green));
+                CHECK_NOTHROW(renderer.DrawRect(Color::White, r));
+                text_color = Color::Green;
+                CHECK_NOTHROW(text.SetValue("GREEN"));
             }
             SUBCASE("BLUE") {
-                CHECK_NOTHROW(text.DrawRectangle(r, Color::White));
-                CHECK_NOTHROW(text.SetValue("BLUE").SetColor(Color::Blue));
+                CHECK_NOTHROW(renderer.DrawRect(Color::White, r));
+                text_color = Color::Blue;
+                CHECK_NOTHROW(text.SetValue("BLUE"));
             }
 
-            CHECK_NOTHROW(text.SetScaleToFit(scale).Reload());
-            CHECK_NOTHROW(panel->Update(text, Color::White));
-            CHECK_NOTHROW(renderer.Render(*panel));
+            CHECK_NOTHROW(text.Reload());
+            CHECK_NOTHROW(panel->Update(text, text_color));
+            CHECK_NOTHROW(panel->SetDestination(text.GetPosition(r)));
+            CHECK_NOTHROW(renderer.Blit(*panel));
             CHECK_NOTHROW(renderer.Present());
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
         SUBCASE("Rainbow") {
             const Color rainbow[] = { Color::White, Color::Red, Color::Yellow, Color::Green, Color::Aqua, Color::Lime, Color::Blue, Color::Silver };
 
             MESSAGE("FPS Test");
-            CHECK_NOTHROW(text.SetScaleToFit(true).SetLineSpacing(50).SetValue("FPS:\n0").Reload().SetScaleToFit(false));
+            CHECK_NOTHROW(text.SetArea(r).SetScaleToFit(true).SetLineSpacing(50).SetValue("FPS:\n0").Reload().SetScaleToFit(false));
+            panel = Texture::Create(text, Color::Black);
+            CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::ColorKey).SetDestination(Point(100, 200)));
 
             rsp::utils::StopWatch sw;
             for (int i = 0 ; i < 200 ; i++) {
@@ -526,10 +535,10 @@ TEST_CASE("Framebuffer")
                 int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
                 std::stringstream ss;
                 ss << "FPS:\n" << fps;
-                CHECK_NOTHROW(panel->Fill(Color::None));
                 CHECK_NOTHROW(text.SetValue(ss.str()).Reload());
-                CHECK_NOTHROW(panel->Update(text, Color::None));
-                CHECK_NOTHROW(renderer.Render(*panel));
+                CHECK_NOTHROW(panel->Fill(Color::None));
+                CHECK_NOTHROW(panel->Update(text, Color::Black));
+                CHECK_NOTHROW(renderer.Blit(*panel));
                 CHECK_NOTHROW(renderer.Present());
             }
             MESSAGE(text.GetValue());
@@ -546,16 +555,14 @@ TEST_CASE("Framebuffer")
         Rect r(10, 10, 460, 780);
 
         Text text("Exo 2", "Hello\nWorld");
-        CHECK_NOTHROW(text.SetArea(r).GetFont().SetSize(50).SetColor(Color::Yellow));
+        CHECK_NOTHROW(text.GetFont().SetSize(50));
         CHECK_NOTHROW(text.Reload());
-        CHECK_NOTHROW(text.SetArea(text.GetBoundingRect()));
 
-        auto panel = Texture::Create(text.GetBoundingRect().GetWidth(), text.GetBoundingRect().GetHeight());
+        auto panel = Texture::Create(text.GetWidth(), text.GetHeight());
 
-        CHECK_NOTHROW(panel->Update(text, Color::White));
-        CHECK_NOTHROW(renderer.Render(*panel));
-        CHECK_NOTHROW(renderer.Present());
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::ColorKey, Color::None));
+        CHECK_NOTHROW(text.Reload());
+        CHECK_NOTHROW(panel->Fill(Color::None).Update(text, Color::Yellow));
 
         const Text::VAlign cVertical[] = { Text::VAlign::Top, Text::VAlign::Center, Text::VAlign::Bottom };
         const Text::HAlign cHorizontal[] = { Text::HAlign::Left, Text::HAlign::Center, Text::HAlign::Right };
@@ -563,11 +570,10 @@ TEST_CASE("Framebuffer")
         for (int h = 0 ; h < 3 ; h++) {
             for (int v = 0 ; v < 3 ; v++) {
                 CHECK_NOTHROW(text.SetVAlignment(cVertical[v]).SetHAlignment(cHorizontal[h]));
-                CHECK_NOTHROW(text.Reload());
-                CHECK_NOTHROW(panel->Update(text, Color::White));
-                CHECK_NOTHROW(renderer.Fill(Color::Black));
                 CHECK_NOTHROW(panel->SetDestination(text.GetPosition(r)));
-                CHECK_NOTHROW(renderer.Render(*panel));
+
+                CHECK_NOTHROW(renderer.Fill(Color::Black));
+                CHECK_NOTHROW(renderer.Blit(*panel));
                 CHECK_NOTHROW(renderer.DrawRect(Color::White, r));
                 CHECK_NOTHROW(renderer.Present());
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -584,10 +590,10 @@ TEST_CASE("Framebuffer")
         r2.AddSize(2, 2).Move(-1, -1);
 
         auto panel = Texture::Create(r.GetWidth(), r.GetHeight());
-        CHECK_NOTHROW(panel->SetDestination(r.GetTopLeft()));
+        CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::ColorKey, Color::None));
 
         Text text("Exo 2", "Regular");
-        CHECK_NOTHROW(text.SetArea(r).SetScaleToFit(true).GetFont().SetSize(50).SetColor(Color::Yellow));
+        CHECK_NOTHROW(text.SetArea(r).SetScaleToFit(true).GetFont().SetSize(50));
 
         SUBCASE("Normal") {
         }
@@ -602,10 +608,11 @@ TEST_CASE("Framebuffer")
         }
 
         CHECK_NOTHROW(text.Reload());
-        CHECK_NOTHROW(panel->Update(text, Color::White));
+        CHECK_NOTHROW(panel->Fill(Color::None).Update(text, Color::Yellow));
+        CHECK_NOTHROW(panel->SetDestination(text.GetPosition(r)));
         CHECK_NOTHROW(renderer.Fill(Color::Black));
-        CHECK_NOTHROW(renderer.DrawRect(Color::White, r2));
-        CHECK_NOTHROW(renderer.Render(*panel));
+        CHECK_NOTHROW(renderer.DrawRect(Color::Green, r2));
+        CHECK_NOTHROW(renderer.Blit(*panel));
         CHECK_NOTHROW(renderer.Present());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
@@ -622,7 +629,7 @@ TEST_CASE("Framebuffer")
         texture.SetBlendOperation(GfxBlendOperation::Copy);
 
         CHECK_NOTHROW(texture.Update(testImgMap, Color::White));
-        CHECK_NOTHROW(renderer.Render(texture));
+        CHECK_NOTHROW(renderer.Blit(texture));
         CHECK_NOTHROW(renderer.Present());
     }
 
@@ -640,7 +647,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(canvas.DrawRectangle(Rect(100,100, 100, 100), blue, true));
             CHECK_NOTHROW(canvas.DrawRectangle(Rect(170,100, 100, 100), green, true));
             CHECK_NOTHROW(texture.Update(canvas, Color::White));
-            CHECK_NOTHROW(renderer.Render(texture));
+            CHECK_NOTHROW(renderer.Blit(texture));
             CHECK_NOTHROW(renderer.Present());
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }

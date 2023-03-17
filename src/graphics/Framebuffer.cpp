@@ -123,18 +123,4 @@ void Framebuffer::swapBuffer()
     }
 }
 
-
-void Framebuffer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
-{
-    mrGfxHal.SetPixel(mScreenSurfaces[mCurrentSurface], aX, aY, arColor);
-}
-
-uint32_t Framebuffer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
-{
-    if (aFront) {
-        return mrGfxHal.GetPixel(mScreenSurfaces[(mCurrentSurface) ? 0 : 1], aX, aY);
-    }
-    return mrGfxHal.GetPixel(mScreenSurfaces[mCurrentSurface], aX, aY);
-}
-
 } // namespace rsp::graphics

@@ -198,7 +198,7 @@ void Control::Render(Renderer &arRenderer) const
     }
 
     for (const TexturePtr_t& texture : style.mTextures) {
-        arRenderer.Render(*texture);
+        arRenderer.Blit(*texture);
     }
 
     for (Control* child : mChildren) {

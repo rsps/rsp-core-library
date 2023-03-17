@@ -41,7 +41,7 @@ Renderer& SWRenderer::Fill(Color aColor, Optional<const Rect> aDestination)
     return *this;
 }
 
-Renderer& SWRenderer::Render(const Texture &arTexture)
+Renderer& SWRenderer::Blit(const Texture &arTexture)
 {
     auto &swt = dynamic_cast<const SWTexture&>(arTexture);
     mrGfxHal.Blit(mScreenSurfaces[mCurrentSurface], *swt.mpSurface, swt.mDestinationRect, swt.mSourceRect);
@@ -80,13 +80,16 @@ PixelData::ColorDepth SWRenderer::GetColorDepth() const
 
 Renderer& SWRenderer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 {
-    Framebuffer::SetPixel(aX, aY, arColor);
+    mrGfxHal.SetPixel(mScreenSurfaces[mCurrentSurface], aX, aY, arColor);
     return *this;
 }
 
 uint32_t SWRenderer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
 {
-    return Framebuffer::GetPixel(aX, aY, aFront);
+    if (aFront) {
+        return mrGfxHal.GetPixel(mScreenSurfaces[(mCurrentSurface) ? 0 : 1], aX, aY);
+    }
+    return mrGfxHal.GetPixel(mScreenSurfaces[mCurrentSurface], aX, aY);
 }
 
 } /* namespace rsp::graphics::sw */

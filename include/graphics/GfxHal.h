@@ -45,7 +45,7 @@ struct VideoSurface
     GuiUnit_t mHeight = 0;
     int mRotation = 0; // Rotation of this surface. Only supports: 0, 90, 180, 270
     GfxBlendOperation mBlendOperation = GfxBlendOperation::Copy;
-    uint32_t mColorKey = Color::None;
+    uint32_t mColorKey = Color::None; // Value of transparent pixel on this surface (source key)
 };
 
 /**

@@ -19,14 +19,6 @@ Label& Label::SetCaption(const std::string &arCaption)
     return *this;
 }
 
-Label& Label::SetTextPosition(const Point &arPoint)
-{
-    Rect r = mText.GetArea();
-    r.MoveTo(arPoint);
-    mText.SetArea(r);
-    return *this;
-}
-
 Label& Label::SetVAlignment(Text::VAlign aVAlign)
 {
     mText.SetVAlignment(aVAlign);
@@ -49,11 +41,11 @@ Control& Label::SetOrigin(const Point &arPoint)
     return *this;
 }
 
-Label& Label::SetTextArea(const Rect &arArea)
-{
-    mText.SetArea(arArea);
-    return *this;
-}
+//Label& Label::SetTextArea(const Rect &arArea)
+//{
+//    mText.SetArea(arArea);
+//    return *this;
+//}
 
 Label& Label::SetFontSize(int aSizePx)
 {
@@ -64,16 +56,32 @@ Label& Label::SetFontSize(int aSizePx)
 void Label::refresh()
 {
     if (mText.IsDirty()) {
-        mText.GetFont().SetColor(mStyles[mState].mForegroundColor);
         mText.Reload();
         Invalidate();
     }
 }
 
-//void Label::paint(Canvas &arCanvas, const Style &arStyle)
-//{
-//    Control::paint(arCanvas, arStyle);
-//    arCanvas.DrawPixelData(Point(0,0), mText);
-//}
+void Label::update()
+{
+    auto tr = mText.GetRect();
+    if (!mpTexture || (tr != Rect(0, 0, mpTexture->GetWidth(), mpTexture->GetHeight()))) {
+        mpTexture = Texture::Create(tr.GetWidth(), tr.GetHeight());
+        mpTexture->SetBlendOperation(GfxBlendOperation::ColorKey);
+    }
+
+    mpTexture->Fill(Color::None).Update(mText.GetPixelData(), mStyles[mState].mForegroundColor);
+
+    tr &= GetArea().MoveTo({0,0});
+    mpTexture->SetDestination(mText.GetPosition(mArea))
+        .SetSourceRect(tr);
+}
+
+void Label::Render(Renderer &arRenderer) const
+{
+    Control::Render(arRenderer);
+    if (mpTexture) {
+        arRenderer.Blit(*mpTexture);
+    }
+}
 
 } /* namespace rsp::graphics */

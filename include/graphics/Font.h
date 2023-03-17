@@ -112,25 +112,25 @@ public:
      * \param arColor
      * \return Reference to this for fluent calls.
      */
-    Font& SetColor(const Color &arColor);
+//    Font& SetColor(const Color &arColor);
     /**
      * Get the current color of the font.
      *
      * \return Color
      */
-    Color GetColor() const { return mColor; }
+//    Color GetColor() const { return mColor; }
 
     /**
      * \brief Set the background color for the characters in the font
      * \param arColor
      * \return self
      */
-    Font& SetBackgroundColor(const Color &arColor);
+//    Font& SetBackgroundColor(const Color &arColor);
     /**
      * \brief Get the current background color for the characters in the font.
      * \return Color
      */
-    Color GetBackgroundColor() const { return mBackgroundColor; }
+//    Color GetBackgroundColor() const { return mBackgroundColor; }
 
     /**
      * Set the style of the font.
@@ -148,8 +148,8 @@ public:
 
 protected:
     static std::string mDefaultFontName;
-    Color mColor;
-    Color mBackgroundColor = Color::None;
+//    Color mColor;
+//    Color mBackgroundColor = Color::None;
     std::shared_ptr<FontRawInterface> mpImpl;
 
     static std::shared_ptr<FontRawInterface> MakePimpl(const std::string &arFontName);

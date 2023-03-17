@@ -44,7 +44,7 @@ Text& Text::SetArea(const Rect &arRect)
 {
     if (mRect != arRect) {
         mDirty = true;
-        Init(arRect.GetWidth(), arRect.GetHeight(), ColorDepth::RGBA, nullptr);
+        Init(arRect.GetWidth(), arRect.GetHeight(), ColorDepth::Alpha, nullptr);
     }
     return *this;
 }
@@ -98,7 +98,7 @@ void Text::scaleToFit()
         mFont.SetSize(width, height);
 
         mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
-        calcBoundingRect(mpGlyphs);
+        mBoundingRect = mpGlyphs->mBoundingRect;
 
         Logger::GetDefault().Debug() << "Area: " << mRect << ", Bounding Rect: " << mBoundingRect;
 
@@ -120,92 +120,17 @@ void Text::scaleToFit()
     Logger::GetDefault().Debug() << "scaleToFit done: " << done << " attempts: " << attempts;
 }
 
-void Text::calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs)
-{
-    mBoundingRect = apGlyphs->mBoundingRect;
-//    alignGlyphs();
-    return;
-
-//    int w = 0;
-//    int h = apGlyphs->mLineHeight;
-//    int line_count = 1;
-//    int line_width = 0;
-//    for (unsigned i=0 ; i < apGlyphs->GetCount(); ++i) {
-//        const Glyph &glyph = apGlyphs->GetGlyph(i);
-//        if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
-//            line_count++;
-//            if (w > line_width) {
-//                line_width = w;
-//            }
-//            w = 0;
-//        }
-//        else {
-//            w += glyph.mAdvanceX; //.mWidth;
-//        }
-//    }
-//    if (w > line_width) {
-//        line_width = w;
-//    }
-//
-//    mBoundingRect = Rect(0, 0, line_width, (h * line_count) + ((line_count - 1) * mLineSpacing));
-//    alignGlyphs();
-//
-//    if (apGlyphs->GetCount()) {
-//        const Glyph &glyph = apGlyphs->GetGlyph(0);
-//        mBoundingRect.MoveTo(Point(glyph.mLeft, glyph.mTop));
-//    }
-}
-
 void Text::loadGlyphs()
 {
+    Logger::GetDefault().Debug() << "Loading glyphs. ScaleToFit=" << mScaleToFit;
     if (mScaleToFit) {
         scaleToFit();
     }
     else {
         mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
-        calcBoundingRect(mpGlyphs);
+        mBoundingRect = mpGlyphs->mBoundingRect;
+        SetArea(mBoundingRect);
     }
-}
-
-void Text::alignGlyphs()
-{
-    if (mVAlign == VAlign::Top && mHAlign == HAlign::Left) {
-        mBoundingRect.MoveTo(mRect.GetTopLeft());
-        return;
-    }
-
-    int voffset = 0;
-    int hoffset = 0;
-    switch(mVAlign) {
-        default:
-        case VAlign::Top:
-            voffset = 0;
-            break;
-        case VAlign::Center:
-            voffset = (GetHeight() - mBoundingRect.GetHeight()) / 2;
-            break;
-        case VAlign::Bottom:
-            voffset = (GetHeight() - mBoundingRect.GetHeight());
-            break;
-    }
-    switch(mHAlign) {
-        default:
-        case HAlign::Left:
-            hoffset = 0;
-            break;
-        case HAlign::Center:
-            hoffset = (GetWidth() - mBoundingRect.GetWidth()) / 2;
-            break;
-        case HAlign::Right:
-            hoffset = (GetWidth()- mBoundingRect.GetWidth());
-            break;
-    }
-    for (unsigned i=0 ; i < mpGlyphs->GetCount() ; ++i) {
-        Glyph &glyph = mpGlyphs->GetGlyph(i);
-        glyph.mTop += voffset;
-        glyph.mLeft += hoffset;
-    }
-    mBoundingRect.MoveTo(mRect.GetTopLeft() + Point(hoffset, voffset));
 }
 
 Point Text::GetPosition(const Rect &arArea) const
@@ -241,13 +166,13 @@ Point Text::GetPosition(const Rect &arArea) const
 
 void Text::draw()
 {
-    Fill(GetFont().GetBackgroundColor());
-    Color aColor = GetFont().GetColor();
     auto &glyphs = GetGlyphs();
     if (!glyphs) {
         std::cout << "No glyphs to paint!!" << std::endl;
         return;
     }
+    Color aColor = Color::None;
+    Fill(aColor); // TODO: Test if this is faster than writing alpha=0 via SetPixel below.
     for (unsigned i=0; i < glyphs->GetCount() ; ++i) {
         Glyph &glyph = glyphs->GetGlyph(i);
         GuiUnit_t py = GuiUnit_t(glyph.mTop);
@@ -267,7 +192,6 @@ void Text::draw()
             py++;
         }
     }
-
 }
 
 }

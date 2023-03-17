@@ -33,6 +33,9 @@ public:
 
     virtual ~Texture() {}
 
+    virtual GuiUnit_t GetHeight() const = 0;
+    virtual GuiUnit_t GetWidth() const = 0;
+
     /**
      * \brief Fill this texture with the given color
      * \param aColor

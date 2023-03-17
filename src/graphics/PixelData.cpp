@@ -8,6 +8,8 @@
  * \author      Steffen Brummer
  */
 
+#include <cstring>
+#include <cstdlib>
 #include <graphics/PixelData.h>
 #include <posix/FileSystem.h>
 #include <utils/CppObjectFile.h>
@@ -333,7 +335,7 @@ void PixelData::Fill(Color aColor)
         }
 
         case ColorDepth::Alpha:
-            std::fill_n(mData.data(), mData.size(), aColor.GetAlpha());
+            std::memset(mData.data(), int(aColor.GetAlpha()), mData.size());
             break;
 
         case ColorDepth::Monochrome:

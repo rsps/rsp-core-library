@@ -56,7 +56,7 @@ void Font::RegisterFont(const char *apFileName)
 
 
 Font::Font(FontStyles aStyle)
-    : mColor(Color::White),
+    : /*mColor(Color::White),*/
       mpImpl(MakePimpl(mDefaultFontName))
 {
     SetStyle(aStyle);
@@ -64,7 +64,7 @@ Font::Font(FontStyles aStyle)
 }
 
 Font::Font(const std::string &arFontName, FontStyles aStyle)
-    : mColor(Color::White),
+    : /*mColor(Color::White),*/
       mpImpl(MakePimpl(arFontName))
 {
     SetStyle(aStyle);
@@ -91,17 +91,17 @@ int Font::GetSize() const
     return mpImpl->GetSize();
 }
 
-Font& Font::SetColor(const Color &arColor)
-{
-    mColor = arColor;
-    return *this;
-}
-
-Font& Font::SetBackgroundColor(const Color &arColor)
-{
-    mBackgroundColor = arColor;
-    return *this;
-}
+//Font& Font::SetColor(const Color &arColor)
+//{
+//    mColor = arColor;
+//    return *this;
+//}
+//
+//Font& Font::SetBackgroundColor(const Color &arColor)
+//{
+//    mBackgroundColor = arColor;
+//    return *this;
+//}
 
 Font& Font::SetStyle(FontStyles aStyle)
 {
