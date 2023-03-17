@@ -184,6 +184,16 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
     mPixelData.GetPixelAt(0, 0, Color::White);
 }
 
+int BmpLoader::maskToIndex(uint32_t aMask)
+{
+    int result = 3;
+    while(aMask != 0xFF000000) {
+        aMask <<= 8;
+        result--;
+    }
+    return result;
+}
+
 Color BmpLoader::ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::uint32_t aY, std::size_t aPaddedRowSize)
 {
     Color pixel = 0;
@@ -217,29 +227,20 @@ Color BmpLoader::ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::ui
             pixel.SetAlpha(255);
             break;
 
-        case 32:
+        case 32: {
             apPixelData += (aY * aPaddedRowSize) + (aX * 4);
 //            std::cout << "CSType: " << mBmpHeader.v5.CSType[0] << mBmpHeader.v5.CSType[1] << mBmpHeader.v5.CSType[2] << mBmpHeader.v5.CSType[3] << std::endl;
-            if (std::memcmp(mBmpHeader.v5.CSType, "BGRs", 4) != 0) {
-                pixel.SetRed(apPixelData[2]);
-                pixel.SetGreen(apPixelData[1]);
-                pixel.SetBlue(apPixelData[0]);
-                pixel.SetAlpha(apPixelData[3]);
-            }
-            else {
-                pixel.SetRed(apPixelData[3]);
-                pixel.SetGreen(apPixelData[2]);
-                pixel.SetBlue(apPixelData[1]);
-                pixel.SetAlpha(apPixelData[0]);
-            }
-//            std::cout << "ReadPixel(" << aX << ", " << aY << ", 32) -> "
-//                << std::hex << std::setw(2) << std::setfill('0')
-//                << static_cast<int>(pixel.GetAlpha()) << ", "
-//                << static_cast<int>(pixel.GetRed()) << ", "
-//                << static_cast<int>(pixel.GetGreen()) << ", "
-//                << static_cast<int>(pixel.GetBlue()) << std::endl;
-//            exit (1);
+            int red_index = maskToIndex(mBmpHeader.v5.RedMask);
+            int green_index = maskToIndex(mBmpHeader.v5.GreenMask);
+            int blue_index = maskToIndex(mBmpHeader.v5.BlueMask);
+            int alpha_index = maskToIndex(mBmpHeader.v5.AlphaMask);
+
+            pixel.SetRed(apPixelData[red_index]);
+            pixel.SetGreen(apPixelData[green_index]);
+            pixel.SetBlue(apPixelData[blue_index]);
+            pixel.SetAlpha(apPixelData[alpha_index]);
             break;
+        }
 
         default:
             THROW_WITH_BACKTRACE1(rsp::exceptions::NotImplementedException, "BmpLoader does not support images with a color depth of " + std::to_string(int(mBmpHeader.v1.bitsPerPixel)) + " bpp");
