@@ -12,23 +12,35 @@
 
 namespace rsp::graphics {
 
-//Button::Button()
-//    : Control(rsp::utils::MakeTypeInfo<Button>())
-//{
-//}
-//
-//Button::Button(const rsp::utils::TypeInfo &arInfo)
-//    : Control(arInfo)
-//{
-//}
 
+Button& Button::Setup(Rect aTouchArea, Rect aArea, Point aPosition)
+{
+    SetArea(aArea.MoveTo(aPosition));
+    SetTouchArea(aTouchArea);
+    SetTexturePosition(aPosition);
+    return *this;
+}
 
-//void Button::paint(Canvas &arCanvas, const Style &arStyle)
-//{
-//    Button::paint(arCanvas, arStyle);
-//    arStyle.mBackground.Paint(GetOrigin(), arCanvas);
-//    arStyle.mForeground.Paint(GetOrigin(), arCanvas);
-//    arCanvas.DrawText(mText, arStyle.mForegroundColor);
-//}
+Button& Button::Background(Control::States aState, Color aColor, OptionalPixels_t aPixels, Point aOffset)
+{
+    Style& style = GetStyle(aState);
+    if (aPixels) {
+        style.mTextures.push_back(Texture::Create(*aPixels, aColor));
+        style.mTextures.back()->SetOffset(aOffset);
+    }
+    style.mBackgroundColor = aColor;
+    return *this;
+}
+
+Button& Button::Foreground(Control::States aState, Color aColor, OptionalPixels_t aPixels, Point aOffset)
+{
+    Style& style = GetStyle(aState);
+    if (aPixels) {
+        style.mTextures.push_back(Texture::Create(*aPixels, aColor));
+        style.mTextures.back()->SetOffset(aOffset);
+    }
+    style.mForegroundColor = aColor;
+    return *this;
+}
 
 } /* namespace rsp::graphics */

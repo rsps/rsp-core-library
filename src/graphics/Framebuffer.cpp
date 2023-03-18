@@ -80,10 +80,10 @@ Framebuffer::Framebuffer()
         THROW_SYSTEM("Framebuffer shared memory mapping failed");
     }
 
-    mScreenSurfaces[0].mpPhysAddr = VideoSurface::PixelPtr_t(fb, [screensize](uint32_t *p) noexcept {
+    mScreenSurfaces[0].mpVirtAddr = VideoSurface::PixelPtr_t(fb, [screensize](uint32_t *p) noexcept {
         munmap(p, screensize*2);
     });
-    mScreenSurfaces[1].mpPhysAddr = VideoSurface::PixelPtr_t(fb + (screensize / sizeof(std::uint32_t)), [](uint32_t apPtr[]) noexcept {});
+    mScreenSurfaces[1].mpVirtAddr = VideoSurface::PixelPtr_t(fb + (screensize / sizeof(std::uint32_t)), [](uint32_t apPtr[]) noexcept {});
 
     if (mVariableInfo.yoffset == 0) {
         mCurrentSurface = 1;

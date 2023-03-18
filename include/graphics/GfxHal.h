@@ -36,11 +36,8 @@ struct VideoSurface
 {
     using PixelPtr_t = std::unique_ptr<uint32_t[], std::function<void(uint32_t[])> >;
 
-    VideoSurface() {}
-    VideoSurface(GuiUnit_t aWidth, GuiUnit_t aHeight);
-
-    PixelPtr_t mpPhysAddr{}; // Pointer to 32-bit ARGB pixels
-    uintptr_t mRowPitch = 0; // Number of bytes per row in physical memory (alignment vs. width)
+    PixelPtr_t mpVirtAddr{}; // Pointer to 32-bit ARGB pixels, accessible from user space
+    uintptr_t mRowPitch = 0; // Number of bytes per row in physical memory (alignment vs. pixel width)
     GuiUnit_t mWidth = 0;
     GuiUnit_t mHeight = 0;
     int mRotation = 0; // Rotation of this surface. Only supports: 0, 90, 180, 270
@@ -58,8 +55,7 @@ struct VideoSurface
 class GfxHal
 {
 public:
-    template <class T>
-    using Optional = rsp::utils::OptionalPtr<T>;
+    using OptionalRect = rsp::utils::OptionalPtr<const Rect>;
 
     /**
      * \brief Get an instance. Can be a static factory or just a facade.
@@ -72,16 +68,18 @@ public:
     /**
      * \brief Allocate a buffer in video memory
      *
-     * This fills out the attributes of the given VideoSurface.
-     * The mpPhysAddr pointer is allocated with a specialized deallocator so
+     * This allocates the requested amount of video memory returns a VideoSurface object with
+     * the attributes of allocation.
+     * The mpVirtAddr unique pointer is allocated with a specialized deallocator so
      * standard smart pointer operations work on designated memory.
-     * To free it, simply destroy the VideoSurface or set mpPhysAddr to null.
+     * To free it, simply destroy the VideoSurface or set mpVirtAddr to null.
      *
      * \param arSurface The surface struct to fill
      * \param aWidth
      * \param aHeight
+     * \return shared_ptr to VideoSurface, multiple references can be made to the same physical surface, e.g. textures used by many components.
      */
-    virtual void Alloc(VideoSurface &arSurface, int aWidth, int aHeight) = 0;
+    virtual std::shared_ptr<VideoSurface> Alloc(int aWidth, int aHeight) = 0;
 
     /**
      * \brief Copy an area onto another
@@ -91,7 +89,7 @@ public:
      * \param aDstRect Optional area on destination surface, if null the entire destination is filled
      * \param aSrcRect Optional area from source surface, if null, the entire source is copied
      */
-    virtual void Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<const Rect> aDstRect = nullptr, Optional<const Rect> aSrcRect = nullptr) = 0;
+    virtual void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalRect aDstRect = nullptr, OptionalRect aSrcRect = nullptr) = 0;
 
     /**
      * \brief Copy an area of PixelData into a VideoSurface
@@ -100,7 +98,7 @@ public:
      * \param aDstRect
      * \param aSrcRect
      */
-    virtual void CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint32_t aColor, Optional<const Rect> aDstRect = nullptr, Optional<const Rect> aSrcRect = nullptr) = 0;
+    virtual void CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint32_t aColor, OptionalRect aDstRect = nullptr, OptionalRect aSrcRect = nullptr) = 0;
 
     /**
      * \brief Draw a rectangle with single pixel line width in a given color
@@ -118,7 +116,7 @@ public:
      * \param aColor
      * \param aDest Optional area to fill on destination, if not given the entire surface is filled
      */
-    virtual void Fill(VideoSurface &arDst, uint32_t aColor, Optional<const Rect> aDest = nullptr) = 0;
+    virtual void Fill(VideoSurface &arDst, uint32_t aColor, OptionalRect aDest = nullptr) = 0;
 
     /**
      * \brief Set the value of a single pixel, with respect to the selected blend operation.
@@ -143,12 +141,6 @@ public:
      */
     virtual void Sync() = 0;
 };
-
-inline VideoSurface::VideoSurface(GuiUnit_t aWidth, GuiUnit_t aHeight)
-{
-    GfxHal::Get().Alloc(*this, aWidth, aHeight);
-}
-
 
 
 } /* namespace rsp::graphics */

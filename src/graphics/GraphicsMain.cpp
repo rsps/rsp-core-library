@@ -23,7 +23,7 @@ using namespace rsp::logging;
 namespace rsp::graphics
 {
 
-GraphicsMain::GraphicsMain(Renderer &arRenderer, GfxEvents &arEvents, SceneMap &arScenes)
+GraphicsMain::GraphicsMain(Renderer &arRenderer, GfxInputEvents &arEvents, SceneMap &arScenes)
     : mrRenderer(arRenderer),
       mrEvents(arEvents),
       mrScenes(arScenes)

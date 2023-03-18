@@ -15,6 +15,7 @@
 #include <string_view>
 #include <magic_enum.hpp>
 #include <exceptions/CoreException.h>
+#include <graphics/GfxInputEvents.h>
 #include <logging/Logger.h>
 #include <utils/ConstTypeInfo.h>
 #include <utils/Function.h>
@@ -23,7 +24,6 @@
 #include "Rect.h"
 #include "Renderer.h"
 #include "Style.h"
-#include "GfxEvents.h"
 
 #define GFXLOG(a) DLOG(a)
 //#define GFXLOG(a)

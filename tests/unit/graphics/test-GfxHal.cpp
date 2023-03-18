@@ -27,16 +27,19 @@ TEST_CASE("GfxHal")
     constexpr const uint32_t cSize   = (cWidth * cHeight);
     constexpr const uint32_t cByteSize   = (cSize * sizeof(uint32_t));
 
-    CHECK_NOTHROW(VideoSurface dummy(cWidth, cHeight));
-    VideoSurface src(cWidth, cHeight);
-    VideoSurface dst(cWidth, cHeight);
-
     CHECK_NOTHROW(GfxHal::Get());
     GfxHal& gfx = GfxHal::Get();
 
+    CHECK_NOTHROW(gfx.Alloc(cWidth, cHeight));
+    auto surface1 = gfx.Alloc(cWidth, cHeight);
+    auto surface2 = gfx.Alloc(cWidth, cHeight);
+
+    VideoSurface &src = *surface1;
+    VideoSurface &dst = *surface2;
+
     CHECK_NOTHROW(
     for (uint32_t i = 0 ; i < cSize ; ++i) {
-        src.mpPhysAddr.get()[i] = 0xAA000000 + i;
+        src.mpVirtAddr.get()[i] = 0xAA000000 + i;
     });
 
     SUBCASE("Surface") {
@@ -49,100 +52,100 @@ TEST_CASE("GfxHal")
     SUBCASE("Copy") {
         SUBCASE("Blit") {
             CHECK_NOTHROW(gfx.Blit(dst, src));
-            CHECK_MESSAGE(std::memcmp(dst.mpPhysAddr.get(), src.mpPhysAddr.get(), cByteSize) == 0,
-                "src\n" << ToHex(src.mpPhysAddr.get(), cSize) << "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(std::memcmp(dst.mpVirtAddr.get(), src.mpVirtAddr.get(), cByteSize) == 0,
+                "src\n" << ToHex(src.mpVirtAddr.get(), cSize) << "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
         }
 
         SUBCASE("DrawRect") {
             CHECK_NOTHROW(gfx.DrawRect(dst, 0xFFFFFFFF, Rect(0, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 3518719063u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 3518719063u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.DrawRect(dst, 0x11111111, Rect(1, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2652070992u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 2652070992u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.DrawRect(dst, 0x22222222, Rect(0, 1, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2871923838u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 2871923838u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.DrawRect(dst, 0x33333333, Rect(-1, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2431894754u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 2431894754u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.DrawRect(dst, 0x44444444, Rect(0, -1, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 1697079512u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 1697079512u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.DrawRect(dst, 0x55555555, Rect(-4, -25, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 1697079512u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 1697079512u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.DrawRect(dst, 0x66666666, Rect(1, 1, 2, 23)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 259604865u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 259604865u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
     }
 
         SUBCASE("Fill") {
             CHECK_NOTHROW(gfx.Fill(dst, 0, Rect(0, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 1176636684u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 1176636684u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.Fill(dst, 0xAAAAAAAA, Rect(1, 1, 2, 23)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 1472934187u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 1472934187u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.Fill(dst, 0xBBBBBBBB, Rect(-1, -1, 2, 8)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 3186885033u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 3186885033u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.Fill(dst, 0xCCCCCCCC, Rect(3, 18, 2, 8)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 522257633u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 522257633u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
         }
     }
 
     SUBCASE("SourceAlpha") {
         CHECK_NOTHROW(gfx.Fill(src, 0xAAFFFFFF, Rect(0, 0, 4, 25)));
-        CHECK_MESSAGE(Crc32::Calc(src.mpPhysAddr.get(), cByteSize) == 1438074527u, "src\n" << ToHex(src.mpPhysAddr.get(), cSize));
+        CHECK_MESSAGE(Crc32::Calc(src.mpVirtAddr.get(), cByteSize) == 1438074527u, "src\n" << ToHex(src.mpVirtAddr.get(), cSize));
 
         CHECK_NOTHROW(gfx.Fill(dst, 0xFF000000, Rect(0, 0, 4, 25)));
-        CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 4178597885u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+        CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 4178597885u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
         src.mBlendOperation = GfxBlendOperation::SourceAlpha;
         dst.mBlendOperation = GfxBlendOperation::SourceAlpha;
 
         SUBCASE("Blit") {
             CHECK_NOTHROW(gfx.Blit(dst, src));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2240954413u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 2240954413u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
         }
 
         SUBCASE("DrawRect") {
             CHECK_NOTHROW(gfx.DrawRect(dst, 0xAAFFFFFF, Rect(0, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 1819834801u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 1819834801u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.DrawRect(dst, 0x11111111, Rect(1, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 1885296249u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 1885296249u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.DrawRect(dst, 0x66666666, Rect(1, 1, 2, 23)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 4028978613u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 4028978613u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
     }
 
         SUBCASE("Fill") {
             CHECK_NOTHROW(gfx.Fill(dst, 0xAAFFFFFF, Rect(0, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 1438074527u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 1438074527u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.Fill(dst, 0x11111111, Rect(1, 1, 2, 23)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 396653420u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 396653420u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.Fill(dst, 0x66666666, Rect(-1, -1, 2, 8)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 3786681453u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 3786681453u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.Fill(dst, 0xCCCCCCCC, Rect(3, 18, 2, 8)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2543531643u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 2543531643u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
         }
     }
 
     SUBCASE("ColorKey") {
         CHECK_NOTHROW(gfx.Fill(src, 0xFFFFFFFF, Rect(0, 0, 4, 25)));
-        CHECK_MESSAGE(Crc32::Calc(src.mpPhysAddr.get(), cByteSize) == 2307493135u, "src\n" << ToHex(src.mpPhysAddr.get(), cSize));
+        CHECK_MESSAGE(Crc32::Calc(src.mpVirtAddr.get(), cByteSize) == 2307493135u, "src\n" << ToHex(src.mpVirtAddr.get(), cSize));
 
         CHECK_NOTHROW(gfx.Fill(src, 0xFF555555, Rect(1, 1, 2, 23)));
-        CHECK_MESSAGE(Crc32::Calc(src.mpPhysAddr.get(), cByteSize) == 1190816953u, "src\n" << ToHex(src.mpPhysAddr.get(), cSize));
+        CHECK_MESSAGE(Crc32::Calc(src.mpVirtAddr.get(), cByteSize) == 1190816953u, "src\n" << ToHex(src.mpVirtAddr.get(), cSize));
 
         CHECK_NOTHROW(gfx.Fill(dst, 0xFF000000, Rect(0, 0, 4, 25)));
-        CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 4178597885u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+        CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 4178597885u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
         src.mBlendOperation = GfxBlendOperation::ColorKey;
         src.mColorKey = 0xFF555555;
@@ -151,66 +154,67 @@ TEST_CASE("GfxHal")
 
         SUBCASE("Blit") {
             CHECK_NOTHROW(gfx.Blit(dst, src));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 558079074u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 558079074u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
         }
 
         SUBCASE("DrawRect") {
             CHECK_NOTHROW(gfx.DrawRect(dst, 0xFF222222, Rect(0, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2681254777u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 2681254777u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.DrawRect(dst, 0xFF555555, Rect(1, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2681254777u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 2681254777u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.DrawRect(dst, 0x66666666, Rect(1, 1, 2, 23)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2050463010u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 2050463010u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
         }
 
         SUBCASE("Fill") {
             CHECK_NOTHROW(gfx.Fill(dst, 0xFFFFFFFF, Rect(0, 0, 4, 25)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2307493135u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 2307493135u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.Fill(dst, 0xFF555555, Rect(1, 1, 2, 23)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 1190816953u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 1190816953u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.Fill(dst, 0x66666666, Rect(-1, -1, 2, 8)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2910689584u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 2910689584u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
             CHECK_NOTHROW(gfx.Fill(dst, 0xCCCCCCCC, Rect(3, 18, 2, 8)));
-            CHECK_MESSAGE(Crc32::Calc(dst.mpPhysAddr.get(), cByteSize) == 2244532322u, "dst\n" << ToHex(dst.mpPhysAddr.get(), cSize));
+            CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 2244532322u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
         }
     }
 
-    CHECK_NOTHROW(dst.mpPhysAddr = nullptr);
-    CHECK_NOTHROW(src.mpPhysAddr = nullptr);
+    // Try to free video memory
+    CHECK_NOTHROW(dst.mpVirtAddr = nullptr);
+    CHECK_NOTHROW(src.mpVirtAddr = nullptr);
 
     SUBCASE("Performance") {
-        CHECK_NOTHROW(gfx.Alloc(src, 480, 800));
-        CHECK_NOTHROW(gfx.Alloc(dst, 480, 800));
+        auto source = gfx.Alloc(480, 800);
+        auto dest = gfx.Alloc(480, 800);
 
         CHECK_NOTHROW(
         for (uint32_t y = 0 ; y < 800 ; ++y) {
             uint32_t line = y * (src.mRowPitch / sizeof(uint32_t));
             for (uint32_t x = 0 ; x < 480 ; ++x) {
-                src.mpPhysAddr.get()[line + x] = 0xFF7F00FF;
+                source->mpVirtAddr.get()[line + x] = 0xFF7F00FF;
             }
         });
 
         SUBCASE("Copy") {
-            src.mBlendOperation = GfxBlendOperation::Copy;
+            source->mBlendOperation = GfxBlendOperation::Copy;
         }
 
         SUBCASE("SourceAlpha") {
-            src.mBlendOperation = GfxBlendOperation::SourceAlpha;
+            source->mBlendOperation = GfxBlendOperation::SourceAlpha;
         }
 
         SUBCASE("ColorKey") {
-            src.mBlendOperation = GfxBlendOperation::ColorKey;
-            src.mColorKey = Color::White;
+            source->mBlendOperation = GfxBlendOperation::ColorKey;
+            source->mColorKey = Color::White;
         }
 
         StopWatch sw;
         for (int i = 0; i < 1000 ; i++) {
-            CHECK_NOTHROW(gfx.Blit(dst, src));
+            CHECK_NOTHROW(gfx.Blit(*dest, *source));
         }
         float mps = ((480 * 800) / (sw.Elapsed<std::chrono::milliseconds>() + 1));
         MESSAGE(mps << " MP/s");

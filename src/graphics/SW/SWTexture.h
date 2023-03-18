@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_SW_SWTEXTURE_H_
-#define INCLUDE_GRAPHICS_SW_SWTEXTURE_H_
+#ifndef SRC_GRAPHICS_SW_SWTEXTURE_H_
+#define SRC_GRAPHICS_SW_SWTEXTURE_H_
 
 #include <graphics/GfxHal.h>
 #include <graphics/PixelData.h>
@@ -28,7 +28,7 @@ public:
     GuiUnit_t GetWidth() const override;
     GuiUnit_t GetHeight() const override;
 
-    Texture& Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr) override;
+    Texture& Fill(Color aColor, GfxHal::OptionalRect arRect = nullptr) override;
     Texture& Update(const PixelData &arPixelData, Color aColor) override;
     Texture& SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None) override;
     Texture& SetSourceRect(const Rect &arRect) override;
@@ -39,6 +39,8 @@ public:
     Rect GetDestinationRect() const override;
     const Rect& GetSourceRect() const override { return mSourceRect; }
 
+    rsp::graphics::Texture& Blit(const rsp::graphics::Texture &arTexture) override;
+    rsp::graphics::Texture& DrawRect(rsp::graphics::Color aColor, const rsp::graphics::Rect &arRect) override;
 
 protected:
     SWTexture(const SWTexture& arOther) = default;
@@ -53,4 +55,4 @@ protected:
 
 } /* namespace rsp::graphics::sw */
 
-#endif /* INCLUDE_GRAPHICS_SW_SWTEXTURE_H_ */
+#endif /* SRC_GRAPHICS_SW_SWTEXTURE_H_ */

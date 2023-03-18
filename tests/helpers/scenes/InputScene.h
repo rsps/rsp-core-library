@@ -18,7 +18,7 @@
 #include <graphics/Keyboard.h>
 #include <graphics/Label.h>
 #include <graphics/Scene.h>
-#include <graphics/GfxEvents.h>
+#include <graphics/GfxInputEvents.h>
 #include <graphics/Bitmap.h>
 
 namespace rsp::graphics {

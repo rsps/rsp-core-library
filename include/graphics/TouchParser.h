@@ -10,10 +10,10 @@
 #ifndef TOUCHPARSER_H
 #define TOUCHPARSER_H
 
+#include <graphics/GfxInputEvents.h>
 #include <fstream>
 #include <iostream>
 #include <posix/FileIO.h>
-#include <graphics/GfxEvents.h>
 
 namespace rsp::graphics
 {
@@ -44,10 +44,12 @@ std::ostream &operator<<(std::ostream &os, const RawTouchEvent &arTouchEvent);
  * flag readable to select or epoll. Reading the value could then return
  * 0 bytes if empty, so this could be done in one read operation.
  */
-class TouchParser: public GfxEvents
+class TouchParser: public GfxInputEvents, public rsp::utils::Singleton<TouchParser>
 {
 public:
-    TouchParser(const std::string &arPath = "/dev/input/event1");
+    static const char *mpDevicePath;
+
+    TouchParser();
     virtual ~TouchParser();
 
     /**

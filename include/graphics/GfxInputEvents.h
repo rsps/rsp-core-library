@@ -9,6 +9,7 @@
  */
 
 #include <chrono>
+#include <utils/Singleton.h>
 #include "Point.h"
 
 #ifndef INCLUDE_GRAPHICS_GFXEVENTS_H_
@@ -90,10 +91,12 @@ std::ostream &operator<<(std::ostream &os, const GfxEvent &arGfxEvent);
 /**
  * \brief Interface for GFX events parser
  */
-class GfxEvents
+class GfxInputEvents
 {
 public:
-    virtual ~GfxEvents() {}
+    static GfxInputEvents& Get();
+
+    virtual ~GfxInputEvents() {}
 
     /**
      * \brief Parse input from event driver

@@ -10,8 +10,8 @@
 
 #include <doctest.h>
 #include <graphics/Control.h>
+#include <graphics/Framebuffer.h>
 #include <graphics/Renderer.h>
-#include <graphics/SW/SWRenderer.h>
 #include <posix/FileSystem.h>
 #include <TestHelpers.h>
 

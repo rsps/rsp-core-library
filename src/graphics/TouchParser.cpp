@@ -9,12 +9,22 @@
  */
 
 #include <exceptions/CoreException.h>
-#include <graphics/SW/TouchParser.h>
+#include <graphics/TouchParser.h>
 #include <linux/input.h>
 #include <magic_enum.hpp>
 
 namespace rsp::graphics
 {
+
+GfxInputEvents& GfxInputEvents::Get()
+{
+    if (!TouchParser::HasInstance()) {
+        TouchParser::Create();
+    }
+    return rsp::utils::Singleton<TouchParser>::Get();
+}
+
+
 
 class NoInputData : public exceptions::CoreException
 {
@@ -37,10 +47,12 @@ std::ostream &operator<<(std::ostream &os, const GfxEvent &arGfxEvent)
     return os;
 }
 
-TouchParser::TouchParser(const std::string &arPath)
+const char *TouchParser::mpDevicePath = "/dev/input/event1";
+
+TouchParser::TouchParser()
 {
-    if (arPath.length()) {
-        mTouchDevice.Open(arPath, std::ifstream::binary);
+    if (mpDevicePath) {
+        mTouchDevice.Open(mpDevicePath, std::ifstream::binary);
     }
 }
 

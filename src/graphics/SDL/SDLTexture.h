@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_SDL_SDLTEXTURE_H_
-#define INCLUDE_GRAPHICS_SDL_SDLTEXTURE_H_
+#ifndef SRC_GRAPHICS_SDL_SDLTEXTURE_H_
+#define SRC_GRAPHICS_SDL_SDLTEXTURE_H_
 
 #include <graphics/Texture.h>
 
@@ -22,4 +22,4 @@ public:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_SDL_SDLTEXTURE_H_ */
+#endif /* SRC_GRAPHICS_SDL_SDLTEXTURE_H_ */

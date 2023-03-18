@@ -10,11 +10,11 @@
 #ifndef GRAPHICSMAIN_H
 #define GRAPHICSMAIN_H
 
+#include <graphics/GfxInputEvents.h>
 #include <graphics/Renderer.h>
 #include <messaging/Subscriber.h>
 #include <messaging/Broker.h>
 #include <graphics/SceneMap.h>
-#include <graphics/GfxEvents.h>
 
 namespace rsp::graphics
 {
@@ -22,7 +22,7 @@ namespace rsp::graphics
 class GraphicsMain
 {
 public:
-    GraphicsMain(Renderer &arRenderer, GfxEvents &arEvents, SceneMap &arScenes);
+    GraphicsMain(Renderer &arRenderer, GfxInputEvents &arEvents, SceneMap &arScenes);
     GraphicsMain(const GraphicsMain&) = default;
     ~GraphicsMain();
 
@@ -66,7 +66,7 @@ public:
 
 protected:
     Renderer &mrRenderer;
-    GfxEvents &mrEvents;
+    GfxInputEvents &mrEvents;
     SceneMap &mrScenes;
     bool mTerminated = false;
     std::uint32_t mNextScene = 0;

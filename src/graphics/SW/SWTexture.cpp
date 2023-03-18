@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/SW/SWTexture.h>
+#include "SWTexture.h"
 
 namespace rsp::graphics {
 
@@ -46,10 +46,23 @@ SWTexture::SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestPos
       mDestinationPos(arDestPos),
       mDestinationOffset(arDestOffset)
 {
-    mpSurface = std::make_shared<VideoSurface>(aWidth, aHeight);
+    mpSurface = mrGfxHal.Alloc(aWidth, aHeight);
 }
 
-Texture& SWTexture::Fill(Color aColor, GfxHal::Optional<const Rect> aRect)
+rsp::graphics::Texture& SWTexture::Blit(const rsp::graphics::Texture &arTexture)
+{
+    auto &swt = dynamic_cast<const SWTexture&>(arTexture);
+    mrGfxHal.Blit(*mpSurface, *swt.mpSurface, swt.GetDestinationRect(), swt.mSourceRect);
+    return *this;
+}
+
+rsp::graphics::Texture& SWTexture::DrawRect(rsp::graphics::Color aColor, const rsp::graphics::Rect &arRect)
+{
+    mrGfxHal.DrawRect(*mpSurface, aColor, arRect);
+    return *this;
+}
+
+Texture& SWTexture::Fill(Color aColor, GfxHal::OptionalRect aRect)
 {
     mrGfxHal.Fill(*mpSurface, aColor, aRect);
     return *this;

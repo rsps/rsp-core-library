@@ -12,8 +12,8 @@
 #define SECONDSCENE_H
 
 #include <graphics/Button.h>
+#include <graphics/GfxInputEvents.h>
 #include <graphics/Scene.h>
-#include <graphics/GfxEvents.h>
 
 namespace rsp::graphics {
 

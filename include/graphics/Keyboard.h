@@ -121,9 +121,7 @@ class Key : public Button
 {
 public:
     Key();
-    Key& Setup(Rect aTouchArea, Rect aArea, Point aPosition, int aSymbol = 0);
-    Key& Background(Control::States aState, Color aColor, const PixelData *apPixels = nullptr, Point aOffset = {0,0});
-    Key& Foreground(Control::States aState, Color aColor, const PixelData *apPixels = nullptr, Point aOffset = {0,0});
+    Key& Symbol(int aSymbol);
 };
 
 class Keyboard: public Control

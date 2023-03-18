@@ -11,9 +11,9 @@
 #ifndef TESTS_HELPERS_TESTTOUCHPARSER_H_
 #define TESTS_HELPERS_TESTTOUCHPARSER_H_
 
-#include <graphics/GfxEvents.h>
+#include <graphics/GfxInputEvents.h>
 
-class TestTouchParser: public rsp::graphics::GfxEvents
+class TestTouchParser: public rsp::graphics::GfxInputEvents
 {
 public:
     TestTouchParser() {};

@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/SW/SWRenderer.h>
 #include <graphics/Font.h>
+#include <graphics/Framebuffer.h>
 #include <graphics/Scene.h>
 #include <messaging/Subscriber.h>
 #include <messaging/Publisher.h>
@@ -60,7 +60,8 @@ TEST_CASE("Scene Test")
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Framebuffer::mpDevicePath = p.c_str();
-    sw::SWRenderer& renderer = dynamic_cast<sw::SWRenderer&>(Renderer::Get());
+
+    auto& renderer = Renderer::Get();
 
     CHECK_NOTHROW(Scenes scenes_dummy);
     Scenes scenes;

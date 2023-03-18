@@ -15,7 +15,6 @@
 #include <graphics/Framebuffer.h>
 #include <graphics/Text.h>
 #include <graphics/Renderer.h>
-#include <graphics/SW/SWRenderer.h>
 #include <thread>
 #include <filesystem>
 #include <posix/FileSystem.h>

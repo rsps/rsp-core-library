@@ -15,9 +15,9 @@
 
 #include <doctest.h>
 #include <posix/FileSystem.h>
-#include <graphics/Label.h>
-#include <graphics/SW/SWRenderer.h>
+#include <graphics/Framebuffer.h>
 #include <graphics/GraphicsMain.h>
+#include <graphics/Label.h>
 #include <utils/Timer.h>
 #include <scenes/Scenes.h>
 #include <TestHelpers.h>

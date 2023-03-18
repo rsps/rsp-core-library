@@ -9,15 +9,15 @@
  */
 
 #include <doctest.h>
-#include <graphics/GfxEvents.h>
-#include <graphics/SW/TouchParser.h>
+#include <graphics/GfxInputEvents.h>
+#include <graphics/TouchParser.h>
 #include <vector>
 
 using namespace rsp::graphics;
 
 TEST_SUITE_BEGIN("Graphics");
 
-TEST_CASE("GfxEvents")
+TEST_CASE("GfxInputEvents")
 {
     // Arrange
     std::vector<EventTypes> inputs = {
@@ -50,7 +50,9 @@ TEST_CASE("GfxEvents")
         EventTypes::Drag,
         EventTypes::Lift};
     uint counter = 0;
-    TouchParser tp("testImages/touchTest.bin");
+    TouchParser::mpDevicePath = "testImages/touchTest.bin";
+
+    auto &tp = GfxInputEvents::Get();
 
     // Act
     GfxEvent event;

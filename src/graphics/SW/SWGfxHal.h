@@ -21,11 +21,11 @@ namespace rsp::graphics::sw {
 class SWGfxHal: public rsp::graphics::GfxHal, public rsp::utils::Singleton<SWGfxHal>
 {
 public:
-    void Alloc(VideoSurface &arSurface, int aWidth, int aHeight) override;
-    void Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<const Rect> aDstRect, Optional<const Rect> aSrcRect) override;
-    void CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint32_t aColor, Optional<const Rect> aDstRect, Optional<const Rect> aSrcRect) override;
+    std::shared_ptr<VideoSurface> Alloc(int aWidth, int aHeight) override;
+    void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalRect aDstRect, OptionalRect aSrcRect) override;
+    void CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint32_t aColor, OptionalRect aDstRect, OptionalRect aSrcRect) override;
     void DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect) override;
-    void Fill(VideoSurface &arDst, uint32_t aColor, Optional<const Rect> aDest) override;
+    void Fill(VideoSurface &arDst, uint32_t aColor, OptionalRect aDest) override;
     void Sync() override;
     uint32_t GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, bool aFrontBuffer) const override;
     void SetPixel(VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, uint32_t aColor) override;

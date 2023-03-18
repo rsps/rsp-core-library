@@ -37,10 +37,25 @@ public:
     virtual GuiUnit_t GetWidth() const = 0;
 
     /**
+     * \brief Blit another texture into this texture
+     * \param arTexture
+     * \return self
+     */
+    virtual Texture& Blit(const Texture &arTexture) = 0;
+
+    /**
+     * \brief Draw the given rectangle on this texture
+     * \param aColor
+     * \param arRect
+     * \return self
+     */
+    virtual Texture& DrawRect(Color aColor, const Rect &arRect) = 0;
+
+    /**
      * \brief Fill this texture with the given color
      * \param aColor
      */
-    virtual Texture& Fill(Color aColor, GfxHal::Optional<const Rect> arRect = nullptr) = 0;
+    virtual Texture& Fill(Color aColor, GfxHal::OptionalRect arRect = nullptr) = 0;
 
     /**
      * \brief Update this texture with content from the given pixel data

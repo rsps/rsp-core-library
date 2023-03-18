@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_SW_SWRENDERER_H_
-#define INCLUDE_GRAPHICS_SW_SWRENDERER_H_
+#ifndef SRC_GRAPHICS_SW_SWRENDERER_H_
+#define SRC_GRAPHICS_SW_SWRENDERER_H_
 
 #include <graphics/Framebuffer.h>
 #include <string>
@@ -39,4 +39,4 @@ public:
 
 } /* namespace rsp::graphics::sw */
 
-#endif /* INCLUDE_GRAPHICS_SW_SWRENDERER_H_ */
+#endif /* SRC_GRAPHICS_SW_SWRENDERER_H_ */

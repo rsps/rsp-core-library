@@ -11,8 +11,8 @@
 #ifdef USE_GFX_SW
 
 #include <cstring>
-#include <graphics/SW/SWRenderer.h>
-#include <graphics/SW/SWTexture.h>
+#include "SWRenderer.h"
+#include "SWTexture.h"
 #include <graphics/GfxHal.h>
 
 namespace rsp::graphics {
