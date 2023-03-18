@@ -23,7 +23,7 @@ class SWRenderer;
 class SWTexture: public rsp::graphics::Texture
 {
 public:
-    SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestPos);
+    SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestPos, const Point &arDestOffset);
 
     GuiUnit_t GetWidth() const override;
     GuiUnit_t GetHeight() const override;
@@ -33,9 +33,12 @@ public:
     Texture& SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None) override;
     Texture& SetSourceRect(const Rect &arRect) override;
     Texture& SetDestination(const Point &arPoint) override;
+    Point GetDestination() const override;
+    Texture& SetOffset(const Point &arPoint) override;
     std::unique_ptr<Texture> Clone() const override;
-    const Rect& GetDestinationRect() const override { return mDestinationRect; }
+    Rect GetDestinationRect() const override;
     const Rect& GetSourceRect() const override { return mSourceRect; }
+
 
 protected:
     SWTexture(const SWTexture& arOther) = default;
@@ -44,7 +47,8 @@ protected:
     friend SWRenderer;
     std::shared_ptr<VideoSurface> mpSurface{};
     Rect mSourceRect;
-    Rect mDestinationRect;
+    Point mDestinationPos;
+    Point mDestinationOffset;
 };
 
 } /* namespace rsp::graphics::sw */

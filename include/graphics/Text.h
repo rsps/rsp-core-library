@@ -16,6 +16,7 @@
 #include "Font.h"
 #include "Rect.h"
 #include "Style.h"
+#include <utils/OptionalPtr.h>
 
 namespace rsp::graphics {
 
@@ -88,20 +89,6 @@ public:
     Text& SetValue(const std::string &arValue);
 
     /**
-     * Getter for the area where the text is drawn on a canvas.
-     *
-     * \return
-     */
-    const Rect& GetArea() const;
-    /**
-     * Setter for the text area.
-     *
-     * \param arRect
-     * \return Reference to this for fluent calls.
-     */
-    Text& SetArea(const Rect &arRect);
-
-    /**
      * Returns a reference to the internal font object.
      * It must be used to change font properties of the text.
      *
@@ -109,20 +96,6 @@ public:
      */
     Font& GetFont() { mDirty = true; return mFont; }
     const Font& GetFont() const { return mFont; }
-
-    /**
-     * Get the current value of the ScaleToFit member.
-     *
-     * \return bool
-     */
-    bool GetScaleToFit() const { return mScaleToFit; }
-    /**
-     * Set the current ScaleToFit member. If set the text is scaled to fit the Area of the Text object
-     *
-     * \param aValue
-     * \return Reference to this for fluent calls.
-     */
-    Text& SetScaleToFit(bool aValue = true);
 
     /**
      * Get the current value of the line spacing.
@@ -191,10 +164,12 @@ public:
 
     /**
      * Reload all glyphs based on the current settings.
+     * Optional scale this text to fit the given rect.
      *
+     * \param aRect Optional Rect that text should fit inside
      * \return Reference to this for fluent calls.
      */
-    Text& Reload();
+    Text& Reload(utils::OptionalPtr<const Rect> aRect = nullptr);
 
     /**
      * \brief Check if the text object has changed and needs glyph reloading
@@ -202,13 +177,6 @@ public:
      * \return True if glyphs needs to be reloaded.
      */
     bool IsDirty() { return mDirty; }
-
-    /**
-     * Get the glyphs for the current text.
-     *
-     * \return Pointer to Glyphs object.
-     */
-    const std::unique_ptr<Glyphs>& GetGlyphs() const { return mpGlyphs; }
 
     /**
      * Get the minimum bounding rectangle containing all the glyphs.
@@ -221,7 +189,6 @@ protected:
     Font mFont;
     Rect mBoundingRect{};
     std::string mValue{};
-    bool mScaleToFit = false;
     std::unique_ptr<Glyphs> mpGlyphs{};
     int mLineCount = 0;
     int mLineMaxChar = 0;
@@ -230,10 +197,9 @@ protected:
     VAlign mVAlign = VAlign::Center;
     bool mDirty = false;
 
-    void scaleToFit();
+    void scaleToFit(int aWidth, int aHeight);
     void loadGlyphs();
     void alignGlyphs();
-    void calcBoundingRect(const std::unique_ptr<Glyphs>& apGlyphs);
     void draw();
 };
 

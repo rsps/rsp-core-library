@@ -102,6 +102,11 @@ Control& Control::SetOrigin(const Point &arPoint)
     Point difference = arPoint - mArea.GetTopLeft();
     mArea.MoveTo(arPoint);
     mTouchArea.MoveTo(mTouchArea.GetTopLeft() + difference);
+    for (auto &style : mStyles) {
+        for (auto &texture : style.mTextures) {
+            texture->SetDestination(texture->GetDestination() + difference);
+        }
+    }
     for (Control* child : mChildren) {
         child->SetOrigin(child->GetOrigin() + difference);
     }
@@ -135,9 +140,8 @@ Control& Control::AddChild(Control *apChild)
 {
     if (apChild) {
         mChildren.push_back(apChild);
-        Rect r = apChild->GetArea();
         apChild->mpParent = this;
-        apChild->SetOrigin(r.GetTopLeft() + GetOrigin());
+        apChild->SetOrigin(apChild->GetOrigin() + GetOrigin());
     }
     return *this;
 }
@@ -167,7 +171,7 @@ Control& Control::SetTexturePosition(const Point &arPoint)
 
 bool Control::UpdateData()
 {
-    GFXLOG("Updating Data: " << GetName() << " " << mArea);
+//    GFXLOG("Updating Data: " << GetName() << " " << mArea);
     bool result = false;
     refresh();
     if (mDirty) {
@@ -189,7 +193,7 @@ void Control::Render(Renderer &arRenderer) const
         return;
     }
 
-    GFXLOG("Rendering: " << GetName() << " " << mArea);
+//    GFXLOG("Rendering: " << GetName() << " " << mArea);
 
     auto &style = mStyles[mState];
 

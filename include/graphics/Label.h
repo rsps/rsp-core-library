@@ -24,25 +24,23 @@ public:
     Label() { initTypeInfo<Label>(); }
 
     Label& operator<<(const std::string &arCaption) { return SetCaption(arCaption); }
-//    Label& operator<<(const Point &arPoint) { return SetTextPosition(arPoint); }
     Label& operator<<(Text::VAlign aVAlign) { return SetVAlignment(aVAlign); }
     Label& operator<<(Text::HAlign aHAlign) { return SetHAlignment(aHAlign); }
 
     Label& SetCaption(const std::string &arCaption);
-//    Label& SetTextPosition(const Point &arPoint);
-    Label& SetFontSize(int aSizePx);
     Label& SetVAlignment(Text::VAlign aVAlign);
     Label& SetHAlignment(Text::HAlign aHAlign);
+    Label& SetFontSize(int aSizePx);
+    Label& ScaleToFit(bool aValue);
 
     Text& GetText() { return mText; }
 
-    Control& SetOrigin(const Point &arPoint) override;
     void Render(Renderer &arRenderer) const override;
 
 protected:
     Text mText{};
-    Point mTextOrigin{};
     TexturePtr_t mpTexture = nullptr;
+    bool mScaleToFit = false;
 
     void update() override;
     void refresh() override;

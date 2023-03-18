@@ -32,7 +32,7 @@ Scene& SceneMap::ActiveScene()
         THROW_WITH_BACKTRACE(ActiveSceneNotSet);
     }
 
-    GFXLOG("Get Active Scene: " << mpActiveScene->GetName());
+//    GFXLOG("Get Active Scene: " << mpActiveScene->GetName());
 
     return *mpActiveScene;
 }

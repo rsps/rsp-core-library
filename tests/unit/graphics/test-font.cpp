@@ -62,9 +62,9 @@ TEST_CASE("Font")
         const int size = 16;
 
         Rect dst(100, 200, 280, 200);
-        text.SetScaleToFit(true).SetArea(dst).Reload();
+        text.Reload(dst);
 
-        Rect r = text.Reload().GetBoundingRect();
+        Rect r = text.GetBoundingRect();
 
         MESSAGE(r.GetHeight(), " < ", dst.GetHeight());
         MESSAGE(r.GetWidth(), " < ", dst.GetWidth());

@@ -144,8 +144,8 @@ TEST_CASE("Graphics Main Test")
         const uint32_t cGreenColor = 0xFF24b40b;
         Point toppoint = scenes.ActiveScene<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1);
         Point botpoint = scenes.ActiveScene<SecondScene>().GetBotRect().GetTopLeft() + Point(1,1);
-        CHECK_EQ(renderer.GetPixel(toppoint, true), cGreenColor);
-        CHECK_EQ(renderer.GetPixel(botpoint, true), cGreenColor);
+        CHECK_MESSAGE(renderer.GetPixel(toppoint, true) == cGreenColor, "toppoint = " << toppoint);
+        CHECK_MESSAGE(renderer.GetPixel(botpoint, true) == cGreenColor, "botpoint = " << botpoint);
         CHECK_EQ(topBtnClicked, 2);
     }
 

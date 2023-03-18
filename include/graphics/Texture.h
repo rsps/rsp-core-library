@@ -28,8 +28,8 @@ typedef std::unique_ptr<Texture> TexturePtr_t;
 class Texture
 {
 public:
-    static TexturePtr_t Create(const PixelData &arPixelData, Color aColor = Color::None, Point aDestPos = {0,0});
-    static TexturePtr_t Create(GuiUnit_t aWidth, GuiUnit_t aHeight, Point aDestPos = {0,0});
+    static TexturePtr_t Create(const PixelData &arPixelData, Color aColor = Color::None, Point aDestPos = {0,0}, Point aDestOffset = {0,0});
+    static TexturePtr_t Create(GuiUnit_t aWidth, GuiUnit_t aHeight, Point aDestPos = {0,0}, Point aDestOffset = {0,0});
 
     virtual ~Texture() {}
 
@@ -74,7 +74,9 @@ public:
      * \return self
      */
     virtual Texture& SetDestination(const Point &arPoint) = 0;
-    virtual const Rect& GetDestinationRect() const = 0;
+    virtual Point GetDestination() const = 0;
+    virtual Texture& SetOffset(const Point &arPoint) = 0;
+    virtual Rect GetDestinationRect() const = 0;
 
     /**
      * \brief Make a safe copy of this texture, possibly referencing the same internal raster storage.

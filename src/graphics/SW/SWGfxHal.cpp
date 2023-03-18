@@ -124,7 +124,18 @@ void SWGfxHal::Blit(VideoSurface &arDst, const VideoSurface &arSrc, Optional<con
                 uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
                 uint32_t *source = offset(src, arSrc.mRowPitch, sr.GetLeft(), src_y++);
                 for(size_t x = 0; x < w ; ++x) {
-                    dest[x] = alphaBlend(dest[x], source[x]);
+                    switch(source[x] & 0xFF000000) {
+                        case 0x00000000:
+                            // Source is fully transparent, don't waste time on memory access
+                            break;
+                        case 0xFF000000:
+                            // Source is fully opaque, simply copy to destination
+                            dest[x] = source[x];
+                            break;
+                        default:
+                            dest[x] = alphaBlend(dest[x], source[x]);
+                            break;
+                    }
                 }
             }
             break;
@@ -276,6 +287,12 @@ void SWGfxHal::Fill(VideoSurface &arDst, uint32_t aColor, Optional<const Rect> a
         dr &= *aDstRect;
     }
 
+//    if (arDst.mBlendOperation == GfxBlendOperation::ColorKey) {
+//        if (aColor == arDst.mColorKey) {
+//            return;
+//        }
+//    }
+
     GuiUnit_t y_end = dr.GetBottom();
     GuiUnit_t x_end = dr.GetRight();
 
@@ -283,6 +300,19 @@ void SWGfxHal::Fill(VideoSurface &arDst, uint32_t aColor, Optional<const Rect> a
         uint32_t *dst = offset(arDst.mpPhysAddr.get(), arDst.mRowPitch, dr.GetLeft(), y);
         for (GuiUnit_t x = dr.GetLeft() ; x < x_end ; ++x) {
             *dst = aColor;
+//            switch(arDst.mBlendOperation) {
+//                default:
+//                case GfxBlendOperation::ColorKey:
+//                case GfxBlendOperation::Copy: {
+//                    *dst = aColor;
+//                    break;
+//                }
+//
+//                case GfxBlendOperation::SourceAlpha: {
+//                    *dst = alphaBlend(*dst, aColor);
+//                    break;
+//                }
+//            }
             ++dst;
         }
     }

@@ -31,32 +31,30 @@ Label& Label::SetHAlignment(Text::HAlign aHAlign)
     return *this;
 }
 
-Control& Label::SetOrigin(const Point &arPoint)
-{
-    Point difference = arPoint - mArea.GetTopLeft();
-    Control::SetOrigin(arPoint);
-//    Rect r = mText.GetArea();
-//    r.MoveTo(r.GetTopLeft() + difference);
-//    mText.SetArea(r);
-    return *this;
-}
-
-//Label& Label::SetTextArea(const Rect &arArea)
-//{
-//    mText.SetArea(arArea);
-//    return *this;
-//}
-
 Label& Label::SetFontSize(int aSizePx)
 {
     mText.SetFontSize(aSizePx);
     return *this;
 }
 
+Label& Label::ScaleToFit(bool aValue)
+{
+    if (mScaleToFit != aValue) {
+        mScaleToFit = aValue;
+        Invalidate();
+    }
+    return *this;
+}
+
 void Label::refresh()
 {
-    if (mText.IsDirty()) {
-        mText.Reload();
+    if (mDirty || mText.IsDirty()) {
+        if (mScaleToFit) {
+            mText.Reload(mArea);
+        }
+        else {
+            mText.Reload();
+        }
         Invalidate();
     }
 }
@@ -66,14 +64,14 @@ void Label::update()
     auto tr = mText.GetRect();
     if (!mpTexture || (tr != Rect(0, 0, mpTexture->GetWidth(), mpTexture->GetHeight()))) {
         mpTexture = Texture::Create(tr.GetWidth(), tr.GetHeight());
-        mpTexture->SetBlendOperation(GfxBlendOperation::ColorKey);
+        mpTexture->SetBlendOperation(GfxBlendOperation::SourceAlpha);
     }
 
     mpTexture->Fill(Color::None).Update(mText.GetPixelData(), mStyles[mState].mForegroundColor);
 
-    tr &= GetArea().MoveTo({0,0});
-    mpTexture->SetDestination(mText.GetPosition(mArea))
-        .SetSourceRect(tr);
+//    tr &= GetArea().MoveTo({0,0});
+    mpTexture->SetDestination(mText.GetPosition(mArea));
+//        .SetSourceRect(tr);
 }
 
 void Label::Render(Renderer &arRenderer) const

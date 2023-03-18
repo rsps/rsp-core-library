@@ -11,6 +11,8 @@
 #include <graphics/Text.h>
 #include <logging/Logger.h>
 
+#define DEBUG(a) { Logger::GetDefault().Debug() << a; }
+
 using namespace rsp::logging;
 
 namespace rsp::graphics {
@@ -35,25 +37,14 @@ Text& Text::SetValue(const std::string &arValue)
     return *this;
 }
 
-const Rect& Text::GetArea() const
+Text& Text::Reload(utils::OptionalPtr<const Rect> aRect)
 {
-    return mRect;
-}
-
-Text& Text::SetArea(const Rect &arRect)
-{
-    if (mRect != arRect) {
-        mDirty = true;
-        Init(arRect.GetWidth(), arRect.GetHeight(), ColorDepth::Alpha, nullptr);
-    }
-    return *this;
-}
-
-Text& Text::Reload()
-{
-    if (!mDirty) {
+    if (!mDirty && !aRect) {
         return *this;
     }
+
+    DEBUG("Reloading glyphs for '" << mValue << "'")
+
     mLineCount = 1;
     mLineMaxChar = 1; // Avoid division by zero
     int count = 0;
@@ -68,31 +59,27 @@ Text& Text::Reload()
         }
     }
 
-    loadGlyphs();
+    if (aRect) {
+        scaleToFit(int(aRect.Get().GetWidth()), int(aRect.Get().GetHeight()));
+    }
+    else {
+        loadGlyphs();
+    }
+    Init(mBoundingRect.GetWidth(), mBoundingRect.GetHeight(), ColorDepth::Alpha, nullptr);
     draw();
     mDirty = false;
     return *this;
 }
 
-Text& Text::SetScaleToFit(bool aValue)
+void Text::scaleToFit(int aWidth, int aHeight)
 {
-    if (mScaleToFit != aValue) {
-        mScaleToFit = aValue;
-        mDirty = true;
-    }
-    return *this;
-}
-
-void Text::scaleToFit()
-{
-//    int width = ((mArea.GetWidth() + (mLineMaxChar/2)) / mLineMaxChar); // Texts seems to be about 1/3 of desired width
-    int width = GetWidth() / mLineMaxChar; // Texts seems to be about 1/3 of desired width
-    int height = GetHeight() / mLineCount;
+    int width = aWidth / mLineMaxChar; // Texts seems to be about 1/3 of desired width
+    int height = aHeight / mLineCount;
     int done;
     int attempts = 5;
-    int w_limit = GetWidth() * 90 / 100; // >90%
-    int h_limit = GetHeight() * 90 / 100; // > 90%
-    Logger::GetDefault().Debug() << "scaleToFit w_limit: " << w_limit << " h_limit: " << h_limit << " line count: " << mLineCount;
+    int w_limit = aWidth * 90 / 100; // >90%
+    int h_limit = aHeight * 90 / 100; // > 90%
+    DEBUG("scaleToFit(" << aWidth << ", " << aHeight << "), line count: " << mLineCount)
 
     do {
         mFont.SetSize(width, height);
@@ -100,37 +87,31 @@ void Text::scaleToFit()
         mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
         mBoundingRect = mpGlyphs->mBoundingRect;
 
-        Logger::GetDefault().Debug() << "Area: " << mRect << ", Bounding Rect: " << mBoundingRect;
+//        DEBUG("ScaleToFit(" << aWidth << ", " << aHeight << ") -> Bounding Rect: " << mBoundingRect)
 
         done = 0;
-        if ((mBoundingRect.GetWidth() < w_limit) || (mBoundingRect.GetWidth() > GetWidth())) {
-            width += ((GetWidth() - mBoundingRect.GetWidth()) + (mLineMaxChar/2)) / mLineMaxChar;
+        if ((mBoundingRect.GetWidth() < w_limit) || (mBoundingRect.GetWidth() > aWidth)) {
+            width += ((aWidth - mBoundingRect.GetWidth()) + (mLineMaxChar/2)) / mLineMaxChar;
         }
         else {
             done++;
         }
-        if ((mBoundingRect.GetHeight() < h_limit) || (mBoundingRect.GetHeight() > GetHeight())) {
-            height += (GetHeight() - mBoundingRect.GetHeight()) / mLineCount;
+        if ((mBoundingRect.GetHeight() < h_limit) || (mBoundingRect.GetHeight() > aHeight)) {
+            height += (aHeight - mBoundingRect.GetHeight()) / mLineCount;
         }
         else {
             done++;
         }
     }
     while( (done != 2) && --attempts);
-    Logger::GetDefault().Debug() << "scaleToFit done: " << done << " attempts: " << attempts;
+    DEBUG("scaleToFit done: " << done << " attempts: " << attempts << " Bounding Rect: " << mBoundingRect)
 }
 
 void Text::loadGlyphs()
 {
-    Logger::GetDefault().Debug() << "Loading glyphs. ScaleToFit=" << mScaleToFit;
-    if (mScaleToFit) {
-        scaleToFit();
-    }
-    else {
-        mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
-        mBoundingRect = mpGlyphs->mBoundingRect;
-        SetArea(mBoundingRect);
-    }
+    DEBUG("Loading glyphs")
+    mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
+    mBoundingRect = mpGlyphs->mBoundingRect;
 }
 
 Point Text::GetPosition(const Rect &arArea) const
@@ -161,12 +142,15 @@ Point Text::GetPosition(const Rect &arArea) const
             hoffset = (arArea.GetWidth()- GetWidth());
             break;
     }
-    return Point(hoffset, voffset) + arArea.GetTopLeft();
+    Point p(hoffset, voffset);
+    p += arArea.GetTopLeft();
+    DEBUG("GetPosition(" << arArea << ") -> " << p)
+    return p;
 }
 
 void Text::draw()
 {
-    auto &glyphs = GetGlyphs();
+    auto &glyphs = mpGlyphs;
     if (!glyphs) {
         std::cout << "No glyphs to paint!!" << std::endl;
         return;

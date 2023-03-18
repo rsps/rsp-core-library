@@ -474,9 +474,8 @@ TEST_CASE("Framebuffer")
 
         Text text("Exo 2", "Hello World");
         CHECK_NOTHROW(text.GetFont().SetSize(30));
-        CHECK_NOTHROW(text.SetArea(r).SetScaleToFit().Reload());
 
-        auto panel = Texture::Create(text, Color::Black);
+        auto panel = Texture::Create(280, 200);
         CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::ColorKey));
 
         SUBCASE("Text Attributes") {
@@ -513,7 +512,7 @@ TEST_CASE("Framebuffer")
                 CHECK_NOTHROW(text.SetValue("BLUE"));
             }
 
-            CHECK_NOTHROW(text.Reload());
+            CHECK_NOTHROW(text.Reload(r));
             CHECK_NOTHROW(panel->Update(text, text_color));
             CHECK_NOTHROW(panel->SetDestination(text.GetPosition(r)));
             CHECK_NOTHROW(renderer.Blit(*panel));
@@ -525,7 +524,7 @@ TEST_CASE("Framebuffer")
             const Color rainbow[] = { Color::White, Color::Red, Color::Yellow, Color::Green, Color::Aqua, Color::Lime, Color::Blue, Color::Silver };
 
             MESSAGE("FPS Test");
-            CHECK_NOTHROW(text.SetArea(r).SetScaleToFit(true).SetLineSpacing(50).SetValue("FPS:\n0").Reload().SetScaleToFit(false));
+            CHECK_NOTHROW(text.SetLineSpacing(50).SetValue("FPS:\n0").Reload(r));
             panel = Texture::Create(text, Color::Black);
             CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::ColorKey).SetDestination(Point(100, 200)));
 
@@ -593,7 +592,7 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::ColorKey, Color::None));
 
         Text text("Exo 2", "Regular");
-        CHECK_NOTHROW(text.SetArea(r).SetScaleToFit(true).GetFont().SetSize(50));
+        CHECK_NOTHROW(text.GetFont().SetSize(50));
 
         SUBCASE("Normal") {
         }
@@ -607,7 +606,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(text.SetValue("Bold Italic").GetFont().SetStyle(FontStyles::BoldItalic));
         }
 
-        CHECK_NOTHROW(text.Reload());
+        CHECK_NOTHROW(text.Reload(r));
         CHECK_NOTHROW(panel->Fill(Color::None).Update(text, Color::Yellow));
         CHECK_NOTHROW(panel->SetDestination(text.GetPosition(r)));
         CHECK_NOTHROW(renderer.Fill(Color::Black));

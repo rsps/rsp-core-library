@@ -44,7 +44,7 @@ Renderer& SWRenderer::Fill(Color aColor, Optional<const Rect> aDestination)
 Renderer& SWRenderer::Blit(const Texture &arTexture)
 {
     auto &swt = dynamic_cast<const SWTexture&>(arTexture);
-    mrGfxHal.Blit(mScreenSurfaces[mCurrentSurface], *swt.mpSurface, swt.mDestinationRect, swt.mSourceRect);
+    mrGfxHal.Blit(mScreenSurfaces[mCurrentSurface], *swt.mpSurface, swt.GetDestinationRect(), swt.mSourceRect);
     return *this;
 }
 

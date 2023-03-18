@@ -24,10 +24,11 @@ class OptionalPtr
 {
 public:
     OptionalPtr(const T* apValue = nullptr) : mPtr(apValue) {}
-    OptionalPtr(const T &aValue) : mPtr(&aValue) {}
+    OptionalPtr(const T &arValue) : mPtr(&arValue) {}
     operator bool() const { return (mPtr); }
     const T& operator->() const { return *mPtr; }
     const T& operator*() const { return *mPtr; }
+    const T& Get() const { return *mPtr; }
 protected:
     const T* mPtr;
 };
