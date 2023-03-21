@@ -15,6 +15,7 @@
 #include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <TestHelpers.h>
+#include "pixmap/TestImage480x800.h"
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
@@ -75,6 +76,29 @@ TEST_CASE("Image")
     CHECK_EQ(renderer.GetPixel(219,  20, true), fill_color);
     CHECK_EQ(renderer.GetPixel(20,  119, true), fill_color);
     CHECK_EQ(renderer.GetPixel(219, 119, true), fill_color);
+}
+
+TEST_CASE("TestImage")
+{
+    rsp::logging::Logger logger;
+    TestHelpers::AddConsoleLogger(logger);
+
+    // Arrange
+    std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+    Framebuffer::mpDevicePath = p.c_str();
+
+    auto& renderer = Renderer::Get();
+    CHECK_NOTHROW(renderer.Fill(Color::Grey));
+    CHECK_NOTHROW(renderer.Present());
+    CHECK_NOTHROW(renderer.Fill(Color::Grey));
+
+    BitmapView bmp(cTestImage480x800);
+
+    Image image(bmp);
+
+    CHECK(image.UpdateData());
+    CHECK_NOTHROW(image.Render(renderer));
+    CHECK_NOTHROW(renderer.Present());
 }
 
 TEST_SUITE_END();
