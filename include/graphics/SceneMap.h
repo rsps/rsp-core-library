@@ -43,7 +43,7 @@ public:
     SceneMap(const SceneMap&) = default;
 
     #define AddFactory(T) \
-        GFXLOG("Adding scene factory: " << T::NAME << " with id: " << T::ID); \
+        GFXLOG("Adding scene factory: " << rsp::utils::NameOf<T>() << " with id: " << rsp::utils::ID<T>()); \
         mScenes[rsp::utils::ID<T>()] = []() { \
             Scene* result = new T(); \
             GFXLOG("Created scene: " << result->GetName()); \

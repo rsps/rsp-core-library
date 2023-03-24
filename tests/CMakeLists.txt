@@ -53,6 +53,7 @@ target_include_directories(${TEST_BINARY}
 if (NOT RELEASE_BUILD)
 target_compile_options(${TEST_BINARY} PRIVATE 
     -DGFX_FPS=20
+    -DDEBUG_LOG
     -g
     -O0
     )
