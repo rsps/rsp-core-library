@@ -162,11 +162,11 @@ public:
      * \param aKey Name of object member
      * \return Reference to value
      */
-    virtual DynamicData& operator[](std::string_view aKey);
+    DynamicData& operator[](std::string_view aKey);
     DynamicData& operator[](const std::string& arKey) { return (*this)[std::string_view(arKey)]; }
     DynamicData& operator[](const char* apKey)  { return (*this)[std::string_view(apKey)]; }
 
-    virtual const DynamicData& operator[](std::string_view aKey) const;
+    const DynamicData& operator[](std::string_view aKey) const;
     const DynamicData& operator[](const std::string& arKey) const { return (*this)[std::string_view(arKey)]; }
     const DynamicData& operator[](const char* apKey) const { return (*this)[std::string_view(apKey)]; }
 
@@ -176,10 +176,10 @@ public:
      * \param aIndex Index number
      * \return Reference to value
      */
-    virtual DynamicData& operator[](size_type aIndex);
+    DynamicData& operator[](size_type aIndex);
     DynamicData& operator[](int aIndex) { return (*this)[static_cast<size_type>(aIndex)]; }
 
-    virtual const DynamicData& operator[](size_type aIndex) const;
+    const DynamicData& operator[](size_type aIndex) const;
     const DynamicData& operator[](int aIndex) const { return (*this)[static_cast<size_type>(aIndex)]; }
 
     /**

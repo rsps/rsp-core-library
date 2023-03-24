@@ -59,11 +59,14 @@ public:
     static std::string GetJsonTypeAsString(Types aType);
     std::string GetJsonTypeAsString();
 
-    Json& operator[](std::string_view aKey) override { return dynamic_cast<Json&>(DynamicData::operator[](aKey)); }
-    const Json& operator[](std::string_view aKey) const override { return dynamic_cast<const Json&>(DynamicData::operator[](aKey)); }
+    template<class T>
+    Json& operator=(T aValue) { rsp::utils::Variant::operator=(aValue); return *this; }
 
-    Json& operator[](size_type aIndex) override { return dynamic_cast<Json&>(DynamicData::operator[](aIndex)); }
-    const Json& operator[](size_type aIndex) const override { return dynamic_cast<const Json&>(DynamicData::operator[](aIndex)); }
+    template <class T>
+    Json& operator[](T aKey) { return dynamic_cast<Json&>(DynamicData::operator[](aKey)); }
+
+    template <class T>
+    const Json& operator[](T aKey) const { return dynamic_cast<Json&>(DynamicData::operator[](aKey)); }
 
 };
 
