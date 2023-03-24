@@ -58,6 +58,13 @@ public:
      */
     static std::string GetJsonTypeAsString(Types aType);
     std::string GetJsonTypeAsString();
+
+    Json& operator[](std::string_view aKey) override { return dynamic_cast<Json&>(DynamicData::operator[](aKey)); }
+    const Json& operator[](std::string_view aKey) const override { return dynamic_cast<const Json&>(DynamicData::operator[](aKey)); }
+
+    Json& operator[](size_type aIndex) override { return dynamic_cast<Json&>(DynamicData::operator[](aIndex)); }
+    const Json& operator[](size_type aIndex) const override { return dynamic_cast<const Json&>(DynamicData::operator[](aIndex)); }
+
 };
 
 std::ostream& operator<<(std::ostream& os, Json::Types aType);
