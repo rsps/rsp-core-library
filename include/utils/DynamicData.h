@@ -119,7 +119,7 @@ public:
      * \return True if successful
      */
     template<class T, class I>
-    bool TryAssign(T& arLValue, const I& arIndex) try
+    bool TryAssign(T& arLValue, const I& arIndex) const try
     {
         arLValue = (*this)[arIndex];
         return true;

@@ -25,7 +25,7 @@ namespace rsp::json {
 
 std::ostream& operator<<(std::ostream& os, Json::Types aType)
 {
-    os << magic_enum::enum_name<Json::Types>(aType);
+    os << magic_enum::enum_name(aType);
     return os;
 }
 
@@ -69,7 +69,7 @@ DynamicData Json::Decode(std::string_view aJson)
 
 std::string Json::GetJsonTypeAsString(Json::Types aType)
 {
-    return std::string(magic_enum::enum_name<Json::Types>(aType));
+    return std::string(magic_enum::enum_name(aType));
 }
 
 std::string Json::GetJsonTypeAsString()
