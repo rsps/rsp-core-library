@@ -14,20 +14,19 @@
 
 #include <exceptions/ExceptionHelper.h>
 #include <system_error>
-#include "TracedException.h"
 
 namespace rsp::exceptions {
 
 
-class CoreException: public RuntimeError
+class CoreException: public std::runtime_error
 {
 public:
     explicit CoreException(const char *apMsg)
-        : RuntimeError(std::string(apMsg))
+        : std::runtime_error(std::string(apMsg))
     {
     }
     CoreException(const std::string &arMsg)
-        : RuntimeError(arMsg)
+        : std::runtime_error(arMsg)
     {
     }
 };
@@ -35,7 +34,7 @@ public:
 class NotImplementedException: public CoreException
 {
 public:
-    explicit NotImplementedException(const char *aMsg)
+    explicit NotImplementedException(const char *aMsg = "Not Implemented")
         : CoreException(aMsg)
     {
     }

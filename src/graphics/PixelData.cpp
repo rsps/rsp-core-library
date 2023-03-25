@@ -155,7 +155,7 @@ std::size_t PixelData::GetDataSize() const
 Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const
 {
     if (!GetRect().IsHit(aX, aY)) {
-        THROW_WITH_BACKTRACE1(exceptions::OutOfRange, "Pixel coordinates out of range (" + std::to_string(aX) + ", " + std::to_string(aY) + " not in " + to_string(GetRect()) + ")");
+        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + ", " + std::to_string(aY) + " not in " + to_string(GetRect()) + ")");
     }
     Color result(aColor);
     int offset;

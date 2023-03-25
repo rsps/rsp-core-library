@@ -43,12 +43,19 @@ static const char* FreeTypeErrorToString(int aCode)
 }
 
 FontException::FontException(const char *aMsg, FT_Error aCode)
-    : CoreException(aMsg)
+    : CoreException(std::string(aMsg) + formatCode(aCode))
 {
-    mWhat += ": (" + std::to_string(aCode) + ") ";
-    const char *err = FreeTypeErrorToString(aCode);
-    mWhat.append((err) ? err : "N");
 }
+
+std::string FontException::formatCode(int aCode)
+{
+    std::string result;
+    result += ": (" + std::to_string(aCode) + ") ";
+    const char *err = FreeTypeErrorToString(aCode);
+    result.append((err) ? err : "N");
+    return result;
+}
+
 
 inline static uint unsign(int aValue)
 {

@@ -40,11 +40,17 @@ public:
 
     template <typename T>
     ENotInRange(T aLow, T aHigh, T aValue)
-        :ValidatorException("Value is not in range: (")
+        :ValidatorException("Value is not in range: " + format(aLow, aHigh, aValue))
+    {
+
+    }
+
+    template <typename T>
+    std::string format(T aLow, T aHigh, T aValue)
     {
         std::stringstream ss;
-        ss << aLow << " < " << aValue << " < " << aHigh << ")";
-        mWhat += ss.str();
+        ss << "(" << aLow << " < " << aValue << " < " << aHigh << ")";
+        return ss.str();
     }
 };
 

@@ -27,10 +27,9 @@ namespace rsp::network::curl {
 class ECurlVersion: public rsp::network::NetworkException
 {
 public:
-    explicit ECurlVersion(const std::string &aMsg, std::string_view aVersion)
-        : NetworkException(aMsg)
+    explicit ECurlVersion(const std::string &arMsg, std::string_view aVersion)
+        : NetworkException(arMsg + ": " + std::string(aVersion))
     {
-        mWhat.append(": ").append(aVersion);
     }
 };
 
@@ -43,30 +42,42 @@ public:
 class ECurlError: public rsp::network::NetworkException
 {
 public:
-    explicit ECurlError(const std::string &aMsg, CURLcode aCode = CURLE_OK)
-        : NetworkException(aMsg)
+    explicit ECurlError(const std::string &arMsg, CURLcode aCode = CURLE_OK)
+        : NetworkException(formatError(arMsg, aCode))
     {
+    }
+
+    std::string formatError(const std::string &arMsg, CURLcode aCode)
+    {
+        std::string result(arMsg);
         if (aCode != CURLE_OK) {
-            mWhat.append(" (")
+            result.append(" (")
                 .append(std::to_string(static_cast<unsigned long>(aCode)))
                 .append(") ")
                 .append(curl_easy_strerror(aCode));
         }
+        return result;
     }
 };
 
 class ECurlMError: public rsp::network::NetworkException
 {
 public:
-    explicit ECurlMError(const std::string &aMsg, CURLMcode aCode = CURLM_OK)
-        : NetworkException(aMsg)
+    explicit ECurlMError(const std::string &arMsg, CURLMcode aCode = CURLM_OK)
+        : NetworkException(formatError(arMsg, aCode))
     {
+    }
+
+    std::string formatError(const std::string &arMsg, CURLMcode aCode)
+    {
+        std::string result(arMsg);
         if (aCode != CURLM_OK) {
-            mWhat.append(" (")
+            result.append(" (")
                 .append(std::to_string(static_cast<unsigned long>(aCode)))
                 .append(") ")
                 .append(curl_multi_strerror(aCode));
         }
+        return result;
     }
 };
 

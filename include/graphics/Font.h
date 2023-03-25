@@ -30,6 +30,8 @@ public:
     explicit FontException(const char *aMsg, int aCode);
     FontException(const char *aMsg) : CoreException(aMsg) {};
     FontException(const std::string &arMsg) : CoreException(arMsg.c_str()) {};
+
+    std::string formatCode(int aCode);
 };
 
 /**

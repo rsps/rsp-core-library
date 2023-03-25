@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <exceptions/TracedException.h>
+#include <exceptions/ExceptionHelper.h>
 #include <new>
 #include <typeinfo>
 
@@ -23,64 +23,64 @@ namespace std {
 void
 __throw_bad_exception(void)
 {
-    throw TracedException<bad_exception>();
+    THROW_WITH_BACKTRACE(bad_exception);
 }
 
 // Helper for exception objects in <new>
 void
 __throw_bad_alloc(void)
 {
-    throw TracedException<bad_alloc>();
+    THROW_WITH_BACKTRACE(bad_alloc);
 }
 
 void
 __throw_bad_array_new_length(void)
 {
-    throw TracedException<bad_array_new_length>();
+    THROW_WITH_BACKTRACE(bad_array_new_length);
 }
 
 // Helper for exception objects in <typeinfo>
 void
 __throw_bad_cast(void)
 {
-    throw TracedException<bad_cast>();
+    THROW_WITH_BACKTRACE(bad_cast);
 }
 
 void
 __throw_bad_typeid(void)
 {
-    throw TracedException<bad_typeid>();
+    THROW_WITH_BACKTRACE(bad_typeid);
 }
 
 // Helpers for exception objects in <stdexcept>
 void
 __throw_logic_error(const char* apMsg)
 {
-    throw LogicError(apMsg);
+    THROW_WITH_BACKTRACE1(logic_error, apMsg);
 }
 
 void
 __throw_domain_error(const char* apMsg)
 {
-    throw DomainError(apMsg);
+    THROW_WITH_BACKTRACE1(domain_error, apMsg);
 }
 
 void
 __throw_invalid_argument(const char* apMsg)
 {
-    throw InvalidArgument(apMsg);
+    THROW_WITH_BACKTRACE1(invalid_argument, apMsg);
 }
 
 void
 __throw_length_error(const char* apMsg)
 {
-    throw LengthError(apMsg);
+    THROW_WITH_BACKTRACE1(length_error, apMsg);
 }
 
 void
 __throw_out_of_range(const char* apMsg)
 {
-    throw OutOfRange(apMsg);
+    THROW_WITH_BACKTRACE1(out_of_range, apMsg);
 }
 
 //void
@@ -93,28 +93,28 @@ __throw_out_of_range(const char* apMsg)
 void
 __throw_runtime_error(const char* apMsg)
 {
-    throw RuntimeError(apMsg);
+    THROW_WITH_BACKTRACE1(runtime_error, apMsg);
 }
 
 
 void
 __throw_range_error(const char* apMsg)
 {
-    throw RangeError(apMsg);
+    THROW_WITH_BACKTRACE1(range_error, apMsg);
 }
 
 
 void
 __throw_overflow_error(const char* apMsg)
 {
-    throw OverflowError(apMsg);
+    THROW_WITH_BACKTRACE1(overflow_error, apMsg);
 }
 
 
 void
 __throw_underflow_error(const char* apMsg)
 {
-    throw UnderflowError(apMsg);
+    THROW_WITH_BACKTRACE1(underflow_error, apMsg);
 }
 
 
@@ -129,8 +129,7 @@ __throw_underflow_error(const char* apMsg)
 void
 __throw_system_error(int __v)
 {
-
-    throw SystemError(__v, std::generic_category());
+    THROW_WITH_BACKTRACE2(system_error, __v, std::generic_category());
 }
 
 // Helpers for exception objects in <future>

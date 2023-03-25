@@ -75,7 +75,7 @@ public:
     public:
         virtual ~Serializable() {};
         virtual DynamicData ToData() const = 0;
-        virtual void FromData(const DynamicData &arData) = 0;
+        virtual void FromData(const DynamicData &arData) { THROW_WITH_BACKTRACE(exceptions::NotImplementedException); }
     };
 
     typedef unsigned int  size_type;
