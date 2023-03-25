@@ -129,8 +129,9 @@ null }
 
     SUBCASE("Decode Object") {
         Json v;
+        CHECK_NOTHROW(v = Json::Decode(json_object));
+
         SUBCASE("Static") {
-            CHECK_NOTHROW(v = Json::Decode(json_object));
         }
         SUBCASE("Dynamic") {
             CHECK_NOTHROW(v = Json(json_object));

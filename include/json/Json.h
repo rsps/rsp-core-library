@@ -58,16 +58,6 @@ public:
      */
     static std::string GetJsonTypeAsString(Types aType);
     std::string GetJsonTypeAsString();
-
-    template<class T>
-    Json& operator=(T aValue) { rsp::utils::Variant::operator=(aValue); return *this; }
-
-    template <class T>
-    Json& operator[](T aKey) { return dynamic_cast<Json&>(DynamicData::operator[](aKey)); }
-
-    template <class T>
-    const Json& operator[](T aKey) const { return dynamic_cast<Json&>(DynamicData::operator[](aKey)); }
-
 };
 
 std::ostream& operator<<(std::ostream& os, Json::Types aType);

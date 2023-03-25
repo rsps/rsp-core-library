@@ -25,7 +25,7 @@ JsonDecoder::JsonDecoder(std::string_view aJson)
       mIt(begin()),
       mEnd(end())
 {
-//    JLOG("JsonString Created: " << std::distance(begin(), mIt) << ", " << getLength());
+    JLOG("JsonString Created: " << std::distance(begin(), mIt) << ", " << getLength());
 }
 
 /**
@@ -408,19 +408,19 @@ DynamicData JsonDecoder::Decode()
             case '{':
                 JLOG("Object detected: " << getOffset() << ", " << getLength() << "; " << substr(getOffset(), getLength()));
                 result = getObject();
-                JLOG("Result Type: " << result << ", Count: " << result.GetCount());
+                JLOG("Result Object: " << result << ", Count: " << result.GetCount());
                 break;
 
             case '[':
                 JLOG("Array detected: " << substr(getOffset(), getLength()));
                 result = getArray();
-                JLOG("Result Type: " << result << ", Count: " << result.GetCount());
+                JLOG("Result Array: " << result << ", Count: " << result.GetCount());
                 break;
 
             case '"':
                 JLOG("String detected: " << substr(getOffset(), getLength()));
                 result = getString();
-                JLOG("Result Type: " << result << ", Length: " << result.AsString().size());
+                JLOG("Result String: " << result << ", Length: " << result.AsString().size());
                 break;
 
             case '0':
@@ -436,7 +436,7 @@ DynamicData JsonDecoder::Decode()
             case '-':
                 JLOG("Number detected: " << substr(getOffset(), getLength()));
                 result = getNumber();
-                JLOG("Result Type: " << *result);
+                JLOG("Result Number: " << result);
                 break;
 
             case 't':
@@ -479,7 +479,7 @@ DynamicData JsonDecoder::Decode()
         skipWhiteSpace();
     }
 
-    JLOG("getValue exit (" << result << "): " << debug());
+    JLOG("Decode exit (" << result << "): " << debug());
     return result;
 }
 

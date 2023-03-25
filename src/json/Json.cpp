@@ -19,10 +19,6 @@ using namespace rsp::utils;
 
 namespace rsp::json {
 
-//#define JLOG(a) DLOG(a)
-#define JLOG(a)
-
-
 std::ostream& operator<<(std::ostream& os, Json::Types aType)
 {
     os << magic_enum::enum_name(aType);

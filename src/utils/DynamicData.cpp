@@ -5,6 +5,7 @@
 
 #include <logging/Logger.h>
 #include <utils/DynamicData.h>
+#include <json/JsonEncoder.h>
 
 using namespace rsp::logging;
 
@@ -15,7 +16,8 @@ namespace rsp::utils {
 
 std::ostream& operator<< (std::ostream& os, const DynamicData& arValue)
 {
-    os << *static_cast<const Variant*>(&arValue);
+    rsp::json::JsonEncoder je(true);
+    os << je.Encode(arValue);
     return os;
 }
 
