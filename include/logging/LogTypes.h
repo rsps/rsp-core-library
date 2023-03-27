@@ -28,8 +28,7 @@ enum class LogLevel {
     Warning    = LOG_WARNING,/**< Warning */
     Notice     = LOG_NOTICE, /**< Notice */
     Info       = LOG_INFO,   /**< Info */
-    Debug      = LOG_DEBUG,  /**< Debug */
-    __END__
+    Debug      = LOG_DEBUG   /**< Debug */
 };
 
 constexpr LogLevel cDefautLogLevel = LogLevel::Info;
