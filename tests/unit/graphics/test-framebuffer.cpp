@@ -426,7 +426,7 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(renderer.Fill(Color::Black));
 
         // Arrange
-        Bitmap imgSimple("testImages/Monochrome.bmp");
+        Bitmap imgSimple("testImages/monochrome/Monochrome.bmp");
         int iterations = 100;
         Color mcl[5] = {
             Color::White,
@@ -621,7 +621,7 @@ TEST_CASE("Framebuffer")
     }
 
     SUBCASE("Draw Fullscreen") {
-        std::string testImage = "testImages/Asset2WithAlpha.bmp";
+        std::string testImage = "testImages/rgba/Asset2WithAlpha.bmp";
         Bitmap testImgMap(testImage);
 
         texture.SetBlendOperation(GfxBlendOperation::Copy);

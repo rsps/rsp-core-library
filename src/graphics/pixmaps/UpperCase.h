@@ -1,3 +1,3 @@
 #include <graphics/PixelData.h>
 
-extern const rsp::graphics::PixelData cUpperCase;
+rsp::graphics::PixelData LoadUpperCase();

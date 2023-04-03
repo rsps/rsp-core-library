@@ -126,6 +126,21 @@ void BmpLoader::ReadHeader(rsp::posix::FileIO &arFile)
     }
 
     initAfterLoad(static_cast<GuiUnit_t>(std::abs(mBmpHeader.v1.width)), static_cast<GuiUnit_t>(std::abs(mBmpHeader.v1.heigth)), bitsPerPixelToColorDepth(mBmpHeader.v1.bitsPerPixel));
+    mPixelData.SetBlend(false);
+
+    if (mBmpHeader.v1.size >= sizeof(BmpLoader::BitmapV4Header)) {
+        if (mBmpHeader.v5.RedMask == 0x73524742) {
+            mRedIndex   = 2;
+            mGreenIndex = 1;
+            mBlueIndex  = 0;
+        }
+        else {
+            mRedIndex   = maskToIndex(mBmpHeader.v5.RedMask);
+            mGreenIndex = maskToIndex(mBmpHeader.v5.GreenMask);
+            mBlueIndex  = maskToIndex(mBmpHeader.v5.BlueMask);
+            mAlphaIndex = maskToIndex(mBmpHeader.v5.AlphaMask);
+        }
+    }
 }
 
 void BmpLoader::ReadPalette(rsp::posix::FileIO &arFile)
@@ -187,7 +202,7 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
 int BmpLoader::maskToIndex(uint32_t aMask)
 {
     int result = 3;
-    while(aMask != 0xFF000000) {
+    while(aMask && (aMask != 0xFF000000)) {
         aMask <<= 8;
         result--;
     }
@@ -214,31 +229,21 @@ Color BmpLoader::ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::ui
             }
             break;
 
-//        case 2:
-//        case 4:
-//        case 8:
-//            break;
-
         case 24:
             apPixelData += (aY * aPaddedRowSize) + (aX * 3);
-            pixel.SetRed(apPixelData[2]);
-            pixel.SetGreen(apPixelData[1]);
-            pixel.SetBlue(apPixelData[0]);
+            pixel.SetRed(apPixelData[mRedIndex]);
+            pixel.SetGreen(apPixelData[mGreenIndex]);
+            pixel.SetBlue(apPixelData[mBlueIndex]);
             pixel.SetAlpha(255);
             break;
 
         case 32: {
             apPixelData += (aY * aPaddedRowSize) + (aX * 4);
 //            std::cout << "CSType: " << mBmpHeader.v5.CSType[0] << mBmpHeader.v5.CSType[1] << mBmpHeader.v5.CSType[2] << mBmpHeader.v5.CSType[3] << std::endl;
-            int red_index = maskToIndex(mBmpHeader.v5.RedMask);
-            int green_index = maskToIndex(mBmpHeader.v5.GreenMask);
-            int blue_index = maskToIndex(mBmpHeader.v5.BlueMask);
-            int alpha_index = maskToIndex(mBmpHeader.v5.AlphaMask);
-
-            pixel.SetRed(apPixelData[red_index]);
-            pixel.SetGreen(apPixelData[green_index]);
-            pixel.SetBlue(apPixelData[blue_index]);
-            pixel.SetAlpha(apPixelData[alpha_index]);
+            pixel.SetRed(apPixelData[mRedIndex]);
+            pixel.SetGreen(apPixelData[mGreenIndex]);
+            pixel.SetBlue(apPixelData[mBlueIndex]);
+            pixel.SetAlpha(apPixelData[mAlphaIndex]);
             break;
         }
 

@@ -28,7 +28,7 @@ class Canvas : public PixelData
 public:
     Canvas() noexcept : PixelData() {}
     Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth = PixelData::ColorDepth::RGBA);
-    Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData);
+    Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData, size_t aDataSize);
 
     /**
      * \brief Draw a a full or partial eclipse

@@ -110,60 +110,69 @@ Keyboard::Keyboard()
     initTypeInfo<Keyboard>();
     SetTransparent(true);
 
+    auto small_special = LoadSmallSpecial();
+    auto lower_case = LoadLowerCase();
+    auto upper_case = LoadUpperCase();
+
     mBtnShift.Symbol(cKEY_SHIFT)
-        .Background(Control::States::Normal, Color::White, &cSmallSpecial)
-        .Foreground(Control::States::Normal, Color(0x494A63), &cLowerCase, {11, 7})
-        .Background(Control::States::Pressed, Color(0x494A63), &cSmallSpecial)
-        .Foreground(Control::States::Pressed, Color::White, &cLowerCase, {11, 7})
-        .Background(Control::States::Checked, Color::White, &cSmallSpecial)
-        .Foreground(Control::States::Checked, Color(0x494A63), &cUpperCase, {11, 3})
-        .Background(Control::States::CheckedPressed, Color(0x494A63), &cSmallSpecial)
-        .Foreground(Control::States::CheckedPressed, Color::White, &cUpperCase, {11, 3})
-        .Setup(Rect(0, 152, 80, 71), cSmallSpecial.GetRect(), {18, 167})
+        .Background(Control::States::Normal, Color::White, &small_special)
+        .Foreground(Control::States::Normal, Color(0x494A63), &lower_case, {11, 7})
+        .Background(Control::States::Pressed, Color(0x494A63), &small_special)
+        .Foreground(Control::States::Pressed, Color::White, &lower_case, {11, 7})
+        .Background(Control::States::Checked, Color::White, &small_special)
+        .Foreground(Control::States::Checked, Color(0x494A63), &upper_case, {11, 3})
+        .Background(Control::States::CheckedPressed, Color(0x494A63), &small_special)
+        .Foreground(Control::States::CheckedPressed, Color::White, &upper_case, {11, 3})
+        .Setup(Rect(0, 152, 80, 71), small_special.GetRect(), {18, 167})
         .SetCheckable(true)
         .SetName("Shift");
 
+    auto big_special = LoadBigSpecial();
+    mBigSpecialRect = big_special.GetRect();
+
     mBtnLetters.Symbol(cKEY_LETTERS)
-        .Background(Control::States::Normal, Color::White, &cBigSpecial)
+        .Background(Control::States::Normal, Color::White, &big_special)
         .Foreground(Control::States::Normal, Color::Black)
-        .Background(Control::States::Pressed, Color(0x494A63), &cBigSpecial)
+        .Background(Control::States::Pressed, Color(0x494A63), &big_special)
         .Foreground(Control::States::Pressed, Color::White)
-        .Setup(cSpecialLeft, cBigSpecial.GetRect(), {18, 236})
+        .Setup(cSpecialLeft, big_special.GetRect(), {18, 236})
         .SetName("Letters");
     mBtnLetters.SetCaption("ABC").SetFontSize(22);
 
     mBtnNumbers.Symbol(cKEY_NUMBERS)
-        .Background(Control::States::Normal, Color::White, &cBigSpecial)
+        .Background(Control::States::Normal, Color::White, &big_special)
         .Foreground(Control::States::Normal, Color::Black)
-        .Background(Control::States::Pressed, Color(0x494A63), &cBigSpecial)
+        .Background(Control::States::Pressed, Color(0x494A63), &big_special)
         .Foreground(Control::States::Pressed, Color::White)
-        .Setup(cSpecialLeft, cBigSpecial.GetRect(), {18, 236})
+        .Setup(cSpecialLeft, big_special.GetRect(), {18, 236})
         .SetName("Numbers");
     mBtnNumbers.SetCaption("123").SetFontSize(22);
 
     mBtnSpecials.Symbol(cKEY_SPECIALS)
-        .Background(Control::States::Normal, Color::White, &cBigSpecial)
+        .Background(Control::States::Normal, Color::White, &big_special)
         .Foreground(Control::States::Normal, Color::Black)
-        .Background(Control::States::Pressed, Color(0x494A63), &cBigSpecial)
+        .Background(Control::States::Pressed, Color(0x494A63), &big_special)
         .Foreground(Control::States::Pressed, Color::White)
-        .Setup(cSpecialRight, cBigSpecial.GetRect(), {366, 236})
+        .Setup(cSpecialRight, big_special.GetRect(), {366, 236})
         .SetName("Special");
     mBtnSpecials.SetCaption("+*#").SetFontSize(22);
 
+    auto erase = LoadErase();
     mBtnErase.Symbol('\b')
-        .Background(Control::States::Normal, Color::White, &cSmallSpecial)
-        .Foreground(Control::States::Normal, Color(0x494A63), &cErase, {9, 9})
-        .Background(Control::States::Pressed, Color(0x494A63), &cSmallSpecial)
-        .Foreground(Control::States::Pressed, Color::White, &cErase, {9, 9})
-        .Setup(Rect(374, 152, 80, 71), cSmallSpecial.GetRect(), {390, 167})
+        .Background(Control::States::Normal, Color::White, &small_special)
+        .Foreground(Control::States::Normal, Color(0x494A63), &erase, {9, 9})
+        .Background(Control::States::Pressed, Color(0x494A63), &small_special)
+        .Foreground(Control::States::Pressed, Color::White, &erase, {9, 9})
+        .Setup(Rect(374, 152, 80, 71), small_special.GetRect(), {390, 167})
         .SetName("Erase");
 
+    auto space = LoadSpace();
     mBtnSpace.Symbol(' ')
-        .Background(Control::States::Normal, Color::White, &cSpace)
+        .Background(Control::States::Normal, Color::White, &space)
         .Foreground(Control::States::Normal, Color::None)
-        .Background(Control::States::Pressed, Color(0x494A63), &cSpace)
+        .Background(Control::States::Pressed, Color(0x494A63), &space)
         .Foreground(Control::States::Pressed, Color::None)
-        .Setup(Rect(98, 224, 258, 64), cSpace.GetRect(), {106, 236})
+        .Setup(Rect(98, 224, 258, 64), space.GetRect(), {106, 236})
         .SetName("Space");
 
     addBtn(mBtnShift);
@@ -174,11 +183,12 @@ Keyboard::Keyboard()
     addBtn(mBtnSpace);
 
     int index = 0;
+    auto key = LoadKey();
     for(Key& arBtn : mKeys) {
-        arBtn.Setup(cKeyTouchAreas[index], cKey.GetRect(), cKeyPositions[index])
+        arBtn.Setup(cKeyTouchAreas[index], key.GetRect(), cKeyPositions[index])
             .Background(Control::States::Normal, Color::None)
             .Foreground(Control::States::Normal, Color::White)
-            .Background(Control::States::Pressed, Color(0x494A63), &cKey, cKeyPositions[index])
+            .Background(Control::States::Pressed, Color(0x494A63), &key, cKeyPositions[index])
             .Foreground(Control::States::Pressed, Color::White);
         addBtn(arBtn);
         index++;
@@ -263,7 +273,7 @@ void Keyboard::SetLayout(LayoutType aLayout)
         case LayoutType::Numbers:
             setSymbols(std::string(cNumbers));
             mBtnShift.Hide();
-            mBtnLetters.Setup(cSpecialLeft, cBigSpecial.GetRect(), Point(18, 236) + GetOrigin()).Show();
+            mBtnLetters.Setup(cSpecialLeft, mBigSpecialRect, Point(18, 236) + GetOrigin()).Show();
             mBtnNumbers.Hide();
             mBtnSpecials.Show();
             break;
@@ -271,7 +281,7 @@ void Keyboard::SetLayout(LayoutType aLayout)
         case LayoutType::Special:
             setSymbols(std::string(cSpecials));
             mBtnShift.Hide();
-            mBtnLetters.Setup(cSpecialRight, cBigSpecial.GetRect(), Point(366, 236) + GetOrigin()).Show();
+            mBtnLetters.Setup(cSpecialRight, mBigSpecialRect, Point(366, 236) + GetOrigin()).Show();
             mBtnNumbers.Show();
             mBtnSpecials.Hide();
             break;

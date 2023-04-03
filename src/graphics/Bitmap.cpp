@@ -37,6 +37,11 @@ Bitmap::Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, Pi
     Init(aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
 }
 
+Bitmap::Bitmap(const PixelData &arPixelData)
+{
+    Assign(arPixelData);
+}
+
 
 Bitmap& Bitmap::Load(const std::string &arImgName)
 {

@@ -20,13 +20,13 @@ CppObjectFile::CppObjectFile(const std::filesystem::path &arFileName)
     mVariableName.erase(std::remove(mVariableName.begin(), mVariableName.end(), '\"' ), mVariableName.end());
 }
 
-CppObjectFile& CppObjectFile::Hex(const std::uint8_t *apData, std::size_t aSize)
+CppObjectFile& CppObjectFile::Hex(const std::uint8_t *apData, size_t aSize, size_t aIndent)
 {
     std::string delim = ", ";
 
     for (std::size_t i = 0 ; i < aSize ; i++) {
         if ((i % 16) == 0) {
-            mFile << "    ";
+            mFile << std::string(aIndent, ' ');
         }
         if (i == (aSize - 1)) {
             delim = "";

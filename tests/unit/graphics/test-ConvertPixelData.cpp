@@ -26,63 +26,42 @@ TEST_CASE("Bitmap to C")
     TestHelpers::AddConsoleLogger(logger);
 
     std::string root = FileSystem::GetCurrentWorkingDirectory() + "testImages";
+    PixelData::ColorDepth depth;
+    std::string dir;
 
     SUBCASE("Alpha") {
-        MESSAGE("Converting alphas");
-        if (!FileSystem::DirectoryExists(root + "/alpha")) {
-            return;
-        }
-        std::vector<std::filesystem::path> list = FileSystem::Glob(root + "/alpha/*.bmp");
-
-        for(std::filesystem::path &path : list) {
-            MESSAGE("Converting " << path << " to C++ file");
-            Bitmap bmp(path);
-            PixelData alpha = bmp.GetPixelData().ChangeColorDepth(PixelData::ColorDepth::Alpha);
-            alpha.SaveToCFile(path.replace_extension("cpp"));
-        }
+        MESSAGE("Converting alpha");
+        dir = root + "/alpha";
+        depth = PixelData::ColorDepth::Alpha;
     }
 
     SUBCASE("Monochrome") {
-        if (!FileSystem::DirectoryExists(root + "/monochrome")) {
-            return;
-        }
-        std::vector<std::filesystem::path> list = FileSystem::Glob(root + "/monochrome/*.bmp");
-
-        for(std::filesystem::path &path : list) {
-            Bitmap bmp(path);
-            PixelData mono = bmp.GetPixelData().ChangeColorDepth(PixelData::ColorDepth::Monochrome);
-            mono.SaveToCFile(path.replace_extension("cpp"));
-        }
+        MESSAGE("Converting monochrome");
+        dir = root + "/monochrome";
+        depth = PixelData::ColorDepth::Monochrome;
     }
 
     SUBCASE("RGB") {
-        if (!FileSystem::DirectoryExists(root + "/rgb")) {
-            return;
-        }
-        MESSAGE("Found directory " << root + "/rgb");
-        std::vector<std::filesystem::path> list = FileSystem::Glob(root+ "/rgb/*.bmp");
-
-        for(std::filesystem::path &path : list) {
-            MESSAGE("Convert file " << path);
-            Bitmap bmp(path);
-            PixelData rgb = bmp.GetPixelData().ChangeColorDepth(PixelData::ColorDepth::RGB);
-            rgb.SaveToCFile(path.replace_extension("cpp"));
-        }
+        MESSAGE("Converting rgb");
+        dir = root + "/rgb";
+        depth = PixelData::ColorDepth::RGB;
     }
 
     SUBCASE("RGBA") {
-        if (!FileSystem::DirectoryExists(root + "/rgba")) {
-            return;
-        }
-        std::vector<std::filesystem::path> list = FileSystem::Glob(root + "/rgba/*.bmp");
-
-        for(std::filesystem::path &path : list) {
-            Bitmap bmp(path);
-            PixelData rgba = bmp.GetPixelData().ChangeColorDepth(PixelData::ColorDepth::RGBA);
-            rgba.SaveToCFile(path.replace_extension("cpp"));
-        }
+        MESSAGE("Converting rgba");
+        dir = root + "/rgba";
+        depth = PixelData::ColorDepth::RGBA;
     }
 
+    REQUIRE_MESSAGE(FileSystem::DirectoryExists(dir), "The directory " << dir << " does not exist.");
+
+    std::vector<std::filesystem::path> list = FileSystem::Glob(dir + "/*.bmp");
+    for(std::filesystem::path &path : list) {
+        MESSAGE("Converting " << path.filename() << " to C++ file");
+        Bitmap bmp(path);
+        PixelData pd = bmp.GetPixelData().ChangeColorDepth(depth);
+        pd.SaveToCFile(path.replace_extension("cpp"), true);
+    }
 }
 
 

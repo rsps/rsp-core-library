@@ -15,6 +15,7 @@
 #include <graphics/Color.h>
 #include <graphics/Point.h>
 #include <graphics/Rect.h>
+#include <graphics/GfxCompressor.h>
 #include <graphics/GfxHal.h>
 #include <cstdint>
 #include <cstddef>
@@ -38,7 +39,7 @@ public:
 
     PixelData() noexcept {}
     PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth = PixelData::ColorDepth::RGBA);
-    PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData);
+    PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData, size_t aDataSize, bool aCompressed = false);
 
     PixelData(const PixelData& arOther);
     PixelData(PixelData&& arOther);
@@ -86,7 +87,7 @@ public:
     PixelData& SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor);
     PixelData& SetPixel(const Point &arPoint, Color aColor) { return SetPixelAt(arPoint.mX, arPoint.mY, aColor); }
 
-    void SaveToCFile(const std::filesystem::path &arFileName);
+    void SaveToCFile(const std::filesystem::path &arFileName, bool aCompress = false) const;
 
     bool SetBlend(bool aValue);
 
@@ -96,6 +97,8 @@ protected:
     const std::uint8_t *mpData = nullptr;
     std::vector<std::uint8_t> mData{};
     bool mBlend = true;
+
+    GfxCompression getCompressionType(bool aCompress) const;
 
     friend class ImgLoader;
     void initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth);

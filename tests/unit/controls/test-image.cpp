@@ -16,6 +16,7 @@
 #include <utils/Random.h>
 #include <TestHelpers.h>
 #include "pixmap/TestImage480x800.h"
+#include "pixmap/LowerCase.h"
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
@@ -92,9 +93,12 @@ TEST_CASE("TestImage")
     CHECK_NOTHROW(renderer.Present());
     CHECK_NOTHROW(renderer.Fill(Color::Grey));
 
-    BitmapView bmp(cTestImage480x800);
+//    auto bmp(LoadLowerCase());
+    auto bmp(LoadTestImage480x800());
+//    bmp.SaveToCFile("TestImage480x800b.cpp");
 
-    Image image(bmp);
+    BitmapView bv(bmp);
+    Image image(bv);
 
     CHECK(image.UpdateData());
     CHECK_NOTHROW(image.Render(renderer));

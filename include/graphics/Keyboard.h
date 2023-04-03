@@ -158,6 +158,7 @@ protected:
     Key mBtnErase{};
     Key mBtnSpace{};
     std::string mInput{};
+    Rect mBigSpecialRect{};
 
     void addBtn(Key &arBtn);
     void setSymbols(const std::string &arSymbols);

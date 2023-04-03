@@ -19,8 +19,8 @@ Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
 {
 }
 
-Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData)
-    : PixelData(aWidth, aHeight, aDepth, aData),
+Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData, size_t aDataSize)
+    : PixelData(aWidth, aHeight, aDepth, aData, aDataSize),
       mClipRect(mRect)
 {
 }

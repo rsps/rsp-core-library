@@ -11,9 +11,10 @@
 #include <cstring>
 #include <cstdlib>
 #include <graphics/PixelData.h>
+#include <logging/Logger.h>
 #include <posix/FileSystem.h>
 #include <utils/CppObjectFile.h>
-#include <logging/Logger.h>
+#include <utils/StrUtils.h>
 
 namespace rsp::graphics {
 
@@ -40,11 +41,25 @@ std::ostream& operator<<(std::ostream& os, const PixelData::ColorDepth arDepth)
 }
 
 
-PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData)
+PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData, size_t aDataSize, bool aCompressed)
     : mColorDepth(aDepth),
       mRect(0, 0, aWidth, aHeight),
       mpData(apData)
 {
+    if (aCompressed) {
+        GfxCompressor cmp(getCompressionType(aCompressed));
+        auto result = cmp.Decompress(mpData, aDataSize);
+
+        mData.resize(result.mSize);
+
+        GfxCompressor::size_type i = 0;
+        for (auto &val : mData) {
+            val = result.mpData[i++];
+        }
+
+        mpData = mData.data();
+    }
+
 }
 
 PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
@@ -270,28 +285,53 @@ void PixelData::initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aD
     mpData = mData.data();
 }
 
-void PixelData::SaveToCFile(const std::filesystem::path &arFileName)
+GfxCompression PixelData::getCompressionType(bool aCompress) const
+{
+    if (!aCompress) {
+        return GfxCompression::None;
+    }
+
+    switch(mColorDepth) {
+        case ColorDepth::Alpha:
+            return GfxCompression::Alpha;
+
+        case ColorDepth::RGB:
+            return GfxCompression::RGB;
+
+        default:
+            return GfxCompression::None;
+    }
+}
+
+void PixelData::SaveToCFile(const std::filesystem::path &arFileName, bool aCompress) const
 {
     rsp::utils::CppObjectFile fo(arFileName);
 
     fo << "#include \"" << fo.Name() << ".h\"\n" << std::endl;
-
-    fo << "static const std::uint8_t c" << fo.Name() << "PixData[" << GetDataSize() << "] = {\n";
-    fo.Hex(mpData, GetDataSize());
-    fo << "};\n\n";
-
     fo << "using namespace rsp::graphics;\n" << std::endl;
 
-    fo << "const PixelData c"
-        << fo.Name() << "(" << GetWidth() << "u, " << GetHeight() << "u, PixelData::ColorDepth::"
-        << mColorDepth << ", " << "c" << fo.Name() << "PixData);\n" << std::endl;
+    std::string obj_name = fo.Name();
+    utils::StrUtils::ReplaceAll(obj_name, "-", "_");
+
+    GfxCompressor cmp(getCompressionType(aCompress));
+    auto result = cmp.Compress(mpData, GetDataSize());
+
+    fo << "PixelData Load" << obj_name << "()\n{\n";
+    fo << "    const std::uint8_t cPixData[" << result.mSize << "] = {\n";
+    fo.Hex(result.mpData, result.mSize, 8u);
+    fo << "    };\n\n";
+
+    fo << "    return PixelData(" << GetWidth() << "u, " << GetHeight() << "u, PixelData::ColorDepth::"
+        << mColorDepth << ", " << "cPixData, sizeof(cPixData), "
+        << (aCompress ? "true" : "false") <<  ");\n}" << std::endl;
 
     std::filesystem::path hfile = arFileName;
     hfile.replace_extension("h");
     std::fstream header(hfile, std::ios_base::out | std::ios_base::trunc);
-    header << "#include <graphics/primitives/PixelData.h>\n" << std::endl;
-    header << "extern const rsp::graphics::PixelData c" << fo.Name() << ";" << std::endl;
+    header << "#include <graphics/PixelData.h>\n" << std::endl;
+    header << "rsp::graphics::PixelData Load" << obj_name << "();" << std::endl;
 }
+
 
 PixelData PixelData::ChangeColorDepth(ColorDepth aDepth, Color aColor) const
 {

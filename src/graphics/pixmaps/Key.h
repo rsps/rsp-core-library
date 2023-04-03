@@ -1,3 +1,3 @@
 #include <graphics/PixelData.h>
 
-extern const rsp::graphics::PixelData cKey;
+rsp::graphics::PixelData LoadKey();

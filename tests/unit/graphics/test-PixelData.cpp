@@ -45,13 +45,13 @@ TEST_CASE("PixelData")
         CHECK_NOTHROW(PixelData tmp2(10, 10, PixelData::ColorDepth::Monochrome));
         CHECK_NOTHROW(PixelData tmp3(10, 10, PixelData::ColorDepth::Alpha));
         CHECK_NOTHROW(PixelData tmp4(10, 10, PixelData::ColorDepth::RGB));
-        CHECK_NOTHROW(PixelData tmp5(2, 2, PixelData::ColorDepth::RGB, cImageRGB));
-        CHECK_NOTHROW(PixelData tmp6(8, 8, PixelData::ColorDepth::Monochrome, cImage1bit));
+        CHECK_NOTHROW(PixelData tmp5(2, 2, PixelData::ColorDepth::RGB, cImageRGB, sizeof(cImageRGB)));
+        CHECK_NOTHROW(PixelData tmp6(8, 8, PixelData::ColorDepth::Monochrome, cImage1bit, sizeof(cImage1bit)));
     }
 
     SUBCASE("Monochrome")
     {
-        PixelData pd(8, 8, PixelData::ColorDepth::Monochrome, cImage1bit);
+        PixelData pd(8, 8, PixelData::ColorDepth::Monochrome, cImage1bit, sizeof(cImage1bit));
         CHECK_EQ(pd.GetWidth(), 8);
         CHECK_EQ(pd.GetHeight(), 8);
         CHECK_EQ(pd.GetColorDepth(), PixelData::ColorDepth::Monochrome);
@@ -72,7 +72,7 @@ TEST_CASE("PixelData")
 
     SUBCASE("Alpha")
     {
-        PixelData pd(8, 4, PixelData::ColorDepth::Alpha, cImageAlpha);
+        PixelData pd(8, 4, PixelData::ColorDepth::Alpha, cImageAlpha, sizeof(cImageAlpha));
         CHECK_EQ(pd.GetWidth(), 8);
         CHECK_EQ(pd.GetHeight(), 4);
         CHECK_EQ(pd.GetColorDepth(), PixelData::ColorDepth::Alpha);
@@ -91,7 +91,7 @@ TEST_CASE("PixelData")
 
     SUBCASE("RGB")
     {
-        PixelData pd(2, 2, PixelData::ColorDepth::RGB, cImageRGB);
+        PixelData pd(2, 2, PixelData::ColorDepth::RGB, cImageRGB, sizeof(cImageRGB));
         CHECK_EQ(pd.GetWidth(), 2);
         CHECK_EQ(pd.GetHeight(), 2);
         CHECK_EQ(pd.GetColorDepth(), PixelData::ColorDepth::RGB);

@@ -58,9 +58,9 @@ TEST_CASE("Bitmap")
         CHECK(bitmap.GetHeight() == height);
         CHECK(bitmap.GetWidth() == width);
         CHECK_EQ(bitmap.GetPixelData().GetDataSize(), (width * height * 3));
-        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White), Color(0xFF020A8F));
-        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White), Color(0xFF020A8F));
-        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(55, 111, Color::White), Color(0xFFEAEFE8));
+        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White).AsUint(), 0xFF020A8F);
+        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White).AsUint(), 0xFF020A8F);
+        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(55, 111, Color::White).AsUint(), 0xFFEAEFE8);
 
         SUBCASE("Drawing on loaded Img") {
             // Arrange
@@ -99,7 +99,7 @@ TEST_CASE("Bitmap")
     SUBCASE("Monochrome Bmp file")
     {
         // Arrange
-        std::string filepath = "testImages/Monochrome.bmp";
+        std::string filepath = "testImages/monochrome/Monochrome.bmp";
         uint32_t height = 100;
         uint32_t width = 100;
 

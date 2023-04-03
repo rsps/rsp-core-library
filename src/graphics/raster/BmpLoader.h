@@ -117,6 +117,11 @@ protected:
         };
     } __attribute__((packed)) mBmpHeader{};
 
+    int mRedIndex = 0;
+    int mGreenIndex = 0;
+    int mBlueIndex = 0;
+    int mAlphaIndex = 0;
+
     friend std::ostream &operator<<(std::ostream &os, const BmpLoader::BmpHeader_t &arHeader);
 
     std::size_t mBytesPerPixel = 0;

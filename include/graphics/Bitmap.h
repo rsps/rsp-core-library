@@ -36,6 +36,7 @@ public:
 
     Bitmap(const std::string &arImgName);
     Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, PixelData::ColorDepth aDepth);
+    Bitmap(const PixelData &arPixelData);
 
     Bitmap& Load(const std::string &arImgName);
     Bitmap& Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, PixelData::ColorDepth aDepth);
