@@ -35,7 +35,7 @@ public:
 
     virtual GuiUnit_t GetHeight() const = 0;
     virtual GuiUnit_t GetWidth() const = 0;
-    virtual PixelData::ColorDepth GetColorDepth() const = 0;
+    virtual ColorDepth GetColorDepth() const = 0;
 
     virtual Renderer& DrawRect(Color aColor, const Rect &arRect) = 0;
     virtual Renderer& Fill(Color aColor, Optional<const Rect> aDestination = nullptr) = 0;

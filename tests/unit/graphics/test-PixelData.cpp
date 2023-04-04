@@ -42,19 +42,19 @@ TEST_CASE("PixelData")
     SUBCASE("Constructs")
     {
         CHECK_NOTHROW(PixelData tmp1);
-        CHECK_NOTHROW(PixelData tmp2(10, 10, PixelData::ColorDepth::Monochrome));
-        CHECK_NOTHROW(PixelData tmp3(10, 10, PixelData::ColorDepth::Alpha));
-        CHECK_NOTHROW(PixelData tmp4(10, 10, PixelData::ColorDepth::RGB));
-        CHECK_NOTHROW(PixelData tmp5(2, 2, PixelData::ColorDepth::RGB, cImageRGB, sizeof(cImageRGB)));
-        CHECK_NOTHROW(PixelData tmp6(8, 8, PixelData::ColorDepth::Monochrome, cImage1bit, sizeof(cImage1bit)));
+        CHECK_NOTHROW(PixelData tmp2(10, 10, ColorDepth::Monochrome));
+        CHECK_NOTHROW(PixelData tmp3(10, 10, ColorDepth::Alpha));
+        CHECK_NOTHROW(PixelData tmp4(10, 10, ColorDepth::RGB));
+        CHECK_NOTHROW(PixelData tmp5(2, 2, ColorDepth::RGB, cImageRGB, sizeof(cImageRGB)));
+        CHECK_NOTHROW(PixelData tmp6(8, 8, ColorDepth::Monochrome, cImage1bit, sizeof(cImage1bit)));
     }
 
     SUBCASE("Monochrome")
     {
-        PixelData pd(8, 8, PixelData::ColorDepth::Monochrome, cImage1bit, sizeof(cImage1bit));
+        PixelData pd(8, 8, ColorDepth::Monochrome, cImage1bit, sizeof(cImage1bit));
         CHECK_EQ(pd.GetWidth(), 8);
         CHECK_EQ(pd.GetHeight(), 8);
-        CHECK_EQ(pd.GetColorDepth(), PixelData::ColorDepth::Monochrome);
+        CHECK_EQ(pd.GetColorDepth(), ColorDepth::Monochrome);
 
         CHECK_EQ(pd.GetPixelAt(0,0, Color::White), Color(0x00FFFFFF));
         CHECK_EQ(pd.GetPixelAt(1,0, Color::White), Color(0xFFFFFFFF));
@@ -72,10 +72,10 @@ TEST_CASE("PixelData")
 
     SUBCASE("Alpha")
     {
-        PixelData pd(8, 4, PixelData::ColorDepth::Alpha, cImageAlpha, sizeof(cImageAlpha));
+        PixelData pd(8, 4, ColorDepth::Alpha, cImageAlpha, sizeof(cImageAlpha));
         CHECK_EQ(pd.GetWidth(), 8);
         CHECK_EQ(pd.GetHeight(), 4);
-        CHECK_EQ(pd.GetColorDepth(), PixelData::ColorDepth::Alpha);
+        CHECK_EQ(pd.GetColorDepth(), ColorDepth::Alpha);
 
         CHECK_EQ(pd.GetPixelAt(0,0, Color::White), Color(0x10FFFFFF));
         CHECK_EQ(pd.GetPixelAt(1,0, Color::White), Color(0x20FFFFFF));
@@ -91,10 +91,10 @@ TEST_CASE("PixelData")
 
     SUBCASE("RGB")
     {
-        PixelData pd(2, 2, PixelData::ColorDepth::RGB, cImageRGB, sizeof(cImageRGB));
+        PixelData pd(2, 2, ColorDepth::RGB, cImageRGB, sizeof(cImageRGB));
         CHECK_EQ(pd.GetWidth(), 2);
         CHECK_EQ(pd.GetHeight(), 2);
-        CHECK_EQ(pd.GetColorDepth(), PixelData::ColorDepth::RGB);
+        CHECK_EQ(pd.GetColorDepth(), ColorDepth::RGB);
 
         CHECK_EQ(pd.GetPixelAt(0,0, Color::Black), Color(0xFFFFFFFF));
         CHECK_EQ(pd.GetPixelAt(1,0, Color::White), Color(0xFF000000));

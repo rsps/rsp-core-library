@@ -17,6 +17,7 @@
 #include <graphics/Rect.h>
 #include <graphics/GfxCompressor.h>
 #include <graphics/GfxHal.h>
+#include <graphics/GfxResource.h>
 #include <cstdint>
 #include <cstddef>
 #include <filesystem>
@@ -35,11 +36,10 @@ public:
 class PixelData
 {
 public:
-    enum class ColorDepth { Monochrome = 1, Alpha = 8, RGB = 24, RGBA = 32 };
-
     PixelData() noexcept {}
-    PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth = PixelData::ColorDepth::RGBA);
+    PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth = ColorDepth::RGBA);
     PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData, size_t aDataSize, bool aCompressed = false);
+    PixelData(const GfxResource &arResource);
 
     PixelData(const PixelData& arOther);
     PixelData(PixelData&& arOther);
@@ -87,7 +87,7 @@ public:
     PixelData& SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor);
     PixelData& SetPixel(const Point &arPoint, Color aColor) { return SetPixelAt(arPoint.mX, arPoint.mY, aColor); }
 
-    void SaveToCFile(const std::filesystem::path &arFileName, bool aCompress = false) const;
+    void SaveToCFile(const std::filesystem::path &arFileName, bool aCompress = false, const char *apHeaderFile = nullptr) const;
 
     bool SetBlend(bool aValue);
 
@@ -106,8 +106,6 @@ protected:
     void assign(const PixelData& arOther);
     void move(PixelData&& arOther);
 };
-
-std::ostream& operator<<(std::ostream& os, const PixelData::ColorDepth arDepth);
 
 } /* namespace rsp::graphics */
 

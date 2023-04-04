@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_STATICTEXTURES_H_
-#define INCLUDE_GRAPHICS_STATICTEXTURES_H_
+#ifndef INCLUDE_GRAPHICS_TEXTUREMAP_H_
+#define INCLUDE_GRAPHICS_TEXTUREMAP_H_
 
 #include <graphics/Texture.h>
 #include <map>
@@ -31,15 +31,20 @@ public:
 };
 
 
-class StaticTextures : public rsp::utils::Singleton<StaticTextures>
+class TextureMap
 {
 public:
-    virtual ~StaticTextures() {}
+    virtual ~TextureMap() {}
 
     virtual void Load() {};
 
+    std::unique_ptr<const Texture> Get(uint32_t aId) const
+    {
+        return get(aId);
+    }
+
     template<class T>
-    std::unique_ptr<const Texture> GetTexture()
+    std::unique_ptr<const Texture> Get() const
     {
         return get(rsp::utils::ID<T>());
     }
@@ -66,6 +71,10 @@ protected:
     }
 };
 
+class StaticTextures : public TextureMap, public rsp::utils::Singleton<StaticTextures>
+{
+};
+
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_STATICTEXTURES_H_ */
+#endif /* INCLUDE_GRAPHICS_TEXTUREMAP_H_ */

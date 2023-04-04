@@ -19,9 +19,9 @@ namespace rsp::graphics
 GfxInputEvents& GfxInputEvents::Get()
 {
     if (!TouchParser::HasInstance()) {
-        TouchParser::Create();
+        TouchParser::CreateInstance();
     }
-    return rsp::utils::Singleton<TouchParser>::Get();
+    return rsp::utils::Singleton<TouchParser>::GetInstance();
 }
 
 

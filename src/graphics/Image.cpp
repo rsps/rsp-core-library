@@ -57,6 +57,13 @@ void Image::Render(Renderer &arRenderer) const
 void Image::update()
 {
     if (mpTexture) {
+        if (mBitmap.GetPixelData().GetColorDepth() != ColorDepth::RGB) {
+            mpTexture->Fill(Color::None);
+            mpTexture->SetBlendOperation(GfxBlendOperation::SourceAlpha);
+        }
+        else {
+            mpTexture->SetBlendOperation(GfxBlendOperation::Copy);
+        }
         mpTexture->Update(mBitmap.GetPixelData(), mStyles[mState].mForegroundColor);
 
         auto sr = Rect(0, 0, mBitmap.GetWidth(), mBitmap.GetHeight());

@@ -15,13 +15,6 @@
 #include <codecvt>
 #include <graphics/Keyboard.h>
 #include <utils/Function.h>
-#include "pixmaps/BigSpecial.h"
-#include "pixmaps/Erase.h"
-#include "pixmaps/Key.h"
-#include "pixmaps/LowerCase.h"
-#include "pixmaps/SmallSpecial.h"
-#include "pixmaps/Space.h"
-#include "pixmaps/UpperCase.h"
 
 using namespace rsp::utils;
 
@@ -105,37 +98,38 @@ static Point cKeyPositions[26] = {
     {333, 154}   // M
 };
 
-Keyboard::Keyboard()
+Keyboard::Keyboard(TextureMap &arTextures)
+    : mrTextures(arTextures)
 {
     initTypeInfo<Keyboard>();
     SetTransparent(true);
 
-    auto small_special = LoadSmallSpecial();
-    auto lower_case = LoadLowerCase();
-    auto upper_case = LoadUpperCase();
+    auto small_special = getTexture(TextureId::SmallSpecial);
+    auto lower_case = getTexture(TextureId::LowerCase);
+    auto upper_case = getTexture(TextureId::UpperCase);
 
     mBtnShift.Symbol(cKEY_SHIFT)
-        .Background(Control::States::Normal, Color::White, &small_special)
-        .Foreground(Control::States::Normal, Color(0x494A63), &lower_case, {11, 7})
-        .Background(Control::States::Pressed, Color(0x494A63), &small_special)
-        .Foreground(Control::States::Pressed, Color::White, &lower_case, {11, 7})
-        .Background(Control::States::Checked, Color::White, &small_special)
-        .Foreground(Control::States::Checked, Color(0x494A63), &upper_case, {11, 3})
-        .Background(Control::States::CheckedPressed, Color(0x494A63), &small_special)
-        .Foreground(Control::States::CheckedPressed, Color::White, &upper_case, {11, 3})
-        .Setup(Rect(0, 152, 80, 71), small_special.GetRect(), {18, 167})
+        .Background(Control::States::Normal, Color::White, small_special)
+        .Foreground(Control::States::Normal, Color(0x494A63), lower_case, {11, 7})
+        .Background(Control::States::Pressed, Color(0x494A63), small_special)
+        .Foreground(Control::States::Pressed, Color::White, lower_case, {11, 7})
+        .Background(Control::States::Checked, Color::White, small_special)
+        .Foreground(Control::States::Checked, Color(0x494A63), upper_case, {11, 3})
+        .Background(Control::States::CheckedPressed, Color(0x494A63), small_special)
+        .Foreground(Control::States::CheckedPressed, Color::White, upper_case, {11, 3})
+        .Setup(Rect(0, 152, 80, 71), small_special->GetDestinationRect(), {18, 167})
         .SetCheckable(true)
         .SetName("Shift");
 
-    auto big_special = LoadBigSpecial();
-    mBigSpecialRect = big_special.GetRect();
+    auto big_special = getTexture(TextureId::BigSpecial);
+    mBigSpecialRect = big_special->GetDestinationRect();
 
     mBtnLetters.Symbol(cKEY_LETTERS)
         .Background(Control::States::Normal, Color::White, &big_special)
         .Foreground(Control::States::Normal, Color::Black)
         .Background(Control::States::Pressed, Color(0x494A63), &big_special)
         .Foreground(Control::States::Pressed, Color::White)
-        .Setup(cSpecialLeft, big_special.GetRect(), {18, 236})
+        .Setup(cSpecialLeft, big_special->GetDestinationRect(), {18, 236})
         .SetName("Letters");
     mBtnLetters.SetCaption("ABC").SetFontSize(22);
 
@@ -144,7 +138,7 @@ Keyboard::Keyboard()
         .Foreground(Control::States::Normal, Color::Black)
         .Background(Control::States::Pressed, Color(0x494A63), &big_special)
         .Foreground(Control::States::Pressed, Color::White)
-        .Setup(cSpecialLeft, big_special.GetRect(), {18, 236})
+        .Setup(cSpecialLeft, big_special->GetDestinationRect(), {18, 236})
         .SetName("Numbers");
     mBtnNumbers.SetCaption("123").SetFontSize(22);
 
@@ -153,26 +147,26 @@ Keyboard::Keyboard()
         .Foreground(Control::States::Normal, Color::Black)
         .Background(Control::States::Pressed, Color(0x494A63), &big_special)
         .Foreground(Control::States::Pressed, Color::White)
-        .Setup(cSpecialRight, big_special.GetRect(), {366, 236})
+        .Setup(cSpecialRight, big_special->GetDestinationRect(), {366, 236})
         .SetName("Special");
     mBtnSpecials.SetCaption("+*#").SetFontSize(22);
 
-    auto erase = LoadErase();
+    auto erase = getTexture(TextureId::Erase);
     mBtnErase.Symbol('\b')
         .Background(Control::States::Normal, Color::White, &small_special)
         .Foreground(Control::States::Normal, Color(0x494A63), &erase, {9, 9})
         .Background(Control::States::Pressed, Color(0x494A63), &small_special)
         .Foreground(Control::States::Pressed, Color::White, &erase, {9, 9})
-        .Setup(Rect(374, 152, 80, 71), small_special.GetRect(), {390, 167})
+        .Setup(Rect(374, 152, 80, 71), small_special->GetDestinationRect(), {390, 167})
         .SetName("Erase");
 
-    auto space = LoadSpace();
+    auto space = getTexture(TextureId::Space);
     mBtnSpace.Symbol(' ')
         .Background(Control::States::Normal, Color::White, &space)
         .Foreground(Control::States::Normal, Color::None)
         .Background(Control::States::Pressed, Color(0x494A63), &space)
         .Foreground(Control::States::Pressed, Color::None)
-        .Setup(Rect(98, 224, 258, 64), space.GetRect(), {106, 236})
+        .Setup(Rect(98, 224, 258, 64), space->GetDestinationRect(), {106, 236})
         .SetName("Space");
 
     addBtn(mBtnShift);
@@ -183,9 +177,9 @@ Keyboard::Keyboard()
     addBtn(mBtnSpace);
 
     int index = 0;
-    auto key = LoadKey();
+    auto key = getTexture(TextureId::Key);
     for(Key& arBtn : mKeys) {
-        arBtn.Setup(cKeyTouchAreas[index], key.GetRect(), cKeyPositions[index])
+        arBtn.Setup(cKeyTouchAreas[index], key->GetDestinationRect(), cKeyPositions[index])
             .Background(Control::States::Normal, Color::None)
             .Foreground(Control::States::Normal, Color::White)
             .Background(Control::States::Pressed, Color(0x494A63), &key, cKeyPositions[index])
@@ -295,6 +289,11 @@ Keyboard& Keyboard::SetInput(const std::string &arText)
     Invalidate();
     mOnKeyClick(mInput);
     return *this;
+}
+
+std::unique_ptr<const Texture> Keyboard::getTexture(TextureId aId)
+{
+    return mrTextures.Get(std::uint32_t(aId));
 }
 
 } /* namespace rsp::graphics */

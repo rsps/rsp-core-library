@@ -26,7 +26,7 @@ TEST_CASE("Timer")
     int triggered2_count = 0;
     int loop_count = 0;
 
-    CHECK_NOTHROW(TimerQueue::Create());
+    CHECK_NOTHROW(TimerQueue::CreateInstance());
 
     CHECK_NOTHROW(Timer tmp);
     Timer t1;
@@ -63,7 +63,7 @@ TEST_CASE("Timer")
 
     for (; loop_count < 20 ; ++loop_count) {
         std::this_thread::sleep_for(5ms);
-        CHECK_NOTHROW(TimerQueue::Get().Poll());
+        CHECK_NOTHROW(TimerQueue::GetInstance().Poll());
     }
 
     CHECK(triggered[0]);

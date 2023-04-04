@@ -305,7 +305,7 @@ TEST_CASE("Framebuffer")
         SUBCASE("Draw memory created image")
         {
             // Arrange
-            Bitmap emptyMap(width, height, PixelData::ColorDepth::RGBA);
+            Bitmap emptyMap(width, height, ColorDepth::RGBA);
             Point randomPoint(Random::Roll(0, width-1), Random::Roll(0, height-1));
 
             MESSAGE("randomPoint: " << randomPoint);

@@ -92,7 +92,7 @@ class ImgLoader
   protected:
     PixelData mPixelData{};
 
-    void initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, PixelData::ColorDepth aDepth);
+    void initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth);
 };
 
 } // namespace rsp::graphics

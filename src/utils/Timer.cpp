@@ -39,10 +39,10 @@ Timer& Timer::Enable(bool aOn)
     mEnabled = aOn;
 
     if (aOn) {
-        TimerQueue::Get().RegisterTimer(this);
+        TimerQueue::GetInstance().RegisterTimer(this);
     }
     else {
-        TimerQueue::Get().UnregisterTimer(this);
+        TimerQueue::GetInstance().UnregisterTimer(this);
     }
 
     return *this;

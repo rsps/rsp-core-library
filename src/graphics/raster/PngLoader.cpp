@@ -134,25 +134,25 @@ bool PngLoader::PngChunk::LoadFrom(rsp::posix::FileIO &arFile)
     return true;
 }
 
-PixelData::ColorDepth PngLoader::getColorDepth()
+ColorDepth PngLoader::getColorDepth()
 {
     switch(mIhdr.ColorType) {
         case 0:
             if (mIhdr.BitDepth == 1) {
-                return PixelData::ColorDepth::Monochrome;
+                return ColorDepth::Monochrome;
             }
             else {
-                return PixelData::ColorDepth::Alpha;
+                return ColorDepth::Alpha;
             }
 
         case 4:
-            return PixelData::ColorDepth::Alpha;
+            return ColorDepth::Alpha;
 
         case 2:
         case 3:
         case 6:
         default:
-            return PixelData::ColorDepth::RGB;
+            return ColorDepth::RGB;
     }
 }
 

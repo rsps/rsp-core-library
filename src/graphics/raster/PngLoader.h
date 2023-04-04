@@ -106,7 +106,7 @@ protected:
     pHYs mPhys{};
 
     void checkSignature(rsp::posix::FileIO &arFile);
-    PixelData::ColorDepth getColorDepth();
+    ColorDepth getColorDepth();
     void decodeDataChunk(const std::uint8_t *apData, std::size_t aSize);
 };
 

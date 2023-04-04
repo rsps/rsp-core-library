@@ -70,7 +70,7 @@ public:
      * \fn void Create()
      * \brief Generic factory method.
      */
-    static void Create() {
+    static void CreateInstance() {
 #ifdef MT
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
@@ -90,7 +90,7 @@ public:
      *
      * \param aObject
      */
-    static void Set(T* apObject) {
+    static void SetInstance(T* apObject) {
 #ifdef MT
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
@@ -106,7 +106,7 @@ public:
      *
      * \return
      */
-    static T& Get() {
+    static T& GetInstance() {
         if (!mpInstance) {
             THROW_WITH_BACKTRACE(exceptions::ENoInstance);
         }
@@ -117,7 +117,7 @@ public:
      * \fn void Destroy()
      * \brief Call this to destroy a self owned instance. Useful during unit testing.
      */
-    static void Destroy() {
+    static void DestroyInstance() {
 #ifdef MT
         std::lock_guard<std::mutex> lock(mMutex);
 #endif

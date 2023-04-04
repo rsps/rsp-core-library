@@ -25,7 +25,7 @@ public:
 
     GuiUnit_t GetWidth() const override;
     GuiUnit_t GetHeight() const override;
-    PixelData::ColorDepth GetColorDepth() const override;
+    ColorDepth GetColorDepth() const override;
 
     Renderer& DrawRect(Color aColor, const Rect &arRect) override;
     Renderer& Fill(Color aColor, Optional<const Rect> aDestination = nullptr) override;

@@ -28,7 +28,7 @@ std::shared_ptr<ImgLoader> ImgLoader::GetRasterLoader(const std::string aFileTyp
     }
 }
 
-void ImgLoader::initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, PixelData::ColorDepth aDepth)
+void ImgLoader::initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
 {
     mPixelData.initAfterLoad(aWidth, aHeight, aDepth);
 }

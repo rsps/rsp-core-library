@@ -20,10 +20,10 @@ namespace rsp::graphics {
 GfxHal& GfxHal::Get()
 {
     if (!sw::SWGfxHal::HasInstance()) {
-        sw::SWGfxHal::Create();
+        sw::SWGfxHal::CreateInstance();
     }
 
-    return rsp::utils::Singleton<sw::SWGfxHal>::Get();
+    return rsp::utils::Singleton<sw::SWGfxHal>::GetInstance();
 }
 
 } /* namespace rsp::graphics */
@@ -178,8 +178,8 @@ void SWGfxHal::CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint3
 
     switch(arPixelData.GetColorDepth()) {
         default:
-        case PixelData::ColorDepth::RGB:
-        case PixelData::ColorDepth::RGBA: {
+        case ColorDepth::RGB:
+        case ColorDepth::RGBA: {
             for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
                 uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
                 GuiUnit_t src_x = sr.GetLeft();
@@ -191,7 +191,7 @@ void SWGfxHal::CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint3
             break;
         }
 
-//        case PixelData::ColorDepth::RGBA: {
+//        case ColorDepth::RGBA: {
 //            for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
 //                uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
 //                GuiUnit_t src_x = sr.GetLeft();
@@ -203,8 +203,8 @@ void SWGfxHal::CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint3
 //            break;
 //        }
 
-        case PixelData::ColorDepth::Monochrome:
-        case PixelData::ColorDepth::Alpha: {
+        case ColorDepth::Monochrome:
+        case ColorDepth::Alpha: {
             for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
                 uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
                 GuiUnit_t src_x = sr.GetLeft();

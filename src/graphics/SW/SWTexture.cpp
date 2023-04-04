@@ -17,12 +17,12 @@ std::unique_ptr<Texture> Texture::Create(const PixelData &arPixelData, Color aCo
     auto result = std::make_unique<sw::SWTexture>(arPixelData.GetWidth(), arPixelData.GetHeight(), aDestPos, aDestOffset);
     switch(arPixelData.GetColorDepth()) {
         default:
-        case PixelData::ColorDepth::RGB:
-        case PixelData::ColorDepth::RGBA:
+        case ColorDepth::RGB:
+        case ColorDepth::RGBA:
             result->SetBlendOperation(GfxBlendOperation::Copy);
             break;
-        case PixelData::ColorDepth::Monochrome:
-        case PixelData::ColorDepth::Alpha:
+        case ColorDepth::Monochrome:
+        case ColorDepth::Alpha:
             result->SetBlendOperation(GfxBlendOperation::SourceAlpha);
             break;
     }

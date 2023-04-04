@@ -21,22 +21,22 @@ Button& Button::Setup(Rect aTouchArea, Rect aArea, Point aPosition)
     return *this;
 }
 
-Button& Button::Background(Control::States aState, Color aColor, OptionalPixels_t aPixels, Point aOffset)
+Button& Button::Background(Control::States aState, Color aColor, OptionalTexture_t apTexture, Point aOffset)
 {
     Style& style = GetStyle(aState);
-    if (aPixels) {
-        style.mTextures.push_back(Texture::Create(*aPixels, aColor));
+    if (apTexture) {
+        style.mTextures.push_back(apTexture->Clone());
         style.mTextures.back()->SetOffset(aOffset);
     }
     style.mBackgroundColor = aColor;
     return *this;
 }
 
-Button& Button::Foreground(Control::States aState, Color aColor, OptionalPixels_t aPixels, Point aOffset)
+Button& Button::Foreground(Control::States aState, Color aColor, OptionalTexture_t apTexture, Point aOffset)
 {
     Style& style = GetStyle(aState);
-    if (aPixels) {
-        style.mTextures.push_back(Texture::Create(*aPixels, aColor));
+    if (apTexture) {
+        style.mTextures.push_back(apTexture->Clone());
         style.mTextures.back()->SetOffset(aOffset);
     }
     style.mForegroundColor = aColor;

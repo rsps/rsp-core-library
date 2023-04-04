@@ -94,21 +94,21 @@ void BmpLoader::LoadImg(const std::string &aImgName)
     ReadData(file);
 }
 
-PixelData::ColorDepth BmpLoader::bitsPerPixelToColorDepth(std::uint32_t aBpp)
+ColorDepth BmpLoader::bitsPerPixelToColorDepth(std::uint32_t aBpp)
 {
     switch (aBpp) {
         case 1:
-            return PixelData::ColorDepth::Monochrome;
+            return ColorDepth::Monochrome;
         case 2:
         case 4:
         case 8:
-            return PixelData::ColorDepth::Alpha;
+            return ColorDepth::Alpha;
 
         case 32:
-            return PixelData::ColorDepth::RGBA;
+            return ColorDepth::RGBA;
 
         default:
-            return PixelData::ColorDepth::RGB;
+            return ColorDepth::RGB;
 
     }
 }

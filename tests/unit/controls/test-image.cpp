@@ -15,8 +15,7 @@
 #include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <TestHelpers.h>
-#include "pixmap/TestImage480x800.h"
-#include "pixmap/LowerCase.h"
+#include "pixmap/GfxResources.h"
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
@@ -90,19 +89,34 @@ TEST_CASE("TestImage")
 
     auto& renderer = Renderer::Get();
     CHECK_NOTHROW(renderer.Fill(Color::Grey));
-    CHECK_NOTHROW(renderer.Present());
-    CHECK_NOTHROW(renderer.Fill(Color::Grey));
 
-//    auto bmp(LoadLowerCase());
-    auto bmp(LoadTestImage480x800());
-//    bmp.SaveToCFile("TestImage480x800b.cpp");
+    PixelData bmp;
+
+    SUBCASE("Monochrome") {
+        bmp = PixelData(cMonochrome);
+    }
+    SUBCASE("Alpha") {
+        bmp = PixelData(cLowerCase);
+//        bmp.SaveToCFile("LowerCase-compressed.cpp", true);
+//        bmp.SaveToCFile("LowerCase-normal.cpp", false);
+    }
+    SUBCASE("RGB") {
+        bmp = PixelData(cTestImage480x800);
+//        bmp.SaveToCFile("TestImage480x800b.cpp");
+    }
 
     BitmapView bv(bmp);
     Image image(bv);
+    image.GetStyle(Control::States::Normal).mForegroundColor = Color::Black;
+    image.GetStyle(Control::States::Normal).mBackgroundColor = Color::Yellow;
+
+    image.SetTransparent(false).SetOrigin(Point((480 - bmp.GetWidth()) / 2, (800 - bmp.GetHeight()) / 2));
 
     CHECK(image.UpdateData());
     CHECK_NOTHROW(image.Render(renderer));
     CHECK_NOTHROW(renderer.Present());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
 TEST_SUITE_END();

@@ -60,7 +60,8 @@ public:
     }
 
     InputScene()
-        : mBackground("testImages/rgb/Background.bmp")
+        : mKeyboard(StaticTextures::GetInstance()),
+          mBackground("testImages/rgb/Background.bmp")
     {
         SetTransparent(false); // No need to paint background color, we have full screen image.
 
@@ -83,7 +84,7 @@ public:
 
 protected:
     Label mLabel{};
-    Keyboard mKeyboard{};
+    Keyboard mKeyboard;
     Bitmap mBackground;
 
     void onInputChange(const std::string &arInput)

@@ -13,24 +13,25 @@
 #include <graphics/PixelData.h>
 #include <logging/Logger.h>
 #include <posix/FileSystem.h>
+#include <utils/Crc32.h>
 #include <utils/CppObjectFile.h>
 #include <utils/StrUtils.h>
 
 namespace rsp::graphics {
 
-std::ostream& operator<<(std::ostream& os, const PixelData::ColorDepth arDepth)
+std::ostream& operator<<(std::ostream& os, const ColorDepth arDepth)
 {
     switch (arDepth) {
-        case PixelData::ColorDepth::Monochrome:
+        case ColorDepth::Monochrome:
             os << "Monochrome";
             break;
-        case PixelData::ColorDepth::Alpha:
+        case ColorDepth::Alpha:
             os << "Alpha";
             break;
-        case PixelData::ColorDepth::RGB:
+        case ColorDepth::RGB:
             os << "RGB";
             break;
-        case PixelData::ColorDepth::RGBA:
+        case ColorDepth::RGBA:
             os << "RGBA";
             break;
         default:
@@ -38,6 +39,26 @@ std::ostream& operator<<(std::ostream& os, const PixelData::ColorDepth arDepth)
             break;
     }
     return os;
+}
+
+PixelData::PixelData(const GfxResource &arResource)
+    : mColorDepth(arResource.Depth),
+      mRect(0, 0, arResource.Width, arResource.Height),
+      mpData(arResource.PixData)
+{
+    if (arResource.Compressed) {
+        GfxCompressor cmp(getCompressionType(arResource.Compressed));
+        auto result = cmp.Decompress(mpData, arResource.PixDataSize);
+
+        mData.resize(result.mSize);
+
+        GfxCompressor::size_type i = 0;
+        for (auto &val : mData) {
+            val = result.mpData[i++];
+        }
+
+        mpData = mData.data();
+    }
 }
 
 
@@ -292,6 +313,7 @@ GfxCompression PixelData::getCompressionType(bool aCompress) const
     }
 
     switch(mColorDepth) {
+        case ColorDepth::Monochrome:
         case ColorDepth::Alpha:
             return GfxCompression::Alpha;
 
@@ -303,33 +325,39 @@ GfxCompression PixelData::getCompressionType(bool aCompress) const
     }
 }
 
-void PixelData::SaveToCFile(const std::filesystem::path &arFileName, bool aCompress) const
+void PixelData::SaveToCFile(const std::filesystem::path &arFileName, bool aCompress, const char *apHeaderFile) const
 {
     rsp::utils::CppObjectFile fo(arFileName);
-
-    fo << "#include \"" << fo.Name() << ".h\"\n" << std::endl;
-    fo << "using namespace rsp::graphics;\n" << std::endl;
 
     std::string obj_name = fo.Name();
     utils::StrUtils::ReplaceAll(obj_name, "-", "_");
 
+    fo << "#include \"" << (apHeaderFile ? apHeaderFile : obj_name + ".h") << "\"\n\n"
+        << "using namespace rsp::graphics;\n" << std::endl;
+
     GfxCompressor cmp(getCompressionType(aCompress));
     auto result = cmp.Compress(mpData, GetDataSize());
 
-    fo << "PixelData Load" << obj_name << "()\n{\n";
-    fo << "    const std::uint8_t cPixData[" << result.mSize << "] = {\n";
-    fo.Hex(result.mpData, result.mSize, 8u);
-    fo << "    };\n\n";
+    fo << "static const std::uint8_t pixdata[" << result.mSize << "]{\n";
+    fo.Hex(result.mpData, result.mSize);
+    fo << "};\n\n";
 
-    fo << "    return PixelData(" << GetWidth() << "u, " << GetHeight() << "u, PixelData::ColorDepth::"
-        << mColorDepth << ", " << "cPixData, sizeof(cPixData), "
-        << (aCompress ? "true" : "false") <<  ");\n}" << std::endl;
+    fo << "const GfxResource c" << obj_name << "{" << utils::crc32::HashConst(obj_name.c_str()) << "u, "
+        << GetWidth() << "u, " << GetHeight() << "u, ColorDepth::"
+        << mColorDepth << ", " << (aCompress ? "true" : "false")
+        << ", " << result.mSize << ", pixdata};" << std::endl;
 
+    std::ios_base::openmode mode = std::ios_base::out | (apHeaderFile ? std::ios_base::app : std::ios_base::trunc);
     std::filesystem::path hfile = arFileName;
     hfile.replace_extension("h");
-    std::fstream header(hfile, std::ios_base::out | std::ios_base::trunc);
-    header << "#include <graphics/PixelData.h>\n" << std::endl;
-    header << "rsp::graphics::PixelData Load" << obj_name << "();" << std::endl;
+    if (apHeaderFile) {
+        hfile.replace_filename(apHeaderFile);
+    }
+    std::fstream header(hfile, mode);
+    if (header.tellp() == 0) {
+        header << "#include <graphics/GfxResource.h>\n" << std::endl;
+    }
+    header << "extern const rsp::graphics::GfxResource c" << obj_name << ";" << std::endl;
 }
 
 

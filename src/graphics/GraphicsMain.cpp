@@ -9,7 +9,7 @@
  */
 
 #include <graphics/GraphicsMain.h>
-#include <graphics/StaticTextures.h>
+#include <graphics/TextureMap.h>
 #include <chrono>
 #include <thread>
 #include <utils/StopWatch.h>
@@ -42,7 +42,7 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
     int64_t frame_time = 1000 / aMaxFPS;
 
     if (StaticTextures::HasInstance()) {
-        StaticTextures::Get().Load();
+        StaticTextures::GetInstance().Load();
     }
 
     while (!mTerminated) {
@@ -50,7 +50,7 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
         sw.Reset();
 
         if (aPollTimers) {
-            rsp::utils::TimerQueue::Get().Poll();
+            rsp::utils::TimerQueue::GetInstance().Poll();
         }
 
         // New scene requested?

@@ -26,31 +26,34 @@ TEST_CASE("Bitmap to C")
     TestHelpers::AddConsoleLogger(logger);
 
     std::string root = FileSystem::GetCurrentWorkingDirectory() + "testImages";
-    PixelData::ColorDepth depth;
+    ColorDepth depth;
     std::string dir;
 
+    FileSystem::MakeDirectory(root + "/gfx");
+
     SUBCASE("Alpha") {
+        FileSystem::DeleteFile(root + "/gfx/GfxResources.h");
         MESSAGE("Converting alpha");
         dir = root + "/alpha";
-        depth = PixelData::ColorDepth::Alpha;
+        depth = ColorDepth::Alpha;
     }
 
     SUBCASE("Monochrome") {
         MESSAGE("Converting monochrome");
         dir = root + "/monochrome";
-        depth = PixelData::ColorDepth::Monochrome;
+        depth = ColorDepth::Monochrome;
     }
 
     SUBCASE("RGB") {
         MESSAGE("Converting rgb");
         dir = root + "/rgb";
-        depth = PixelData::ColorDepth::RGB;
+        depth = ColorDepth::RGB;
     }
 
     SUBCASE("RGBA") {
         MESSAGE("Converting rgba");
         dir = root + "/rgba";
-        depth = PixelData::ColorDepth::RGBA;
+        depth = ColorDepth::RGBA;
     }
 
     REQUIRE_MESSAGE(FileSystem::DirectoryExists(dir), "The directory " << dir << " does not exist.");
@@ -60,7 +63,9 @@ TEST_CASE("Bitmap to C")
         MESSAGE("Converting " << path.filename() << " to C++ file");
         Bitmap bmp(path);
         PixelData pd = bmp.GetPixelData().ChangeColorDepth(depth);
-        pd.SaveToCFile(path.replace_extension("cpp"), true);
+
+        std::string dest = root + "/gfx/" + std::string(path.stem()) + ".cpp";
+        pd.SaveToCFile(dest, true, "GfxResources.h");
     }
 }
 

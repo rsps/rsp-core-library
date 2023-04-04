@@ -20,9 +20,9 @@ namespace rsp::graphics {
 Renderer& Renderer::Get()
 {
     if (!sw::SWRenderer::HasInstance()) {
-        sw::SWRenderer::Create();
+        sw::SWRenderer::CreateInstance();
     }
-    return rsp::utils::Singleton<sw::SWRenderer>::Get();
+    return rsp::utils::Singleton<sw::SWRenderer>::GetInstance();
 }
 
 } /* namespace rsp::graphics */
@@ -64,11 +64,11 @@ GuiUnit_t SWRenderer::GetWidth() const
     return Framebuffer::GetWidth();
 }
 
-PixelData::ColorDepth SWRenderer::GetColorDepth() const
+ColorDepth SWRenderer::GetColorDepth() const
 {
     switch (mVariableInfo.bits_per_pixel) {
         case 32:
-            return PixelData::ColorDepth::RGBA;
+            return ColorDepth::RGBA;
 
         default:
         case 1:

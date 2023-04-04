@@ -76,7 +76,7 @@ TEST_CASE("Graphics Main Test")
     CHECK_NOTHROW(Font::RegisterFont(cFontFile));
     CHECK_NOTHROW(Font::SetDefaultFont(cFontName));
 
-    CHECK_NOTHROW(TimerQueue::Create());
+    CHECK_NOTHROW(TimerQueue::CreateInstance());
 
     // Make framebuffer
     std::filesystem::path p;
@@ -232,6 +232,6 @@ TEST_CASE("Graphics Main Test")
 
     CHECK_NOTHROW(gfx.RegisterOverlay(nullptr));
 
-    CHECK_NOTHROW(TimerQueue::Destroy());
+    CHECK_NOTHROW(TimerQueue::DestroyInstance());
 }
 

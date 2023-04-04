@@ -20,6 +20,7 @@ namespace rsp::graphics {
 
 class Texture;
 typedef std::unique_ptr<Texture> TexturePtr_t;
+typedef std::unique_ptr<const Texture> cTexturePtr_t;
 
 
 /**

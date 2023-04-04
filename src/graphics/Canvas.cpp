@@ -19,11 +19,11 @@ Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
 {
 }
 
-Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData, size_t aDataSize)
-    : PixelData(aWidth, aHeight, aDepth, aData, aDataSize),
-      mClipRect(mRect)
-{
-}
+//Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData, size_t aDataSize)
+//    : PixelData(aWidth, aHeight, aDepth, aData, aDataSize),
+//      mClipRect(mRect)
+//{
+//}
 
 void Canvas::DrawArc(const Point &arCenter, GuiUnit_t aRadius1, GuiUnit_t aRadius2,
     int aStartAngel, int aSweepAngle, const Color &arColor)
