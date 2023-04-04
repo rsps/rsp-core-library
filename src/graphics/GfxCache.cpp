@@ -10,7 +10,6 @@
 
 
 #include <graphics/GfxCache.h>
-#include <graphics/TextureMap.h>
 
 namespace rsp::graphics {
 
@@ -24,6 +23,9 @@ PixelData& GfxCache::MakePixelData(const GfxResource &arResource, uint32_t aId)
     auto pd = findPixelData(aId);
     if (!pd) {
         auto pair = mPixelDataList.emplace(aId, arResource);
+        if (pair.second == false) {
+            THROW_WITH_BACKTRACE1(ResourceExists, aId);
+        }
         pd = &(pair.first->second);
     }
     return *pd;
@@ -35,7 +37,7 @@ try
     return mPixelDataList.at(aId);
 }
 catch(const std::out_of_range &e) {
-    THROW_WITH_BACKTRACE1(PixelDataNotFound, aId);
+    THROW_WITH_BACKTRACE1(ResourceNotFound, aId);
 }
 
 TexturePtr_t& GfxCache::MakeTexture(const PixelData &arPixelData)
@@ -48,6 +50,9 @@ TexturePtr_t& GfxCache::MakeTexture(const PixelData &arPixelData, uint32_t aId)
     auto result = findTexture(aId);
     if (!result) {
         auto pair = mTextureList.insert({aId, Texture::Create(arPixelData)});
+        if (pair.second == false) {
+            THROW_WITH_BACKTRACE1(ResourceExists, aId);
+        }
         result = &(pair.first->second);
     }
     return *result;
@@ -59,7 +64,7 @@ try
     return mTextureList.at(aId);
 }
 catch(const std::out_of_range &e) {
-    THROW_WITH_BACKTRACE1(TextureNotFound, aId);
+    THROW_WITH_BACKTRACE1(ResourceNotFound, aId);
 }
 
 PixelData* GfxCache::findPixelData(uint32_t aId)

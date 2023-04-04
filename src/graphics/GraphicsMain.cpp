@@ -9,7 +9,6 @@
  */
 
 #include <graphics/GraphicsMain.h>
-#include <graphics/TextureMap.h>
 #include <chrono>
 #include <thread>
 #include <utils/StopWatch.h>
@@ -40,10 +39,6 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
     GfxEvent event;
     rsp::utils::StopWatch sw;
     int64_t frame_time = 1000 / aMaxFPS;
-
-    if (StaticTextures::HasInstance()) {
-        StaticTextures::GetInstance().Load();
-    }
 
     while (!mTerminated) {
 

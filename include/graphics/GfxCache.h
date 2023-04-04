@@ -21,11 +21,18 @@
 
 namespace rsp::graphics {
 
-class PixelDataNotFound : public exceptions::CoreException
+class ResourceNotFound : public exceptions::CoreException
 {
 public:
-    PixelDataNotFound(uint32_t aId) : CoreException("PixelData " + std::to_string(aId) + " does not exist") {};
+    ResourceNotFound(uint32_t aId) : CoreException("GFX Resource with id " + std::to_string(aId) + " does not exist") {};
 };
+
+class ResourceExists : public exceptions::CoreException
+{
+public:
+    ResourceExists(uint32_t aId) : CoreException("GFX Resource with id " + std::to_string(aId) + " already exists") {};
+};
+
 
 class GfxCache : public rsp::utils::Singleton<GfxCache>
 {
