@@ -50,11 +50,11 @@ public:
 
     PixelData ChangeColorDepth(ColorDepth aDepth, Color aColor = Color::Black) const;
 
-    PixelData& Init(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData);
+    PixelData& Init(uint32_t aId, GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData);
 
     void Fill(Color aColor);
 
-    uintptr_t GetId() { return uintptr_t(mpData); }
+    uint32_t GetId() const { return mId; }
 
     const std::uint8_t* GetData() const { return mpData; }
     std::vector<std::uint8_t>& GetData() { return mData; }
@@ -97,6 +97,7 @@ protected:
     const std::uint8_t *mpData = nullptr;
     std::vector<std::uint8_t> mData{};
     bool mBlend = true;
+    uint32_t mId = 0;
 
     GfxCompression getCompressionType(bool aCompress) const;
 

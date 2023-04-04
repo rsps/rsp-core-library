@@ -11,7 +11,6 @@
 #ifndef INCLUDE_GRAPHICS_KEYBOARD_H_
 #define INCLUDE_GRAPHICS_KEYBOARD_H_
 
-#include <graphics/TextureMap.h>
 #include <map>
 #include <array>
 #include <string>
@@ -142,7 +141,7 @@ public:
 
     enum class TextureId { BigSpecial = 1000, Erase, Key, LowerCase, SmallSpecial, Space, UpperCase };
 
-    Keyboard(TextureMap &arTextures);
+    Keyboard();
     ~Keyboard();
 
     void SetLayout(LayoutType aLayout);
@@ -152,7 +151,6 @@ public:
 
     KeyboardCallback_t& OnKeyClick() { return mOnKeyClick; }
 protected:
-    TextureMap &mrTextures;
     KeyboardCallback_t mOnKeyClick{};
     std::array<Key, 26u> mKeys{};
     Key mBtnShift{};
@@ -167,7 +165,7 @@ protected:
     void addBtn(Key &arBtn);
     void setSymbols(const std::string &arSymbols);
     void doKeyClick(const Point &arPoint, uint32_t aSymbol);
-    std::unique_ptr<const Texture> getTexture(TextureId aId);
+    const PixelData& getPixelData(TextureId aId);
 };
 
 } /* namespace rsp::graphics */

@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <logging/Logger.h>
+#include <utils/Crc32.h>
 
 using namespace rsp::utils;
 
@@ -34,14 +35,13 @@ Bitmap::Bitmap(const std::string &arImgName)
 Bitmap::Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, ColorDepth aDepth)
     : Canvas(aHeight, aWidth, aDepth)
 {
-    Init(aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
+    Init(uint32_t(uintptr_t(this)), aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
 }
 
 Bitmap::Bitmap(const PixelData &arPixelData)
 {
     Assign(arPixelData);
 }
-
 
 Bitmap& Bitmap::Load(const std::string &arImgName)
 {
@@ -51,13 +51,14 @@ Bitmap& Bitmap::Load(const std::string &arImgName)
     // Get raw data
     loader->LoadImg(filename);
     Assign(loader->GetPixelData());
+    mId = Crc32::Calc(arImgName.c_str(), arImgName.size());
     mClipRect = GetRect();
     return *this;
 }
 
 Bitmap& Bitmap::Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, ColorDepth aDepth)
 {
-    Init(aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
+    Init(uint32_t(uintptr_t(this)), aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
 
     return *this;
 }

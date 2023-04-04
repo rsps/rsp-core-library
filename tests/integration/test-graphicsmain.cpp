@@ -22,6 +22,7 @@
 #include <scenes/Scenes.h>
 #include <TestHelpers.h>
 #include <TestTouchParser.h>
+#include <TestPixmap.h>
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
@@ -88,6 +89,8 @@ TEST_CASE("Graphics Main Test")
 
     // Set default scene size to screen size
     CHECK_NOTHROW(Scene::SetScreenSize(renderer.GetWidth(), renderer.GetHeight()));
+
+    TestPixmap pix_map;
 
     // Make scenes
     CHECK_NOTHROW(SecondScene scn2);

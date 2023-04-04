@@ -23,13 +23,13 @@ namespace rsp::graphics {
 class Button: public Label
 {
 public:
-    using OptionalTexture_t = utils::OptionalPtr<cTexturePtr_t>;
+    using Optional_t = utils::OptionalPtr<PixelData>;
 
     Button() { initTypeInfo<Button>(); }
 
     Button& Setup(Rect aTouchArea, Rect aArea, Point aPosition);
-    Button& Background(Control::States aState, Color aColor, OptionalTexture_t aTexture = nullptr, Point aOffset = {0,0});
-    Button& Foreground(Control::States aState, Color aColor, OptionalTexture_t aTexture = nullptr, Point aOffset = {0,0});
+    Button& Background(Control::States aState, Color aColor, Optional_t apPixelData = nullptr, Point aOffset = {0,0});
+    Button& Foreground(Control::States aState, Color aColor, Optional_t apPixelData = nullptr, Point aOffset = {0,0});
 };
 
 } /* namespace rsp::graphics */

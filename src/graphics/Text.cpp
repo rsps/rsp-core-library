@@ -65,7 +65,7 @@ Text& Text::Reload(utils::OptionalPtr<const Rect> aRect)
     else {
         loadGlyphs();
     }
-    Init(mBoundingRect.GetWidth(), mBoundingRect.GetHeight(), ColorDepth::Alpha, nullptr);
+    Init(GetId(), mBoundingRect.GetWidth(), mBoundingRect.GetHeight(), ColorDepth::Alpha, nullptr);
     draw();
     mDirty = false;
     return *this;

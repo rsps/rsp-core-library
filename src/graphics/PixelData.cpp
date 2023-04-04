@@ -56,9 +56,9 @@ PixelData::PixelData(const GfxResource &arResource)
         for (auto &val : mData) {
             val = result.mpData[i++];
         }
-
         mpData = mData.data();
     }
+    mId = arResource.Id;
 }
 
 
@@ -80,7 +80,7 @@ PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, con
 
         mpData = mData.data();
     }
-
+    mId = uint32_t(uintptr_t(mpData));
 }
 
 PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
@@ -89,6 +89,7 @@ PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
 {
     mData.resize(GetDataSize());
     mpData = mData.data();
+    mId = uint32_t(uintptr_t(mpData));
 }
 
 PixelData::PixelData(const PixelData &arOther)
@@ -119,6 +120,7 @@ PixelData& PixelData::operator=(PixelData &&arOther)
 
 void PixelData::assign(const PixelData& arOther)
 {
+    mId = arOther.mId;
     mColorDepth = arOther.mColorDepth;
     mRect = arOther.mRect;
     mData = arOther.mData;
@@ -132,6 +134,7 @@ void PixelData::assign(const PixelData& arOther)
 
 void PixelData::move(PixelData &&arOther)
 {
+    mId = arOther.mId;
     mColorDepth = arOther.mColorDepth;
     mRect = std::move(arOther.mRect);
     mData = std::move(arOther.mData);
@@ -144,8 +147,9 @@ void PixelData::move(PixelData &&arOther)
 }
 
 
-PixelData& PixelData::Init(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData)
+PixelData& PixelData::Init(uint32_t aId, GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData)
 {
+    mId = aId;
     mColorDepth = aDepth;
     mRect = Rect(0, 0, aWidth, aHeight);
     if (apData) {

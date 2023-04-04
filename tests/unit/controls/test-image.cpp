@@ -15,7 +15,7 @@
 #include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <TestHelpers.h>
-#include "pixmap/GfxResources.h"
+#include <pixmap/GfxResources.h>
 
 using namespace rsp::graphics;
 using namespace rsp::utils;

@@ -9,6 +9,7 @@
  */
 
 #include <graphics/Button.h>
+#include <graphics/Texture.h>
 
 namespace rsp::graphics {
 
@@ -21,22 +22,22 @@ Button& Button::Setup(Rect aTouchArea, Rect aArea, Point aPosition)
     return *this;
 }
 
-Button& Button::Background(Control::States aState, Color aColor, OptionalTexture_t apTexture, Point aOffset)
+Button& Button::Background(Control::States aState, Color aColor, Optional_t apPixelData, Point aOffset)
 {
     Style& style = GetStyle(aState);
-    if (apTexture) {
-        style.mTextures.push_back(apTexture->Clone());
+    if (apPixelData) {
+        style.mTextures.push_back(Texture::Create(apPixelData.Get(), aColor));
         style.mTextures.back()->SetOffset(aOffset);
     }
     style.mBackgroundColor = aColor;
     return *this;
 }
 
-Button& Button::Foreground(Control::States aState, Color aColor, OptionalTexture_t apTexture, Point aOffset)
+Button& Button::Foreground(Control::States aState, Color aColor, Optional_t apPixelData, Point aOffset)
 {
     Style& style = GetStyle(aState);
-    if (apTexture) {
-        style.mTextures.push_back(apTexture->Clone());
+    if (apPixelData) {
+        style.mTextures.push_back(Texture::Create(apPixelData.Get(), aColor));
         style.mTextures.back()->SetOffset(aOffset);
     }
     style.mForegroundColor = aColor;
