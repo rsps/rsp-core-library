@@ -125,12 +125,16 @@ TEST_CASE("Bitmap")
         uint32_t height = 194;
         uint32_t width = 259;
 
-        CHECK_NOTHROW(Bitmap png1(filepath));
+//        REQUIRE_NOTHROW(Bitmap png1(filepath));
         Bitmap png(filepath);
 
         CHECK(png.GetHeight() == height);
         CHECK(png.GetWidth() == width);
         CHECK_EQ(png.GetPixelData().GetDataSize(), (width * height * 3));
+        CHECK_EQ(png.GetPixelData().GetPixelAt(0, 0, Color::White).AsUint(), 0xFF020A8F);
+        CHECK_EQ(png.GetPixelData().GetPixelAt(1, 0, Color::White).AsUint(), 0xFF020A8F);
+        CHECK_EQ(png.GetPixelData().GetPixelAt(55, 111, Color::White).AsUint(), 0xFFEAEFE8);
+
 //        Color col(png.GetPixelData().GetPixelAt(0, 0, Color::White));
 //        CHECK_EQ(col, Color(4292918232));
     }

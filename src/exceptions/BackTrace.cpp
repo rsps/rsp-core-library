@@ -44,7 +44,7 @@ BackTrace::BackTrace(size_t aEntriesToDiscard)
 {
     using namespace abi;
 
-    void* trace[MAX_DEPTH];
+    void* trace[MAX_DEPTH]{};
     char **strings;
     int stack_depth = backtrace(trace, MAX_DEPTH);
 

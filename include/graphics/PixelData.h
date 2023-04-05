@@ -61,7 +61,7 @@ public:
 
     PixelData& SetData(const std::uint8_t *apData) { mpData = const_cast<std::uint8_t*>(apData); return *this; }
 
-    std::size_t GetDataSize() const;
+    size_t GetDataSize() const;
 
     GuiUnit_t GetWidth() const { return mRect.GetWidth(); }
     GuiUnit_t GetHeight() const { return mRect.GetHeight(); }

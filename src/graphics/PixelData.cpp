@@ -163,7 +163,7 @@ PixelData& PixelData::Init(uint32_t aId, GuiUnit_t aWidth, GuiUnit_t aHeight, Co
     return *this;
 }
 
-std::size_t PixelData::GetDataSize() const
+size_t PixelData::GetDataSize() const
 {
     int result;
 
@@ -189,7 +189,7 @@ std::size_t PixelData::GetDataSize() const
             break;
     }
 
-    return std::size_t(result);
+    return size_t(result);
 }
 
 Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const

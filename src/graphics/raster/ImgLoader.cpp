@@ -20,9 +20,11 @@ std::shared_ptr<ImgLoader> ImgLoader::GetRasterLoader(const std::string aFileTyp
     if (aFileType == ".bmp") {
         return std::make_shared<BmpLoader>();
     }
+#ifdef USE_PNG
     else if (aFileType == ".png") {
         return std::make_shared<PngLoader>();
     }
+#endif
     else {
         THROW_WITH_BACKTRACE1(EUnsupportedFileformat, std::string("Raster loader not found for file type: ") + aFileType);
     }

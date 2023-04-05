@@ -54,13 +54,13 @@ const std::uint32_t* Crc32::getTable()
 }
 
 
-std::uint32_t Crc32::Calc(const void* aBuf, std::size_t aLen, std::uint32_t aInitial)
+std::uint32_t Crc32::Calc(const void* aBuf, size_t aLen, std::uint32_t aInitial)
 {
     const std::uint32_t* table = getTable();
     uint32_t c = aInitial ^ cCRC32_XOR_MASK;
     const uint8_t* u = static_cast<const uint8_t*>(aBuf);
 
-    for (std::size_t i = 0 ; i < aLen ; i++) {
+    for (size_t i = 0 ; i < aLen ; i++) {
         c = table[(c ^ u[i]) & 0xFF] ^ (c >> 8);
     }
     return c ^ cCRC32_XOR_MASK;

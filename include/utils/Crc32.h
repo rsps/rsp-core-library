@@ -49,7 +49,7 @@ public:
      * \param aInitial
      * \return
      */
-    static std::uint32_t Calc(const void* aBuf, std::size_t aLen, std::uint32_t aInitial = 0);
+    static std::uint32_t Calc(const void* aBuf, size_t aLen, std::uint32_t aInitial = 0);
 
     /**
      * \fn std::uint32_t Add(uint8_t)

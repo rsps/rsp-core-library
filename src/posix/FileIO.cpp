@@ -85,7 +85,7 @@ void FileIO::Close()
     }
 }
 
-std::size_t FileIO::Seek(std::size_t aOffset, std::ios_base::seekdir aSeekdir)
+size_t FileIO::Seek(size_t aOffset, std::ios_base::seekdir aSeekdir)
 {
     int base = 0;
     switch (aSeekdir) {
@@ -105,22 +105,22 @@ std::size_t FileIO::Seek(std::size_t aOffset, std::ios_base::seekdir aSeekdir)
         THROW_SYSTEM("Error moving cursor in file " + mFileName);
     }
 
-    return static_cast<std::size_t>(ret);
+    return static_cast<size_t>(ret);
 }
 
-std::size_t FileIO::Read(void *apBuffer, std::size_t aNumberOfBytesToRead)
+size_t FileIO::Read(void *apBuffer, size_t aNumberOfBytesToRead)
 {
     int ret = read(mHandle, apBuffer, aNumberOfBytesToRead);
     if (ret < 0) {
         THROW_SYSTEM("Error reading from file " + mFileName);
     }
 
-    return static_cast<std::size_t>(ret);
+    return static_cast<size_t>(ret);
 }
 
-void FileIO::ExactRead(void *apBuffer, std::size_t aNumberOfBytesToRead)
+void FileIO::ExactRead(void *apBuffer, size_t aNumberOfBytesToRead)
 {
-    std::size_t len = 0;
+    size_t len = 0;
     int retries = 3;
 
     while (len != aNumberOfBytesToRead) {
@@ -133,19 +133,19 @@ void FileIO::ExactRead(void *apBuffer, std::size_t aNumberOfBytesToRead)
     }
 }
 
-std::size_t FileIO::Write(const void *apBuffer, std::size_t aNumberOfBytesToWrite)
+size_t FileIO::Write(const void *apBuffer, size_t aNumberOfBytesToWrite)
 {
     int ret = write(mHandle, apBuffer, aNumberOfBytesToWrite);
     if (ret < 0) {
         THROW_SYSTEM("Error writing to file " + mFileName);
     }
 
-    return static_cast<std::size_t>(ret);
+    return static_cast<size_t>(ret);
 }
 
-void FileIO::ExactWrite(const void *apBuffer, std::size_t aNumberOfBytesToWrite)
+void FileIO::ExactWrite(const void *apBuffer, size_t aNumberOfBytesToWrite)
 {
-    std::size_t len = 0;
+    size_t len = 0;
     int retries = 3;
 
     while (len != aNumberOfBytesToWrite) {
@@ -175,27 +175,27 @@ std::string FileIO::GetLine()
 
 void FileIO::PutLine(const std::string &arData)
 {
-    std::size_t offset = 0;
-    std::size_t remaining = arData.size();
+    size_t offset = 0;
+    size_t remaining = arData.size();
     char *p = const_cast<char *>(arData.data());
 
     do {
-        std::size_t count = Write(p + offset, remaining);
+        size_t count = Write(p + offset, remaining);
         remaining -= count;
         offset += count;
     } while (remaining > 0);
 }
 
-std::size_t FileIO::GetSize()
+size_t FileIO::GetSize()
 {
-    std::size_t current = Seek(0, std::ios_base::cur); // Get current position
-    std::size_t result = Seek(0, std::ios_base::end);  // Get last position
+    size_t current = Seek(0, std::ios_base::cur); // Get current position
+    size_t result = Seek(0, std::ios_base::end);  // Get last position
     Seek(current);                                     // Restore position
 
     return result;
 }
 
-void FileIO::SetSize(std::size_t aSize)
+void FileIO::SetSize(size_t aSize)
 {
     int ret = ftruncate(mHandle, static_cast<long int>(aSize));
     if (ret < 0) {
@@ -229,7 +229,7 @@ std::string FileIO::GetContents()
 
     std::stringstream ss;
     char buf[1024];
-    std::size_t rlen;
+    size_t rlen;
 
     while ((rlen = Read(buf, 1024)) > 0) {
         ss.write(buf, static_cast<long int>(rlen));

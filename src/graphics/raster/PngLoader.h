@@ -10,49 +10,29 @@
 #ifndef PNGLOADER_H
 #define PNGLOADER_H
 
-#include <cstring>
-#include <iostream>
+#ifdef USE_PNG
+
+#include <string>
 #include <vector>
-#include <posix/FileIO.h>
-#include <endian.h>
+#include <exceptions/CoreException.h>
 #include <graphics/raster/ImgLoader.h>
+#include <posix/FileIO.h>
+#include <utils/FourCC.h>
 
 namespace rsp::graphics
 {
 
-class FourCC
+class ZlibException: public exceptions::CoreException
 {
 public:
-    FourCC() noexcept {}
-    FourCC(std::uint32_t aValue)
+    explicit ZlibException(const char *apMsg, int aErrorCode)
+    : CoreException(formatError(apMsg, aErrorCode))
     {
-        mValue = htobe32(aValue);
     }
 
-    FourCC(const char *apValue)
-    {
-        for (unsigned int i = 0; i < sizeof(mAscii) ; i++) {
-            mAscii[i] = apValue[i];
-        }
-    }
-
-    operator std::uint32_t() { return mValue; }
-
-    bool operator==(const FourCC &arOther)
-    {
-        std::cout << "FourCC compare(" << mValue << ", " << arOther.mValue << ")" << std::endl;
-        return mValue == arOther.mValue;
-    }
-
-protected:
-    friend std::ostream& operator<<(std::ostream& os, const FourCC &arChunk);
-
-    union {
-        std::uint32_t mValue = 0;
-        char mAscii[4];
-    };
+    std::string formatError(const char *apMsg, int aErrorCode);
 };
-std::ostream& operator<<(std::ostream& os, const FourCC &arChunk);
+
 
 class PngLoader: public ImgLoader
 {
@@ -79,9 +59,9 @@ public:
     public:
         bool LoadFrom(rsp::posix::FileIO &arFile);
 
-        FourCC GetType() { return mType; }
+        utils::FourCC GetType() const { return mType; }
 
-        std::size_t GetSize() const { return mData.size(); }
+        size_t GetSize() const { return mData.size(); }
 
         template <typename T>
         const T& GetAs() const
@@ -89,29 +69,43 @@ public:
             return reinterpret_cast<const T&>(*mData.data());
         }
 
-        const std::uint8_t* GetData() { return mData.data(); }
+        const std::uint8_t* GetData() const { return mData.data(); }
 
-        const IHDR& GetHeader() { return GetAs<IHDR>(); }
+        const IHDR& GetHeader() const { return GetAs<IHDR>(); }
 
     protected:
-        FourCC mType{};
+        utils::FourCC mType{};
         std::vector<std::uint8_t> mData{};
     };
 
     void LoadImg(const std::string &aImgName) override;
 
 protected:
+    struct Filter
+    {
+        std::uint8_t *ScanLines[2]{};
+        int Current = 0;
+        int X = 0;
+        int Y = 0;
+    };
+    Filter mFilter{};
 
     IHDR mIhdr{};
     pHYs mPhys{};
 
-    void checkSignature(rsp::posix::FileIO &arFile);
-    ColorDepth getColorDepth();
-    void decodeDataChunk(const std::uint8_t *apData, std::size_t aSize);
+    void checkSignature(rsp::posix::FileIO &arFile) const;
+    ColorDepth getColorDepth() const;
+    void decodeDataChunk(const std::uint8_t *apData, size_t aSize);
+    void decompressData(const std::uint8_t *apData, size_t aSize);
+    void defilterScanLine(const std::vector<std::uint8_t> &arData);
+    std::uint8_t unFilter(std::uint8_t aType, std::uint8_t aValue);
+    size_t getScanlineWidth();
 };
 
 std::ostream& operator<<(std::ostream& os, const PngLoader::IHDR &arIhdr);
 
 } // namespace rsp::graphics
+
+#endif // USE_PNG
 
 #endif // PNGLOADER_H

@@ -15,6 +15,7 @@
 #include <logging/ConsoleLogWriter.h>
 #include <posix/FileIO.h>
 #include <posix/FileSystem.h>
+#include <utils/HexStream.h>
 #include "TestHelpers.h"
 
 using namespace rsp::logging;
@@ -59,47 +60,7 @@ std::string TestHelpers::ToHex(const std::string &arString)
 std::string TestHelpers::ToHex(const uint8_t *apData, std::uint32_t aSize, std::uint32_t aSizeOf)
 {
     std::stringstream out;
-    std::string delim = ", ";
-    std::string line;
-    size_t mod = 16 / aSizeOf;
-
-    for (std::size_t i = 0 ; i < aSize ; i++) {
-        if ((i % mod) == 0) {
-            out << "    ";
-        }
-        if (i == (aSize - 1)) {
-            delim = "  ";
-        }
-        if (aSizeOf == 1) {
-            char ch = *reinterpret_cast<const char*>(apData);
-            if (ch >= '0' && ch <= 'z') {
-                line += ch;
-            }
-            else {
-                line += '.';
-            }
-        }
-        uint32_t value = 0;
-        for (uint32_t n=0 ; n < aSizeOf ; ++n) {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-            value = value + (uint32_t(*apData++) << (8*n));
-#else
-            value = (value << 8) + *apData++;
-#endif
-        }
-
-        out << "0x" << std::setw(int(2*aSizeOf)) << std::setfill('0') << std::hex << value << delim;
-
-        if ((i % mod) == (mod - 1)) {
-            out << "  " << line << "\n";
-            line.clear();
-        }
-    }
-    if ((aSize % mod) != (mod - 1)) {
-        out << std::string((16 - (aSize % 16)) * 6, ' ') << "  " << line << "\n";
-    }
-    out << std::dec;
-
+    out << rsp::utils::HexStream(apData, aSize).SizeOfValue(aSizeOf);
     return out.str();
 }
 
