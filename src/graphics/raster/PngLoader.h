@@ -81,6 +81,7 @@ public:
     void LoadImg(const std::string &aImgName) override;
 
 protected:
+    enum class FilterTypes { None, Sub, Up, Average, Paeth };
     struct Filter
     {
         std::uint8_t *ScanLines[2]{};

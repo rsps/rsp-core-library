@@ -278,7 +278,13 @@ void PngLoader::defilterScanLine(const std::vector<std::uint8_t> &arData)
 
 std::uint8_t PngLoader::unFilter(std::uint8_t aType, std::uint8_t aValue)
 {
-    switch(aType) {
+    switch(FilterTypes(aType)) {
+        case FilterTypes::None:
+            break;
+        case FilterTypes::Sub:
+        case FilterTypes::Up:
+        case FilterTypes::Average:
+        case FilterTypes::Paeth:
         default:
             break;
     }

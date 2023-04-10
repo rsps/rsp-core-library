@@ -26,14 +26,19 @@ All source files shall include the following file header:
 
 ## Prerequisites
 
-The library uses libraries for OpenSSL, Curl and FreeType2 when building to a Linux platform.
+This library uses libraries for OpenSSL, Curl, FreeType2 and Zlib when building to a Linux platform.
 The libraries should be available for the linker to build the program.
 
 To install those libraries on on Debian based systems, execute the following in a terminal:
 
 ```
-sudo apt install libssl-dev libcurl4 libcurl4-openssl-dev libfreetype-dev
+sudo apt install libssl-dev libcurl4 libcurl4-openssl-dev libfreetype-dev zlib1g-dev
 ```
+
+To execute the unit tests a ffew other libraries are needed:
+```
+sudo apt install libpcre2-dev pkg-config
+``` 
 
 The code is using some C++20 features, so make sure to use a recent compiler to build the project.
 To install GCC-10 and GCC-11 on Ubuntu 20.04:
