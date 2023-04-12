@@ -15,6 +15,7 @@
 #include <iomanip>
 #include <string>
 #include <logging/Logger.h>
+#include <utils/FourCC.h>
 
 using namespace rsp::logging;
 
@@ -82,6 +83,8 @@ void BmpLoader::LoadImg(const std::string &aImgName)
 
     mPixelData.GetData().clear();
 
+    Logger::GetDefault().Debug() << "Loading Bitmap: " << aImgName;
+
     rsp::posix::FileIO file(aImgName, std::ios::in);
 
     ReadHeader(file);
@@ -129,7 +132,7 @@ void BmpLoader::ReadHeader(rsp::posix::FileIO &arFile)
     mPixelData.SetBlend(false);
 
     if (mBmpHeader.v1.size >= sizeof(BmpLoader::BitmapV4Header)) {
-        if (mBmpHeader.v5.RedMask == 0x73524742) {
+        if (mBmpHeader.v5.RedMask == rsp::utils::fourcc("BGRs")) {
             mRedIndex   = 2;
             mGreenIndex = 1;
             mBlueIndex  = 0;
@@ -151,21 +154,21 @@ void BmpLoader::ReadPalette(rsp::posix::FileIO &arFile)
     std::uint8_t data[4];
     for (Color &color : mPalette) {
         arFile.ExactRead(data, 4);
-        color.SetBlue(data[0]);
-        color.SetGreen(data[1]);
-        color.SetRed(data[2]);
-        color.SetAlpha(data[3]);
+        color.SetBlue(data[mBlueIndex]);
+        color.SetGreen(data[mGreenIndex]);
+        color.SetRed(data[mRedIndex]);
+        color.SetAlpha(data[mAlphaIndex]);
     }
 }
 
 void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
 {
     // Figure out amount to read per row
-    std::size_t paddedRowSize = static_cast<std::size_t>(((static_cast<std::size_t>(std::abs(mBmpHeader.v1.width) * mBmpHeader.v1.bitsPerPixel) + 7) / 8) + 3u) & static_cast<std::size_t>(~3);
+    size_t paddedRowSize = static_cast<size_t>(((static_cast<size_t>(std::abs(mBmpHeader.v1.width) * mBmpHeader.v1.bitsPerPixel) + 7) / 8) + 3u) & static_cast<size_t>(~3);
     Logger::GetDefault().Debug() << "Padded Row size: " << paddedRowSize;
 
     // Initialize container for reading
-    std::vector<std::uint8_t> pixelRows(paddedRowSize * static_cast<std::size_t>(std::abs(mBmpHeader.v1.heigth)));
+    std::vector<std::uint8_t> pixelRows(paddedRowSize * static_cast<size_t>(std::abs(mBmpHeader.v1.heigth)));
     Logger::GetDefault().Debug() << "Container size: " << pixelRows.size();
 
     // Skip past the offset
@@ -173,8 +176,8 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
     arFile.ExactRead(pixelRows.data(), pixelRows.size());
 
     // Height can be negative, showing the image is stored from top to bottom
-    std::size_t h = static_cast<std::size_t>(abs(mBmpHeader.v1.heigth));
-    std::size_t w = static_cast<std::size_t>(mBmpHeader.v1.width);
+    size_t h = static_cast<size_t>(abs(mBmpHeader.v1.heigth));
+    size_t w = static_cast<size_t>(mBmpHeader.v1.width);
 
     std::uint8_t *data = pixelRows.data();
     if (mBmpHeader.v1.heigth < 0) { // If height is negative, then image is stored top to bottom.
@@ -201,15 +204,23 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
 
 int BmpLoader::maskToIndex(uint32_t aMask)
 {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
     int result = 3;
     while(aMask && (aMask != 0xFF000000)) {
         aMask <<= 8;
         result--;
     }
+#else
+    int result = 3;
+    while(aMask) {
+        aMask >>= 8;
+        result++;
+    }
+#endif
     return result;
 }
 
-Color BmpLoader::ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::uint32_t aY, std::size_t aPaddedRowSize)
+Color BmpLoader::ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::uint32_t aY, size_t aPaddedRowSize)
 {
     Color pixel = 0;
 

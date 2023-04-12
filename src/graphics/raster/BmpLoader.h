@@ -124,13 +124,13 @@ protected:
 
     friend std::ostream &operator<<(std::ostream &os, const BmpLoader::BmpHeader_t &arHeader);
 
-    std::size_t mBytesPerPixel = 0;
+    size_t mBytesPerPixel = 0;
     std::vector<Color> mPalette{};
 
     void ReadHeader(rsp::posix::FileIO &arFile);
     void ReadPalette(rsp::posix::FileIO &arFile);
     void ReadData(rsp::posix::FileIO &arFile);
-    Color ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::uint32_t aY, std::size_t aPaddedRowSize);
+    Color ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::uint32_t aY, size_t aPaddedRowSize);
 
     ColorDepth bitsPerPixelToColorDepth(std::uint32_t aBpp);
     int maskToIndex(uint32_t aMask);

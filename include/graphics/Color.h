@@ -53,7 +53,7 @@ class Color
         Purple =  0xFF800080
     };
 
-    Color() : mValue(None) {}
+    Color() noexcept : mValue{} {}
 
     /**
      * \brief Construct with given base colors.
@@ -78,7 +78,13 @@ class Color
      * \param aColor
      */
     Color(const Color &arColor);
-    Color(const Color &&arColor);
+
+    /**
+     * \brief Move constructor.
+     *
+     * \param aColor
+     */
+    Color(Color &&arColor);
 
     /**
      * \brief Get the red base color value.
@@ -140,12 +146,27 @@ class Color
     uint32_t AsUint() const { return static_cast<ARGB_t>(*this); }
 
     /**
-     * \brief Assign the value from the given Color object.
+     * \brief For fast color value in native 32-bit format
+     *
+     * \return uint32
+     */
+
+    uint32_t AsRaw() const { return mValue.rgba; }
+    Color& FromRaw(uint32_t aValue) { mValue.rgba = aValue; return *this; }
+
+    /**
+     * \brief Assignment operator.
      *
      * \param aValue
      */
     Color& operator=(const Color &arColor);
-    Color& operator=(const Color &&arColor);
+
+    /**
+     * \brief Move operator.
+     *
+     * \param aValue
+     */
+    Color& operator=(Color &&arColor);
 
     /**
      * \fn Color Blend(Color&, Color&)
@@ -158,33 +179,29 @@ class Color
     static Color Blend(Color a, Color b);
 
   protected:
+    struct __rgba {
+        uint32_t red : 8;
+        uint32_t green : 8;
+        uint32_t blue : 8;
+        uint32_t alpha : 8;
+    };
+    struct __abgr {
+        uint32_t alpha : 8;
+        uint32_t blue : 8;
+        uint32_t green : 8;
+        uint32_t red : 8;
+    };
+
     /**
      * \brief Color value type
      */
     union ColorValue_t {
-        ARGB_t rgba;
-#ifdef LITTLE_ENDIAN
-        struct __item_type {
-            uint32_t blue : 8;
-            uint32_t green : 8;
-            uint32_t red : 8;
-            uint32_t alpha : 8;
-        } item;
+        uint32_t rgba;
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+        __rgba item;
 #else
-        struct __item_type {
-            uint32_t alpha : 8;
-            uint32_t red : 8;
-            uint32_t green : 8;
-            uint32_t blue : 8;
-        } item;
+        __abgr item;
 #endif
-    public:
-        ColorValue_t() : rgba(0) {}
-        ColorValue_t(ARGB_t aValue) : rgba(aValue) {}
-        ColorValue_t(const ColorValue_t& arOther) : rgba(arOther.rgba) {}
-        ColorValue_t(const ColorValue_t&& arOther) : rgba(std::move(arOther.rgba)) {}
-        ColorValue_t& operator=(const ColorValue_t& arOther) { rgba = arOther.rgba; return *this; }
-        ColorValue_t& operator=(const ColorValue_t&& arOther) { rgba = std::move(arOther.rgba); return *this; }
     };
 
     ColorValue_t mValue{};

@@ -12,6 +12,10 @@
 
 #include <string>
 #include <logging/Logger.h>
+#include <utils/StrUtils.h>
+
+#define CHECK_HEX(a, b) CHECK_MESSAGE(a == b, rsp::utils::StrUtils::Format( "%8.8X != %8.8X" , a, b))
+
 
 class TestHelpers
 {

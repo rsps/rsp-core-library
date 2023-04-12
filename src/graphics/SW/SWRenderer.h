@@ -34,7 +34,7 @@ public:
     void Present() override;
 
     Renderer& SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) override;
-    uint32_t GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const override;
+    Color GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const override;
 };
 
 } /* namespace rsp::graphics::sw */

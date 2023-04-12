@@ -26,7 +26,7 @@ std::unique_ptr<Texture> Texture::Create(const PixelData &arPixelData, Color aCo
             result->SetBlendOperation(GfxBlendOperation::SourceAlpha);
             break;
     }
-    result->Fill(Color::None).Update(arPixelData, aColor);
+    result->Fill(Color::None).Update(arPixelData, aColor.AsRaw());
     return result;
 }
 
@@ -56,28 +56,28 @@ rsp::graphics::Texture& SWTexture::Blit(const rsp::graphics::Texture &arTexture)
     return *this;
 }
 
-rsp::graphics::Texture& SWTexture::DrawRect(rsp::graphics::Color aColor, const rsp::graphics::Rect &arRect)
+rsp::graphics::Texture& SWTexture::DrawRect(Color aColor, const rsp::graphics::Rect &arRect)
 {
-    mrGfxHal.DrawRect(*mpSurface, aColor, arRect);
+    mrGfxHal.DrawRect(*mpSurface, aColor.AsRaw(), arRect);
     return *this;
 }
 
 Texture& SWTexture::Fill(Color aColor, GfxHal::OptionalRect aRect)
 {
-    mrGfxHal.Fill(*mpSurface, aColor, aRect);
+    mrGfxHal.Fill(*mpSurface, aColor.AsRaw(), aRect);
     return *this;
 }
 
 Texture& SWTexture::Update(const PixelData &arPixelData, Color aColor)
 {
-    mrGfxHal.CopyFrom(*mpSurface, arPixelData, aColor);
+    mrGfxHal.CopyFrom(*mpSurface, arPixelData, aColor.AsRaw());
     return *this;
 }
 
 Texture& SWTexture::SetBlendOperation(GfxBlendOperation aOp, Color aColorKey)
 {
     mpSurface->mBlendOperation = aOp;
-    mpSurface->mColorKey = aColorKey;
+    mpSurface->mColorKey = aColorKey.AsRaw();
     return *this;
 }
 

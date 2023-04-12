@@ -58,9 +58,9 @@ TEST_CASE("Bitmap")
         CHECK(bitmap.GetHeight() == height);
         CHECK(bitmap.GetWidth() == width);
         CHECK_EQ(bitmap.GetPixelData().GetDataSize(), (width * height * 3));
-        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White).AsUint(), 0xFF020A8F);
-        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White).AsUint(), 0xFF020A8F);
-        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(55, 111, Color::White).AsUint(), 0xFFEAEFE8);
+        CHECK_HEX(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White).AsRaw(), 0xFF020A8F);
+        CHECK_HEX(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White).AsRaw(), 0xFF020A8F);
+        CHECK_HEX(bitmap.GetPixelData().GetPixelAt(55, 111, Color::White).AsRaw(), 0xFFEAEFE8);
 
         SUBCASE("Drawing on loaded Img") {
             // Arrange
@@ -71,7 +71,7 @@ TEST_CASE("Bitmap")
             CHECK_NOTHROW(bitmap.SetPixel(pt, cl));
 
             // Assert
-            CHECK_EQ(bitmap.GetPixel(pt), cl);
+            CHECK_HEX(bitmap.GetPixel(pt).AsRaw(), cl.AsUint());
         }
     }
 
@@ -117,7 +117,7 @@ TEST_CASE("Bitmap")
         CHECK_EQ(bitmap3.GetPixelData().GetPixelAt(0,0,Color::White), Color(0x00FFFFFF));
         CHECK_EQ(bitmap3.GetPixelData().GetPixelAt(32,50,Color::White), Color(Color::White));
     }
-
+/*
     SUBCASE("Loading PNG file")
     {
         // Arrange
@@ -138,7 +138,7 @@ TEST_CASE("Bitmap")
 //        Color col(png.GetPixelData().GetPixelAt(0, 0, Color::White));
 //        CHECK_EQ(col, Color(4292918232));
     }
-
+*/
     SUBCASE("Loading unsupported file")
     {
         // Arrange

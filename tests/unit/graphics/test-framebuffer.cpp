@@ -21,11 +21,12 @@
 #include <utils/StopWatch.h>
 #include <TestHelpers.h>
 #include <utils/Random.h>
+#include <TestHelpers.h>
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
 
-inline void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer &fb)
+static void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer &fb)
 {
     if (Rect(0, 0, fb.GetWidth(), fb.GetHeight()).IsHit(aX, aY)) {
         CHECK_EQ(fb.GetPixel(aX, aY), aColor.AsUint());
@@ -59,6 +60,21 @@ TEST_CASE("Framebuffer")
     srand(ms.count()); // generates random seed val
     Color col( Random::Roll(56u, 200u), Random::Roll(56u, 200u), Random::Roll(56u, 200u), 0xff);
     MESSAGE("Color: " << col.AsUint());
+
+    SUBCASE("Fill")
+    {
+        Color colors[] { Color::Red, Color::Blue, Color::Green };
+
+        for (auto &color : colors) {
+            renderer.Fill(color);
+            renderer.Present();
+
+            uint32_t fb_value = renderer.GetPixel(0, 0, true).AsUint();
+            CHECK_HEX(fb_value, color.AsUint());
+            fb_value = renderer.GetPixel(479, 799, true).AsUint();
+            CHECK_HEX(fb_value, color.AsUint());
+        }
+    }
 
     SUBCASE("Clear")
     {
@@ -267,7 +283,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(renderer.Blit(*raster));
 
             // Assert
-            CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + 4, topLeftImgCorner.GetY() + 4, false), Color(0xFF020F92));
+            CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + 4, topLeftImgCorner.GetY() + 4, false), 0xFF920F02);
 
             CHECK_NOTHROW(renderer.Present());
         }
@@ -636,10 +652,10 @@ TEST_CASE("Framebuffer")
         Color green(Color::Green);
         Color red(Color::Red);
 
-        for (std::uint32_t a = 0; a < 200 ; a += 5) {
-            blue.SetAlpha(static_cast<std::uint8_t>(a));
-            green.SetAlpha(static_cast<std::uint8_t>(a));
-            red.SetAlpha(static_cast<std::uint8_t>(a));
+        for (std::uint8_t a = 0; a < 200 ; a += 5) {
+            blue.SetAlpha(a);
+            green.SetAlpha(a);
+            red.SetAlpha(a);
             CHECK_NOTHROW(canvas.Fill(Color::Black));
             CHECK_NOTHROW(canvas.DrawRectangle(Rect(135,170, 100, 100), red, true));
             CHECK_NOTHROW(canvas.DrawRectangle(Rect(100,100, 100, 100), blue, true));
@@ -649,7 +665,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(renderer.Present());
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
-        CHECK(renderer.GetPixel(Point(185, 185), true) == 0xFF0B612D);
+        CHECK_HEX(renderer.GetPixel(Point(185, 185), true).AsRaw(), 0xFF006138);
     }
 
 }

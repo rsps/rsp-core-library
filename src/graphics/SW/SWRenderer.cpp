@@ -31,13 +31,13 @@ namespace rsp::graphics::sw {
 
 Renderer& SWRenderer::DrawRect(Color aColor, const Rect &arRect)
 {
-    mrGfxHal.DrawRect(mScreenSurfaces[mCurrentSurface], aColor, arRect);
+    mrGfxHal.DrawRect(mScreenSurfaces[mCurrentSurface], aColor.AsRaw(), arRect);
     return *this;
 }
 
 Renderer& SWRenderer::Fill(Color aColor, Optional<const Rect> aDestination)
 {
-    mrGfxHal.Fill(mScreenSurfaces[mCurrentSurface], aColor, aDestination);
+    mrGfxHal.Fill(mScreenSurfaces[mCurrentSurface], aColor.AsRaw(), aDestination);
     return *this;
 }
 
@@ -80,16 +80,19 @@ ColorDepth SWRenderer::GetColorDepth() const
 
 Renderer& SWRenderer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 {
-    mrGfxHal.SetPixel(mScreenSurfaces[mCurrentSurface], aX, aY, arColor);
+    mrGfxHal.SetPixel(mScreenSurfaces[mCurrentSurface], aX, aY, arColor.AsRaw());
     return *this;
 }
 
-uint32_t SWRenderer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
+Color SWRenderer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
 {
+    int index = mCurrentSurface;
     if (aFront) {
-        return mrGfxHal.GetPixel(mScreenSurfaces[(mCurrentSurface) ? 0 : 1], aX, aY);
+        index = mCurrentSurface ? 0 : 1;
     }
-    return mrGfxHal.GetPixel(mScreenSurfaces[mCurrentSurface], aX, aY);
+    Color result;
+    result.FromRaw(mrGfxHal.GetPixel(mScreenSurfaces[index], aX, aY));
+    return result;
 }
 
 } /* namespace rsp::graphics::sw */

@@ -219,7 +219,7 @@ Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const
 
         case ColorDepth::RGBA:
             offset = ((aY * GetWidth()) + aX) * 4;
-            result = *reinterpret_cast<const std::uint32_t*>(uintptr_t(mpData + offset));
+            result.FromRaw(*reinterpret_cast<const std::uint32_t*>(uintptr_t(mpData + offset)));
 //            result.SetRed(mpData[offset + 0]);
 //            result.SetGreen(mpData[offset + 1]);
 //            result.SetBlue(mpData[offset + 2]);
@@ -272,18 +272,18 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
 
         case ColorDepth::RGB:
             offset = ((aY * GetWidth()) + aX) * 3;
-            pdata[offset + 0] = aColor.GetRed();
+            pdata[offset + 2] = aColor.GetRed();
             pdata[offset + 1] = aColor.GetGreen();
-            pdata[offset + 2] = aColor.GetBlue();
+            pdata[offset + 0] = aColor.GetBlue();
             break;
 
         case ColorDepth::RGBA:
             offset = ((aY * GetWidth()) + aX) * 4;
             if (!mBlend || aColor.GetAlpha() == 255) {
-                *reinterpret_cast<std::uint32_t*>(uintptr_t(pdata + offset)) = aColor.AsUint();
+                *reinterpret_cast<std::uint32_t*>(uintptr_t(pdata + offset)) = aColor.AsRaw();
             }
             else {
-                *reinterpret_cast<std::uint32_t*>(uintptr_t(pdata + offset)) = Color::Blend(*reinterpret_cast<std::uint32_t*>(uintptr_t(pdata + offset)), aColor);
+                *reinterpret_cast<std::uint32_t*>(uintptr_t(pdata + offset)) = Color::Blend(*reinterpret_cast<std::uint32_t*>(uintptr_t(pdata + offset)), aColor).AsRaw();
             }
 //            pdata[offset + 0] = aColor.GetRed();
 //            pdata[offset + 1] = aColor.GetGreen();

@@ -21,16 +21,12 @@ Color::Color(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha)
     mValue.item.alpha = aAlpha;
 }
 
-Color::Color(ARGB_t aRGBA)
+Color::Color(ARGB_t aARGB)
 {
-#ifdef LITTLE_ENDIAN
-    mValue.rgba = aRGBA;
-#else
-    mValue.item.alpha = (aRGBA & 0xFF);
-    mValue.item.blue = (aRGBA >> 8) & 0xFF;
-    mValue.item.green = (aRGBA >> 16) & 0xFF;
-    mValue.item.red = (aRGBA >> 24) & 0xFF;
-#endif
+    mValue.item.red = (aARGB & 0x00FF0000) >> 16;
+    mValue.item.green = (aARGB & 0x0000FF00) >> 8;
+    mValue.item.blue = (aARGB & 0x000000FF);
+    mValue.item.alpha = (aARGB & 0xFF000000) >> 24;
 }
 
 Color::Color(const Color &arColor)
@@ -38,7 +34,7 @@ Color::Color(const Color &arColor)
 {
 }
 
-Color::Color(const Color &&arColor)
+Color::Color(Color &&arColor)
     : mValue(std::move(arColor.mValue))
 {
 }
@@ -86,15 +82,11 @@ void Color::SetAlpha(uint8_t aValue)
 
 Color::operator Color::ARGB_t() const
 {
-#ifdef LITTLE_ENDIAN
-    return mValue.rgba;
-#else
-    std::err << "UPPPSSSSS" << std::endl;
-    return (((ARGB_t)mValue.item.red) << 24) |
-           (((ARGB_t)mValue.item.green) << 16) |
-           (((ARGB_t)mValue.item.blue) << 8) |
-           ((ARGB_t)mValue.item.alpha);
-#endif
+    return
+        uint32_t(mValue.item.red) << 16 |
+        uint32_t(mValue.item.green) << 8 |
+        uint32_t(mValue.item.blue) |
+        uint32_t(mValue.item.alpha) << 24;
 }
 
 Color &Color::operator=(const Color &arColor)
@@ -105,7 +97,7 @@ Color &Color::operator=(const Color &arColor)
     return *this;
 }
 
-Color& Color::operator =(const Color &&arColor)
+Color& Color::operator=(Color &&arColor)
 {
     if (this != &arColor) {
         mValue = std::move(arColor.mValue);
@@ -120,7 +112,9 @@ Color& Color::operator =(const Color &&arColor)
  */
 Color Color::Blend(Color aBg, Color aFg)
 {
-    uint32_t a = aFg >> 24;
+    uint32_t fg = aFg.AsUint();
+    uint32_t bg = aBg.AsUint();
+    uint32_t a = fg >> 24;
 
     // If source pixel is fully transparent, just return the background
     if (0 == a) {
@@ -132,11 +126,12 @@ Color Color::Blend(Color aBg, Color aFg)
         return aFg;
     }
 
-    uint32_t rb = ((((aFg & 0x00ff00ff) * a) + 0x00007F007F) + ((aBg & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;
-    uint32_t g  = ((((aFg & 0x0000ff00) * a) + 0x00007f00) + ((aBg & 0x0000ff00) * (0xff - a))) & 0x00ff0000;
+    uint32_t rb = ((((fg & 0x00ff00ff) * a) + 0x00007F007F) + ((bg & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;
+    uint32_t g  = ((((fg & 0x0000ff00) * a) + 0x00007f00) + ((bg & 0x0000ff00) * (0xff - a))) & 0x00ff0000;
     uint32_t result = 0xff000000 | ((rb | g) >> 8);
 
-    return result;
+    return Color(result);
 }
 
-}
+} // namespace rsp::graphics
+
