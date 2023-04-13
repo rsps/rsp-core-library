@@ -14,14 +14,12 @@ namespace rsp::graphics
 {
 
 Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
-    : PixelData(aWidth, aHeight, aDepth),
-      mClipRect(mRect)
+    : PixelData(aWidth, aHeight, aDepth)
 {
 }
 
 //Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData, size_t aDataSize)
-//    : PixelData(aWidth, aHeight, aDepth, aData, aDataSize),
-//      mClipRect(mRect)
+//    : PixelData(aWidth, aHeight, aDepth, aData, aDataSize)
 //{
 //}
 
@@ -55,7 +53,7 @@ void Canvas::DrawCircle(const Point &arCenter, GuiUnit_t aRadius, const Color &a
 void Canvas::DrawRectangle(const Rect &arRect, const Color &arColor, bool aFilled)
 {
     mBlend = true;
-    Rect r = arRect & mClipRect;
+    Rect r = arRect;
     GuiUnit_t h_end = r.GetTop() + r.GetHeight();
     GuiUnit_t w_end = r.GetLeft() + r.GetWidth();
     if (aFilled) {
@@ -121,13 +119,8 @@ void Canvas::DrawLine(const Point &arA, const Point &arB, const Color &arColor)
 
 void Canvas::DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData, const Rect &arSection, Color aColor)
 {
-    CopyFrom(arLeftTop, arPixelData, arSection, aColor);
-}
 
-Canvas& Canvas::SetClipRect(const Rect &arClipRect)
-{
-    mClipRect = GetRect() & arClipRect;
-    return *this;
+    CopyFrom(arLeftTop, arPixelData, arSection, aColor);
 }
 
 void Canvas::plot4Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)

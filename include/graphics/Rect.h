@@ -12,6 +12,7 @@
 #define RECT_H
 
 #include <graphics/Point.h>
+#include <utils/OptionalPtr.h>
 
 namespace rsp::graphics
 {
@@ -276,6 +277,8 @@ class Rect
     GuiUnit_t mWidth = 0;
     GuiUnit_t mHeight = 0;
 };
+
+using OptionalRect = rsp::utils::OptionalPtr<const Rect>;
 
 std::ostream &operator<<(std::ostream &aStream, const Rect &arRect);
 std::string to_string(const Rect &arRect);

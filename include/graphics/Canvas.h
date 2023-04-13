@@ -85,25 +85,7 @@ public:
     PixelData& GetPixelData() { return *this; }
     const PixelData& GetPixelData() const { return *this; }
 
-    /**
-     * \brief Get a reference to the clipping rect for this canvas
-     * \return Reference to Rect
-     */
-    const Rect& GetClipRect() const { return mClipRect; }
-
-    /**
-     * \brief Set the clipping rect for this canvas
-     *
-     * If the clipping rect is larger than the size of the canvas, it will be trimmed to this size
-     *
-     * \param arClipRect New clipping rect
-     * \return self
-     */
-    Canvas& SetClipRect(const Rect &arClipRect);
-
 protected:
-    Rect mClipRect{};
-
     void plot4Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor);
     void plot8Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor);
 };

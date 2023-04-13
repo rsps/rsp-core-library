@@ -201,12 +201,24 @@ void Control::Render(Renderer &arRenderer) const
         arRenderer.Fill(style.mBackgroundColor, mArea);
     }
 
+    if (!mpParent) {
+        arRenderer.SetClipRect(mArea);
+    }
+
     for (const TexturePtr_t& texture : style.mTextures) {
         arRenderer.Blit(*texture);
     }
 
-    for (Control* child : mChildren) {
-        child->Render(arRenderer);
+    if (mChildren.size() > 0) {
+        arRenderer.SetClipRect(mArea);
+
+        for (Control* child : mChildren) {
+            child->Render(arRenderer);
+        }
+
+        if (mpParent) {
+            arRenderer.SetClipRect(mpParent->mArea);
+        }
     }
 
     if ((mTouchAreaColor != Color::None) && !mTouchArea.empty()) {

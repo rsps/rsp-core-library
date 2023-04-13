@@ -184,7 +184,7 @@ void SWGfxHal::CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint3
                 uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
                 GuiUnit_t src_x = sr.GetLeft();
                 for(size_t x = 0; x < w ; ++x) {
-                    dest[x] = arPixelData.GetPixelAt(src_x++, src_y, aColor);
+                    dest[x] = arPixelData.GetPixelAt(src_x++, src_y, Color().FromRaw(aColor)).AsRaw();
                 }
                 ++src_y;
             }
@@ -209,7 +209,7 @@ void SWGfxHal::CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint3
                 uint32_t *dest = offset(dst, arDst.mRowPitch, dr.GetLeft(), y);
                 GuiUnit_t src_x = sr.GetLeft();
                 for(size_t x = 0; x < w ; ++x) {
-                    uint32_t cl = arPixelData.GetPixelAt(src_x++, src_y, aColor);
+                    uint32_t cl = arPixelData.GetPixelAt(src_x++, src_y, Color().FromRaw(aColor)).AsRaw();
                     if (cl & 0xFF000000) {
                         dest[x] = cl;
                     }

@@ -272,9 +272,9 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
 
         case ColorDepth::RGB:
             offset = ((aY * GetWidth()) + aX) * 3;
-            pdata[offset + 2] = aColor.GetRed();
+            pdata[offset + 0] = aColor.GetRed();
             pdata[offset + 1] = aColor.GetGreen();
-            pdata[offset + 0] = aColor.GetBlue();
+            pdata[offset + 2] = aColor.GetBlue();
             break;
 
         case ColorDepth::RGBA:
@@ -402,7 +402,7 @@ void PixelData::Fill(Color aColor)
     switch (mColorDepth) {
         case ColorDepth::RGBA: {
             std::uint32_t *p = reinterpret_cast<std::uint32_t*>(mData.data());
-            std::fill_n(p, mData.size() / sizeof(std::uint32_t), aColor.AsUint());
+            std::fill_n(p, mData.size() / sizeof(std::uint32_t), aColor.AsRaw());
             break;
         }
 

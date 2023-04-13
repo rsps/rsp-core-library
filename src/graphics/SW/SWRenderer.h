@@ -21,20 +21,24 @@ namespace rsp::graphics::sw {
 class SWRenderer: public Renderer, public Framebuffer, public rsp::utils::Singleton<SWRenderer>
 {
 public:
-    SWRenderer() {}
+    SWRenderer() : mClipRect(0,0,Framebuffer::GetWidth(), Framebuffer::GetHeight()) {}
 
     GuiUnit_t GetWidth() const override;
     GuiUnit_t GetHeight() const override;
     ColorDepth GetColorDepth() const override;
 
     Renderer& DrawRect(Color aColor, const Rect &arRect) override;
-    Renderer& Fill(Color aColor, Optional<const Rect> aDestination = nullptr) override;
+    Renderer& Fill(Color aColor, OptionalRect aDestination = nullptr) override;
     Renderer& Blit(const Texture &arTexture) override;
+    Renderer& SetClipRect(const Rect &arClipRect) override;
 
     void Present() override;
 
     Renderer& SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) override;
     Color GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const override;
+
+protected:
+    Rect mClipRect;
 };
 
 } /* namespace rsp::graphics::sw */

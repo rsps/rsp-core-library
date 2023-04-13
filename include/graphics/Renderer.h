@@ -14,7 +14,6 @@
 #include <functional>
 #include <memory>
 #include <optional>
-#include <utils/OptionalPtr.h>
 #include "Color.h"
 #include "GuiUnit.h"
 #include "PixelData.h"
@@ -23,12 +22,22 @@
 
 namespace rsp::graphics {
 
+/**
+ * \class Renderer
+ * \brief A Renderer represents a presentation surface, e.g. a display device.
+ *
+ * Content is drawn on the display by using the drawing operations in this class,
+ * and made visible on the display device by calling the Present method.
+ *
+ */
 class Renderer
 {
 public:
-    template <class T>
-    using Optional = rsp::utils::OptionalPtr<T>;
-
+    /**
+     * \brief Get the default Renderer instance
+     *
+     * \return self
+     */
     static Renderer& Get();
 
     virtual ~Renderer() {}
@@ -37,10 +46,46 @@ public:
     virtual GuiUnit_t GetWidth() const = 0;
     virtual ColorDepth GetColorDepth() const = 0;
 
+    /**
+     * \brief Draw a rectangle of width 1px
+     *
+     * \param aColor
+     * \param arRect
+     * \return self
+     */
     virtual Renderer& DrawRect(Color aColor, const Rect &arRect) = 0;
-    virtual Renderer& Fill(Color aColor, Optional<const Rect> aDestination = nullptr) = 0;
+
+    /**
+     * \brief Fill the presentation surface with the given color
+     *
+     * \param aColor
+     * \param aDestination Optional area on the surface to fill
+     * \return self
+     */
+    virtual Renderer& Fill(Color aColor, OptionalRect aDestination = nullptr) = 0;
+
+    /**
+     * \brief Copy the given texture onto this presentation surface
+     *
+     * \param arTexture
+     * \return self
+     */
     virtual Renderer& Blit(const Texture &arTexture) = 0;
 
+    /**
+     * \brief Limit the drawing area on this presentation surface
+     *
+     * \param aClipRect
+     * \return
+     */
+    virtual Renderer& SetClipRect(const Rect &arClipRect) = 0;
+
+    /**
+     * \brief Make sure the presentation surface is visible on the display device.
+     *
+     * Mainly used to wait for acceleration hardware to finish and setting view-port
+     * on multi-buffer architectures.
+     */
     virtual void Present() = 0;
 
     /**
@@ -57,7 +102,6 @@ public:
      */
     virtual Color GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront = false) const = 0;
     Color GetPixel(const Point &arPoint, bool aFront = false) const { return GetPixel(arPoint.GetX(), arPoint.GetY(), aFront); }
-
 };
 
 } /* namespace rsp::graphics */

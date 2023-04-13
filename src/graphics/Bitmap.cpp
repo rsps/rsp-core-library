@@ -52,7 +52,6 @@ Bitmap& Bitmap::Load(const std::string &arImgName)
     loader->LoadImg(filename);
     Assign(loader->GetPixelData());
     mId = Crc32::Calc(arImgName.c_str(), arImgName.size());
-    mClipRect = GetRect();
     return *this;
 }
 

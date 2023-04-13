@@ -35,7 +35,7 @@ Renderer& SWRenderer::DrawRect(Color aColor, const Rect &arRect)
     return *this;
 }
 
-Renderer& SWRenderer::Fill(Color aColor, Optional<const Rect> aDestination)
+Renderer& SWRenderer::Fill(Color aColor, OptionalRect aDestination)
 {
     mrGfxHal.Fill(mScreenSurfaces[mCurrentSurface], aColor.AsRaw(), aDestination);
     return *this;
@@ -44,7 +44,15 @@ Renderer& SWRenderer::Fill(Color aColor, Optional<const Rect> aDestination)
 Renderer& SWRenderer::Blit(const Texture &arTexture)
 {
     auto &swt = dynamic_cast<const SWTexture&>(arTexture);
-    mrGfxHal.Blit(mScreenSurfaces[mCurrentSurface], *swt.mpSurface, swt.GetDestinationRect(), swt.mSourceRect);
+    Rect dst = swt.GetDestinationRect();
+    dst &= mClipRect;
+    mrGfxHal.Blit(mScreenSurfaces[mCurrentSurface], *swt.mpSurface, dst, swt.mSourceRect);
+    return *this;
+}
+
+Renderer& SWRenderer::SetClipRect(const Rect &arClipRect)
+{
+    mClipRect = arClipRect & Rect(0, 0, GetWidth(), GetHeight());
     return *this;
 }
 

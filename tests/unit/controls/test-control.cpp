@@ -139,7 +139,8 @@ TEST_CASE("Control")
         CHECK_EQ(renderer.GetPixel(299, 539, true), Color::Blue);
         CHECK_EQ(renderer.GetPixel(300, 540, true), Color::Grey);
 
-        CHECK_EQ(renderer.GetPixel(100, 300, true), Color::Yellow);
+        CHECK_EQ(renderer.GetPixel(100, 300, true), Color::Grey);
+        CHECK_EQ(renderer.GetPixel(200, 300, true), Color::Yellow);
         CHECK_EQ(renderer.GetPixel(249, 349, true), Color::Yellow);
         CHECK_EQ(renderer.GetPixel(250, 350, true), Color::Blue);
 }

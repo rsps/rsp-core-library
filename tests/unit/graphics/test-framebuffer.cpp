@@ -73,6 +73,7 @@ TEST_CASE("Framebuffer")
             CHECK_HEX(fb_value, color.AsUint());
             fb_value = renderer.GetPixel(479, 799, true).AsUint();
             CHECK_HEX(fb_value, color.AsUint());
+            std::this_thread::sleep_for(300ms);
         }
     }
 
@@ -274,6 +275,7 @@ TEST_CASE("Framebuffer")
         CHECK_EQ(testImgMap.GetHeight(), height);
         CHECK_EQ(testImgMap.GetWidth(), width);
         CHECK_EQ(testImgMap.GetPixelData().GetDataSize(), (width * height * 3));
+        CHECK_HEX(testImgMap.GetPixelAt(50, 50).AsUint(), 0xFF031b95);
 
         SUBCASE("Draw image from file")
         {
@@ -283,7 +285,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(renderer.Blit(*raster));
 
             // Assert
-            CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + 4, topLeftImgCorner.GetY() + 4, false), 0xFF920F02);
+            CHECK_EQ(renderer.GetPixel(topLeftImgCorner.GetX() + 4, topLeftImgCorner.GetY() + 4, false).AsUint(), 0xFF020F92);
 
             CHECK_NOTHROW(renderer.Present());
         }
@@ -665,7 +667,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(renderer.Present());
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
-        CHECK_HEX(renderer.GetPixel(Point(185, 185), true).AsRaw(), 0xFF006138);
+        CHECK_HEX(renderer.GetPixel(Point(180, 180), true).AsUint(), 0xFF386100);
     }
 
 }
