@@ -116,15 +116,22 @@ void PngLoader::LoadImg(const std::string &arImgName)
                 decodeDataChunk(chunk.GetData(), chunk.GetSize());
                 break;
 
-            case fourcc("PLTE"):
-                THROW_WITH_BACKTRACE1(rsp::exceptions::NotImplementedException, "Palette chunks are not supported yet");
-                break;
-
             case fourcc("IEND"):
                 return;
 
             case fourcc("pHYs"):
                 mPhys = chunk.GetAs<pHYs>();
+                break;
+
+            case fourcc("PLTE"):
+                if ((chunk.GetSize() % 3) != 0) {
+                    THROW_WITH_BACKTRACE1(ECorruptedFile, "Illegal PNG palette size in " + file.GetFileName());
+                }
+                decodePaletteChunk(chunk.GetData(), chunk.GetSize());
+                break;
+
+            case fourcc("tRNS"):
+                decodeTransparencyChunk(chunk.GetData(), chunk.GetSize());
                 break;
 
             default:
@@ -207,6 +214,43 @@ void PngLoader::decodeDataChunk(const std::uint8_t *apData, size_t aSize)
     decompressData(apData, aSize);
 }
 
+void PngLoader::decodePaletteChunk(const std::uint8_t *apData, size_t aSize)
+{
+    mPalette.clear();
+    for (size_t i = 0 ; i < aSize ; i +=3) {
+        mPalette.emplace_back(apData[i], apData[i+1], apData[i+2], 0xFF);
+    }
+}
+
+void PngLoader::decodeTransparencyChunk(const std::uint8_t *apData, size_t aSize)
+{
+    switch (ColorTypes(mIhdr.ColorType)) {
+        case ColorTypes::GreyScale:
+            // Only 8 bit sample values supported, so only read LSB value
+            mTransparentColor.Alpha = readSample(&apData);
+            break;
+
+        case ColorTypes::TrueColor:
+            // Only 8 bit sample values supported, so only read LSB values
+            mTransparentColor.Red = readSample(&apData);
+            mTransparentColor.Green = readSample(&apData);
+            mTransparentColor.Blue = readSample(&apData);
+            break;
+
+        case ColorTypes::IndexedColor: {
+            size_t pi = 0;
+            for (size_t i = 0 ; i < aSize ; ++i) {
+                mPalette.at(pi++).Alpha = apData[i];
+            }
+            break;
+        }
+
+        default:
+            break;
+    }
+}
+
+
 void PngLoader::decompressData(const std::uint8_t *apData, size_t aSize)
 {
     // init the decompression stream
@@ -228,31 +272,26 @@ void PngLoader::decompressData(const std::uint8_t *apData, size_t aSize)
     stream.avail_in = aSize;
     stream.next_in = apData;
 
-    std::vector<std::uint8_t> buffer;
-    size_t line_size = 1 + getScanlineWidth();
-
-    buffer.resize(2 * line_size);
-    mFilter.ScanLines[0] = buffer.data();
-    mFilter.ScanLines[1] = buffer.data() + line_size;
+    Scanlines buffer(getScanlineWidth());
 
     // Start decompressing
     while (stream.avail_in != 0) {
-        stream.next_out = buffer.data();
-        stream.avail_out = buffer.size();
+        stream.next_out = buffer.Next();
+        stream.avail_out = buffer.LineLength();
 
         ret = inflate(&stream, Z_NO_FLUSH);
 
         if (ret == Z_STREAM_END) {
             // only store the data we have left in the stream
-            buffer.resize(buffer.size() - stream.avail_out);
-            defilterScanLine(buffer);
+//            buffer.resize(buffer.size() - stream.avail_out);
+            buffer.Defilter();
             break;
         }
         else if (ret == Z_OK) {
-            defilterScanLine(buffer);
+            buffer.Defilter();
         }
         else {
-            std::cout << "Available: " << stream.avail_in << ", buffer: " << buffer.size() << std::endl;
+            std::cout << "Available: " << stream.avail_in << ", buffer: " << buffer.LineLength() << std::endl;
             THROW_WITH_BACKTRACE2(ZlibException, "inflate", ret);
         }
     }
@@ -263,17 +302,17 @@ void PngLoader::decompressData(const std::uint8_t *apData, size_t aSize)
     }
 }
 
-void PngLoader::defilterScanLine(const std::vector<std::uint8_t> &arData)
+void PngLoader::Scanlines::Defilter()
 {
-    std::cout << "Defiltering: " << int(arData[0]) << std::endl;
-//    std::cout << HexStream(arData) << std::endl;
-
-    auto it = arData.begin();
-    std::uint8_t type = *it++;
-
-    for (; it != arData.end(); ++it) {
-        auto orig = unFilter(type, *it);
-    }
+//    std::cout << "Defiltering: " << int(arData[0]) << std::endl;
+////    std::cout << HexStream(arData) << std::endl;
+//
+//    auto it = arData.begin();
+//    std::uint8_t type = *it++;
+//
+//    for (; it != arData.end(); ++it) {
+//        auto orig = unFilter(type, *it);
+//    }
 }
 
 std::uint8_t PngLoader::unFilter(std::uint8_t aType, std::uint8_t aValue)
@@ -296,10 +335,19 @@ std::uint8_t PngLoader::unFilter(std::uint8_t aType, std::uint8_t aValue)
 size_t PngLoader::getScanlineWidth()
 {
     size_t result = mIhdr.Width * mIhdr.BitDepth;
-    switch (mIhdr.ColorType) {
-        case 2:
-        case 6:
+    switch (ColorTypes(mIhdr.ColorType)) {
+        case ColorTypes::GreyScale:
+            break;
+        case ColorTypes::TrueColor:
             result *= 3;
+            break;
+        case ColorTypes::IndexedColor:
+            break;
+        case ColorTypes::GreyScaleWithAlpha:
+            result *= 2;
+            break;
+        case ColorTypes::TrueColorWithAlpha:
+            result *= 4;
             break;
         default:
             break;
@@ -307,6 +355,40 @@ size_t PngLoader::getScanlineWidth()
     return (result / 8);
 }
 
+PngLoader::Scanlines::Scanlines(size_t aLength)
+{
+    mData.resize((aLength + 1) * 2);
+    mLines[0] = mData.data();
+    mLines[1] = mData.data() + aLength + 1;
+}
+
+std::uint8_t* PngLoader::Scanlines::Current()
+{
+    return mLines[mCurrent];
+}
+
+std::uint8_t* PngLoader::Scanlines::Next()
+{
+    mCurrent = (mCurrent + 1) % 2;
+    return mLines[mCurrent];
+}
+
+std::uint8_t* PngLoader::Scanlines::Previous()
+{
+    return mLines[(mCurrent - 1) % 2];
+}
+
+PngLoader::FilterTypes PngLoader::Scanlines::FilterType()
+{
+    return FilterTypes(mLines[mCurrent][0]);
+}
+
+size_t PngLoader::Scanlines::LineLength()
+{
+    return (mData.size() / 2);
+}
+
 } // rsp::graphics
+
 
 #endif // USE_PNG

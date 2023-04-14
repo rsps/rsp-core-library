@@ -33,7 +33,6 @@ public:
     std::string formatError(const char *apMsg, int aErrorCode);
 };
 
-
 class PngLoader: public ImgLoader
 {
 public:
@@ -81,24 +80,65 @@ public:
     void LoadImg(const std::string &aImgName) override;
 
 protected:
+    using sample_t = std::uint16_t;
+    struct Pixel
+    {
+        sample_t Red;
+        sample_t Green;
+        sample_t Blue;
+        sample_t Alpha;
+    };
+    constexpr sample_t readSample(const std::uint8_t **p)
+    {
+        sample_t result = ((sample_t(*p[0]) << 8) + *p[1]);
+        *p += 2;
+        return result;
+    }
+
     enum class FilterTypes { None, Sub, Up, Average, Paeth };
     struct Filter
     {
-        std::uint8_t *ScanLines[2]{};
-        int Current = 0;
         int X = 0;
         int Y = 0;
     };
     Filter mFilter{};
 
+    class Scanlines
+    {
+    public:
+        Scanlines(size_t aLength);
+        Scanlines(const Scanlines&) = default;
+        Scanlines(Scanlines&&) = default;
+        Scanlines& operator=(const Scanlines&) = default;
+        Scanlines& operator=(Scanlines&&) = default;
+
+        std::uint8_t* Current();
+        std::uint8_t* Next();
+        std::uint8_t* Previous();
+        FilterTypes  FilterType();
+        size_t LineLength();
+
+        void Defilter();
+    protected:
+        std::vector<std::uint8_t> mData{};
+        std::uint8_t *mLines[2];
+        int mCurrent = -1;
+    };
+
+    enum class ColorTypes { GreyScale = 0, TrueColor = 2, IndexedColor = 3, GreyScaleWithAlpha = 4, TrueColorWithAlpha = 6 };
+
     IHDR mIhdr{};
     pHYs mPhys{};
+
+    std::vector<Pixel> mPalette{};
+    Pixel mTransparentColor{};
 
     void checkSignature(rsp::posix::FileIO &arFile) const;
     ColorDepth getColorDepth() const;
     void decodeDataChunk(const std::uint8_t *apData, size_t aSize);
+    void decodePaletteChunk(const std::uint8_t *apData, size_t aSize);
+    void decodeTransparencyChunk(const std::uint8_t *apData, size_t aSize);
     void decompressData(const std::uint8_t *apData, size_t aSize);
-    void defilterScanLine(const std::vector<std::uint8_t> &arData);
     std::uint8_t unFilter(std::uint8_t aType, std::uint8_t aValue);
     size_t getScanlineWidth();
 };
