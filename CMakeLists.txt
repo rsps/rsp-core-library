@@ -11,7 +11,7 @@ OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by d
 OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
 OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
 OPTION(SDL2 "Use SDL2 for graphic accelleration." OFF)
-OPTION(BITMAP_PNG "Support PNG in bitmap loading. Requires zlib." ON)
+OPTION(ZLIB "Build with ZLib Inflate/Deflate compression." ON)
 
 if(ARCH_ARM)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
@@ -95,10 +95,10 @@ if (OPENSSL_CRYPTO)
     set(CRYPTO_LIB OpenSSL::Crypto)
 endif()
 
-if (BITMAP_PNG)
+if (ZLIB)
     find_package(ZLIB REQUIRED)
-    set(PNG_BUILD_OPTIONS -DUSE_PNG)
-    set(PNG_LIB ${ZLIB_LIBRARIES})
+    set(ZLIB_BUILD_OPTIONS -DUSE_ZLIB)
+    set(ZLIB_LIB ${ZLIB_LIBRARIES})
 endif()
 
 target_link_libraries ("rsp-core-lib"
@@ -106,7 +106,7 @@ target_link_libraries ("rsp-core-lib"
     ${CRYPTO_LIB}
     ${NETWORK_LIB}
     ${SDL_LIB}
-    ${PNG_LIB}
+    ${ZLIB_LIB}
 )
 
 # Keep symbol information for exception stack traces
@@ -133,7 +133,7 @@ target_compile_options(rsp-core-lib PUBLIC
     ${OPENSSL_BUILD_OPTIONS}
     ${LIBCURL_BUILD_OPTIONS}
     ${SDL_BUILD_OPTIONS}
-    ${PNG_BUILD_OPTIONS}
+    ${ZLIB_BUILD_OPTIONS}
 )
 
 if (NOT RELEASE_BUILD)
