@@ -30,16 +30,43 @@ GfxHal& GfxHal::Get()
 
 namespace rsp::graphics::sw {
 
+std::uint64_t SWGfxHal::mAllocated = 0;
+
+struct VideoDeleter
+{
+    VideoDeleter(size_t aSize) : mSize(aSize) {}
+
+    void operator()(uint32_t p[]) noexcept {
+        try {
+            delete[] p;
+        }
+        catch(...) {
+        }
+        SWGfxHal::mAllocated -= mSize * sizeof(uint32_t);
+    }
+
+protected:
+    size_t mSize;
+};
+
 
 std::shared_ptr<VideoSurface> SWGfxHal::Alloc(int aWidth, int aHeight)
 {
     auto surface = std::make_shared<VideoSurface>();
-    surface->mpVirtAddr = std::unique_ptr<uint32_t[]>(new uint32_t[aWidth * aHeight]);
+    size_t size = size_t(aWidth * aHeight);
+    surface->mpVirtAddr = std::unique_ptr<uint32_t[], VideoDeleter>(new uint32_t[size], VideoDeleter(size));
+    mAllocated += (size * sizeof(uint32_t));
     surface->mRowPitch = uintptr_t(aWidth) * sizeof(uint32_t);
     surface->mWidth = aWidth;
     surface->mHeight = aHeight;
     return surface;
 }
+
+std::uint64_t SWGfxHal::GetVideoMemoryUsage() const
+{
+    return mAllocated;
+}
+
 
 /**
  * \brief Same blending as in Color::Blend

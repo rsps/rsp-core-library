@@ -22,7 +22,7 @@ Button& Button::Setup(Rect aTouchArea, Rect aArea, Point aPosition)
     return *this;
 }
 
-Button& Button::Background(Control::States aState, Color aColor, Optional_t apPixelData, Point aOffset)
+Button& Button::Background(Control::States aState, Color aColor, OptionalSurface_t apPixelData, Point aOffset)
 {
     Style& style = GetStyle(aState);
     if (apPixelData) {
@@ -33,11 +33,32 @@ Button& Button::Background(Control::States aState, Color aColor, Optional_t apPi
     return *this;
 }
 
-Button& Button::Foreground(Control::States aState, Color aColor, Optional_t apPixelData, Point aOffset)
+Button& Button::Background(Control::States aState, Color aColor, const Texture* apTexture, Point aOffset){
+    Style& style = GetStyle(aState);
+    if (apTexture) {
+        style.mTextures.push_back(apTexture->Clone());
+        style.mTextures.back()->SetOffset(aOffset);
+    }
+    style.mBackgroundColor = aColor;
+    return *this;
+}
+
+Button& Button::Foreground(Control::States aState, Color aColor, OptionalSurface_t apPixelData, Point aOffset)
 {
     Style& style = GetStyle(aState);
     if (apPixelData) {
         style.mTextures.push_back(Texture::Create(apPixelData.Get(), aColor));
+        style.mTextures.back()->SetOffset(aOffset);
+    }
+    style.mForegroundColor = aColor;
+    return *this;
+}
+
+Button& Button::Foreground(Control::States aState, Color aColor, const Texture* apTexture, Point aOffset)
+{
+    Style& style = GetStyle(aState);
+    if (apTexture) {
+        style.mTextures.push_back(apTexture->Clone());
         style.mTextures.back()->SetOffset(aOffset);
     }
     style.mForegroundColor = aColor;

@@ -18,6 +18,7 @@
 #include <graphics/Framebuffer.h>
 #include <graphics/GraphicsMain.h>
 #include <graphics/Label.h>
+#include <graphics/GfxHal.h>
 #include <utils/Timer.h>
 #include <scenes/Scenes.h>
 #include <TestHelpers.h>
@@ -232,6 +233,8 @@ TEST_CASE("Graphics Main Test")
         MESSAGE("Running GFX loop with " << 1000 << " FPS limitation");
         CHECK_NOTHROW(gfx.Run(1000, true));
     }
+
+    MESSAGE("Video Memory Usage: " << GfxHal::Get().GetVideoMemoryUsage());
 
     CHECK_NOTHROW(gfx.RegisterOverlay(nullptr));
 

@@ -82,6 +82,13 @@ public:
     virtual std::shared_ptr<VideoSurface> Alloc(int aWidth, int aHeight) = 0;
 
     /**
+     * \brief Get the video memory usage statistics
+     *
+     * \return AllocaStatus
+     */
+    virtual std::uint64_t GetVideoMemoryUsage() const = 0;
+
+    /**
      * \brief Copy an area onto another
      *
      * \param arDst Destination surface

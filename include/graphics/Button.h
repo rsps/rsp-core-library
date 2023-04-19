@@ -16,6 +16,7 @@
 #include "Control.h"
 #include "Label.h"
 #include "Text.h"
+#include "Texture.h"
 #include <utils/OptionalPtr.h>
 
 namespace rsp::graphics {
@@ -23,13 +24,15 @@ namespace rsp::graphics {
 class Button: public Label
 {
 public:
-    using Optional_t = utils::OptionalPtr<PixelData>;
+    using OptionalSurface_t = utils::OptionalPtr<PixelData>;
 
     Button() { initTypeInfo<Button>(); }
 
     Button& Setup(Rect aTouchArea, Rect aArea, Point aPosition);
-    Button& Background(Control::States aState, Color aColor, Optional_t apPixelData = nullptr, Point aOffset = {0,0});
-    Button& Foreground(Control::States aState, Color aColor, Optional_t apPixelData = nullptr, Point aOffset = {0,0});
+    Button& Background(Control::States aState, Color aColor, OptionalSurface_t apPixelData = nullptr, Point aOffset = {0,0});
+    Button& Background(Control::States aState, Color aColor, const Texture* apTexture, Point aOffset = {0,0});
+    Button& Foreground(Control::States aState, Color aColor, OptionalSurface_t apPixelData = nullptr, Point aOffset = {0,0});
+    Button& Foreground(Control::States aState, Color aColor, const Texture* apTexture, Point aOffset = {0,0});
 };
 
 } /* namespace rsp::graphics */
