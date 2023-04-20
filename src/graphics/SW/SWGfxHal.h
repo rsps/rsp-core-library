@@ -11,10 +11,10 @@
 #ifndef SRC_GRAPHICS_SW_SWGFXHAL_H_
 #define SRC_GRAPHICS_SW_SWGFXHAL_H_
 
+#ifdef USE_GFX_SW
+
 #include <utils/Singleton.h>
 #include "GfxHal.h"
-
-#ifdef USE_GFX_SW
 
 namespace rsp::graphics::sw {
 

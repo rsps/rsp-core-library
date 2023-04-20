@@ -125,6 +125,7 @@ target_include_directories(rsp-core-lib
         ${FREETYPE_INCLUDE_DIRS}
         ${CURL_INCLUDE_DIRS}
         ${ZLIB_INCLUDE_DIRS}
+        ${SDL_INCLUDE_DIRS}
 )
 
 target_compile_options(rsp-core-lib PUBLIC

@@ -7,6 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+#ifdef USE_GFX_SW
 
 #include "SWTexture.h"
 
@@ -127,3 +128,5 @@ Point SWTexture::GetDestination() const
 }
 
 } /* namespace rsp::graphics::sw */
+
+#endif /* USE_GFX_SW */

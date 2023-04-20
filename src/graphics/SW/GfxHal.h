@@ -11,6 +11,8 @@
 #ifndef SRC_GRAPHICS_SW_GFXHAL_H_
 #define SRC_GRAPHICS_SW_GFXHAL_H_
 
+#ifdef USE_GFX_SW
+
 #include <stdint.h>
 #include <memory>
 #include <functional>
@@ -147,5 +149,5 @@ public:
 
 } /* namespace rsp::graphics::sw */
 
-
+#endif /* USE_GFX_SW */
 #endif /* SRC_GRAPHICS_SW_GFXHAL_H_ */

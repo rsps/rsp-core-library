@@ -11,6 +11,8 @@
 #ifndef FRAMEBUFFER_H
 #define FRAMEBUFFER_H
 
+#ifdef USE_GFX_SW
+
 #include <graphics/Rect.h>
 #include <linux/fb.h>
 #include "GfxHal.h"
@@ -48,4 +50,5 @@ protected:
 
 } // namespace rsp::graphics::sw
 
+#endif /* USE_GFX_SW */
 #endif // FRAMEBUFFER_H

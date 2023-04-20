@@ -16,6 +16,14 @@ if(NOT libSDL2pp_POPULATED)
     SET(SDL2PP_WITH_MIXER OFF) # if you need SDL_mixer support
     SET(SDL2PP_WITH_TTF OFF) # if you need SDL_ttf support
     add_subdirectory(${libsdl2pp_SOURCE_DIR} ${libsdl2pp_BINARY_DIR})
+    SET(SDL2PP_INCLUDE_DIRS ${libsdl2pp_SOURCE_DIR} ${libsdl2pp_BINARY_DIR})
 endif()
 
 find_package(SDL2 REQUIRED)
+
+#message("SDL INCLUDES: " ${SDL2_INCLUDE_DIRS})
+#message("SDL++ INCLUDES: " ${SDL2PP_INCLUDE_DIRS})
+
+SET(SDL_INCLUDE_DIRS ${SDL2PP_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS})
+
+mark_as_advanced(SDL_INCLUDE_DIRS)

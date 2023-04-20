@@ -11,6 +11,8 @@
 #ifndef SRC_GRAPHICS_SW_SWTEXTURE_H_
 #define SRC_GRAPHICS_SW_SWTEXTURE_H_
 
+#ifdef USE_GFX_SW
+
 #include <graphics/PixelData.h>
 #include <graphics/Texture.h>
 #include "GfxHal.h"
@@ -55,4 +57,5 @@ protected:
 
 } /* namespace rsp::graphics::sw */
 
+#endif /* USE_GFX_SW */
 #endif /* SRC_GRAPHICS_SW_SWTEXTURE_H_ */

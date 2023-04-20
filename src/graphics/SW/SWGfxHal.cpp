@@ -8,12 +8,12 @@
  * \author      Steffen Brummer
  */
 
+#ifdef USE_GFX_SW
+
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
 #include "SWGfxHal.h"
-
-#ifdef USE_GFX_SW
 
 namespace rsp::graphics::sw {
 

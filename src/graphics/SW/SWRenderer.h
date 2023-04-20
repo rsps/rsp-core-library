@@ -11,6 +11,8 @@
 #ifndef SRC_GRAPHICS_SW_SWRENDERER_H_
 #define SRC_GRAPHICS_SW_SWRENDERER_H_
 
+#ifdef USE_GFX_SW
+
 #include <string>
 #include <graphics/Renderer.h>
 #include <utils/Singleton.h>
@@ -43,4 +45,5 @@ protected:
 
 } /* namespace rsp::graphics::sw */
 
+#endif /* USE_GFX_SW */
 #endif /* SRC_GRAPHICS_SW_SWRENDERER_H_ */

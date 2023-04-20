@@ -8,6 +8,8 @@
  * \author      Simon Glashoff
  */
 
+#ifdef USE_GFX_SW
+
 #include <exceptions/ExceptionHelper.h>
 #include <chrono>
 #include <cstring>
@@ -123,3 +125,5 @@ void Framebuffer::swapBuffer()
 }
 
 } // namespace rsp::graphics::sw
+
+#endif /* USE_GFX_SW */
