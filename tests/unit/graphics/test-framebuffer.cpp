@@ -12,9 +12,9 @@
 #include <doctest.h>
 #include <graphics/Bitmap.h>
 #include <graphics/Font.h>
-#include <graphics/Framebuffer.h>
 #include <graphics/Text.h>
 #include <graphics/Renderer.h>
+#include <graphics/SW/Framebuffer.h>
 #include <thread>
 #include <filesystem>
 #include <posix/FileSystem.h>
@@ -46,7 +46,7 @@ TEST_CASE("Framebuffer")
     Random::Seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
 
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    Framebuffer::mpDevicePath = p.c_str();
+    sw::Framebuffer::mpDevicePath = p.c_str();
 
     auto &renderer = Renderer::Get();
 
@@ -457,7 +457,7 @@ TEST_CASE("Framebuffer")
 
         auto sprite = Texture::Create(imgSimple.GetWidth(), imgSimple.GetHeight()+5);
         CHECK_NOTHROW(sprite->Fill(Color::Black));
-        CHECK_NOTHROW(sprite->SetBlendOperation(GfxBlendOperation::SourceAlpha));
+        CHECK_NOTHROW(sprite->SetBlendOperation(Texture::BlendOperation::SourceAlpha));
         Point pos(100, 200);
 
         // Act
@@ -493,7 +493,7 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(text.GetFont().SetSize(30));
 
         auto panel = Texture::Create(280, 200);
-        CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::ColorKey));
+        CHECK_NOTHROW(panel->SetBlendOperation(Texture::BlendOperation::ColorKey));
 
         SUBCASE("Text Attributes") {
             CHECK_NOTHROW(panel->Fill(Color::None));
@@ -543,7 +543,7 @@ TEST_CASE("Framebuffer")
             MESSAGE("FPS Test");
             CHECK_NOTHROW(text.SetLineSpacing(50).SetValue("FPS:\n0").Reload(r));
             panel = Texture::Create(text, Color::Black);
-            CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::ColorKey).SetDestination(Point(100, 200)));
+            CHECK_NOTHROW(panel->SetBlendOperation(Texture::BlendOperation::ColorKey).SetDestination(Point(100, 200)));
 
             rsp::utils::StopWatch sw;
             for (int i = 0 ; i < 200 ; i++) {
@@ -576,7 +576,7 @@ TEST_CASE("Framebuffer")
 
         auto panel = Texture::Create(text.GetWidth(), text.GetHeight());
 
-        CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::ColorKey, Color::None));
+        CHECK_NOTHROW(panel->SetBlendOperation(Texture::BlendOperation::ColorKey, Color::None));
         CHECK_NOTHROW(text.Reload());
         CHECK_NOTHROW(panel->Fill(Color::None).Update(text, Color::Yellow));
 
@@ -606,7 +606,7 @@ TEST_CASE("Framebuffer")
         r2.AddSize(2, 2).Move(-1, -1);
 
         auto panel = Texture::Create(r.GetWidth(), r.GetHeight());
-        CHECK_NOTHROW(panel->SetBlendOperation(GfxBlendOperation::ColorKey, Color::None));
+        CHECK_NOTHROW(panel->SetBlendOperation(Texture::BlendOperation::ColorKey, Color::None));
 
         Text text("Exo 2", "Regular");
         CHECK_NOTHROW(text.GetFont().SetSize(50));
@@ -642,7 +642,7 @@ TEST_CASE("Framebuffer")
         std::string testImage = "testImages/rgba/Asset2WithAlpha.bmp";
         Bitmap testImgMap(testImage);
 
-        texture.SetBlendOperation(GfxBlendOperation::Copy);
+        texture.SetBlendOperation(Texture::BlendOperation::Copy);
 
         CHECK_NOTHROW(texture.Update(testImgMap, Color::White));
         CHECK_NOTHROW(renderer.Blit(texture));

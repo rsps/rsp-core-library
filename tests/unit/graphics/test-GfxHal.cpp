@@ -9,13 +9,14 @@
  */
 
 #include <doctest.h>
+#include <graphics/SW/GfxHal.h>
 #include <cstring>
-#include <graphics/GfxHal.h>
 #include <utils/Crc32.h>
 #include <utils/StopWatch.h>
 #include <TestHelpers.h>
 
 using namespace rsp::graphics;
+using namespace rsp::graphics::sw;
 using namespace rsp::utils;
 
 TEST_SUITE_BEGIN("Graphics");
@@ -27,7 +28,7 @@ TEST_CASE("GfxHal")
     constexpr const uint32_t cSize   = (cWidth * cHeight);
     constexpr const uint32_t cByteSize   = (cSize * sizeof(uint32_t));
 
-    CHECK_NOTHROW(GfxHal::Get());
+    CHECK_NOTHROW(sw::GfxHal::Get());
     GfxHal& gfx = GfxHal::Get();
 
     CHECK_NOTHROW(gfx.Alloc(cWidth, cHeight));
@@ -102,8 +103,8 @@ TEST_CASE("GfxHal")
         CHECK_NOTHROW(gfx.Fill(dst, 0xFF000000, Rect(0, 0, 4, 25)));
         CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 4178597885u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
-        src.mBlendOperation = GfxBlendOperation::SourceAlpha;
-        dst.mBlendOperation = GfxBlendOperation::SourceAlpha;
+        src.mBlendOperation = Texture::BlendOperation::SourceAlpha;
+        dst.mBlendOperation = Texture::BlendOperation::SourceAlpha;
 
         SUBCASE("Blit") {
             CHECK_NOTHROW(gfx.Blit(dst, src));
@@ -147,9 +148,9 @@ TEST_CASE("GfxHal")
         CHECK_NOTHROW(gfx.Fill(dst, 0xFF000000, Rect(0, 0, 4, 25)));
         CHECK_MESSAGE(Crc32::Calc(dst.mpVirtAddr.get(), cByteSize) == 4178597885u, "dst\n" << ToHex(dst.mpVirtAddr.get(), cSize));
 
-        src.mBlendOperation = GfxBlendOperation::ColorKey;
+        src.mBlendOperation = Texture::BlendOperation::ColorKey;
         src.mColorKey = 0xFF555555;
-        dst.mBlendOperation = GfxBlendOperation::ColorKey;
+        dst.mBlendOperation = Texture::BlendOperation::ColorKey;
         dst.mColorKey = 0xFF555555;
 
         SUBCASE("Blit") {
@@ -200,15 +201,15 @@ TEST_CASE("GfxHal")
         });
 
         SUBCASE("Copy") {
-            source->mBlendOperation = GfxBlendOperation::Copy;
+            source->mBlendOperation = Texture::BlendOperation::Copy;
         }
 
         SUBCASE("SourceAlpha") {
-            source->mBlendOperation = GfxBlendOperation::SourceAlpha;
+            source->mBlendOperation = Texture::BlendOperation::SourceAlpha;
         }
 
         SUBCASE("ColorKey") {
-            source->mBlendOperation = GfxBlendOperation::ColorKey;
+            source->mBlendOperation = Texture::BlendOperation::ColorKey;
             source->mColorKey = Color::White;
         }
 

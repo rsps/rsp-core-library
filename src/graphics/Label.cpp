@@ -64,7 +64,7 @@ void Label::update()
     auto tr = mText.GetRect();
     if (!mpTexture || (tr != Rect(0, 0, mpTexture->GetWidth(), mpTexture->GetHeight()))) {
         mpTexture = Texture::Create(tr.GetWidth(), tr.GetHeight());
-        mpTexture->SetBlendOperation(GfxBlendOperation::SourceAlpha);
+        mpTexture->SetBlendOperation(Texture::BlendOperation::SourceAlpha);
     }
 
     mpTexture->Fill(Color::None).Update(mText.GetPixelData(), mStyles[mState].mForegroundColor);

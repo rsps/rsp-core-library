@@ -12,12 +12,11 @@
 #define FRAMEBUFFER_H
 
 #include <graphics/Rect.h>
-#include <graphics/GfxHal.h>
 #include <linux/fb.h>
+#include "GfxHal.h"
 
 
-namespace rsp::graphics
-{
+namespace rsp::graphics::sw {
 
 class Framebuffer
 {
@@ -47,6 +46,6 @@ protected:
     void swapBuffer();
 };
 
-} // namespace rsp::graphics
+} // namespace rsp::graphics::sw
 
 #endif // FRAMEBUFFER_H

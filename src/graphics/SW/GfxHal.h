@@ -8,25 +8,20 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_GFXHAL_H_
-#define INCLUDE_GRAPHICS_GFXHAL_H_
+#ifndef SRC_GRAPHICS_SW_GFXHAL_H_
+#define SRC_GRAPHICS_SW_GFXHAL_H_
 
 #include <stdint.h>
 #include <memory>
 #include <functional>
 #include <utils/OptionalPtr.h>
-#include "Color.h"
-#include "GuiUnit.h"
-#include "Rect.h"
-#include "PixelData.h"
+#include <graphics/Color.h>
+#include <graphics/GuiUnit.h>
+#include <graphics/Rect.h>
+#include <graphics/PixelData.h>
+#include <graphics/Texture.h>
 
-namespace rsp::graphics {
-
-enum class GfxBlendOperation {
-    Copy,        // Copy source to destination
-    SourceAlpha, // Blend source with destination, using source alpha value
-    ColorKey     // Omit drawing pixels with same color value as ColorKey (transparent color)
-};
+namespace rsp::graphics::sw {
 
 /**
  * \struct VideoSurface
@@ -41,7 +36,7 @@ struct VideoSurface
     GuiUnit_t mWidth = 0;
     GuiUnit_t mHeight = 0;
     int mRotation = 0; // Rotation of this surface. Only supports: 0, 90, 180, 270
-    GfxBlendOperation mBlendOperation = GfxBlendOperation::Copy;
+    Texture::BlendOperation mBlendOperation = Texture::BlendOperation::Copy;
     uint32_t mColorKey = Color::None; // Value of transparent pixel on this surface (source key)
 };
 
@@ -150,7 +145,7 @@ public:
 };
 
 
-} /* namespace rsp::graphics */
+} /* namespace rsp::graphics::sw */
 
 
-#endif /* INCLUDE_GRAPHICS_GFXHAL_H_ */
+#endif /* SRC_GRAPHICS_SW_GFXHAL_H_ */

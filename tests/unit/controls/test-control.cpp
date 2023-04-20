@@ -10,8 +10,8 @@
 
 #include <doctest.h>
 #include <graphics/Control.h>
-#include <graphics/Framebuffer.h>
 #include <graphics/Renderer.h>
+#include <graphics/SW/Framebuffer.h>
 #include <posix/FileSystem.h>
 #include <TestHelpers.h>
 
@@ -25,7 +25,7 @@ TEST_CASE("Control")
     TestHelpers::AddConsoleLogger(logger);
 
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    Framebuffer::mpDevicePath = p.c_str();
+    sw::Framebuffer::mpDevicePath = p.c_str();
 
     CHECK_NOTHROW(Control dummy);
     Control myControl;

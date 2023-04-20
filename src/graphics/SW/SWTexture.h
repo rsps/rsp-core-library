@@ -11,9 +11,9 @@
 #ifndef SRC_GRAPHICS_SW_SWTEXTURE_H_
 #define SRC_GRAPHICS_SW_SWTEXTURE_H_
 
-#include <graphics/GfxHal.h>
 #include <graphics/PixelData.h>
 #include <graphics/Texture.h>
+#include "GfxHal.h"
 
 namespace rsp::graphics::sw {
 
@@ -30,7 +30,7 @@ public:
 
     Texture& Fill(Color aColor, GfxHal::OptionalRect arRect = nullptr) override;
     Texture& Update(const PixelData &arPixelData, Color aColor) override;
-    Texture& SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None) override;
+    Texture& SetBlendOperation(Texture::BlendOperation aOp, Color aColorKey = Color::None) override;
     Texture& SetSourceRect(const Rect &arRect) override;
     Texture& SetDestination(const Point &arPoint) override;
     Point GetDestination() const override;

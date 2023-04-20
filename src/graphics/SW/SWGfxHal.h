@@ -11,14 +11,14 @@
 #ifndef SRC_GRAPHICS_SW_SWGFXHAL_H_
 #define SRC_GRAPHICS_SW_SWGFXHAL_H_
 
-#include <graphics/GfxHal.h>
 #include <utils/Singleton.h>
+#include "GfxHal.h"
 
 #ifdef USE_GFX_SW
 
 namespace rsp::graphics::sw {
 
-class SWGfxHal: public rsp::graphics::GfxHal, public rsp::utils::Singleton<SWGfxHal>
+class SWGfxHal: public GfxHal, public rsp::utils::Singleton<SWGfxHal>
 {
 public:
     std::shared_ptr<VideoSurface> Alloc(int aWidth, int aHeight) override;

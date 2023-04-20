@@ -19,11 +19,11 @@ std::unique_ptr<Texture> Texture::Create(const PixelData &arPixelData, Color aCo
         default:
         case ColorDepth::RGB:
         case ColorDepth::RGBA:
-            result->SetBlendOperation(GfxBlendOperation::Copy);
+            result->SetBlendOperation(Texture::BlendOperation::Copy);
             break;
         case ColorDepth::Monochrome:
         case ColorDepth::Alpha:
-            result->SetBlendOperation(GfxBlendOperation::SourceAlpha);
+            result->SetBlendOperation(Texture::BlendOperation::SourceAlpha);
             break;
     }
     result->Fill(Color::None).Update(arPixelData, aColor.AsRaw());
@@ -74,7 +74,7 @@ Texture& SWTexture::Update(const PixelData &arPixelData, Color aColor)
     return *this;
 }
 
-Texture& SWTexture::SetBlendOperation(GfxBlendOperation aOp, Color aColorKey)
+Texture& SWTexture::SetBlendOperation(Texture::BlendOperation aOp, Color aColorKey)
 {
     mpSurface->mBlendOperation = aOp;
     mpSurface->mColorKey = aColorKey.AsRaw();

@@ -12,7 +12,6 @@
 #include <chrono>
 #include <cstring>
 #include <fcntl.h>
-#include <graphics/Framebuffer.h>
 #include <iostream>
 #include <linux/kd.h>
 #include <sys/ioctl.h>
@@ -20,9 +19,9 @@
 #include <thread>
 #include <unistd.h>
 #include <memory>
+#include "Framebuffer.h"
 
-namespace rsp::graphics
-{
+namespace rsp::graphics::sw {
 
 const char* Framebuffer::mpDevicePath = nullptr;
 
@@ -123,4 +122,4 @@ void Framebuffer::swapBuffer()
     }
 }
 
-} // namespace rsp::graphics
+} // namespace rsp::graphics::sw

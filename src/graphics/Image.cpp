@@ -59,10 +59,10 @@ void Image::update()
     if (mpTexture) {
         if (mBitmap.GetPixelData().GetColorDepth() != ColorDepth::RGB) {
             mpTexture->Fill(Color::None);
-            mpTexture->SetBlendOperation(GfxBlendOperation::SourceAlpha);
+            mpTexture->SetBlendOperation(Texture::BlendOperation::SourceAlpha);
         }
         else {
-            mpTexture->SetBlendOperation(GfxBlendOperation::Copy);
+            mpTexture->SetBlendOperation(Texture::BlendOperation::Copy);
         }
         mpTexture->Update(mBitmap.GetPixelData(), mStyles[mState].mForegroundColor);
 

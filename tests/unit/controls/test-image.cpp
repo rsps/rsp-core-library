@@ -9,9 +9,9 @@
  */
 
 #include <doctest.h>
-#include <graphics/Framebuffer.h>
 #include <graphics/Image.h>
 #include <graphics/Renderer.h>
+#include <graphics/SW/Framebuffer.h>
 #include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <TestHelpers.h>
@@ -29,7 +29,7 @@ TEST_CASE("Image")
 
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    Framebuffer::mpDevicePath = p.c_str();
+    sw::Framebuffer::mpDevicePath = p.c_str();
 
     auto& renderer = Renderer::Get();
     CHECK_NOTHROW(renderer.Fill(Color::Grey));
@@ -85,7 +85,7 @@ TEST_CASE("TestImage")
 
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    Framebuffer::mpDevicePath = p.c_str();
+    sw::Framebuffer::mpDevicePath = p.c_str();
 
     auto& renderer = Renderer::Get();
     CHECK_NOTHROW(renderer.Fill(Color::Grey));

@@ -22,13 +22,18 @@ class Texture;
 typedef std::unique_ptr<Texture> TexturePtr_t;
 typedef std::unique_ptr<const Texture> cTexturePtr_t;
 
-
 /**
  * \brief Wrapper for raster images kept in video memory for fast rendering operations.
  */
 class Texture
 {
 public:
+    enum class BlendOperation {
+        Copy,        // Copy source to destination
+        SourceAlpha, // Blend source with destination, using source alpha value
+        ColorKey     // Omit drawing pixels with same color value as ColorKey (transparent color)
+    };
+
     static TexturePtr_t Create(const PixelData &arPixelData, Color aColor = Color::None, Point aDestPos = {0,0}, Point aDestOffset = {0,0});
     static TexturePtr_t Create(GuiUnit_t aWidth, GuiUnit_t aHeight, Point aDestPos = {0,0}, Point aDestOffset = {0,0});
 
@@ -56,7 +61,7 @@ public:
      * \brief Fill this texture with the given color
      * \param aColor
      */
-    virtual Texture& Fill(Color aColor, GfxHal::OptionalRect arRect = nullptr) = 0;
+    virtual Texture& Fill(Color aColor, OptionalRect arRect = nullptr) = 0;
 
     /**
      * \brief Update this texture with content from the given pixel data
@@ -72,7 +77,7 @@ public:
      * \param aColorKey
      * \return self
      */
-    virtual Texture& SetBlendOperation(GfxBlendOperation aOp, Color aColorKey = Color::None) = 0;
+    virtual Texture& SetBlendOperation(BlendOperation aOp, Color aColorKey = Color::None) = 0;
 
     /**
      * \brief Set/get the source area to use when reading from this texture. Defaults to entire texture.

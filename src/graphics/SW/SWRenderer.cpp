@@ -13,7 +13,7 @@
 #include <cstring>
 #include "SWRenderer.h"
 #include "SWTexture.h"
-#include <graphics/GfxHal.h>
+#include "GfxHal.h"
 
 namespace rsp::graphics {
 

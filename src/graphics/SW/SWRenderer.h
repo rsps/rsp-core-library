@@ -11,10 +11,10 @@
 #ifndef SRC_GRAPHICS_SW_SWRENDERER_H_
 #define SRC_GRAPHICS_SW_SWRENDERER_H_
 
-#include <graphics/Framebuffer.h>
 #include <string>
 #include <graphics/Renderer.h>
 #include <utils/Singleton.h>
+#include "Framebuffer.h"
 
 namespace rsp::graphics::sw {
 

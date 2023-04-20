@@ -16,7 +16,6 @@
 #include <graphics/Point.h>
 #include <graphics/Rect.h>
 #include <graphics/GfxCompressor.h>
-#include <graphics/GfxHal.h>
 #include <graphics/GfxResource.h>
 #include <cstdint>
 #include <cstddef>

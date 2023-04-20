@@ -9,12 +9,12 @@
  */
 
 #include <doctest.h>
-#include <graphics/Framebuffer.h>
 #include <graphics/Label.h>
 #include <graphics/Renderer.h>
 #include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <TestHelpers.h>
+#include "../../../src/graphics/SW/Framebuffer.h"
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
@@ -27,7 +27,7 @@ TEST_CASE("Label")
     TestHelpers::AddConsoleLogger(logger);
 
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    Framebuffer::mpDevicePath = p.c_str();
+    sw::Framebuffer::mpDevicePath = p.c_str();
 
     CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-Italic-VariableFont_wght.ttf"));
     CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-VariableFont_wght.ttf"));

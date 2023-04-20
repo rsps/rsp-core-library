@@ -15,10 +15,10 @@
 
 #include <doctest.h>
 #include <posix/FileSystem.h>
-#include <graphics/Framebuffer.h>
+#include <graphics/SW/Framebuffer.h>
 #include <graphics/GraphicsMain.h>
 #include <graphics/Label.h>
-#include <graphics/GfxHal.h>
+#include <graphics/SW/GfxHal.h>
 #include <utils/Timer.h>
 #include <scenes/Scenes.h>
 #include <TestHelpers.h>
@@ -83,7 +83,7 @@ TEST_CASE("Graphics Main Test")
     // Make framebuffer
     std::filesystem::path p;
     CHECK_NOTHROW(p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"}));
-    Framebuffer::mpDevicePath = p.c_str();
+    sw::Framebuffer::mpDevicePath = p.c_str();
 
     CHECK_NOTHROW(Renderer::Get());
     auto& renderer = Renderer::Get();
@@ -234,7 +234,7 @@ TEST_CASE("Graphics Main Test")
         CHECK_NOTHROW(gfx.Run(1000, true));
     }
 
-    MESSAGE("Video Memory Usage: " << GfxHal::Get().GetVideoMemoryUsage());
+    MESSAGE("Video Memory Usage: " << sw::GfxHal::Get().GetVideoMemoryUsage());
 
     CHECK_NOTHROW(gfx.RegisterOverlay(nullptr));
 

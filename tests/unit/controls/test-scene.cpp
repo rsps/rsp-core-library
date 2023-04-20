@@ -9,7 +9,6 @@
  */
 
 #include <graphics/Font.h>
-#include <graphics/Framebuffer.h>
 #include <graphics/Scene.h>
 #include <messaging/Subscriber.h>
 #include <messaging/Publisher.h>
@@ -18,6 +17,7 @@
 #include <doctest.h>
 
 #include <eventTypes/ClickedEvent.h>
+#include <graphics/SW/Framebuffer.h>
 #include <scenes/Scenes.h>
 #include <TestHelpers.h>
 
@@ -59,7 +59,7 @@ TEST_CASE("Scene Test")
 
     // Arrange
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    Framebuffer::mpDevicePath = p.c_str();
+    sw::Framebuffer::mpDevicePath = p.c_str();
 
     auto& renderer = Renderer::Get();
 
