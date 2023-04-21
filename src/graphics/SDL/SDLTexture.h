@@ -64,6 +64,11 @@ protected:
     Point mDestinationPos;
     Point mDestinationOffset;
     SDLRenderer &mrRenderer;
+
+    friend class SDLRenderer;
+    int mRotation = 0; // Rotation of this texture. Only supports: 0, 90, 180, 270
+    Texture::BlendOperation mBlendOperation = Texture::BlendOperation::Copy;
+    uint32_t mColorKey = Color::None; // Value of transparent pixel on this surface (source key)
 };
 
 } /* namespace rsp::graphics::sdl */

@@ -554,19 +554,19 @@ TEST_CASE("Framebuffer")
             const Color rainbow[] = { Color::White, Color::Red, Color::Yellow, Color::Green, Color::Aqua, Color::Lime, Color::Blue, Color::Silver };
 
             MESSAGE("FPS Test");
-            CHECK_NOTHROW(text.SetLineSpacing(50).SetValue("FPS:\n0").Reload(r));
+            CHECK_NOTHROW(text.SetLineSpacing(50).SetValue("FPS:\n0000").Reload(r));
             panel = Texture::Create(text, Color::Black);
-            CHECK_NOTHROW(panel->SetBlendOperation(Texture::BlendOperation::ColorKey).SetDestination(Point(100, 200)));
+            CHECK_NOTHROW(panel->SetBlendOperation(Texture::BlendOperation::ColorKey, Color::None).SetDestination(Point(100, 200)));
 
             rsp::utils::StopWatch sw;
-            for (int i = 0 ; i < 200 ; i++) {
+            for (int i = 0 ; i < 2000 ; i++) {
                 CHECK_NOTHROW(renderer.Fill(rainbow[i & 0x07]));
                 int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
                 std::stringstream ss;
                 ss << "FPS:\n" << fps;
                 CHECK_NOTHROW(text.SetValue(ss.str()).Reload());
                 CHECK_NOTHROW(panel->Fill(Color::None));
-                CHECK_NOTHROW(panel->Update(text, Color::Black));
+                CHECK_NOTHROW(panel->Update(text, Color::Aqua));
                 CHECK_NOTHROW(renderer.Blit(*panel));
                 CHECK_NOTHROW(renderer.Present());
             }

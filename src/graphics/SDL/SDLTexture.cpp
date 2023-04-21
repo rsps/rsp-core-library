@@ -63,7 +63,7 @@ SDLTexture::SDLTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestP
       mDestinationOffset(arDestOffset),
       mrRenderer(dynamic_cast<SDLRenderer&>(Renderer::Get()))
 {
-    mpTexture = std::make_shared<SDL_TextureWrapper>(SDL_CreateTexture(mrRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_XBGR8888, SDL_TEXTUREACCESS_STREAMING, aWidth, aHeight));
+    mpTexture = std::make_shared<SDL_TextureWrapper>(SDL_CreateTexture(mrRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, aWidth, aHeight));
     if (!mpTexture) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateTexture");
     }
@@ -104,7 +104,11 @@ Texture& SDLTexture::Update(const PixelData &arPixelData, const Color &arColor)
                 uint32_t *dest = offset(dst, uintptr_t(pitch), dr.GetLeft(), y);
                 GuiUnit_t src_x = sr.GetLeft();
                 for(size_t x = 0; x < w ; ++x) {
-                    dest[x] = arPixelData.GetPixelAt(src_x++, src_y, arColor).AsRaw();
+                    uint32_t cl = arPixelData.GetPixelAt(src_x++, src_y, arColor).AsRaw();
+                    if (mBlendOperation == Texture::BlendOperation::ColorKey && cl == mColorKey) {
+                        continue;
+                    }
+                    dest[x] = cl;
                 }
                 ++src_y;
             }
@@ -118,6 +122,9 @@ Texture& SDLTexture::Update(const PixelData &arPixelData, const Color &arColor)
                 GuiUnit_t src_x = sr.GetLeft();
                 for(size_t x = 0; x < w ; ++x) {
                     uint32_t cl = arPixelData.GetPixelAt(src_x++, src_y, arColor).AsRaw();
+                    if (mBlendOperation == Texture::BlendOperation::ColorKey && cl == mColorKey) {
+                        continue;
+                    }
                     if (cl & 0xFF000000) {
                         dest[x] = cl;
                     }
@@ -136,7 +143,7 @@ Texture& SDLTexture::Update(const PixelData &arPixelData, const Color &arColor)
 Texture& SDLTexture::Fill(const Color &arColor, OptionalRect arRect)
 {
 //    SDL_Surface *surface = SDL_CreateRGBSurface(0, GetWidth(), GetHeight(), 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-    SDLRect r(arRect ? *arRect : mArea);
+    SDLRect r(arRect ? (*arRect & mArea) : mArea);
     SDL_Surface *surface;
 
     if (SDL_LockTextureToSurface(mpTexture->Get(), nullptr, &surface)) {
@@ -154,17 +161,8 @@ Texture& SDLTexture::Fill(const Color &arColor, OptionalRect arRect)
 
 Texture& SDLTexture::SetBlendOperation(Texture::BlendOperation aOp, const Color &arColorKey)
 {
-    SDL_BlendMode blendMode = SDL_BLENDMODE_NONE;
-    if (aOp == Texture::BlendOperation::SourceAlpha) {
-        blendMode = SDL_BLENDMODE_BLEND;
-    }
-    else if (aOp == Texture::BlendOperation::ColorKey) {
-
-    }
-
-    if (SDL_SetTextureBlendMode(mpTexture->Get(), blendMode)) {
-        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetTextureBlendMode");
-    }
+    mBlendOperation = aOp;
+    mColorKey = arColorKey;
     return *this;
 }
 

@@ -84,8 +84,10 @@ Renderer& SDLRenderer::Blit(const Texture &arTexture)
     SDLRect dr(arTexture.GetDestinationRect());
     SDLRect sr(arTexture.GetSourceRect());
 
-    if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_BLEND)) {
-        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawBlendMode");
+    if (tex.mBlendOperation != Texture::BlendOperation::Copy) {
+        if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_BLEND)) {
+            THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawBlendMode");
+        }
     }
 
     if (SDL_RenderCopy(mpRenderer, tex.GetSDLTexture(), &sr, &dr)) {
