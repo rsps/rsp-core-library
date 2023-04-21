@@ -58,10 +58,12 @@ TEST_CASE("Scene Test")
     CHECK_NOTHROW(Font::SetDefaultFont(cFontName));
 
     // Arrange
+#ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     sw::Framebuffer::mpDevicePath = p.c_str();
+#endif
 
-    auto& renderer = Renderer::Get();
+    auto& renderer = Renderer::Init(480, 800);
 
     CHECK_NOTHROW(Scenes scenes_dummy);
     Scenes scenes;

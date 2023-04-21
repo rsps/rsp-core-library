@@ -80,7 +80,7 @@ public:
      * \param aColor
      * \return Color
      */
-    Color GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor = Color::Black) const;
+    Color GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color& arColor = Color::Black) const;
     Color GetPixel(const Point &arPoint, Color aColor = Color::Black) const { return GetPixelAt(arPoint.mX, arPoint.mY, aColor); }
 
     PixelData& SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor);

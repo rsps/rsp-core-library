@@ -22,6 +22,7 @@
 #include <TestHelpers.h>
 #include <utils/Random.h>
 #include <TestHelpers.h>
+#include <magic_enum.hpp>
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
@@ -29,9 +30,9 @@ using namespace rsp::utils;
 static void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer &fb)
 {
     if (Rect(0, 0, fb.GetWidth(), fb.GetHeight()).IsHit(aX, aY)) {
-        CHECK_EQ(fb.GetPixel(aX, aY), aColor.AsUint());
+        CHECK_HEX(fb.GetPixel(aX, aY).AsUint(), aColor.AsUint());
     } else {
-        CHECK_EQ(fb.GetPixel(aX, aY), 0);
+        CHECK_HEX(fb.GetPixel(aX, aY).AsUint(), 0);
     }
 }
 
@@ -45,10 +46,12 @@ TEST_CASE("Framebuffer")
 
     Random::Seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
 
+#ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     sw::Framebuffer::mpDevicePath = p.c_str();
+#endif
 
-    auto &renderer = Renderer::Get();
+    auto &renderer = Renderer::Init(480, 800);
 
     Canvas canvas(renderer.GetWidth(), renderer.GetHeight());
     CHECK_NOTHROW(Texture::Create(renderer.GetWidth(), renderer.GetHeight()));
@@ -65,13 +68,15 @@ TEST_CASE("Framebuffer")
     {
         Color colors[] { Color::Red, Color::Blue, Color::Green };
 
-        for (auto &color : colors) {
+        for (Color color : colors) {
+            renderer.Fill(color);
+            renderer.Present();
             renderer.Fill(color);
             renderer.Present();
 
-            uint32_t fb_value = renderer.GetPixel(0, 0, true).AsUint();
+            uint32_t fb_value = renderer.GetPixel(0, 0).AsUint();
             CHECK_HEX(fb_value, color.AsUint());
-            fb_value = renderer.GetPixel(479, 799, true).AsUint();
+            fb_value = renderer.GetPixel(479, 799).AsUint();
             CHECK_HEX(fb_value, color.AsUint());
             std::this_thread::sleep_for(300ms);
         }
@@ -117,8 +122,8 @@ TEST_CASE("Framebuffer")
                     py += signumY;
                 }
                 px += signumX;
-                CHECK_EQ(canvas.GetPixelAt(px, py).AsUint(), col.AsUint());
-                CHECK_EQ(renderer.GetPixel(px, py, false), col.AsUint());
+                CHECK_HEX(canvas.GetPixelAt(px, py).AsUint(), col.AsUint());
+                CHECK_HEX(renderer.GetPixel(px, py, false).AsUint(), col.AsUint());
             }
         } else {
             for (int i = 0; i < absDeltaY; i++) {
@@ -128,8 +133,8 @@ TEST_CASE("Framebuffer")
                     px += signumX;
                 }
                 py += signumY;
-                CHECK_EQ(canvas.GetPixelAt(px, py), col.AsUint());
-                CHECK_EQ(renderer.GetPixel(px, py, false), col.AsUint());
+                CHECK_HEX(canvas.GetPixelAt(px, py).AsUint(), col.AsUint());
+                CHECK_HEX(renderer.GetPixel(px, py, false).AsUint(), col.AsUint());
             }
         }
 
@@ -670,6 +675,7 @@ TEST_CASE("Framebuffer")
         CHECK_HEX(renderer.GetPixel(Point(180, 180), true).AsUint(), 0xFF386100);
     }
 
+    std::this_thread::sleep_for(1000ms);
 }
 
 TEST_SUITE_END();

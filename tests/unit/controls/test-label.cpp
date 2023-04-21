@@ -26,13 +26,15 @@ TEST_CASE("Label")
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
+#ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     sw::Framebuffer::mpDevicePath = p.c_str();
+#endif
 
     CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-Italic-VariableFont_wght.ttf"));
     CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-VariableFont_wght.ttf"));
 
-    auto& renderer = Renderer::Get();
+    auto& renderer = Renderer::Init(480, 800);
     CHECK_NOTHROW(renderer.Fill(Color::Grey));
 
     Rect r(50, 100, 380, 200);

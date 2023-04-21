@@ -278,7 +278,7 @@ class Rect
     GuiUnit_t mHeight = 0;
 };
 
-using OptionalRect = rsp::utils::OptionalPtr<const Rect>;
+typedef rsp::utils::OptionalPtr<const Rect> OptionalRect;
 
 std::ostream &operator<<(std::ostream &aStream, const Rect &arRect);
 std::string to_string(const Rect &arRect);

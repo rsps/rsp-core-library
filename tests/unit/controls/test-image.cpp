@@ -28,10 +28,12 @@ TEST_CASE("Image")
     TestHelpers::AddConsoleLogger(logger);
 
     // Arrange
+#ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     sw::Framebuffer::mpDevicePath = p.c_str();
+#endif
 
-    auto& renderer = Renderer::Get();
+    auto& renderer = Renderer::Init(480, 800);
     CHECK_NOTHROW(renderer.Fill(Color::Grey));
     CHECK_NOTHROW(renderer.Present());
     CHECK_NOTHROW(renderer.Fill(Color::Grey));
@@ -84,10 +86,12 @@ TEST_CASE("TestImage")
     TestHelpers::AddConsoleLogger(logger);
 
     // Arrange
+#ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     sw::Framebuffer::mpDevicePath = p.c_str();
+#endif
 
-    auto& renderer = Renderer::Get();
+    auto& renderer = Renderer::Init(480, 800);
     CHECK_NOTHROW(renderer.Fill(Color::Grey));
 
     PixelData bmp;

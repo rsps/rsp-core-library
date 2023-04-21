@@ -13,29 +13,57 @@
 
 #ifdef USE_GFX_SDL
 
+#include <memory>
+#include <SDL2/SDL.h>
 #include <graphics/Texture.h>
 
 namespace rsp::graphics::sdl {
+
+class SDLRenderer;
+
+struct SDL_TextureWrapper
+{
+    SDL_TextureWrapper(SDL_Texture *apTexture) noexcept;
+    ~SDL_TextureWrapper();
+    SDL_TextureWrapper(const SDL_TextureWrapper&) = default;
+    SDL_TextureWrapper(SDL_TextureWrapper&&) = default;
+    SDL_TextureWrapper& operator=(const SDL_TextureWrapper&) = default;
+    SDL_TextureWrapper& operator=(SDL_TextureWrapper&&) = default;
+
+    SDL_Texture* Get() const { return mpTexture; }
+
+protected:
+    SDL_Texture *mpTexture;
+};
 
 class SDLTexture: public rsp::graphics::Texture
 {
 public:
     SDLTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestPos, const Point &arDestOffset);
+    ~SDLTexture() override;
 
-    Texture& Blit(const Texture &arTexture) override;
     Texture& SetSourceRect(const Rect &arRect) override;
     GuiUnit_t GetWidth() const override;
     Rect GetDestinationRect() const override;
     const Rect& GetSourceRect() const override;
-    Texture& DrawRect(Color aColor, const Rect &arRect) override;
-    Texture& Update(const PixelData &arPixelData, Color aColor = Color::None) override;
-    Texture& SetBlendOperation(Texture::BlendOperation aOp, Color aColorKey = Color::None) override;
+    Texture& Update(const PixelData &arPixelData, const Color &arColor = Color::None) override;
+    Texture& SetBlendOperation(Texture::BlendOperation aOp, const Color &arColorKey = Color::None) override;
     Texture& SetOffset(const Point &arPoint) override;
     Texture& SetDestination(const Point &arPoint) override;
-    Texture& Fill(Color aColor, OptionalRect arRect = nullptr) override;
+    Texture& Fill(const Color &arColor, OptionalRect arRect = nullptr) override;
     Point GetDestination() const override;
     GuiUnit_t GetHeight() const override;
     TexturePtr_t Clone() const override;
+
+    SDL_Texture* GetSDLTexture() const { return mpTexture->Get(); }
+
+protected:
+    std::shared_ptr<SDL_TextureWrapper> mpTexture = nullptr;
+    Rect mArea;
+    Rect mSourceRect;
+    Point mDestinationPos;
+    Point mDestinationOffset;
+    SDLRenderer &mrRenderer;
 };
 
 } /* namespace rsp::graphics::sdl */

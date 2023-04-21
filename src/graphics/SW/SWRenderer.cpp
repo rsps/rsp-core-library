@@ -29,15 +29,15 @@ Renderer& Renderer::Get()
 
 namespace rsp::graphics::sw {
 
-Renderer& SWRenderer::DrawRect(Color aColor, const Rect &arRect)
+Renderer& SWRenderer::DrawRect(const Color &arColor, const Rect &arRect)
 {
-    mrGfxHal.DrawRect(mScreenSurfaces[mCurrentSurface], aColor.AsRaw(), arRect);
+    mrGfxHal.DrawRect(mScreenSurfaces[mCurrentSurface], arColor.AsRaw(), arRect);
     return *this;
 }
 
-Renderer& SWRenderer::Fill(Color aColor, OptionalRect aDestination)
+Renderer& SWRenderer::Fill(const Color &arColor, OptionalRect aDestination)
 {
-    mrGfxHal.Fill(mScreenSurfaces[mCurrentSurface], aColor.AsRaw(), aDestination);
+    mrGfxHal.Fill(mScreenSurfaces[mCurrentSurface], arColor.AsRaw(), aDestination);
     return *this;
 }
 

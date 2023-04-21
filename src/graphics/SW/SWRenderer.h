@@ -29,8 +29,8 @@ public:
     GuiUnit_t GetHeight() const override;
     ColorDepth GetColorDepth() const override;
 
-    Renderer& DrawRect(Color aColor, const Rect &arRect) override;
-    Renderer& Fill(Color aColor, OptionalRect aDestination = nullptr) override;
+    Renderer& DrawRect(const Color &arColor, const Rect &arRect) override;
+    Renderer& Fill(const Color &arColor, OptionalRect aDestination = nullptr) override;
     Renderer& Blit(const Texture &arTexture) override;
     Renderer& SetClipRect(const Rect &arClipRect) override;
 

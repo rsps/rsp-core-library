@@ -10,17 +10,23 @@
 
 #ifdef USE_GFX_SDL
 
-#include <SDL2pp/SDL2pp.hh>
 #include <SDL2/SDL.h>
 #include "SDLRenderer.h"
+#include "SDLTexture.h"
+#include "SDLRect.h"
 
 namespace rsp::graphics {
 
-Renderer& Renderer::Get()
+Renderer& Renderer::Init(GuiUnit_t aWidth, GuiUnit_t aHeight)
 {
     if (!sdl::SDLRenderer::HasInstance()) {
-        sdl::SDLRenderer::CreateInstance();
+        sdl::SDLRenderer::CreateInstance(aWidth, aHeight);
     }
+    return rsp::utils::Singleton<sdl::SDLRenderer>::GetInstance();
+}
+
+Renderer& Renderer::Get()
+{
     return rsp::utils::Singleton<sdl::SDLRenderer>::GetInstance();
 }
 
@@ -28,70 +34,149 @@ Renderer& Renderer::Get()
 
 namespace rsp::graphics::sdl {
 
-SDLRenderer::SDLRenderer()
+SDLRenderer::SDLRenderer(GuiUnit_t aWidth, GuiUnit_t aHeight)
+    : mArea(0, 0, aWidth, aHeight),
+      mClipRect(0, 0, aWidth, aHeight)
 {
-    mpSdl = new SDL(SDL_INIT_VIDEO);
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_Init");
+    }
 
-    mpWindow = new Window("Framebuffer Emulator",
-            SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-            480, 800,
-            SDL_WINDOW_SHOWN | SDL_WINDOW_MOUSE_FOCUS | SDL_WINDOW_MOUSE_CAPTURE);
+    mpWindow = SDL_CreateWindow("RSP", 0, 0, aWidth, aHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_MOUSE_FOCUS | SDL_WINDOW_MOUSE_CAPTURE);
+    if (!mpWindow) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateWindow");
+    }
 
-    // Create accelerated video renderer with default driver
-    mpRenderer = new Renderer(*mpWindow, -1, SDL_RENDERER_ACCELERATED);
-    mpRenderer->SetDrawBlendMode(SDL_BLENDMODE_NONE);
+    mpRenderer = SDL_CreateRenderer(mpWindow, -1, SDL_RENDERER_ACCELERATED);
+    if (!mpRenderer) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateRenderer");
+    }
+
+//    SDL_RendererInfo info;
+//    if (SDL_GetRendererInfo(mpRenderer, &info)) {
+//        THROW_WITH_BACKTRACE1(SDLException, "SDL_GetRendererInfo");
+//    }
+//    std::cout << "Renderer: " << info.name << " Flags: 0x" << std::hex << std::setfill('0') << std::setw(8) << info.flags << "\n";
+//    for (uint32_t i = 0 ; i < info.num_texture_formats ; ++i) {
+//        std::cout << "0x" << info.texture_formats[i] << "\n";
+//    }
+//    std::cout << std::dec << std::endl;
+
+    if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_NONE)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawBlendMode");
+    }
 }
 
 SDLRenderer::~SDLRenderer()
 {
+    if (mpRenderer) {
+        SDL_DestroyRenderer(mpRenderer);
+    }
+    if (mpWindow) {
+        SDL_DestroyWindow(mpWindow);
+    }
+    SDL_Quit();
 }
 
-rsp::graphics::Renderer& SDLRenderer::Blit(const rsp::graphics::Texture &arTexture)
+Renderer& SDLRenderer::Blit(const Texture &arTexture)
 {
+    const SDLTexture &tex = dynamic_cast<const SDLTexture&>(arTexture);
+    SDLRect dr(arTexture.GetDestinationRect());
+    SDLRect sr(arTexture.GetSourceRect());
+
+    if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_BLEND)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawBlendMode");
+    }
+
+    if (SDL_RenderCopy(mpRenderer, tex.GetSDLTexture(), &sr, &dr)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderCopy");
+    }
+
+    if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_NONE)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawBlendMode");
+    }
     return *this;
 }
 
-rsp::graphics::Renderer& SDLRenderer::SetClipRect(const rsp::graphics::Rect &arClipRect)
+Renderer& SDLRenderer::SetClipRect(const Rect &arClipRect)
 {
-    mClipRect = arClipRect; // TODO: & mRendererRect;
+    mClipRect = arClipRect & mArea;
     return *this;
 }
 
-rsp::graphics::Renderer& SDLRenderer::Fill(rsp::graphics::Color aColor, rsp::graphics::OptionalRect aDestination)
+Renderer& SDLRenderer::Fill(const Color &arColor, OptionalRect aDestination)
 {
-    return *this;
-}
+    Rect dest = aDestination ? *aDestination : mArea;
+    dest &= mClipRect;
+    SDLRect r(dest);
 
-rsp::graphics::GuiUnit_t SDLRenderer::GetWidth() const
-{
+    if (SDL_SetRenderDrawColor(mpRenderer, arColor.GetRed(), arColor.GetGreen(), arColor.GetBlue(), arColor.GetAlpha())) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawColor");
+    }
+    if (SDL_RenderFillRect(mpRenderer, &r)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderFillRect");
+    }
     return *this;
 }
 
 void SDLRenderer::Present()
 {
+    if (SDL_RenderFlush(mpRenderer)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderFlush");
+    }
+    SDL_RenderPresent(mpRenderer);
+//    SDL_RenderClear(mpRenderer);
 }
 
-rsp::graphics::GuiUnit_t SDLRenderer::GetHeight() const
+GuiUnit_t SDLRenderer::GetWidth() const
 {
+    return mArea.GetWidth();
 }
 
-rsp::graphics::Renderer& SDLRenderer::DrawRect(rsp::graphics::Color aColor, const rsp::graphics::Rect &arRect)
+GuiUnit_t SDLRenderer::GetHeight() const
 {
+    return mArea.GetHeight();
+}
+
+Renderer& SDLRenderer::DrawRect(const Color &arColor, const Rect &arRect)
+{
+    SDLRect r(arRect);
+
+    if (SDL_SetRenderDrawColor(mpRenderer, arColor.GetRed(), arColor.GetGreen(), arColor.GetBlue(), arColor.GetAlpha())) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawColor");
+    }
+    if (SDL_RenderDrawRect(mpRenderer, &r)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderDrawRect");
+    }
     return *this;
 }
 
-rsp::graphics::Renderer& SDLRenderer::SetPixel(rsp::graphics::GuiUnit_t aX, rsp::graphics::GuiUnit_t aY,
-    const rsp::graphics::Color &arColor)
+Renderer& SDLRenderer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
 {
+    if (SDL_SetRenderDrawColor(mpRenderer, arColor.GetRed(), arColor.GetGreen(), arColor.GetBlue(), arColor.GetAlpha())) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawColor");
+    }
+    if (SDL_RenderDrawPoint(mpRenderer, aX, aY)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderDrawPoint");
+    }
+
     return *this;
 }
 
-rsp::graphics::Color SDLRenderer::GetPixel(rsp::graphics::GuiUnit_t aX, rsp::graphics::GuiUnit_t aY, bool aFront) const
+Color SDLRenderer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
 {
+    SDLRect r(aX, aY, 1, 1);
+    uint32_t raw;
+    if (SDL_RenderReadPixels(mpRenderer, &r, SDL_PIXELFORMAT_ARGB8888, &raw, int(sizeof(raw)))) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderReadPixels");
+    }
+
+    return Color(raw);
 }
 
-rsp::graphics::ColorDepth SDLRenderer::GetColorDepth() const
+ColorDepth SDLRenderer::GetColorDepth() const
 {
+    return ColorDepth::RGBA;
 }
 
 } /* namespace rsp::graphics::sdl */

@@ -81,11 +81,13 @@ TEST_CASE("Graphics Main Test")
     CHECK_NOTHROW(TimerQueue::CreateInstance());
 
     // Make framebuffer
+#ifdef USE_GFX_SW
     std::filesystem::path p;
     CHECK_NOTHROW(p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"}));
     sw::Framebuffer::mpDevicePath = p.c_str();
+#endif
 
-    CHECK_NOTHROW(Renderer::Get());
+    CHECK_NOTHROW(Renderer::Init(480, 800));
     auto& renderer = Renderer::Get();
 
     // Set default scene size to screen size
@@ -234,8 +236,9 @@ TEST_CASE("Graphics Main Test")
         CHECK_NOTHROW(gfx.Run(1000, true));
     }
 
+#ifdef USE_GFX_SW
     MESSAGE("Video Memory Usage: " << sw::GfxHal::Get().GetVideoMemoryUsage());
-
+#endif
     CHECK_NOTHROW(gfx.RegisterOverlay(nullptr));
 
     CHECK_NOTHROW(TimerQueue::DestroyInstance());

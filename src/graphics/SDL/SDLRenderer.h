@@ -13,34 +13,56 @@
 
 #ifdef USE_GFX_SDL
 
-#include <SDL2pp/SDL2pp.hh>
+#include <string>
+#include <memory>
+#include <SDL2/SDL.h>
+#include <graphics/Rect.h>
 #include <graphics/Renderer.h>
 #include <utils/Singleton.h>
+#include <exceptions/CoreException.h>
+
 
 namespace rsp::graphics::sdl {
+
+
+class SDLException: public exceptions::CoreException
+{
+public:
+    explicit SDLException(const char *apMsg)
+        : CoreException(std::string(apMsg) + ": " + std::string(SDL_GetError()))
+    {
+    }
+};
+
 
 class SDLRenderer: public rsp::graphics::Renderer, public rsp::utils::Singleton<SDLRenderer>
 {
 public:
-    SDLRenderer();
+    SDLRenderer(GuiUnit_t aWidth, GuiUnit_t aHeight);
     ~SDLRenderer() override;
+    SDLRenderer(const SDLRenderer&) = delete;
+    SDLRenderer(SDLRenderer&&) = default;
+    SDLRenderer& operator=(const SDLRenderer&) = delete;
+    SDLRenderer& operator=(SDLRenderer&&) = default;
 
     Renderer& Blit(const Texture &arTexture) override;
     Renderer& SetClipRect(const Rect &arClipRect) override;
-    Renderer& Fill(Color aColor, rsp::graphics::OptionalRect aDestination) override;
+    Renderer& Fill(const Color &arColor, OptionalRect aDestination) override;
     GuiUnit_t GetWidth() const override;
     void Present() override;
     GuiUnit_t GetHeight() const override;
-    Renderer& DrawRect(Color aColor, const Rect &arRect) override;
+    Renderer& DrawRect(const Color &arColor, const Rect &arRect) override;
     Renderer& SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) override;
     Color GetPixel(GuiUnit_t aX, rsp::graphics::GuiUnit_t aY, bool aFront) const override;
     ColorDepth GetColorDepth() const override;
 
+    SDL_Renderer* GetSDLRenderer() const { return mpRenderer; }
+
 protected:
-    Rect mClipRect{};
-    SDL2pp::SDL *mpSdl = nullptr;
-    SDL2pp::Window *mpWindow = nullptr;
-    SDL2pp::Renderer *mpRenderer = nullptr;
+    Rect mArea;
+    Rect mClipRect;
+    SDL_Window* mpWindow = nullptr;
+    SDL_Renderer* mpRenderer = nullptr;
 };
 
 } /* namespace rsp::graphics::sdl */

@@ -41,7 +41,6 @@ public:
     Rect GetDestinationRect() const override;
     const Rect& GetSourceRect() const override { return mSourceRect; }
 
-    rsp::graphics::Texture& Blit(const rsp::graphics::Texture &arTexture) override;
     rsp::graphics::Texture& DrawRect(rsp::graphics::Color aColor, const rsp::graphics::Rect &arRect) override;
 
 protected:

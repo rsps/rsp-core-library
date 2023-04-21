@@ -67,17 +67,18 @@ public:
     }
 
     /**
-     * \fn void Create()
+     * \fn void Create(...)
      * \brief Generic factory method.
      */
-    static void CreateInstance() {
+    template<typename... Args>
+    static void CreateInstance(Args &&... args) {
 #ifdef MT
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
         if (mpInstance) {
             THROW_WITH_BACKTRACE(exceptions::ESingletonViolation);
         }
-        mpInstance = new T();
+        mpInstance = new T(std::forward<Args>(args)...);
         mOwnsInstance = true;
     }
 

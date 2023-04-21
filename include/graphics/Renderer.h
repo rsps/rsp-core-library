@@ -34,6 +34,14 @@ class Renderer
 {
 public:
     /**
+     * \brief Create the default renderer instance
+     * \param aWidth
+     * \param aHeight
+     * \return self
+     */
+    static Renderer& Init(GuiUnit_t aWidth, GuiUnit_t aHeight);
+
+    /**
      * \brief Get the default Renderer instance
      *
      * \return self
@@ -53,7 +61,7 @@ public:
      * \param arRect
      * \return self
      */
-    virtual Renderer& DrawRect(Color aColor, const Rect &arRect) = 0;
+    virtual Renderer& DrawRect(const Color &arColor, const Rect &arRect) = 0;
 
     /**
      * \brief Fill the presentation surface with the given color
@@ -62,7 +70,7 @@ public:
      * \param aDestination Optional area on the surface to fill
      * \return self
      */
-    virtual Renderer& Fill(Color aColor, OptionalRect aDestination = nullptr) = 0;
+    virtual Renderer& Fill(const Color &arColor, OptionalRect aDestination = nullptr) = 0;
 
     /**
      * \brief Copy the given texture onto this presentation surface

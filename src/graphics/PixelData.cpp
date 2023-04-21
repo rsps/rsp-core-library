@@ -192,12 +192,12 @@ size_t PixelData::GetDataSize() const
     return size_t(result);
 }
 
-Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor) const
+Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) const
 {
     if (!GetRect().IsHit(aX, aY)) {
         THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + ", " + std::to_string(aY) + " not in " + to_string(GetRect()) + ")");
     }
-    Color result(aColor);
+    Color result(arColor);
     int offset;
     switch (mColorDepth) {
         case ColorDepth::Monochrome:

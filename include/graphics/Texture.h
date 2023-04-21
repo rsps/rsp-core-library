@@ -34,7 +34,7 @@ public:
         ColorKey     // Omit drawing pixels with same color value as ColorKey (transparent color)
     };
 
-    static TexturePtr_t Create(const PixelData &arPixelData, Color aColor = Color::None, Point aDestPos = {0,0}, Point aDestOffset = {0,0});
+    static TexturePtr_t Create(const PixelData &arPixelData, const Color &arColor = Color::None, Point aDestPos = {0,0}, Point aDestOffset = {0,0});
     static TexturePtr_t Create(GuiUnit_t aWidth, GuiUnit_t aHeight, Point aDestPos = {0,0}, Point aDestOffset = {0,0});
 
     virtual ~Texture() {}
@@ -43,25 +43,10 @@ public:
     virtual GuiUnit_t GetWidth() const = 0;
 
     /**
-     * \brief Blit another texture into this texture
-     * \param arTexture
-     * \return self
-     */
-    virtual Texture& Blit(const Texture &arTexture) = 0;
-
-    /**
-     * \brief Draw the given rectangle on this texture
-     * \param aColor
-     * \param arRect
-     * \return self
-     */
-    virtual Texture& DrawRect(Color aColor, const Rect &arRect) = 0;
-
-    /**
      * \brief Fill this texture with the given color
      * \param aColor
      */
-    virtual Texture& Fill(Color aColor, OptionalRect arRect = nullptr) = 0;
+    virtual Texture& Fill(const Color &arColor, OptionalRect arRect = nullptr) = 0;
 
     /**
      * \brief Update this texture with content from the given pixel data
@@ -69,7 +54,7 @@ public:
      * \param aColor Color to use if pixel data is monochrome or alpha
      * \return self
      */
-    virtual Texture& Update(const PixelData &arPixelData, Color aColor = Color::None) = 0;
+    virtual Texture& Update(const PixelData &arPixelData, const Color &arColor = Color::None) = 0;
 
     /**
      * \brief Set the blend operation to use when updating this texture. Defaults to "Copy".
@@ -77,7 +62,7 @@ public:
      * \param aColorKey
      * \return self
      */
-    virtual Texture& SetBlendOperation(BlendOperation aOp, Color aColorKey = Color::None) = 0;
+    virtual Texture& SetBlendOperation(BlendOperation aOp, const Color &arColorKey = Color::None) = 0;
 
     /**
      * \brief Set/get the source area to use when reading from this texture. Defaults to entire texture.

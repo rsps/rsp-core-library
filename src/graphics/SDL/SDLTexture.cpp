@@ -11,10 +11,12 @@
 #ifdef USE_GFX_SDL
 
 #include "SDLTexture.h"
+#include "SDLRenderer.h"
+#include "SDLRect.h"
 
 namespace rsp::graphics {
 
-std::unique_ptr<Texture> Texture::Create(const PixelData &arPixelData, Color aColor, Point aDestPos, Point aDestOffset)
+std::unique_ptr<Texture> Texture::Create(const PixelData &arPixelData, const Color &arColor, Point aDestPos, Point aDestOffset)
 {
     auto result = std::make_unique<sdl::SDLTexture>(arPixelData.GetWidth(), arPixelData.GetHeight(), aDestPos, aDestOffset);
     switch(arPixelData.GetColorDepth()) {
@@ -28,7 +30,7 @@ std::unique_ptr<Texture> Texture::Create(const PixelData &arPixelData, Color aCo
             result->SetBlendOperation(Texture::BlendOperation::SourceAlpha);
             break;
     }
-    result->Fill(Color::None).Update(arPixelData, aColor.AsRaw());
+    result->Fill(Color::None).Update(arPixelData, arColor.AsRaw());
     return result;
 }
 
@@ -41,74 +43,179 @@ std::unique_ptr<Texture> Texture::Create(GuiUnit_t aWidth, GuiUnit_t aHeight, Po
 
 namespace rsp::graphics::sdl {
 
+SDL_TextureWrapper::SDL_TextureWrapper(SDL_Texture *apTexture) noexcept
+    : mpTexture(apTexture)
+{
+}
+
+SDL_TextureWrapper::~SDL_TextureWrapper()
+{
+    if (mpTexture) {
+        SDL_DestroyTexture(mpTexture);
+    }
+}
+
+
 SDLTexture::SDLTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestPos, const Point &arDestOffset)
+    : mArea(0, 0, aWidth, aHeight),
+      mSourceRect(0, 0, aWidth, aHeight),
+      mDestinationPos(arDestPos),
+      mDestinationOffset(arDestOffset),
+      mrRenderer(dynamic_cast<SDLRenderer&>(Renderer::Get()))
 {
-
+    mpTexture = std::make_shared<SDL_TextureWrapper>(SDL_CreateTexture(mrRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_XBGR8888, SDL_TEXTUREACCESS_STREAMING, aWidth, aHeight));
+    if (!mpTexture) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateTexture");
+    }
 }
 
-Texture& SDLTexture::Blit(const Texture &arTexture)
+SDLTexture::~SDLTexture()
 {
+}
+
+constexpr uint32_t* offset(uint32_t *addr, uintptr_t pitch, uintptr_t x, uintptr_t y) {
+    return reinterpret_cast<uint32_t*>(uintptr_t(addr) + (y * pitch) + (x * sizeof(uint32_t)));
+}
+
+constexpr uint32_t* offset(uint32_t *addr, uintptr_t pitch, GuiUnit_t x, GuiUnit_t y) {
+    return offset(addr, pitch, uintptr_t(x), uintptr_t(y));
+}
+
+Texture& SDLTexture::Update(const PixelData &arPixelData, const Color &arColor)
+{
+    uint32_t *dst;
+    int pitch;
+    if (SDL_LockTexture(mpTexture->Get(), nullptr, reinterpret_cast<void**>(&dst), &pitch)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_LockTexture");
+    }
+
+    Rect dr(mArea);
+    Rect sr(arPixelData.GetRect());
+
+    GuiUnit_t y_end = uintptr_t(std::min(dr.GetHeight(), sr.GetHeight()));
+    size_t w = size_t(std::min(dr.GetWidth(), sr.GetWidth()));
+    GuiUnit_t src_y = sr.GetTop();
+
+    switch(arPixelData.GetColorDepth()) {
+        default:
+        case ColorDepth::RGB:
+        case ColorDepth::RGBA: {
+            for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
+                uint32_t *dest = offset(dst, uintptr_t(pitch), dr.GetLeft(), y);
+                GuiUnit_t src_x = sr.GetLeft();
+                for(size_t x = 0; x < w ; ++x) {
+                    dest[x] = arPixelData.GetPixelAt(src_x++, src_y, arColor).AsRaw();
+                }
+                ++src_y;
+            }
+            break;
+        }
+
+        case ColorDepth::Monochrome:
+        case ColorDepth::Alpha: {
+            for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
+                uint32_t *dest = offset(dst, uintptr_t(pitch), dr.GetLeft(), y);
+                GuiUnit_t src_x = sr.GetLeft();
+                for(size_t x = 0; x < w ; ++x) {
+                    uint32_t cl = arPixelData.GetPixelAt(src_x++, src_y, arColor).AsRaw();
+                    if (cl & 0xFF000000) {
+                        dest[x] = cl;
+                    }
+                }
+                ++src_y;
+            }
+            break;
+        }
+    }
+
+    SDL_UnlockTexture(mpTexture->Get());
+
     return *this;
 }
 
-Texture& SDLTexture::SetSourceRect(const Rect &arRect)
+Texture& SDLTexture::Fill(const Color &arColor, OptionalRect arRect)
 {
+//    SDL_Surface *surface = SDL_CreateRGBSurface(0, GetWidth(), GetHeight(), 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+    SDLRect r(arRect ? *arRect : mArea);
+    SDL_Surface *surface;
+
+    if (SDL_LockTextureToSurface(mpTexture->Get(), nullptr, &surface)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_LockTextureToSurface");
+    }
+
+    if (SDL_FillRect(surface, &r, arColor.AsRaw())) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_FillRect");
+    }
+
+    SDL_UnlockTexture(mpTexture->Get());
+
     return *this;
 }
 
-GuiUnit_t SDLTexture::GetWidth() const
+Texture& SDLTexture::SetBlendOperation(Texture::BlendOperation aOp, const Color &arColorKey)
 {
-}
+    SDL_BlendMode blendMode = SDL_BLENDMODE_NONE;
+    if (aOp == Texture::BlendOperation::SourceAlpha) {
+        blendMode = SDL_BLENDMODE_BLEND;
+    }
+    else if (aOp == Texture::BlendOperation::ColorKey) {
 
-Rect SDLTexture::GetDestinationRect() const
-{
-}
+    }
 
-const Rect& SDLTexture::GetSourceRect() const
-{
-}
-
-Texture& SDLTexture::DrawRect(Color aColor, const Rect &arRect)
-{
-    return *this;
-}
-
-Texture& SDLTexture::Update(const PixelData &arPixelData, Color aColor)
-{
-    return *this;
-}
-
-Texture& SDLTexture::SetBlendOperation(Texture::BlendOperation aOp,
-    Color aColorKey)
-{
+    if (SDL_SetTextureBlendMode(mpTexture->Get(), blendMode)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetTextureBlendMode");
+    }
     return *this;
 }
 
 Texture& SDLTexture::SetOffset(const Point &arPoint)
 {
+    mDestinationOffset = arPoint;
     return *this;
+}
+
+Texture& SDLTexture::SetSourceRect(const Rect &arRect)
+{
+    mSourceRect = arRect;
+    return *this;
+}
+
+Rect SDLTexture::GetDestinationRect() const
+{
+    Rect result(mSourceRect);
+    result.Move(mDestinationPos.GetX() + mDestinationOffset.GetX(), mDestinationPos.GetY() + mDestinationOffset.GetY());
+    return result;
+}
+
+const Rect& SDLTexture::GetSourceRect() const
+{
+    return mSourceRect;
 }
 
 Texture& SDLTexture::SetDestination(const Point &arPoint)
 {
-    return *this;
-}
-
-Texture& SDLTexture::Fill(Color aColor, OptionalRect arRect)
-{
+    mDestinationPos = arPoint;
     return *this;
 }
 
 Point SDLTexture::GetDestination() const
 {
+    return mDestinationPos;
+}
+
+GuiUnit_t SDLTexture::GetWidth() const
+{
+    return mArea.GetWidth();
 }
 
 GuiUnit_t SDLTexture::GetHeight() const
 {
+    return mArea.GetHeight();
 }
 
 TexturePtr_t SDLTexture::Clone() const
 {
+    return std::unique_ptr<SDLTexture>(new SDLTexture(*this));
 }
 
 } /* namespace rsp::graphics::sdl */

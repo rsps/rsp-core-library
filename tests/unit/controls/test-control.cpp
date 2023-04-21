@@ -24,8 +24,10 @@ TEST_CASE("Control")
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
+#ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     sw::Framebuffer::mpDevicePath = p.c_str();
+#endif
 
     CHECK_NOTHROW(Control dummy);
     Control myControl;
@@ -117,7 +119,7 @@ TEST_CASE("Control")
 
     SUBCASE("Render")
     {
-        auto &renderer = Renderer::Get();
+        auto &renderer = Renderer::Init(480, 800);
         CHECK_NOTHROW(renderer.Fill(Color::Grey));
 
         Canvas paper(150, 50);

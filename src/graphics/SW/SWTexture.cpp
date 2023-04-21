@@ -50,13 +50,6 @@ SWTexture::SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestPos
     mpSurface = mrGfxHal.Alloc(aWidth, aHeight);
 }
 
-rsp::graphics::Texture& SWTexture::Blit(const rsp::graphics::Texture &arTexture)
-{
-    auto &swt = dynamic_cast<const SWTexture&>(arTexture);
-    mrGfxHal.Blit(*mpSurface, *swt.mpSurface, swt.GetDestinationRect(), swt.mSourceRect);
-    return *this;
-}
-
 rsp::graphics::Texture& SWTexture::DrawRect(Color aColor, const rsp::graphics::Rect &arRect)
 {
     mrGfxHal.DrawRect(*mpSurface, aColor.AsRaw(), arRect);
