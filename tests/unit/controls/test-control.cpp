@@ -136,15 +136,17 @@ TEST_CASE("Control")
         CHECK(myControl.UpdateData());
         CHECK_NOTHROW(myControl.Render(renderer));
         CHECK_NOTHROW(renderer.Present());
+        CHECK_NOTHROW(myControl.Render(renderer));
+        CHECK_NOTHROW(renderer.Present());
 
-        CHECK_EQ(renderer.GetPixel(200, 40, true), Color::Blue);
-        CHECK_EQ(renderer.GetPixel(299, 539, true), Color::Blue);
-        CHECK_EQ(renderer.GetPixel(300, 540, true), Color::Grey);
+        CHECK_HEX(renderer.GetPixel(200,  40).AsUint(), Color::Blue);
+        CHECK_HEX(renderer.GetPixel(299, 539).AsUint(), Color::Blue);
+        CHECK_HEX(renderer.GetPixel(300, 540).AsUint(), Color::Grey);
 
-        CHECK_EQ(renderer.GetPixel(100, 300, true), Color::Grey);
-        CHECK_EQ(renderer.GetPixel(200, 300, true), Color::Yellow);
-        CHECK_EQ(renderer.GetPixel(249, 349, true), Color::Yellow);
-        CHECK_EQ(renderer.GetPixel(250, 350, true), Color::Blue);
+        CHECK_HEX(renderer.GetPixel(100, 300).AsUint(), Color::Grey);
+        CHECK_HEX(renderer.GetPixel(200, 300).AsUint(), Color::Yellow);
+        CHECK_HEX(renderer.GetPixel(249, 349).AsUint(), Color::Yellow);
+        CHECK_HEX(renderer.GetPixel(250, 350).AsUint(), Color::Blue);
 }
 }
 

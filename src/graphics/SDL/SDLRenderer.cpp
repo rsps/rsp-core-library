@@ -163,11 +163,14 @@ Renderer& SDLRenderer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor
     return *this;
 }
 
-Color SDLRenderer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
+Color SDLRenderer::GetPixel(GuiUnit_t aX, GuiUnit_t aY) const
 {
-    SDLRect r(aX, aY, 1, 1);
-    uint32_t raw;
-    if (SDL_RenderReadPixels(mpRenderer, &r, SDL_PIXELFORMAT_ARGB8888, &raw, int(sizeof(raw)))) {
+    Rect r(aX, aY, 1, 1);
+    r &= mArea;
+    SDLRect sr(r);
+
+    uint32_t raw = 0;
+    if (SDL_RenderReadPixels(mpRenderer, &sr, SDL_PIXELFORMAT_ARGB8888, &raw, int(sizeof(raw)))) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderReadPixels");
     }
 

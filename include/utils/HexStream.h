@@ -18,16 +18,38 @@ namespace rsp::utils {
 class HexStream
 {
 public:
-    HexStream(const std::uint8_t *apData, size_t aSize)
+    /**
+     * \brief Helper class to stream data into hex values
+     * \param apData Pointer to data
+     * \param aSize Length of data
+     */
+    HexStream(const std::uint8_t *apData, size_t aSize, size_t aElementSize)
         : mpData(apData),
-          mDataSize(aSize)
+          mDataSize(aSize / aElementSize),
+          mSizeOf(aElementSize)
     {
     }
 
+    /**
+     * \brief Template constructor to take any type object as argument
+     * \tparam T
+     * \param arT
+     */
     template <class T>
-    HexStream(const T &arT) : HexStream(arT.data(), arT.size()) {}
+    HexStream(const T &arT) : HexStream(arT.data(), arT.size(), 1) {}
 
+    /**
+     * \brief Set the size of the formatted hex elements in output
+     * \param aSize
+     * \return self
+     */
     HexStream& SizeOfValue(size_t aSize) { mSizeOf = aSize; return *this; }
+
+    /**
+     * \brief Set the elements count per line
+     * \param aCount
+     * \return self
+     */
     HexStream& ElementsPerLine(size_t aCount) { mElementsPerLine = aCount; return *this; }
 
 protected:

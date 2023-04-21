@@ -53,7 +53,7 @@ public:
     GuiUnit_t GetHeight() const override;
     Renderer& DrawRect(const Color &arColor, const Rect &arRect) override;
     Renderer& SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) override;
-    Color GetPixel(GuiUnit_t aX, rsp::graphics::GuiUnit_t aY, bool aFront) const override;
+    Color GetPixel(GuiUnit_t aX, rsp::graphics::GuiUnit_t aY) const override;
     ColorDepth GetColorDepth() const override;
 
     SDL_Renderer* GetSDLRenderer() const { return mpRenderer; }

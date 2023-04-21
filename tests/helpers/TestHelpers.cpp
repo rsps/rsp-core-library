@@ -57,10 +57,15 @@ std::string TestHelpers::ToHex(const std::string &arString)
     return ToHex(reinterpret_cast<const std::uint8_t*>(arString.c_str()), arString.size(), 1);
 }
 
+std::string TestHelpers::ToHex(std::uint32_t aValue)
+{
+    return ToHex(reinterpret_cast<const std::uint8_t*>(&aValue), 4, 4);
+}
+
 std::string TestHelpers::ToHex(const uint8_t *apData, std::uint32_t aSize, std::uint32_t aSizeOf)
 {
     std::stringstream out;
-    out << rsp::utils::HexStream(apData, aSize).SizeOfValue(aSizeOf);
+    out << rsp::utils::HexStream(apData, aSize, aSizeOf);
     return out.str();
 }
 

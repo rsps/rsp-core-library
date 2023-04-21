@@ -92,14 +92,10 @@ Renderer& SWRenderer::SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)
     return *this;
 }
 
-Color SWRenderer::GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront) const
+Color SWRenderer::GetPixel(GuiUnit_t aX, GuiUnit_t aY) const
 {
-    int index = mCurrentSurface;
-    if (aFront) {
-        index = mCurrentSurface ? 0 : 1;
-    }
     Color result;
-    result.FromRaw(mrGfxHal.GetPixel(mScreenSurfaces[index], aX, aY));
+    result.FromRaw(mrGfxHal.GetPixel(mScreenSurfaces[mCurrentSurface], aX, aY));
     return result;
 }
 

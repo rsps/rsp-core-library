@@ -27,6 +27,7 @@ public:
     static void ParseArguments(const char ** apArgv);
 
     static std::string ToHex(const std::string &arString);
+    static std::string ToHex(std::uint32_t aValue);
 //    static std::string ToHex(const std::uint8_t *apData, std::uint32_t aSize);
     static std::string ToHex(const uint8_t *apData, std::uint32_t aSize, std::uint32_t aSizeOf);
 

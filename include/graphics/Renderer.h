@@ -106,10 +106,9 @@ public:
     /**
      * \brief Gets a single pixel to the given Color
      * \param aPoint Reference to the coordinate for the pixel to get
-     * \param aFront Gets pixels from the backbuffer by default, set true to read front buffer
      */
-    virtual Color GetPixel(GuiUnit_t aX, GuiUnit_t aY, bool aFront = false) const = 0;
-    Color GetPixel(const Point &arPoint, bool aFront = false) const { return GetPixel(arPoint.GetX(), arPoint.GetY(), aFront); }
+    virtual Color GetPixel(GuiUnit_t aX, GuiUnit_t aY) const = 0;
+    Color GetPixel(const Point &arPoint) const { return GetPixel(arPoint.GetX(), arPoint.GetY()); }
 };
 
 } /* namespace rsp::graphics */

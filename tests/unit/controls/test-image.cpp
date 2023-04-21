@@ -66,18 +66,20 @@ TEST_CASE("Image")
     CHECK_FALSE(image->UpdateData());
     CHECK_NOTHROW(image->Render(renderer));
     CHECK_NOTHROW(renderer.Present());
+    CHECK_NOTHROW(image->Render(renderer));
+    CHECK_NOTHROW(renderer.Present());
 
-    CHECK_EQ(renderer.GetPixel(insidePoint.GetX(), insidePoint.GetY(), true), fill_color);
-    CHECK_NE(renderer.GetPixel(19,   19, true), fill_color);
-    CHECK_NE(renderer.GetPixel(20,   19, true), fill_color);
-    CHECK_NE(renderer.GetPixel(19,   20, true), fill_color);
-    CHECK_NE(renderer.GetPixel(119,  19, true), fill_color);
-    CHECK_NE(renderer.GetPixel(220,  19, true), fill_color);
-    CHECK_NE(renderer.GetPixel(119, 120, true), fill_color);
-    CHECK_EQ(renderer.GetPixel(20,   20, true), fill_color);
-    CHECK_EQ(renderer.GetPixel(219,  20, true), fill_color);
-    CHECK_EQ(renderer.GetPixel(20,  119, true), fill_color);
-    CHECK_EQ(renderer.GetPixel(219, 119, true), fill_color);
+    CHECK_EQ(renderer.GetPixel(insidePoint.GetX(), insidePoint.GetY()), fill_color);
+    CHECK_NE(renderer.GetPixel(19,   19), fill_color);
+    CHECK_NE(renderer.GetPixel(20,   19), fill_color);
+    CHECK_NE(renderer.GetPixel(19,   20), fill_color);
+    CHECK_NE(renderer.GetPixel(119,  19), fill_color);
+    CHECK_NE(renderer.GetPixel(220,  19), fill_color);
+    CHECK_NE(renderer.GetPixel(119, 120), fill_color);
+    CHECK_EQ(renderer.GetPixel(20,   20), fill_color);
+    CHECK_EQ(renderer.GetPixel(219,  20), fill_color);
+    CHECK_EQ(renderer.GetPixel(20,  119), fill_color);
+    CHECK_EQ(renderer.GetPixel(219, 119), fill_color);
 }
 
 TEST_CASE("TestImage")
