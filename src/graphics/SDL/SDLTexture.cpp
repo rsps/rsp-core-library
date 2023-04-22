@@ -150,6 +150,15 @@ Texture& SDLTexture::Fill(const Color &arColor, OptionalRect arRect)
         THROW_WITH_BACKTRACE1(SDLException, "SDL_LockTextureToSurface");
     }
 
+//    SDL_Surface* converted_surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_ABGR8888, 0);
+
+//    if (SDL_SetSurfaceBlendMode(converted_surface, SDL_BLENDMODE_BLEND)) {
+//        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetSurfaceBlendMode");
+//    }
+//    if (SDL_SetSurfaceAlphaMod(converted_surface, arColor.GetAlpha())) {
+//        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetSurfaceAlphaMod");
+//    }
+
     if (SDL_FillRect(surface, &r, arColor.AsRaw())) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_FillRect");
     }
@@ -163,6 +172,18 @@ Texture& SDLTexture::SetBlendOperation(Texture::BlendOperation aOp, const Color 
 {
     mBlendOperation = aOp;
     mColorKey = arColorKey;
+
+    if (mBlendOperation == Texture::BlendOperation::Copy) {
+        if (SDL_SetTextureBlendMode(mpTexture->Get(), SDL_BLENDMODE_NONE)) {
+            THROW_WITH_BACKTRACE1(SDLException, "SDL_SetTextureBlendMode");
+        }
+    }
+    else {
+        if (SDL_SetTextureBlendMode(mpTexture->Get(), SDL_BLENDMODE_BLEND)) {
+            THROW_WITH_BACKTRACE1(SDLException, "SDL_SetTextureBlendMode");
+        }
+    }
+
     return *this;
 }
 

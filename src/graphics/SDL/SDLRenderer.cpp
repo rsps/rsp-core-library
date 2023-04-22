@@ -84,19 +84,19 @@ Renderer& SDLRenderer::Blit(const Texture &arTexture)
     SDLRect dr(arTexture.GetDestinationRect());
     SDLRect sr(arTexture.GetSourceRect());
 
-    if (tex.mBlendOperation != Texture::BlendOperation::Copy) {
-        if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_BLEND)) {
-            THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawBlendMode");
-        }
-    }
+//    if (tex.mBlendOperation != Texture::BlendOperation::Copy) {
+//        if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_BLEND)) {
+//            THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawBlendMode");
+//        }
+//    }
 
     if (SDL_RenderCopy(mpRenderer, tex.GetSDLTexture(), &sr, &dr)) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderCopy");
     }
 
-    if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_NONE)) {
-        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawBlendMode");
-    }
+//    if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_NONE)) {
+//        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawBlendMode");
+//    }
     return *this;
 }
 

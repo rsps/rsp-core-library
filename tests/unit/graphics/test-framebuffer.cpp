@@ -560,13 +560,13 @@ TEST_CASE("Framebuffer")
 
             rsp::utils::StopWatch sw;
             for (int i = 0 ; i < 2000 ; i++) {
-                CHECK_NOTHROW(renderer.Fill(rainbow[i & 0x07]));
                 int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
                 std::stringstream ss;
                 ss << "FPS:\n" << fps;
                 CHECK_NOTHROW(text.SetValue(ss.str()).Reload());
                 CHECK_NOTHROW(panel->Fill(Color::None));
-                CHECK_NOTHROW(panel->Update(text, Color::Aqua));
+                CHECK_NOTHROW(panel->Update(text, Color::Black));
+                CHECK_NOTHROW(renderer.Fill(rainbow[i & 0x07]));
                 CHECK_NOTHROW(renderer.Blit(*panel));
                 CHECK_NOTHROW(renderer.Present());
             }
@@ -637,9 +637,10 @@ TEST_CASE("Framebuffer")
         }
 
         CHECK_NOTHROW(text.Reload(r));
-        CHECK_NOTHROW(panel->Fill(Color::None).Update(text, Color::Yellow));
+        CHECK_NOTHROW(panel->Fill(Color::None));
+        CHECK_NOTHROW(panel->Update(text, Color::Yellow));
         CHECK_NOTHROW(panel->SetDestination(text.GetPosition(r)));
-        CHECK_NOTHROW(renderer.Fill(Color::Black));
+        CHECK_NOTHROW(renderer.Fill(Color::Silver));
         CHECK_NOTHROW(renderer.DrawRect(Color::Green, r2));
         CHECK_NOTHROW(renderer.Blit(*panel));
         CHECK_NOTHROW(renderer.Present());
