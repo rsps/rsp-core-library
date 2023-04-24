@@ -345,9 +345,15 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(renderer.Blit(texture));
             CHECK_NOTHROW(renderer.Present());
             CHECK_NOTHROW(renderer.Blit(texture));
-            CHECK_NOTHROW(renderer.Present());
 
             // Assert
+            CHECK_HEX(emptyMap.GetPixel({0,0}).AsUint(), col.AsUint());
+            CHECK_HEX(emptyMap.GetPixel({1,1}).AsUint(), col.AsUint());
+
+            CHECK_HEX(canvas.GetPixel(topLeftImgCorner).AsUint(), col.AsUint());
+            CHECK_HEX(canvas.GetPixel(topLeftImgCorner + Point(width-1, height-1)).AsUint(), col.AsUint());
+            CHECK_HEX(canvas.GetPixel(topLeftImgCorner + randomPoint).AsUint(), Color::White);
+
             CHECK_HEX(renderer.GetPixel(topLeftImgCorner).AsUint(), col.AsUint());
             CHECK_HEX(renderer.GetPixel(topLeftImgCorner + Point(width-1, height-1)).AsUint(), col.AsUint());
             CHECK_HEX(renderer.GetPixel(topLeftImgCorner + randomPoint).AsUint(), Color::White);
@@ -377,21 +383,57 @@ TEST_CASE("Framebuffer")
         CHECK_NE(largeImgMap.GetPixel(randomPoint).AsUint(), 0);
         CHECK_NE(renderer.GetPixel(randomPoint).AsUint(), 0);
 
-        SUBCASE("Spill large image into screen")
+        SUBCASE("Pan large image into screen")
         {
-            // Arrange
-            topLeft = {-100, -100};
+            TexturePtr_t large_texture = Texture::Create(largeImgMap);
 
-            // Act
-            CHECK_NOTHROW(canvas.DrawPixelData(topLeft, largeImgMap));
-            CHECK_NOTHROW(texture.Update(canvas, Color::White));
-            CHECK_NOTHROW(renderer.Blit(texture));
-            CHECK_NOTHROW(renderer.Present());
-            CHECK_NOTHROW(renderer.Blit(texture));
-            CHECK_NOTHROW(renderer.Present());
+            int x = 0;
+            int y = 0;
+            int y_delta = 1;
+            int x_delta = 1;
+
+            for (int i = 0 ; i < 2000 ; ++i) {
+                large_texture->SetSourceRect({x, y, 480, 800});
+                Rect src_rect = large_texture->GetSourceRect();
+                int dy = 0;
+                int dx = 0;
+                if (src_rect.GetWidth() < 480 && src_rect.GetLeft() == 0) {
+                    dx = 480 - src_rect.GetWidth();
+                }
+                if (src_rect.GetHeight() < 800 && src_rect.GetTop() == 0) {
+                    dy = 800 - src_rect.GetHeight();
+                }
+                large_texture->SetOffset({dx, dy});
+
+                CHECK_NOTHROW(renderer.Fill(Color::Black));
+                CHECK_NOTHROW(renderer.Blit(*large_texture));
+                CHECK_NOTHROW(renderer.Present());
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+                x += x_delta;
+                y += y_delta;
+                if (x >= (large_texture->GetWidth() - 280)) {
+                    x_delta = -1;
+                }
+                else if (x <= -200) {
+                    x_delta = 1;
+                }
+                if (y >= large_texture->GetHeight() - 200) {
+                    y_delta = -1;
+                }
+                else if (y <= -200) {
+                    y_delta = 1;
+                }
+            }
+
+            // Update backbuffer with visible content, so we can check result
+            CHECK_NOTHROW(renderer.Fill(Color::Black));
+            CHECK_NOTHROW(renderer.Blit(*large_texture));
 
             // Assert
-            CHECK_NE(renderer.GetPixel(randomPoint).AsUint(), 0);
+            CHECK_HEX(renderer.GetPixel(54, 176).AsUint(), 0xFF000000);
+            CHECK_HEX(renderer.GetPixel(55, 177).AsUint(), 0xFF121C2D);
+            CHECK_HEX(renderer.GetPixel(100, 210).AsUint(), 0xFF3583C5);
         }
     }
 
@@ -640,7 +682,7 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(panel->Fill(Color::None));
         CHECK_NOTHROW(panel->Update(text, Color::Yellow));
         CHECK_NOTHROW(panel->SetDestination(text.GetPosition(r)));
-        CHECK_NOTHROW(renderer.Fill(Color::Silver));
+        CHECK_NOTHROW(renderer.Fill(Color::Black));
         CHECK_NOTHROW(renderer.DrawRect(Color::Green, r2));
         CHECK_NOTHROW(renderer.Blit(*panel));
         CHECK_NOTHROW(renderer.Present());
@@ -679,14 +721,14 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(texture.Update(canvas, Color::White));
             CHECK_NOTHROW(renderer.Blit(texture));
             CHECK_NOTHROW(renderer.Present());
+            CHECK_NOTHROW(renderer.Blit(texture));
+            CHECK_NOTHROW(renderer.Present());
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
-        CHECK_NOTHROW(renderer.Blit(texture));
-        CHECK_NOTHROW(renderer.Present());
         CHECK_HEX(renderer.GetPixel(Point(180, 180)).AsUint(), 0xFF386100);
     }
 
-    std::this_thread::sleep_for(1000ms);
+    std::this_thread::sleep_for(500ms);
 }
 
 TEST_SUITE_END();

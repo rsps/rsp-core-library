@@ -195,7 +195,8 @@ size_t PixelData::GetDataSize() const
 Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) const
 {
     if (!GetRect().IsHit(aX, aY)) {
-        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + ", " + std::to_string(aY) + " not in " + to_string(GetRect()) + ")");
+        return Color::None;
+//        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + ", " + std::to_string(aY) + " not in " + to_string(GetRect()) + ")");
     }
     Color result(arColor);
     int offset;
@@ -379,7 +380,7 @@ PixelData& PixelData::CopyFrom(const Point &arLeftTop, const PixelData &arOther,
 {
     Rect r = arSection;
     if (arLeftTop.GetX() < 0 || arLeftTop.GetY() < 0) {
-        r.MoveTo(arLeftTop);
+        r.MoveTo(arLeftTop); // TODO: Explain why this move?
     }
     r &= GetRect();
     auto oy = arLeftTop.GetY();

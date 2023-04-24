@@ -195,14 +195,14 @@ Texture& SDLTexture::SetOffset(const Point &arPoint)
 
 Texture& SDLTexture::SetSourceRect(const Rect &arRect)
 {
-    mSourceRect = arRect;
+    mSourceRect = arRect & mArea;
     return *this;
 }
 
 Rect SDLTexture::GetDestinationRect() const
 {
     Rect result(mSourceRect);
-    result.Move(mDestinationPos.GetX() + mDestinationOffset.GetX(), mDestinationPos.GetY() + mDestinationOffset.GetY());
+    result.MoveTo({mDestinationPos.GetX() + mDestinationOffset.GetX(), mDestinationPos.GetY() + mDestinationOffset.GetY()});
     return result;
 }
 
