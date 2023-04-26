@@ -38,10 +38,10 @@ public:
             GfxEvent(73, EventTypes::Drag, Point(250, 360)),  // Drag over BotBtn
             GfxEvent(74, EventTypes::Drag, Point(300, 380)),  // Drag over BotBtn
             GfxEvent(75, EventTypes::Drag, Point(310, 390)),  // Drag outside BotBtn
-            GfxEvent(576, EventTypes::Lift, Point(310, 390)),  // Lift outside BotBtn
+            GfxEvent(76, EventTypes::Lift, Point(310, 390)),  // Lift outside BotBtn
 
-            GfxEvent(600, EventTypes::Refresh, Point(0, 0)),   // Refresh display
-            GfxEvent(1000, EventTypes::Quit, Point(0, 0))       // Terminate
+            GfxEvent(80, EventTypes::Refresh, Point(0, 0)),   // Refresh display
+            GfxEvent(81, EventTypes::Quit, Point(0, 0))       // Terminate
         };
         return events;
     }
