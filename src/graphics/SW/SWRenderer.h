@@ -23,7 +23,7 @@ namespace rsp::graphics::sw {
 class SWRenderer: public Renderer, public Framebuffer, public rsp::utils::Singleton<SWRenderer>
 {
 public:
-    SWRenderer() : mClipRect(0,0,Framebuffer::GetWidth(), Framebuffer::GetHeight()) {}
+    SWRenderer(GuiUnit_t aWidth, GuiUnit_t aHeight);
 
     GuiUnit_t GetWidth() const override;
     GuiUnit_t GetHeight() const override;
@@ -33,7 +33,8 @@ public:
     Renderer& Fill(const Color &arColor, OptionalRect aDestination = nullptr) override;
     Renderer& Blit(const Texture &arTexture) override;
     Renderer& SetClipRect(const Rect &arClipRect) override;
-
+    Renderer& ClearClipRect() override;
+    Renderer& Flush() override;
     void Present() override;
 
     Renderer& SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) override;

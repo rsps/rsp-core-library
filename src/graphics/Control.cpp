@@ -221,6 +221,10 @@ void Control::Render(Renderer &arRenderer) const
         }
     }
 
+    if (!mpParent) {
+        arRenderer.ClearClipRect();
+    }
+
     if ((mTouchAreaColor != Color::None) && !mTouchArea.empty()) {
         Rect r = mTouchArea;
         r.AddSize(1, 1);
@@ -342,6 +346,10 @@ bool Control::ProcessInput(GfxEvent &arInput)
                 }
                 return true;
             }
+            break;
+
+        case EventTypes::Refresh:
+            Invalidate();
             break;
 
         default:

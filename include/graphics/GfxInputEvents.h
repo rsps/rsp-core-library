@@ -26,6 +26,7 @@ enum class EventTypes {
     Press,
     Drag,
     Lift,
+    Refresh,
     Quit
 };
 

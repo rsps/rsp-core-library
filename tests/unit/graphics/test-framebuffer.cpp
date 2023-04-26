@@ -383,7 +383,7 @@ TEST_CASE("Framebuffer")
         CHECK_NE(largeImgMap.GetPixel(randomPoint).AsUint(), 0);
         CHECK_NE(renderer.GetPixel(randomPoint).AsUint(), 0);
 
-        SUBCASE("Pan large image into screen")
+        SUBCASE("Pan screen over large image")
         {
             TexturePtr_t large_texture = Texture::Create(largeImgMap);
 
@@ -394,16 +394,16 @@ TEST_CASE("Framebuffer")
 
             for (int i = 0 ; i < 2000 ; ++i) {
                 large_texture->SetSourceRect({x, y, 480, 800});
-                Rect src_rect = large_texture->GetSourceRect();
-                int dy = 0;
-                int dx = 0;
-                if (src_rect.GetWidth() < 480 && src_rect.GetLeft() == 0) {
-                    dx = 480 - src_rect.GetWidth();
-                }
-                if (src_rect.GetHeight() < 800 && src_rect.GetTop() == 0) {
-                    dy = 800 - src_rect.GetHeight();
-                }
-                large_texture->SetOffset({dx, dy});
+//                Rect src_rect = large_texture->GetSourceRect();
+//                int dy = 0;
+//                int dx = 0;
+//                if (src_rect.GetWidth() < 480 && src_rect.GetLeft() == 0) {
+//                    dx = 480 - src_rect.GetWidth();
+//                }
+//                if (src_rect.GetHeight() < 800 && src_rect.GetTop() == 0) {
+//                    dy = 800 - src_rect.GetHeight();
+//                }
+//                large_texture->SetOffset({dx, dy});
 
                 CHECK_NOTHROW(renderer.Fill(Color::Black));
                 CHECK_NOTHROW(renderer.Blit(*large_texture));
@@ -429,6 +429,7 @@ TEST_CASE("Framebuffer")
             // Update backbuffer with visible content, so we can check result
             CHECK_NOTHROW(renderer.Fill(Color::Black));
             CHECK_NOTHROW(renderer.Blit(*large_texture));
+            CHECK_NOTHROW(renderer.Flush());
 
             // Assert
             CHECK_HEX(renderer.GetPixel(54, 176).AsUint(), 0xFF000000);
@@ -441,50 +442,31 @@ TEST_CASE("Framebuffer")
     {
         // Arrange
         Bitmap imgSimple("testImages/testImage.bmp");
-        int iterations = 100;
+        int iterations = 700;
 
         auto sprite = Texture::Create(imgSimple, Color::Black);
-        Point pos(100, 200);
+        Point pos(460, 810);
 
         // Act
         rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
+            CHECK_NOTHROW(sprite->SetDestination(pos));
             CHECK_NOTHROW(renderer.Fill(Color::Black));
-            CHECK_NOTHROW(sprite->SetDestination(pos));
             CHECK_NOTHROW(renderer.Blit(*sprite));
             CHECK_NOTHROW(renderer.Present());
-            pos.SetY(200 - i);
+            pos.SetY(800 - int(i * 1.5));
+            pos.SetX(500 - i);
         }
-        int fps = (1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
 
-        // Assert
-        CHECK(fps > 10);
-        MESSAGE("Fps: " << fps);
-    }
-
-    SUBCASE("Moving image2")
-    {
-        CHECK_NOTHROW(renderer.Fill(Color::Black));
-        CHECK_NOTHROW(renderer.Present());
-        CHECK_NOTHROW(renderer.Fill(Color::Black));
-        // Arrange
-        Bitmap imgSimple("testImages/testImage.bmp");
-        int iterations = 100;
-
-        auto sprite = Texture::Create(imgSimple.GetWidth(), imgSimple.GetHeight()+2);
-        sprite->Fill(Color::Black);
-        sprite->Update(imgSimple, Color::Black);
-
-        Point pos(100, 200);
-
-        // Act
-        rsp::utils::StopWatch sw;
         for (int i = 0; i < iterations; i++) {
+            pos.SetY(int((i-200) * 1.5));
+            pos.SetX(470 - i);
             CHECK_NOTHROW(sprite->SetDestination(pos));
+            CHECK_NOTHROW(renderer.Fill(Color::Black));
             CHECK_NOTHROW(renderer.Blit(*sprite));
             CHECK_NOTHROW(renderer.Present());
-            pos.SetY(200 - i);
         }
+
         int fps = (1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
 
         // Assert
@@ -728,7 +710,7 @@ TEST_CASE("Framebuffer")
         CHECK_HEX(renderer.GetPixel(Point(180, 180)).AsUint(), 0xFF386100);
     }
 
-    std::this_thread::sleep_for(500ms);
+//    std::this_thread::sleep_for(500ms);
 }
 
 TEST_SUITE_END();

@@ -56,10 +56,10 @@ TEST_CASE("PixelData")
         CHECK_EQ(pd.GetHeight(), 8);
         CHECK_EQ(pd.GetColorDepth(), ColorDepth::Monochrome);
 
-        CHECK_EQ(pd.GetPixelAt(0,0, Color::White), Color(0x00FFFFFF));
-        CHECK_EQ(pd.GetPixelAt(1,0, Color::White), Color(0xFFFFFFFF));
-        CHECK_EQ(pd.GetPixelAt(7,7, Color::White), Color(0xFFFFFFFF));
-        CHECK_THROWS_AS(pd.GetPixelAt(8,7, Color::White), std::exception);
+        CHECK_HEX(pd.GetPixelAt(0,0, Color::White).AsUint(), 0x00FFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,0, Color::White).AsUint(), 0xFFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(7,7, Color::White).AsUint(), 0xFFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(8,7, Color::White).AsUint(), Color::None);
         CHECK_EQ(pd.GetDataSize(), 8);
 
         CHECK_NOTHROW(pd.SetPixelAt(0,0, Color::White));

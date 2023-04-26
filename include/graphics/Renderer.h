@@ -84,15 +84,31 @@ public:
      * \brief Limit the drawing area on this presentation surface
      *
      * \param aClipRect
-     * \return
+     * \return self
      */
     virtual Renderer& SetClipRect(const Rect &arClipRect) = 0;
+
+    /**
+     * \brief Reset the clipping rectangle to the size of the Renderer surface
+     *
+     * \return self
+     */
+    virtual Renderer& ClearClipRect() = 0;
+
+    /**
+     * \brief Wait for any pending GPU operations to finish
+     *
+     * Useful during unit test, to make sure drawing operations are completed.
+     */
+    virtual Renderer& Flush() = 0;
 
     /**
      * \brief Make sure the presentation surface is visible on the display device.
      *
      * Mainly used to wait for acceleration hardware to finish and setting view-port
      * on multi-buffer architectures.
+
+     * \return self
      */
     virtual void Present() = 0;
 

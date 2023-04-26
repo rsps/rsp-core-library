@@ -62,6 +62,10 @@ void Label::refresh()
 void Label::update()
 {
     auto tr = mText.GetRect();
+    if (tr.empty()) {
+        return;
+    }
+
     if (!mpTexture || (tr != Rect(0, 0, mpTexture->GetWidth(), mpTexture->GetHeight()))) {
         mpTexture = Texture::Create(tr.GetWidth(), tr.GetHeight());
         mpTexture->SetBlendOperation(Texture::BlendOperation::SourceAlpha);

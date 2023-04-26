@@ -36,7 +36,6 @@ TEST_CASE("Image")
     auto& renderer = Renderer::Init(480, 800);
     CHECK_NOTHROW(renderer.Fill(Color::Grey));
     CHECK_NOTHROW(renderer.Present());
-    CHECK_NOTHROW(renderer.Fill(Color::Grey));
 
     auto fill_color = Color::Purple;
 
@@ -64,10 +63,11 @@ TEST_CASE("Image")
     CHECK(image->UpdateData());
     // Check that UpdateData returns false if not invalid
     CHECK_FALSE(image->UpdateData());
+    CHECK_NOTHROW(renderer.Fill(Color::Grey));
     CHECK_NOTHROW(image->Render(renderer));
     CHECK_NOTHROW(renderer.Present());
+    CHECK_NOTHROW(renderer.Fill(Color::Grey));
     CHECK_NOTHROW(image->Render(renderer));
-    CHECK_NOTHROW(renderer.Present());
 
     CHECK_EQ(renderer.GetPixel(insidePoint.GetX(), insidePoint.GetY()), fill_color);
     CHECK_NE(renderer.GetPixel(19,   19), fill_color);
@@ -80,6 +80,9 @@ TEST_CASE("Image")
     CHECK_EQ(renderer.GetPixel(219,  20), fill_color);
     CHECK_EQ(renderer.GetPixel(20,  119), fill_color);
     CHECK_EQ(renderer.GetPixel(219, 119), fill_color);
+
+    using namespace std::chrono_literals;
+    std::this_thread::sleep_for(500ms);
 }
 
 TEST_CASE("TestImage")

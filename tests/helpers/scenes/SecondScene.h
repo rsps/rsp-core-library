@@ -22,7 +22,7 @@ class SecondScene : public SceneBase<SecondScene>
 public:
     using Clicked_t = rsp::utils::Function<void(void)>;
 
-    static std::array<GfxEvent, 13>& GetTouchEvents() {
+    static std::array<GfxEvent, 15>& GetTouchEvents() {
         static std::array events {
             GfxEvent(50, EventTypes::Press, Point(100, 100)),
             GfxEvent(51, EventTypes::Lift, Point(100, 100)),  // Click outside any buttons
@@ -38,7 +38,10 @@ public:
             GfxEvent(73, EventTypes::Drag, Point(250, 360)),  // Drag over BotBtn
             GfxEvent(74, EventTypes::Drag, Point(300, 380)),  // Drag over BotBtn
             GfxEvent(75, EventTypes::Drag, Point(310, 390)),  // Drag outside BotBtn
-            GfxEvent(76, EventTypes::Lift, Point(310, 390))   // Lift outside BotBtn
+            GfxEvent(576, EventTypes::Lift, Point(310, 390)),  // Lift outside BotBtn
+
+            GfxEvent(600, EventTypes::Refresh, Point(0, 0)),   // Refresh display
+            GfxEvent(1000, EventTypes::Quit, Point(0, 0))       // Terminate
         };
         return events;
     }

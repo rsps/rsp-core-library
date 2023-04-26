@@ -46,9 +46,11 @@ public:
     SDLRenderer& operator=(SDLRenderer&&) = default;
 
     Renderer& Blit(const Texture &arTexture) override;
+    Renderer& ClearClipRect() override;
     Renderer& SetClipRect(const Rect &arClipRect) override;
     Renderer& Fill(const Color &arColor, OptionalRect aDestination) override;
     GuiUnit_t GetWidth() const override;
+    Renderer& Flush() override;
     void Present() override;
     GuiUnit_t GetHeight() const override;
     Renderer& DrawRect(const Color &arColor, const Rect &arRect) override;

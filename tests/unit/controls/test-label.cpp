@@ -35,7 +35,6 @@ TEST_CASE("Label")
     CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-VariableFont_wght.ttf"));
 
     auto& renderer = Renderer::Init(480, 800);
-    CHECK_NOTHROW(renderer.Fill(Color::Grey));
 
     Rect r(50, 100, 380, 200);
     Label label;
@@ -82,12 +81,13 @@ TEST_CASE("Label")
     CHECK(label.UpdateData());
     // Check that UpdateData returns false if not invalid
     CHECK_FALSE(label.UpdateData());
+    CHECK_NOTHROW(renderer.Fill(Color::Grey));
     CHECK_NOTHROW(label.Render(renderer));
     CHECK_NOTHROW(renderer.Present());
+    CHECK_NOTHROW(renderer.Fill(Color::Grey));
     CHECK_NOTHROW(label.Render(renderer));
-    CHECK_NOTHROW(renderer.Present());
 
-    // Dont know how to test that text is rendered correctly, but a least we can test that nothing paint outside background
+    // Don't know good method to test that text is rendered correctly, but a least we can test that nothing paint outside background
     for (int y = r.GetTop(); y < r.GetBottom() ; ++y) {
         CHECK_HEX(renderer.GetPixel( 49, y).AsUint(), Color::Grey);
         CHECK_HEX(renderer.GetPixel(430, y).AsUint(), Color::Grey);
@@ -102,7 +102,7 @@ TEST_CASE("Label")
         CHECK_HEX(renderer.GetPixel(x, 299).AsUint(), Color::Yellow);
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
 TEST_SUITE_END();

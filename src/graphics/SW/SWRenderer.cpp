@@ -17,17 +17,30 @@
 
 namespace rsp::graphics {
 
-Renderer& Renderer::Get()
+Renderer& Renderer::Init(GuiUnit_t aWidth, GuiUnit_t aHeight)
 {
     if (!sw::SWRenderer::HasInstance()) {
-        sw::SWRenderer::CreateInstance();
+        sw::SWRenderer::CreateInstance(aWidth, aHeight);
     }
+    return rsp::utils::Singleton<sw::SWRenderer>::GetInstance();
+}
+
+Renderer& Renderer::Get()
+{
     return rsp::utils::Singleton<sw::SWRenderer>::GetInstance();
 }
 
 } /* namespace rsp::graphics */
 
 namespace rsp::graphics::sw {
+
+SWRenderer::SWRenderer(GuiUnit_t aWidth, GuiUnit_t aHeight)
+    : mClipRect(0, 0, Framebuffer::GetWidth(), Framebuffer::GetHeight())
+{
+    if (aWidth != Framebuffer::GetWidth() || aHeight != Framebuffer::GetHeight()) {
+        // throw...
+    }
+}
 
 Renderer& SWRenderer::DrawRect(const Color &arColor, const Rect &arRect)
 {
@@ -45,8 +58,27 @@ Renderer& SWRenderer::Blit(const Texture &arTexture)
 {
     auto &swt = dynamic_cast<const SWTexture&>(arTexture);
     Rect dst = swt.GetDestinationRect();
+    Rect src = swt.mSourceRect;
+    if (dst.GetTop() < 0) {
+        src.SetTop(std::min(-dst.GetTop(), src.GetHeight()));
+    }
+    if (dst.GetLeft() < 0) {
+        src.SetLeft(std::min(-dst.GetLeft(), src.GetWidth()));
+    }
+
+    int dy = 0;
+    int dx = 0;
+    if (arTexture.GetWidth() > GetWidth() && src.GetWidth() < GetWidth() && src.GetLeft() == 0) {
+        dx = GetWidth() - src.GetWidth();
+    }
+    if (arTexture.GetHeight() > GetHeight() && src.GetHeight() < GetHeight() && src.GetTop() == 0) {
+        dy = GetHeight() - src.GetHeight();
+    }
+    dst.Move(dx, dy);
+
     dst &= mClipRect;
-    mrGfxHal.Blit(mScreenSurfaces[mCurrentSurface], *swt.mpSurface, dst, swt.mSourceRect);
+
+    mrGfxHal.Blit(mScreenSurfaces[mCurrentSurface], *swt.mpSurface, dst, src);
     return *this;
 }
 
@@ -56,9 +88,21 @@ Renderer& SWRenderer::SetClipRect(const Rect &arClipRect)
     return *this;
 }
 
-void SWRenderer::Present()
+Renderer& SWRenderer::ClearClipRect()
+{
+    mClipRect = Rect(0, 0, GetWidth(), GetHeight());
+    return *this;
+}
+
+Renderer& SWRenderer::Flush()
 {
     mrGfxHal.Sync();
+    return *this;
+}
+
+void SWRenderer::Present()
+{
+    Flush();
     swapBuffer();
 }
 

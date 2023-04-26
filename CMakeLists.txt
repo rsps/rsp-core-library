@@ -11,7 +11,7 @@ OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by d
 OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
 OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
 OPTION(SDL2 "Use SDL2 for graphic accelleration." OFF)
-OPTION(ZLIB "Build with ZLib Inflate/Deflate compression." ON)
+OPTION(ZLIB "Build with ZLib Inflate/Deflate compression." OFF)
 
 if(ARCH_ARM)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)

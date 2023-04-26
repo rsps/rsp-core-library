@@ -8,6 +8,7 @@
  * \author      Simon Glashoff
  */
 
+#include <chrono>
 #include <doctest.h>
 #include <graphics/Control.h>
 #include <graphics/Renderer.h>
@@ -120,7 +121,6 @@ TEST_CASE("Control")
     SUBCASE("Render")
     {
         auto &renderer = Renderer::Init(480, 800);
-        CHECK_NOTHROW(renderer.Fill(Color::Grey));
 
         Canvas paper(150, 50);
         paper.Fill(Color::Yellow);
@@ -134,10 +134,14 @@ TEST_CASE("Control")
         CHECK_NOTHROW(myControl.SetTransparent(false).SetArea({200, 40, 100, 500}).Show().Invalidate());
 
         CHECK(myControl.UpdateData());
+        CHECK_NOTHROW(renderer.Fill(Color::Grey));
         CHECK_NOTHROW(myControl.Render(renderer));
         CHECK_NOTHROW(renderer.Present());
+
+        // Paint again on backbuffer to allow checks below
+        CHECK_NOTHROW(renderer.Fill(Color::Grey));
         CHECK_NOTHROW(myControl.Render(renderer));
-        CHECK_NOTHROW(renderer.Present());
+        CHECK_NOTHROW(renderer.Flush());
 
         CHECK_HEX(renderer.GetPixel(200,  40).AsUint(), Color::Blue);
         CHECK_HEX(renderer.GetPixel(299, 539).AsUint(), Color::Blue);
@@ -147,7 +151,10 @@ TEST_CASE("Control")
         CHECK_HEX(renderer.GetPixel(200, 300).AsUint(), Color::Yellow);
         CHECK_HEX(renderer.GetPixel(249, 349).AsUint(), Color::Yellow);
         CHECK_HEX(renderer.GetPixel(250, 350).AsUint(), Color::Blue);
-}
+
+//        using namespace std::chrono_literals;
+//        std::this_thread::sleep_for(2500ms);
+    }
 }
 
 TEST_SUITE_END();

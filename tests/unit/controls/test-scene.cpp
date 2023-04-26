@@ -24,6 +24,7 @@
 using namespace rsp::graphics;
 using namespace rsp::messaging;
 using namespace rsp::utils;
+using namespace std::chrono_literals;
 
 class TestSub : public Subscriber<ClickTopics>
 {
@@ -159,12 +160,28 @@ TEST_CASE("Scene Test")
         CHECK_NOTHROW(sub.Subscribe(ClickTopics::SceneChange));
         CHECK_NOTHROW(event.mCurrent = insideBotPoint);
 
+        CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
+        CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));
+        CHECK_NOTHROW(renderer.Present());
+//        std::this_thread::sleep_for(500ms);
+
         // Act
         event.mType = EventTypes::Press;
         event.mPress = event.mCurrent;
         CHECK_NOTHROW(scenes.ActiveScene().ProcessInput(event));
+
+        CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
+        CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));
+        CHECK_NOTHROW(renderer.Present());
+//        std::this_thread::sleep_for(500ms);
+
         event.mType = EventTypes::Lift;
         CHECK_NOTHROW(scenes.ActiveScene().ProcessInput(event));
+
+        CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
+        CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));
+        CHECK_NOTHROW(renderer.Present());
+//        std::this_thread::sleep_for(500ms);
 
          // Assert
         CHECK(clicked);

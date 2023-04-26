@@ -81,8 +81,28 @@ SDLRenderer::~SDLRenderer()
 Renderer& SDLRenderer::Blit(const Texture &arTexture)
 {
     const SDLTexture &tex = dynamic_cast<const SDLTexture&>(arTexture);
-    SDLRect dr(arTexture.GetDestinationRect());
-    SDLRect sr(arTexture.GetSourceRect());
+    Rect dst = tex.GetDestinationRect();
+    Rect src = tex.GetSourceRect();
+    if (dst.GetTop() < 0) {
+        src.SetTop(std::min(-dst.GetTop(), src.GetHeight()));
+    }
+    if (dst.GetLeft() < 0) {
+        src.SetLeft(std::min(-dst.GetLeft(), src.GetWidth()));
+    }
+
+    int dy = 0;
+    int dx = 0;
+    if (arTexture.GetWidth() > GetWidth() && src.GetWidth() < GetWidth() && src.GetLeft() == 0) {
+        dx = GetWidth() - src.GetWidth();
+    }
+    if (arTexture.GetHeight() > GetHeight() && src.GetHeight() < GetHeight() && src.GetTop() == 0) {
+        dy = GetHeight() - src.GetHeight();
+    }
+    dst.Move(dx, dy);
+    dst &= mClipRect;
+
+    SDLRect dr(dst);
+    SDLRect sr(src);
 
 //    if (tex.mBlendOperation != Texture::BlendOperation::Copy) {
 //        if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_BLEND)) {
@@ -103,8 +123,21 @@ Renderer& SDLRenderer::Blit(const Texture &arTexture)
 Renderer& SDLRenderer::SetClipRect(const Rect &arClipRect)
 {
     mClipRect = arClipRect & mArea;
+    SDLRect clip(mClipRect);
+
+    if (SDL_RenderSetClipRect(mpRenderer, &clip)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderSetClipRect");
+    }
+
     return *this;
 }
+
+Renderer& SDLRenderer::ClearClipRect()
+{
+    SetClipRect(mArea);
+    return *this;
+}
+
 
 Renderer& SDLRenderer::Fill(const Color &arColor, OptionalRect aDestination)
 {
@@ -117,6 +150,14 @@ Renderer& SDLRenderer::Fill(const Color &arColor, OptionalRect aDestination)
     }
     if (SDL_RenderFillRect(mpRenderer, &r)) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderFillRect");
+    }
+    return *this;
+}
+
+Renderer& SDLRenderer::Flush()
+{
+    if (SDL_RenderFlush(mpRenderer)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderFlush");
     }
     return *this;
 }

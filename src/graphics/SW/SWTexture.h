@@ -30,18 +30,16 @@ public:
     GuiUnit_t GetWidth() const override;
     GuiUnit_t GetHeight() const override;
 
-    Texture& Fill(Color aColor, GfxHal::OptionalRect arRect = nullptr) override;
-    Texture& Update(const PixelData &arPixelData, Color aColor) override;
-    Texture& SetBlendOperation(Texture::BlendOperation aOp, Color aColorKey = Color::None) override;
+    Texture& Fill(const Color &arColor, GfxHal::OptionalRect arRect = nullptr) override;
+    Texture& Update(const PixelData &arPixelData, const Color &arColor) override;
+    Texture& SetBlendOperation(Texture::BlendOperation aOp, const Color &arColorKey = Color::None) override;
     Texture& SetSourceRect(const Rect &arRect) override;
     Texture& SetDestination(const Point &arPoint) override;
     Point GetDestination() const override;
     Texture& SetOffset(const Point &arPoint) override;
     std::unique_ptr<Texture> Clone() const override;
     Rect GetDestinationRect() const override;
-    const Rect& GetSourceRect() const override { return mSourceRect; }
-
-    rsp::graphics::Texture& DrawRect(rsp::graphics::Color aColor, const rsp::graphics::Rect &arRect) override;
+    const Rect& GetSourceRect() const override;
 
 protected:
     SWTexture(const SWTexture& arOther) = default;

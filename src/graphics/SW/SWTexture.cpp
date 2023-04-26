@@ -13,7 +13,7 @@
 
 namespace rsp::graphics {
 
-std::unique_ptr<Texture> Texture::Create(const PixelData &arPixelData, Color aColor, Point aDestPos, Point aDestOffset)
+std::unique_ptr<Texture> Texture::Create(const PixelData &arPixelData, const Color &arColor, Point aDestPos, Point aDestOffset)
 {
     auto result = std::make_unique<sw::SWTexture>(arPixelData.GetWidth(), arPixelData.GetHeight(), aDestPos, aDestOffset);
     switch(arPixelData.GetColorDepth()) {
@@ -27,7 +27,7 @@ std::unique_ptr<Texture> Texture::Create(const PixelData &arPixelData, Color aCo
             result->SetBlendOperation(Texture::BlendOperation::SourceAlpha);
             break;
     }
-    result->Fill(Color::None).Update(arPixelData, aColor.AsRaw());
+    result->Fill(Color::None).Update(arPixelData, arColor.AsRaw());
     return result;
 }
 
@@ -50,35 +50,39 @@ SWTexture::SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestPos
     mpSurface = mrGfxHal.Alloc(aWidth, aHeight);
 }
 
-rsp::graphics::Texture& SWTexture::DrawRect(Color aColor, const rsp::graphics::Rect &arRect)
+Texture& SWTexture::Fill(const Color &arColor, GfxHal::OptionalRect aRect)
 {
-    mrGfxHal.DrawRect(*mpSurface, aColor.AsRaw(), arRect);
+    mrGfxHal.Fill(*mpSurface, arColor.AsRaw(), aRect);
     return *this;
 }
 
-Texture& SWTexture::Fill(Color aColor, GfxHal::OptionalRect aRect)
+Texture& SWTexture::Update(const PixelData &arPixelData, const Color &arColor)
 {
-    mrGfxHal.Fill(*mpSurface, aColor.AsRaw(), aRect);
+    mrGfxHal.CopyFrom(*mpSurface, arPixelData, arColor.AsRaw());
     return *this;
 }
 
-Texture& SWTexture::Update(const PixelData &arPixelData, Color aColor)
-{
-    mrGfxHal.CopyFrom(*mpSurface, arPixelData, aColor.AsRaw());
-    return *this;
-}
-
-Texture& SWTexture::SetBlendOperation(Texture::BlendOperation aOp, Color aColorKey)
+Texture& SWTexture::SetBlendOperation(Texture::BlendOperation aOp, const Color &arColorKey)
 {
     mpSurface->mBlendOperation = aOp;
-    mpSurface->mColorKey = aColorKey.AsRaw();
+    mpSurface->mColorKey = arColorKey.AsRaw();
     return *this;
 }
 
 Texture& SWTexture::SetSourceRect(const Rect &arRect)
 {
-    mSourceRect = arRect;
+    mSourceRect = arRect & Rect(0, 0, GetWidth(), GetHeight());
     return *this;
+}
+
+const Rect& SWTexture::GetSourceRect() const
+{
+    return mSourceRect;
+}
+
+Point SWTexture::GetDestination() const
+{
+    return mDestinationPos;
 }
 
 Texture& SWTexture::SetDestination(const Point &arPoint)
@@ -91,6 +95,13 @@ Texture& SWTexture::SetOffset(const Point &arPoint)
 {
     mDestinationOffset = arPoint;
     return *this;
+}
+
+Rect SWTexture::GetDestinationRect() const
+{
+    Rect result(mSourceRect);
+    result.MoveTo({mDestinationPos.GetX() + mDestinationOffset.GetX(), mDestinationPos.GetY() + mDestinationOffset.GetY()});
+    return result;
 }
 
 std::unique_ptr<Texture> SWTexture::Clone() const
@@ -108,17 +119,6 @@ rsp::graphics::GuiUnit_t SWTexture::GetHeight() const
     return mpSurface->mHeight;
 }
 
-Rect SWTexture::GetDestinationRect() const
-{
-    Rect result(mSourceRect);
-    result.Move(mDestinationPos.GetX() + mDestinationOffset.GetX(), mDestinationPos.GetY() + mDestinationOffset.GetY());
-    return result;
-}
-
-Point SWTexture::GetDestination() const
-{
-    return mDestinationPos;
-}
 
 } /* namespace rsp::graphics::sw */
 

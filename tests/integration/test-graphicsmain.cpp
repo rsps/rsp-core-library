@@ -122,7 +122,7 @@ TEST_CASE("Graphics Main Test")
         CHECK_NOTHROW(gfx.ChangeScene<SecondScene>());
 
         int topBtnClicked = 0;
-        scenes.GetAfterCreate() = [&gfx, &topBtnClicked, &tp](Scene *apScene) {
+        scenes.GetAfterCreate() = [&topBtnClicked, &tp](Scene *apScene) {
             CHECK_EQ(apScene->GetId(), rsp::utils::ID<SecondScene>());
 
             CHECK_NOTHROW(tp.SetEvents(SecondScene::GetTouchEvents().data(), SecondScene::GetTouchEvents().size()));
@@ -138,16 +138,16 @@ TEST_CASE("Graphics Main Test")
             };
 
             // Check for lift even though we lift outside button
-            apScene->GetAs<SecondScene>().GetBottomBtn().OnLift() = [&gfx](const Point& arPoint, uint32_t id) {
+            apScene->GetAs<SecondScene>().GetBottomBtn().OnLift() = [](const Point& arPoint, uint32_t id) {
                 CHECK_EQ(arPoint, Point(310, 390));
-                gfx.Terminate();
             };
         };
 
         MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
-        CHECK_NOTHROW(gfx.Run(1000, true));
+        CHECK_NOTHROW(gfx.Run(1200, true));
 
         const uint32_t cGreenColor = 0xFF24b40b;
+        const uint32_t cRedColor = 0xFFc41616;
         Point toppoint = scenes.ActiveScene<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1);
         Point botpoint = scenes.ActiveScene<SecondScene>().GetBotRect().GetTopLeft() + Point(1,1);
         CHECK_MESSAGE(renderer.GetPixel(toppoint).AsUint() == cGreenColor, "toppoint = " << toppoint);
