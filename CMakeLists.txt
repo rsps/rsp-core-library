@@ -55,15 +55,18 @@ include(FetchContent)
 find_package(Git REQUIRED)
 
 if (SDL2)
-    include("cmake/libSDL2pp.cmake")
+    if (NOT DEFINED RELEASE_BUILD)
+        include("cmake/libSDL2pp.cmake")
+    endif()
     set(SDL_BUILD_OPTIONS -DUSE_GFX_SDL)
-    set(SDL_LIB ${SDL2PP_LIBRARIES} ${SDL2_LIBRARIES})
+    set(SDL_LIB ${SDL2_LIBRARIES})
 else()
     set(SDL_BUILD_OPTIONS -DUSE_GFX_SW)
 endif()
 
-include("cmake/strict-compile-options.cmake")
-
+if (NOT DEFINED RELEASE_BUILD)
+    include("cmake/strict-compile-options.cmake")
+endif()
 
 # Include external projects Doctest from github.
 FetchContent_Declare(
