@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 3.16)
 # Usage: cmake [-DRELEASE_BUILD=ON] [-DPLATFORM_P05=ON] [FREETYPE_FONTS=OFF] [-DOPENSSL_CRYPTO=OFF] ..
 
 OPTION(RELEASE_BUILD "Set to turn off debug output" OFF) # Disabled by default.
-OPTION(ARC_ARM "Set to cross-compile for ARM CPU" OFF) # Disabled by default.
+OPTION(ARCH_ARM "Set to cross-compile for ARM CPU" OFF) # Disabled by default.
 OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
 OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
 OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
