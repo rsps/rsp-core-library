@@ -142,28 +142,17 @@ Texture& SDLTexture::Update(const PixelData &arPixelData, const Color &arColor)
 
 Texture& SDLTexture::Fill(const Color &arColor, OptionalRect arRect)
 {
-//    SDL_Surface *surface = SDL_CreateRGBSurface(0, GetWidth(), GetHeight(), 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-    SDLRect r(arRect ? (*arRect & mArea) : mArea);
-    SDL_Surface *surface;
+    SDL_Renderer *renderer = dynamic_cast<SDLRenderer&>(Renderer::Get()).GetSDLRenderer();
 
-    if (SDL_LockTextureToSurface(mpTexture->Get(), nullptr, &surface)) {
-        THROW_WITH_BACKTRACE1(SDLException, "SDL_LockTextureToSurface");
+    if (SDL_SetRenderTarget(renderer, mpTexture->Get())) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderTarget");
     }
 
-//    SDL_Surface* converted_surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_ABGR8888, 0);
+    Renderer::Get().Fill(arColor, arRect);
 
-//    if (SDL_SetSurfaceBlendMode(converted_surface, SDL_BLENDMODE_BLEND)) {
-//        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetSurfaceBlendMode");
-//    }
-//    if (SDL_SetSurfaceAlphaMod(converted_surface, arColor.GetAlpha())) {
-//        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetSurfaceAlphaMod");
-//    }
-
-    if (SDL_FillRect(surface, &r, arColor.AsRaw())) {
-        THROW_WITH_BACKTRACE1(SDLException, "SDL_FillRect");
+    if (SDL_SetRenderTarget(renderer, nullptr)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderTarget");
     }
-
-    SDL_UnlockTexture(mpTexture->Get());
 
     return *this;
 }
