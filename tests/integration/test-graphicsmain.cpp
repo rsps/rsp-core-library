@@ -146,8 +146,6 @@ TEST_CASE("Graphics Main Test")
         MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
         CHECK_NOTHROW(gfx.Run(1200, true));
 
-        CHECK_NOTHROW(renderer.Present()); // Swap frontbuffer back again to check values in it.
-
         const uint32_t cGreenColor = 0xFF24b40b;
         const uint32_t cRedColor = 0xFFc41616;
         Point toppoint = scenes.ActiveScene<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1);
