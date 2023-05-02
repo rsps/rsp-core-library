@@ -55,7 +55,7 @@ include(FetchContent)
 find_package(Git REQUIRED)
 
 if (SDL2)
-    if (NOT DEFINED RELEASE_BUILD)
+    if (NOT ARCH_ARM)
         include("cmake/libSDL2pp.cmake")
     endif()
     set(SDL_BUILD_OPTIONS -DUSE_GFX_SDL)

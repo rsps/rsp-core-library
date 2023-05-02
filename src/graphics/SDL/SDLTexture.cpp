@@ -142,18 +142,29 @@ Texture& SDLTexture::Update(const PixelData &arPixelData, const Color &arColor)
 
 Texture& SDLTexture::Fill(const Color &arColor, OptionalRect arRect)
 {
-    SDL_Renderer *renderer = dynamic_cast<SDLRenderer&>(Renderer::Get()).GetSDLRenderer();
-
-    if (SDL_SetRenderTarget(renderer, mpTexture->Get())) {
-        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderTarget");
+    uint32_t *dst;
+    int pitch;
+    if (SDL_LockTexture(mpTexture->Get(), nullptr, reinterpret_cast<void**>(&dst), &pitch)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_LockTexture");
     }
 
-    Renderer::Get().Fill(arColor, arRect);
-
-    if (SDL_SetRenderTarget(renderer, nullptr)) {
-        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderTarget");
+    Rect dr(mArea);
+    if (arRect) {
+        dr &= *arRect;
     }
 
+    GuiUnit_t h = dr.GetHeight();
+    size_t w = size_t(dr.GetWidth());
+    uint32_t cl = arColor.AsRaw();
+
+    for (GuiUnit_t y = dr.GetTop(); y < h ; ++y) {
+        uint32_t *dest = offset(dst, uintptr_t(pitch), dr.GetLeft(), y);
+        for(size_t x = 0; x < w ; ++x) {
+            dest[x] = cl;
+        }
+    }
+
+    SDL_UnlockTexture(mpTexture->Get());
     return *this;
 }
 
