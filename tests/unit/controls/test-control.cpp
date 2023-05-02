@@ -12,7 +12,6 @@
 #include <doctest.h>
 #include <graphics/Control.h>
 #include <graphics/Renderer.h>
-#include <graphics/SW/Framebuffer.h>
 #include <posix/FileSystem.h>
 #include <TestHelpers.h>
 
@@ -27,7 +26,7 @@ TEST_CASE("Control")
 
 #ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    sw::Framebuffer::mpDevicePath = p.c_str();
+    Renderer::SetDevicePath(p.string());
 #endif
 
     CHECK_NOTHROW(Control dummy);

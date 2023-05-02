@@ -14,6 +14,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <string>
 #include "Color.h"
 #include "GuiUnit.h"
 #include "PixelData.h"
@@ -33,6 +34,13 @@ namespace rsp::graphics {
 class Renderer
 {
 public:
+    /**
+     * \brief Set path to framebuffer device, used by software renderer.
+     *
+     * \param arPath
+     */
+    static void SetDevicePath(const std::string &arPath);
+
     /**
      * \brief Create the default renderer instance
      * \param aWidth

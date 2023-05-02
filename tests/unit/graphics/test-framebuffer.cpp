@@ -14,7 +14,6 @@
 #include <graphics/Font.h>
 #include <graphics/Text.h>
 #include <graphics/Renderer.h>
-#include <graphics/SW/Framebuffer.h>
 #include <thread>
 #include <filesystem>
 #include <posix/FileSystem.h>
@@ -48,7 +47,7 @@ TEST_CASE("Framebuffer")
 
 #ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    sw::Framebuffer::mpDevicePath = p.c_str();
+    Renderer::SetDevicePath(p.string());
 #endif
 
     auto &renderer = Renderer::Init(480, 800);

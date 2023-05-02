@@ -17,6 +17,11 @@
 
 namespace rsp::graphics {
 
+void Renderer::SetDevicePath(const std::string&)
+{
+    // We don't need this for SDL.
+}
+
 Renderer& Renderer::Init(GuiUnit_t aWidth, GuiUnit_t aHeight)
 {
     if (!sdl::SDLRenderer::HasInstance()) {
