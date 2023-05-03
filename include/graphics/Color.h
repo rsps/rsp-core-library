@@ -179,17 +179,11 @@ class Color
     static Color Blend(Color a, Color b);
 
   protected:
-    struct __rgba {
-        uint32_t red : 8;
-        uint32_t green : 8;
-        uint32_t blue : 8;
-        uint32_t alpha : 8;
-    };
     struct __abgr {
-        uint32_t alpha : 8;
-        uint32_t blue : 8;
-        uint32_t green : 8;
         uint32_t red : 8;
+        uint32_t green : 8;
+        uint32_t blue : 8;
+        uint32_t alpha : 8;
     };
 
     /**
@@ -197,11 +191,7 @@ class Color
      */
     union ColorValue_t {
         uint32_t rgba;
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-        __rgba item;
-#else
         __abgr item;
-#endif
     };
 
     ColorValue_t mValue{};

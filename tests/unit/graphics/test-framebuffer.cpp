@@ -65,19 +65,21 @@ TEST_CASE("Framebuffer")
 
     SUBCASE("Fill")
     {
+//        CHECK_HEX(Color(Color::Blue).AsRaw(), Color::Blue);
+//        CHECK_HEX(Color(Color::Red).AsRaw(), Color::Red);
+
         Color colors[] { Color::Red, Color::Blue, Color::Green };
 
         for (Color color : colors) {
             renderer.Fill(color);
             renderer.Present();
             renderer.Fill(color);
-            renderer.Present();
 
             uint32_t fb_value = renderer.GetPixel(0, 0).AsUint();
             CHECK_HEX(fb_value, color.AsUint());
             fb_value = renderer.GetPixel(479, 799).AsUint();
             CHECK_HEX(fb_value, color.AsUint());
-            std::this_thread::sleep_for(300ms);
+            std::this_thread::sleep_for(500ms);
         }
     }
 
@@ -684,6 +686,7 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(texture.Update(testImgMap, Color::White));
         CHECK_NOTHROW(renderer.Blit(texture));
         CHECK_NOTHROW(renderer.Present());
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     SUBCASE("Draw Transparent") {

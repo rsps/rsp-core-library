@@ -217,12 +217,12 @@ Color SDLRenderer::GetPixel(GuiUnit_t aX, GuiUnit_t aY) const
     r &= mArea;
     SDLRect sr(r);
 
-    uint32_t raw = 0;
-    if (SDL_RenderReadPixels(mpRenderer, &sr, SDL_PIXELFORMAT_ARGB8888, &raw, int(sizeof(raw)))) {
+    uint32_t value = 0;
+    if (SDL_RenderReadPixels(mpRenderer, &sr, SDL_PIXELFORMAT_ABGR8888, &value, int(sizeof(value)))) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderReadPixels");
     }
 
-    return Color(raw);
+    return Color().FromRaw(value);
 }
 
 ColorDepth SDLRenderer::GetColorDepth() const
