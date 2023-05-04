@@ -37,10 +37,6 @@ static void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer 
     }
 }
 
-static void SigHandler(const rsp::exceptions::BackTrace &arBT)
-{
-    MESSAGE("SegFault: " << arBT);
-}
 
 TEST_SUITE_BEGIN("Graphics");
 
@@ -50,7 +46,7 @@ TEST_CASE("Framebuffer")
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
-    SignalHandler::Register(Signals::InvalidAccess, SigHandler);
+    SignalHandler sig_handler;
 //    uint32_t *p = nullptr;
 //    *p = 123;
 
@@ -256,6 +252,8 @@ TEST_CASE("Framebuffer")
             }
         }
         CHECK_NOTHROW(renderer.Present());
+            uint32_t *p = nullptr;
+            *p = 123;
     }
 
     SUBCASE("Set/Get pixel outside screen")

@@ -44,10 +44,13 @@ enum class Signals {
 class SignalHandler
 {
 public:
-    using SignalCallback_t = rsp::utils::Function<void(const BackTrace &arBackTrace)>;
+    using SignalCallback_t = rsp::utils::Function<void(void)>;
 
-    static void Register(Signals aSignal, SignalCallback_t aHandler);
-    static void Unregister(Signals aSignal);
+    SignalHandler();
+    ~SignalHandler();
+
+    void Register(Signals aSignal, SignalCallback_t aHandler);
+    void Unregister(Signals aSignal);
 
 protected:
     static SignalCallback_t mHandlers[_NSIG];

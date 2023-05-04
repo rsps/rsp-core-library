@@ -13,6 +13,7 @@
 #include "SDLTexture.h"
 #include "SDLRenderer.h"
 #include "SDLRect.h"
+#include <logging/Logger.h>
 
 namespace rsp::graphics {
 
@@ -43,15 +44,22 @@ std::unique_ptr<Texture> Texture::Create(GuiUnit_t aWidth, GuiUnit_t aHeight, Po
 
 namespace rsp::graphics::sdl {
 
-SDL_TextureWrapper::SDL_TextureWrapper(SDL_Texture *apTexture) noexcept
-    : mpTexture(apTexture)
+size_t SDL_TextureWrapper::mTotalAllocated = 0;
+
+SDL_TextureWrapper::SDL_TextureWrapper(SDL_Texture *apTexture, GuiUnit_t aWidth, GuiUnit_t aHeight) noexcept
+    : mpTexture(apTexture),
+      mSize(aWidth * aHeight * sizeof(uint32_t))
 {
+    mTotalAllocated += mSize;
+    logging::Logger::GetDefault().Debug() << "VideoMemAlloc(" << mSize << "), Total: " << (mTotalAllocated / 1024.0 / 1024.0) << " MB";
 }
 
 SDL_TextureWrapper::~SDL_TextureWrapper()
 {
     if (mpTexture) {
         SDL_DestroyTexture(mpTexture);
+        mTotalAllocated -= mSize;
+        logging::Logger::GetDefault().Debug() << "VideoMemFree(" << mSize << "), Total: " << (mTotalAllocated / 1024.0 / 1024.0) << " MB";
     }
 }
 
@@ -63,7 +71,7 @@ SDLTexture::SDLTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestP
       mDestinationOffset(arDestOffset),
       mrRenderer(dynamic_cast<SDLRenderer&>(Renderer::Get()))
 {
-    mpTexture = std::make_shared<SDL_TextureWrapper>(SDL_CreateTexture(mrRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, aWidth, aHeight));
+    mpTexture = std::make_shared<SDL_TextureWrapper>(SDL_CreateTexture(mrRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, aWidth, aHeight), aWidth, aHeight);
     if (!mpTexture) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateTexture");
     }

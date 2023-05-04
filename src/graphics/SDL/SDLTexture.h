@@ -23,7 +23,7 @@ class SDLRenderer;
 
 struct SDL_TextureWrapper
 {
-    SDL_TextureWrapper(SDL_Texture *apTexture) noexcept;
+    SDL_TextureWrapper(SDL_Texture *apTexture, GuiUnit_t aWidth, GuiUnit_t aHeight) noexcept;
     ~SDL_TextureWrapper();
     SDL_TextureWrapper(const SDL_TextureWrapper&) = default;
     SDL_TextureWrapper(SDL_TextureWrapper&&) = default;
@@ -34,6 +34,8 @@ struct SDL_TextureWrapper
 
 protected:
     SDL_Texture *mpTexture;
+    size_t mSize;
+    static size_t mTotalAllocated;
 };
 
 class SDLTexture: public rsp::graphics::Texture

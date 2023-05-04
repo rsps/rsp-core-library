@@ -8,34 +8,80 @@
  * \author      Steffen Brummer
  */
 
+#include <iostream>
 #include <exceptions/SignalHandler.h>
+#include <logging/Logger.h>
+#include <magic_enum.hpp>
 
 namespace rsp::exceptions {
 
 SignalHandler::SignalCallback_t SignalHandler::mHandlers[_NSIG]{};
 
+SignalHandler::SignalHandler()
+{
+    Signals signals[] = {
+        Signals::HangUp,
+        Signals::InteractiveAttention,
+        Signals::Quit,
+        Signals::IllegalInstruction,
+        Signals::BreakpointTrap,
+        Signals::AbnormalTermination,
+        Signals::FloatingPointErr,
+        Signals::Killed,
+        Signals::InvalidAccess,
+        Signals::BrokenPipe,
+        Signals::AlarmClock,
+        Signals::Terminate
+    };
+
+    for (Signals s : signals) {
+        signal(static_cast<int>(s), signalHandler);
+    }
+}
+
+SignalHandler::~SignalHandler()
+{
+    Signals signals[] = {
+        Signals::HangUp,
+        Signals::InteractiveAttention,
+        Signals::Quit,
+        Signals::IllegalInstruction,
+        Signals::BreakpointTrap,
+        Signals::AbnormalTermination,
+        Signals::FloatingPointErr,
+        Signals::Killed,
+        Signals::InvalidAccess,
+        Signals::BrokenPipe,
+        Signals::AlarmClock,
+        Signals::Terminate
+    };
+
+    for (Signals s : signals) {
+        signal(static_cast<int>(s), SIG_DFL);
+    }
+}
 
 void SignalHandler::signalHandler(int aSignalCode) noexcept
 {
     if (mHandlers[aSignalCode]) {
-        BackTrace bt(0);
-        mHandlers[aSignalCode](bt);
+        mHandlers[aSignalCode]();
+        return;
     }
+
+    BackTrace bt(1);
+    logging::Logger::GetDefault().Alert() << "Caught signal (" << aSignalCode << ") " << magic_enum::enum_name(static_cast<Signals>(aSignalCode)) << "\n" << bt;
+    exit(200 + aSignalCode);
 }
 
 
 void SignalHandler::Register(Signals aSignal, SignalCallback_t aHandler)
 {
-    int s = static_cast<int>(aSignal);
-    mHandlers[s] = aHandler;
-    signal(s, signalHandler);
+    mHandlers[static_cast<int>(aSignal)] = aHandler;
 }
 
 void SignalHandler::Unregister(Signals aSignal)
 {
-    int s = static_cast<int>(aSignal);
-    mHandlers[s].Clear();
-    signal(s, SIG_DFL);
+    mHandlers[static_cast<int>(aSignal)].Clear();
 }
 
 
