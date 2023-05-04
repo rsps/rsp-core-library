@@ -252,8 +252,6 @@ TEST_CASE("Framebuffer")
             }
         }
         CHECK_NOTHROW(renderer.Present());
-            uint32_t *p = nullptr;
-            *p = 123;
     }
 
     SUBCASE("Set/Get pixel outside screen")
