@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <doctest.h>
+#include <exceptions/SignalHandler.h>
 #include <graphics/Bitmap.h>
 #include <graphics/Font.h>
 #include <graphics/Text.h>
@@ -25,6 +26,7 @@
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
+using namespace rsp::exceptions;
 
 static void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer &fb)
 {
@@ -35,6 +37,11 @@ static void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer 
     }
 }
 
+static void SigHandler(const rsp::exceptions::BackTrace &arBT)
+{
+    MESSAGE("SegFault: " << arBT);
+}
+
 TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("Framebuffer")
@@ -42,6 +49,10 @@ TEST_CASE("Framebuffer")
     using namespace std::chrono;
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
+
+    SignalHandler::Register(Signals::InvalidAccess, SigHandler);
+//    uint32_t *p = nullptr;
+//    *p = 123;
 
     Random::Seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
 
@@ -710,6 +721,7 @@ TEST_CASE("Framebuffer")
         CHECK_HEX(renderer.GetPixel(Point(180, 180)).AsUint(), 0xFF386100);
     }
 
+//    Renderer::Destroy();
 //    std::this_thread::sleep_for(500ms);
 }
 

@@ -31,6 +31,11 @@ Renderer& Renderer::Init(GuiUnit_t aWidth, GuiUnit_t aHeight)
     return rsp::utils::Singleton<sw::SWRenderer>::GetInstance();
 }
 
+void Renderer::Destroy()
+{
+    rsp::utils::Singleton<sw::SWRenderer>::DestroyInstance();
+}
+
 Renderer& Renderer::Get()
 {
     return rsp::utils::Singleton<sw::SWRenderer>::GetInstance();

@@ -30,6 +30,11 @@ Renderer& Renderer::Init(GuiUnit_t aWidth, GuiUnit_t aHeight)
     return rsp::utils::Singleton<sdl::SDLRenderer>::GetInstance();
 }
 
+void Renderer::Destroy()
+{
+    rsp::utils::Singleton<sdl::SDLRenderer>::DestroyInstance();
+}
+
 Renderer& Renderer::Get()
 {
     return rsp::utils::Singleton<sdl::SDLRenderer>::GetInstance();

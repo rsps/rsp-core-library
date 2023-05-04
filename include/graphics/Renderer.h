@@ -50,6 +50,11 @@ public:
     static Renderer& Init(GuiUnit_t aWidth, GuiUnit_t aHeight);
 
     /**
+     * \brief Destroy the renderer instance. Useful for unit tests.
+     */
+    static void Destroy();
+
+    /**
      * \brief Get the default Renderer instance
      *
      * \return self
