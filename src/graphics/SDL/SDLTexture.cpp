@@ -50,6 +50,9 @@ SDL_TextureWrapper::SDL_TextureWrapper(SDL_Texture *apTexture, GuiUnit_t aWidth,
     : mpTexture(apTexture),
       mSize(aWidth * aHeight * sizeof(uint32_t))
 {
+    if (!apTexture) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateTexture() returned nullptr");
+    }
     mTotalAllocated += mSize;
     logging::Logger::GetDefault().Debug() << "VideoMemAlloc(" << mSize << "), Total: " << (mTotalAllocated / 1024.0 / 1024.0) << " MB";
 }
