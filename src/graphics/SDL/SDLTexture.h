@@ -23,7 +23,7 @@ class SDLRenderer;
 
 struct SDL_TextureWrapper
 {
-    SDL_TextureWrapper(SDL_Texture *apTexture, GuiUnit_t aWidth, GuiUnit_t aHeight) noexcept;
+    SDL_TextureWrapper(SDL_Texture *apTexture, GuiUnit_t aWidth, GuiUnit_t aHeight);
     ~SDL_TextureWrapper();
     SDL_TextureWrapper(const SDL_TextureWrapper&) = default;
     SDL_TextureWrapper(SDL_TextureWrapper&&) = default;

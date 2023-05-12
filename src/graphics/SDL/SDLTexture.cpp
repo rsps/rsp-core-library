@@ -46,11 +46,11 @@ namespace rsp::graphics::sdl {
 
 size_t SDL_TextureWrapper::mTotalAllocated = 0;
 
-SDL_TextureWrapper::SDL_TextureWrapper(SDL_Texture *apTexture, GuiUnit_t aWidth, GuiUnit_t aHeight) noexcept
+SDL_TextureWrapper::SDL_TextureWrapper(SDL_Texture *apTexture, GuiUnit_t aWidth, GuiUnit_t aHeight)
     : mpTexture(apTexture),
       mSize(aWidth * aHeight * sizeof(uint32_t))
 {
-    if (!apTexture) {
+    if (!mpTexture) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateTexture() returned nullptr");
     }
     mTotalAllocated += mSize;
