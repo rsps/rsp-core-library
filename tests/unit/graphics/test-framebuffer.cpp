@@ -10,11 +10,11 @@
 
 #include <chrono>
 #include <doctest.h>
+#include <exceptions/SignalHandler.h>
 #include <graphics/Bitmap.h>
 #include <graphics/Font.h>
 #include <graphics/Text.h>
 #include <graphics/Renderer.h>
-#include <graphics/SW/Framebuffer.h>
 #include <thread>
 #include <filesystem>
 #include <posix/FileSystem.h>
@@ -26,6 +26,7 @@
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
+using namespace rsp::exceptions;
 
 static void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer &fb)
 {
@@ -36,6 +37,7 @@ static void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer 
     }
 }
 
+
 TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("Framebuffer")
@@ -44,11 +46,15 @@ TEST_CASE("Framebuffer")
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
 
+    SignalHandler sig_handler;
+//    uint32_t *p = nullptr;
+//    *p = 123;
+
     Random::Seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
 
 #ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    sw::Framebuffer::mpDevicePath = p.c_str();
+    Renderer::SetDevicePath(p.string());
 #endif
 
     auto &renderer = Renderer::Init(480, 800);
@@ -66,19 +72,20 @@ TEST_CASE("Framebuffer")
 
     SUBCASE("Fill")
     {
+//        CHECK_HEX(Color(Color::Blue).AsRaw(), Color::Blue);
+//        CHECK_HEX(Color(Color::Red).AsRaw(), Color::Red);
         Color colors[] { Color::Red, Color::Blue, Color::Green };
 
         for (Color color : colors) {
-            renderer.Fill(color);
-            renderer.Present();
-            renderer.Fill(color);
-            renderer.Present();
+            CHECK_NOTHROW(renderer.Fill(color));
+            CHECK_NOTHROW(renderer.Flush());
 
             uint32_t fb_value = renderer.GetPixel(0, 0).AsUint();
             CHECK_HEX(fb_value, color.AsUint());
             fb_value = renderer.GetPixel(479, 799).AsUint();
             CHECK_HEX(fb_value, color.AsUint());
-            std::this_thread::sleep_for(300ms);
+            renderer.Present();
+            std::this_thread::sleep_for(500ms);
         }
     }
 
@@ -102,6 +109,7 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(canvas.DrawLine(pointA, pointB, col));
         CHECK_NOTHROW(texture.Update(canvas, col));
         CHECK_NOTHROW(renderer.Blit(texture));
+        CHECK_NOTHROW(renderer.Flush());
 
         // Assert
         int deltaX = static_cast<int>(pointB.GetX() - pointA.GetX());
@@ -162,6 +170,7 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(canvas.DrawRectangle(rect, col));
         CHECK_NOTHROW(texture.Update(canvas, col));
         CHECK_NOTHROW(renderer.Blit(texture));
+        CHECK_NOTHROW(renderer.Flush());
 
         // Assert
         // Expect all four side to hold values
@@ -186,23 +195,25 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(canvas.DrawRectangle(small, white));
         CHECK_NOTHROW(texture.Update(canvas, white));
         CHECK_NOTHROW(renderer.Blit(texture));
-        CHECK_EQ(renderer.GetPixel(10, 10), white);
-        CHECK_NE(renderer.GetPixel(11, 10), white);
-        CHECK_NE(renderer.GetPixel(10, 11), white);
-        CHECK_NE(renderer.GetPixel(11, 11), white);
+        CHECK_NOTHROW(renderer.Flush());
+        CHECK_EQ(renderer.GetPixel(10, 10).AsUint(), white.AsUint());
+        CHECK_NE(renderer.GetPixel(11, 10).AsUint(), white.AsUint());
+        CHECK_NE(renderer.GetPixel(10, 11).AsUint(), white.AsUint());
+        CHECK_NE(renderer.GetPixel(11, 11).AsUint(), white.AsUint());
         CHECK_NOTHROW(renderer.Present());
 
         Rect medium(20, 20, 10, 10);
         CHECK_NOTHROW(canvas.DrawRectangle(medium, white));
         CHECK_NOTHROW(texture.Update(canvas, white));
         CHECK_NOTHROW(renderer.Blit(texture));
-        CHECK_EQ(renderer.GetPixel(20, 20), white);
-        CHECK_EQ(renderer.GetPixel(20, 29), white);
-        CHECK_NE(renderer.GetPixel(20, 30), white);
-        CHECK_EQ(renderer.GetPixel(29, 20), white);
-        CHECK_NE(renderer.GetPixel(30, 20), white);
-        CHECK_EQ(renderer.GetPixel(29, 29), white);
-        CHECK_NE(renderer.GetPixel(30, 30), white);
+        CHECK_NOTHROW(renderer.Flush());
+        CHECK_EQ(renderer.GetPixel(20, 20).AsUint(), white.AsUint());
+        CHECK_EQ(renderer.GetPixel(20, 29).AsUint(), white.AsUint());
+        CHECK_NE(renderer.GetPixel(20, 30).AsUint(), white.AsUint());
+        CHECK_EQ(renderer.GetPixel(29, 20).AsUint(), white.AsUint());
+        CHECK_NE(renderer.GetPixel(30, 20).AsUint(), white.AsUint());
+        CHECK_EQ(renderer.GetPixel(29, 29).AsUint(), white.AsUint());
+        CHECK_NE(renderer.GetPixel(30, 30).AsUint(), white.AsUint());
         CHECK_NOTHROW(renderer.Present());
     }
 
@@ -216,6 +227,7 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(canvas.DrawCircle(centerPoint, radius, col));
         CHECK_NOTHROW(texture.Update(canvas, col));
         CHECK_NOTHROW(renderer.Blit(texture));
+        CHECK_NOTHROW(renderer.Flush());
 
         // Assert
         int error = -static_cast<int>(radius);
@@ -251,6 +263,7 @@ TEST_CASE("Framebuffer")
         // Act
         CHECK_NOTHROW(renderer.SetPixel(outSideXAxis.GetX(), outSideXAxis.GetY(), col));
         CHECK_NOTHROW(renderer.SetPixel(outSideYAxis.GetX(), outSideYAxis.GetY(), col));
+        CHECK_NOTHROW(renderer.Flush());
 
         // Assert
         CHECK_HEX(renderer.GetPixel(outSideXAxis.GetX(), outSideXAxis.GetY()).AsUint(), 0);
@@ -288,6 +301,7 @@ TEST_CASE("Framebuffer")
             auto raster = Texture::Create(testImgMap, Color::White);
             CHECK_NOTHROW(raster->SetDestination(topLeftImgCorner));
             CHECK_NOTHROW(renderer.Blit(*raster));
+            CHECK_NOTHROW(renderer.Flush());
 
             // Assert
             CHECK_HEX(renderer.GetPixel(topLeftImgCorner.GetX() + 4, topLeftImgCorner.GetY() + 4).AsUint(), 0xFF020F92);
@@ -312,9 +326,7 @@ TEST_CASE("Framebuffer")
             auto raster = Texture::Create(testImgMap, Color::White);
             CHECK_NOTHROW(raster->SetDestination(topLeftImgCorner));
             CHECK_NOTHROW(renderer.Blit(*raster));
-            CHECK_NOTHROW(renderer.Present());
-            CHECK_NOTHROW(renderer.Blit(*raster));
-            CHECK_NOTHROW(renderer.Present());
+            CHECK_NOTHROW(renderer.Flush());
 
             // Assert
             CHECK_HEX(testImgMap.GetPixelAt(width / 2, 0).AsUint(), 0xFF777777);
@@ -326,6 +338,7 @@ TEST_CASE("Framebuffer")
             CHECK_HEX(renderer.GetPixel(topLeftImgCorner.GetX() + 0         , topLeftImgCorner.GetY() + height / 2).AsUint(), 0xFF777777);
             CHECK_HEX(renderer.GetPixel(topLeftImgCorner.GetX() + width - 12, topLeftImgCorner.GetY() + height / 2).AsUint(), 0xFFCFCFCF);
             CHECK_HEX(renderer.GetPixel(topLeftImgCorner.GetX() + width / 2 , topLeftImgCorner.GetY() + height - 4).AsUint(), 0xFF8F8F8F);
+            CHECK_NOTHROW(renderer.Present());
         }
         SUBCASE("Draw memory created image")
         {
@@ -343,8 +356,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(canvas.SetPixel(topLeftImgCorner + randomPoint, Color::White));
             CHECK_NOTHROW(texture.Update(canvas, Color::White));
             CHECK_NOTHROW(renderer.Blit(texture));
-            CHECK_NOTHROW(renderer.Present());
-            CHECK_NOTHROW(renderer.Blit(texture));
+            CHECK_NOTHROW(renderer.Flush());
 
             // Assert
             CHECK_HEX(emptyMap.GetPixel({0,0}).AsUint(), col.AsUint());
@@ -357,6 +369,7 @@ TEST_CASE("Framebuffer")
             CHECK_HEX(renderer.GetPixel(topLeftImgCorner).AsUint(), col.AsUint());
             CHECK_HEX(renderer.GetPixel(topLeftImgCorner + Point(width-1, height-1)).AsUint(), col.AsUint());
             CHECK_HEX(renderer.GetPixel(topLeftImgCorner + randomPoint).AsUint(), Color::White);
+            CHECK_NOTHROW(renderer.Present());
         }
     }
 
@@ -373,15 +386,14 @@ TEST_CASE("Framebuffer")
         // Act
         CHECK_NOTHROW(texture.Update(largeImgMap, Color::White));
         CHECK_NOTHROW(renderer.Blit(texture));
-        CHECK_NOTHROW(renderer.Present());
-        CHECK_NOTHROW(renderer.Blit(texture));
-        CHECK_NOTHROW(renderer.Present());
+        CHECK_NOTHROW(renderer.Flush());
 
         // Assert
         CHECK(largeImgMap.GetHeight() > renderer.GetHeight());
         CHECK(largeImgMap.GetWidth() > renderer.GetWidth());
         CHECK_NE(largeImgMap.GetPixel(randomPoint).AsUint(), 0);
         CHECK_NE(renderer.GetPixel(randomPoint).AsUint(), 0);
+        CHECK_NOTHROW(renderer.Present());
 
         SUBCASE("Pan screen over large image")
         {
@@ -476,10 +488,6 @@ TEST_CASE("Framebuffer")
 
     SUBCASE("Moving monochrome image")
     {
-        CHECK_NOTHROW(renderer.Fill(Color::Black));
-        CHECK_NOTHROW(renderer.Present());
-        CHECK_NOTHROW(renderer.Fill(Color::Black));
-
         // Arrange
         Bitmap imgSimple("testImages/monochrome/Monochrome.bmp");
         int iterations = 100;
@@ -490,7 +498,6 @@ TEST_CASE("Framebuffer")
             Color::Green,
             Color::Yellow
         };
-
 
         auto sprite = Texture::Create(imgSimple.GetWidth(), imgSimple.GetHeight()+5);
         CHECK_NOTHROW(sprite->Fill(Color::Black));
@@ -504,6 +511,7 @@ TEST_CASE("Framebuffer")
                 CHECK_NOTHROW(sprite->Update(imgSimple, mcl[(i / 20) % 5]));
             }
             CHECK_NOTHROW(sprite->SetDestination(pos));
+            CHECK_NOTHROW(renderer.Fill(Color::Black));
             CHECK_NOTHROW(renderer.Blit(*sprite));
             CHECK_NOTHROW(renderer.Present());
             pos.SetY(200 - i);
@@ -518,10 +526,6 @@ TEST_CASE("Framebuffer")
 
     SUBCASE("Draw Text")
     {
-        CHECK_NOTHROW(renderer.Fill(Color::Black));
-        CHECK_NOTHROW(renderer.Present());
-        CHECK_NOTHROW(renderer.Fill(Color::Black));
-
         const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
         Font::RegisterFont(cFontFile);
         Rect r(100, 200, 280, 200);
@@ -531,6 +535,8 @@ TEST_CASE("Framebuffer")
 
         auto panel = Texture::Create(280, 200);
         CHECK_NOTHROW(panel->SetBlendOperation(Texture::BlendOperation::ColorKey));
+
+        CHECK_NOTHROW(renderer.Fill(Color::Black));
 
         SUBCASE("Text Attributes") {
             CHECK_NOTHROW(panel->Fill(Color::None));
@@ -685,6 +691,7 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(texture.Update(testImgMap, Color::White));
         CHECK_NOTHROW(renderer.Blit(texture));
         CHECK_NOTHROW(renderer.Present());
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     SUBCASE("Draw Transparent") {
@@ -703,13 +710,14 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(texture.Update(canvas, Color::White));
             CHECK_NOTHROW(renderer.Blit(texture));
             CHECK_NOTHROW(renderer.Present());
-            CHECK_NOTHROW(renderer.Blit(texture));
-            CHECK_NOTHROW(renderer.Present());
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
+        CHECK_NOTHROW(renderer.Blit(texture));
+        CHECK_NOTHROW(renderer.Flush());
         CHECK_HEX(renderer.GetPixel(Point(180, 180)).AsUint(), 0xFF386100);
     }
 
+//    Renderer::Destroy();
 //    std::this_thread::sleep_for(500ms);
 }
 

@@ -15,7 +15,7 @@
 
 #include <doctest.h>
 #include <posix/FileSystem.h>
-#include <graphics/SW/Framebuffer.h>
+#include <graphics/Renderer.h>
 #include <graphics/GraphicsMain.h>
 #include <graphics/Label.h>
 #include <graphics/SW/GfxHal.h>
@@ -84,7 +84,7 @@ TEST_CASE("Graphics Main Test")
 #ifdef USE_GFX_SW
     std::filesystem::path p;
     CHECK_NOTHROW(p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"}));
-    sw::Framebuffer::mpDevicePath = p.c_str();
+    Renderer::SetDevicePath(p.string());
 #endif
 
     CHECK_NOTHROW(Renderer::Init(480, 800));
@@ -145,8 +145,6 @@ TEST_CASE("Graphics Main Test")
 
         MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
         CHECK_NOTHROW(gfx.Run(1200, true));
-
-        CHECK_NOTHROW(renderer.Present()); // Swap frontbuffer back again to check values in it.
 
         const uint32_t cGreenColor = 0xFF24b40b;
         const uint32_t cRedColor = 0xFFc41616;

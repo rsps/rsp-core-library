@@ -11,7 +11,6 @@
 #include <doctest.h>
 #include <graphics/Image.h>
 #include <graphics/Renderer.h>
-#include <graphics/SW/Framebuffer.h>
 #include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <TestHelpers.h>
@@ -30,7 +29,7 @@ TEST_CASE("Image")
     // Arrange
 #ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    sw::Framebuffer::mpDevicePath = p.c_str();
+    Renderer::SetDevicePath(p.string());
 #endif
 
     auto& renderer = Renderer::Init(480, 800);

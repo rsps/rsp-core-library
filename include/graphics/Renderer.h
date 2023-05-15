@@ -14,6 +14,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <string>
 #include "Color.h"
 #include "GuiUnit.h"
 #include "PixelData.h"
@@ -34,12 +35,24 @@ class Renderer
 {
 public:
     /**
+     * \brief Set path to framebuffer device, used by software renderer.
+     *
+     * \param arPath
+     */
+    static void SetDevicePath(const std::string &arPath);
+
+    /**
      * \brief Create the default renderer instance
      * \param aWidth
      * \param aHeight
      * \return self
      */
     static Renderer& Init(GuiUnit_t aWidth, GuiUnit_t aHeight);
+
+    /**
+     * \brief Destroy the renderer instance. Useful for unit tests.
+     */
+    static void Destroy();
 
     /**
      * \brief Get the default Renderer instance

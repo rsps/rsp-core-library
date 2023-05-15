@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 3.16)
 # Usage: cmake [-DRELEASE_BUILD=ON] [-DPLATFORM_P05=ON] [FREETYPE_FONTS=OFF] [-DOPENSSL_CRYPTO=OFF] ..
 
 OPTION(RELEASE_BUILD "Set to turn off debug output" OFF) # Disabled by default.
-OPTION(ARC_ARM "Set to cross-compile for ARM CPU" OFF) # Disabled by default.
+OPTION(ARCH_ARM "Set to cross-compile for ARM CPU" OFF) # Disabled by default.
 OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
 OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
 OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
@@ -55,15 +55,18 @@ include(FetchContent)
 find_package(Git REQUIRED)
 
 if (SDL2)
-    include("cmake/libSDL2pp.cmake")
+    if (NOT ARCH_ARM)
+        include("cmake/libSDL2pp.cmake")
+    endif()
     set(SDL_BUILD_OPTIONS -DUSE_GFX_SDL)
-    set(SDL_LIB ${SDL2PP_LIBRARIES} ${SDL2_LIBRARIES})
+    set(SDL_LIB ${SDL2_LIBRARIES})
 else()
     set(SDL_BUILD_OPTIONS -DUSE_GFX_SW)
 endif()
 
-include("cmake/strict-compile-options.cmake")
-
+if (NOT DEFINED RELEASE_BUILD)
+    include("cmake/strict-compile-options.cmake")
+endif()
 
 # Include external projects Doctest from github.
 FetchContent_Declare(

@@ -11,11 +11,17 @@
 #ifdef USE_GFX_SW
 
 #include <cstring>
+#include <posix/FileSystem.h>
 #include "SWRenderer.h"
 #include "SWTexture.h"
 #include "GfxHal.h"
 
 namespace rsp::graphics {
+
+void Renderer::SetDevicePath(const std::string &arPath)
+{
+    sw::Framebuffer::mpDevicePath = arPath.empty() ? nullptr : arPath.c_str();
+}
 
 Renderer& Renderer::Init(GuiUnit_t aWidth, GuiUnit_t aHeight)
 {
@@ -23,6 +29,11 @@ Renderer& Renderer::Init(GuiUnit_t aWidth, GuiUnit_t aHeight)
         sw::SWRenderer::CreateInstance(aWidth, aHeight);
     }
     return rsp::utils::Singleton<sw::SWRenderer>::GetInstance();
+}
+
+void Renderer::Destroy()
+{
+    rsp::utils::Singleton<sw::SWRenderer>::DestroyInstance();
 }
 
 Renderer& Renderer::Get()

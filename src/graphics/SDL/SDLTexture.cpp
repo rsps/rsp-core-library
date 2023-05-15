@@ -13,6 +13,7 @@
 #include "SDLTexture.h"
 #include "SDLRenderer.h"
 #include "SDLRect.h"
+#include <logging/Logger.h>
 
 namespace rsp::graphics {
 
@@ -43,15 +44,25 @@ std::unique_ptr<Texture> Texture::Create(GuiUnit_t aWidth, GuiUnit_t aHeight, Po
 
 namespace rsp::graphics::sdl {
 
-SDL_TextureWrapper::SDL_TextureWrapper(SDL_Texture *apTexture) noexcept
-    : mpTexture(apTexture)
+size_t SDL_TextureWrapper::mTotalAllocated = 0;
+
+SDL_TextureWrapper::SDL_TextureWrapper(SDL_Texture *apTexture, GuiUnit_t aWidth, GuiUnit_t aHeight)
+    : mpTexture(apTexture),
+      mSize(aWidth * aHeight * sizeof(uint32_t))
 {
+    if (!mpTexture) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateTexture() returned nullptr");
+    }
+    mTotalAllocated += mSize;
+    logging::Logger::GetDefault().Debug() << "VideoMemAlloc(" << mSize << "), Total: " << (mTotalAllocated / 1024.0 / 1024.0) << " MB";
 }
 
 SDL_TextureWrapper::~SDL_TextureWrapper()
 {
     if (mpTexture) {
         SDL_DestroyTexture(mpTexture);
+        mTotalAllocated -= mSize;
+        logging::Logger::GetDefault().Debug() << "VideoMemFree(" << mSize << "), Total: " << (mTotalAllocated / 1024.0 / 1024.0) << " MB";
     }
 }
 
@@ -63,7 +74,7 @@ SDLTexture::SDLTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestP
       mDestinationOffset(arDestOffset),
       mrRenderer(dynamic_cast<SDLRenderer&>(Renderer::Get()))
 {
-    mpTexture = std::make_shared<SDL_TextureWrapper>(SDL_CreateTexture(mrRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, aWidth, aHeight));
+    mpTexture = std::make_shared<SDL_TextureWrapper>(SDL_CreateTexture(mrRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, aWidth, aHeight), aWidth, aHeight);
     if (!mpTexture) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateTexture");
     }
@@ -142,29 +153,29 @@ Texture& SDLTexture::Update(const PixelData &arPixelData, const Color &arColor)
 
 Texture& SDLTexture::Fill(const Color &arColor, OptionalRect arRect)
 {
-//    SDL_Surface *surface = SDL_CreateRGBSurface(0, GetWidth(), GetHeight(), 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-    SDLRect r(arRect ? (*arRect & mArea) : mArea);
-    SDL_Surface *surface;
-
-    if (SDL_LockTextureToSurface(mpTexture->Get(), nullptr, &surface)) {
-        THROW_WITH_BACKTRACE1(SDLException, "SDL_LockTextureToSurface");
+    uint32_t *dst;
+    int pitch;
+    if (SDL_LockTexture(mpTexture->Get(), nullptr, reinterpret_cast<void**>(&dst), &pitch)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_LockTexture");
     }
 
-//    SDL_Surface* converted_surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_ABGR8888, 0);
+    Rect dr(mArea);
+    if (arRect) {
+        dr &= *arRect;
+    }
 
-//    if (SDL_SetSurfaceBlendMode(converted_surface, SDL_BLENDMODE_BLEND)) {
-//        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetSurfaceBlendMode");
-//    }
-//    if (SDL_SetSurfaceAlphaMod(converted_surface, arColor.GetAlpha())) {
-//        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetSurfaceAlphaMod");
-//    }
+    GuiUnit_t h = dr.GetHeight();
+    size_t w = size_t(dr.GetWidth());
+    uint32_t cl = arColor.AsRaw();
 
-    if (SDL_FillRect(surface, &r, arColor.AsRaw())) {
-        THROW_WITH_BACKTRACE1(SDLException, "SDL_FillRect");
+    for (GuiUnit_t y = dr.GetTop(); y < h ; ++y) {
+        uint32_t *dest = offset(dst, uintptr_t(pitch), dr.GetLeft(), y);
+        for(size_t x = 0; x < w ; ++x) {
+            dest[x] = cl;
+        }
     }
 
     SDL_UnlockTexture(mpTexture->Get());
-
     return *this;
 }
 

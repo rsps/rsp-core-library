@@ -17,12 +17,22 @@
 
 namespace rsp::graphics {
 
+void Renderer::SetDevicePath(const std::string&)
+{
+    // We don't need this for SDL.
+}
+
 Renderer& Renderer::Init(GuiUnit_t aWidth, GuiUnit_t aHeight)
 {
     if (!sdl::SDLRenderer::HasInstance()) {
         sdl::SDLRenderer::CreateInstance(aWidth, aHeight);
     }
     return rsp::utils::Singleton<sdl::SDLRenderer>::GetInstance();
+}
+
+void Renderer::Destroy()
+{
+    rsp::utils::Singleton<sdl::SDLRenderer>::DestroyInstance();
 }
 
 Renderer& Renderer::Get()
@@ -212,12 +222,12 @@ Color SDLRenderer::GetPixel(GuiUnit_t aX, GuiUnit_t aY) const
     r &= mArea;
     SDLRect sr(r);
 
-    uint32_t raw = 0;
-    if (SDL_RenderReadPixels(mpRenderer, &sr, SDL_PIXELFORMAT_ARGB8888, &raw, int(sizeof(raw)))) {
+    uint32_t value = 0;
+    if (SDL_RenderReadPixels(mpRenderer, &sr, SDL_PIXELFORMAT_ABGR8888, &value, int(sizeof(value)))) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderReadPixels");
     }
 
-    return Color(raw);
+    return Color().FromRaw(value);
 }
 
 ColorDepth SDLRenderer::GetColorDepth() const
