@@ -41,29 +41,31 @@ void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int a
 {
     std::string s = arData.AsString();
     std::size_t i = 0;
+    mResult << "\"";
+
     while (i < s.length()) {
         auto c = s[i];
         switch (c) {
             case '\"':
-                s.replace(i, 1, "\\\"");
+                mResult << "\\\"";
                 break;
             case '\\':
-                s.replace(i, 1, "\\\\");
+                mResult << "\\\\";
                 break;
             case '\b':
-                s.replace(i, 1, "\\b");
+                mResult << "\\b";
                 break;
             case '\f':
-                s.replace(i, 1, "\\f");
+                mResult << "\\f";
                 break;
             case '\n':
-                s.replace(i, 1, "\\n");
+                mResult << "\\n";
                 break;
             case '\r':
-                s.replace(i, 1, "\\r");
+                mResult << "\\r";
                 break;
             case '\t':
-                s.replace(i, 1, "\\t");
+                mResult << "\\t";
                 break;
             default:
                 if (mPf.ForceToUCS2 && static_cast<uint8_t>(c) > 127) {
@@ -75,7 +77,7 @@ void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int a
                                 + ((static_cast<int>(s[i+1]) & 0x3F) << 6)
                                 + (static_cast<int>(s[i+2]) & 0x3F);
                             sprintf(buf, "\\u%04x", v);
-                            s.replace(i, 3, buf);
+                            mResult << buf;
                             i += 4;
                             break;
 
@@ -83,7 +85,7 @@ void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int a
                             v =   ((static_cast<int>(s[i]) & 0x1F) << 6)
                                 + (static_cast<int>(s[i+1]) & 0x3F);
                             sprintf(buf, "\\u%04x", v);
-                            s.replace(i, 2, buf);
+                            mResult << buf;
                             i += 4;
                             break;
 
@@ -92,11 +94,14 @@ void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int a
                             break;
                     }
                 }
+                else {
+                    mResult << c;
+                }
                 break;
         }
         i++;
     }
-    mResult << "\"" << s << "\"";
+    mResult << "\"";
 }
 
 void JsonEncoder::arrayToStringStream(const DynamicData &arData, unsigned int aLevel)
