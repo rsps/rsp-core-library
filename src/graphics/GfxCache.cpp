@@ -40,6 +40,16 @@ catch(const std::out_of_range &e) {
     THROW_WITH_BACKTRACE1(ResourceNotFound, aId);
 }
 
+TexturePtr_t& GfxCache::MakeTexture(const GfxResource &arResource)
+{
+    return MakeTexture(PixelData(arResource), arResource.Id);
+}
+
+TexturePtr_t& GfxCache::MakeTexture(const GfxResource &arResource, uint32_t aId)
+{
+    return MakeTexture(PixelData(arResource), aId);
+}
+
 TexturePtr_t& GfxCache::MakeTexture(const PixelData &arPixelData)
 {
     return MakeTexture(arPixelData, arPixelData.GetId());
