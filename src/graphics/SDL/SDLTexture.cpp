@@ -48,7 +48,7 @@ size_t SDL_TextureWrapper::mTotalAllocated = 0;
 
 SDL_TextureWrapper::SDL_TextureWrapper(SDL_Texture *apTexture, GuiUnit_t aWidth, GuiUnit_t aHeight)
     : mpTexture(apTexture),
-      mSize(aWidth * aHeight * sizeof(uint32_t))
+      mSize(size_t(aWidth) * size_t(aHeight) * sizeof(uint32_t))
 {
     if (!mpTexture) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateTexture() returned nullptr");
