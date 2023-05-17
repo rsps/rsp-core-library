@@ -57,7 +57,7 @@ SDLRenderer::SDLRenderer(GuiUnit_t aWidth, GuiUnit_t aHeight)
         THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateWindow");
     }
 
-    mpRenderer = SDL_CreateRenderer(mpWindow, -1, SDL_RENDERER_ACCELERATED);
+    mpRenderer = SDL_CreateRenderer(mpWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!mpRenderer) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateRenderer");
     }
