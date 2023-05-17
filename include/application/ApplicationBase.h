@@ -95,7 +95,7 @@ public:
      *
      * \param aResult Integer result value to return from the application.
      */
-    void Terminate(int aResult) {
+    virtual void Terminate(int aResult) {
         if (!mTerminated) {
             mApplicationResult = aResult;
             mTerminated = true;
