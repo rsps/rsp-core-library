@@ -82,7 +82,7 @@ std::string BackTrace::demangle(const std::string &arMangled) const
 {
     std::string result = arMangled;
     int status;
-    char* demangled = abi::__cxa_demangle(arMangled.c_str(), NULL, 0, &status);
+    char* demangled = abi::__cxa_demangle(arMangled.c_str(), nullptr, 0, &status);
     if(status == 0 && demangled) {
         result = demangled;
     }
