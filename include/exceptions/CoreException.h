@@ -12,6 +12,7 @@
 #ifndef RSPCOREEXCEPTION_H
 #define RSPCOREEXCEPTION_H
 
+#include <string_view>
 #include <exceptions/ExceptionHelper.h>
 #include <system_error>
 
@@ -87,13 +88,17 @@ public:
         : CoreException(aMsg)
     {
     }
+    explicit ApplicationException(const std::string &arMsg)
+        : CoreException(arMsg)
+    {
+    }
 };
 
 class ESingletonViolation: public ApplicationException
 {
 public:
-    explicit ESingletonViolation()
-        : ApplicationException("Singleton object already exist")
+    explicit ESingletonViolation(std::string_view aClass)
+        : ApplicationException(std::string("Singleton<") + std::string(aClass) + std::string(">() object already exist"))
     {
     }
 };
@@ -101,8 +106,8 @@ public:
 class ENoInstance: public ApplicationException
 {
 public:
-    explicit ENoInstance()
-        : ApplicationException("Singleton object has not been created")
+    explicit ENoInstance(std::string_view aClass)
+        : ApplicationException(std::string("Singleton<") + std::string(aClass) + std::string(">() object has not been created"))
     {
     }
 };

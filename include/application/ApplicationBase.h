@@ -77,7 +77,7 @@ public:
     template<class T>
     static T& Get() {
         if (!mpInstance) {
-            THROW_WITH_BACKTRACE(exceptions::ENoInstance);
+            THROW_WITH_BACKTRACE1(exceptions::ENoInstance, "ApplicationBase");
         }
         return *static_cast<T*>(mpInstance);
     }

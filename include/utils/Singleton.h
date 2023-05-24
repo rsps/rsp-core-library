@@ -16,6 +16,7 @@
 #include <mutex>
 #endif
 #include <exceptions/CoreException.h>
+#include "ConstTypeInfo.h"
 
 namespace rsp::utils {
 
@@ -76,7 +77,7 @@ public:
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
         if (mpInstance) {
-            THROW_WITH_BACKTRACE(exceptions::ESingletonViolation);
+            THROW_WITH_BACKTRACE1(exceptions::ESingletonViolation, NameOf<T>());
         }
         mpInstance = new T(std::forward<Args>(args)...);
         mOwnsInstance = true;
@@ -96,7 +97,7 @@ public:
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
         if (mpInstance && mOwnsInstance) {
-            THROW_WITH_BACKTRACE(exceptions::ESingletonViolation);
+            THROW_WITH_BACKTRACE1(exceptions::ESingletonViolation, NameOf<T>());
         }
         mpInstance = apObject;
     }
@@ -109,7 +110,7 @@ public:
      */
     static T& GetInstance() {
         if (!mpInstance) {
-            THROW_WITH_BACKTRACE(exceptions::ENoInstance);
+            THROW_WITH_BACKTRACE1(exceptions::ENoInstance, NameOf<T>());
         }
         return *mpInstance;
     }
