@@ -52,27 +52,34 @@ void JsonDecoder::findSubString(const char aToken1, const char aToken2)
     mIt = it;
 
     int indent = 0;
+    bool in_quotes = false;
 
     while (it != mEnd) {
-        if (*it == aToken2) {
+        if (!in_quotes && (*it == aToken2)) {
             if (indent == 0) {
                 push();
                 mEnd = it;
-                JLOG("findSubString stacked: " << std::string(mIt, mEnd));
+                JLOG("findSubString stacked: " << std::string(mIt, mEnd) << "\n" << debug());
                 return;
             }
             else {
                 indent--;
             }
         }
-        else if (*it == aToken1) {
+        else if (!in_quotes && (*it == aToken1)) {
             indent++;
         }
-        else if (*it == '\\') {
+        else if (!in_quotes && (*it == '\\')) {
             it++;
             if (*it == 'u') {
                 it += 4; // Advance u + 4 hex digits
             }
+            else if (*it == '"') {
+                // Skip escaped quote
+            }
+        }
+        else if (*it == '"') {
+            in_quotes = !in_quotes;
         }
         it++;
     }

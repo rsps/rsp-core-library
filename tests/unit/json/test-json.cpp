@@ -371,6 +371,45 @@ null }
             << Indent(0) << OEnd();
         CHECK_EQ(js.str(), raw);
     }
+
+    SUBCASE("Decode2") {
+        std::string raw = R"(
+{
+    "Token": "",
+    "ConfigFingerprint": "",
+    "ItemId": 1,
+    "Queue": [
+        [
+            3,
+            "api/v1/log-entries",
+            {
+                "data": [
+                    {
+                        "device": "SN220001",
+                        "severity": {
+                            "slug": "critical"
+                        },
+                        "channel": "",
+                        "message": "Unhandled exception: From '/home/steffen/Projects/tgm/tgm-device/common/Application.cpp:63'->\nThe Application::Execute method is not defined.\ntrial-app   (+0x755bb) [0x56453fb365bb])\ntrial-app   (+0x73173) [0x56453fb34173])\ntrial-app   (+0x29916) [0x",
+                        "context": null,
+                        "timestamp": "2023-05-24T09:01:04.016Z",
+                        "context": {
+                            "original-message": "Unhandled exception: From '/home/steffen/Projects/tgm/tgm-device/common/Application.cpp:63'->\nThe Application::Execute method is not defined.\ntrial-app   (+0x755bb) [0x56453fb365bb])\ntrial-app   (+0x73173) [0x56453fb34173])\ntrial-app   (+0x29916) [0x56453faea916])\ntrial-app  main (+0x5b) [0x56453fae7012])\nlibc.so   (+0x29d90) [0x7fb3c81f2d90])\nlibc.so  __libc_start_main (+0x80) [0x7fb3c81f2e40])\ntrial-app   (+0x1ffe5) [0x56453fae0fe5])\n\n"
+                        }
+                    }
+                ]
+            },
+            0
+        ]
+    ]
+})";
+
+        auto o = Json::Decode(raw);
+
+        CHECK(o.MemberExists("Queue"));
+        CHECK(o["Queue"].IsArray());
+        CHECK(o["Queue"][0][0].AsInt() == 3);
+    }
 }
 
 template <typename E, E V, int I> void func_print() {
