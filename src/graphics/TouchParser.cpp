@@ -88,6 +88,10 @@ void TouchParser::readRawTouchEvent()
 
 EventTypes TouchParser::readType()
 {
+    if (!mTouchDevice.WaitForDataReady(1)) {
+        return EventTypes::None;
+    }
+
     readRawTouchEvent();
     if (mRawTouchEvent.code == ABS_MT_SLOT) {
         // New touch detected on multi-touch panel
