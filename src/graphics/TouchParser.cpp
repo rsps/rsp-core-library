@@ -8,10 +8,11 @@
  * \author      Simon Glashoff
  */
 
+#ifndef USE_GFX_SDL
+
 #include <exceptions/CoreException.h>
 #include <graphics/TouchParser.h>
 #include <linux/input.h>
-#include <magic_enum.hpp>
 
 namespace rsp::graphics
 {
@@ -38,12 +39,6 @@ std::ostream& operator<<(std::ostream &os, const RawTouchEvent &arRTE)
        << "  Type:  " << arRTE.type << "\n"
        << "  Code:  " << arRTE.code << "\n"
        << "  Value: " << arRTE.value;
-    return os;
-}
-
-std::ostream &operator<<(std::ostream &os, const GfxEvent &arGfxEvent)
-{
-    os << std::string(magic_enum::enum_name<EventTypes>(arGfxEvent.mType)) << "(" << arGfxEvent.mCurrent << ")";
     return os;
 }
 
@@ -142,3 +137,5 @@ void TouchParser::Flush()
 }
 
 } // namespace rsp::graphics
+
+#endif // USE_GFX_SDL

@@ -13,6 +13,18 @@
 #include <SDL2/SDL.h>
 #include "SDLEvents.h"
 
+namespace rsp::graphics {
+
+GfxInputEvents& GfxInputEvents::Get()
+{
+    if (!sdl::SDLEvents::HasInstance()) {
+        sdl::SDLEvents::CreateInstance();
+    }
+    return rsp::utils::Singleton<sdl::SDLEvents>::GetInstance();
+}
+
+} /* namespace rsp::graphics */
+
 namespace rsp::graphics::sdl {
 
 SDLEvents::SDLEvents()
@@ -29,32 +41,28 @@ bool SDLEvents::Poll(rsp::graphics::GfxEvent &arInput)
 
     switch (event.type) {
         case SDL_MOUSEMOTION:
-            event.motion.x;
-            event.motion.y;
-//            Uint32 state;       /**< The current button state */
-//            Sint32 x;           /**< X coordinate, relative to window */
-//            Sint32 y;           /**< Y coordinate, relative to window */
-//            Sint32 xrel;        /**< The relative motion in the X direction */
-//            Sint32 yrel;        /**< The relative motion in the Y direction */
+            if (event.motion.state == 1) {
+                arInput.mTime = event.motion.timestamp;
+                arInput.mType = EventTypes::Drag;
+                arInput.mCurrent = Point(event.motion.x, event.motion.y);
+            }
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            event.button;
-//            Uint8 button;       /**< The mouse button index */
-//            Uint8 state;        /**< ::SDL_PRESSED or ::SDL_RELEASED */
-//            Uint8 clicks;       /**< 1 for single-click, 2 for double-click, etc. */
-//            Uint8 padding1;
-//            Sint32 x;           /**< X coordinate, relative to window */
-//            Sint32 y;           /**< Y coordinate, relative to window */
-
-            EventTypes::Lift;
-
+            arInput.mTime = std::chrono::milliseconds(event.motion.timestamp);
+            arInput.mType = EventTypes::Press;
+            arInput.mCurrent = Point(event.motion.x, event.motion.y);
+            arInput.mPress = Point(event.motion.x, event.motion.y);
             break;
 
         case SDL_MOUSEBUTTONUP:
-            event.button;
-            EventTypes::Press;
+            arInput.mTime = std::chrono::milliseconds(event.motion.timestamp);
+            arInput.mType = EventTypes::Lift;
+            arInput.mCurrent = Point(event.motion.x, event.motion.y);
+            break;
 
+        case SDL_QUIT:
+            arInput = GfxEvent(event.motion.timestamp, EventTypes::Quit, Point(0, 0));
             break;
 
         default:

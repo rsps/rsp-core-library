@@ -8,6 +8,8 @@
  * \author      Simon Glashoff
  */
 
+#ifndef USE_GFX_SDL
+
 #include <doctest.h>
 #include <graphics/GfxInputEvents.h>
 #include <graphics/TouchParser.h>
@@ -65,3 +67,5 @@ TEST_CASE("GfxInputEvents")
 }
 
 TEST_SUITE_END();
+
+#endif // USE_GFX_SDL

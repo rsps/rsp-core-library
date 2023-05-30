@@ -10,6 +10,8 @@
 #ifndef TOUCHPARSER_H
 #define TOUCHPARSER_H
 
+#ifndef USE_GFX_SDL
+
 #include <graphics/GfxInputEvents.h>
 #include <fstream>
 #include <iostream>
@@ -74,4 +76,7 @@ protected:
 };
 
 } // namespace rsp::graphics
+
+#endif // USE_GFX_SDL
+
 #endif // TOUCHPARSER_H

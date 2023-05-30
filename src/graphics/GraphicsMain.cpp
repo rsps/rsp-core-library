@@ -70,14 +70,13 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
             changed |= mpOverlay->UpdateData();
             mpOverlay->Render(mrRenderer);
         }
-        if (changed) {
-            if (event.mType == EventTypes::Quit) {
-                mrRenderer.Flush();
-                Terminate();
-            }
-            else {
-                mrRenderer.Present();
-            }
+
+        if (event.mType == EventTypes::Quit) {
+            mrRenderer.Flush();
+            Terminate();
+        }
+        else if (changed) {
+            mrRenderer.Present();
         }
 
         int64_t delay = std::max(std::int64_t(0), frame_time - sw.Elapsed<std::chrono::milliseconds>());

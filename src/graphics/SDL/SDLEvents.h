@@ -14,11 +14,12 @@
 #ifdef USE_GFX_SDL
 
 #include <graphics/GfxInputEvents.h>
+#include <utils/Singleton.h>
 
 namespace rsp::graphics::sdl {
 
 
-class SDLEvents: public GfxInputEvents
+class SDLEvents: public GfxInputEvents, public rsp::utils::Singleton<SDLEvents>
 {
 public:
     SDLEvents();
