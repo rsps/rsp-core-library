@@ -15,7 +15,8 @@ namespace rsp::graphics {
 
 std::ostream &operator<<(std::ostream &os, const GfxEvent &arGfxEvent)
 {
-    os << std::string(magic_enum::enum_name<EventTypes>(arGfxEvent.mType)) << "(" << arGfxEvent.mCurrent << ")";
+    os << arGfxEvent.mTime.time_since_epoch().count() << " "
+        << std::string(magic_enum::enum_name<EventTypes>(arGfxEvent.mType)) << "(" << arGfxEvent.mCurrent << ")";
     return os;
 }
 

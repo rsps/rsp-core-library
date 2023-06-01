@@ -56,7 +56,7 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
         }
 
         // New inputs?
-        if (mrEvents.Poll(event)) {
+        while (mrEvents.Poll(event)) {
             Logger::GetDefault().Debug() << "Touch Event: " << event;
             mrScenes.ActiveScene().ProcessInput(event);
         }

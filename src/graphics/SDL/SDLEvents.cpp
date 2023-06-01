@@ -33,6 +33,7 @@ SDLEvents::SDLEvents()
 
 bool SDLEvents::Poll(rsp::graphics::GfxEvent &arInput)
 {
+    using namespace std::chrono;
     SDL_Event event;
 
     if (SDL_PollEvent(&event) == 0) {
@@ -42,30 +43,31 @@ bool SDLEvents::Poll(rsp::graphics::GfxEvent &arInput)
     switch (event.type) {
         case SDL_MOUSEMOTION:
             if (event.motion.state == 1) {
-                arInput.mTime = event.motion.timestamp;
+                arInput.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
                 arInput.mType = EventTypes::Drag;
                 arInput.mCurrent = Point(event.motion.x, event.motion.y);
             }
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            arInput.mTime = std::chrono::milliseconds(event.motion.timestamp);
+            arInput.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
             arInput.mType = EventTypes::Press;
             arInput.mCurrent = Point(event.motion.x, event.motion.y);
             arInput.mPress = Point(event.motion.x, event.motion.y);
             break;
 
         case SDL_MOUSEBUTTONUP:
-            arInput.mTime = std::chrono::milliseconds(event.motion.timestamp);
+            arInput.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
             arInput.mType = EventTypes::Lift;
             arInput.mCurrent = Point(event.motion.x, event.motion.y);
             break;
 
         case SDL_QUIT:
-            arInput = GfxEvent(event.motion.timestamp, EventTypes::Quit, Point(0, 0));
+            arInput = GfxEvent(steady_clock::time_point(milliseconds{event.quit.timestamp}), EventTypes::Quit, Point(0, 0));
             break;
 
         default:
+            return false;
             break;
     }
 
