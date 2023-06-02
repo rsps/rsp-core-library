@@ -73,6 +73,7 @@ public:
         mKeyboard.SetArea(Rect(KB_X, KB_Y, 460, 350));
         mKeyboard.SetName("Keyboard");
         mKeyboard.OnKeyClick() = rsp::utils::Method(this, &InputScene::onInputChange);
+        mKeyboard.SetInput("qwertyuiopzxcvbnm");
 
         AddChild(&mLabel);
         AddChild(&mKeyboard);

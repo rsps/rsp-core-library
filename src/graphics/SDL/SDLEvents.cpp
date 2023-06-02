@@ -40,12 +40,18 @@ bool SDLEvents::Poll(rsp::graphics::GfxEvent &arInput)
         return false;
     }
 
+    arInput.mType = EventTypes::None;
+
     switch (event.type) {
         case SDL_MOUSEMOTION:
+            getLatestOf(SDL_MOUSEMOTION, event);
             if (event.motion.state == 1) {
                 arInput.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
                 arInput.mType = EventTypes::Drag;
                 arInput.mCurrent = Point(event.motion.x, event.motion.y);
+            }
+            else {
+                return false;
             }
             break;
 
@@ -62,16 +68,29 @@ bool SDLEvents::Poll(rsp::graphics::GfxEvent &arInput)
             arInput.mCurrent = Point(event.motion.x, event.motion.y);
             break;
 
+        case SDL_MOUSEWHEEL:
+            return false;
+
         case SDL_QUIT:
             arInput = GfxEvent(steady_clock::time_point(milliseconds{event.quit.timestamp}), EventTypes::Quit, Point(0, 0));
             break;
 
+        case SDL_WINDOWEVENT:
+            return false;
+
         default:
             return false;
-            break;
     }
 
     return true;
+}
+
+void SDLEvents::getLatestOf(std::uint32_t aEventType, SDL_Event &aEvent)
+{
+    SDL_PumpEvents();
+    while (SDL_PeepEvents(&aEvent, 1, SDL_GETEVENT, aEventType, aEventType)) {
+        continue;
+    }
 }
 
 void SDLEvents::Flush()

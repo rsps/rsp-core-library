@@ -75,7 +75,12 @@ void Label::update()
 
 //    tr &= GetArea().MoveTo({0,0});
     mpTexture->SetDestination(mText.GetPosition(mArea));
-//        .SetSourceRect(tr);
+
+    Rect clip = mArea;
+    if (mText.GetRect().GetWidth() > mArea.GetWidth()) {
+        clip.MoveTo({(mText.GetRect().GetWidth() - mArea.GetWidth()) / 2, 0});
+        mpTexture->SetSourceRect(clip);
+    }
 }
 
 void Label::Render(Renderer &arRenderer) const

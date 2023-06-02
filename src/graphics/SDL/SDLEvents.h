@@ -26,6 +26,10 @@ public:
 
     bool Poll(rsp::graphics::GfxEvent &arInput) override;
     void Flush() override;
+
+protected:
+    void getLatestOf(std::uint32_t aEventType, SDL_Event &aEvent);
+
 };
 
 
