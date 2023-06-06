@@ -238,7 +238,7 @@ void Keyboard::doKeyClick(const Point &arPoint, uint32_t aSymbol)
             break;
 
         case '\b':
-            if (mInput.length() > 1) {
+            if (mInput.length() > 0) {
                 mInput.pop_back();
                 mOnKeyClick(mInput);
             }

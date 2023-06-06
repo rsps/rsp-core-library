@@ -137,7 +137,7 @@ Point Text::GetPosition(const Rect &arArea) const
             break;
         case HAlign::Center:
             if (arArea.GetWidth() < GetWidth()) {
-                hoffset = (arArea.GetWidth()- GetWidth());
+                hoffset = 0;
             }
             else {
                 hoffset = (arArea.GetWidth() - GetWidth()) / 2;

@@ -63,6 +63,7 @@ void Label::update()
 {
     auto tr = mText.GetRect();
     if (tr.empty()) {
+        mpTexture = nullptr;
         return;
     }
 
@@ -73,13 +74,12 @@ void Label::update()
 
     mpTexture->Fill(Color::None).Update(mText.GetPixelData(), mStyles[mState].mForegroundColor);
 
-//    tr &= GetArea().MoveTo({0,0});
-    mpTexture->SetDestination(mText.GetPosition(mArea));
+    Point pos = mText.GetPosition(mArea);
+    mpTexture->SetDestination(pos);
 
-    Rect clip = mArea;
-    if (mText.GetRect().GetWidth() > mArea.GetWidth()) {
-        clip.MoveTo({(mText.GetRect().GetWidth() - mArea.GetWidth()) / 2, 0});
-        mpTexture->SetSourceRect(clip);
+    if (tr.GetWidth() > mArea.GetWidth()) {
+        Rect sr(tr.GetWidth() - mArea.GetWidth(), 0, mArea.GetWidth(), mArea.GetHeight());
+        mpTexture->SetSourceRect(sr);
     }
 }
 
@@ -87,7 +87,14 @@ void Label::Render(Renderer &arRenderer) const
 {
     Control::Render(arRenderer);
     if (mpTexture) {
+        arRenderer.SetClipRect(mArea);
         arRenderer.Blit(*mpTexture);
+        if (mpParent) {
+            arRenderer.SetClipRect(mpParent->GetArea());
+        }
+        else {
+            arRenderer.ClearClipRect();
+        }
     }
 }
 

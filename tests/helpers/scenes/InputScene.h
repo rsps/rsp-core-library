@@ -62,7 +62,7 @@ public:
     InputScene()
         : mBackground("testImages/rgb/Background.bmp")
     {
-        SetTransparent(false); // No need to paint background color, we have full screen image.
+        SetTransparent(true); // No need to paint background color, we have full screen image.
 
         GetStyle(Control::States::Normal).mTextures.push_back(Texture::Create(mBackground));
 
