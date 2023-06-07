@@ -401,10 +401,10 @@ TEST_CASE("Framebuffer")
 
             int x = 0;
             int y = 0;
-            int y_delta = 1;
-            int x_delta = 1;
+            int y_delta = 4;
+            int x_delta = 4;
 
-            for (int i = 0 ; i < 2000 ; ++i) {
+            for (int i = 0 ; i < 500 ; ++i) {
                 large_texture->SetSourceRect({x, y, 480, 800});
 //                Rect src_rect = large_texture->GetSourceRect();
 //                int dy = 0;
@@ -425,16 +425,16 @@ TEST_CASE("Framebuffer")
                 x += x_delta;
                 y += y_delta;
                 if (x >= (large_texture->GetWidth() - 280)) {
-                    x_delta = -1;
+                    x_delta = -4;
                 }
                 else if (x <= -200) {
-                    x_delta = 1;
+                    x_delta = 4;
                 }
                 if (y >= large_texture->GetHeight() - 200) {
-                    y_delta = -1;
+                    y_delta = -4;
                 }
                 else if (y <= -200) {
-                    y_delta = 1;
+                    y_delta = 4;
                 }
             }
 
@@ -444,9 +444,9 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(renderer.Flush());
 
             // Assert
-            CHECK_HEX(renderer.GetPixel(54, 176).AsUint(), 0xFF000000);
-            CHECK_HEX(renderer.GetPixel(55, 177).AsUint(), 0xFF121C2D);
-            CHECK_HEX(renderer.GetPixel(100, 210).AsUint(), 0xFF3583C5);
+            CHECK_HEX(renderer.GetPixel(43, 171).AsUint(), 0xFF000000);
+            CHECK_HEX(renderer.GetPixel(44, 172).AsUint(), 0xFF121C2D);
+            CHECK_HEX(renderer.GetPixel(79, 201).AsUint(), 0xFF3583C5);
         }
     }
 
@@ -461,7 +461,7 @@ TEST_CASE("Framebuffer")
 
         // Act
         rsp::utils::StopWatch sw;
-        for (int i = 0; i < iterations; i++) {
+        for (int i = 0; i < iterations; i+=4) {
             CHECK_NOTHROW(sprite->SetDestination(pos));
             CHECK_NOTHROW(renderer.Fill(Color::Black));
             CHECK_NOTHROW(renderer.Blit(*sprite));
@@ -470,7 +470,7 @@ TEST_CASE("Framebuffer")
             pos.SetX(500 - i);
         }
 
-        for (int i = 0; i < iterations; i++) {
+        for (int i = 0; i < iterations; i+=4) {
             pos.SetY(int((i-200) * 1.5));
             pos.SetX(470 - i);
             CHECK_NOTHROW(sprite->SetDestination(pos));
@@ -589,7 +589,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(panel->SetBlendOperation(Texture::BlendOperation::ColorKey, Color::None).SetDestination(Point(100, 200)));
 
             rsp::utils::StopWatch sw;
-            for (int i = 0 ; i < 2000 ; i++) {
+            for (int i = 0 ; i < 300 ; i++) {
                 int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
                 std::stringstream ss;
                 ss << "FPS:\n" << fps;

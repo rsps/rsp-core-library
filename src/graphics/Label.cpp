@@ -85,6 +85,10 @@ void Label::update()
 
 void Label::Render(Renderer &arRenderer) const
 {
+    if (!mVisible) {
+        return;
+    }
+
     Control::Render(arRenderer);
     if (mpTexture) {
         arRenderer.SetClipRect(mArea);

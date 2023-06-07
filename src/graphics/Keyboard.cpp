@@ -128,14 +128,24 @@ Keyboard::Keyboard()
     auto big_special_dark = Texture::Create(getPixelData(TextureId::BigSpecial), cRspDarkBlue);
     mBigSpecialRect = big_special->GetDestinationRect();
 
-    mBtnLetters.Symbol(cKEY_LETTERS)
+    mBtnLettersLeft.Symbol(cKEY_LETTERS)
         .Background(Control::States::Normal, Color::White, big_special.get())
         .Foreground(Control::States::Normal, Color::Black)
         .Background(Control::States::Pressed, Color(cRspDarkBlue), big_special_dark.get())
         .Foreground(Control::States::Pressed, Color::White)
         .Setup(cSpecialLeft, mBigSpecialRect, {18, 236})
-        .SetName("Letters");
-    mBtnLetters.SetCaption("ABC").SetFontSize(22);
+        .SetName("LettersLeft");
+    mBtnLettersLeft.SetCaption("ABC").SetFontSize(22);
+
+    mBtnLettersRight.Symbol(cKEY_LETTERS)
+        .Background(Control::States::Normal, Color::White, big_special.get())
+        .Foreground(Control::States::Normal, Color::Black)
+        .Background(Control::States::Pressed, Color(cRspDarkBlue), big_special_dark.get())
+        .Foreground(Control::States::Pressed, Color::White)
+        .Setup(cSpecialRight, mBigSpecialRect, {366, 236})
+        .SetName("LettersRight");
+    mBtnLettersRight.SetCaption("ABC").SetFontSize(22);
+    mBtnLettersRight.Hide();
 
     mBtnNumbers.Symbol(cKEY_NUMBERS)
         .Background(Control::States::Normal, Color::White, big_special.get())
@@ -174,7 +184,8 @@ Keyboard::Keyboard()
         .SetName("Space");
 
     addBtn(mBtnShift);
-    addBtn(mBtnLetters);
+    addBtn(mBtnLettersLeft);
+    addBtn(mBtnLettersRight);
     addBtn(mBtnNumbers);
     addBtn(mBtnSpecials);
     addBtn(mBtnErase);
@@ -263,7 +274,8 @@ void Keyboard::SetLayout(LayoutType aLayout)
         case LayoutType::Letters:
             setSymbols(std::string(cLetters));
             mBtnShift.Show();
-            mBtnLetters.Hide();
+            mBtnLettersLeft.Hide();
+            mBtnLettersRight.Hide();
             mBtnNumbers.Show();
             mBtnSpecials.Show();
             break;
@@ -271,7 +283,8 @@ void Keyboard::SetLayout(LayoutType aLayout)
         case LayoutType::Numbers:
             setSymbols(std::string(cNumbers));
             mBtnShift.Hide();
-            mBtnLetters.Setup(cSpecialLeft, mBigSpecialRect, Point(18, 236) + GetOrigin()).Show();
+            mBtnLettersLeft.Show();
+            mBtnLettersRight.Hide();
             mBtnNumbers.Hide();
             mBtnSpecials.Show();
             break;
@@ -279,7 +292,8 @@ void Keyboard::SetLayout(LayoutType aLayout)
         case LayoutType::Special:
             setSymbols(std::string(cSpecials));
             mBtnShift.Hide();
-            mBtnLetters.Setup(cSpecialRight, mBigSpecialRect, Point(366, 236) + GetOrigin()).Show();
+            mBtnLettersLeft.Hide();
+            mBtnLettersRight.Show();
             mBtnNumbers.Show();
             mBtnSpecials.Hide();
             break;

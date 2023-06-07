@@ -93,12 +93,12 @@ Renderer& SDLRenderer::Blit(const Texture &arTexture)
     const SDLTexture &tex = dynamic_cast<const SDLTexture&>(arTexture);
     Rect dst = tex.GetDestinationRect();
     Rect src = tex.GetSourceRect();
-    if (dst.GetTop() < 0) {
-        src.SetTop(std::min(-dst.GetTop(), src.GetHeight()));
-    }
-    if (dst.GetLeft() < 0) {
-        src.SetLeft(std::min(-dst.GetLeft(), src.GetWidth()));
-    }
+//    if (dst.GetTop() < 0) {
+//        src.SetTop(std::min(-dst.GetTop(), src.GetHeight()));
+//    }
+//    if (dst.GetLeft() < 0) {
+//        src.SetLeft(std::min(-dst.GetLeft(), src.GetWidth()));
+//    }
 
     int dy = 0;
     int dx = 0;
@@ -109,7 +109,7 @@ Renderer& SDLRenderer::Blit(const Texture &arTexture)
         dy = GetHeight() - src.GetHeight();
     }
     dst.Move(dx, dy);
-    dst &= mClipRect;
+//    dst &= mClipRect;
 
     SDLRect dr(dst);
     SDLRect sr(src);

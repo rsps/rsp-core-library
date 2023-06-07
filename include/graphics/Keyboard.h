@@ -154,7 +154,8 @@ protected:
     KeyboardCallback_t mOnKeyClick{};
     std::array<Key, 26u> mKeys{};
     Key mBtnShift{};
-    Key mBtnLetters{};
+    Key mBtnLettersLeft{};
+    Key mBtnLettersRight{};
     Key mBtnNumbers{};
     Key mBtnSpecials{};
     Key mBtnErase{};

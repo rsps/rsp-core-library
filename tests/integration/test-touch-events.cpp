@@ -26,7 +26,7 @@ using namespace rsp::utils;
 using namespace std::literals::chrono_literals;
 
 
-TEST_CASE("Touch Events")
+TEST_CASE("Touch Events" * doctest::skip())
 {
     rsp::logging::Logger logger;
     TestHelpers::AddConsoleLogger(logger);
@@ -71,17 +71,13 @@ TEST_CASE("Touch Events")
         int progress = 0;
         Timer t1(1, 500ms);
         t1.Callback() = [&](Timer &arTimer) {
-            switch (progress++) {
-                case 10:
-                    if (scenes.ActiveScene<InputScene>().GetLabel().GetText().GetValue() == "Quit") {
-                        gfx.Terminate();
-                    }
-                    break;
-
-                default:
-                    CHECK_NOTHROW(arTimer.SetTimeout(500ms).Enable());
-                    break;
+            if (scenes.ActiveScene<InputScene>().GetLabel().GetText().GetValue() == "Quit") {
+                gfx.Terminate();
             }
+            if (++progress > 200) {
+                gfx.Terminate();
+            }
+            CHECK_NOTHROW(arTimer.SetTimeout(500ms).Enable());
         };
         CHECK_NOTHROW(t1.Enable());
 

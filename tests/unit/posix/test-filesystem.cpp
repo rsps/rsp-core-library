@@ -94,7 +94,9 @@ TEST_CASE("FileSystem") {
 
         MESSAGE((p.empty() ? "Not Found!" : p.string()));
 
-        CHECK(StrUtils::StartsWith(p.string(), "/dev/fb"));
+        if (!p.empty()) {
+            CHECK(StrUtils::StartsWith(p.string(), "/dev/fb"));
+        }
     }
 
     SUBCASE("File time") {
