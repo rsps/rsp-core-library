@@ -68,7 +68,8 @@ void Image::update()
 
         auto sr = Rect(0, 0, mBitmap.GetWidth(), mBitmap.GetHeight());
         if (mpParent) {
-            sr &= mpParent->GetArea();
+            Rect a = mpParent->GetArea();
+            sr &= a.MoveTo({0, 0});
         }
         mpTexture->SetDestination(mArea.GetTopLeft())
             .SetSourceRect(sr);
