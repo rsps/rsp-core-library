@@ -382,11 +382,11 @@ PixelData& PixelData::CopyFrom(const Point &arLeftTop, const PixelData &arOther,
     if (arLeftTop.GetX() < 0 || arLeftTop.GetY() < 0) {
         r.MoveTo(arLeftTop); // TODO: Explain why this move?
     }
-    r &= GetRect();
+    r &= arOther.GetRect();
     auto oy = arLeftTop.GetY();
     for (int y = r.GetTop(); y < r.GetHeight(); y++) {
         auto ox = arLeftTop.GetX();
-        for (int x = r.GetLeft(); x < r.GetWidth(); x++) {
+        for (int x = r.GetLeft(); x < (r.GetLeft() + r.GetWidth()); x++) {
             SetPixelAt(ox, oy, arOther.GetPixelAt(x, y, aColor));
             ox++;
         }
