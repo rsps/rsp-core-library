@@ -100,6 +100,10 @@ Rect Control::GetArea() const
 Control& Control::SetOrigin(const Point &arPoint)
 {
     Point difference = arPoint - mArea.GetTopLeft();
+    if (difference == Point()) {
+        return *this;
+    }
+
     mArea.MoveTo(arPoint);
     mTouchArea.MoveTo(mTouchArea.GetTopLeft() + difference);
     for (auto &style : mStyles) {
@@ -110,6 +114,7 @@ Control& Control::SetOrigin(const Point &arPoint)
     for (Control* child : mChildren) {
         child->SetOrigin(child->GetOrigin() + difference);
     }
+    doSetArea(mArea);
     return *this;
 }
 
