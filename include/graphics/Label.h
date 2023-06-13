@@ -35,8 +35,6 @@ public:
 
     Text& GetText() { return mText; }
 
-    void Render(Renderer &arRenderer) const override;
-
 protected:
     Text mText{};
     TexturePtr_t mpTexture = nullptr;
@@ -44,6 +42,7 @@ protected:
 
     void update() override;
     void refresh() override;
+    void render(Renderer &arRenderer) const override;
 };
 
 } /* namespace rsp::graphics */

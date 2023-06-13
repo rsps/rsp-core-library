@@ -129,7 +129,7 @@ public:
      * \brief Virtual method for rendering the object
      * \param aCanvas The canvas the object is rendered on
      */
-    virtual void Render(Renderer &arRenderer) const;
+    void Render(Renderer &arRenderer) const;
 
     /**
      * \brief Sets the area of the object as a rectangle in parent coordinates
@@ -269,6 +269,13 @@ protected:
      * \brief Override this to update this objects textures after it is invalidated
      */
     virtual void update() {}
+
+    /**
+     * \brief Override this to perform custom rendering.
+     *
+     * \param arRenderer
+     */
+    virtual void render(Renderer &arRenderer) const {};
 
     /**
      * \brief Override this to handle resizing events

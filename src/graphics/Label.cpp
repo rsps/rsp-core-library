@@ -83,22 +83,10 @@ void Label::update()
     }
 }
 
-void Label::Render(Renderer &arRenderer) const
+void Label::render(Renderer &arRenderer) const
 {
-    if (!mVisible) {
-        return;
-    }
-
-    Control::Render(arRenderer);
     if (mpTexture) {
-        arRenderer.SetClipRect(mArea);
         arRenderer.Blit(*mpTexture);
-        if (mpParent) {
-            arRenderer.SetClipRect(mpParent->GetArea());
-        }
-        else {
-            arRenderer.ClearClipRect();
-        }
     }
 }
 

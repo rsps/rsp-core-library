@@ -29,14 +29,13 @@ public:
 
     BitmapView& GetBitmap() { return mBitmap; }
 
-    void Render(Renderer &arRenderer) const override;
-
 protected:
     BitmapView mBitmap{};
     TexturePtr_t mpTexture = nullptr;
 
     void doSetArea(const Rect &arRect) override;
     void update() override;
+    void render(Renderer &arRenderer) const override;
 };
 
 } // namespace rsp::graphics
