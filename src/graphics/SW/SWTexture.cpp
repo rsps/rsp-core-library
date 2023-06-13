@@ -27,7 +27,7 @@ std::unique_ptr<Texture> Texture::Create(const PixelData &arPixelData, const Col
             result->SetBlendOperation(Texture::BlendOperation::SourceAlpha);
             break;
     }
-    result->Fill(Color::None).Update(arPixelData, arColor.AsRaw());
+    result->Fill(Color::None).Update(arPixelData, arColor);
     return result;
 }
 
