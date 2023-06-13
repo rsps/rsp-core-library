@@ -207,6 +207,8 @@ void Control::Render(Renderer &arRenderer) const
         arRenderer.Blit(*texture);
     }
 
+    render(arRenderer);
+
     if (mChildren.size() > 0) {
         for (Control* child : mChildren) {
             child->Render(arRenderer);
