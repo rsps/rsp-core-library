@@ -15,6 +15,9 @@
 #include <utils/Random.h>
 #include <TestHelpers.h>
 #include <pixmap/GfxResources.h>
+#ifdef USE_GFX_SW
+#include <graphics/SW/Framebuffer.h>
+#endif
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
