@@ -143,7 +143,7 @@ Control& Control::SetTouchArea(Rect aRect)
 
 Control& Control::AddChild(Control *apChild)
 {
-    if (apChild) {
+    if (apChild && (apChild->mpParent != this)) {
         mChildren.push_back(apChild);
         apChild->mpParent = this;
         apChild->SetOrigin(apChild->GetOrigin() + GetOrigin());
