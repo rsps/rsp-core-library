@@ -43,7 +43,9 @@ ApplicationBase::~ApplicationBase()
 
 int ApplicationBase::Run()
 {
-    beforeExecute();
+    if (!beforeExecute()) {
+        mTerminated = false;
+    }
     while(!mTerminated) {
         try {
             execute();
@@ -58,9 +60,10 @@ int ApplicationBase::Run()
     return mApplicationResult;
 }
 
-void ApplicationBase::beforeExecute()
+bool ApplicationBase::beforeExecute()
 {
     handleOptions();
+    return !mTerminated;
 }
 
 void ApplicationBase::handleOptions()

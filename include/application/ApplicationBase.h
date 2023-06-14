@@ -111,7 +111,7 @@ protected:
     /**
      * Virtual helpers, override these to add functionality during the run loop.
      */
-    virtual void beforeExecute();
+    virtual bool beforeExecute(); // Return false to terminate
     virtual void execute() {};
     virtual void afterExecute() {};
 
