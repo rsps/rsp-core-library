@@ -112,6 +112,21 @@ public:
     }
 };
 
+class ETerminate: public ApplicationException
+{
+public:
+    explicit ETerminate(int aExitCode)
+        : ApplicationException(std::string("Terminating with code: ") + std::to_string(aExitCode)),
+          mCode(aExitCode)
+    {
+    }
+
+    int GetCode() const { return mCode; }
+
+protected:
+    int mCode = 0;
+};
+
 class EMissingArgument: public std::invalid_argument
 {
 public:

@@ -14,6 +14,7 @@
 #include <version.h>
 
 using namespace rsp::utils;
+using namespace rsp::exceptions;
 
 namespace rsp::application {
 
@@ -43,27 +44,37 @@ ApplicationBase::~ApplicationBase()
 
 int ApplicationBase::Run()
 {
-    if (!beforeExecute()) {
-        mTerminated = false;
-    }
-    while(!mTerminated) {
-        try {
-            execute();
+    try {
+        beforeExecute();
+
+        while(!mTerminated) {
+            try {
+                execute();
+            }
+            catch(const ETerminate &e) {
+                mTerminated = true;
+                mApplicationResult = e.GetCode();
+            }
+            catch(const std::exception &e) {
+                mLogger.Critical() << "Unhandled exception: " << e.what() << " Attempting graceful shutdown" << std::endl;
+                mApplicationResult = cResultUnhandledError;
+                mTerminated = true;
+            }
         }
-        catch(const std::exception &e) {
-            mLogger.Critical() << "Unhandled exception: " << e.what() << std::endl;
-            mApplicationResult = cResultUnhandledError;
-            mTerminated = true;
-        }
     }
+    catch(const ETerminate &e) {
+        mTerminated = true;
+        mApplicationResult = e.GetCode();
+    }
+
     afterExecute();
+
     return mApplicationResult;
 }
 
-bool ApplicationBase::beforeExecute()
+void ApplicationBase::beforeExecute()
 {
     handleOptions();
-    return !mTerminated;
 }
 
 void ApplicationBase::handleOptions()
@@ -80,12 +91,12 @@ void ApplicationBase::handleOptions()
 
     if ( mCmd.HasOption("-h") || mCmd.HasOption("--help")) {
         showHelp();
-        mTerminated = true;
+        THROW_WITH_BACKTRACE1(ETerminate, cResultSuccess);
     }
 
     if ( mCmd.HasOption("--version")) {
         showVersion();
-        mTerminated = true;
+        THROW_WITH_BACKTRACE1(ETerminate, cResultSuccess);
     }
 }
 

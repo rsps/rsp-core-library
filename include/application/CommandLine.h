@@ -37,6 +37,7 @@ public:
      * \return List of strings
      */
     std::vector<std::string>& GetOptions() { return mOptions; }
+
     /**
      * Check if a given option exist on the command line.
      *
@@ -44,6 +45,8 @@ public:
      * \return True if the option exists
      */
     bool HasOption(const std::string aStr);
+    bool HasOption(const char *apStr) { return HasOption(std::string(apStr)); }
+
     /**
      * Get the value assigned to an extended option, e.g. '--name=value'
      *
@@ -52,6 +55,7 @@ public:
      * \return bool True if the option exists
      */
     bool GetOptionValue(const std::string aOption, std::string &arValue);
+    bool GetOptionValue(const char *apOption, std::string &arValue) { return GetOptionValue(std::string(apOption), arValue); }
 
     /**
      * Get a list of all commands on the command line, except the one invoking this application.
