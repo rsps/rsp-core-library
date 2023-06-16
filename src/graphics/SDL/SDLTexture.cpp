@@ -206,7 +206,7 @@ Texture& SDLTexture::SetOffset(const Point &arPoint)
 
 Texture& SDLTexture::SetSourceRect(const Rect &arRect)
 {
-    mSourceRect = arRect & mArea;
+    mSourceRect = arRect; // & mArea;
     return *this;
 }
 

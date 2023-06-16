@@ -92,41 +92,40 @@ Renderer& SDLRenderer::Blit(const Texture &arTexture)
 {
     const SDLTexture &tex = dynamic_cast<const SDLTexture&>(arTexture);
     Rect dst = tex.GetDestinationRect();
-    Rect src = tex.GetSourceRect();
-//    if (dst.GetTop() < 0) {
-//        src.SetTop(std::min(-dst.GetTop(), src.GetHeight()));
-//    }
-//    if (dst.GetLeft() < 0) {
-//        src.SetLeft(std::min(-dst.GetLeft(), src.GetWidth()));
-//    }
+    Rect src = tex.GetSourceRect() & Rect(0, 0, tex.GetWidth(), tex.GetHeight());
 
-    int dy = 0;
-    int dx = 0;
-    if (arTexture.GetWidth() > GetWidth() && src.GetWidth() < GetWidth() && src.GetLeft() == 0) {
-        dx = GetWidth() - src.GetWidth();
+//    std::cout << "A dst: " << dst << " src: " << src << std::endl;
+
+    if (src.GetWidth() < dst.GetWidth()) {
+        if (tex.GetSourceRect().GetLeft() < 0) {
+            dst.SetLeft(std::min(mArea.GetWidth(), dst.GetLeft() + dst.GetWidth() - src.GetWidth()));
+            dst.SetWidth(src.GetWidth());
+        }
+        else {
+            dst.SetLeft(std::max(0, dst.GetLeft() + src.GetWidth() - dst.GetWidth()));
+            dst.SetWidth(src.GetWidth());
+        }
     }
-    if (arTexture.GetHeight() > GetHeight() && src.GetHeight() < GetHeight() && src.GetTop() == 0) {
-        dy = GetHeight() - src.GetHeight();
+    if (src.GetHeight() < dst.GetHeight()) {
+        if (tex.GetSourceRect().GetTop() < 0) {
+            dst.SetTop(std::min(mArea.GetHeight(), dst.GetTop() + dst.GetHeight() - src.GetHeight()));
+            dst.SetHeight(src.GetHeight());
+        }
+        else {
+            dst.SetTop(std::max(0, dst.GetTop() + src.GetHeight() - dst.GetHeight()));
+            dst.SetHeight(src.GetHeight());
+        }
     }
-    dst.Move(dx, dy);
-//    dst &= mClipRect;
+
+//    std::cout << "B dst: " << dst << " src: " << src << std::endl;
 
     SDLRect dr(dst);
     SDLRect sr(src);
-
-//    if (tex.mBlendOperation != Texture::BlendOperation::Copy) {
-//        if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_BLEND)) {
-//            THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawBlendMode");
-//        }
-//    }
 
     if (SDL_RenderCopy(mpRenderer, tex.GetSDLTexture(), &sr, &dr)) {
         THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderCopy");
     }
 
-//    if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_NONE)) {
-//        THROW_WITH_BACKTRACE1(SDLException, "SDL_SetRenderDrawBlendMode");
-//    }
     return *this;
 }
 
