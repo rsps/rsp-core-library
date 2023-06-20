@@ -76,6 +76,11 @@ constexpr uint32_t HashOf() noexcept
     return crc32::HashConst(NameOf<T>().data());
 }
 
+constexpr uint32_t HashOf(const char *apName) noexcept
+{
+    return crc32::HashConst(apName);
+}
+
 } /* namespace crc32 */
 
 
