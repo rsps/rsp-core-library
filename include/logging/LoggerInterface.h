@@ -8,6 +8,7 @@
  * \author      Steffen Brummer
  */
 
+#include <algorithm>
 #include <memory>
 #include <mutex>
 #include "LogStream.h"
