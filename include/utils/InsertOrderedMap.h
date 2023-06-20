@@ -11,6 +11,7 @@
 #define INCLUDE_UTILS_INSERTORDEREDMAP_H_
 
 #include <exceptions/CoreException.h>
+#include <algorithm>
 #include <map>
 #include <vector>
 #include <functional>

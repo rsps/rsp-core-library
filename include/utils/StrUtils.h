@@ -11,6 +11,7 @@
 #ifndef SRC_UTILS_STRUTILS_H_
 #define SRC_UTILS_STRUTILS_H_
 
+#include <algorithm>
 #include <memory>
 #include <stdexcept>
 #include <string>
