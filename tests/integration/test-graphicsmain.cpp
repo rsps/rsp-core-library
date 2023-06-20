@@ -156,10 +156,10 @@ TEST_CASE("Graphics Main Test")
     }
 
     SUBCASE("Input Scene") {
-        CHECK_NOTHROW(gfx.ChangeScene<InputScene>());
+        CHECK_NOTHROW(gfx.ChangeScene(Scenes::InputScene));
 
         scenes.GetAfterCreate() = [&tp](Scene *apScene) {
-            CHECK_EQ(apScene->GetId(), rsp::utils::ID<InputScene>());
+            CHECK_EQ(apScene->GetId(), uint32_t(Scenes::InputScene));
 
             tp.SetEvents(InputScene::GetTouchEvents().data(), InputScene::GetTouchEvents().size());
         };

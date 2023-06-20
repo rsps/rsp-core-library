@@ -66,7 +66,7 @@ TEST_CASE("Touch Events" * doctest::skip())
     }
 
     SUBCASE("Input Scene") {
-        CHECK_NOTHROW(gfx.ChangeScene<InputScene>());
+        CHECK_NOTHROW(gfx.ChangeScene(Scenes::InputScene));
 
         int progress = 0;
         Timer t1(1, 500ms);

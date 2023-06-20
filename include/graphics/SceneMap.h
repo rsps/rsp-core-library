@@ -18,6 +18,7 @@
 #include <functional>
 #include <utils/Function.h>
 #include <logging/Logger.h>
+#include <magic_enum.hpp>
 
 namespace rsp::graphics {
 
@@ -30,7 +31,7 @@ public:
 class ActiveSceneNotSet : public rsp::exceptions::CoreException
 {
 public:
-    ActiveSceneNotSet() : rsp::exceptions::CoreException("No scene has been set activate") {};
+    ActiveSceneNotSet() : rsp::exceptions::CoreException("No scene has been set active") {};
 };
 
 class SceneMap
@@ -42,13 +43,30 @@ public:
     SceneMap() {};
     SceneMap(const SceneMap&) = default;
 
-    #define AddFactory(T) \
-        GFXLOG("Adding scene factory: " << rsp::utils::NameOf<T>() << " with id: " << rsp::utils::ID<T>()); \
+    template <typename T>
+    void AddFactory()
+    {
+        GFXLOG("Adding scene factory: " << rsp::utils::NameOf<T>() << " with id: " << rsp::utils::ID<T>());
         mScenes[rsp::utils::ID<T>()] = []() { \
             Scene* result = new T(); \
             GFXLOG("Created scene: " << result->GetName()); \
             return result; \
-        }
+        };
+    }
+
+    template<typename T, typename E, typename = typename std::enable_if<std::is_enum<E>::value, E>::type>
+    void AddFactory(E e)
+    {
+        std::string_view sv = magic_enum::enum_name(e);
+        GFXLOG("Adding scene factory: " << rsp::utils::NameOf<T>() << " with id: " << sv);
+        mScenes[uint32_t(e)] = [id=uint32_t(e), sv]() {
+            Scene* result = new T();
+            result->SetId(id);
+            result->SetName(sv.data());
+            GFXLOG("Created scene: " << result->GetName());
+            return result;
+        };
+    }
 
     SceneMap& operator=(const SceneMap&) = default;
 

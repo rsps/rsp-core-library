@@ -45,10 +45,13 @@ public:
      * \param aSceneName The name of the scene to change to
      * \return self
      */
-    GraphicsMain& ChangeScene(std::uint32_t aId) { mNextScene = aId; return *this; }
+    GraphicsMain& ChangeScene(std::uint32_t aId);
 
     template <class T>
     GraphicsMain& ChangeScene() { return ChangeScene(rsp::utils::ID<T>()); }
+
+    template <class E, typename = typename std::enable_if<std::is_enum<E>::value, E>::type>
+    GraphicsMain& ChangeScene(E e) { return ChangeScene(uint32_t(e)); }
 
 
     /**

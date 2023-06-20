@@ -34,6 +34,12 @@ GraphicsMain::~GraphicsMain()
 {
 }
 
+GraphicsMain& GraphicsMain::ChangeScene(std::uint32_t aId)
+{
+    mNextScene = aId;
+    return *this;
+}
+
 void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
 {
     GfxEvent event;
