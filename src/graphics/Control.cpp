@@ -70,6 +70,14 @@ Control& Control::SetArea(Rect aRect)
         aRect.MoveTo(aRect.GetTopLeft() + mpParent->GetOrigin());
     }
     if (mArea != aRect) {
+        Point difference = aRect.GetTopLeft() - mArea.GetTopLeft();
+        if (difference != Point()) {
+            for (auto &style : mStyles) {
+                for (TexturePtr_t &texture : style.mTextures) {
+                    texture->SetDestination(texture->GetDestination() + difference);
+                }
+            }
+        }
         for (Control* child : mChildren) {
             child->SetOrigin((child->GetOrigin() - mArea.GetTopLeft()) + aRect.GetTopLeft());
         }
