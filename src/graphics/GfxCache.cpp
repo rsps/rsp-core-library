@@ -40,26 +40,26 @@ catch(const std::out_of_range &e) {
     THROW_WITH_BACKTRACE1(ResourceNotFound, aId);
 }
 
-TexturePtr_t& GfxCache::MakeTexture(const GfxResource &arResource)
+TexturePtr_t& GfxCache::MakeTexture(const GfxResource &arResource, const Color &arColor)
 {
-    return MakeTexture(PixelData(arResource), arResource.Id);
+    return MakeTexture(PixelData(arResource), arResource.Id, arColor);
 }
 
-TexturePtr_t& GfxCache::MakeTexture(const GfxResource &arResource, uint32_t aId)
+TexturePtr_t& GfxCache::MakeTexture(const GfxResource &arResource, uint32_t aId, const Color &arColor)
 {
-    return MakeTexture(PixelData(arResource), aId);
+    return MakeTexture(PixelData(arResource), aId, arColor);
 }
 
-TexturePtr_t& GfxCache::MakeTexture(const PixelData &arPixelData)
+TexturePtr_t& GfxCache::MakeTexture(const PixelData &arPixelData, const Color &arColor)
 {
-    return MakeTexture(arPixelData, arPixelData.GetId());
+    return MakeTexture(arPixelData, arPixelData.GetId(), arColor);
 }
 
-TexturePtr_t& GfxCache::MakeTexture(const PixelData &arPixelData, uint32_t aId)
+TexturePtr_t& GfxCache::MakeTexture(const PixelData &arPixelData, uint32_t aId, const Color &arColor)
 {
     auto result = findTexture(aId);
     if (!result) {
-        auto pair = mTextureList.insert({aId, Texture::Create(arPixelData)});
+        auto pair = mTextureList.insert({aId, Texture::Create(arPixelData, arColor)});
         if (pair.second == false) {
             THROW_WITH_BACKTRACE1(ResourceExists, aId);
         }

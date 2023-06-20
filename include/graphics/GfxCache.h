@@ -41,10 +41,10 @@ public:
     PixelData& MakePixelData(const GfxResource &arResource, uint32_t aId);
     PixelData& GetPixelData(uint32_t aId);
 
-    TexturePtr_t& MakeTexture(const GfxResource &arResource);
-    TexturePtr_t& MakeTexture(const GfxResource &arResource, uint32_t aId);
-    TexturePtr_t& MakeTexture(const PixelData &arPixelData);
-    TexturePtr_t& MakeTexture(const PixelData &arPixelData, uint32_t aId);
+    TexturePtr_t& MakeTexture(const GfxResource &arResource, const Color &arColor = Color::White);
+    TexturePtr_t& MakeTexture(const GfxResource &arResource, uint32_t aId, const Color &arColor = Color::White);
+    TexturePtr_t& MakeTexture(const PixelData &arPixelData, const Color &arColor = Color::White);
+    TexturePtr_t& MakeTexture(const PixelData &arPixelData, uint32_t aId, const Color &arColor = Color::White);
     TexturePtr_t& GetTexture(uint32_t aId);
 
 protected:
