@@ -69,14 +69,6 @@ BitmapView& BitmapView::SetPixelColor(const Color &arColor)
     return *this;
 }
 
-void BitmapView::Paint(const Point &arOffset, Canvas &arCanvas) const
-{
-    if (!mpPixelData) {
-        return;
-    }
-    arCanvas.DrawPixelData(arOffset, *mpPixelData, mSection, mPixelColor);
-}
-
 GuiUnit_t BitmapView::GetWidth()
 {
     return (!mpPixelData) ? 0 : mpPixelData->GetWidth();

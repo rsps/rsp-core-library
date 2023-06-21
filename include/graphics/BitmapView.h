@@ -45,8 +45,6 @@ public:
 
     Rect GetBoundingRect(Point aPoint = {0,0}) { return Rect(aPoint, GetWidth(), GetHeight()); }
 
-    void Paint(const Point &arOffset, Canvas &arCanvas) const;
-
 protected:
     Color mPixelColor = Color::White;
     Rect mSection{};

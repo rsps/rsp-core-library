@@ -79,8 +79,8 @@ public:
      * \param arSection
      * \param aColor
      */
-    void DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData, const Rect &arSection, Color aColor);
-    void DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData) { DrawPixelData(arLeftTop, arPixelData, arPixelData.GetRect(), Color::None); }
+    void DrawPixelData(const Point &arDestination, const PixelData &arPixelData, const Rect &arSourceRect, Color aColor);
+    void DrawPixelData(const Point &arDestination, const PixelData &arPixelData) { DrawPixelData(arDestination, arPixelData, arPixelData.GetRect(), Color::White); }
 
     PixelData& GetPixelData() { return *this; }
     const PixelData& GetPixelData() const { return *this; }

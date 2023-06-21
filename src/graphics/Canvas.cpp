@@ -117,10 +117,10 @@ void Canvas::DrawLine(const Point &arA, const Point &arB, const Color &arColor)
     mBlend = false;
 }
 
-void Canvas::DrawPixelData(const Point &arLeftTop, const PixelData &arPixelData, const Rect &arSection, Color aColor)
+void Canvas::DrawPixelData(const Point &arDestination, const PixelData &arPixelData, const Rect &arSourceRect, Color aColor)
 {
 
-    CopyFrom(arLeftTop, arPixelData, arSection, aColor);
+    CopyFrom(arDestination, arPixelData, arSourceRect, aColor);
 }
 
 void Canvas::plot4Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor)

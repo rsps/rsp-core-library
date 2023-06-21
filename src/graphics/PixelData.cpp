@@ -376,16 +376,16 @@ PixelData PixelData::ChangeColorDepth(ColorDepth aDepth, Color aColor) const
     return result;
 }
 
-PixelData& PixelData::CopyFrom(const Point &arLeftTop, const PixelData &arOther, const Rect &arSection, Color aColor)
+PixelData& PixelData::CopyFrom(const Point &arDestination, const PixelData &arOther, const Rect &arSourceRect, Color aColor)
 {
-    Rect r = arSection;
-    if (arLeftTop.GetX() < 0 || arLeftTop.GetY() < 0) {
-        r.MoveTo(arLeftTop); // TODO: Explain why this move?
+    Rect r = arSourceRect & arOther.GetRect();
+    if (arDestination.GetX() < 0 || arDestination.GetY() < 0) {
+        r.Move(arDestination.GetX(), arDestination.GetY()); // Clip source if we are painting partial outside this
+        r &= arOther.GetRect();
     }
-    r &= arOther.GetRect();
-    auto oy = arLeftTop.GetY();
+    auto oy = arDestination.GetY();
     for (int y = r.GetTop(); y < r.GetHeight(); y++) {
-        auto ox = arLeftTop.GetX();
+        auto ox = arDestination.GetX();
         for (int x = r.GetLeft(); x < (r.GetLeft() + r.GetWidth()); x++) {
             SetPixelAt(ox, oy, arOther.GetPixelAt(x, y, aColor));
             ox++;

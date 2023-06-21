@@ -45,7 +45,7 @@ public:
     PixelData& operator=(const PixelData& arOther);
     PixelData& operator=(PixelData&& arOther);
 
-    PixelData& CopyFrom(const Point &arLeftTop, const PixelData &arOther, const Rect &arSection, Color aColor);
+    PixelData& CopyFrom(const Point &arDestination, const PixelData &arOther, const Rect &arSourceRect, Color aColor);
 
     PixelData ChangeColorDepth(ColorDepth aDepth, Color aColor = Color::Black) const;
 
