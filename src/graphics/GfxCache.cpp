@@ -31,6 +31,20 @@ PixelData& GfxCache::MakePixelData(const GfxResource &arResource, uint32_t aId)
     return *pd;
 }
 
+PixelData& GfxCache::MakePixelData(uint32_t aId, const PixelData &arPixelData, const Rect &arSourceRect, const Color &arColor)
+{
+    auto pd = findPixelData(aId);
+    if (!pd) {
+        auto pair = mPixelDataList.emplace(std::piecewise_construct, std::forward_as_tuple(aId), std::forward_as_tuple(arSourceRect.GetWidth(), arSourceRect.GetHeight(), arPixelData.GetColorDepth()));
+        if (pair.second == false) {
+            THROW_WITH_BACKTRACE1(ResourceExists, aId);
+        }
+        pd = &(pair.first->second);
+        pd->CopyFrom(Point(), arPixelData, arSourceRect, arColor);
+    }
+    return *pd;
+}
+
 PixelData& GfxCache::GetPixelData(uint32_t aId)
 try
 {
@@ -81,7 +95,7 @@ PixelData* GfxCache::findPixelData(uint32_t aId)
 {
     auto it = mPixelDataList.find(aId);
     if (it != mPixelDataList.end()) {
-        return &it->second;
+        return &(it->second);
     }
     return nullptr;
 }
@@ -90,9 +104,21 @@ TexturePtr_t* GfxCache::findTexture(uint32_t aId)
 {
     auto it = mTextureList.find(aId);
     if (it != mTextureList.end()) {
-        return &it->second;
+        return &(it->second);
     }
     return nullptr;
+}
+
+GfxCache& GfxCache::SetPixelData(uint32_t aId, const PixelData &arPixelData)
+{
+    mPixelDataList[aId] = arPixelData;
+    return *this;
+}
+
+GfxCache& GfxCache::SetTexture(uint32_t aId, TexturePtr_t &arTexture)
+{
+    mTextureList[aId] = arTexture->Clone();
+    return *this;
 }
 
 } /* namespace rsp::graphics */

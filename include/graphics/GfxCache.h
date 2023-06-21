@@ -39,6 +39,7 @@ class GfxCache : public rsp::utils::Singleton<GfxCache>
 public:
     PixelData& MakePixelData(const GfxResource &arResource);
     PixelData& MakePixelData(const GfxResource &arResource, uint32_t aId);
+    PixelData& MakePixelData(uint32_t aId, const PixelData &arPixelData, const Rect &arSourceRect, const Color &arColor = Color::White);
     PixelData& GetPixelData(uint32_t aId);
 
     TexturePtr_t& MakeTexture(const GfxResource &arResource, const Color &arColor = Color::White);
@@ -46,6 +47,9 @@ public:
     TexturePtr_t& MakeTexture(const PixelData &arPixelData, const Color &arColor = Color::White);
     TexturePtr_t& MakeTexture(const PixelData &arPixelData, uint32_t aId, const Color &arColor = Color::White);
     TexturePtr_t& GetTexture(uint32_t aId);
+
+    GfxCache& SetPixelData(uint32_t aId, const PixelData &arPixelData);
+    GfxCache& SetTexture(uint32_t aId, TexturePtr_t &arTexture);
 
 protected:
     std::map<uint32_t, PixelData>    mPixelDataList{};
