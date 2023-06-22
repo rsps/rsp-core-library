@@ -12,6 +12,7 @@
 #define INCLUDE_GRAPHICS_LABEL_H
 
 #include <string>
+#include <string_view>
 #include <graphics/Control.h>
 #include <graphics/Text.h>
 #include <graphics/Texture.h>
@@ -24,6 +25,8 @@ public:
     Label() { initTypeInfo<Label>(); }
 
     Label& operator<<(const std::string &arCaption) { return SetCaption(arCaption); }
+    Label& operator<<(const std::string_view aCaption) { return SetCaption(std::string(aCaption)); }
+    Label& operator<<(const char *apCaption) { return SetCaption(std::string(apCaption)); }
     Label& operator<<(Text::VAlign aVAlign) { return SetVAlignment(aVAlign); }
     Label& operator<<(Text::HAlign aHAlign) { return SetHAlignment(aHAlign); }
 
