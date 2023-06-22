@@ -20,6 +20,7 @@
 
 namespace rsp::graphics {
 
+struct Typography;
 
 /**
  * \class Text
@@ -71,6 +72,13 @@ public:
     Text& operator=(const Text&) = default;
     Text& operator=(Text&&) = default;
 
+    /**
+     * \brief Load Text and font attributes from given Typography
+     *
+     * \param arTypography
+     * \return self
+     */
+    Text& operator<<(const Typography &arTypography);
 
     operator std::string() const { return mValue; }
 
@@ -83,10 +91,18 @@ public:
     /**
      * Setter for the string content.
      *
-     * \param arValue
+     * \param aValue
      * \return Reference to this for fluent calls.
      */
-    Text& SetValue(const std::string &arValue);
+    Text& SetValue(std::string aValue);
+
+    /**
+     * \brief Force all text to upper case, useful for headings.
+     *
+     * \param aUpperCase
+     * \return self
+     */
+    Text& ForceUpperCase(bool aUpperCase = true);
 
     /**
      * Returns a reference to the internal font object.
@@ -94,7 +110,7 @@ public:
      *
      * \return Reference to Font.
      */
-    Font& GetFont() { mDirty = true; return mFont; }
+    Font& GetFont() { return mFont; }
     const Font& GetFont() const { return mFont; }
 
     /**
@@ -160,7 +176,7 @@ public:
      * \param aSizePx
      * \return self
      */
-    Text& SetFontSize(int aSizePx) { mFont.SetSize(aSizePx); mDirty = true; return *this; }
+    Text& SetFontSize(int aSizePx) { mFont.SetSize(aSizePx); return *this; }
 
     /**
      * Reload all glyphs based on the current settings.
@@ -176,7 +192,7 @@ public:
      *
      * \return True if glyphs needs to be reloaded.
      */
-    bool IsDirty() { return mDirty; }
+    bool IsDirty() { return mDirty | mFont.IsDirty(); }
 
     /**
      * Get the minimum bounding rectangle containing all the glyphs.
@@ -196,11 +212,23 @@ protected:
     HAlign mHAlign = HAlign::Center;
     VAlign mVAlign = VAlign::Center;
     bool mDirty = false;
+    bool mUpperCase = false;
 
     void scaleToFit(int aWidth, int aHeight);
     void loadGlyphs();
     void alignGlyphs();
     void draw();
+};
+
+
+struct Typography {
+    bool UpperCase = false;
+    FontStyles Style = FontStyles::Normal;
+    uint32_t Color = Color::Black;
+    int Size = 16;
+    int Spacing = 1;
+    Text::HAlign HAlignment = Text::HAlign::Left;
+    Text::VAlign VAlignment = Text::VAlign::Center;
 };
 
 } /* namespace rsp::graphics */

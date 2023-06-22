@@ -114,13 +114,13 @@ public:
      * \param arColor
      * \return Reference to this for fluent calls.
      */
-//    Font& SetColor(const Color &arColor);
+    Font& SetColor(const Color &arColor);
     /**
      * Get the current color of the font.
      *
      * \return Color
      */
-//    Color GetColor() const { return mColor; }
+    Color GetColor() const { return mColor; }
 
     /**
      * \brief Set the background color for the characters in the font
@@ -148,10 +148,18 @@ public:
      */
     FontStyles GetStyle() const;
 
+    /**
+     * \brief Get if the font attributes has changed since last creation
+     *
+     * \return True if font needs updating
+     */
+    bool IsDirty() const { return mDirty; }
+
 protected:
     static std::string mDefaultFontName;
-//    Color mColor;
+    Color mColor;
 //    Color mBackgroundColor = Color::None;
+    bool mDirty = false;
     std::shared_ptr<FontRawInterface> mpImpl;
 
     static std::shared_ptr<FontRawInterface> MakePimpl(const std::string &arFontName);

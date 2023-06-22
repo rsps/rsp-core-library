@@ -72,7 +72,9 @@ void Label::update()
         mpTexture->SetBlendOperation(Texture::BlendOperation::SourceAlpha);
     }
 
-    mpTexture->Fill(Color::None).Update(mText.GetPixelData(), mStyles[mState].mForegroundColor);
+    Color &color = mStyles[mState].mForegroundColor;
+
+    mpTexture->Fill(Color::None).Update(mText.GetPixelData(), (color == Color::None) ? mText.GetFont().GetColor() : color);
 
     Point pos = mText.GetPosition(mArea);
     mpTexture->SetDestination(pos);

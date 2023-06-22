@@ -10,6 +10,7 @@
 
 #include <graphics/Text.h>
 #include <logging/Logger.h>
+#include <utils/StrUtils.h>
 
 #define DEBUG(a) { Logger::GetDefault().Debug() << a; }
 
@@ -28,10 +29,34 @@ Text::Text(const std::string &arFontName, const std::string &arText)
     SetValue(arText);
 }
 
-Text& Text::SetValue(const std::string &arValue)
+Text& Text::operator <<(const Typography &arTypography)
 {
-    if (mValue != arValue) {
-        mValue = arValue;
+    ForceUpperCase(arTypography.UpperCase);
+    mFont.SetStyle(arTypography.Style);
+    mFont.SetColor(arTypography.Color);
+    mFont.SetSize(arTypography.Size);
+    SetLineSpacing(arTypography.Spacing);
+    SetHAlignment(arTypography.HAlignment);
+    SetVAlignment(arTypography.VAlignment);
+    return *this;
+}
+
+Text& Text::SetValue(std::string aValue)
+{
+    if (mUpperCase) {
+        utils::StrUtils::ToUpper(aValue);
+    }
+    if (mValue != aValue) {
+        mValue = aValue;
+        mDirty = true;
+    }
+    return *this;
+}
+
+Text& Text::ForceUpperCase(bool aUpperCase)
+{
+    if (mUpperCase != aUpperCase) {
+        mUpperCase = aUpperCase;
         mDirty = true;
     }
     return *this;
@@ -39,7 +64,7 @@ Text& Text::SetValue(const std::string &arValue)
 
 Text& Text::Reload(utils::OptionalPtr<const Rect> aRect)
 {
-    if (!mDirty && !aRect) {
+    if (!mDirty && !mFont.IsDirty() && !aRect) {
         return *this;
     }
 

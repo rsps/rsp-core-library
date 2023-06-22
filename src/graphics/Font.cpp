@@ -83,6 +83,7 @@ Font& Font::SetSize(int aSizePx)
 Font& Font::SetSize(int aWidthPx, int aHeightPx)
 {
     mpImpl->SetSize(aWidthPx, aHeightPx);
+    mDirty = true;
     return *this;
 }
 
@@ -91,12 +92,15 @@ int Font::GetSize() const
     return mpImpl->GetSize();
 }
 
-//Font& Font::SetColor(const Color &arColor)
-//{
-//    mColor = arColor;
-//    return *this;
-//}
-//
+Font& Font::SetColor(const Color &arColor)
+{
+    if (mColor != arColor) {
+        mColor = arColor;
+        mDirty = true;
+    }
+    return *this;
+}
+
 //Font& Font::SetBackgroundColor(const Color &arColor)
 //{
 //    mBackgroundColor = arColor;
@@ -106,6 +110,7 @@ int Font::GetSize() const
 Font& Font::SetStyle(FontStyles aStyle)
 {
     mpImpl->SetStyle(aStyle);
+    mDirty = true;
     return *this;
 }
 
@@ -117,6 +122,7 @@ FontStyles Font::GetStyle() const
 
 std::unique_ptr<Glyphs> Font::MakeGlyphs(const std::string &arText, int aLineSpacing)
 {
+    mDirty = false;
     return mpImpl->MakeGlyphs(arText, aLineSpacing);
 }
 
