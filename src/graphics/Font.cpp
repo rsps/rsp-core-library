@@ -56,16 +56,14 @@ void Font::RegisterFont(const char *apFileName)
 
 
 Font::Font(FontStyles aStyle)
-    : /*mColor(Color::White),*/
-      mpImpl(MakePimpl(mDefaultFontName))
+    : mpImpl(MakePimpl(mDefaultFontName))
 {
     SetStyle(aStyle);
     SetSize(16);
 }
 
 Font::Font(const std::string &arFontName, FontStyles aStyle)
-    : /*mColor(Color::White),*/
-      mpImpl(MakePimpl(arFontName))
+    : mpImpl(MakePimpl(arFontName))
 {
     SetStyle(aStyle);
     SetSize(16);

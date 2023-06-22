@@ -157,7 +157,7 @@ public:
 
 protected:
     static std::string mDefaultFontName;
-    Color mColor;
+    Color mColor = Color::Black;
 //    Color mBackgroundColor = Color::None;
     bool mDirty = false;
     std::shared_ptr<FontRawInterface> mpImpl;
