@@ -15,6 +15,13 @@
 
 using namespace rsp::graphics;
 
+const std::uint8_t cImageRGBA[] = {
+    0xFF, 0xFF, 0xFF, 0xFF,  0x00, 0x00, 0x00, 0xFF,
+    0x00, 0x00, 0x00, 0xFF,  0xFF, 0xFF, 0xFF, 0xFF,
+    0xFF, 0xFF, 0xFF, 0x80,  0x00, 0x00, 0x00, 0x80,
+    0x00, 0x00, 0x00, 0x80,  0xFF, 0xFF, 0xFF, 0x80,
+};
+
 const std::uint8_t cImageRGB[] = {
     0xFF, 0xFF, 0xFF,  0x00, 0x00, 0x00,
     0x00, 0x00, 0x00,  0xFF, 0xFF, 0xFF
@@ -63,7 +70,7 @@ TEST_CASE("PixelData")
         CHECK_EQ(pd.GetDataSize(), 8);
 
         CHECK_NOTHROW(pd.SetPixelAt(0,0, Color::White));
-        CHECK_EQ(pd.GetPixelAt(0,0, Color::White), Color(0xFFFFFFFF));
+        CHECK_EQ(pd.GetPixelAt(0,0, Color::White).AsUint(), 0xFFFFFFFF);
         CHECK_EQ(pd.GetDataSize(), 8);
 
         rsp::posix::FileSystem::MakeDirectory("cfiles");
@@ -77,13 +84,13 @@ TEST_CASE("PixelData")
         CHECK_EQ(pd.GetHeight(), 4);
         CHECK_EQ(pd.GetColorDepth(), ColorDepth::Alpha);
 
-        CHECK_EQ(pd.GetPixelAt(0,0, Color::White), Color(0x10FFFFFF));
-        CHECK_EQ(pd.GetPixelAt(1,0, Color::White), Color(0x20FFFFFF));
-        CHECK_EQ(pd.GetPixelAt(7,3, Color::White), Color(0xFFFFFFFF));
+        CHECK_EQ(pd.GetPixelAt(0,0, Color::White).AsUint(), 0x10FFFFFF);
+        CHECK_EQ(pd.GetPixelAt(1,0, Color::White).AsUint(), 0x20FFFFFF);
+        CHECK_EQ(pd.GetPixelAt(7,3, Color::White).AsUint(), 0xFFFFFFFF);
         CHECK_EQ(pd.GetDataSize(), 32);
 
         CHECK_NOTHROW(pd.SetPixelAt(0,0, Color::White));
-        CHECK_EQ(pd.GetPixelAt(0,0, Color::White), Color(0xFFFFFFFF));
+        CHECK_EQ(pd.GetPixelAt(0,0, Color::White).AsUint(), 0xFFFFFFFF);
         CHECK_EQ(pd.GetDataSize(), 32);
 
         pd.SaveToCFile(std::string("cfiles/Alpha.cpp"));
@@ -96,17 +103,68 @@ TEST_CASE("PixelData")
         CHECK_EQ(pd.GetHeight(), 2);
         CHECK_EQ(pd.GetColorDepth(), ColorDepth::RGB);
 
-        CHECK_EQ(pd.GetPixelAt(0,0, Color::Black), Color(0xFFFFFFFF));
-        CHECK_EQ(pd.GetPixelAt(1,0, Color::White), Color(0xFF000000));
-        CHECK_EQ(pd.GetPixelAt(1,0, Color::White), Color(0xFF000000));
-        CHECK_EQ(pd.GetPixelAt(1,1, Color::Black), Color(0xFFFFFFFF));
+        CHECK_EQ(pd.GetPixelAt(0,0, Color::Black).AsUint(), 0xFFFFFFFF);
+        CHECK_EQ(pd.GetPixelAt(1,0, Color::White).AsUint(), 0xFF000000);
+        CHECK_EQ(pd.GetPixelAt(0,1, Color::White).AsUint(), 0xFF000000);
+        CHECK_EQ(pd.GetPixelAt(1,1, Color::Black).AsUint(), 0xFFFFFFFF);
         CHECK_EQ(pd.GetDataSize(), 12);
 
         CHECK_NOTHROW(pd.SetPixelAt(0,0, Color::Blue));
-        CHECK_EQ(pd.GetPixelAt(0,0, Color::White), Color::Blue);
+        CHECK_EQ(pd.GetPixelAt(0,0, Color::White).AsUint(), Color::Blue);
         CHECK_EQ(pd.GetDataSize(), 12);
 
         pd.SaveToCFile(std::string("cfiles/RGB.cpp"));
+    }
+
+    SUBCASE("RGBA")
+    {
+        PixelData pd(2, 4, ColorDepth::RGBA, cImageRGBA, sizeof(cImageRGBA));
+        CHECK_EQ(pd.GetWidth(), 2);
+        CHECK_EQ(pd.GetHeight(), 4);
+        CHECK_EQ(pd.GetColorDepth(), ColorDepth::RGBA);
+
+        CHECK_EQ(pd.GetPixelAt(0,0, Color::Black).AsUint(), 0xFFFFFFFF);
+        CHECK_EQ(pd.GetPixelAt(1,0, Color::White).AsUint(), 0xFF000000);
+        CHECK_EQ(pd.GetPixelAt(0,1, Color::White).AsUint(), 0xFF000000);
+        CHECK_EQ(pd.GetPixelAt(1,1, Color::Black).AsUint(), 0xFFFFFFFF);
+        CHECK_EQ(pd.GetPixelAt(0,2, Color::Black).AsUint(), 0x80FFFFFF);
+        CHECK_EQ(pd.GetPixelAt(1,2, Color::White).AsUint(), 0x80000000);
+        CHECK_EQ(pd.GetPixelAt(0,3, Color::White).AsUint(), 0x80000000);
+        CHECK_EQ(pd.GetPixelAt(1,3, Color::Black).AsUint(), 0x80FFFFFF);
+        CHECK_EQ(pd.GetDataSize(), 32);
+
+        CHECK_NOTHROW(pd.SetPixelAt(0,0, Color::Blue));
+        CHECK_EQ(pd.GetPixelAt(0,0, Color::White).AsUint(), Color::Blue);
+        CHECK_EQ(pd.GetDataSize(), 32);
+
+        pd.SaveToCFile(std::string("cfiles/RGB.cpp"));
+    }
+
+    SUBCASE("Compress RGBA")
+    {
+        PixelData in(2, 4, ColorDepth::RGBA, cImageRGBA, sizeof(cImageRGBA));
+
+        GfxCompressor::CompressedData cd;
+        CHECK_NOTHROW(cd = in.Compress());
+
+        CHECK_EQ(cd.mData.size(), 30);
+
+//        MESSAGE("Compressed:\n" << TestHelpers::ToHex(cd.mData.data(), cd.mData.size(), 1));
+
+        PixelData pd(2, 4, ColorDepth::RGBA);
+        CHECK_NOTHROW(pd.Decompress(cd));
+
+//        MESSAGE("Decompressed:\n" << TestHelpers::ToHex(pd.GetData().data(), pd.GetDataSize(), 1));
+
+        CHECK_EQ(pd.GetPixelAt(0,0, Color::Black).AsUint(), 0xFFFFFFFF);
+        CHECK_EQ(pd.GetPixelAt(1,0, Color::White).AsUint(), 0xFF000000);
+        CHECK_EQ(pd.GetPixelAt(0,1, Color::White).AsUint(), 0xFF000000);
+        CHECK_EQ(pd.GetPixelAt(1,1, Color::Black).AsUint(), 0xFFFFFFFF);
+        CHECK_EQ(pd.GetPixelAt(0,2, Color::Black).AsUint(), 0x80FFFFFF);
+        CHECK_EQ(pd.GetPixelAt(1,2, Color::White).AsUint(), 0x80000000);
+        CHECK_EQ(pd.GetPixelAt(0,3, Color::White).AsUint(), 0x80000000);
+        CHECK_EQ(pd.GetPixelAt(1,3, Color::Black).AsUint(), 0x80FFFFFF);
+        CHECK_EQ(pd.GetDataSize(), 32);
     }
 
 }

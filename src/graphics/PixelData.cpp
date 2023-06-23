@@ -47,16 +47,7 @@ PixelData::PixelData(const GfxResource &arResource)
       mpData(arResource.PixData)
 {
     if (arResource.Compressed) {
-        GfxCompressor cmp(getCompressionType(arResource.Compressed));
-        auto result = cmp.Decompress(mpData, arResource.PixDataSize);
-
-        mData.resize(result.mSize);
-
-        GfxCompressor::size_type i = 0;
-        for (auto &val : mData) {
-            val = result.mpData[i++];
-        }
-        mpData = mData.data();
+        Decompress(getCompressionType(arResource.Compressed), mpData, arResource.PixDataSize);
     }
     mId = arResource.Id;
 }
@@ -68,17 +59,7 @@ PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, con
       mpData(apData)
 {
     if (aCompressed) {
-        GfxCompressor cmp(getCompressionType(aCompressed));
-        auto result = cmp.Decompress(mpData, aDataSize);
-
-        mData.resize(result.mSize);
-
-        GfxCompressor::size_type i = 0;
-        for (auto &val : mData) {
-            val = result.mpData[i++];
-        }
-
-        mpData = mData.data();
+        Decompress(getCompressionType(aCompressed), mpData, aDataSize);
     }
     mId = uint32_t(uintptr_t(mpData));
 }
@@ -311,26 +292,48 @@ void PixelData::initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aD
     mpData = mData.data();
 }
 
-GfxCompression PixelData::getCompressionType(bool aCompress) const
+GfxCompressor::CompressionType PixelData::getCompressionType(bool aCompress) const
 {
     if (!aCompress) {
-        return GfxCompression::None;
+        return GfxCompressor::CompressionType::None;
     }
 
     switch(mColorDepth) {
         case ColorDepth::Monochrome:
         case ColorDepth::Alpha:
-            return GfxCompression::Alpha;
+            return GfxCompressor::CompressionType::Alpha;
 
         case ColorDepth::RGB:
-            return GfxCompression::RGB;
+            return GfxCompressor::CompressionType::RGB;
 
         case ColorDepth::RGBA:
-            return GfxCompression::RGBA;
+            return GfxCompressor::CompressionType::RGBA;
 
         default:
-            return GfxCompression::None;
+            return GfxCompressor::CompressionType::None;
     }
+}
+
+GfxCompressor::CompressedData PixelData::Compress(bool aCompress) const
+{
+    GfxCompressor cmp;
+    return cmp.Compress(getCompressionType(aCompress), mpData, GetDataSize());
+}
+
+PixelData& PixelData::Decompress(const GfxCompressor::CompressedData &arCompressedData)
+{
+    GfxCompressor cmp;
+    mData = cmp.Decompress(arCompressedData.mType, arCompressedData.mData.data(), arCompressedData.mData.size());
+    mpData = mData.data();
+    return *this;
+}
+
+PixelData& PixelData::Decompress(const GfxCompressor::CompressionType aType, const uint8_t* apData, size_t aSize)
+{
+    GfxCompressor cmp;
+    mData = cmp.Decompress(aType, apData, aSize);
+    mpData = mData.data();
+    return *this;
 }
 
 void PixelData::SaveToCFile(const std::filesystem::path &arFileName, bool aCompress, const char *apHeaderFile) const
@@ -343,17 +346,16 @@ void PixelData::SaveToCFile(const std::filesystem::path &arFileName, bool aCompr
     fo << "#include \"" << (apHeaderFile ? apHeaderFile : obj_name + ".h") << "\"\n\n"
         << "using namespace rsp::graphics;\n" << std::endl;
 
-    GfxCompressor cmp(getCompressionType(aCompress));
-    auto result = cmp.Compress(mpData, GetDataSize());
+    auto result = Compress(aCompress);
 
-    fo << "static const std::uint8_t pixdata[" << result.mSize << "]{\n";
-    fo.Hex(result.mpData, result.mSize);
+    fo << "static const std::uint8_t pixdata[" << result.mData.size() << "]{\n";
+    fo.Hex(result.mData.data(), result.mData.size());
     fo << "};\n\n";
 
     fo << "const GfxResource c" << obj_name << "{" << utils::crc32::HashConst(obj_name.c_str()) << "u, "
         << GetWidth() << "u, " << GetHeight() << "u, ColorDepth::"
         << mColorDepth << ", " << (aCompress ? "true" : "false")
-        << ", " << result.mSize << ", pixdata};" << std::endl;
+        << ", " << result.mData.size() << ", pixdata};" << std::endl;
 
     std::ios_base::openmode mode = std::ios_base::out | (apHeaderFile ? std::ios_base::app : std::ios_base::trunc);
     std::filesystem::path hfile = arFileName;

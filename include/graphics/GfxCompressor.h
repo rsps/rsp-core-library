@@ -17,38 +17,41 @@
 
 namespace rsp::graphics {
 
-enum class GfxCompression {None, Alpha, RGB, RGBA};
-
 /**
  * \brief Interface for graphic compression algorithm
  */
 class GfxCompressor
 {
 public:
-    using size_type = size_t;
-    using data_type = std::uint8_t;
-
-    struct Result {
-        const data_type *mpData;
-        size_type mSize;
+    enum class CompressionType : uint32_t {
+        None, Alpha, RGB, RGBA
     };
 
-    GfxCompressor(GfxCompression aType) : mType(aType) {}
-    const Result Compress(const data_type* apData, size_type aSize);
-    const Result Decompress(const data_type* apData, size_type aSize);
+    using data_type = std::uint8_t;
+    using DecompressedData = std::vector<data_type>;
+    using size_type = DecompressedData::size_type;
+
+    struct CompressedData {
+        CompressionType mType = CompressionType::None;
+        std::vector<data_type> mData{};
+    };
+
+    CompressedData Compress(CompressionType aType, const data_type* apData, size_type aSize);
+    DecompressedData Decompress(const CompressedData &arCompressedData);
+    DecompressedData Decompress(CompressionType aType, const data_type* apData, size_type aSize);
 
 protected:
-    GfxCompression mType;
-    std::vector<data_type> mData{};
+    CompressedData nullCompress(const data_type* apData, size_type aSize);
+    DecompressedData nullDecompress(const data_type* apData, size_type aSize);
 
-    const Result alphaCompress(const data_type* apData, size_t aSize);
-    const Result alphaDecompress(const data_type* apData, size_t aSize);
+    CompressedData alphaCompress(const data_type* apData, size_type aSize);
+    DecompressedData alphaDecompress(const data_type* apData, size_type aSize);
 
-    const Result rgbCompress(const data_type* apData, size_t aSize);
-    const Result rgbDecompress(const data_type* apData, size_t aSize);
+    CompressedData rgbCompress(const data_type* apData, size_type aSize);
+    DecompressedData rgbDecompress(const data_type* apData, size_type aSize);
 
-    const Result rgbaCompress(const data_type* apData, size_t aSize);
-    const Result rgbaDecompress(const data_type* apData, size_t aSize);
+    CompressedData rgbaCompress(const data_type* apData, size_type aSize);
+    DecompressedData rgbaDecompress(const data_type* apData, size_type aSize);
 };
 
 }; // namespace rsp::graphics

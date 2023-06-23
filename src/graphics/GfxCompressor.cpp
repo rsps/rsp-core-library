@@ -17,100 +17,132 @@
 namespace rsp::graphics {
 
 
-const GfxCompressor::Result GfxCompressor::Compress(const data_type *apData, size_type aSize)
+GfxCompressor::CompressedData GfxCompressor::Compress(CompressionType aType, const data_type *apData, size_type aSize)
 {
-    std::cout << "GfxCompress(" << magic_enum::enum_name(mType) << ")" << std::endl;
+    std::cout << "GfxCompress(" << magic_enum::enum_name(aType) << ")" << std::endl;
 //    exceptions::BackTrace bt(0);
 //    std::cout << bt << std::endl;
 
-    switch (mType) {
+    switch (aType) {
         default:
-        case GfxCompression::None:
-            return Result{apData, aSize};
+        case CompressionType::None:
+            return nullCompress(apData, aSize);
 
-        case GfxCompression::Alpha:
+        case CompressionType::Alpha:
             return alphaCompress(apData, aSize);
 
-        case GfxCompression::RGB:
+        case CompressionType::RGB:
             return rgbCompress(apData, aSize);
 
-        case GfxCompression::RGBA:
+        case CompressionType::RGBA:
             return rgbaCompress(apData, aSize);
     }
 }
 
-const GfxCompressor::Result GfxCompressor::Decompress(const data_type *apData, size_type aSize)
+GfxCompressor::DecompressedData GfxCompressor::Decompress(const CompressedData &arCompressedData)
 {
-    std::cout << "GfxDecompress(" << magic_enum::enum_name(mType) << ")" << std::endl;
+    return Decompress(arCompressedData.mType, arCompressedData.mData.data(), arCompressedData.mData.size());
+}
+
+GfxCompressor::DecompressedData GfxCompressor::Decompress(CompressionType aType, const data_type *apData, size_type aSize)
+{
+    std::cout << "GfxDecompress(" << magic_enum::enum_name(aType) << ")" << std::endl;
 //    exceptions::BackTrace bt(0);
 //    std::cout << bt << std::endl;
 
-    switch (mType) {
+    switch (aType) {
         default:
-        case GfxCompression::None:
-            return Result{apData, aSize};
+        case CompressionType::None:
+            return nullDecompress(apData, aSize);
 
-        case GfxCompression::Alpha:
+        case CompressionType::Alpha:
             return alphaDecompress(apData, aSize);
 
-        case GfxCompression::RGB:
+        case CompressionType::RGB:
             return rgbDecompress(apData, aSize);
 
-        case GfxCompression::RGBA:
+        case CompressionType::RGBA:
             return rgbaDecompress(apData, aSize);
     }
 }
 
-const GfxCompressor::Result GfxCompressor::alphaCompress(const data_type* apData, size_t aSize)
+GfxCompressor::CompressedData GfxCompressor::nullCompress(const data_type *apData, size_type aSize)
 {
-    mData.reserve(aSize);
+    CompressedData result;
+
+    result.mType = CompressionType::None;
+    result.mData.resize(aSize);
+
+    for (auto &val : result.mData) {
+        val = *apData++;
+    }
+
+    return result;
+}
+
+GfxCompressor::DecompressedData GfxCompressor::nullDecompress(const data_type *apData, size_type aSize)
+{
+    DecompressedData result;
+    result.resize(aSize);
+    for (auto &val : result) {
+        val = *apData++;
+    }
+    return result;
+}
+
+GfxCompressor::CompressedData GfxCompressor::alphaCompress(const data_type* apData, size_t aSize)
+{
+    CompressedData result;
+    result.mType = CompressionType::Alpha;
+    result.mData.reserve(aSize);
 
     data_type val = apData[0];
     data_type count = 0;
 
     for (size_t i = 0; i < aSize ; ++i) {
         if ((val != apData[i]) || (count == 255)) {
-            mData.push_back(count);
-            mData.push_back(val);
+            result.mData.push_back(count);
+            result.mData.push_back(val);
             val = apData[i];
             count = 0;
         }
         count++;
     }
     if (aSize) {
-        mData.push_back(count);
-        mData.push_back(val);
+        result.mData.push_back(count);
+        result.mData.push_back(val);
     }
 
-    return Result{mData.data(), mData.size()};
+    return result;
 }
 
-const GfxCompressor::Result GfxCompressor::alphaDecompress(const data_type* apData, size_t aSize)
+GfxCompressor::DecompressedData GfxCompressor::alphaDecompress(const data_type* apData, size_type aSize)
 {
-    mData.reserve(aSize*2);
+    DecompressedData result;
+    result.reserve(aSize*2);
 
     for (size_t i = 0; i < aSize ; i += 2) {
         data_type count = apData[i];
         data_type val = apData[i+1];
-        mData.insert(mData.end(), size_type(count), val);
+        result.insert(result.end(), size_type(count), val);
     }
 
-    return Result{mData.data(), mData.size()};
+    return result;
 }
 
-const GfxCompressor::Result GfxCompressor::rgbCompress(const data_type *apData, size_t aSize)
+GfxCompressor::CompressedData GfxCompressor::rgbCompress(const data_type *apData, size_type aSize)
 {
-    mData.reserve(aSize);
+    CompressedData result;
+    result.mType = CompressionType::RGB;
+    result.mData.reserve(aSize);
 
     data_type val[3] = { apData[0], apData[1], apData[2] };
     data_type count = 0;
 
     for (size_t i = 0; i < aSize ; i += 3) {
         if (memcmp(val, &apData[i], 3) || (count == 255)) {
-            mData.push_back(count);
-            mData.push_back(val[0]);
-            mData.push_back(val[1]);
-            mData.push_back(val[2]);
+            result.mData.push_back(count);
+            result.mData.insert(result.mData.end(), &val[0], &val[2]);
             val[0] = apData[i+0];
             val[1] = apData[i+1];
             val[2] = apData[i+2];
@@ -119,45 +151,43 @@ const GfxCompressor::Result GfxCompressor::rgbCompress(const data_type *apData, 
         count++;
     }
     if (count) {
-        mData.push_back(count);
-        mData.push_back(val[0]);
-        mData.push_back(val[1]);
-        mData.push_back(val[2]);
+        result.mData.push_back(count);
+        result.mData.insert(result.mData.end(), &val[0], &val[2]);
     }
 
-    return Result{mData.data(), mData.size()};
+    return result;
 }
 
-const GfxCompressor::Result GfxCompressor::rgbDecompress(const data_type *apData, size_t aSize)
+GfxCompressor::DecompressedData GfxCompressor::rgbDecompress(const data_type *apData, size_type aSize)
 {
-    mData.reserve(aSize*2);
+    DecompressedData result;
+    result.reserve(aSize*2);
 
     for (size_t i = 0; i < aSize ; i += 4) {
         data_type count = apData[i];
         data_type val[3] = { apData[i+1], apData[i+2], apData[i+3] };
 
         for (data_type n = 0 ; n < count ; n++) {
-            mData.insert(mData.end(), &val[0], &val[3]);
+            result.insert(result.end(), &val[0], &val[3]);
         }
     }
 
-    return Result{mData.data(), mData.size()};
+    return result;
 }
 
-const GfxCompressor::Result GfxCompressor::rgbaCompress(const data_type *apData, size_t aSize)
+GfxCompressor::CompressedData GfxCompressor::rgbaCompress(const data_type *apData, size_type aSize)
 {
-    mData.reserve(aSize);
+    CompressedData result;
+    result.mType = CompressionType::RGBA;
+    result.mData.reserve(aSize);
 
     data_type val[4] = { apData[0], apData[1], apData[2], apData[3] };
     data_type count = 0;
 
     for (size_t i = 0; i < aSize ; i += 4) {
         if (memcmp(val, &apData[i], 4) || (count == 255)) {
-            mData.push_back(count);
-            mData.push_back(val[0]);
-            mData.push_back(val[1]);
-            mData.push_back(val[2]);
-            mData.push_back(val[3]);
+            result.mData.push_back(count);
+            result.mData.insert(result.mData.end(), &val[0], &val[4]);
             val[0] = apData[i+0];
             val[1] = apData[i+1];
             val[2] = apData[i+2];
@@ -167,31 +197,28 @@ const GfxCompressor::Result GfxCompressor::rgbaCompress(const data_type *apData,
         count++;
     }
     if (count) {
-        mData.push_back(count);
-        mData.push_back(val[0]);
-        mData.push_back(val[1]);
-        mData.push_back(val[2]);
-        mData.push_back(val[3]);
+        result.mData.push_back(count);
+        result.mData.insert(result.mData.end(), &val[0], &val[4]);
     }
 
-    return Result{mData.data(), mData.size()};
+    return result;
 }
 
-const GfxCompressor::Result GfxCompressor::rgbaDecompress(const data_type *apData, size_t aSize)
+GfxCompressor::DecompressedData GfxCompressor::rgbaDecompress(const data_type *apData, size_type aSize)
 {
-    mData.reserve(aSize*2);
+    DecompressedData result;
+    result.reserve(aSize*2);
 
-    for (size_t i = 0; i < aSize ; i += 4) {
+    for (size_t i = 0; i < aSize ; i += 5) {
         data_type count = apData[i];
         data_type val[4] = { apData[i+1], apData[i+2], apData[i+3], apData[i+4] };
 
         for (data_type n = 0 ; n < count ; n++) {
-            mData.insert(mData.end(), &val[0], &val[3]);
+            result.insert(result.end(), &val[0], &val[4]);
         }
     }
 
-    return Result{mData.data(), mData.size()};
+    return result;
 }
-
 
 } /* namespace rsp::graphics */

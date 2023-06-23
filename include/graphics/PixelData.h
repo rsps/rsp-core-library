@@ -90,6 +90,10 @@ public:
 
     bool SetBlend(bool aValue);
 
+    GfxCompressor::CompressedData Compress(bool aCompress = true) const;
+    PixelData& Decompress(const GfxCompressor::CompressedData &arCompressedData);
+    PixelData& Decompress(const GfxCompressor::CompressionType aType, const uint8_t* apData, size_t aSize);
+
 protected:
     ColorDepth mColorDepth = ColorDepth::RGB;
     Rect mRect{};
@@ -98,7 +102,7 @@ protected:
     bool mBlend = true;
     uint32_t mId = 0;
 
-    GfxCompression getCompressionType(bool aCompress) const;
+    GfxCompressor::CompressionType getCompressionType(bool aCompress) const;
 
     friend class ImgLoader;
     void initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth);
