@@ -140,6 +140,70 @@ TEST_CASE("PixelData")
         pd.SaveToCFile(std::string("cfiles/RGB.cpp"));
     }
 
+    SUBCASE("Compress Monochrome")
+    {
+        PixelData in(8, 8, ColorDepth::Monochrome, cImage1bit, sizeof(cImage1bit));
+
+        GfxCompressor::CompressedData cd;
+        CHECK_NOTHROW(cd = in.Compress());
+
+        CHECK_EQ(cd.mData.size(), 12);
+//        MESSAGE("Compressed:\n" << TestHelpers::ToHex(cd.mData.data(), cd.mData.size(), 1));
+
+        PixelData pd(8, 8, ColorDepth::Monochrome);
+        CHECK_NOTHROW(pd.Decompress(cd));
+//        MESSAGE("Decompressed:\n" << TestHelpers::ToHex(pd.GetData().data(), pd.GetDataSize(), 1));
+
+        CHECK_HEX(pd.GetPixelAt(0,0, Color::White).AsUint(), 0x00FFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,0, Color::White).AsUint(), 0xFFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(7,7, Color::White).AsUint(), 0xFFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(8,7, Color::White).AsUint(), Color::None);
+        CHECK_EQ(pd.GetDataSize(), 8);
+    }
+
+    SUBCASE("Compress Alpha")
+    {
+        PixelData in(8, 4, ColorDepth::Alpha, cImageAlpha, sizeof(cImageAlpha));
+
+        GfxCompressor::CompressedData cd;
+        CHECK_NOTHROW(cd = in.Compress());
+
+        CHECK_EQ(cd.mData.size(), 64);
+//        MESSAGE("Compressed:\n" << TestHelpers::ToHex(cd.mData.data(), cd.mData.size(), 1));
+
+        PixelData pd(8, 4, ColorDepth::Alpha);
+        CHECK_NOTHROW(pd.Decompress(cd));
+//        MESSAGE("Decompressed:\n" << TestHelpers::ToHex(pd.GetData().data(), pd.GetDataSize(), 1));
+
+        CHECK_EQ(pd.GetPixelAt(0,0, Color::White).AsUint(), 0x10FFFFFF);
+        CHECK_EQ(pd.GetPixelAt(1,0, Color::White).AsUint(), 0x20FFFFFF);
+        CHECK_EQ(pd.GetPixelAt(7,3, Color::White).AsUint(), 0xFFFFFFFF);
+        CHECK_EQ(pd.GetDataSize(), 32);
+    }
+
+    SUBCASE("Compress RGB")
+    {
+        PixelData in(2, 2, ColorDepth::RGB, cImageRGB, sizeof(cImageRGB));
+
+        GfxCompressor::CompressedData cd;
+        CHECK_NOTHROW(cd = in.Compress());
+
+        CHECK_EQ(cd.mData.size(), 12);
+//        MESSAGE("Compressed:\n" << TestHelpers::ToHex(cd.mData.data(), cd.mData.size(), 1));
+
+        PixelData pd(2, 2, ColorDepth::RGB);
+        CHECK_NOTHROW(pd.Decompress(cd));
+//        MESSAGE("Decompressed:\n" << TestHelpers::ToHex(pd.GetData().data(), pd.GetDataSize(), 1));
+
+        CHECK_EQ(pd.GetPixelAt(0,0, Color::Black).AsUint(), 0xFFFFFFFF);
+        CHECK_EQ(pd.GetPixelAt(1,0, Color::White).AsUint(), 0xFF000000);
+        CHECK_EQ(pd.GetPixelAt(0,1, Color::White).AsUint(), 0xFF000000);
+        CHECK_EQ(pd.GetPixelAt(1,1, Color::Black).AsUint(), 0xFFFFFFFF);
+        CHECK_EQ(pd.GetDataSize(), 12);
+
+    }
+
+
     SUBCASE("Compress RGBA")
     {
         PixelData in(2, 4, ColorDepth::RGBA, cImageRGBA, sizeof(cImageRGBA));
@@ -148,12 +212,10 @@ TEST_CASE("PixelData")
         CHECK_NOTHROW(cd = in.Compress());
 
         CHECK_EQ(cd.mData.size(), 30);
-
 //        MESSAGE("Compressed:\n" << TestHelpers::ToHex(cd.mData.data(), cd.mData.size(), 1));
 
         PixelData pd(2, 4, ColorDepth::RGBA);
         CHECK_NOTHROW(pd.Decompress(cd));
-
 //        MESSAGE("Decompressed:\n" << TestHelpers::ToHex(pd.GetData().data(), pd.GetDataSize(), 1));
 
         CHECK_EQ(pd.GetPixelAt(0,0, Color::Black).AsUint(), 0xFFFFFFFF);

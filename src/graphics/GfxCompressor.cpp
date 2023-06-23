@@ -142,7 +142,7 @@ GfxCompressor::CompressedData GfxCompressor::rgbCompress(const data_type *apData
     for (size_t i = 0; i < aSize ; i += 3) {
         if (memcmp(val, &apData[i], 3) || (count == 255)) {
             result.mData.push_back(count);
-            result.mData.insert(result.mData.end(), &val[0], &val[2]);
+            result.mData.insert(result.mData.end(), &val[0], &val[3]);
             val[0] = apData[i+0];
             val[1] = apData[i+1];
             val[2] = apData[i+2];
@@ -152,7 +152,7 @@ GfxCompressor::CompressedData GfxCompressor::rgbCompress(const data_type *apData
     }
     if (count) {
         result.mData.push_back(count);
-        result.mData.insert(result.mData.end(), &val[0], &val[2]);
+        result.mData.insert(result.mData.end(), &val[0], &val[3]);
     }
 
     return result;
