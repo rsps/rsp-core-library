@@ -17,7 +17,7 @@
 
 namespace rsp::graphics {
 
-enum class GfxCompression {None, Alpha, RGB};
+enum class GfxCompression {None, Alpha, RGB, RGBA};
 
 /**
  * \brief Interface for graphic compression algorithm
@@ -46,6 +46,9 @@ protected:
 
     const Result rgbCompress(const data_type* apData, size_t aSize);
     const Result rgbDecompress(const data_type* apData, size_t aSize);
+
+    const Result rgbaCompress(const data_type* apData, size_t aSize);
+    const Result rgbaDecompress(const data_type* apData, size_t aSize);
 };
 
 }; // namespace rsp::graphics

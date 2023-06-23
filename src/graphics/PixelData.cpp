@@ -325,6 +325,9 @@ GfxCompression PixelData::getCompressionType(bool aCompress) const
         case ColorDepth::RGB:
             return GfxCompression::RGB;
 
+        case ColorDepth::RGBA:
+            return GfxCompression::RGBA;
+
         default:
             return GfxCompression::None;
     }

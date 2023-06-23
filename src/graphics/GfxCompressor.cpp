@@ -33,6 +33,9 @@ const GfxCompressor::Result GfxCompressor::Compress(const data_type *apData, siz
 
         case GfxCompression::RGB:
             return rgbCompress(apData, aSize);
+
+        case GfxCompression::RGBA:
+            return rgbaCompress(apData, aSize);
     }
 }
 
@@ -52,6 +55,9 @@ const GfxCompressor::Result GfxCompressor::Decompress(const data_type *apData, s
 
         case GfxCompression::RGB:
             return rgbDecompress(apData, aSize);
+
+        case GfxCompression::RGBA:
+            return rgbaDecompress(apData, aSize);
     }
 }
 
@@ -137,5 +143,55 @@ const GfxCompressor::Result GfxCompressor::rgbDecompress(const data_type *apData
 
     return Result{mData.data(), mData.size()};
 }
+
+const GfxCompressor::Result GfxCompressor::rgbaCompress(const data_type *apData, size_t aSize)
+{
+    mData.reserve(aSize);
+
+    data_type val[4] = { apData[0], apData[1], apData[2], apData[3] };
+    data_type count = 0;
+
+    for (size_t i = 0; i < aSize ; i += 4) {
+        if (memcmp(val, &apData[i], 4) || (count == 255)) {
+            mData.push_back(count);
+            mData.push_back(val[0]);
+            mData.push_back(val[1]);
+            mData.push_back(val[2]);
+            mData.push_back(val[3]);
+            val[0] = apData[i+0];
+            val[1] = apData[i+1];
+            val[2] = apData[i+2];
+            val[3] = apData[i+3];
+            count = 0;
+        }
+        count++;
+    }
+    if (count) {
+        mData.push_back(count);
+        mData.push_back(val[0]);
+        mData.push_back(val[1]);
+        mData.push_back(val[2]);
+        mData.push_back(val[3]);
+    }
+
+    return Result{mData.data(), mData.size()};
+}
+
+const GfxCompressor::Result GfxCompressor::rgbaDecompress(const data_type *apData, size_t aSize)
+{
+    mData.reserve(aSize*2);
+
+    for (size_t i = 0; i < aSize ; i += 4) {
+        data_type count = apData[i];
+        data_type val[4] = { apData[i+1], apData[i+2], apData[i+3], apData[i+4] };
+
+        for (data_type n = 0 ; n < count ; n++) {
+            mData.insert(mData.end(), &val[0], &val[3]);
+        }
+    }
+
+    return Result{mData.data(), mData.size()};
+}
+
 
 } /* namespace rsp::graphics */
