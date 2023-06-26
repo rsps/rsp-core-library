@@ -256,6 +256,10 @@ protected:
     bool mVisible = true;
     bool mCheckable = false;
     States mState = States::Normal;
+    TouchCallback_t mOnPress{};
+    TouchCallback_t mOnMove{};
+    TouchCallback_t mOnLift{};
+    TouchCallback_t mOnClick{};
 
     void setName(const std::string &arName) override;
     void setId(uint32_t aId) override;
@@ -283,17 +287,13 @@ protected:
      */
     virtual void doSetArea(const Rect &arRect);
 
-private:
-    static Color mTouchAreaColor;
-    TouchCallback_t mOnPress{};
-    TouchCallback_t mOnMove{};
-    TouchCallback_t mOnLift{};
-    TouchCallback_t mOnClick{};
-
     virtual void doPress(const Point &arPoint);
     virtual void doMove(const Point &arPoint);
     virtual void doLift(const Point &arPoint);
     virtual void doClick(const Point &arPoint);
+
+private:
+    static Color mTouchAreaColor;
 };
 
 std::string to_string(Control::States aState);
