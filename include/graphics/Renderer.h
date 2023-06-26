@@ -99,7 +99,13 @@ public:
      * \param aClipRect
      * \return self
      */
-    virtual Renderer& SetClipRect(const Rect &arClipRect) = 0;
+    virtual Renderer& PushClipRect(const Rect &arClipRect) = 0;
+
+    /**
+     * \brief Pop the latest rect pushed to the clip rect list.
+     * \return self
+     */
+    virtual Renderer& PopClipRect() = 0;
 
     /**
      * \brief Reset the clipping rectangle to the size of the Renderer surface

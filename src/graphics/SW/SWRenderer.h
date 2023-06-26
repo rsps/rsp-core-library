@@ -14,6 +14,7 @@
 #ifdef USE_GFX_SW
 
 #include <string>
+#include <vector>
 #include <graphics/Renderer.h>
 #include <utils/Singleton.h>
 #include "Framebuffer.h"
@@ -32,7 +33,8 @@ public:
     Renderer& DrawRect(const Color &arColor, const Rect &arRect) override;
     Renderer& Fill(const Color &arColor, OptionalRect aDestination = nullptr) override;
     Renderer& Blit(const Texture &arTexture) override;
-    Renderer& SetClipRect(const Rect &arClipRect) override;
+    Renderer& PushClipRect(const Rect &arClipRect) override;
+    Renderer& PopClipRect() override;
     Renderer& ClearClipRect() override;
     Renderer& Flush() override;
     void Present() override;
@@ -42,6 +44,7 @@ public:
 
 protected:
     Rect mClipRect;
+    std::vector<Rect> mClipRectList{};
 };
 
 } /* namespace rsp::graphics::sw */

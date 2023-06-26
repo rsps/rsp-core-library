@@ -93,9 +93,23 @@ Renderer& SWRenderer::Blit(const Texture &arTexture)
     return *this;
 }
 
-Renderer& SWRenderer::SetClipRect(const Rect &arClipRect)
+Renderer& SWRenderer::PushClipRect(const Rect &arClipRect)
 {
-    mClipRect = arClipRect & Rect(0, 0, GetWidth(), GetHeight());
+    mClipRectList.push_back(arClipRect);
+    mClipRect = {0, 0, GetWidth(), GetHeight()};
+    for (const Rect& r : mClipRectList) {
+        mClipRect &= r;
+    }
+    return *this;
+}
+
+Renderer& SWRenderer::PopClipRect()
+{
+    mClipRectList.pop_back();
+    mClipRect = {0, 0, GetWidth(), GetHeight()};
+    for (const Rect& r : mClipRectList) {
+        mClipRect &= r;
+    }
     return *this;
 }
 

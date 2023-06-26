@@ -129,24 +129,43 @@ Renderer& SDLRenderer::Blit(const Texture &arTexture)
     return *this;
 }
 
-Renderer& SDLRenderer::SetClipRect(const Rect &arClipRect)
+Renderer& SDLRenderer::PushClipRect(const Rect &arClipRect)
 {
-    mClipRect = arClipRect & mArea;
-    SDLRect clip(mClipRect);
-
-    if (SDL_RenderSetClipRect(mpRenderer, &clip)) {
-        THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderSetClipRect");
+    mClipRectList.push_back(arClipRect);
+    mClipRect = mArea;
+    for (const Rect& r : mClipRectList) {
+        mClipRect &= r;
     }
+    setClipRect();
+    return *this;
+}
 
+Renderer& SDLRenderer::PopClipRect()
+{
+    mClipRectList.pop_back();
+    mClipRect = mArea;
+    for (const Rect& r : mClipRectList) {
+        mClipRect &= r;
+    }
+    setClipRect();
     return *this;
 }
 
 Renderer& SDLRenderer::ClearClipRect()
 {
-    SetClipRect(mArea);
+    mClipRectList.clear();
+    mClipRect = mArea;
+    setClipRect();
     return *this;
 }
 
+void SDLRenderer::setClipRect()
+{
+    SDLRect clip(mClipRect);
+    if (SDL_RenderSetClipRect(mpRenderer, &clip)) {
+        THROW_WITH_BACKTRACE1(SDLException, "SDL_RenderSetClipRect");
+    }
+}
 
 Renderer& SDLRenderer::Fill(const Color &arColor, OptionalRect aDestination)
 {

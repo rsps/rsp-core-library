@@ -15,6 +15,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 #include <SDL2/SDL.h>
 #include <graphics/Rect.h>
 #include <graphics/Renderer.h>
@@ -47,7 +48,8 @@ public:
 
     Renderer& Blit(const Texture &arTexture) override;
     Renderer& ClearClipRect() override;
-    Renderer& SetClipRect(const Rect &arClipRect) override;
+    Renderer& PushClipRect(const Rect &arClipRect) override;
+    Renderer& PopClipRect() override;
     Renderer& Fill(const Color &arColor, OptionalRect aDestination) override;
     GuiUnit_t GetWidth() const override;
     Renderer& Flush() override;
@@ -63,8 +65,11 @@ public:
 protected:
     Rect mArea;
     Rect mClipRect;
+    std::vector<Rect> mClipRectList{};
     SDL_Window* mpWindow = nullptr;
     SDL_Renderer* mpRenderer = nullptr;
+
+    void setClipRect();
 };
 
 } /* namespace rsp::graphics::sdl */
