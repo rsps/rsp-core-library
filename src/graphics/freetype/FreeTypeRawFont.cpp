@@ -98,7 +98,7 @@ FreeTypeRawFont::~FreeTypeRawFont()
     freeFace();
 }
 
-std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aLineSpacing)
+std::shared_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aLineSpacing)
 {
     /**
      * For general font terms
@@ -106,7 +106,7 @@ std::unique_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
      */
     createFace();
 
-    auto glyphs = std::make_unique<FTGlyphs>();
+    auto glyphs = std::make_shared<FTGlyphs>();
 
     std::u32string unicode = stringToU32(arText);
 

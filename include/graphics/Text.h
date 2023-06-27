@@ -12,6 +12,7 @@
 #define INCLUDE_GRAPHICS_TEXT_H_
 
 #include <string>
+#include <memory>
 #include "Canvas.h"
 #include "Font.h"
 #include "Rect.h"
@@ -205,7 +206,7 @@ protected:
     Font mFont;
     Rect mBoundingRect{};
     std::string mValue{};
-    std::unique_ptr<Glyphs> mpGlyphs{};
+    std::shared_ptr<Glyphs> mpGlyphs{};
     int mLineCount = 0;
     int mLineMaxChar = 0;
     int mLineSpacing = 1;

@@ -54,7 +54,7 @@ public:
     FreeTypeRawFont(const std::string &arFontName, int aFaceIndex = 0);
     ~FreeTypeRawFont();
 
-    std::unique_ptr<Glyphs> MakeGlyphs(const std::string &arText, int aLineSpacing) override;
+    std::shared_ptr<Glyphs> MakeGlyphs(const std::string &arText, int aLineSpacing) override;
     std::string GetFamilyName() const override;
     void SetSize(int aWidthPx, int aHeightPx) override;
     void SetStyle(FontStyles aStyle) override;

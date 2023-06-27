@@ -118,7 +118,7 @@ FontStyles Font::GetStyle() const
 }
 
 
-std::unique_ptr<Glyphs> Font::MakeGlyphs(const std::string &arText, int aLineSpacing)
+std::shared_ptr<Glyphs> Font::MakeGlyphs(const std::string &arText, int aLineSpacing)
 {
     mDirty = false;
     return mpImpl->MakeGlyphs(arText, aLineSpacing);
