@@ -92,4 +92,25 @@ void Label::render(Renderer &arRenderer) const
     }
 }
 
+Label::Label(const Label &arOther)
+    : Control(arOther)
+{
+    if (this != &arOther) {
+        mText = arOther.mText;
+        mpTexture = arOther.mpTexture->Clone();
+        mScaleToFit = arOther.mScaleToFit;
+    }
+}
+
+Label& Label::operator =(const Label &arOther)
+{
+    if (this != &arOther) {
+        Control::operator=(arOther);
+        mText = arOther.mText;
+        mpTexture = arOther.mpTexture->Clone();
+        mScaleToFit = arOther.mScaleToFit;
+    }
+    return *this;
+}
+
 } /* namespace rsp::graphics */

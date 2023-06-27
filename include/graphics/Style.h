@@ -11,7 +11,6 @@
 #ifndef INCLUDE_GRAPHICS_STYLE_H_
 #define INCLUDE_GRAPHICS_STYLE_H_
 
-#include <memory>
 #include <vector>
 #include <graphics/Color.h>
 #include <graphics/Texture.h>
@@ -21,6 +20,24 @@ namespace rsp::graphics {
 class Style
 {
 public:
+    Style() noexcept {}
+
+    Style(const Style &arOther) {
+        for(const TexturePtr_t &tex : arOther.mTextures) {
+            mTextures.push_back(tex->Clone());
+        }
+    }
+    Style& operator=(const Style &arOther) {
+        if (this != &arOther) {
+            for(const TexturePtr_t &tex : arOther.mTextures) {
+               mTextures.push_back(tex->Clone());
+            }
+        }
+        return *this;
+    }
+    Style(Style &&arOther) = default;
+    Style& operator=(Style &&arOther) = default;
+
     Color mForegroundColor = Color::White;
     Color mBackgroundColor = Color::None;
     std::vector<TexturePtr_t> mTextures{};

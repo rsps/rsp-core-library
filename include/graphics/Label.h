@@ -24,6 +24,12 @@ class Label : public Control
 public:
     Label() { initTypeInfo<Label>(); }
 
+    Label(const Label &arOther);
+    Label(Label &&arOther) = default;
+
+    Label& operator=(const Label &arOther);
+    Label& operator=(Label &&arOther) = default;
+
     Label& operator<<(const std::string &arCaption) { return SetCaption(arCaption); }
     Label& operator<<(const std::string_view aCaption) { return SetCaption(std::string(aCaption)); }
     Label& operator<<(const char *apCaption) { return SetCaption(std::string(apCaption)); }
