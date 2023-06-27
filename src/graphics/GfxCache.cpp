@@ -115,7 +115,7 @@ GfxCache& GfxCache::SetPixelData(uint32_t aId, const PixelData &arPixelData)
     return *this;
 }
 
-GfxCache& GfxCache::SetTexture(uint32_t aId, TexturePtr_t &arTexture)
+GfxCache& GfxCache::SetTexture(uint32_t aId, const TexturePtr_t &arTexture)
 {
     mTextureList[aId] = arTexture->Clone();
     return *this;

@@ -49,7 +49,7 @@ public:
     TexturePtr_t& GetTexture(uint32_t aId);
 
     GfxCache& SetPixelData(uint32_t aId, const PixelData &arPixelData);
-    GfxCache& SetTexture(uint32_t aId, TexturePtr_t &arTexture);
+    GfxCache& SetTexture(uint32_t aId, const TexturePtr_t &arTexture);
 
 protected:
     std::map<uint32_t, PixelData>    mPixelDataList{};
