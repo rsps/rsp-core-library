@@ -60,6 +60,7 @@ bool SDLEvents::Poll(rsp::graphics::GfxEvent &arInput)
             arInput.mType = EventTypes::Press;
             arInput.mCurrent = Point(event.motion.x, event.motion.y);
             arInput.mPress = Point(event.motion.x, event.motion.y);
+            arInput.mPressTime = arInput.mTime;
             break;
 
         case SDL_MOUSEBUTTONUP:
