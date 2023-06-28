@@ -320,7 +320,6 @@ bool Control::ProcessInput(GfxEvent &arInput)
             if (mTouchArea.IsHit(arInput.mPress)) {
                 bool result = doLift(arInput.mCurrent);
                 if (mTouchArea.IsHit(arInput.mCurrent)) {
-                    Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput;
                     if (IsCheckable()) {
                         if (IsChecked()) {
                             SetState(Control::States::Normal);
@@ -333,6 +332,7 @@ bool Control::ProcessInput(GfxEvent &arInput)
                         SetState(Control::States::Normal);
                     }
                     if ((arInput.mTime - arInput.mPressTime) < std::chrono::milliseconds(800)) {
+                        Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput;
                         doClick(arInput.mCurrent);
                     }
                 }
