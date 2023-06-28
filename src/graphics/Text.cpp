@@ -12,7 +12,8 @@
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
 
-#define DEBUG(a) { Logger::GetDefault().Debug() << a; }
+//#define DEBUG(a) { Logger::GetDefault().Debug() << a; }
+#define DEBUG(a)
 
 using namespace rsp::logging;
 

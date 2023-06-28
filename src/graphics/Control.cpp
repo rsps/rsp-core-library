@@ -53,15 +53,20 @@ void Control::SetState(States aState)
     if (mState != aState) {
         mState = aState;
         Invalidate();
-        for (Control* child : mChildren) {
-            child->SetState(aState);
-        }
+//        for (Control* child : mChildren) {
+//            child->SetState(aState);
+//        }
     }
 }
 
 void Control::Invalidate()
 {
-    mDirty = true;
+    if (!mDirty) {
+        mDirty = true;
+        for (Control* child : mChildren) {
+            child->Invalidate();
+        }
+    }
 }
 
 Control& Control::SetArea(Rect aRect)
@@ -82,10 +87,12 @@ Control& Control::SetArea(Rect aRect)
             child->SetOrigin((child->GetOrigin() - mArea.GetTopLeft()) + aRect.GetTopLeft());
         }
         mArea = aRect;
-        Invalidate();
         if (mpParent) {
             // Force repaint of parent, this is resizing
             mpParent->Invalidate();
+        }
+        else {
+            Invalidate();
         }
     }
     doSetArea(aRect);
@@ -316,12 +323,11 @@ bool Control::ProcessInput(GfxEvent &arInput)
                     Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput;
                     if (IsCheckable()) {
                         if (IsChecked()) {
-                            mState = States::Normal;
+                            SetState(Control::States::Normal);
                         }
                         else {
-                            mState = States::Checked;
+                            SetState(Control::States::Checked);
                         }
-                        Invalidate();
                     }
                     else {
                         SetState(Control::States::Normal);
@@ -355,13 +361,13 @@ bool Control::ProcessInput(GfxEvent &arInput)
                 }
                 else if (!mTouchArea.IsHit(arInput.mCurrent)) {
                     if (!IsChecked()) {
-                        mState = States::Normal;
+                        SetState(Control::States::Normal);
                     }
                     else {
-                        mState = States::Checked;
+                        SetState(Control::States::Checked);
                     }
                 }
-                return true;
+                return false;
             }
             break;
 
