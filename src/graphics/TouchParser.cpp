@@ -64,6 +64,7 @@ bool TouchParser::Poll(GfxEvent &arInput)
             readBody(arInput);
             if (arInput.mType == EventTypes::Press) {
                 arInput.mPress = arInput.mCurrent;
+                arInput.mPressTime = arInput.mTime;
             }
             return true;
         }
