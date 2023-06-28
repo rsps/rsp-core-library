@@ -110,20 +110,20 @@ Color& Color::operator=(Color &&arColor)
  * \see https://en.wikipedia.org/wiki/Blend_modes
  * \see GIMP mode: GIMP_LAYER_MODE_NORMAL
  */
-Color Color::Blend(Color aBg, Color aFg)
+Color Color::Blend(const Color &arBg, const Color &arFg)
 {
-    uint32_t fg = aFg.AsUint();
-    uint32_t bg = aBg.AsUint();
+    uint32_t fg = arFg.AsUint();
+    uint32_t bg = arBg.AsUint();
     uint32_t a = fg >> 24;
 
     // If source pixel is fully transparent, just return the background
     if (0 == a) {
-      return aBg;
+      return arBg;
     }
 
     // If source pixel is not transparent, just return the foreground
     if (255 == a) {
-        return aFg;
+        return arFg;
     }
 
     uint32_t rb = ((((fg & 0x00ff00ff) * a) + 0x00007F007F) + ((bg & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;

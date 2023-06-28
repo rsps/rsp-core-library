@@ -176,7 +176,7 @@ class Color
      * \param b
      * \return Combined color
      */
-    static Color Blend(Color a, Color b);
+    static Color Blend(const Color &a, const Color &b);
 
   protected:
     struct __abgr {
