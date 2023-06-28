@@ -287,10 +287,10 @@ protected:
      */
     virtual void doSetArea(const Rect &arRect);
 
-    virtual void doPress(const Point &arPoint);
-    virtual void doMove(const Point &arPoint);
-    virtual void doLift(const Point &arPoint);
-    virtual void doClick(const Point &arPoint);
+    virtual bool doPress(const Point &arPoint);
+    virtual bool doMove(const Point &arPoint, const Point &arPressPoint);
+    virtual bool doLift(const Point &arPoint);
+    virtual bool doClick(const Point &arPoint);
 
 private:
     static Color mTouchAreaColor;

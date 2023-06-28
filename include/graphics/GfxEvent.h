@@ -37,6 +37,7 @@ public:
     std::chrono::steady_clock::time_point mTime{};
     EventTypes mType = EventTypes::None;
     Point mCurrent{};  // Value of the latest absolute coordinate from touch controller
+    std::chrono::steady_clock::time_point mPressTime{};
     Point mPress{}; // Absolute coordinate of latest press
 
     GfxEvent() {}

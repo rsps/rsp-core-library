@@ -292,14 +292,13 @@ bool Control::ProcessInput(GfxEvent &arInput)
                 }
             }
             if (mTouchArea.IsHit(arInput.mCurrent)) {
-                doPress(arInput.mCurrent);
                 if (GetState() == Control::States::Checked) {
                     SetState(Control::States::CheckedPressed);
                 }
                 else {
                     SetState(Control::States::Pressed);
                 }
-                return true;
+                return doPress(arInput.mCurrent);
             }
             break;
 
@@ -312,7 +311,7 @@ bool Control::ProcessInput(GfxEvent &arInput)
                 }
             }
             if (mTouchArea.IsHit(arInput.mPress)) {
-                doLift(arInput.mCurrent);
+                bool result = doLift(arInput.mCurrent);
                 if (mTouchArea.IsHit(arInput.mCurrent)) {
                     Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput;
                     if (IsCheckable()) {
@@ -327,12 +326,14 @@ bool Control::ProcessInput(GfxEvent &arInput)
                     else {
                         SetState(Control::States::Normal);
                     }
-                    doClick(arInput.mCurrent);
+                    if ((arInput.mTime - arInput.mPressTime) < std::chrono::milliseconds(800)) {
+                        doClick(arInput.mCurrent);
+                    }
                 }
                 else {
                     SetState(Control::States::Normal);
                 }
-                return true;
+                return result;
             }
             break;
 
@@ -346,8 +347,16 @@ bool Control::ProcessInput(GfxEvent &arInput)
             }
             if (mTouchArea.IsHit(arInput.mPress)) {
                 if (IsDraggable()) {
-                    doMove(arInput.mCurrent);
                     SetState(Control::States::Dragged);
+                    return doMove(arInput.mCurrent, arInput.mPress);
+                }
+                else if (!mTouchArea.IsHit(arInput.mCurrent)) {
+                    if (!IsChecked()) {
+                        mState = States::Normal;
+                    }
+                    else {
+                        mState = States::Checked;
+                    }
                 }
                 return true;
             }
@@ -364,24 +373,28 @@ bool Control::ProcessInput(GfxEvent &arInput)
     return false;
 }
 
-void Control::doPress(const Point &arPoint)
+bool Control::doPress(const Point &arPoint)
 {
     mOnPress(arPoint, GetId());
+    return true;
 }
 
-void Control::doMove(const Point &arPoint)
+bool Control::doMove(const Point &arPoint, const Point &arPressPoint)
 {
     mOnMove(arPoint, GetId());
+    return true;
 }
 
-void Control::doLift(const Point &arPoint)
+bool Control::doLift(const Point &arPoint)
 {
     mOnLift(arPoint, GetId());
+    return true;
 }
 
-void Control::doClick(const Point &arPoint)
+bool Control::doClick(const Point &arPoint)
 {
     mOnClick(arPoint, GetId());
+    return true;
 }
 
 } // namespace rsp::graphics
