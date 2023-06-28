@@ -167,6 +167,8 @@ class Point
         mY = aValue;
     }
 
+    int Distance(const Point &arOther) const;
+
   protected:
     // Allow friends to access members for speed optimizations.
     friend PixelData;

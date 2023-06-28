@@ -8,6 +8,7 @@
  * \author      Simon Glashoff
  */
 
+#include <cmath>
 #include <graphics/Point.h>
 
 namespace rsp::graphics
@@ -17,6 +18,11 @@ std::ostream& operator <<(std::ostream &os, const Point &p)
 {
     os << "X: " << p.GetX() << ", Y: " << p.GetY();
     return os;
+}
+
+int Point::Distance(const Point &arOther) const
+{
+    return int(std::sqrt(std::pow(float(arOther.GetY() - mY), 2.0f) + std::pow(float(arOther.GetX() - mX), 2.0f)));
 }
 
 }

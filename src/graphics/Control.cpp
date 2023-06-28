@@ -346,6 +346,9 @@ bool Control::ProcessInput(GfxEvent &arInput)
                 }
             }
             if (mTouchArea.IsHit(arInput.mPress)) {
+                if ((arInput.mPressTime != std::chrono::steady_clock::time_point()) && (arInput.mPress.Distance(arInput.mCurrent) > 10)) {
+                    arInput.mPressTime = std::chrono::steady_clock::time_point();
+                }
                 if (IsDraggable()) {
                     SetState(Control::States::Dragged);
                     return doMove(arInput.mCurrent, arInput.mPress);
