@@ -359,13 +359,11 @@ bool Control::ProcessInput(GfxEvent &arInput)
                     SetState(Control::States::Dragged);
                     return doMove(arInput.mCurrent, arInput.mPress);
                 }
-                else if (!mTouchArea.IsHit(arInput.mCurrent)) {
-                    if (!IsChecked()) {
-                        SetState(Control::States::Normal);
-                    }
-                    else {
-                        SetState(Control::States::Checked);
-                    }
+                else if (!IsChecked()) {
+                    SetState(Control::States::Normal);
+                }
+                else {
+                    SetState(Control::States::Checked);
                 }
                 return false;
             }
