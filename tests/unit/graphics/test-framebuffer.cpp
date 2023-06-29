@@ -699,7 +699,7 @@ TEST_CASE("Framebuffer")
         Color green(Color::Green);
         Color red(Color::Red);
 
-        for (std::uint8_t a = 0; a < 200 ; a += 5) {
+        for (std::uint8_t a = 0; a < 250 ; a += 5) {
             blue.SetAlpha(a);
             green.SetAlpha(a);
             red.SetAlpha(a);
@@ -714,7 +714,7 @@ TEST_CASE("Framebuffer")
         }
         CHECK_NOTHROW(renderer.Blit(texture));
         CHECK_NOTHROW(renderer.Flush());
-        CHECK_HEX(renderer.GetPixel(Point(180, 180)).AsUint(), 0xFF386100);
+        CHECK_HEX(renderer.GetPixel(Point(180, 180)).AsUint(), 0xFF007A0A);
     }
 
 //    Renderer::Destroy();

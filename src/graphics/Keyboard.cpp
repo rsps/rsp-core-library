@@ -116,8 +116,8 @@ Keyboard::Keyboard()
         .Foreground(Control::States::Normal, Color(cRspDarkBlue), lower_case, {11, 7})
         .Background(Control::States::Pressed, Color(cRspDarkBlue), small_special_dark.get())
         .Foreground(Control::States::Pressed, Color::White, lower_case, {11, 7})
-        .Background(Control::States::Checked, Color::White, small_special.get())
-        .Foreground(Control::States::Checked, Color(cRspDarkBlue), upper_case, {11, 3})
+        .Background(Control::States::CheckedNormal, Color::White, small_special.get())
+        .Foreground(Control::States::CheckedNormal, Color(cRspDarkBlue), upper_case, {11, 3})
         .Background(Control::States::CheckedPressed, Color(cRspDarkBlue), small_special_dark.get())
         .Foreground(Control::States::CheckedPressed, Color::White, upper_case, {11, 3})
         .Setup(Rect(0, 152, 80, 71), small_special->GetDestinationRect(), {18, 167})
@@ -135,7 +135,7 @@ Keyboard::Keyboard()
         .Foreground(Control::States::Pressed, Color::White)
         .Setup(cSpecialLeft, mBigSpecialRect, {18, 236})
         .SetName("LettersLeft");
-    mBtnLettersLeft.SetCaption("ABC").SetFontSize(22);
+    mBtnLettersLeft.SetFontSize(22).SetCaption("ABC");
 
     mBtnLettersRight.Symbol(cKEY_LETTERS)
         .Background(Control::States::Normal, Color::White, big_special.get())
@@ -144,7 +144,7 @@ Keyboard::Keyboard()
         .Foreground(Control::States::Pressed, Color::White)
         .Setup(cSpecialRight, mBigSpecialRect, {366, 236})
         .SetName("LettersRight");
-    mBtnLettersRight.SetCaption("ABC").SetFontSize(22);
+    mBtnLettersRight.SetFontSize(22).SetCaption("ABC");
     mBtnLettersRight.Hide();
 
     mBtnNumbers.Symbol(cKEY_NUMBERS)
@@ -154,7 +154,7 @@ Keyboard::Keyboard()
         .Foreground(Control::States::Pressed, Color::White)
         .Setup(cSpecialLeft, mBigSpecialRect, {18, 236})
         .SetName("Numbers");
-    mBtnNumbers.SetCaption("123").SetFontSize(22);
+    mBtnNumbers.SetFontSize(22).SetCaption("123");
 
     mBtnSpecials.Symbol(cKEY_SPECIALS)
         .Background(Control::States::Normal, Color::White, big_special.get())
@@ -163,7 +163,7 @@ Keyboard::Keyboard()
         .Foreground(Control::States::Pressed, Color::White)
         .Setup(cSpecialRight, mBigSpecialRect, {366, 236})
         .SetName("Special");
-    mBtnSpecials.SetCaption("+-/").SetFontSize(22);
+    mBtnSpecials.SetFontSize(22).SetCaption("+-/");
 
     auto erase = getPixelData(TextureId::Erase);
     mBtnErase.Symbol('\b')
@@ -232,7 +232,7 @@ Keyboard::~Keyboard()
 {
 }
 
-void Keyboard::doKeyClick(const Point &arPoint, uint32_t aSymbol)
+void Keyboard::doKeyClick(const GfxEvent &arEvent, uint32_t aSymbol)
 {
     switch(aSymbol) {
         case cKEY_SHIFT:

@@ -50,7 +50,7 @@ TEST_CASE("Control")
         CHECK_NOTHROW(myControl.Invalidate());
 
         CHECK(myControl.IsInvalid());
-        CHECK_FALSE(childControl.IsInvalid());
+        CHECK(childControl.IsInvalid());
 
         CHECK_NOTHROW(myControl.UpdateData());
         CHECK_FALSE(myControl.IsInvalid());
@@ -124,7 +124,7 @@ TEST_CASE("Control")
         Canvas paper(150, 50);
         paper.Fill(Color::Yellow);
         auto texture = Texture::Create(paper);
-        texture->SetDestination({100, 300});
+        texture->SetDestination({-100, 260}); // Relative to myControl
 
         auto &style = myControl.GetStyle(Control::States::Normal);
         style.mBackgroundColor = Color::Blue;

@@ -165,7 +165,7 @@ protected:
 
     void addBtn(Key &arBtn);
     void setSymbols(const std::string &arSymbols);
-    void doKeyClick(const Point &arPoint, uint32_t aSymbol);
+    void doKeyClick(const GfxEvent &arEvent, uint32_t aSymbol);
     const PixelData& getPixelData(TextureId aId);
 };
 

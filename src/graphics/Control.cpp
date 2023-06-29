@@ -50,12 +50,15 @@ void Control::setId(uint32_t aId)
 
 void Control::SetState(States aState)
 {
+    if (aState > States::Dragged) {
+        aState = States(uint32_t(aState) % uint32_t(States::CheckedNormal));
+    }
     if (mState != aState) {
         mState = aState;
         Invalidate();
-//        for (Control* child : mChildren) {
-//            child->SetState(aState);
-//        }
+        for (Control* child : mChildren) {
+            child->SetState(aState);
+        }
     }
 }
 
@@ -138,7 +141,7 @@ Point Control::GetOrigin() const
     return mArea.GetTopLeft();
 }
 
-Rect Control::GetTouchArea()
+Rect Control::GetTouchArea() const
 {
     Rect r = mTouchArea;
     if (mpParent) {
@@ -262,6 +265,15 @@ Control& Control::SetCheckable(bool aValue)
     return *this;
 }
 
+Control& Control::SetChecked(bool aValue)
+{
+    if (mChecked != aValue) {
+        mChecked = aValue;
+        Invalidate();
+    }
+    return *this;
+}
+
 Control& Control::Show(bool aVisible)
 {
     if (mVisible != aVisible) {
@@ -285,8 +297,8 @@ bool Control::ProcessInput(GfxEvent &arInput)
     if (!IsVisible()) {
         return false;
     }
-    if ((GetState() == Control::States::Disabled) && mTouchArea.IsHit(arInput.mCurrent)) {
-        return true;
+    if (!IsEnabled()) {
+        return mTouchArea.IsHit(arInput.mCurrent);
     }
 
     switch (arInput.mType) {
@@ -299,13 +311,8 @@ bool Control::ProcessInput(GfxEvent &arInput)
                 }
             }
             if (mTouchArea.IsHit(arInput.mCurrent)) {
-                if (GetState() == Control::States::Checked) {
-                    SetState(Control::States::CheckedPressed);
-                }
-                else {
-                    SetState(Control::States::Pressed);
-                }
-                return doPress(arInput.mCurrent);
+                SetState(Control::States::Pressed);
+                return doPress(arInput);
             }
             break;
 
@@ -318,26 +325,16 @@ bool Control::ProcessInput(GfxEvent &arInput)
                 }
             }
             if (mTouchArea.IsHit(arInput.mPress)) {
-                bool result = doLift(arInput.mCurrent);
+                bool result = doLift(arInput);
+                SetState(Control::States::Normal);
                 if (mTouchArea.IsHit(arInput.mCurrent)) {
                     if (IsCheckable()) {
-                        if (IsChecked()) {
-                            SetState(Control::States::Normal);
-                        }
-                        else {
-                            SetState(Control::States::Checked);
-                        }
-                    }
-                    else {
-                        SetState(Control::States::Normal);
+                        SetChecked(!IsChecked());
                     }
                     if ((arInput.mTime - arInput.mPressTime) < std::chrono::milliseconds(800)) {
                         Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput;
-                        doClick(arInput.mCurrent);
+                        doClick(arInput);
                     }
-                }
-                else {
-                    SetState(Control::States::Normal);
                 }
                 return result;
             }
@@ -357,15 +354,11 @@ bool Control::ProcessInput(GfxEvent &arInput)
                 }
                 if (IsDraggable()) {
                     SetState(Control::States::Dragged);
-                    return doMove(arInput.mCurrent, arInput.mPress);
-                }
-                else if (!IsChecked()) {
-                    SetState(Control::States::Normal);
+                    return doMove(arInput);
                 }
                 else {
-                    SetState(Control::States::Checked);
+                    SetState(Control::States::Normal);
                 }
-                return false;
             }
             break;
 
@@ -380,27 +373,27 @@ bool Control::ProcessInput(GfxEvent &arInput)
     return false;
 }
 
-bool Control::doPress(const Point &arPoint)
+bool Control::doPress(const GfxEvent &arEvent)
 {
-    mOnPress(arPoint, GetId());
+    mOnPress(arEvent, GetId());
     return true;
 }
 
-bool Control::doMove(const Point &arPoint, const Point &arPressPoint)
+bool Control::doMove(const GfxEvent &arEvent)
 {
-    mOnMove(arPoint, GetId());
+    mOnMove(arEvent, GetId());
     return true;
 }
 
-bool Control::doLift(const Point &arPoint)
+bool Control::doLift(const GfxEvent &arEvent)
 {
-    mOnLift(arPoint, GetId());
+    mOnLift(arEvent, GetId());
     return true;
 }
 
-bool Control::doClick(const Point &arPoint)
+bool Control::doClick(const GfxEvent &arEvent)
 {
-    mOnClick(arPoint, GetId());
+    mOnClick(arEvent, GetId());
     return true;
 }
 

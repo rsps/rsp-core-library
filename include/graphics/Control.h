@@ -40,19 +40,19 @@ public:
 class Control : public rsp::utils::TypeInfo
 {
 public:
-    using TouchCallback_t = rsp::utils::Function<void(const Point&, uint32_t)>;
+    using TouchCallback_t = rsp::utils::Function<void(const GfxEvent&, uint32_t)>;
 
     /**
      * \brief Enum type defining the available states
      * Not class scoped on purpose, they are used as array indexes
      */
     enum States {
-        Disabled,
         Normal,
         Pressed,
         Dragged,
-        Checked,
-        CheckedPressed
+        CheckedNormal,  // Read only
+        CheckedPressed, // Read only
+        CheckedDragged  // Read only
     };
 
     Control() { initTypeInfo<Control>(); }
@@ -94,15 +94,20 @@ public:
     bool IsInvalid() const { return mDirty; }
 
     virtual Control& SetDraggable(bool aValue);
-    virtual bool IsDraggable() { return mDraggable; }
+    virtual bool IsDraggable() const { return mDraggable; }
 
     virtual Control& SetCheckable(bool aValue);
-    virtual bool IsCheckable() { return mCheckable; }
-    virtual bool IsChecked() { return (mState == States::Checked) || (mState == States::CheckedPressed); }
+    virtual bool IsCheckable() const { return mCheckable; }
+    virtual Control& SetChecked(bool aValue);
+    virtual bool IsChecked() const { return mChecked; }
 
-    virtual bool IsVisible() {return mVisible; }
+    virtual bool IsVisible() const {return mVisible; }
     virtual Control& Show(bool aVisible = true);
-    virtual Control& Hide() { return Show(false); }
+    Control& Hide() { return Show(false); }
+
+    virtual bool IsEnabled() const { return mEnabled; }
+    virtual Control& Enable(bool aEnable = true) { mEnabled = aEnable; return *this; }
+    Control& Disable() { return Enable(false); }
 
     /**
      * \brief Set the object to transparent or not
@@ -160,7 +165,7 @@ public:
      * \brief Gets the touch area in parent coordinates
      * \return The current defined area as a Rectangle
      */
-    Rect GetTouchArea();
+    Rect GetTouchArea() const;
 
     /**
      * \brief Set the touch area in parent coordinates
@@ -254,7 +259,10 @@ protected:
     bool mDirty = true;
     bool mDraggable = false;
     bool mVisible = true;
+    bool mEnabled = true;
     bool mCheckable = false;
+    bool mChecked = false;
+
     States mState = States::Normal;
     TouchCallback_t mOnPress{};
     TouchCallback_t mOnMove{};
@@ -287,10 +295,10 @@ protected:
      */
     virtual void doSetArea(const Rect &arRect);
 
-    virtual bool doPress(const Point &arPoint);
-    virtual bool doMove(const Point &arPoint, const Point &arPressPoint);
-    virtual bool doLift(const Point &arPoint);
-    virtual bool doClick(const Point &arPoint);
+    virtual bool doPress(const GfxEvent &arEvent);
+    virtual bool doMove(const GfxEvent &arEvent);
+    virtual bool doLift(const GfxEvent &arEvent);
+    virtual bool doClick(const GfxEvent &arEvent);
 
 private:
     static Color mTouchAreaColor;
