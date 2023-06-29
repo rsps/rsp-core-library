@@ -311,7 +311,6 @@ bool Control::ProcessInput(GfxEvent &arInput)
                 }
             }
             if (mTouchArea.IsHit(arInput.mCurrent)) {
-                SetState(Control::States::Pressed);
                 return doPress(arInput);
             }
             break;
@@ -326,7 +325,6 @@ bool Control::ProcessInput(GfxEvent &arInput)
             }
             if (mTouchArea.IsHit(arInput.mPress)) {
                 bool result = doLift(arInput);
-                SetState(Control::States::Normal);
                 if (mTouchArea.IsHit(arInput.mCurrent)) {
                     if (IsCheckable()) {
                         SetChecked(!IsChecked());
@@ -353,11 +351,7 @@ bool Control::ProcessInput(GfxEvent &arInput)
                     arInput.mPressTime = std::chrono::steady_clock::time_point();
                 }
                 if (IsDraggable()) {
-                    SetState(Control::States::Dragged);
                     return doMove(arInput);
-                }
-                else {
-                    SetState(Control::States::Normal);
                 }
             }
             break;
@@ -375,18 +369,21 @@ bool Control::ProcessInput(GfxEvent &arInput)
 
 bool Control::doPress(const GfxEvent &arEvent)
 {
+    SetState(Control::States::Pressed);
     mOnPress(arEvent, GetId());
     return true;
 }
 
 bool Control::doMove(const GfxEvent &arEvent)
 {
+    SetState(Control::States::Dragged);
     mOnMove(arEvent, GetId());
     return true;
 }
 
 bool Control::doLift(const GfxEvent &arEvent)
 {
+    SetState(Control::States::Normal);
     mOnLift(arEvent, GetId());
     return true;
 }
