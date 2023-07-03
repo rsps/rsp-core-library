@@ -35,7 +35,7 @@ protected:
 
     void doSetArea(const Rect &arRect) override;
     void update() override;
-    void render(Renderer &arRenderer) const override;
+    bool render(Renderer &arRenderer) const override;
 };
 
 } // namespace rsp::graphics

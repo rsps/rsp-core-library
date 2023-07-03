@@ -85,11 +85,12 @@ void Label::update()
     }
 }
 
-void Label::render(Renderer &arRenderer) const
+bool Label::render(Renderer &arRenderer) const
 {
     if (mpTexture) {
         arRenderer.Blit(*mpTexture);
     }
+    return false;
 }
 
 Label::Label(const Label &arOther)

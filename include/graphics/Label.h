@@ -51,7 +51,7 @@ protected:
 
     void update() override;
     void refresh() override;
-    void render(Renderer &arRenderer) const override;
+    bool render(Renderer &arRenderer) const override;
 };
 
 } /* namespace rsp::graphics */

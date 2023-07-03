@@ -286,8 +286,9 @@ protected:
      * \brief Override this to perform custom rendering.
      *
      * \param arRenderer
+     * \result Boolean true if children is already rendered
      */
-    virtual void render(Renderer &arRenderer) const {};
+    virtual bool render(Renderer &arRenderer) const { return false; }
 
     /**
      * \brief Override this to handle resizing events

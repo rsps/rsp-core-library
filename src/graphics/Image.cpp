@@ -48,9 +48,10 @@ Image& Image::operator=(const BitmapView &&arBitmap)
     return *this;
 }
 
-void Image::render(Renderer &arRenderer) const
+bool Image::render(Renderer &arRenderer) const
 {
     arRenderer.Blit(*mpTexture);
+    return false;
 }
 
 void Image::update()
