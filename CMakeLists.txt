@@ -61,10 +61,6 @@ else()
     set(SDL_BUILD_OPTIONS -DUSE_GFX_SW)
 endif()
 
-if (NOT DEFINED RELEASE_BUILD)
-    include("cmake/strict-compile-options.cmake")
-endif()
-
 # Include external projects Doctest from github.
 FetchContent_Declare(
     magic_enum
@@ -128,6 +124,11 @@ target_include_directories(rsp-core-lib
         ${SDL_INCLUDE_DIRS}
 )
 
+include("cmake/strict-compile-options.cmake")
+if (NOT RELEASE_BUILD)
+    add_compile_options(${STRICT_COMPILE_OPTIONS})
+endif()
+
 target_compile_options(rsp-core-lib PUBLIC
     -Wshadow
     ${FREETYPE_BUILD_OPTIONS}
@@ -139,6 +140,7 @@ target_compile_options(rsp-core-lib PUBLIC
 
 if (NOT RELEASE_BUILD)
 target_compile_options(rsp-core-lib PRIVATE
+    ${STRICT_COMPILE_OPTIONS}
     -DDEBUG_LOG
     -g
     -O0

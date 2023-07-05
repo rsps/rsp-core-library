@@ -1,4 +1,4 @@
-add_compile_options(
+set(STRICT_COMPILE_OPTIONS
     -pedantic
     -Wall
     -Wextra
@@ -16,6 +16,7 @@ add_compile_options(
     -Woverloaded-virtual
     -Wredundant-decls
     -Wsign-conversion
+    -Wsign-compare
     -Wsign-promo
     -Wstrict-null-sentinel
     -Wstrict-overflow=3
@@ -26,3 +27,4 @@ add_compile_options(
     -Werror
 #     -v -dD
 )
+mark_as_advanced(STRICT_COMPILE_OPTIONS)

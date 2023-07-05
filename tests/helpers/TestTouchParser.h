@@ -28,7 +28,7 @@ public:
 
 protected:
     const rsp::graphics::GfxEvent *mpTouchEvents = nullptr;
-    rsp::graphics::GfxEvent mLastEvent;
+    rsp::graphics::GfxEvent mLastEvent{};
     std::size_t mEventCount = 0;
     std::size_t mIndex = 0;
 };
