@@ -29,24 +29,13 @@ public:
     GraphicsMain& operator=(const GraphicsMain&) = default;
 
     /**
-     * \brief Runs the Gui loop. The overall CPU usage can be reduced by setting a lower frame rate.
-     * \param aMaxFPS Maximum allowed frames per second on the GUI.
-     * \param aPollTimers Set to poll the timer queue on each GUI loop iteration
-     */
-    void Run(int aMaxFPS = 30, bool aPollTimers = false);
-
-    /**
      * \brief Perform a single iteration on the GUI loop
      *
+     * \param aMaxFPS Maximum allowed frames per second on the GUI.
      * \param aPollTimers Set to poll the timer queue on each GUI loop iteration
+     * \return False if quit event was received
      */
-    void Poll(bool aPollTimers);
-
-    /**
-     * \brief Sets Gui loop to terminate on next loop through
-     * \return self
-     */
-    GraphicsMain& Terminate() { mTerminated = true; return *this; }
+    bool Iterate(int aMaxFPS, bool aPollTimers);
 
     /**
      * \brief Change the current active Scene
@@ -79,7 +68,6 @@ protected:
     Renderer &mrRenderer;
     GfxInputEvents &mrEvents;
     SceneMap &mrScenes;
-    bool mTerminated = false;
     std::uint32_t mNextScene = 0;
     Control *mpOverlay = nullptr;
     int mFps = 0;

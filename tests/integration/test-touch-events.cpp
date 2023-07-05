@@ -69,20 +69,21 @@ TEST_CASE("Touch Events" * doctest::skip())
         CHECK_NOTHROW(gfx.ChangeScene(Scenes::InputScene));
 
         int progress = 0;
+        bool terminate = false;
         Timer t1(1, 500ms);
         t1.Callback() = [&](Timer &arTimer) {
             if (scenes.ActiveScene<InputScene>().GetLabel().GetText().GetValue() == "Quit") {
-                gfx.Terminate();
+                terminate = true;
             }
             if (++progress > 200) {
-                gfx.Terminate();
+                terminate = true;
             }
             CHECK_NOTHROW(arTimer.SetTimeout(500ms).Enable());
         };
         CHECK_NOTHROW(t1.Enable());
 
         MESSAGE("Running GFX loop with " << GFX_FPS << " FPS limitation");
-        CHECK_NOTHROW(gfx.Run(GFX_FPS, true));
+        CHECK_NOTHROW(while (!terminate) { gfx.Iterate(GFX_FPS, true); } );
     }
 
     CHECK_NOTHROW(TimerQueue::DestroyInstance());

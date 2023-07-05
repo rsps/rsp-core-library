@@ -144,7 +144,7 @@ TEST_CASE("Graphics Main Test")
         };
 
         MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
-        CHECK_NOTHROW(gfx.Run(1200, true));
+        CHECK_NOTHROW(while(gfx.Iterate(1200, true)) continue;);
 
         const uint32_t cGreenColor = 0xFF24B40B;
         const uint32_t cRedColor = 0xFFC41616;
@@ -165,6 +165,7 @@ TEST_CASE("Graphics Main Test")
             tp.SetEvents(InputScene::GetTouchEvents().data(), InputScene::GetTouchEvents().size());
         };
 
+        bool terminate = false;
         int progress = 0;
         Timer t1(1, 2800ms);
         t1.Callback() = [&](Timer &arTimer) {
@@ -226,7 +227,7 @@ TEST_CASE("Graphics Main Test")
                     break;
                 default:
                     CHECK_EQ(scenes.ActiveScene<InputScene>().GetLabel().GetText().GetValue(), "æøåößđŋµÅÖ");
-                    gfx.Terminate();
+                    terminate = true;
                     break;
             }
             CHECK_NOTHROW(arTimer.SetTimeout(timeout).Enable());
@@ -234,7 +235,7 @@ TEST_CASE("Graphics Main Test")
         CHECK_NOTHROW(t1.Enable());
 
         MESSAGE("Running GFX loop with " << 1000 << " FPS limitation");
-        CHECK_NOTHROW(gfx.Run(1000, true));
+        CHECK_NOTHROW(while (!terminate) { gfx.Iterate(1000, true); });
     }
 
 #ifdef USE_GFX_SW

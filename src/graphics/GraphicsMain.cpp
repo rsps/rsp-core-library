@@ -40,9 +40,12 @@ GraphicsMain& GraphicsMain::ChangeScene(std::uint32_t aId)
     return *this;
 }
 
-void GraphicsMain::Poll(bool aPollTimers)
+bool GraphicsMain::Iterate(int aMaxFPS, bool aPollTimers)
 {
+    rsp::utils::StopWatch sw;
+    int64_t frame_time = 1000 / aMaxFPS;
     GfxEvent event;
+    bool result = true;
 
     if (aPollTimers) {
         rsp::utils::TimerQueue::GetInstance().Poll();
@@ -73,28 +76,17 @@ void GraphicsMain::Poll(bool aPollTimers)
 
     if (event.mType == EventTypes::Quit) {
         mrRenderer.Flush();
-        Terminate();
+        result = false;
     }
     else if (changed) {
         mrRenderer.Present();
     }
-}
 
-void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
-{
-    rsp::utils::StopWatch sw;
-    int64_t frame_time = 1000 / aMaxFPS;
+    int64_t delay = std::max(std::int64_t(0), frame_time - sw.Elapsed<std::chrono::milliseconds>());
+    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+    mFps = 1000 / std::max(std::int64_t(1), sw.Elapsed<std::chrono::milliseconds>());
 
-    while (!mTerminated) {
-
-        sw.Reset();
-
-        Poll(aPollTimers);
-
-        int64_t delay = std::max(std::int64_t(0), frame_time - sw.Elapsed<std::chrono::milliseconds>());
-        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-        mFps = 1000 / std::max(std::int64_t(1), sw.Elapsed<std::chrono::milliseconds>());
-    }
+    return result;
 }
 
 GraphicsMain& GraphicsMain::RegisterOverlay(Control *apWidget)
