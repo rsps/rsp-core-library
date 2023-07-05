@@ -58,17 +58,18 @@ bool GraphicsMain::Iterate(int aMaxFPS, bool aPollTimers)
         mNextScene = 0;
     }
 
+    Scene& scene  = mrScenes.ActiveScene();
+
     // New inputs?
     while (mrEvents.Poll(event)) {
         Logger::GetDefault().Debug() << "Touch Event: " << event;
-        mrScenes.ActiveScene().ProcessInput(event);
+        scene.ProcessInput(event);
     }
 
-    bool changed = mrScenes.ActiveScene().UpdateData();
-//        mrScenes.ActiveScene().Invalidate();
+    bool changed = scene.UpdateData();
 
     // Render invalidated things
-    mrScenes.ActiveScene().Render(mrRenderer);
+    scene.Render(mrRenderer);
     if (mpOverlay) {
         changed |= mpOverlay->UpdateData();
         mpOverlay->Render(mrRenderer);
