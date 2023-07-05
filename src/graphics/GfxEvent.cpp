@@ -44,6 +44,11 @@ GfxEvent::GfxEvent(std::chrono::steady_clock::time_point aTime, EventTypes aType
     }
 }
 
+GfxEvent::GfxEvent(const GfxEvent& arOther)
+{
+    Assign(arOther);
+}
+
 GfxEvent& GfxEvent::operator=(const GfxEvent& arOther)
 {
     if (this != &arOther) {
@@ -60,9 +65,9 @@ void GfxEvent::Assign(const GfxEvent &arOther)
     mTime = arOther.mTime;
     mType = arOther.mType;
     mCurrent = arOther.mCurrent;
-    if (mType == EventTypes::Press) {
-        mPress = mCurrent;
-        mPressTime = mTime;
+    if (arOther.mPressTime != std::chrono::steady_clock::time_point()) {
+        mPress = arOther.mPress;
+        mPressTime = arOther.mPressTime;
     }
 }
 

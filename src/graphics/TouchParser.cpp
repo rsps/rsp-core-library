@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#ifndef USE_GFX_SDL
+#ifdef USE_GFX_SW
 
 #include <exceptions/CoreException.h>
 #include <graphics/TouchParser.h>
@@ -59,13 +59,14 @@ TouchParser::~TouchParser()
 bool TouchParser::Poll(GfxEvent &arInput)
 {
     try {
-        arInput.mType = readType();
-        if (arInput.mType != EventTypes::None) {
-            readBody(arInput);
-            if (arInput.mType == EventTypes::Press) {
-                arInput.mPress = arInput.mCurrent;
-                arInput.mPressTime = arInput.mTime;
+        mLastEvent.mType = readType();
+        if (mLastEvent.mType != EventTypes::None) {
+            readBody(mLastEvent);
+            if (mLastEvent.mType == EventTypes::Press) {
+                mLastEvent.mPress = mLastEvent.mCurrent;
+                mLastEvent.mPressTime = mLastEvent.mTime;
             }
+            arInput = mLastEvent;
             return true;
         }
     }
@@ -139,4 +140,4 @@ void TouchParser::Flush()
 
 } // namespace rsp::graphics
 
-#endif // USE_GFX_SDL
+#endif // USE_GFX_SW

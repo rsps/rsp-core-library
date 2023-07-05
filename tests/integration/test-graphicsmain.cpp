@@ -146,13 +146,14 @@ TEST_CASE("Graphics Main Test")
         MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
         CHECK_NOTHROW(gfx.Run(1200, true));
 
-        const uint32_t cGreenColor = 0xFF24b40b;
-        const uint32_t cRedColor = 0xFFc41616;
+        const uint32_t cGreenColor = 0xFF24B40B;
+        const uint32_t cRedColor = 0xFFC41616;
         Point toppoint = scenes.ActiveScene<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1);
         Point botpoint = scenes.ActiveScene<SecondScene>().GetBotRect().GetTopLeft() + Point(1,1);
-        CHECK_MESSAGE(renderer.GetPixel(toppoint).AsUint() == cGreenColor, "toppoint = " << toppoint);
-        CHECK_MESSAGE(renderer.GetPixel(botpoint).AsUint() == cGreenColor, "botpoint = " << botpoint);
+        CHECK_HEX(renderer.GetPixel(toppoint).AsUint(), cGreenColor);
+        CHECK_HEX(renderer.GetPixel(botpoint).AsUint(), cGreenColor);
         CHECK_EQ(topBtnClicked, 2);
+//        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     }
 
     SUBCASE("Input Scene") {

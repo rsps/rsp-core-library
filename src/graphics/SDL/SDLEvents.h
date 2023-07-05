@@ -28,6 +28,8 @@ public:
     void Flush() override;
 
 protected:
+    rsp::graphics::GfxEvent mLastEvent;
+
     void getLatestOf(std::uint32_t aEventType, SDL_Event &aEvent);
 
 };

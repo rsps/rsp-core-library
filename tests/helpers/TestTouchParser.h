@@ -20,7 +20,7 @@ public:
     TestTouchParser(const TestTouchParser&) = delete;
     TestTouchParser& operator=(const TestTouchParser&) = delete;
 
-    TestTouchParser& SetEvents(const rsp::graphics::GfxEvent *apTouchEvents, std::size_t aCount);
+    TestTouchParser& SetEvents(const rsp::graphics::GfxEvent *apTouchEvents, size_t aCount);
 
     bool Poll(rsp::graphics::GfxEvent &arInput) override;
 
@@ -28,6 +28,7 @@ public:
 
 protected:
     const rsp::graphics::GfxEvent *mpTouchEvents = nullptr;
+    rsp::graphics::GfxEvent mLastEvent;
     std::size_t mEventCount = 0;
     std::size_t mIndex = 0;
 };

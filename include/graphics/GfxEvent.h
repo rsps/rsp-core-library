@@ -38,14 +38,14 @@ public:
     EventTypes mType = EventTypes::None;
     Point mCurrent{};  // Value of the latest absolute coordinate from touch controller
     std::chrono::steady_clock::time_point mPressTime{};
-    Point mPress{}; // Absolute coordinate of latest press
+    Point mPress{-1, -1}; // Absolute coordinate of latest press
 
     GfxEvent() {}
     GfxEvent(int aOffset, EventTypes aType, const Point &arPoint);
 
     GfxEvent(std::chrono::steady_clock::time_point aTime, EventTypes aType, const Point &arPoint);
 
-    GfxEvent(const GfxEvent&) = default;
+    GfxEvent(const GfxEvent&);
     GfxEvent(GfxEvent&&) = default;
 
     GfxEvent& operator=(GfxEvent&&) = default;

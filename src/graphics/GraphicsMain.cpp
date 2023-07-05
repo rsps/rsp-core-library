@@ -40,9 +40,48 @@ GraphicsMain& GraphicsMain::ChangeScene(std::uint32_t aId)
     return *this;
 }
 
-void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
+void GraphicsMain::Poll(bool aPollTimers)
 {
     GfxEvent event;
+
+    if (aPollTimers) {
+        rsp::utils::TimerQueue::GetInstance().Poll();
+    }
+
+    // New scene requested?
+    if (mNextScene) {
+        mrEvents.Flush(); // New scene should not inherit un-handled touch events...
+        mrScenes.SetActiveScene(mNextScene);
+        mNextScene = 0;
+    }
+
+    // New inputs?
+    while (mrEvents.Poll(event)) {
+        Logger::GetDefault().Debug() << "Touch Event: " << event;
+        mrScenes.ActiveScene().ProcessInput(event);
+    }
+
+    bool changed = mrScenes.ActiveScene().UpdateData();
+//        mrScenes.ActiveScene().Invalidate();
+
+    // Render invalidated things
+    mrScenes.ActiveScene().Render(mrRenderer);
+    if (mpOverlay) {
+        changed |= mpOverlay->UpdateData();
+        mpOverlay->Render(mrRenderer);
+    }
+
+    if (event.mType == EventTypes::Quit) {
+        mrRenderer.Flush();
+        Terminate();
+    }
+    else if (changed) {
+        mrRenderer.Present();
+    }
+}
+
+void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
+{
     rsp::utils::StopWatch sw;
     int64_t frame_time = 1000 / aMaxFPS;
 
@@ -50,40 +89,7 @@ void GraphicsMain::Run(int aMaxFPS, bool aPollTimers)
 
         sw.Reset();
 
-        if (aPollTimers) {
-            rsp::utils::TimerQueue::GetInstance().Poll();
-        }
-
-        // New scene requested?
-        if (mNextScene) {
-            mrEvents.Flush(); // New scene should not inherit un-handled touch events...
-            mrScenes.SetActiveScene(mNextScene);
-            mNextScene = 0;
-        }
-
-        // New inputs?
-        while (mrEvents.Poll(event)) {
-            Logger::GetDefault().Debug() << "Touch Event: " << event;
-            mrScenes.ActiveScene().ProcessInput(event);
-        }
-
-        bool changed = mrScenes.ActiveScene().UpdateData();
-//        mrScenes.ActiveScene().Invalidate();
-
-        // Render invalidated things
-        mrScenes.ActiveScene().Render(mrRenderer);
-        if (mpOverlay) {
-            changed |= mpOverlay->UpdateData();
-            mpOverlay->Render(mrRenderer);
-        }
-
-        if (event.mType == EventTypes::Quit) {
-            mrRenderer.Flush();
-            Terminate();
-        }
-        else if (changed) {
-            mrRenderer.Present();
-        }
+        Poll(aPollTimers);
 
         int64_t delay = std::max(std::int64_t(0), frame_time - sw.Elapsed<std::chrono::milliseconds>());
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));

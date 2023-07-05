@@ -30,9 +30,17 @@ public:
 
     /**
      * \brief Runs the Gui loop. The overall CPU usage can be reduced by setting a lower frame rate.
-     * \param Maximum allowed frames per second on the GUI.
+     * \param aMaxFPS Maximum allowed frames per second on the GUI.
+     * \param aPollTimers Set to poll the timer queue on each GUI loop iteration
      */
     void Run(int aMaxFPS = 30, bool aPollTimers = false);
+
+    /**
+     * \brief Perform a single iteration on the GUI loop
+     *
+     * \param aPollTimers Set to poll the timer queue on each GUI loop iteration
+     */
+    void Poll(bool aPollTimers);
 
     /**
      * \brief Sets Gui loop to terminate on next loop through

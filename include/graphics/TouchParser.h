@@ -10,7 +10,7 @@
 #ifndef TOUCHPARSER_H
 #define TOUCHPARSER_H
 
-#ifndef USE_GFX_SDL
+#ifdef USE_GFX_SW
 
 #include <graphics/GfxInputEvents.h>
 #include <fstream>
@@ -69,6 +69,7 @@ public:
 protected:
     rsp::posix::FileIO mTouchDevice{};
     RawTouchEvent mRawTouchEvent{};
+    GfxEvent mLastEvent;
 
     EventTypes readType();
     void readBody(GfxEvent &arInput);
@@ -77,6 +78,6 @@ protected:
 
 } // namespace rsp::graphics
 
-#endif // USE_GFX_SDL
+#endif // USE_GFX_SW
 
 #endif // TOUCHPARSER_H
