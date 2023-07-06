@@ -31,7 +31,7 @@ SDLEvents::SDLEvents()
 {
 }
 
-bool SDLEvents::Poll(rsp::graphics::GfxEvent &arInput)
+bool SDLEvents::Poll(GfxEvent &arInput)
 {
     using namespace std::chrono;
     SDL_Event event;
@@ -40,15 +40,16 @@ bool SDLEvents::Poll(rsp::graphics::GfxEvent &arInput)
         return false;
     }
 
-    mLastEvent.mType = EventTypes::None;
+    mLastTouchEvent.mType = TouchTypes::None;
 
     switch (event.type) {
         case SDL_MOUSEMOTION:
             getLatestOf(SDL_MOUSEMOTION, event);
             if (event.motion.state == 1) {
-                mLastEvent.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
-                mLastEvent.mType = EventTypes::Drag;
-                mLastEvent.mCurrent = Point(event.motion.x, event.motion.y);
+                mLastTouchEvent.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
+                mLastTouchEvent.mType = TouchTypes::Drag;
+                mLastTouchEvent.mCurrent = Point(event.motion.x, event.motion.y);
+                arInput.mTouchEvent = mLastTouchEvent;
             }
             else {
                 return false;
@@ -56,24 +57,26 @@ bool SDLEvents::Poll(rsp::graphics::GfxEvent &arInput)
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            mLastEvent.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
-            mLastEvent.mType = EventTypes::Press;
-            mLastEvent.mCurrent = Point(event.motion.x, event.motion.y);
-            mLastEvent.mPress = Point(event.motion.x, event.motion.y);
-            mLastEvent.mPressTime = mLastEvent.mTime;
+            mLastTouchEvent.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
+            mLastTouchEvent.mType = TouchTypes::Press;
+            mLastTouchEvent.mCurrent = Point(event.motion.x, event.motion.y);
+            mLastTouchEvent.mPress = Point(event.motion.x, event.motion.y);
+            mLastTouchEvent.mPressTime = mLastTouchEvent.mTime;
+            arInput.mTouchEvent = mLastTouchEvent;
             break;
 
         case SDL_MOUSEBUTTONUP:
-            mLastEvent.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
-            mLastEvent.mType = EventTypes::Lift;
-            mLastEvent.mCurrent = Point(event.motion.x, event.motion.y);
+            mLastTouchEvent.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
+            mLastTouchEvent.mType = TouchTypes::Lift;
+            mLastTouchEvent.mCurrent = Point(event.motion.x, event.motion.y);
+            arInput.mTouchEvent = mLastTouchEvent;
             break;
 
         case SDL_MOUSEWHEEL:
             return false;
 
         case SDL_QUIT:
-            mLastEvent = GfxEvent(steady_clock::time_point(milliseconds{event.quit.timestamp}), EventTypes::Quit, Point(0, 0));
+            arInput.mQuitEvent = QuitEvent();
             break;
 
         case SDL_WINDOWEVENT:
@@ -83,7 +86,6 @@ bool SDLEvents::Poll(rsp::graphics::GfxEvent &arInput)
             return false;
     }
 
-    arInput = mLastEvent;
     return true;
 }
 

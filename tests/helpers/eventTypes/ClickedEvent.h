@@ -24,7 +24,7 @@ enum class ClickTopics {
     SceneChange
 };
 
-class ClickedEvent : public EventType<ClickedEvent>
+class ClickedEvent : public EventBase<ClickedEvent>
 {
   public:
     ClickedEvent(std::string aMessage) : mMessage(aMessage){};

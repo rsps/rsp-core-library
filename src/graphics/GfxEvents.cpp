@@ -8,48 +8,49 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/GfxEvent.h>
+#include <graphics/GfxEvents.h>
 #include <magic_enum.hpp>
 
 namespace rsp::graphics {
 
-std::ostream &operator<<(std::ostream &os, const GfxEvent &arGfxEvent)
+std::ostream &operator<<(std::ostream &os, const TouchEvent &arEvent)
 {
-    os << arGfxEvent.mTime.time_since_epoch().count() << " "
-        << std::string(magic_enum::enum_name<EventTypes>(arGfxEvent.mType)) << "(" << arGfxEvent.mCurrent << ")";
+    os << arEvent.mTime.time_since_epoch().count() << " "
+        << std::string(magic_enum::enum_name<TouchTypes>(TouchTypes(arEvent.mType))) << "(" << arEvent.mCurrent << ")";
     return os;
 }
 
 
-GfxEvent::GfxEvent(int aOffset, EventTypes aType, const Point &arPoint)
-    : mTime(std::chrono::steady_clock::now()),
-      mType(aType),
+TouchEvent::TouchEvent(int aOffset, TouchTypes aType, const Point &arPoint)
+    : mType(aType),
+      mTime(std::chrono::steady_clock::now()),
       mCurrent(arPoint)
 {
     mTime += std::chrono::milliseconds(aOffset);
-    if (mType == EventTypes::Press) {
+    if (mType == TouchTypes::Press) {
         mPress = arPoint;
         mPressTime = mTime;
     }
 }
 
-GfxEvent::GfxEvent(std::chrono::steady_clock::time_point aTime, EventTypes aType, const Point &arPoint)
-    : mTime(aTime),
-      mType(aType),
-      mCurrent(arPoint)
-{
-    if (mType == EventTypes::Press) {
-        mPress = arPoint;
-        mPressTime = mTime;
-    }
-}
+//TouchEvent::TouchEvent(std::chrono::steady_clock::time_point aTime, EventTypes aType, const Point &arPoint)
+//    : mTime(aTime),
+//      mType(aType),
+//      mCurrent(arPoint)
+//{
+//    if (mType == EventTypes::Press) {
+//        mPress = arPoint;
+//        mPressTime = mTime;
+//    }
+//}
 
-GfxEvent::GfxEvent(const GfxEvent& arOther)
+TouchEvent::TouchEvent(const TouchEvent& arOther)
+    : messaging::EventBase<TouchEvent>(arOther.Type, arOther.Name)
 {
     Assign(arOther);
 }
 
-GfxEvent& GfxEvent::operator=(const GfxEvent& arOther)
+TouchEvent& TouchEvent::operator=(const TouchEvent& arOther)
 {
     if (this != &arOther) {
         Assign(arOther);
@@ -57,7 +58,7 @@ GfxEvent& GfxEvent::operator=(const GfxEvent& arOther)
     return *this;
 }
 
-void GfxEvent::Assign(const GfxEvent &arOther)
+void TouchEvent::Assign(const TouchEvent &arOther)
 {
     if (this == &arOther) {
         return;

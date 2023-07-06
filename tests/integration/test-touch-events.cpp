@@ -72,7 +72,7 @@ TEST_CASE("Touch Events" * doctest::skip())
         bool terminate = false;
         Timer t1(1, 500ms);
         t1.Callback() = [&](Timer &arTimer) {
-            if (scenes.ActiveScene<InputScene>().GetLabel().GetText().GetValue() == "Quit") {
+            if (scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue() == "Quit") {
                 terminate = true;
             }
             if (++progress > 200) {

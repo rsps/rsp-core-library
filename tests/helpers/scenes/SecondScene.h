@@ -24,24 +24,24 @@ public:
 
     static std::array<GfxEvent, 15>& GetTouchEvents() {
         static std::array events {
-            GfxEvent(50, EventTypes::Press, Point(100, 100)),
-            GfxEvent(51, EventTypes::Lift, Point(100, 100)),  // Click outside any buttons
+            GfxEvent(TouchEvent(50, TouchTypes::Press, Point(100, 100))),
+            GfxEvent(TouchEvent(51, TouchTypes::Lift, Point(100, 100))),  // Click outside any buttons
 
-            GfxEvent(60, EventTypes::Press, Point(100, 150)),
-            GfxEvent(61, EventTypes::Lift, Point(100, 150)),  // Click top left corner of TopBtn
-            GfxEvent(62, EventTypes::Press, Point(299, 249)),
-            GfxEvent(63, EventTypes::Lift, Point(299, 249)),  // Click bottom right corner of TopBtn
+            GfxEvent(TouchEvent(60, TouchTypes::Press, Point(100, 150))),
+            GfxEvent(TouchEvent(61, TouchTypes::Lift, Point(100, 150))),  // Click top left corner of TopBtn
+            GfxEvent(TouchEvent(62, TouchTypes::Press, Point(299, 249))),
+            GfxEvent(TouchEvent(63, TouchTypes::Lift, Point(299, 249))),  // Click bottom right corner of TopBtn
 
-            GfxEvent(70, EventTypes::Press, Point(100, 300)), // Press top left corner of BotBtn
-            GfxEvent(71, EventTypes::Drag, Point(150, 320)),  // Drag over BotBtn
-            GfxEvent(72, EventTypes::Drag, Point(200, 340)),  // Drag over BotBtn
-            GfxEvent(73, EventTypes::Drag, Point(250, 360)),  // Drag over BotBtn
-            GfxEvent(74, EventTypes::Drag, Point(300, 380)),  // Drag over BotBtn
-            GfxEvent(75, EventTypes::Drag, Point(310, 390)),  // Drag outside BotBtn
-            GfxEvent(76, EventTypes::Lift, Point(310, 390)),  // Lift outside BotBtn
+            GfxEvent(TouchEvent(70, TouchTypes::Press, Point(100, 300))), // Press top left corner of BotBtn
+            GfxEvent(TouchEvent(71, TouchTypes::Drag, Point(150, 320))),  // Drag over BotBtn
+            GfxEvent(TouchEvent(72, TouchTypes::Drag, Point(200, 340))),  // Drag over BotBtn
+            GfxEvent(TouchEvent(73, TouchTypes::Drag, Point(250, 360))),  // Drag over BotBtn
+            GfxEvent(TouchEvent(74, TouchTypes::Drag, Point(300, 380))),  // Drag over BotBtn
+            GfxEvent(TouchEvent(75, TouchTypes::Drag, Point(310, 390))),  // Drag outside BotBtn
+            GfxEvent(TouchEvent(76, TouchTypes::Lift, Point(310, 390))),  // Lift outside BotBtn
 
-            GfxEvent(80, EventTypes::Refresh, Point(0, 0)),   // Refresh display
-            GfxEvent(81, EventTypes::Quit, Point(0, 0))       // Terminate
+            GfxEvent(RefreshEvent()),   // Refresh display
+            GfxEvent(QuitEvent())       // Terminate
         };
         return events;
     }

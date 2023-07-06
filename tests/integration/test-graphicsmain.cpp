@@ -122,23 +122,23 @@ TEST_CASE("Graphics Main Test")
         CHECK_NOTHROW(gfx.ChangeScene<SecondScene>());
 
         int topBtnClicked = 0;
-        scenes.GetAfterCreate() = [&topBtnClicked, &tp](Scene *apScene) {
-            CHECK_EQ(apScene->GetId(), rsp::utils::ID<SecondScene>());
+        scenes.GetAfterCreate() = [&topBtnClicked, &tp](Scene &arScene) {
+            CHECK_EQ(arScene.GetId(), rsp::utils::ID<SecondScene>());
 
             CHECK_NOTHROW(tp.SetEvents(SecondScene::GetTouchEvents().data(), SecondScene::GetTouchEvents().size()));
 
-            int topBtnId = static_cast<int>(apScene->GetAs<SecondScene>().GetTopBtn().GetId());
-            apScene->GetAs<SecondScene>().GetTopBtn().OnClick() = [&topBtnClicked, topBtnId](const GfxEvent &arEvent, uint32_t id) {
+            int topBtnId = static_cast<int>(arScene.GetAs<SecondScene>().GetTopBtn().GetId());
+            arScene.GetAs<SecondScene>().GetTopBtn().OnClick() = [&topBtnClicked, topBtnId](const TouchEvent &arEvent, uint32_t id) {
                 CHECK_EQ(id, topBtnId);
                 topBtnClicked++;
             };
 
-            apScene->GetAs<SecondScene>().GetBottomBtn().OnClick() = [](const GfxEvent &arEvent, uint32_t id) {
+            arScene.GetAs<SecondScene>().GetBottomBtn().OnClick() = [](const TouchEvent &arEvent, uint32_t id) {
                 FAIL("There should not be a click event from bottom button.");
             };
 
             // Check for lift even though we lift outside button
-            apScene->GetAs<SecondScene>().GetBottomBtn().OnLift() = [](const GfxEvent &arEvent, uint32_t id) {
+            arScene.GetAs<SecondScene>().GetBottomBtn().OnLift() = [](const TouchEvent &arEvent, uint32_t id) {
                 CHECK_EQ(arEvent.mCurrent, Point(310, 390));
             };
         };
@@ -148,8 +148,8 @@ TEST_CASE("Graphics Main Test")
 
         const uint32_t cGreenColor = 0xFF24B40B;
         const uint32_t cRedColor = 0xFFC41616;
-        Point toppoint = scenes.ActiveScene<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1);
-        Point botpoint = scenes.ActiveScene<SecondScene>().GetBotRect().GetTopLeft() + Point(1,1);
+        Point toppoint = scenes.ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1);
+        Point botpoint = scenes.ActiveSceneAs<SecondScene>().GetBotRect().GetTopLeft() + Point(1,1);
         CHECK_HEX(renderer.GetPixel(toppoint).AsUint(), cGreenColor);
         CHECK_HEX(renderer.GetPixel(botpoint).AsUint(), cGreenColor);
         CHECK_EQ(topBtnClicked, 2);
@@ -159,8 +159,8 @@ TEST_CASE("Graphics Main Test")
     SUBCASE("Input Scene") {
         CHECK_NOTHROW(gfx.ChangeScene(Scenes::InputScene));
 
-        scenes.GetAfterCreate() = [&tp](Scene *apScene) {
-            CHECK_EQ(apScene->GetId(), uint32_t(Scenes::InputScene));
+        scenes.GetAfterCreate() = [&tp](Scene &arScene) {
+            CHECK_EQ(arScene.GetId(), uint32_t(Scenes::InputScene));
 
             tp.SetEvents(InputScene::GetTouchEvents().data(), InputScene::GetTouchEvents().size());
         };
@@ -172,61 +172,61 @@ TEST_CASE("Graphics Main Test")
             auto timeout = 200ms;
             switch (progress++) {
                 case 0:
-                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
                     break;
                 case 1:
-                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Center);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Center);
                     break;
                 case 2:
-                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Right);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Right);
                     break;
                 case 3:
-                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Left);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Left);
                     break;
                 case 4:
-                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Center);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Center);
                     break;
                 case 5:
-                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Right);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Bottom).SetHAlignment(Text::HAlign::Right);
                     break;
                 case 6:
-                    scenes.ActiveScene<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Center).SetHAlignment(Text::HAlign::Center);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetVAlignment(Text::VAlign::Center).SetHAlignment(Text::HAlign::Center);
                     break;
                 case 7:
-                    scenes.ActiveScene<InputScene>().GetLabel().SetFontSize(16);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(16);
                     timeout = 500ms;
                     break;
                 case 8:
-                    scenes.ActiveScene<InputScene>().GetLabel().SetFontSize(22);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(22);
                     timeout = 500ms;
                     break;
                 case 9:
-                    scenes.ActiveScene<InputScene>().GetLabel().SetFontSize(26);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(26);
                     timeout = 500ms;
                     break;
                 case 10:
-                    scenes.ActiveScene<InputScene>().GetLabel().SetFontSize(40);
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetFontSize(40);
                     timeout = 500ms;
-                    CHECK_EQ(scenes.ActiveScene<InputScene>().GetLabel().GetText().GetValue(), "Hello 128€?sdgp");
+                    CHECK_EQ(scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue(), "Hello 128€?sdgp");
                     break;
                 case 11:
                     Control::SetTouchAreaColor(Color::Yellow);
-                    scenes.ActiveScene<InputScene>().GetLabel().GetText();
-                    scenes.ActiveScene<InputScene>().Invalidate();
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().GetText();
+                    scenes.ActiveSceneAs<InputScene>().Invalidate();
                     timeout = 800ms;
                     break;
                 case 12:
-                    scenes.ActiveScene<InputScene>().GetLabel().SetCaption("æøåößđŋµÅÖ");
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().SetCaption("æøåößđŋµÅÖ");
                     timeout = 800ms;
                     break;
                 case 13:
                     Control::SetTouchAreaColor(Color::None);
-                    scenes.ActiveScene<InputScene>().GetLabel().GetText();
-                    scenes.ActiveScene<InputScene>().Invalidate();
+                    scenes.ActiveSceneAs<InputScene>().GetLabel().GetText();
+                    scenes.ActiveSceneAs<InputScene>().Invalidate();
                     timeout = 200ms;
                     break;
                 default:
-                    CHECK_EQ(scenes.ActiveScene<InputScene>().GetLabel().GetText().GetValue(), "æøåößđŋµÅÖ");
+                    CHECK_EQ(scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue(), "æøåößđŋµÅÖ");
                     terminate = true;
                     break;
             }

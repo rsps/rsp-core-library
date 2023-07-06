@@ -8,12 +8,12 @@
  * \author      Steffen Brummer
  */
 
-#include <utils/Singleton.h>
-#include "GfxEvent.h"
-#include "Point.h"
+#ifndef INCLUDE_GRAPHICS_GFXINPUTEVENTS_H_
+#define INCLUDE_GRAPHICS_GFXINPUTEVENTS_H_
 
-#ifndef INCLUDE_GRAPHICS_GFXEVENTS_H_
-#define INCLUDE_GRAPHICS_GFXEVENTS_H_
+#include <utils/Singleton.h>
+#include "GfxEvents.h"
+#include "Point.h"
 
 namespace rsp::graphics {
 
@@ -42,4 +42,4 @@ public:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_GFXEVENTS_H_ */
+#endif /* INCLUDE_GRAPHICS_GFXINPUTEVENTS_H_ */

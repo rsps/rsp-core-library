@@ -24,8 +24,8 @@
 namespace rsp::graphics {
 
 #define CLICK(_time, _key) \
-    GfxEvent(_time, EventTypes::Press, _key), \
-    GfxEvent(_time+20, EventTypes::Lift, _key)
+    GfxEvent(TouchEvent(_time, TouchTypes::Press, _key)), \
+    GfxEvent(TouchEvent(_time+20, TouchTypes::Lift, _key))
 
 
 class InputScene : public SceneBase<InputScene>

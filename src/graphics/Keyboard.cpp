@@ -232,7 +232,7 @@ Keyboard::~Keyboard()
 {
 }
 
-void Keyboard::doKeyClick(const GfxEvent &arEvent, uint32_t aSymbol)
+void Keyboard::doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol)
 {
     switch(aSymbol) {
         case cKEY_SHIFT:

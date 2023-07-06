@@ -125,7 +125,7 @@ Control& Control::SetOrigin(const Point &arPoint)
     mArea.MoveTo(arPoint);
     mTouchArea.MoveTo(mTouchArea.GetTopLeft() + difference);
     for (auto &style : mStyles) {
-        for (auto &texture : style.mTextures) {
+        for (TexturePtr_t &texture : style.mTextures) {
             texture->SetDestination(texture->GetDestination() + difference);
         }
     }
@@ -292,71 +292,85 @@ Control& Control::SetTransparent(bool aValue)
     return *this;
 }
 
-bool Control::ProcessInput(GfxEvent &arInput)
+bool Control::handleTouchEvent(GfxEvent &arInput)
 {
-    if (!IsVisible()) {
-        return false;
-    }
-    if (!IsEnabled()) {
-        return mTouchArea.IsHit(arInput.mCurrent);
-    }
+    TouchEvent &touch = arInput.mTouchEvent;
 
-    switch (arInput.mType) {
-        case EventTypes::Press:
-            if (mArea.IsHit(arInput.mCurrent)) {
+    switch (touch.mType) {
+        case TouchTypes::Press:
+            if (mArea.IsHit(touch.mCurrent)) {
                 for(Control *child : mChildren) {
                     if (child->ProcessInput(arInput)) {
                         return true;
                     }
                 }
             }
-            if (mTouchArea.IsHit(arInput.mCurrent)) {
-                return doPress(arInput);
+            if (mTouchArea.IsHit(touch.mCurrent)) {
+                return doPress(touch);
             }
             break;
 
-        case EventTypes::Lift:
-            if (mArea.IsHit(arInput.mPress)) {
+        case TouchTypes::Lift:
+            if (mArea.IsHit(touch.mPress)) {
                 for(Control *child : mChildren) {
                     if (child->ProcessInput(arInput)) {
                         return true;
                     }
                 }
             }
-            if (mTouchArea.IsHit(arInput.mPress)) {
-                bool result = doLift(arInput);
-                if (mTouchArea.IsHit(arInput.mCurrent)) {
+            if (mTouchArea.IsHit(touch.mPress)) {
+                bool result = doLift(touch);
+                if (mTouchArea.IsHit(touch.mCurrent)) {
                     if (IsCheckable()) {
                         SetChecked(!IsChecked());
                     }
-                    if ((arInput.mTime - arInput.mPressTime) < std::chrono::milliseconds(800)) {
+                    if ((touch.mTime - touch.mPressTime) < std::chrono::milliseconds(800)) {
                         Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput;
-                        doClick(arInput);
+                        doClick(touch);
                     }
                 }
                 return result;
             }
             break;
 
-        case EventTypes::Drag:
-            if (mArea.IsHit(arInput.mPress)) {
+        case TouchTypes::Drag:
+            if (mArea.IsHit(touch.mPress)) {
                 for(Control *child : mChildren) {
                     if (child->ProcessInput(arInput)) {
                         return true;
                     }
                 }
             }
-            if (mTouchArea.IsHit(arInput.mPress)) {
-                if ((arInput.mPressTime != std::chrono::steady_clock::time_point()) && (arInput.mPress.Distance(arInput.mCurrent) > 30)) {
-                    arInput.mPressTime = std::chrono::steady_clock::time_point();
+            if (mTouchArea.IsHit(touch.mPress)) {
+                if ((touch.mPressTime != std::chrono::steady_clock::time_point()) && (touch.mPress.Distance(touch.mCurrent) > 30)) {
+                    touch.mPressTime = std::chrono::steady_clock::time_point();
                 }
                 if (IsDraggable()) {
-                    return doMove(arInput);
+                    return doMove(touch);
                 }
             }
             break;
 
-        case EventTypes::Refresh:
+        default:
+            break;
+    }
+    return false;
+}
+
+bool Control::ProcessInput(GfxEvent &arInput)
+{
+    if (!IsVisible()) {
+        return false;
+    }
+    if (!IsEnabled()) {
+        return (arInput.mEvent.Type == TouchEvent::ClassType) && mTouchArea.IsHit(arInput.mTouchEvent.mCurrent);
+    }
+
+    switch (arInput.mEvent.Type) {
+        case TouchEvent::ClassType:
+            return handleTouchEvent(arInput);
+
+        case RefreshEvent::ClassType:
             Invalidate();
             break;
 
@@ -367,28 +381,28 @@ bool Control::ProcessInput(GfxEvent &arInput)
     return false;
 }
 
-bool Control::doPress(const GfxEvent &arEvent)
+bool Control::doPress(const TouchEvent &arEvent)
 {
     SetState(Control::States::Pressed);
     mOnPress(arEvent, GetId());
     return true;
 }
 
-bool Control::doMove(const GfxEvent &arEvent)
+bool Control::doMove(const TouchEvent &arEvent)
 {
     SetState(Control::States::Dragged);
     mOnMove(arEvent, GetId());
     return true;
 }
 
-bool Control::doLift(const GfxEvent &arEvent)
+bool Control::doLift(const TouchEvent &arEvent)
 {
     SetState(Control::States::Normal);
     mOnLift(arEvent, GetId());
     return true;
 }
 
-bool Control::doClick(const GfxEvent &arEvent)
+bool Control::doClick(const TouchEvent &arEvent)
 {
     mOnClick(arEvent, GetId());
     return true;

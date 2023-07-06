@@ -40,7 +40,7 @@ public:
 class Control : public rsp::utils::TypeInfo
 {
 public:
-    using TouchCallback_t = rsp::utils::Function<void(const GfxEvent&, uint32_t)>;
+    using TouchCallback_t = rsp::utils::Function<void(const TouchEvent&, uint32_t)>;
 
     /**
      * \brief Enum type defining the available states
@@ -296,10 +296,12 @@ protected:
      */
     virtual void doSetArea(const Rect &arRect);
 
-    virtual bool doPress(const GfxEvent &arEvent);
-    virtual bool doMove(const GfxEvent &arEvent);
-    virtual bool doLift(const GfxEvent &arEvent);
-    virtual bool doClick(const GfxEvent &arEvent);
+    virtual bool doPress(const TouchEvent &arEvent);
+    virtual bool doMove(const TouchEvent &arEvent);
+    virtual bool doLift(const TouchEvent &arEvent);
+    virtual bool doClick(const TouchEvent &arEvent);
+
+    bool handleTouchEvent(GfxEvent &arInput);
 
 private:
     static Color mTouchAreaColor;

@@ -10,9 +10,11 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-#include <exceptions/ExceptionHelper.h>
+#include <string_view>
 #include <type_traits>
 #include <typeinfo>
+#include <exceptions/ExceptionHelper.h>
+#include <utils/ConstTypeInfo.h>
 
 namespace rsp::messaging
 {
@@ -20,31 +22,31 @@ namespace rsp::messaging
 class Event
 {
   public:
-    Event(std::size_t aHash) : mTypeHash(aHash) {}
-    virtual ~Event() {}
+    size_t Type;
+    std::string_view Name;
 
-    /**
-     * \brief Casts the event to the templated type
-     * \return A reference to the object after casting
-     */
-    template <class T>
-    T &GetAs()
-    {
-        if (typeid(T).hash_code() != mTypeHash) {
+//    Event() : mcType(0), mcName("") {}
+//    Event(size_t aType) : mcType(aType) {}
+    Event(size_t aType, std::string_view aName) : Type(aType), Name(aName) {}
+
+    template<class T>
+    T& GetAs() {
+        if (T::ClassType != Type) {
             THROW_WITH_BACKTRACE(std::bad_alloc);
         }
-        return reinterpret_cast<T&>(*this);
+        return *static_cast<T*>(this);
     }
-
-protected:
-    std::size_t mTypeHash;
 };
 
 template <class T>
-class EventType : public Event
+class EventBase : public Event
 {
   public:
-    EventType() : Event(typeid(T).hash_code()) {}
+    static constexpr size_t ClassType = rsp::utils::ID<T>();
+    static constexpr std::string_view ClassName = rsp::utils::NameOf<T>();
+
+    EventBase() : Event(ClassType, ClassName) {}
+    EventBase(size_t aType, std::string_view aName) : Event(aType, aName) {}
 };
 
 } // namespace rsp::messaging

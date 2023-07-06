@@ -11,11 +11,12 @@
 #ifndef INCLUDE_GRAPHICS_SCENEMAP_H_
 #define INCLUDE_GRAPHICS_SCENEMAP_H_
 
+#include <functional>
+#include <map>
+#include <memory>
+#include <string>
 #include <exceptions/CoreException.h>
 #include <graphics/Scene.h>
-#include <map>
-#include <string>
-#include <functional>
 #include <utils/Function.h>
 #include <logging/Logger.h>
 #include <magic_enum.hpp>
@@ -37,8 +38,8 @@ public:
 class SceneMap
 {
 public:
-    using SceneCreator = std::function<Scene*()>;
-    using SceneNotify = rsp::utils::Function<void(Scene*)>;
+    using SceneCreator = std::function<std::unique_ptr<Scene>()>;
+    using SceneNotify = rsp::utils::Function<void(Scene&)>;
 
     SceneMap() {};
     SceneMap(const SceneMap&) = default;
@@ -48,9 +49,8 @@ public:
     {
         GFXLOG("Adding scene factory: " << rsp::utils::NameOf<T>() << " with id: " << rsp::utils::ID<T>());
         mScenes[rsp::utils::ID<T>()] = []() { \
-            Scene* result = new T(); \
-            GFXLOG("Created scene: " << result->GetName()); \
-            return result; \
+            GFXLOG("Creating scene: " << rsp::utils::NameOf<T>()); \
+            return std::make_unique<T>(); \
         };
     }
 
@@ -60,10 +60,10 @@ public:
         std::string_view sv = magic_enum::enum_name(e);
         GFXLOG("Adding scene factory: " << rsp::utils::NameOf<T>() << " with id: " << sv);
         mScenes[uint32_t(e)] = [id=uint32_t(e), sv]() {
-            Scene* result = new T();
+            GFXLOG("Creating scene: " << rsp::utils::NameOf<T>()); \
+            auto result = std::make_unique<T>(); \
             result->SetId(id);
             result->SetName(sv.data());
-            GFXLOG("Created scene: " << result->GetName());
             return result;
         };
     }
@@ -80,7 +80,7 @@ public:
 
     Scene& ActiveScene();
     template<class T>
-    T& ActiveScene() { return dynamic_cast<T&>(ActiveScene()); }
+    T& ActiveSceneAs() { return dynamic_cast<T&>(ActiveScene()); }
 
 
     SceneNotify& GetAfterCreate() { return mOnCreated; }
@@ -88,7 +88,7 @@ public:
 
 protected:
     std::map<std::uint32_t, SceneCreator> mScenes{};
-    Scene *mpActiveScene = nullptr;
+    std::unique_ptr<Scene> mpActiveScene = nullptr;
     SceneNotify mOnCreated{};
     SceneNotify mOnDestroy{};
 };

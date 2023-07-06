@@ -24,11 +24,11 @@ class SDLEvents: public GfxInputEvents, public rsp::utils::Singleton<SDLEvents>
 public:
     SDLEvents();
 
-    bool Poll(rsp::graphics::GfxEvent &arInput) override;
+    bool Poll(GfxEvent &arEvent) override;
     void Flush() override;
 
 protected:
-    rsp::graphics::GfxEvent mLastEvent{};
+    rsp::graphics::TouchEvent mLastTouchEvent{};
 
     void getLatestOf(std::uint32_t aEventType, SDL_Event &aEvent);
 

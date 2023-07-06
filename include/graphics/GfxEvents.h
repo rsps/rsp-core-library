@@ -8,55 +8,70 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_GFXEVENT_H_
-#define INCLUDE_GRAPHICS_GFXEVENT_H_
+#ifndef INCLUDE_GRAPHICS_GFXEVENTS_H_
+#define INCLUDE_GRAPHICS_GFXEVENTS_H_
 
 #include <chrono>
+#include <messaging/Event.h>
 #include "Point.h"
 
 namespace rsp::graphics {
 
-/**
- * \brief Enum type specifying the different types of GFX events
- */
-enum class EventTypes {
+enum TouchTypes {
     None,
     Press,
     Drag,
-    Lift,
-    Refresh,
-    Quit
+    Lift
 };
 
 /**
- * \brief Object tracking touch interface signals
+ * \brief Object tracking touch interface events
  */
-class GfxEvent
+struct TouchEvent: public rsp::messaging::EventBase<TouchEvent>
 {
-public:
+    uint32_t mType{}; // = TouchTypes::None;
     std::chrono::steady_clock::time_point mTime{};
-    EventTypes mType = EventTypes::None;
     Point mCurrent{};  // Value of the latest absolute coordinate from touch controller
     std::chrono::steady_clock::time_point mPressTime{};
     Point mPress{-1, -1}; // Absolute coordinate of latest press
 
-    GfxEvent() {}
-    GfxEvent(int aOffset, EventTypes aType, const Point &arPoint);
+    TouchEvent();
+    TouchEvent(int aOffset, TouchTypes aType, const Point &arPoint);
+    TouchEvent(const TouchEvent&);
+//    TouchEvent(TouchEvent&&);
+    TouchEvent& operator=(const TouchEvent&);
+//    TouchEvent& operator=(TouchEvent&&);
 
-    GfxEvent(std::chrono::steady_clock::time_point aTime, EventTypes aType, const Point &arPoint);
-
-    GfxEvent(const GfxEvent&);
-    GfxEvent(GfxEvent&&) = default;
-
-    GfxEvent& operator=(GfxEvent&&) = default;
-
-    GfxEvent& operator=(const GfxEvent& arOther);
-
-    void Assign(const GfxEvent &arOther);
+    void Assign(const TouchEvent &arOther);
 };
 
-std::ostream &operator<<(std::ostream &os, const GfxEvent &arGfxEvent);
+std::ostream &operator<<(std::ostream &os, const TouchEvent &arEvent);
+
+class RefreshEvent : public rsp::messaging::EventBase<RefreshEvent>
+{
+};
+
+class QuitEvent : public rsp::messaging::EventBase<QuitEvent>
+{
+};
+
+// TODO: Take at look at std::variant and std::any
+
+union GfxEvent {
+    rsp::messaging::Event mEvent;
+    TouchEvent mTouchEvent;
+    RefreshEvent mRefreshEvent;
+    QuitEvent mQuitEvent;
+
+    GfxEvent() : mEvent(0, "") {}
+//    GfxEvent(int aOffset, TouchTypes aType, const Point &arPoint) : mTouchEvent(aOffset, aType, arPoint) {}
+    GfxEvent(const TouchEvent &arEvent) : mTouchEvent(arEvent) {}
+    GfxEvent(const RefreshEvent &arEvent) : mRefreshEvent(arEvent) {}
+    GfxEvent(const QuitEvent &arEvent) : mQuitEvent(arEvent) {}
+};
+
+std::ostream &operator<<(std::ostream &os, const GfxEvent &arEvent);
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_GFXEVENT_H_ */
+#endif /* INCLUDE_GRAPHICS_GFXEVENTS_H_ */

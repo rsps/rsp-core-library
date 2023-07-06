@@ -75,7 +75,7 @@ bool GraphicsMain::Iterate(int aMaxFPS, bool aPollTimers)
         mpOverlay->Render(mrRenderer);
     }
 
-    if (event.mType == EventTypes::Quit) {
+    if (event.mEvent.Type == QuitEvent::ClassType) {
         mrRenderer.Flush();
         result = false;
     }
