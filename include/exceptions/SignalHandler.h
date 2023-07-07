@@ -12,7 +12,7 @@
 #define INCLUDE_EXCEPTIONS_SIGNALHANDLER_H_
 
 #include <exceptions/BackTrace.h>
-#include <utils/Function.h>
+#include <functional>
 #include <signal.h>
 
 namespace rsp::exceptions {
@@ -44,7 +44,7 @@ enum class Signals {
 class SignalHandler
 {
 public:
-    using SignalCallback_t = rsp::utils::Function<void(void)>;
+    using SignalCallback_t = std::function<void(void)>;
 
     SignalHandler();
     ~SignalHandler();

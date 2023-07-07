@@ -13,10 +13,10 @@
 
 #include <exceptions/CoreException.h>
 #include <exception>
+#include <functional>
 #include <string>
 #include <string_view>
 #include <thread>
-#include "Function.h"
 
 namespace rsp::utils {
 
@@ -41,7 +41,7 @@ public:
 class Thread
 {
 public:
-    using ThreadCallback_t = Function<void(void)>;
+    using ThreadCallback_t = std::function<void(void)>;
 
     Thread() {}
     Thread(std::string_view aName) : mName(aName) {}

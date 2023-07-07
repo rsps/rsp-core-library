@@ -81,7 +81,7 @@ void SignalHandler::Register(Signals aSignal, SignalCallback_t aHandler)
 
 void SignalHandler::Unregister(Signals aSignal)
 {
-    mHandlers[static_cast<int>(aSignal)].Clear();
+    mHandlers[static_cast<int>(aSignal)] = nullptr;
 }
 
 

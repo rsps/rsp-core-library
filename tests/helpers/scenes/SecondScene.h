@@ -21,7 +21,7 @@ namespace rsp::graphics {
 class SecondScene : public SceneBase<SecondScene>
 {
 public:
-    using Clicked_t = rsp::utils::Function<void(void)>;
+    using Clicked_t = std::function<void(void)>;
 
     static std::array<TestEventItem_t, 15>& GetTouchEvents() {
         static std::array events {

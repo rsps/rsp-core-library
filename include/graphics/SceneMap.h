@@ -39,7 +39,7 @@ class SceneMap
 {
 public:
     using SceneCreator = std::function<std::unique_ptr<Scene>()>;
-    using SceneNotify = rsp::utils::Function<void(Scene&)>;
+    using SceneNotify = std::function<void(Scene&)>;
 
     SceneMap() {};
     SceneMap(const SceneMap&) = default;
@@ -70,7 +70,7 @@ public:
 
     SceneMap& operator=(const SceneMap&) = default;
 
-    SceneCreator operator[](std::uint32_t aId);
+    SceneCreator GetFactory(std::uint32_t aId);
 
     bool HasActiveScene() { return (mpActiveScene != nullptr); }
 

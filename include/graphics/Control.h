@@ -11,14 +11,14 @@
 #define CONTROL_H
 
 #include <map>
-#include <vector>
+#include <functional>
 #include <string_view>
+#include <vector>
 #include <magic_enum.hpp>
 #include <exceptions/CoreException.h>
 #include <graphics/GfxInputEvents.h>
 #include <logging/Logger.h>
 #include <utils/ConstTypeInfo.h>
-#include <utils/Function.h>
 #include "Canvas.h"
 #include "Color.h"
 #include "Rect.h"
@@ -40,7 +40,7 @@ public:
 class Control : public rsp::utils::TypeInfo
 {
 public:
-    using TouchCallback_t = rsp::utils::Function<void(const TouchEvent&, uint32_t)>;
+    using TouchCallback_t = std::function<void(const TouchEvent&, uint32_t)>;
 
     /**
      * \brief Enum type defining the available states

@@ -69,7 +69,7 @@ TEST_CASE("Scene Test")
     Scenes scenes;
 
     CHECK_NOTHROW(GfxEvent event_dummy);
-    GfxEvent event;
+    TouchEvent event;
 
     scenes.GetAfterCreate() = [](Scene arScene) {
         CHECK_EQ(arScene.GetId(), ID<SecondScene>());
@@ -94,16 +94,16 @@ TEST_CASE("Scene Test")
     SUBCASE("Scene Process Input")
     {
         // Arrange
-        event.mTouchEvent.mType = TouchTypes::Press;
+        event.mType = TouchTypes::Press;
         CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
         CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));
 
         SUBCASE("Process input for Top elements")
         {
             // Arrange
-            event.mTouchEvent.mCurrent = insideTopPoint;
-            event.mTouchEvent.mPress = event.mTouchEvent.mCurrent;
-            MESSAGE("Event Point:" << event.mTouchEvent.mCurrent);
+            event.mCurrent = insideTopPoint;
+            event.mPress = event.mCurrent;
+            MESSAGE("Event Point:" << event.mCurrent);
 
             // Act
             CHECK_NOTHROW(scenes.ActiveScene().ProcessEvent(event));
@@ -115,7 +115,7 @@ TEST_CASE("Scene Test")
         SUBCASE("Process input for Bot elements")
         {
             // Arrange
-            event.mTouchEvent.mCurrent = insideBotPoint;
+            event.mCurrent = insideBotPoint;
 
             // Act
             CHECK_NOTHROW(scenes.ActiveScene().ProcessEvent(event));
@@ -147,7 +147,7 @@ TEST_CASE("Scene Test")
         Broker<ClickTopics> broker;
         Publisher<ClickTopics> publisher(broker);
         bool clicked = false;
-        scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().OnClick() = [&publisher, &clicked](const TouchEvent &arEvent, uint32_t) {
+        scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().OnClick() = [&publisher, &clicked](const TouchEvent&, uint32_t) {
             clicked = true;
             MESSAGE("Click detected");
             rsp::messaging::ClickedEvent click_event("Button was clicked.");
@@ -157,7 +157,7 @@ TEST_CASE("Scene Test")
         // Arrange
         TestSub sub(broker);
         CHECK_NOTHROW(sub.Subscribe(ClickTopics::SceneChange));
-        CHECK_NOTHROW(event.mTouchEvent.mCurrent = insideBotPoint);
+        CHECK_NOTHROW(event.mCurrent = insideBotPoint);
 
         CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
         CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));
@@ -165,8 +165,8 @@ TEST_CASE("Scene Test")
 //        std::this_thread::sleep_for(500ms);
 
         // Act
-        event.mTouchEvent.mType = TouchTypes::Press;
-        event.mTouchEvent.mPress = event.mTouchEvent.mCurrent;
+        event.mType = TouchTypes::Press;
+        event.mPress = event.mCurrent;
         CHECK_NOTHROW(scenes.ActiveScene().ProcessEvent(event));
 
         CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
@@ -174,7 +174,7 @@ TEST_CASE("Scene Test")
         CHECK_NOTHROW(renderer.Present());
 //        std::this_thread::sleep_for(500ms);
 
-        event.mTouchEvent.mType = TouchTypes::Lift;
+        event.mType = TouchTypes::Lift;
         CHECK_NOTHROW(scenes.ActiveScene().ProcessEvent(event));
 
         CHECK_NOTHROW(scenes.ActiveScene().UpdateData());

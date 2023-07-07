@@ -127,7 +127,7 @@ public:
 class Keyboard: public Control
 {
 public:
-    using KeyboardCallback_t = rsp::utils::Function<void(const std::string &)>;
+    using KeyboardCallback_t = std::function<void(const std::string &)>;
 
     static constexpr int cKEY_SHIFT    = 1000000;
     static constexpr int cKEY_LETTERS  = 1000001;

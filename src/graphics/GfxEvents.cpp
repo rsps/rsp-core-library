@@ -20,6 +20,13 @@ std::ostream &operator<<(std::ostream &os, const TouchEvent &arEvent)
     return os;
 }
 
+std::ostream& operator <<(std::ostream &os, const GfxEvent &arEvent)
+{
+    auto &event = std::get<rsp::messaging::Event>(arEvent);
+    os << "Event (" << event.Type << ") " << event.Name;
+    return os;
+}
+
 
 TouchEvent::TouchEvent(int aOffset, TouchTypes aType, const Point &arPoint)
     : mType(aType),
@@ -71,6 +78,5 @@ void TouchEvent::Assign(const TouchEvent &arOther)
         mPressTime = arOther.mPressTime;
     }
 }
-
 
 } /* namespace rsp::graphics */
