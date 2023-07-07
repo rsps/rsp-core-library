@@ -292,15 +292,15 @@ Control& Control::SetTransparent(bool aValue)
     return *this;
 }
 
-bool Control::handleTouchEvent(GfxEvent &arInput)
+bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
 {
-    TouchEvent &touch = arInput.mTouchEvent;
+    TouchEvent &touch = arEvent.CastTo<TouchEvent>();
 
     switch (touch.mType) {
         case TouchTypes::Press:
             if (mArea.IsHit(touch.mCurrent)) {
                 for(Control *child : mChildren) {
-                    if (child->ProcessInput(arInput)) {
+                    if (child->ProcessEvent(arEvent)) {
                         return true;
                     }
                 }
@@ -313,7 +313,7 @@ bool Control::handleTouchEvent(GfxEvent &arInput)
         case TouchTypes::Lift:
             if (mArea.IsHit(touch.mPress)) {
                 for(Control *child : mChildren) {
-                    if (child->ProcessInput(arInput)) {
+                    if (child->ProcessEvent(arEvent)) {
                         return true;
                     }
                 }
@@ -325,7 +325,7 @@ bool Control::handleTouchEvent(GfxEvent &arInput)
                         SetChecked(!IsChecked());
                     }
                     if ((touch.mTime - touch.mPressTime) < std::chrono::milliseconds(800)) {
-                        Logger::GetDefault().Debug() << GetName() << " was clicked by " << arInput;
+                        Logger::GetDefault().Debug() << GetName() << " was clicked by " << touch;
                         doClick(touch);
                     }
                 }
@@ -336,7 +336,7 @@ bool Control::handleTouchEvent(GfxEvent &arInput)
         case TouchTypes::Drag:
             if (mArea.IsHit(touch.mPress)) {
                 for(Control *child : mChildren) {
-                    if (child->ProcessInput(arInput)) {
+                    if (child->ProcessEvent(arEvent)) {
                         return true;
                     }
                 }
@@ -357,18 +357,18 @@ bool Control::handleTouchEvent(GfxEvent &arInput)
     return false;
 }
 
-bool Control::ProcessInput(GfxEvent &arInput)
+bool Control::ProcessEvent(rsp::messaging::Event &arEvent)
 {
     if (!IsVisible()) {
         return false;
     }
     if (!IsEnabled()) {
-        return (arInput.mEvent.Type == TouchEvent::ClassType) && mTouchArea.IsHit(arInput.mTouchEvent.mCurrent);
+        return (arEvent.Type == TouchEvent::ClassType && mTouchArea.IsHit(arEvent.CastTo<TouchEvent>().mCurrent));
     }
 
-    switch (arInput.mEvent.Type) {
+    switch (arEvent.Type) {
         case TouchEvent::ClassType:
-            return handleTouchEvent(arInput);
+            return handleTouchEvent(arEvent);
 
         case RefreshEvent::ClassType:
             Invalidate();

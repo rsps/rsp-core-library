@@ -136,6 +136,19 @@ public:
     }
 };
 
+class EBadCast: public CoreException
+{
+public:
+    explicit EBadCast(std::string_view aFrom, std::string_view aTo)
+        : EBadCast(std::string(aFrom), std::string(aTo))
+    {
+    }
+    explicit EBadCast(const std::string &arFrom, const std::string &arTo)
+        : CoreException(std::string("Cannot cast ") + arFrom + std::string(" to ") + arTo)
+    {
+    }
+};
+
 } /* namespace rsp::utils */
 
 #endif // RSPCOREEXCEPTION_H

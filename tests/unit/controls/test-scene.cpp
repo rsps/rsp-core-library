@@ -35,7 +35,7 @@ class TestSub : public Subscriber<ClickTopics>
 
     void HandleEvent(Event &arNewEvent) override
     {
-        auto event = arNewEvent.GetAs<rsp::messaging::ClickedEvent>();
+        auto event = arNewEvent.CastTo<rsp::messaging::ClickedEvent>();
 
         message = event.mMessage;
         calledCount++;
@@ -106,7 +106,7 @@ TEST_CASE("Scene Test")
             MESSAGE("Event Point:" << event.mTouchEvent.mCurrent);
 
             // Act
-            CHECK_NOTHROW(scenes.ActiveScene().ProcessInput(event));
+            CHECK_NOTHROW(scenes.ActiveScene().ProcessEvent(event));
 
             // Assert
             CHECK(scenes.ActiveSceneAs<SecondScene>().GetTopBtn().IsInvalid());
@@ -118,7 +118,7 @@ TEST_CASE("Scene Test")
             event.mTouchEvent.mCurrent = insideBotPoint;
 
             // Act
-            CHECK_NOTHROW(scenes.ActiveScene().ProcessInput(event));
+            CHECK_NOTHROW(scenes.ActiveScene().ProcessEvent(event));
 
             // Assert
             CHECK(scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().IsInvalid());
@@ -147,7 +147,7 @@ TEST_CASE("Scene Test")
         Broker<ClickTopics> broker;
         Publisher<ClickTopics> publisher(broker);
         bool clicked = false;
-        scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().OnClick() = [&publisher, &clicked](const GfxEvent &arEvent, uint32_t) {
+        scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().OnClick() = [&publisher, &clicked](const TouchEvent &arEvent, uint32_t) {
             clicked = true;
             MESSAGE("Click detected");
             rsp::messaging::ClickedEvent click_event("Button was clicked.");
@@ -167,7 +167,7 @@ TEST_CASE("Scene Test")
         // Act
         event.mTouchEvent.mType = TouchTypes::Press;
         event.mTouchEvent.mPress = event.mTouchEvent.mCurrent;
-        CHECK_NOTHROW(scenes.ActiveScene().ProcessInput(event));
+        CHECK_NOTHROW(scenes.ActiveScene().ProcessEvent(event));
 
         CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
         CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));
@@ -175,7 +175,7 @@ TEST_CASE("Scene Test")
 //        std::this_thread::sleep_for(500ms);
 
         event.mTouchEvent.mType = TouchTypes::Lift;
-        CHECK_NOTHROW(scenes.ActiveScene().ProcessInput(event));
+        CHECK_NOTHROW(scenes.ActiveScene().ProcessEvent(event));
 
         CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
         CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));

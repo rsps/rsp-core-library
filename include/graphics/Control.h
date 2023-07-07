@@ -206,11 +206,11 @@ public:
     Control& SetTexturePosition(const Point &arPoint);
 
     /**
-     * \brief Processes input for press or click callbacks
-     * \param arInput Reference to the input being processed
+     * \brief Processes events for this object
+     * \param arEvent Reference to the event being processed
      * \return True if handled
      */
-    bool ProcessInput(GfxEvent &arInput);
+    bool ProcessEvent(rsp::messaging::Event &arEvent);
 
     /**
      * \brief OnPress callback reference
@@ -301,7 +301,7 @@ protected:
     virtual bool doLift(const TouchEvent &arEvent);
     virtual bool doClick(const TouchEvent &arEvent);
 
-    bool handleTouchEvent(GfxEvent &arInput);
+    bool handleTouchEvent(rsp::messaging::Event &arEvent);
 
 private:
     static Color mTouchAreaColor;

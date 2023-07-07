@@ -13,6 +13,7 @@
 
 #ifdef USE_GFX_SDL
 
+#include <SDL2/SDL.h>
 #include <graphics/GfxInputEvents.h>
 #include <utils/Singleton.h>
 
@@ -30,7 +31,7 @@ public:
 protected:
     rsp::graphics::TouchEvent mLastTouchEvent{};
 
-    void getLatestOf(std::uint32_t aEventType, SDL_Event &aEvent);
+    void getLatestOf(uint32_t aEventType, SDL_Event &aEvent);
 
 };
 

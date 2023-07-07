@@ -11,7 +11,9 @@
 #include <iostream>
 #include "TestTouchParser.h"
 
-TestTouchParser& TestTouchParser::SetEvents(const rsp::graphics::GfxEvent *apTouchEvents, size_t aCount)
+using namespace rsp::graphics;
+
+TestTouchParser& TestTouchParser::SetEvents(const TestEventItem_t *apTouchEvents, size_t aCount)
 {
     mpTouchEvents = apTouchEvents;
     mEventCount = aCount;
@@ -21,9 +23,15 @@ TestTouchParser& TestTouchParser::SetEvents(const rsp::graphics::GfxEvent *apTou
 
 bool TestTouchParser::Poll(rsp::graphics::GfxEvent &arInput)
 {
-    if ((mIndex < mEventCount) && (std::chrono::steady_clock::now() >= mpTouchEvents[mIndex].mTime)) {
-        mLastEvent.Assign(mpTouchEvents[mIndex++]);
-        arInput = mLastEvent;
+    if ((mIndex < mEventCount) && (std::chrono::steady_clock::now() >= mpTouchEvents[mIndex].Time)) {
+        if (std::holds_alternative<TouchEvent>(mpTouchEvents[mIndex].Event)) {
+            mLastEvent.Assign(std::get<TouchEvent>(mpTouchEvents[mIndex].Event));
+            arInput = mLastEvent;
+        }
+        else {
+            arInput = mpTouchEvents[mIndex].Event;
+        }
+        mIndex++;
         return true;
     }
     return false;

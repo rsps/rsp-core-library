@@ -10,10 +10,11 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include <any>
 #include <string_view>
 #include <type_traits>
 #include <typeinfo>
-#include <exceptions/ExceptionHelper.h>
+#include <exceptions/CoreException.h>
 #include <utils/ConstTypeInfo.h>
 
 namespace rsp::messaging
@@ -25,17 +26,35 @@ class Event
     size_t Type;
     std::string_view Name;
 
-//    Event() : mcType(0), mcName("") {}
-//    Event(size_t aType) : mcType(aType) {}
-    Event(size_t aType, std::string_view aName) : Type(aType), Name(aName) {}
+    Event(size_t aType = 0, std::string_view aName = "") : Type(aType), Name(aName) {}
+    virtual ~Event() {}
+
+    Event(const Event& arOther) : Type(arOther.Type), Name(arOther.Name) {}
+
+    Event& operator=(const Event& arOther) {
+        if (&arOther != this) {
+            Type = arOther.Type;
+            Name = arOther.Name;
+        }
+        return *this;
+    }
 
     template<class T>
-    T& GetAs() {
+    T& CastTo() {
         if (T::ClassType != Type) {
-            THROW_WITH_BACKTRACE(std::bad_alloc);
+            THROW_WITH_BACKTRACE2(rsp::exceptions::EBadCast, Name, T::ClassName);
         }
-        return *static_cast<T*>(this);
+        return dynamic_cast<T&>(*this);
     }
+
+    template<class T>
+    const T& CastTo() const {
+        if (T::ClassType != Type) {
+            THROW_WITH_BACKTRACE2(rsp::exceptions::EBadCast, Name, T::ClassName);
+        }
+        return dynamic_cast<const T&>(*this);
+    }
+
 };
 
 template <class T>

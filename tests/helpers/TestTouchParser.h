@@ -11,7 +11,23 @@
 #ifndef TESTS_HELPERS_TESTTOUCHPARSER_H_
 #define TESTS_HELPERS_TESTTOUCHPARSER_H_
 
+#include <chrono>
 #include <graphics/GfxInputEvents.h>
+
+struct TestEventItem_t {
+    std::chrono::steady_clock::time_point Time;
+    rsp::graphics::GfxEvent Event;
+
+    TestEventItem_t() : Time{}, Event{} {}
+    TestEventItem_t(int aOffset, rsp::graphics::GfxEvent &&arEvent)
+        : Time(std::chrono::steady_clock::now()),
+          Event(std::move(arEvent))
+    {
+        Time += std::chrono::milliseconds(aOffset);
+    }
+};
+
+#define MAKE_TOUCH_ITEM(offset, type, point) TestEventItem_t(offset, TouchEvent(offset, type, point))
 
 class TestTouchParser: public rsp::graphics::GfxInputEvents
 {
@@ -20,15 +36,15 @@ public:
     TestTouchParser(const TestTouchParser&) = delete;
     TestTouchParser& operator=(const TestTouchParser&) = delete;
 
-    TestTouchParser& SetEvents(const rsp::graphics::GfxEvent *apTouchEvents, size_t aCount);
+    TestTouchParser& SetEvents(const TestEventItem_t *apTouchEvents, size_t aCount);
 
     bool Poll(rsp::graphics::GfxEvent &arInput) override;
 
     void Flush() override;
 
 protected:
-    const rsp::graphics::GfxEvent *mpTouchEvents = nullptr;
-    rsp::graphics::GfxEvent mLastEvent{};
+    const TestEventItem_t *mpTouchEvents = nullptr;
+    rsp::graphics::TouchEvent mLastEvent{};
     std::size_t mEventCount = 0;
     std::size_t mIndex = 0;
 };

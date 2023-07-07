@@ -12,12 +12,13 @@
 #define INCLUDE_GRAPHICS_GFXEVENTS_H_
 
 #include <chrono>
+#include <variant>
 #include <messaging/Event.h>
 #include "Point.h"
 
 namespace rsp::graphics {
 
-enum TouchTypes {
+enum class TouchTypes : uint32_t {
     None,
     Press,
     Drag,
@@ -29,7 +30,7 @@ enum TouchTypes {
  */
 struct TouchEvent: public rsp::messaging::EventBase<TouchEvent>
 {
-    uint32_t mType{}; // = TouchTypes::None;
+    TouchTypes mType = TouchTypes::None;
     std::chrono::steady_clock::time_point mTime{};
     Point mCurrent{};  // Value of the latest absolute coordinate from touch controller
     std::chrono::steady_clock::time_point mPressTime{};
@@ -57,18 +58,7 @@ class QuitEvent : public rsp::messaging::EventBase<QuitEvent>
 
 // TODO: Take at look at std::variant and std::any
 
-union GfxEvent {
-    rsp::messaging::Event mEvent;
-    TouchEvent mTouchEvent;
-    RefreshEvent mRefreshEvent;
-    QuitEvent mQuitEvent;
-
-    GfxEvent() : mEvent(0, "") {}
-//    GfxEvent(int aOffset, TouchTypes aType, const Point &arPoint) : mTouchEvent(aOffset, aType, arPoint) {}
-    GfxEvent(const TouchEvent &arEvent) : mTouchEvent(arEvent) {}
-    GfxEvent(const RefreshEvent &arEvent) : mRefreshEvent(arEvent) {}
-    GfxEvent(const QuitEvent &arEvent) : mQuitEvent(arEvent) {}
-};
+using GfxEvent = std::variant<rsp::messaging::Event, TouchEvent, RefreshEvent, QuitEvent>;
 
 std::ostream &operator<<(std::ostream &os, const GfxEvent &arEvent);
 

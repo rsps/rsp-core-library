@@ -49,7 +49,7 @@ public:
     void HandleEvent(Event &arNewEvent)
     {
         isHandled = true;
-        mMessage = arNewEvent.GetAs<ClickedEvent>().mMessage;
+        mMessage = arNewEvent.CastTo<ClickedEvent>().mMessage;
     }
     bool isHandled = false;
     std::string mMessage{};
@@ -64,7 +64,7 @@ public:
     void HandleEvent(Event &arNewEvent)
     {
         isHandled = true;
-        mMessage = arNewEvent.GetAs<ClickedEvent>().mMessage;
+        mMessage = arNewEvent.CastTo<ClickedEvent>().mMessage;
     }
     bool isHandled = false;
     std::string mMessage{};
