@@ -16,6 +16,7 @@ class EmitterBase;
 class SubscriberBase
 {
 public:
+    SubscriberBase() {}
     SubscriberBase(EmitterBase &arEmitter);
     virtual ~SubscriberBase();
 
@@ -24,6 +25,9 @@ public:
 
     SubscriberBase(SubscriberBase&&);
     SubscriberBase& operator=(SubscriberBase&&);
+
+    SubscriberBase& Attach(EmitterBase &arEmitter);
+    SubscriberBase& Detach();
 
 protected:
     friend class EmitterBase;
@@ -46,10 +50,21 @@ template <typename... ArgTypes>
 class Subscriber : public SubscriberBase
 {
 public:
+    Subscriber() {}
+
+    Subscriber(std::function<void(ArgTypes...)> aFunction)
+        : mFunction(aFunction)
+    {
+    }
+
     Subscriber(EmitterBase &arEmitter, std::function<void(ArgTypes...)> aFunction)
         : SubscriberBase(arEmitter),
           mFunction(aFunction)
     {
+    }
+
+    Subscriber& Set(std::function<void(ArgTypes...)> aFunction) {
+        mFunction = aFunction;
     }
 
     void Invoke(ArgTypes ... args) {

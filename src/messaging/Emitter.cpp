@@ -54,6 +54,22 @@ SubscriberBase& SubscriberBase::operator =(SubscriberBase&& arOther)
     return *this;
 }
 
+SubscriberBase& SubscriberBase::Attach(EmitterBase &arEmitter)
+{
+    mpEmitter = &arEmitter;
+    mpEmitter->Subscribe(this);
+    return *this;
+}
+
+SubscriberBase& SubscriberBase::Detach()
+{
+    if (mpEmitter) {
+        mpEmitter->Unsubscribe(this);
+        mpEmitter = nullptr;
+    }
+    return *this;
+}
+
 
 
 EmitterBase::~EmitterBase()
