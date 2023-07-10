@@ -3,67 +3,68 @@
  * \author      steffen
  */
 
-#ifndef INCLUDE_MESSAGING_EMITTER_H_
-#define INCLUDE_MESSAGING_EMITTER_H_
+#ifndef INCLUDE_MESSAGING_NOTIFIER_H_
+#define INCLUDE_MESSAGING_NOTIFIER_H_
 
 #include <functional>
 #include <list>
 
 namespace rsp::messaging {
 
-class EmitterBase;
+class NotifierBase;
 
-class SubscriberBase
+class ListenerBase
 {
 public:
-    SubscriberBase() {}
-    SubscriberBase(EmitterBase &arEmitter);
-    virtual ~SubscriberBase();
+    ListenerBase();
+    ListenerBase(NotifierBase &arEmitter);
+    virtual ~ListenerBase();
 
-    SubscriberBase(const SubscriberBase&);
-    SubscriberBase& operator=(const SubscriberBase&);
+    ListenerBase(const ListenerBase&);
+    ListenerBase& operator=(const ListenerBase&);
 
-    SubscriberBase(SubscriberBase&&);
-    SubscriberBase& operator=(SubscriberBase&&);
+    ListenerBase(ListenerBase&&);
+    ListenerBase& operator=(ListenerBase&&);
 
-    SubscriberBase& Attach(EmitterBase &arEmitter);
-    SubscriberBase& Detach();
+    ListenerBase& Attach(NotifierBase &arEmitter);
+    ListenerBase& Detach();
 
 protected:
-    friend class EmitterBase;
-    EmitterBase *mpEmitter = nullptr;
+    friend class NotifierBase;
+    NotifierBase *mpEmitter = nullptr;
 };
 
-class EmitterBase
+class NotifierBase
 {
 public:
-    ~EmitterBase();
-    EmitterBase& Subscribe(SubscriberBase *apSubscriber);
-    EmitterBase& Unsubscribe(SubscriberBase *apSubscriber);
+    ~NotifierBase();
+    NotifierBase& Subscribe(ListenerBase *apSubscriber);
+    NotifierBase& Unsubscribe(ListenerBase *apSubscriber);
 
 protected:
-    std::list<SubscriberBase*> mSubscribers{};
+    std::list<ListenerBase*> mSubscribers{};
 };
 
 
 template <typename... ArgTypes>
-class Subscriber : public SubscriberBase
+class Listener : public ListenerBase
 {
 public:
-    Subscriber() {}
+    Listener()
+        : ListenerBase() {};
 
-    Subscriber(std::function<void(ArgTypes...)> aFunction)
+    Listener(std::function<void(ArgTypes...)> aFunction)
         : mFunction(aFunction)
     {
     }
 
-    Subscriber(EmitterBase &arEmitter, std::function<void(ArgTypes...)> aFunction)
-        : SubscriberBase(arEmitter),
+    Listener(NotifierBase &arEmitter, std::function<void(ArgTypes...)> aFunction)
+        : ListenerBase(arEmitter),
           mFunction(aFunction)
     {
     }
 
-    Subscriber& Set(std::function<void(ArgTypes...)> aFunction) {
+    Listener& Set(std::function<void(ArgTypes...)> aFunction) {
         mFunction = aFunction;
     }
 
@@ -79,18 +80,19 @@ protected:
 
 
 template <typename... ArgTypes>
-class Emitter : public EmitterBase
+class Notifier : public NotifierBase
 {
 public:
-    using Type_t = Subscriber<ArgTypes...>;
+    using ListenerType = Listener<ArgTypes...>;
 
     void Emit(ArgTypes... args) {
-        for(SubscriberBase* sub : mSubscribers) {
-            dynamic_cast<Type_t*>(sub)->Invoke(args...);
+        for(ListenerBase* sub : mSubscribers) {
+            dynamic_cast<ListenerType*>(sub)->Invoke(args...);
         }
     }
 };
 
 } /* namespace rsp::messaging */
 
-#endif /* INCLUDE_MESSAGING_EMITTER_H_ */
+
+#endif /* INCLUDE_MESSAGING_NOTIFIER_H_ */

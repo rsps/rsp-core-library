@@ -3,30 +3,35 @@
  * \author      steffen
  */
 
-#include <messaging/Emitter.h>
+#include <messaging/Notifier.h>
 
 namespace rsp::messaging {
 
-SubscriberBase::SubscriberBase(EmitterBase &arEmitter)
+ListenerBase::ListenerBase()
+    : mpEmitter(nullptr)
 {
-    arEmitter.Subscribe(this);
-    mpEmitter = &arEmitter;
 }
 
-SubscriberBase::~SubscriberBase()
+ListenerBase::ListenerBase(NotifierBase &arEmitter)
+    : mpEmitter(&arEmitter)
+{
+    arEmitter.Subscribe(this);
+}
+
+ListenerBase::~ListenerBase()
 {
     if (mpEmitter) {
         mpEmitter->Unsubscribe(this);
     }
 }
 
-SubscriberBase::SubscriberBase(const SubscriberBase& arOther)
+ListenerBase::ListenerBase(const ListenerBase& arOther)
 {
     mpEmitter = arOther.mpEmitter;
     mpEmitter->Subscribe(this);
 }
 
-SubscriberBase& SubscriberBase::operator =(const SubscriberBase& arOther)
+ListenerBase& ListenerBase::operator =(const ListenerBase& arOther)
 {
     if (&arOther != this) {
         mpEmitter = arOther.mpEmitter;
@@ -35,7 +40,7 @@ SubscriberBase& SubscriberBase::operator =(const SubscriberBase& arOther)
     return *this;
 }
 
-SubscriberBase::SubscriberBase(SubscriberBase&& arOther)
+ListenerBase::ListenerBase(ListenerBase&& arOther)
 {
     mpEmitter = arOther.mpEmitter;
     arOther.mpEmitter->Unsubscribe(&arOther);
@@ -43,7 +48,7 @@ SubscriberBase::SubscriberBase(SubscriberBase&& arOther)
     mpEmitter->Subscribe(this);
 }
 
-SubscriberBase& SubscriberBase::operator =(SubscriberBase&& arOther)
+ListenerBase& ListenerBase::operator =(ListenerBase&& arOther)
 {
     if (&arOther != this) {
         mpEmitter = arOther.mpEmitter;
@@ -54,14 +59,14 @@ SubscriberBase& SubscriberBase::operator =(SubscriberBase&& arOther)
     return *this;
 }
 
-SubscriberBase& SubscriberBase::Attach(EmitterBase &arEmitter)
+ListenerBase& ListenerBase::Attach(NotifierBase &arEmitter)
 {
     mpEmitter = &arEmitter;
     mpEmitter->Subscribe(this);
     return *this;
 }
 
-SubscriberBase& SubscriberBase::Detach()
+ListenerBase& ListenerBase::Detach()
 {
     if (mpEmitter) {
         mpEmitter->Unsubscribe(this);
@@ -72,20 +77,20 @@ SubscriberBase& SubscriberBase::Detach()
 
 
 
-EmitterBase::~EmitterBase()
+NotifierBase::~NotifierBase()
 {
-    for(SubscriberBase* sub : mSubscribers) {
+    for(ListenerBase* sub : mSubscribers) {
         sub->mpEmitter = nullptr;
     }
 }
 
-EmitterBase& EmitterBase::Subscribe(SubscriberBase *apSubscriber)
+NotifierBase& NotifierBase::Subscribe(ListenerBase *apSubscriber)
 {
     if (!apSubscriber) {
         return *this;
     }
 
-    for(SubscriberBase* sub : mSubscribers) {
+    for(ListenerBase* sub : mSubscribers) {
         if (sub == apSubscriber) {
             return *this; // Already subscribed, do nothing
         }
@@ -96,7 +101,7 @@ EmitterBase& EmitterBase::Subscribe(SubscriberBase *apSubscriber)
     return *this;
 }
 
-EmitterBase& EmitterBase::Unsubscribe(SubscriberBase *apSubscriber)
+NotifierBase& NotifierBase::Unsubscribe(ListenerBase *apSubscriber)
 {
     if (!apSubscriber) {
         return *this;

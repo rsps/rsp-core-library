@@ -9,8 +9,8 @@
  */
 
 #include <string>
-#include <messaging/Emitter.h>
 #include <doctest.h>
+#include <messaging/Notifier.h>
 
 using namespace rsp::messaging;
 
@@ -26,24 +26,24 @@ static void checker(int i, std::string s)
 
 TEST_CASE("Emitter")
 {
-    using Notifier = Emitter<int, const std::string&>;
+    using Notifier = Notifier<int, const std::string&>;
 
     SUBCASE("Constructors") {
-//        CHECK_NOTHROW(Notifier dummy);
-        CHECK_NOTHROW(Notifier::Type_t dummy;);
-//        CHECK_NOTHROW(Notifier::Type_t dummy([&](int, const std::string&) noexcept {}));
-//        CHECK_NOTHROW(
-//            {
-//                Notifier emitter;
-//                Notifier::Type_t sub(emitter, [&](int, const std::string&) noexcept {});
-//            }
-//        );
+        CHECK_NOTHROW(Notifier dummy);
+        CHECK_NOTHROW(Notifier::ListenerType dummy;);
+        CHECK_NOTHROW(Notifier::ListenerType dummy([&](int, const std::string&) noexcept {}));
+        CHECK_NOTHROW(
+            {
+                Notifier emitter;
+                Notifier::ListenerType sub(emitter, [&](int, const std::string&) noexcept {});
+            }
+        );
     }
 
     SUBCASE("Single") {
         Notifier emitter;
         checker_called = 0;
-        Notifier::Type_t subscriber3(emitter, checker);
+        Notifier::ListenerType subscriber3(emitter, checker);
         CHECK_NOTHROW(emitter.Emit(42, s_param));
         CHECK_EQ(checker_called, 1);
     }
@@ -51,7 +51,7 @@ TEST_CASE("Emitter")
     SUBCASE("Attach") {
         Notifier emitter;
         checker_called = 0;
-        Notifier::Type_t subscriber3(checker);
+        Notifier::ListenerType subscriber3(checker);
         CHECK_NOTHROW(emitter.Emit(42, s_param));
         CHECK_EQ(checker_called, 0);
         subscriber3.Attach(emitter);
@@ -67,8 +67,9 @@ TEST_CASE("Emitter")
 
         int sub1_called = 0;
         int sub2_called = 0;
+        checker_called = 0;
 
-        Notifier::Type_t subscriber1(emitter, [&](int i, const std::string &s) {
+        Notifier::ListenerType subscriber1(emitter, [&](int i, const std::string &s) {
             sub1_called++;
             CHECK_EQ(i, 42);
             CHECK_EQ(s, s_param);
@@ -77,13 +78,13 @@ TEST_CASE("Emitter")
         CHECK_NOTHROW(emitter.Emit(42, s_param));
         CHECK_EQ(sub1_called, 1);
 
-        Notifier::Type_t subscriber2(emitter, [&](int i, const std::string &s) {
+        Notifier::ListenerType subscriber2(emitter, [&](int i, const std::string &s) {
             sub2_called++;
             CHECK_EQ(i, 42);
             CHECK_EQ(s, s_param);
         });
 
-        Notifier::Type_t subscriber3(emitter, checker);
+        Notifier::ListenerType subscriber3(emitter, checker);
 
         CHECK_NOTHROW(emitter.Emit(42, s_param));
 
