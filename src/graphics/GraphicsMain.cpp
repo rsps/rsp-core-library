@@ -62,8 +62,8 @@ bool GraphicsMain::Iterate(int aMaxFPS, bool aPollTimers)
 
     // New inputs?
     while (mrEvents.Poll(event)) {
-        Logger::GetDefault().Debug() << "Touch Event: " << event;
-        scene.ProcessEvent(std::get<rsp::messaging::Event>(event));
+        Logger::GetDefault().Debug() << "Touch Event: " << *event;
+        scene.ProcessEvent(*event);
     }
 
     bool changed = scene.UpdateData();
@@ -75,7 +75,7 @@ bool GraphicsMain::Iterate(int aMaxFPS, bool aPollTimers)
         mpOverlay->Render(mrRenderer);
     }
 
-    if (std::holds_alternative<QuitEvent>(event)) {
+    if (std::any_cast<const QuitEvent*>(event)) {
         mrRenderer.Flush();
         result = false;
     }

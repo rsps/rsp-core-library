@@ -27,7 +27,7 @@ struct TestEventItem_t {
     }
 };
 
-#define MAKE_TOUCH_ITEM(offset, type, point) TestEventItem_t(offset, TouchEvent(offset, type, point))
+#define MAKE_TOUCH_ITEM(offset, type, point) TestEventItem_t(offset, std::make_shared<TouchEvent>(offset, type, point))
 
 class TestTouchParser: public rsp::graphics::GfxInputEvents
 {

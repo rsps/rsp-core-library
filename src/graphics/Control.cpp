@@ -294,7 +294,7 @@ Control& Control::SetTransparent(bool aValue)
 
 bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
 {
-    TouchEvent &touch = arEvent.CastTo<TouchEvent>();
+    const TouchEvent &touch = arEvent.CastTo<const TouchEvent>();
 
     switch (touch.mType) {
         case TouchTypes::Press:
@@ -342,9 +342,9 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
                 }
             }
             if (mTouchArea.IsHit(touch.mPress)) {
-                if ((touch.mPressTime != std::chrono::steady_clock::time_point()) && (touch.mPress.Distance(touch.mCurrent) > 30)) {
-                    touch.mPressTime = std::chrono::steady_clock::time_point();
-                }
+//                if ((touch.mPressTime != std::chrono::steady_clock::time_point()) && (touch.mPress.Distance(touch.mCurrent) > 30)) {
+//                    touch.mPressTime = std::chrono::steady_clock::time_point();
+//                }
                 if (IsDraggable()) {
                     return doMove(touch);
                 }

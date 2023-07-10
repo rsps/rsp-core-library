@@ -41,6 +41,7 @@ protected:
 
     virtual void iterateTimers();
     virtual void actualizeNextScene();
+    virtual void iterateEvents();
     virtual bool updateData();
     virtual void render();
     virtual void updateFPS();

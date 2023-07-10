@@ -16,4 +16,41 @@ EventBroker::EventBroker()
 {
 }
 
+size_t EventBroker::ProcessEvents()
+{
+    size_t result = 0;
+    for (auto event : mQueue) {
+        for (SubscriberInterface* sub : mSubscribers) {
+            sub->ProcessEvent(*event);
+        }
+        result++;
+    }
+    mQueue.clear();
+    return result;
+}
+
+EventBroker& EventBroker::Publish(std::shared_ptr<Event> apEvent)
+{
+    mQueue.push_back(apEvent);
+    return *this;
+}
+
+EventBroker& EventBroker::Subscribe(SubscriberInterface *apSubscriber)
+{
+    auto it = std::find(mSubscribers.begin(), mSubscribers.end(), apSubscriber);
+    if (it == mSubscribers.end()) {
+        mSubscribers.push_back(apSubscriber);
+    }
+    return *this;
+}
+
+EventBroker& EventBroker::Unsubscribe(SubscriberInterface *apSubscriber)
+{
+    auto it = std::find(mSubscribers.begin(), mSubscribers.end(), apSubscriber);
+    if (it != mSubscribers.end()) {
+        mSubscribers.erase(it);
+    }
+    return *this;
+}
+
 } /* namespace rsp::messaging */

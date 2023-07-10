@@ -40,8 +40,13 @@ class Event
     }
 
     template<class T>
+    bool IsType() const {
+        return (T::ClassType == Type);
+    }
+
+    template<class T>
     T& CastTo() {
-        if (T::ClassType != Type) {
+        if (!IsType<T>()) {
             THROW_WITH_BACKTRACE2(rsp::exceptions::EBadCast, Name, T::ClassName);
         }
         return dynamic_cast<T&>(*this);
@@ -49,7 +54,7 @@ class Event
 
     template<class T>
     const T& CastTo() const {
-        if (T::ClassType != Type) {
+        if (!IsType<T>()) {
             THROW_WITH_BACKTRACE2(rsp::exceptions::EBadCast, Name, T::ClassName);
         }
         return dynamic_cast<const T&>(*this);

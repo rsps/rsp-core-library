@@ -12,8 +12,9 @@
 #define INCLUDE_GRAPHICS_GFXEVENTS_H_
 
 #include <chrono>
-#include <variant>
+#include <memory>
 #include <messaging/Event.h>
+#include <logging/LogStream.h>
 #include "Point.h"
 
 namespace rsp::graphics {
@@ -56,11 +57,11 @@ class QuitEvent : public rsp::messaging::EventBase<QuitEvent>
 {
 };
 
-// TODO: Take at look at std::variant and std::any
+using GfxEvent = std::shared_ptr<rsp::messaging::Event>; //std::variant<rsp::messaging::Event, TouchEvent, RefreshEvent, QuitEvent>;
 
-using GfxEvent = std::variant<rsp::messaging::Event, TouchEvent, RefreshEvent, QuitEvent>;
+std::ostream& operator<<(std::ostream &os, const rsp::messaging::Event &arEvent);
+rsp::logging::LogStream& operator<<(rsp::logging::LogStream &os, const rsp::messaging::Event &arEvent);
 
-std::ostream &operator<<(std::ostream &os, const GfxEvent &arEvent);
 
 } /* namespace rsp::graphics */
 

@@ -32,7 +32,7 @@ public:
      * \param Reference to the event object to be populated
      * \return bool True if the event is successfully filled
      */
-    virtual bool Poll(GfxEvent &arInput) = 0;
+    virtual bool Poll(GfxEvent &arEvent) = 0;
 
     /**
      * \brief Flush the input buffer for remaining input events

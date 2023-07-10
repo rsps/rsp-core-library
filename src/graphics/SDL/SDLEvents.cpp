@@ -48,7 +48,7 @@ bool SDLEvents::Poll(GfxEvent &arInput)
                 mLastTouchEvent.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
                 mLastTouchEvent.mType = TouchTypes::Drag;
                 mLastTouchEvent.mCurrent = Point(event.motion.x, event.motion.y);
-                arInput = mLastTouchEvent;
+                arInput = std::make_shared<TouchEvent>(mLastTouchEvent);
             }
             else {
                 return false;
@@ -61,21 +61,21 @@ bool SDLEvents::Poll(GfxEvent &arInput)
             mLastTouchEvent.mCurrent = Point(event.motion.x, event.motion.y);
             mLastTouchEvent.mPress = Point(event.motion.x, event.motion.y);
             mLastTouchEvent.mPressTime = mLastTouchEvent.mTime;
-            arInput = mLastTouchEvent;
+            arInput = std::make_shared<TouchEvent>(mLastTouchEvent);
             break;
 
         case SDL_MOUSEBUTTONUP:
             mLastTouchEvent.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
             mLastTouchEvent.mType = TouchTypes::Lift;
             mLastTouchEvent.mCurrent = Point(event.motion.x, event.motion.y);
-            arInput = mLastTouchEvent;
+            arInput = std::make_shared<TouchEvent>(mLastTouchEvent);
             break;
 
         case SDL_MOUSEWHEEL:
             return false;
 
         case SDL_QUIT:
-            arInput = QuitEvent();
+            arInput = std::make_shared<QuitEvent>();
             break;
 
         case SDL_WINDOWEVENT:

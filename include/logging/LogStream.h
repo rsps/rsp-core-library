@@ -77,8 +77,8 @@ public:
      * \param arValue
      * \return self
      */
-    template< class type>
-    LogStream& operator<<(const type &arValue) {
+    template< class T>
+    LogStream& operator<<(const T& arValue) {
         mBuffer << arValue;
         return *this;
     }

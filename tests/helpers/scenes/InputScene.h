@@ -25,8 +25,8 @@
 namespace rsp::graphics {
 
 #define CLICK(_time, _key) \
-    TestEventItem_t(_time, TouchEvent(_time, TouchTypes::Press, _key)), \
-    TestEventItem_t(_time+20, TouchEvent(_time+20, TouchTypes::Lift, _key))
+    MAKE_TOUCH_ITEM(_time, TouchTypes::Press, _key), \
+    MAKE_TOUCH_ITEM(_time+20, time+20, TouchTypes::Lift, _key)
 
 
 class InputScene : public SceneBase<InputScene>
@@ -34,6 +34,8 @@ class InputScene : public SceneBase<InputScene>
 public:
     static std::array<TestEventItem_t, 44>& GetTouchEvents() {
         static std::array events {
+            MAKE_TOUCH_ITEM(300, TouchTypes::Press, _SHIFT),
+            MAKE_TOUCH_ITEM(300+20, TouchTypes::Lift, _SHIFT),
             CLICK(300, _SHIFT),
             CLICK(400, _H),
             CLICK(500, _SHIFT),
@@ -55,7 +57,7 @@ public:
             CLICK(2200, _S),
             CLICK(2250, _D),
             CLICK(2300, _G),
-            CLICK(2350, _P),
+            CLICK(2350, _P)
         };
         return events;
     }

@@ -20,10 +20,15 @@ std::ostream &operator<<(std::ostream &os, const TouchEvent &arEvent)
     return os;
 }
 
-std::ostream& operator <<(std::ostream &os, const GfxEvent &arEvent)
+std::ostream& operator<<(std::ostream &os, const rsp::messaging::Event &arEvent)
 {
-    auto &event = std::get<rsp::messaging::Event>(arEvent);
-    os << "Event (" << event.Type << ") " << event.Name;
+    os << "Event (" << arEvent.Type << ") " << arEvent.Name;
+    return os;
+}
+
+rsp::logging::LogStream& operator<<(rsp::logging::LogStream &os, const rsp::messaging::Event &arEvent)
+{
+    os << "Event (" << arEvent.Type << ") " << arEvent.Name;
     return os;
 }
 

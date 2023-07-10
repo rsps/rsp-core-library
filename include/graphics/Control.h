@@ -18,6 +18,8 @@
 #include <exceptions/CoreException.h>
 #include <graphics/GfxInputEvents.h>
 #include <logging/Logger.h>
+#include <messaging/EventBroker.h>
+#include <messaging/Notifier.h>
 #include <utils/ConstTypeInfo.h>
 #include "Canvas.h"
 #include "Color.h"
@@ -37,7 +39,7 @@ public:
 };
 
 
-class Control : public rsp::utils::TypeInfo
+class Control : public rsp::utils::TypeInfo, public messaging::SubscriberInterface
 {
 public:
     using TouchCallback_t = std::function<void(const TouchEvent&, uint32_t)>;
@@ -210,7 +212,7 @@ public:
      * \param arEvent Reference to the event being processed
      * \return True if handled
      */
-    bool ProcessEvent(rsp::messaging::Event &arEvent);
+    bool ProcessEvent(rsp::messaging::Event &arEvent) override;
 
     /**
      * \brief OnPress callback reference
