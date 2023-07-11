@@ -71,14 +71,14 @@ TEST_CASE("Scene Test")
     CHECK_NOTHROW(GfxEvent event_dummy);
     TouchEvent event;
 
-    scenes.GetAfterCreate() = [](Scene arScene) {
+    auto ac = scenes.GetAfterCreate().Listen([](Scene arScene) {
         CHECK_EQ(arScene.GetId(), ID<SecondScene>());
         MESSAGE("Created Scene: " << arScene.GetName());
-    };
+    });
 
-    scenes.GetBeforeDestroy() = [](Scene &arScene) {
+    auto bd = scenes.GetBeforeDestroy().Listen([](Scene &arScene) {
         MESSAGE("Destroying Scene: " << arScene.GetName());
-    };
+    });
 
     CHECK_NOTHROW(scenes.SetActiveScene<SecondScene>());
     CHECK_NOTHROW(scenes.ActiveScene());
@@ -147,12 +147,12 @@ TEST_CASE("Scene Test")
         Broker<ClickTopics> broker;
         Publisher<ClickTopics> publisher(broker);
         bool clicked = false;
-        scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().OnClick() = [&publisher, &clicked](const TouchEvent&, uint32_t) {
+        auto f1 = scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().OnClick().Listen([&publisher, &clicked](const TouchEvent&, uint32_t) {
             clicked = true;
             MESSAGE("Click detected");
             rsp::messaging::ClickedEvent click_event("Button was clicked.");
             CHECK_NOTHROW(publisher.PublishToBroker(ClickTopics::SceneChange, click_event));
-        };
+        });
 
         // Arrange
         TestSub sub(broker);

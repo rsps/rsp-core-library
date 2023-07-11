@@ -6,90 +6,51 @@
 #ifndef INCLUDE_MESSAGING_NOTIFIER_H_
 #define INCLUDE_MESSAGING_NOTIFIER_H_
 
+#include <algorithm>
 #include <functional>
 #include <list>
+#include <memory>
+#include <vector>
 
 namespace rsp::messaging {
 
-class NotifierBase;
 
-class ListenerBase
+// http://nercury.github.io/c++/interesting/2016/02/22/weak_ptr-and-event-cleanup.html
+// https://stackoverflow.com/a/39920584
+
+template< class ... Args >
+class Notifier final
 {
 public:
-    ListenerBase();
-    ListenerBase(NotifierBase &arEmitter);
-    virtual ~ListenerBase();
+    // Tokens held by listeners
+//    using Listener_t = std::shared_ptr<std::function<void(Args...)> >;
+    using Listener_t = std::shared_ptr<void>;
 
-    ListenerBase(const ListenerBase&);
-    ListenerBase& operator=(const ListenerBase&);
-
-    ListenerBase(ListenerBase&&);
-    ListenerBase& operator=(ListenerBase&&);
-
-    ListenerBase& Attach(NotifierBase &arEmitter);
-    ListenerBase& Detach();
-
-protected:
-    friend class NotifierBase;
-    NotifierBase *mpEmitter = nullptr;
-};
-
-class NotifierBase
-{
-public:
-    ~NotifierBase();
-    NotifierBase& Subscribe(ListenerBase *apSubscriber);
-    NotifierBase& Unsubscribe(ListenerBase *apSubscriber);
-
-protected:
-    std::list<ListenerBase*> mSubscribers{};
-};
-
-
-template <typename... ArgTypes>
-class Listener : public ListenerBase
-{
-public:
-    Listener()
-        : ListenerBase() {};
-
-    Listener(std::function<void(ArgTypes...)> aFunction)
-        : mFunction(aFunction)
+    void operator()(Args ...args)
     {
-    }
-
-    Listener(NotifierBase &arEmitter, std::function<void(ArgTypes...)> aFunction)
-        : ListenerBase(arEmitter),
-          mFunction(aFunction)
-    {
-    }
-
-    Listener& Set(std::function<void(ArgTypes...)> aFunction) {
-        mFunction = aFunction;
-    }
-
-    void Invoke(ArgTypes ... args) {
-        if (mFunction) {
-            mFunction(args...);
+        std::erase_if(mCallbacks, [](auto ptr) { return ptr.expired(); });
+        auto tmp = mCallbacks;
+        for (auto wp : tmp) {
+            auto pf = wp.lock();
+            if (pf && *pf) {
+                (*pf)(args...);
+            }
         }
     }
+    Listener_t Listen(std::shared_ptr<std::function<void(Args...)>> f)
+    {
+        mCallbacks.push_back(f);
+        return f;
+    }
+
+    Listener_t Listen(std::function<void(Args...)> f)
+    {
+        auto ptr = std::make_shared<std::function<void(Args...)>>(std::move(f));
+        return Listen(ptr);
+    }
 
 protected:
-    std::function<void(ArgTypes...)> mFunction{};
-};
-
-
-template <typename... ArgTypes>
-class Notifier : public NotifierBase
-{
-public:
-    using ListenerType = Listener<ArgTypes...>;
-
-    void Emit(ArgTypes... args) {
-        for(ListenerBase* sub : mSubscribers) {
-            dynamic_cast<ListenerType*>(sub)->Invoke(args...);
-        }
-    }
+    std::vector<std::weak_ptr<std::function<void(Args...)> > > mCallbacks{};
 };
 
 } /* namespace rsp::messaging */

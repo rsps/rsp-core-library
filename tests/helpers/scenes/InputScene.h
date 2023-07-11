@@ -21,12 +21,13 @@
 #include <graphics/GfxInputEvents.h>
 #include <graphics/Bitmap.h>
 #include <TestTouchParser.h>
+#include <utils/Function.h>
 
 namespace rsp::graphics {
 
 #define CLICK(_time, _key) \
-    MAKE_TOUCH_ITEM(_time, TouchTypes::Press, _key), \
-    MAKE_TOUCH_ITEM(_time+20, time+20, TouchTypes::Lift, _key)
+    MakeEventItem<TouchEvent>(_time, _time, TouchTypes::Press, Point(_key)), \
+    MakeEventItem<TouchEvent>(_time+20, _time+20, TouchTypes::Lift, Point(_key))
 
 
 class InputScene : public SceneBase<InputScene>
@@ -34,8 +35,6 @@ class InputScene : public SceneBase<InputScene>
 public:
     static std::array<TestEventItem_t, 44>& GetTouchEvents() {
         static std::array events {
-            MAKE_TOUCH_ITEM(300, TouchTypes::Press, _SHIFT),
-            MAKE_TOUCH_ITEM(300+20, TouchTypes::Lift, _SHIFT),
             CLICK(300, _SHIFT),
             CLICK(400, _H),
             CLICK(500, _SHIFT),
@@ -45,10 +44,10 @@ public:
             CLICK(900, _O),
             CLICK(1000, _SPACE),
             CLICK(1100, _NUMBERS),
-            CLICK(1200, _1),
-            CLICK(1300, _2),
-            CLICK(1400, _8),
-            CLICK(1500, _0),
+            CLICK(1200, _NUM_1),
+            CLICK(1300, _NUM_2),
+            CLICK(1400, _NUM_8),
+            CLICK(1500, _NUM_0),
             CLICK(1700, _ERASE),
             CLICK(1800, _SPECIAL),
             CLICK(1900, _EURO_SIGN),
@@ -75,7 +74,7 @@ public:
 
         mKeyboard.SetArea(Rect(KB_X, KB_Y, 460, 350));
         mKeyboard.SetName("Keyboard");
-        mKeyboard.OnKeyClick() = rsp::utils::Method(this, &InputScene::onInputChange);
+        mListener = mKeyboard.OnKeyClick().Listen(rsp::utils::Method(this, &InputScene::onInputChange));
 //        mKeyboard.SetInput("qwertyuiopzxcvbnm");
 
         AddChild(&mLabel);
@@ -89,6 +88,7 @@ protected:
     Label mLabel{};
     Keyboard mKeyboard{};
     Bitmap mBackground;
+    TouchCallback_t::Listener_t mListener{};
 
     void onInputChange(const std::string &arInput)
     {

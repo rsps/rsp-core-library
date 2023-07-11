@@ -122,26 +122,27 @@ TEST_CASE("Graphics Main Test")
         CHECK_NOTHROW(gfx.ChangeScene<SecondScene>());
 
         int topBtnClicked = 0;
-        scenes.GetAfterCreate() = [&topBtnClicked, &tp](Scene &arScene) {
+        std::vector<Control::TouchCallback_t::Listener_t> cb_list;
+        SceneMap::SceneNotify::Listener_t store = scenes.GetAfterCreate().Listen([&topBtnClicked, &tp, &cb_list](Scene &arScene) {
             CHECK_EQ(arScene.GetId(), rsp::utils::ID<SecondScene>());
 
             CHECK_NOTHROW(tp.SetEvents(SecondScene::GetTouchEvents().data(), SecondScene::GetTouchEvents().size()));
 
             int topBtnId = static_cast<int>(arScene.GetAs<SecondScene>().GetTopBtn().GetId());
-            arScene.GetAs<SecondScene>().GetTopBtn().OnClick() = [&topBtnClicked, topBtnId](const TouchEvent &arEvent, uint32_t id) {
+            cb_list.push_back(arScene.GetAs<SecondScene>().GetTopBtn().OnClick().Listen([&topBtnClicked, topBtnId](const TouchEvent &arEvent, uint32_t id) {
                 CHECK_EQ(id, topBtnId);
                 topBtnClicked++;
-            };
+            }));
 
-            arScene.GetAs<SecondScene>().GetBottomBtn().OnClick() = [](const TouchEvent &arEvent, uint32_t id) {
+            cb_list.push_back(arScene.GetAs<SecondScene>().GetBottomBtn().OnClick().Listen([](const TouchEvent &arEvent, uint32_t id) {
                 FAIL("There should not be a click event from bottom button.");
-            };
+            }));
 
             // Check for lift even though we lift outside button
-            arScene.GetAs<SecondScene>().GetBottomBtn().OnLift() = [](const TouchEvent &arEvent, uint32_t id) {
+            cb_list.push_back(arScene.GetAs<SecondScene>().GetBottomBtn().OnLift().Listen([](const TouchEvent &arEvent, uint32_t id) {
                 CHECK_EQ(arEvent.mCurrent, Point(310, 390));
-            };
-        };
+            }));
+        });
 
         MESSAGE("Running GFX loop with " << GFX_FPS << " FPS");
         CHECK_NOTHROW(while(gfx.Iterate(1200, true)) continue;);
@@ -159,11 +160,11 @@ TEST_CASE("Graphics Main Test")
     SUBCASE("Input Scene") {
         CHECK_NOTHROW(gfx.ChangeScene(Scenes::InputScene));
 
-        scenes.GetAfterCreate() = [&tp](Scene &arScene) {
+        SceneMap::SceneNotify::Listener_t store = scenes.GetAfterCreate().Listen([&tp](Scene &arScene) {
             CHECK_EQ(arScene.GetId(), uint32_t(Scenes::InputScene));
 
             tp.SetEvents(InputScene::GetTouchEvents().data(), InputScene::GetTouchEvents().size());
-        };
+        });
 
         bool terminate = false;
         int progress = 0;

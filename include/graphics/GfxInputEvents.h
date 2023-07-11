@@ -14,6 +14,7 @@
 #include <utils/Singleton.h>
 #include "GfxEvents.h"
 #include "Point.h"
+#include <utils/Timer.h>
 
 namespace rsp::graphics {
 

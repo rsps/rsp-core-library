@@ -18,15 +18,16 @@ TestTouchParser& TestTouchParser::SetEvents(const TestEventItem_t *apTouchEvents
     mpTouchEvents = apTouchEvents;
     mEventCount = aCount;
     mIndex = 0;
+    mpLastEvent = std::make_shared<TouchEvent>();
     return *this;
 }
 
-bool TestTouchParser::Poll(rsp::graphics::GfxEvent &arInput)
+bool TestTouchParser::Poll(GfxEvent &arInput)
 {
     if ((mIndex < mEventCount) && (std::chrono::steady_clock::now() >= mpTouchEvents[mIndex].Time)) {
         if (mpTouchEvents[mIndex].Event->IsType<TouchEvent>()) {
-            mLastEvent.Assign(mpTouchEvents[mIndex].Event->CastTo<TouchEvent>());
-            arInput = std::make_shared<TouchEvent>(mLastEvent);
+            mpLastEvent->Assign(mpTouchEvents[mIndex].Event->CastTo<TouchEvent>());
+            arInput = mpLastEvent;
         }
         else {
             arInput = mpTouchEvents[mIndex].Event;

@@ -12,22 +12,34 @@
 #define TESTS_HELPERS_TESTTOUCHPARSER_H_
 
 #include <chrono>
+#include <memory>
+#include <messaging/Event.h>
 #include <graphics/GfxInputEvents.h>
 
 struct TestEventItem_t {
-    std::chrono::steady_clock::time_point Time;
-    rsp::graphics::GfxEvent Event;
+    std::chrono::steady_clock::time_point Time{};
+    std::shared_ptr<rsp::messaging::Event> Event{};
 
-    TestEventItem_t() : Time{}, Event{} {}
-    TestEventItem_t(int aOffset, rsp::graphics::GfxEvent &&arEvent)
-        : Time(std::chrono::steady_clock::now()),
+    TestEventItem_t() {}
+
+    TestEventItem_t(int aOffset, std::shared_ptr<rsp::messaging::Event> &&arEvent)
+        : Time(std::chrono::steady_clock::now() + std::chrono::milliseconds(aOffset)),
           Event(std::move(arEvent))
     {
-        Time += std::chrono::milliseconds(aOffset);
     }
 };
 
-#define MAKE_TOUCH_ITEM(offset, type, point) TestEventItem_t(offset, std::make_shared<TouchEvent>(offset, type, point))
+template<class T, typename... Args>
+static TestEventItem_t MakeEventItem(int aOffset, Args &&... args)
+{
+    return TestEventItem_t(
+        aOffset,
+        std::make_shared<T>(std::forward<Args>(args)...)
+    );
+}
+
+#define MAKE_TOUCH_ITEM(_OFFSET_, _TYPE_, _POINT_) MakeEventItem<TouchEvent>(_OFFSET_, _OFFSET_, _TYPE_, Point(_POINT_))
+
 
 class TestTouchParser: public rsp::graphics::GfxInputEvents
 {
@@ -38,13 +50,13 @@ public:
 
     TestTouchParser& SetEvents(const TestEventItem_t *apTouchEvents, size_t aCount);
 
-    bool Poll(rsp::graphics::GfxEvent &arInput) override;
+    bool Poll(rsp::graphics::GfxEvent &arEvent) override;
 
     void Flush() override;
 
 protected:
     const TestEventItem_t *mpTouchEvents = nullptr;
-    rsp::graphics::TouchEvent mLastEvent{};
+    std::shared_ptr<rsp::graphics::TouchEvent> mpLastEvent{};
     std::size_t mEventCount = 0;
     std::size_t mIndex = 0;
 };

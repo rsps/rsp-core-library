@@ -17,7 +17,7 @@
 #include <string>
 #include <exceptions/CoreException.h>
 #include <graphics/Scene.h>
-#include <utils/Function.h>
+#include <messaging/Notifier.h>
 #include <logging/Logger.h>
 #include <magic_enum.hpp>
 
@@ -39,7 +39,7 @@ class SceneMap
 {
 public:
     using SceneCreator = std::function<std::unique_ptr<Scene>()>;
-    using SceneNotify = std::function<void(Scene&)>;
+    using SceneNotify = rsp::messaging::Notifier<Scene&>;
 
     SceneMap() {};
     SceneMap(const SceneMap&) = default;

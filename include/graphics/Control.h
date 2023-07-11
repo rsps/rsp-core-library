@@ -42,7 +42,7 @@ public:
 class Control : public rsp::utils::TypeInfo, public messaging::SubscriberInterface
 {
 public:
-    using TouchCallback_t = std::function<void(const TouchEvent&, uint32_t)>;
+    using TouchCallback_t = rsp::messaging::Notifier<const TouchEvent&, uint32_t>;
 
     /**
      * \brief Enum type defining the available states

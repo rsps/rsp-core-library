@@ -41,8 +41,8 @@ public:
             MAKE_TOUCH_ITEM(75, TouchTypes::Drag, Point(310, 390)),  // Drag outside BotBtn
             MAKE_TOUCH_ITEM(76, TouchTypes::Lift, Point(310, 390)),  // Lift outside BotBtn
 
-            TestEventItem_t(80, std::make_shared<RefreshEvent>()),   // Refresh display
-            TestEventItem_t(81, std::make_shared<QuitEvent>())       // Terminate
+            MakeEventItem<RefreshEvent>(80),   // Refresh display
+            MakeEventItem<QuitEvent>(81)       // Terminate
         };
         return events;
     }

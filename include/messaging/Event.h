@@ -10,7 +10,7 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-#include <any>
+#include <memory>
 #include <string_view>
 #include <type_traits>
 #include <typeinfo>
@@ -62,6 +62,9 @@ class Event
 
 };
 
+using EventPtr_t = std::shared_ptr<rsp::messaging::Event>;
+
+
 template <class T>
 class EventBase : public Event
 {
@@ -72,6 +75,7 @@ class EventBase : public Event
     EventBase() : Event(ClassType, ClassName) {}
     EventBase(size_t aType, std::string_view aName) : Event(aType, aName) {}
 };
+
 
 } // namespace rsp::messaging
 #endif // EVENT_H

@@ -8,13 +8,112 @@
  * \author      Steffen Brummer
  */
 
+#include <chrono>
+#include <thread>
 #include <graphics/GfxEngine.h>
 
 namespace rsp::graphics {
 
 GfxEngine::GfxEngine(int aMaxFPS)
-    : mMaxFPS(aMaxFPS)
+    : mFrameTime(1000 / aMaxFPS)
 {
+}
+
+GfxEngine& GfxEngine::SetNextScene(std::uint32_t aId)
+{
+    mNextScene = aId;
+    return *this;
+}
+
+bool GfxEngine::Iterate()
+{
+    iterateTimers();
+    iterateEvents();
+
+    actualizeNextScene();
+
+    bool changed = updateData();
+    if (changed) {
+        render();
+    }
+
+    updateFPS();
+
+    return true;
+}
+
+int GfxEngine::GetFPS() const
+{
+    return mFps;
+}
+
+GfxEngine& GfxEngine::AddOverlay(Control *apControl)
+{
+    mOverlays.push_back(apControl);
+    return *this;
+}
+
+GfxEngine& GfxEngine::ClearOverlays()
+{
+    mOverlays.clear();
+    return *this;
+}
+
+void GfxEngine::iterateTimers()
+{
+    rsp::utils::TimerQueue::GetInstance().Poll();
+}
+
+void GfxEngine::actualizeNextScene()
+{
+    getSceneMap().SetActiveScene(mNextScene);
+    mNextScene = 0;
+    GfxInputEvents::Get().Flush();
+}
+
+void GfxEngine::iterateEvents()
+{
+    auto &inputs = GfxInputEvents::Get();
+    auto &broker = getEventBroker();
+    GfxEvent event;
+
+    // Fetch input events and move them to the event queue
+    while (inputs.Poll(event)) {
+        broker.Publish(event);
+    }
+
+    broker.ProcessEvents();
+}
+
+bool GfxEngine::updateData()
+{
+    bool changed = getSceneMap().ActiveScene().UpdateData();
+
+    for (Control* ctrl : mOverlays) {
+        if (ctrl->UpdateData()) {
+            changed = true;
+        }
+    }
+    return true;
+}
+
+void GfxEngine::render()
+{
+    auto &renderer = getRenderer();
+    getSceneMap().ActiveScene().Render(renderer);
+
+    for (Control* ctrl : mOverlays) {
+        ctrl->Render(renderer);
+    }
+
+    renderer.Present();
+}
+
+void GfxEngine::updateFPS()
+{
+    int delay = std::max(int64_t(0), mFrameTime - mStopWatch.Elapsed<std::chrono::milliseconds>());
+    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+    mFps = 1000 / std::max(int64_t(1), mStopWatch.Elapsed<std::chrono::milliseconds>());
 }
 
 } /* namespace rsp::graphics */

@@ -11,8 +11,9 @@
 #ifndef INCLUDE_GRAPHICS_GFXENGINE_H_
 #define INCLUDE_GRAPHICS_GFXENGINE_H_
 
+#include <vector>
 #include "Renderer.h"
-#include "Scene.h"
+#include "SceneMap.h"
 #include <messaging/EventBroker.h>
 #include <utils/StopWatch.h>
 
@@ -22,7 +23,7 @@ class GfxEngine
 {
 public:
     GfxEngine(int aMaxFPS = 1000);
-    virtual ~GfxEngine();
+    virtual ~GfxEngine() {};
 
     GfxEngine& SetNextScene(std::uint32_t aId);
 
@@ -33,11 +34,15 @@ public:
 
     int GetFPS() const;
 
+    GfxEngine& AddOverlay(Control *apControl);
+    GfxEngine& ClearOverlays();
+
 protected:
-    int mMaxFPS;
+    int mFrameTime;
     int mFps = 0;
     rsp::utils::StopWatch mStopWatch{};
     uint32_t mNextScene = 0;
+    std::vector<Control*> mOverlays{};
 
     virtual void iterateTimers();
     virtual void actualizeNextScene();
@@ -47,7 +52,7 @@ protected:
     virtual void updateFPS();
 
     virtual Renderer& getRenderer() = 0;
-    virtual Scene& getScene() = 0;
+    virtual SceneMap& getSceneMap() = 0;
     virtual rsp::messaging::EventBroker& getEventBroker() = 0;
 };
 

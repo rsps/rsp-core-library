@@ -57,7 +57,7 @@ class QuitEvent : public rsp::messaging::EventBase<QuitEvent>
 {
 };
 
-using GfxEvent = std::shared_ptr<rsp::messaging::Event>; //std::variant<rsp::messaging::Event, TouchEvent, RefreshEvent, QuitEvent>;
+using GfxEvent = rsp::messaging::EventPtr_t;
 
 std::ostream& operator<<(std::ostream &os, const rsp::messaging::Event &arEvent);
 rsp::logging::LogStream& operator<<(rsp::logging::LogStream &os, const rsp::messaging::Event &arEvent);
