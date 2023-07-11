@@ -19,23 +19,23 @@
 
 namespace rsp::graphics {
 
-class GfxEngine
+class GfxEngineBase
 {
 public:
-    GfxEngine(int aMaxFPS = 1000);
-    virtual ~GfxEngine() {};
+    GfxEngineBase(int aMaxFPS = 1000);
+    virtual ~GfxEngineBase() {};
 
-    GfxEngine& SetNextScene(std::uint32_t aId);
+    GfxEngineBase& SetNextScene(std::uint32_t aId);
 
     template <class E, typename = typename std::enable_if<std::is_enum<E>::value, E>::type>
-    GfxEngine& SetNextScene(E e) { return SetNextScene(uint32_t(e)); }
+    GfxEngineBase& SetNextScene(E e) { return SetNextScene(uint32_t(e)); }
 
     bool Iterate();
 
     int GetFPS() const;
 
-    GfxEngine& AddOverlay(Control *apControl);
-    GfxEngine& ClearOverlays();
+    GfxEngineBase& AddOverlay(Control *apControl);
+    GfxEngineBase& ClearOverlays();
 
 protected:
     int mFrameTime;
@@ -51,9 +51,33 @@ protected:
     virtual void render();
     virtual void updateFPS();
 
-    virtual Renderer& getRenderer() = 0;
     virtual SceneMap& getSceneMap() = 0;
-    virtual rsp::messaging::EventBroker& getEventBroker() = 0;
+    virtual rsp::messaging::BrokerInterface& getEventBroker() = 0;
+};
+
+
+template <class TSceneMap, class TBroker = rsp::messaging::EventBroker>
+class GfxEngine : public GfxEngineBase
+{
+public:
+    GfxEngine(int aMaxFPS = 1000)
+        : GfxEngineBase(aMaxFPS)
+    {
+    }
+
+protected:
+    TSceneMap mSceneMap{};
+    TBroker mBroker{};
+
+    rsp::messaging::BrokerInterface& getEventBroker() override
+    {
+        return mBroker;
+    }
+
+    rsp::graphics::SceneMap& getSceneMap() override
+    {
+        return mSceneMap;
+    }
 };
 
 } /* namespace rsp::graphics */

@@ -36,6 +36,8 @@ public:
 
     virtual size_t ProcessEvents() = 0;
 
+    virtual BrokerInterface& Publish(std::shared_ptr<Event> apEvent) = 0;
+
     virtual BrokerInterface& Subscribe(SubscriberInterface *apSubscriber) = 0;
     virtual BrokerInterface& Unsubscribe(SubscriberInterface *apSubscriber) = 0;
 
@@ -47,9 +49,9 @@ public:
     EventBroker();
     virtual ~EventBroker() {}
 
-    virtual size_t ProcessEvents() override;
+    size_t ProcessEvents() override;
 
-    EventBroker& Publish(std::shared_ptr<Event> apEvent);
+    EventBroker& Publish(std::shared_ptr<Event> apEvent) override;
 
     EventBroker& Subscribe(SubscriberInterface *apSubscriber) override;
     EventBroker& Unsubscribe(SubscriberInterface *apSubscriber) override;

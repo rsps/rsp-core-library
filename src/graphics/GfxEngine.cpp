@@ -8,24 +8,25 @@
  * \author      Steffen Brummer
  */
 
+#include <graphics/GfxEngine.h>
+#include <graphics/Renderer.h>
 #include <chrono>
 #include <thread>
-#include <graphics/GfxEngine.h>
 
 namespace rsp::graphics {
 
-GfxEngine::GfxEngine(int aMaxFPS)
+GfxEngineBase::GfxEngineBase(int aMaxFPS)
     : mFrameTime(1000 / aMaxFPS)
 {
 }
 
-GfxEngine& GfxEngine::SetNextScene(std::uint32_t aId)
+GfxEngineBase& GfxEngineBase::SetNextScene(std::uint32_t aId)
 {
     mNextScene = aId;
     return *this;
 }
 
-bool GfxEngine::Iterate()
+bool GfxEngineBase::Iterate()
 {
     iterateTimers();
     iterateEvents();
@@ -42,36 +43,36 @@ bool GfxEngine::Iterate()
     return true;
 }
 
-int GfxEngine::GetFPS() const
+int GfxEngineBase::GetFPS() const
 {
     return mFps;
 }
 
-GfxEngine& GfxEngine::AddOverlay(Control *apControl)
+GfxEngineBase& GfxEngineBase::AddOverlay(Control *apControl)
 {
     mOverlays.push_back(apControl);
     return *this;
 }
 
-GfxEngine& GfxEngine::ClearOverlays()
+GfxEngineBase& GfxEngineBase::ClearOverlays()
 {
     mOverlays.clear();
     return *this;
 }
 
-void GfxEngine::iterateTimers()
+void GfxEngineBase::iterateTimers()
 {
     rsp::utils::TimerQueue::GetInstance().Poll();
 }
 
-void GfxEngine::actualizeNextScene()
+void GfxEngineBase::actualizeNextScene()
 {
     getSceneMap().SetActiveScene(mNextScene);
     mNextScene = 0;
     GfxInputEvents::Get().Flush();
 }
 
-void GfxEngine::iterateEvents()
+void GfxEngineBase::iterateEvents()
 {
     auto &inputs = GfxInputEvents::Get();
     auto &broker = getEventBroker();
@@ -85,7 +86,7 @@ void GfxEngine::iterateEvents()
     broker.ProcessEvents();
 }
 
-bool GfxEngine::updateData()
+bool GfxEngineBase::updateData()
 {
     bool changed = getSceneMap().ActiveScene().UpdateData();
 
@@ -97,9 +98,9 @@ bool GfxEngine::updateData()
     return true;
 }
 
-void GfxEngine::render()
+void GfxEngineBase::render()
 {
-    auto &renderer = getRenderer();
+    auto &renderer = Renderer::Get();
     getSceneMap().ActiveScene().Render(renderer);
 
     for (Control* ctrl : mOverlays) {
@@ -109,7 +110,7 @@ void GfxEngine::render()
     renderer.Present();
 }
 
-void GfxEngine::updateFPS()
+void GfxEngineBase::updateFPS()
 {
     int delay = std::max(int64_t(0), mFrameTime - mStopWatch.Elapsed<std::chrono::milliseconds>());
     std::this_thread::sleep_for(std::chrono::milliseconds(delay));
