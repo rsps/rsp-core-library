@@ -89,7 +89,7 @@ void BmpLoader::LoadImg(const std::string &aImgName)
 
     ReadHeader(file);
 
-    std::cout << "Header for " << aImgName << "\n" << mBmpHeader << std::endl;
+//    std::cout << "Header for " << aImgName << "\n" << mBmpHeader << std::endl;
     if (mBmpHeader.v1.bitsPerPixel <= 8) {
         ReadPalette(file);
     }
@@ -121,7 +121,7 @@ void BmpLoader::ReadHeader(rsp::posix::FileIO &arFile)
     // Read the 54 byte header
     arFile.ExactRead(reinterpret_cast<char *>(&mBmpHeader), sizeof(mBmpHeader));
 
-    Logger::GetDefault().Debug() << mBmpHeader;
+//    Logger::GetDefault().Debug() << mBmpHeader;
 
     mBytesPerPixel = mBmpHeader.v1.bitsPerPixel / 8; // Might be 1 or 4
     if ((mBmpHeader.v1.bitsPerPixel % 8) > 0) {

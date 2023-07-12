@@ -25,24 +25,24 @@ public:
 
     static std::array<TestEventItem_t, 15>& GetTouchEvents() {
         static std::array events {
-            MAKE_TOUCH_ITEM(50, TouchTypes::Press, Point(100, 100)),
-            MAKE_TOUCH_ITEM(51, TouchTypes::Lift, Point(100, 100)),  // Click outside any buttons
+            MAKE_TOUCH_ITEM(100, TouchTypes::Press, Point(100, 100)),
+            MAKE_TOUCH_ITEM(110, TouchTypes::Lift, Point(100, 100)),  // Click outside any buttons
 
-            MAKE_TOUCH_ITEM(60, TouchTypes::Press, Point(100, 150)),
-            MAKE_TOUCH_ITEM(61, TouchTypes::Lift, Point(100, 150)),  // Click top left corner of TopBtn
-            MAKE_TOUCH_ITEM(62, TouchTypes::Press, Point(299, 249)),
-            MAKE_TOUCH_ITEM(63, TouchTypes::Lift, Point(299, 249)),  // Click bottom right corner of TopBtn
+            MAKE_TOUCH_ITEM(200, TouchTypes::Press, Point(100, 150)),
+            MAKE_TOUCH_ITEM(210, TouchTypes::Lift, Point(100, 150)),  // Click top left corner of TopBtn
+            MAKE_TOUCH_ITEM(220, TouchTypes::Press, Point(299, 249)),
+            MAKE_TOUCH_ITEM(230, TouchTypes::Lift, Point(299, 249)),  // Click bottom right corner of TopBtn
 
-            MAKE_TOUCH_ITEM(70, TouchTypes::Press, Point(100, 300)), // Press top left corner of BotBtn
-            MAKE_TOUCH_ITEM(71, TouchTypes::Drag, Point(150, 320)),  // Drag over BotBtn
-            MAKE_TOUCH_ITEM(72, TouchTypes::Drag, Point(200, 340)),  // Drag over BotBtn
-            MAKE_TOUCH_ITEM(73, TouchTypes::Drag, Point(250, 360)),  // Drag over BotBtn
-            MAKE_TOUCH_ITEM(74, TouchTypes::Drag, Point(300, 380)),  // Drag over BotBtn
-            MAKE_TOUCH_ITEM(75, TouchTypes::Drag, Point(310, 390)),  // Drag outside BotBtn
-            MAKE_TOUCH_ITEM(76, TouchTypes::Lift, Point(310, 390)),  // Lift outside BotBtn
+            MAKE_TOUCH_ITEM(300, TouchTypes::Press, Point(100, 300)), // Press top left corner of BotBtn
+            MAKE_TOUCH_ITEM(310, TouchTypes::Drag, Point(150, 320)),  // Drag over BotBtn
+            MAKE_TOUCH_ITEM(320, TouchTypes::Drag, Point(200, 340)),  // Drag over BotBtn
+            MAKE_TOUCH_ITEM(330, TouchTypes::Drag, Point(250, 360)),  // Drag over BotBtn
+            MAKE_TOUCH_ITEM(340, TouchTypes::Drag, Point(300, 380)),  // Drag over BotBtn
+            MAKE_TOUCH_ITEM(350, TouchTypes::Drag, Point(310, 390)),  // Drag outside BotBtn
+            MAKE_TOUCH_ITEM(360, TouchTypes::Lift, Point(310, 390)),  // Lift outside BotBtn
 
-            MakeEventItem<RefreshEvent>(80),   // Refresh display
-            MakeEventItem<QuitEvent>(81)       // Terminate
+            MakeEventItem<RefreshEvent>(400),   // Refresh display
+            MakeEventItem<QuitEvent>(410)       // Terminate
         };
         return events;
     }

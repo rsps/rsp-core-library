@@ -54,7 +54,7 @@ SDL_TextureWrapper::SDL_TextureWrapper(SDL_Texture *apTexture, GuiUnit_t aWidth,
         THROW_WITH_BACKTRACE1(SDLException, "SDL_CreateTexture() returned nullptr");
     }
     mTotalAllocated += mSize;
-    logging::Logger::GetDefault().Debug() << "VideoMemAlloc(" << mSize << "), Total: " << (mTotalAllocated / 1024.0 / 1024.0) << " MB";
+//    logging::Logger::GetDefault().Debug() << "VideoMemAlloc(" << mSize << "), Total: " << (mTotalAllocated / 1024.0 / 1024.0) << " MB";
 }
 
 SDL_TextureWrapper::~SDL_TextureWrapper()
@@ -62,7 +62,7 @@ SDL_TextureWrapper::~SDL_TextureWrapper()
     if (mpTexture) {
         SDL_DestroyTexture(mpTexture);
         mTotalAllocated -= mSize;
-        logging::Logger::GetDefault().Debug() << "VideoMemFree(" << mSize << "), Total: " << (mTotalAllocated / 1024.0 / 1024.0) << " MB";
+//        logging::Logger::GetDefault().Debug() << "VideoMemFree(" << mSize << "), Total: " << (mTotalAllocated / 1024.0 / 1024.0) << " MB";
     }
 }
 

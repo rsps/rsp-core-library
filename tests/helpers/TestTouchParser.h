@@ -15,6 +15,7 @@
 #include <memory>
 #include <messaging/Event.h>
 #include <graphics/GfxInputEvents.h>
+#include <logging/LogChannel.h>
 
 struct TestEventItem_t {
     std::chrono::steady_clock::time_point Time{};
@@ -41,7 +42,7 @@ static TestEventItem_t MakeEventItem(int aOffset, Args &&... args)
 #define MAKE_TOUCH_ITEM(_OFFSET_, _TYPE_, _POINT_) MakeEventItem<TouchEvent>(_OFFSET_, _OFFSET_, _TYPE_, Point(_POINT_))
 
 
-class TestTouchParser: public rsp::graphics::GfxInputEvents
+class TestTouchParser: public rsp::graphics::GfxInputEvents, public rsp::logging::NamedLogger<TestTouchParser>
 {
 public:
     TestTouchParser() {};
@@ -54,11 +55,14 @@ public:
 
     void Flush() override;
 
+    int64_t GetMaxDelay() const;
+
 protected:
     const TestEventItem_t *mpTouchEvents = nullptr;
-    std::shared_ptr<rsp::graphics::TouchEvent> mpLastEvent{};
-    std::size_t mEventCount = 0;
-    std::size_t mIndex = 0;
+    rsp::graphics::TouchEvent mLastEvent{};
+    size_t mEventCount = 0;
+    size_t mIndex = 0;
+    int64_t mMaxDelay = 0;
 };
 
 #endif /* TESTS_HELPERS_TESTTOUCHPARSER_H_ */

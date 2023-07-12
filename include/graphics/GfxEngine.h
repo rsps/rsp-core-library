@@ -14,6 +14,7 @@
 #include <vector>
 #include "Renderer.h"
 #include "SceneMap.h"
+#include <logging/LogChannel.h>
 #include <messaging/EventBroker.h>
 #include <utils/StopWatch.h>
 
@@ -34,15 +35,21 @@ public:
 
     int GetFPS() const;
 
-    GfxEngineBase& AddOverlay(Control *apControl);
+    GfxEngineBase& AddOverlay(Control &arControl);
     GfxEngineBase& ClearOverlays();
+
+    virtual SceneMap& GetSceneMap() = 0;
+    virtual rsp::messaging::BrokerInterface& GetEventBroker() = 0;
 
 protected:
     int mFrameTime;
     int mFps = 0;
+    uint32_t mIterations = 0;
     rsp::utils::StopWatch mStopWatch{};
     uint32_t mNextScene = 0;
     std::vector<Control*> mOverlays{};
+    SceneMap::SceneNotify::Listener_t mListeners[2];
+    rsp::logging::LogChannel mLogger;
 
     virtual void iterateTimers();
     virtual void actualizeNextScene();
@@ -51,8 +58,8 @@ protected:
     virtual void render();
     virtual void updateFPS();
 
-    virtual SceneMap& getSceneMap() = 0;
-    virtual rsp::messaging::BrokerInterface& getEventBroker() = 0;
+    void afterSceneCreated(Scene& arScene);
+    void beforeSceneDestroyed(Scene& arScene);
 };
 
 
@@ -63,21 +70,23 @@ public:
     GfxEngine(int aMaxFPS = 1000)
         : GfxEngineBase(aMaxFPS)
     {
+        mListeners[0] = mSceneMap.GetAfterCreate().Listen(std::bind(&GfxEngine::afterSceneCreated, this, std::placeholders::_1));
+        mListeners[1] = mSceneMap.GetBeforeDestroy().Listen(std::bind(&GfxEngine::beforeSceneDestroyed, this, std::placeholders::_1));
+    }
+
+    rsp::messaging::BrokerInterface& GetEventBroker() override
+    {
+        return mBroker;
+    }
+
+    rsp::graphics::SceneMap& GetSceneMap() override
+    {
+        return mSceneMap;
     }
 
 protected:
     TSceneMap mSceneMap{};
     TBroker mBroker{};
-
-    rsp::messaging::BrokerInterface& getEventBroker() override
-    {
-        return mBroker;
-    }
-
-    rsp::graphics::SceneMap& getSceneMap() override
-    {
-        return mSceneMap;
-    }
 };
 
 } /* namespace rsp::graphics */

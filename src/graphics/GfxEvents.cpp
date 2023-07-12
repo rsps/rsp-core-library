@@ -8,6 +8,7 @@
  * \author      Steffen Brummer
  */
 
+#include <chrono>
 #include <graphics/GfxEvents.h>
 #include <magic_enum.hpp>
 
@@ -15,23 +16,11 @@ namespace rsp::graphics {
 
 std::ostream &operator<<(std::ostream &os, const TouchEvent &arEvent)
 {
-    os << arEvent.mTime.time_since_epoch().count() << " "
+    auto int_msec = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - arEvent.mTime);
+    os << int_msec.count() << " "
         << std::string(magic_enum::enum_name<TouchTypes>(TouchTypes(arEvent.mType))) << "(" << arEvent.mCurrent << ")";
     return os;
 }
-
-std::ostream& operator<<(std::ostream &os, const rsp::messaging::Event &arEvent)
-{
-    os << "Event (" << arEvent.Type << ") " << arEvent.Name;
-    return os;
-}
-
-rsp::logging::LogStream& operator<<(rsp::logging::LogStream &os, const rsp::messaging::Event &arEvent)
-{
-    os << "Event (" << arEvent.Type << ") " << arEvent.Name;
-    return os;
-}
-
 
 TouchEvent::TouchEvent(int aOffset, TouchTypes aType, const Point &arPoint)
     : mType(aType),

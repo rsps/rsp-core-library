@@ -10,13 +10,17 @@
 
 #include <graphics/GfxEngine.h>
 #include <graphics/Renderer.h>
+#include <logging/Logger.h>
 #include <chrono>
 #include <thread>
+
+using namespace rsp::logging;
 
 namespace rsp::graphics {
 
 GfxEngineBase::GfxEngineBase(int aMaxFPS)
-    : mFrameTime(1000 / aMaxFPS)
+    : mFrameTime(1000 / aMaxFPS),
+      mLogger("GfxEngine")
 {
 }
 
@@ -28,6 +32,8 @@ GfxEngineBase& GfxEngineBase::SetNextScene(std::uint32_t aId)
 
 bool GfxEngineBase::Iterate()
 {
+    mLogger.Debug() << "Iteration: " << mIterations++;
+
     iterateTimers();
     iterateEvents();
 
@@ -48,9 +54,9 @@ int GfxEngineBase::GetFPS() const
     return mFps;
 }
 
-GfxEngineBase& GfxEngineBase::AddOverlay(Control *apControl)
+GfxEngineBase& GfxEngineBase::AddOverlay(Control &arControl)
 {
-    mOverlays.push_back(apControl);
+    mOverlays.push_back(&arControl);
     return *this;
 }
 
@@ -67,19 +73,22 @@ void GfxEngineBase::iterateTimers()
 
 void GfxEngineBase::actualizeNextScene()
 {
-    getSceneMap().SetActiveScene(mNextScene);
-    mNextScene = 0;
-    GfxInputEvents::Get().Flush();
+    if (mNextScene) {
+        GfxInputEvents::GetInstance().Flush();
+        GetSceneMap().SetActiveScene(mNextScene);
+        mNextScene = 0;
+    }
 }
 
 void GfxEngineBase::iterateEvents()
 {
-    auto &inputs = GfxInputEvents::Get();
-    auto &broker = getEventBroker();
+    auto &inputs = GfxInputEvents::GetInstance();
+    auto &broker = GetEventBroker();
     GfxEvent event;
 
     // Fetch input events and move them to the event queue
     while (inputs.Poll(event)) {
+        Logger::GetDefault().Debug() << "Got Input Event: " << *event;
         broker.Publish(event);
     }
 
@@ -88,7 +97,7 @@ void GfxEngineBase::iterateEvents()
 
 bool GfxEngineBase::updateData()
 {
-    bool changed = getSceneMap().ActiveScene().UpdateData();
+    bool changed = GetSceneMap().ActiveScene().UpdateData();
 
     for (Control* ctrl : mOverlays) {
         if (ctrl->UpdateData()) {
@@ -101,7 +110,7 @@ bool GfxEngineBase::updateData()
 void GfxEngineBase::render()
 {
     auto &renderer = Renderer::Get();
-    getSceneMap().ActiveScene().Render(renderer);
+    GetSceneMap().ActiveScene().Render(renderer);
 
     for (Control* ctrl : mOverlays) {
         ctrl->Render(renderer);
@@ -115,6 +124,18 @@ void GfxEngineBase::updateFPS()
     int delay = std::max(int64_t(0), mFrameTime - mStopWatch.Elapsed<std::chrono::milliseconds>());
     std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     mFps = 1000 / std::max(int64_t(1), mStopWatch.Elapsed<std::chrono::milliseconds>());
+    mStopWatch.Reset();
+}
+
+void GfxEngineBase::afterSceneCreated(Scene &arScene)
+{
+
+    GetEventBroker().Subscribe(arScene);
+}
+
+void GfxEngineBase::beforeSceneDestroyed(Scene &arScene)
+{
+    GetEventBroker().Unsubscribe(arScene);
 }
 
 } /* namespace rsp::graphics */

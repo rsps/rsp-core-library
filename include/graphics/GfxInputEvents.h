@@ -21,12 +21,11 @@ namespace rsp::graphics {
 /**
  * \brief Interface for GFX events parser
  */
-class GfxInputEvents
+class GfxInputEvents : public rsp::utils::Singleton<GfxInputEvents>
 {
 public:
-    static GfxInputEvents& Get();
-
-    virtual ~GfxInputEvents() {}
+    GfxInputEvents() { SetInstance(this); }
+    virtual ~GfxInputEvents() { SetInstance(nullptr); }
 
     /**
      * \brief Parse input from event driver

@@ -15,12 +15,11 @@
 
 #include <SDL2/SDL.h>
 #include <graphics/GfxInputEvents.h>
-#include <utils/Singleton.h>
 
 namespace rsp::graphics::sdl {
 
 
-class SDLEvents: public GfxInputEvents, public rsp::utils::Singleton<SDLEvents>
+class SDLEvents: public GfxInputEvents
 {
 public:
     SDLEvents();
@@ -29,7 +28,7 @@ public:
     void Flush() override;
 
 protected:
-    rsp::graphics::TouchEvent mLastTouchEvent{};
+    std::shared_ptr<rsp::graphics::TouchEvent> mpLastEvent{};
 
     void getLatestOf(uint32_t aEventType, SDL_Event &aEvent);
 

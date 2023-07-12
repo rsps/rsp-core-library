@@ -62,6 +62,8 @@ class Event
 
 };
 
+std::ostream& operator<<(std::ostream &os, const rsp::messaging::Event &arEvent);
+
 using EventPtr_t = std::shared_ptr<rsp::messaging::Event>;
 
 

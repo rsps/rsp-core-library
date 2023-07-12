@@ -59,10 +59,6 @@ class QuitEvent : public rsp::messaging::EventBase<QuitEvent>
 
 using GfxEvent = rsp::messaging::EventPtr_t;
 
-std::ostream& operator<<(std::ostream &os, const rsp::messaging::Event &arEvent);
-rsp::logging::LogStream& operator<<(rsp::logging::LogStream &os, const rsp::messaging::Event &arEvent);
-
-
 } /* namespace rsp::graphics */
 
 #endif /* INCLUDE_GRAPHICS_GFXEVENTS_H_ */

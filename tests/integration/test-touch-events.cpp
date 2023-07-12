@@ -52,10 +52,10 @@ TEST_CASE("Touch Events" * doctest::skip())
     CHECK_NOTHROW(InputScene scn3);
     Scenes scenes;
 
-    CHECK_NOTHROW(GfxInputEvents::Get());
+    CHECK_NOTHROW(GfxInputEvents::GetInstance());
 
-    CHECK_NOTHROW(GraphicsMain dummy_gfx(renderer, GfxInputEvents::Get(), scenes));
-    GraphicsMain gfx(renderer, GfxInputEvents::Get(), scenes);
+    CHECK_NOTHROW(GraphicsMain dummy_gfx(renderer, GfxInputEvents::GetInstance(), scenes));
+    GraphicsMain gfx(renderer, GfxInputEvents::GetInstance(), scenes);
 
 
     SUBCASE("Clear") {
@@ -66,7 +66,7 @@ TEST_CASE("Touch Events" * doctest::skip())
     }
 
     SUBCASE("Input Scene") {
-        CHECK_NOTHROW(gfx.ChangeScene(Scenes::InputScene));
+        CHECK_NOTHROW(gfx.ChangeScene(Scenes::Input));
 
         int progress = 0;
         bool terminate = false;

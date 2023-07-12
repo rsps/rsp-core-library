@@ -62,7 +62,12 @@ LoggerInterface& LoggerInterface::GetDefault()
 
 void LoggerInterface::SetDefault(LoggerInterface* apLogger)
 {
-    mpDefaultInstance = std::shared_ptr<LoggerInterface>(apLogger, [](LoggerInterface*){});
+    if (apLogger) {
+        mpDefaultInstance = std::shared_ptr<LoggerInterface>(apLogger, [](LoggerInterface*){});
+    }
+    else {
+        mpDefaultInstance.reset();
+    }
 }
 
 } /* namespace rsp::logging */

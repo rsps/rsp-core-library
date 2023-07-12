@@ -30,7 +30,7 @@ namespace rsp::logging {
 class LoggerInterface
 {
 public:
-    virtual ~LoggerInterface() { mpDefaultInstance.reset(); }
+    virtual ~LoggerInterface() {}
 
     static void SetDefault(LoggerInterface* apLogger);
     static LoggerInterface& GetDefault();

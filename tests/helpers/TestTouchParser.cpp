@@ -18,16 +18,21 @@ TestTouchParser& TestTouchParser::SetEvents(const TestEventItem_t *apTouchEvents
     mpTouchEvents = apTouchEvents;
     mEventCount = aCount;
     mIndex = 0;
-    mpLastEvent = std::make_shared<TouchEvent>();
     return *this;
 }
 
 bool TestTouchParser::Poll(GfxEvent &arInput)
 {
-    if ((mIndex < mEventCount) && (std::chrono::steady_clock::now() >= mpTouchEvents[mIndex].Time)) {
+    auto now = std::chrono::steady_clock::now();
+    if ((mIndex < mEventCount) && (now >= mpTouchEvents[mIndex].Time)) {
+        auto delay = std::chrono::duration_cast<std::chrono::milliseconds>(now - mpTouchEvents[mIndex].Time).count();
+        if (delay > mMaxDelay) {
+            mMaxDelay = int64_t(delay);
+            mLogger.Debug() << "New maximum event delay: " << delay << "ms";
+        }
         if (mpTouchEvents[mIndex].Event->IsType<TouchEvent>()) {
-            mpLastEvent->Assign(mpTouchEvents[mIndex].Event->CastTo<TouchEvent>());
-            arInput = mpLastEvent;
+            mLastEvent.Assign(mpTouchEvents[mIndex].Event->CastTo<TouchEvent>());
+            arInput = std::make_shared<TouchEvent>(mLastEvent);
         }
         else {
             arInput = mpTouchEvents[mIndex].Event;
@@ -40,7 +45,11 @@ bool TestTouchParser::Poll(GfxEvent &arInput)
 
 void TestTouchParser::Flush()
 {
-    std::cout << "Flushing touch queue." << std::endl;
+    mLogger.Info() << "Flushing touch queue.";
     mIndex = mEventCount;
 }
 
+int64_t TestTouchParser::GetMaxDelay() const
+{
+    return mMaxDelay;
+}

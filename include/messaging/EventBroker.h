@@ -13,6 +13,7 @@
 
 #include <memory>
 #include <vector>
+#include <logging/LogChannel.h>
 #include "Event.h"
 
 namespace rsp::messaging {
@@ -24,7 +25,7 @@ public:
     /**
      * \brief Processes events for this subscriber object
      * \param arEvent Reference to the event being processed
-     * \return True if handled
+     * \return True to stop propagation
      */
     virtual bool ProcessEvent(Event &arEvent) = 0;
 };
@@ -36,11 +37,13 @@ public:
 
     virtual size_t ProcessEvents() = 0;
 
-    virtual BrokerInterface& Publish(std::shared_ptr<Event> apEvent) = 0;
+    virtual BrokerInterface& Publish(EventPtr_t apEvent) = 0;
 
-    virtual BrokerInterface& Subscribe(SubscriberInterface *apSubscriber) = 0;
-    virtual BrokerInterface& Unsubscribe(SubscriberInterface *apSubscriber) = 0;
+    virtual BrokerInterface& Subscribe(SubscriberInterface &arSubscriber) = 0;
+    virtual BrokerInterface& Unsubscribe(SubscriberInterface &arSubscriber) = 0;
 
+    BrokerInterface& Subscribe(SubscriberInterface *apSubscriber) { return Subscribe(*apSubscriber); }
+    BrokerInterface& Unsubscribe(SubscriberInterface *apSubscriber) { return Unsubscribe(*apSubscriber); }
 };
 
 class EventBroker : public BrokerInterface
@@ -51,14 +54,15 @@ public:
 
     size_t ProcessEvents() override;
 
-    EventBroker& Publish(std::shared_ptr<Event> apEvent) override;
+    EventBroker& Publish(EventPtr_t apEvent) override;
 
-    EventBroker& Subscribe(SubscriberInterface *apSubscriber) override;
-    EventBroker& Unsubscribe(SubscriberInterface *apSubscriber) override;
+    EventBroker& Subscribe(SubscriberInterface &arSubscriber) override;
+    EventBroker& Unsubscribe(SubscriberInterface &arSubscriber) override;
 
 protected:
+    rsp::logging::LogChannel mLogger;
     std::vector<SubscriberInterface*> mSubscribers{};
-    std::vector<std::shared_ptr<Event>> mQueue{};
+    std::vector<EventPtr_t> mQueue{};
 };
 
 } /* namespace rsp::messaging */

@@ -12,22 +12,11 @@
 
 #include "SDLEvents.h"
 
-namespace rsp::graphics {
-
-GfxInputEvents& GfxInputEvents::Get()
-{
-    if (!sdl::SDLEvents::HasInstance()) {
-        sdl::SDLEvents::CreateInstance();
-    }
-    return rsp::utils::Singleton<sdl::SDLEvents>::GetInstance();
-}
-
-} /* namespace rsp::graphics */
-
 namespace rsp::graphics::sdl {
 
 SDLEvents::SDLEvents()
 {
+    mpLastEvent = std::make_shared<TouchEvent>();
 }
 
 bool SDLEvents::Poll(GfxEvent &arInput)
@@ -39,16 +28,16 @@ bool SDLEvents::Poll(GfxEvent &arInput)
         return false;
     }
 
-    mLastTouchEvent.mType = TouchTypes::None;
+    mpLastEvent->mType = TouchTypes::None;
 
     switch (event.type) {
         case SDL_MOUSEMOTION:
             getLatestOf(SDL_MOUSEMOTION, event);
             if (event.motion.state == 1) {
-                mLastTouchEvent.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
-                mLastTouchEvent.mType = TouchTypes::Drag;
-                mLastTouchEvent.mCurrent = Point(event.motion.x, event.motion.y);
-                arInput = std::make_shared<TouchEvent>(mLastTouchEvent);
+                mpLastEvent->mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
+                mpLastEvent->mType = TouchTypes::Drag;
+                mpLastEvent->mCurrent = Point(event.motion.x, event.motion.y);
+                arInput = mpLastEvent;
             }
             else {
                 return false;
@@ -56,19 +45,19 @@ bool SDLEvents::Poll(GfxEvent &arInput)
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            mLastTouchEvent.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
-            mLastTouchEvent.mType = TouchTypes::Press;
-            mLastTouchEvent.mCurrent = Point(event.motion.x, event.motion.y);
-            mLastTouchEvent.mPress = Point(event.motion.x, event.motion.y);
-            mLastTouchEvent.mPressTime = mLastTouchEvent.mTime;
-            arInput = std::make_shared<TouchEvent>(mLastTouchEvent);
+            mpLastEvent->mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
+            mpLastEvent->mType = TouchTypes::Press;
+            mpLastEvent->mCurrent = Point(event.motion.x, event.motion.y);
+            mpLastEvent->mPress = Point(event.motion.x, event.motion.y);
+            mpLastEvent->mPressTime = mpLastEvent->mTime;
+            arInput = mpLastEvent;
             break;
 
         case SDL_MOUSEBUTTONUP:
-            mLastTouchEvent.mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
-            mLastTouchEvent.mType = TouchTypes::Lift;
-            mLastTouchEvent.mCurrent = Point(event.motion.x, event.motion.y);
-            arInput = std::make_shared<TouchEvent>(mLastTouchEvent);
+            mpLastEvent->mTime = steady_clock::time_point(milliseconds{event.motion.timestamp});
+            mpLastEvent->mType = TouchTypes::Lift;
+            mpLastEvent->mCurrent = Point(event.motion.x, event.motion.y);
+            arInput = mpLastEvent;
             break;
 
         case SDL_MOUSEWHEEL:
