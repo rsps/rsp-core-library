@@ -124,9 +124,9 @@ public:
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
         if (mpInstance && mOwnsInstance) {
+            mOwnsInstance = false;
             delete mpInstance;
             mpInstance = nullptr;
-            mOwnsInstance = false;
         }
     }
 

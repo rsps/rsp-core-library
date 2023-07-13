@@ -60,8 +60,19 @@ void Timer::trigger()
 TimerQueue::TimerQueue()
 {
     TLOG("Creating TimerQueue");
+    if (!HasInstance()) {
+        SetInstance(this);
+    }
 //    mOffset = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch();
 }
+
+TimerQueue::~TimerQueue()
+{
+    if (&GetInstance() == this) {
+        SetInstance(nullptr);
+    }
+}
+
 
 void TimerQueue::Poll()
 {

@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 #include <graphics/Renderer.h>
-#include <graphics/TouchParser.h>
+#include "TouchParser.h"
 #include <utils/Singleton.h>
 #include "Framebuffer.h"
 

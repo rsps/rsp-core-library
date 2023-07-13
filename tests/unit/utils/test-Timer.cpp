@@ -26,7 +26,15 @@ TEST_CASE("Timer")
     int triggered2_count = 0;
     int loop_count = 0;
 
-    CHECK_NOTHROW(TimerQueue::CreateInstance());
+    CHECK_THROWS_AS(TimerQueue::GetInstance(), rsp::exceptions::ENoInstance);
+    CHECK_NOTHROW(
+        TimerQueue dummy;
+        TimerQueue::GetInstance();
+    );
+    CHECK_THROWS_AS(TimerQueue::GetInstance(), rsp::exceptions::ENoInstance);
+
+    TimerQueue timer_queue;
+    CHECK_NOTHROW(TimerQueue::GetInstance());
 
     CHECK_NOTHROW(Timer tmp);
     Timer t1;
@@ -72,7 +80,5 @@ TEST_CASE("Timer")
     CHECK_EQ(t1.GetTimeout(), 50ms);
     CHECK_EQ(triggered2_count, 5);
     CHECK_EQ(t2.GetTimeout(), 20ms);
-
-//    CHECK_NOTHROW(TimerQueue::Destroy());
 }
 

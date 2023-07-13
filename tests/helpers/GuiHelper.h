@@ -14,6 +14,7 @@
 #include "TestHelpers.h"
 #include "TestPixmap.h"
 #include "TestTouchParser.h"
+#include <utils/Timer.h>
 
 class GuiHelper
 {
@@ -21,6 +22,7 @@ public:
     TestLogger mLogger;
     TestTouchParser mTouchParser;
     TestPixmap mPixMap;
+    rsp::utils::TimerQueue mTimerQueue;
 
     GuiHelper(bool aRegisterTestTouchParser = true);
     virtual ~GuiHelper();

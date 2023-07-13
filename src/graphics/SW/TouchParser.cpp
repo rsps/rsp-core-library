@@ -11,11 +11,10 @@
 #ifdef USE_GFX_SW
 
 #include <exceptions/CoreException.h>
-#include <graphics/TouchParser.h>
+#include "TouchParser.h"
 #include <linux/input.h>
 
-namespace rsp::graphics
-{
+namespace rsp::graphics::sw {
 
 
 class NoInputData : public exceptions::CoreException
@@ -37,7 +36,6 @@ const char *TouchParser::mpDevicePath = "/dev/input/event1";
 
 TouchParser::TouchParser()
 {
-    mpLastEvent = std::make_shared<TouchEvent>();
     if (mpDevicePath) {
         mTouchDevice.Open(mpDevicePath, std::ifstream::binary);
     }
@@ -51,14 +49,14 @@ TouchParser::~TouchParser()
 bool TouchParser::Poll(GfxEvent &arInput)
 {
     try {
-        mpLastEvent->mType = readType();
-        if (mpLastEvent->mType != TouchTypes::None) {
-            readBody(*mLastEvent);
-            if (mpLastEvent->mType == TouchTypes::Press) {
-                mpLastEvent->mPress = mpLastEvent->mCurrent;
-                mpLastEvent->mPressTime = mpLastEvent->mTime;
+        mLastEvent.mType = readType();
+        if (mLastEvent.mType != TouchTypes::None) {
+            readBody(mLastEvent);
+            if (mLastEvent.mType == TouchTypes::Press) {
+                mLastEvent.mPress = mLastEvent.mCurrent;
+                mLastEvent.mPressTime = mLastEvent.mTime;
             }
-            arInput = mpLastEvent;
+            arInput = std::make_shared<TouchEvent>(mLastEvent);
             return true;
         }
     }
@@ -130,6 +128,6 @@ void TouchParser::Flush()
     }
 }
 
-} // namespace rsp::graphics
+} // namespace rsp::graphics::sw
 
 #endif // USE_GFX_SW

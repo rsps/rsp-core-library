@@ -12,7 +12,7 @@
 
 #include <doctest.h>
 #include <graphics/GfxInputEvents.h>
-#include <graphics/TouchParser.h>
+#include <graphics/SW/TouchParser.h>
 #include <vector>
 
 using namespace rsp::graphics;
@@ -22,46 +22,46 @@ TEST_SUITE_BEGIN("Graphics");
 TEST_CASE("GfxInputEvents")
 {
     // Arrange
-    std::vector<EventTypes> inputs = {
-        EventTypes::Press,
-        EventTypes::Lift,
-        EventTypes::Press,
-        EventTypes::Press,
-        EventTypes::Lift,
-        EventTypes::Lift,
-        EventTypes::Press,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Drag,
-        EventTypes::Lift};
+    std::vector<TouchTypes> inputs = {
+        TouchTypes::Press,
+        TouchTypes::Lift,
+        TouchTypes::Press,
+        TouchTypes::Press,
+        TouchTypes::Lift,
+        TouchTypes::Lift,
+        TouchTypes::Press,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Drag,
+        TouchTypes::Lift};
     uint counter = 0;
-    TouchParser::mpDevicePath = "testImages/touchTest.bin";
+    sw::TouchParser::mpDevicePath = "testImages/touchTest.bin";
 
-    auto &tp = GfxInputEvents::Get();
+    sw::TouchParser tp;
 
     // Act
     GfxEvent event;
 
     while (tp.Poll(event)) {
         // Assert
-        CHECK(event.mType == inputs[counter]);
+        CHECK(event->CastTo<TouchEvent>().mType == inputs[counter]);
         counter++;
     }
 }

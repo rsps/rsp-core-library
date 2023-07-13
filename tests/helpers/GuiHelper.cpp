@@ -23,15 +23,14 @@ using namespace rsp::utils;
 GuiHelper::GuiHelper(bool aRegisterTestTouchParser)
     : mLogger{},
       mTouchParser(aRegisterTestTouchParser),
-      mPixMap{}
+      mPixMap{},
+      mTimerQueue{}
 {
     const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
     const char* cFontName = "Exo 2";
 
     CHECK_NOTHROW(Font::RegisterFont(cFontFile));
     CHECK_NOTHROW(Font::SetDefaultFont(cFontName));
-
-    CHECK_NOTHROW(TimerQueue::CreateInstance());
 
     // Make framebuffer
 #ifdef USE_GFX_SW
@@ -56,6 +55,5 @@ GuiHelper::GuiHelper(bool aRegisterTestTouchParser)
 
 GuiHelper::~GuiHelper()
 {
-    CHECK_NOTHROW(TimerQueue::DestroyInstance());
 }
 

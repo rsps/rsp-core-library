@@ -17,8 +17,7 @@
 #include <iostream>
 #include <posix/FileIO.h>
 
-namespace rsp::graphics
-{
+namespace rsp::graphics::sw {
 
 /**
  * \brief Defines the values given on each line by touch driver
@@ -69,14 +68,14 @@ public:
 protected:
     rsp::posix::FileIO mTouchDevice{};
     RawTouchEvent mRawTouchEvent{};
-    std::shared_ptr<TouchEvent> mpLastEvent{};
+    TouchEvent mLastEvent{};
 
     TouchTypes readType();
     void readBody(TouchEvent &arInput);
     void readRawTouchEvent();
 };
 
-} // namespace rsp::graphics
+} // namespace rsp::graphics::sw
 
 #endif // USE_GFX_SW
 

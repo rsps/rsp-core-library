@@ -63,6 +63,7 @@ class TimerQueue : public rsp::utils::Singleton<TimerQueue>
 {
 public:
     TimerQueue();
+    ~TimerQueue();
 
     /**
      * \brief Poll the timer queue to trigger expired timers
