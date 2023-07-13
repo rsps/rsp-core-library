@@ -8,19 +8,19 @@
  * \author      Steffen Brummer
  */
 
+#ifndef TESTS_HELPERS_TESTLOGGER_H_
+#define TESTS_HELPERS_TESTLOGGER_H_
 
-#ifndef TESTS_HELPERS_TESTPIXMAP_H_
-#define TESTS_HELPERS_TESTPIXMAP_H_
+#include <logging/Logger.h>
 
-#include <graphics/GfxCache.h>
 
-class TestPixmap: public rsp::graphics::GfxCache
+class TestLogger : public rsp::logging::Logger
 {
 public:
-    TestPixmap();
-    ~TestPixmap();
+    TestLogger();
+    ~TestLogger();
 
-    void Boot();
+    static rsp::logging::LogLevel mLogLevel;
 };
 
-#endif /* TESTS_HELPERS_TESTPIXMAP_H_ */
+#endif /* TESTS_HELPERS_TESTLOGGER_H_ */

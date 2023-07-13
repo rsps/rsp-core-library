@@ -21,8 +21,7 @@ TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("Bitmap")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     SUBCASE("Create")
     {

@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <graphics/Renderer.h>
+#include <graphics/TouchParser.h>
 #include <utils/Singleton.h>
 #include "Framebuffer.h"
 
@@ -45,6 +46,7 @@ public:
 protected:
     Rect mClipRect;
     std::vector<Rect> mClipRectList{};
+    TouchParser mTouchParser{};
 };
 
 } /* namespace rsp::graphics::sw */

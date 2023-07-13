@@ -35,8 +35,7 @@ TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("TouchArea Constructor")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
     Randomize();
 
     SUBCASE("Construct with Default Values")
@@ -88,8 +87,7 @@ TEST_CASE("TouchArea Constructor")
 
 TEST_CASE("Input Processing")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
     Randomize();
 
     // Arrange

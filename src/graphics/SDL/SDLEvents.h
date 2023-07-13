@@ -28,7 +28,7 @@ public:
     void Flush() override;
 
 protected:
-    std::shared_ptr<rsp::graphics::TouchEvent> mpLastEvent{};
+    rsp::graphics::TouchEvent mLastEvent{};
 
     void getLatestOf(uint32_t aEventType, SDL_Event &aEvent);
 

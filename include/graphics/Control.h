@@ -67,7 +67,7 @@ public:
     T& GetAs()
     try
     {
-        return reinterpret_cast<T&>(*this);
+        return dynamic_cast<T&>(*this);
     }
     catch(const std::bad_cast &e) {
         THROW_WITH_BACKTRACE2(EControlCast, GetName(), std::string(rsp::utils::NameOf<T>()));

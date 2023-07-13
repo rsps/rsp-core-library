@@ -20,10 +20,9 @@
 using namespace rsp::utils;
 using namespace rsp::json;
 
-TEST_CASE("Json") {
-
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+TEST_CASE("Json")
+{
+    TestLogger logger;
 
     std::string_view json_object{ R"(
 {

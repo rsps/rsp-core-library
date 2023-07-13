@@ -29,8 +29,7 @@ TEST_CASE("Secure Container")
     const char* cPlainText = "The big red fox, jumped over the fence.";
     const char* cShaSeed = "Seed for hash";
 
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     SecureContainer<MyData> sc(cFileName, cShaSeed, CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
 

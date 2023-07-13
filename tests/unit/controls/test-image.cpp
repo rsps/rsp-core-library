@@ -26,8 +26,7 @@ TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("Image")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     // Arrange
 #ifdef USE_GFX_SW
@@ -89,8 +88,7 @@ TEST_CASE("Image")
 
 TEST_CASE("TestImage")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     // Arrange
 #ifdef USE_GFX_SW

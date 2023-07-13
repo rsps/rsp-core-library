@@ -15,11 +15,11 @@
 
 #include <doctest.h>
 #include <graphics/Renderer.h>
-#include <graphics/GraphicsMain.h>
+#include <GuiHelper.h>
 #include <utils/Timer.h>
 #include <scenes/Scenes.h>
+#include <TestEngine.h>
 #include <TestHelpers.h>
-#include <TestPixmap.h>
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
@@ -28,35 +28,14 @@ using namespace std::literals::chrono_literals;
 
 TEST_CASE("Touch Events" * doctest::skip())
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    GuiHelper gh(false);
 
-    const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
-    const char* cFontName = "Exo 2";
-
-    CHECK_NOTHROW(Font::RegisterFont(cFontFile));
-    CHECK_NOTHROW(Font::SetDefaultFont(cFontName));
-
-    CHECK_NOTHROW(TimerQueue::CreateInstance());
-
-    CHECK_NOTHROW(Renderer::Init(480, 800));
     auto& renderer = Renderer::Get();
 
-    // Set default scene size to screen size
-    CHECK_NOTHROW(Scene::SetScreenSize(renderer.GetWidth(), renderer.GetHeight()));
-
-    // Load GfxCache
-    TestPixmap pix_map;
-
-    // Make scenes
-    CHECK_NOTHROW(InputScene scn3);
-    Scenes scenes;
-
+    // SDL Renderer creates
     CHECK_NOTHROW(GfxInputEvents::GetInstance());
 
-    CHECK_NOTHROW(GraphicsMain dummy_gfx(renderer, GfxInputEvents::GetInstance(), scenes));
-    GraphicsMain gfx(renderer, GfxInputEvents::GetInstance(), scenes);
-
+    TestEngine gfx;
 
     SUBCASE("Clear") {
         CHECK_NOTHROW(renderer.Fill(Color::None));
@@ -66,26 +45,24 @@ TEST_CASE("Touch Events" * doctest::skip())
     }
 
     SUBCASE("Input Scene") {
-        CHECK_NOTHROW(gfx.ChangeScene(Scenes::Input));
+        CHECK_NOTHROW(gfx.SetNextScene(Scenes::Input));
 
         int progress = 0;
-        bool terminate = false;
         Timer t1(1, 500ms);
         t1.Callback() = [&](Timer &arTimer) {
-            if (scenes.ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue() == "Quit") {
-                terminate = true;
+            if (gfx.GetSceneMap().ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue() == "Quit") {
+                gfx.Terminate();
             }
             if (++progress > 200) {
-                terminate = true;
+                gfx.Terminate();
             }
             CHECK_NOTHROW(arTimer.SetTimeout(500ms).Enable());
         };
         CHECK_NOTHROW(t1.Enable());
 
-        MESSAGE("Running GFX loop with " << GFX_FPS << " FPS limitation");
-        CHECK_NOTHROW(while (!terminate) { gfx.Iterate(GFX_FPS, true); } );
+        CHECK_NOTHROW(gfx.Run());
     }
 
-    CHECK_NOTHROW(TimerQueue::DestroyInstance());
+    MESSAGE("Finished with " << gfx.GetFPS() << " FPS and a maximum event delay of " << gh.mTouchParser.GetMaxDelay() << "ms");
 }
 

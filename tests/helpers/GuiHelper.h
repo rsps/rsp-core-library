@@ -8,19 +8,22 @@
  * \author      Steffen Brummer
  */
 
+#ifndef TESTS_HELPERS_GUIHELPER_H_
+#define TESTS_HELPERS_GUIHELPER_H_
 
-#ifndef TESTS_HELPERS_TESTPIXMAP_H_
-#define TESTS_HELPERS_TESTPIXMAP_H_
+#include "TestHelpers.h"
+#include "TestPixmap.h"
+#include "TestTouchParser.h"
 
-#include <graphics/GfxCache.h>
-
-class TestPixmap: public rsp::graphics::GfxCache
+class GuiHelper
 {
 public:
-    TestPixmap();
-    ~TestPixmap();
+    TestLogger mLogger;
+    TestTouchParser mTouchParser;
+    TestPixmap mPixMap;
 
-    void Boot();
+    GuiHelper(bool aRegisterTestTouchParser = true);
+    virtual ~GuiHelper();
 };
 
-#endif /* TESTS_HELPERS_TESTPIXMAP_H_ */
+#endif /* TESTS_HELPERS_GUIHELPER_H_ */

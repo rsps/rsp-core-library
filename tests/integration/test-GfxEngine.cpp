@@ -10,126 +10,27 @@
 
 #include <doctest.h>
 #include <posix/FileSystem.h>
-#include <graphics/GfxEngine.h>
-#include <graphics/Label.h>
 #include <graphics/SW/GfxHal.h>
-#include <utils/Timer.h>
+#include <GuiHelper.h>
+#include <Overlay.h>
 #include <scenes/Scenes.h>
 #include <TestHelpers.h>
 #include <TestTouchParser.h>
 #include <TestPixmap.h>
+#include <TestEngine.h>
+#include <utils/Timer.h>
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
 using namespace std::literals::chrono_literals;
 
-class TestEngine : public GfxEngine<Scenes>, public rsp::messaging::SubscriberInterface
-{
-public:
-    TestEngine() : GfxEngine<Scenes>(1000) {
-        GetEventBroker().Subscribe(this);
-    }
-
-    void Run() {
-        while(!mTerminated) {
-            Iterate();
-        }
-    }
-
-    void Terminate() {
-        mTerminated = true;
-    }
-
-    bool ProcessEvent(rsp::messaging::Event &arEvent) override
-    {
-        if (arEvent.IsType<QuitEvent>()) {
-            Terminate();
-        }
-        return false;
-    }
-
-protected:
-    bool mTerminated = false;
-};
-
-
-class Overlay : public Label
-{
-public:
-    Overlay(GfxEngineBase &arGfx)
-        : mrGfx(arGfx)
-    {
-        SetTransparent(false);
-        mText.GetFont().SetSize(12); //.SetBackgroundColor(Color::Black);
-        SetArea(Rect(0, 0, 300, 15));
-        GetStyle(States::Normal).mForegroundColor = Color::Yellow;
-        GetStyle(States::Normal).mBackgroundColor = Color::Black;
-        SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
-        SetName("Overlay");
-    }
-
-protected:
-    GfxEngineBase &mrGfx;
-    int mIterations = 0;
-    int mTotalFps = 0;
-    int mMinFps = 10000000;
-    int mMaxFps = 0;
-
-    void refresh() override
-    {
-        int fps = mrGfx.GetFPS();
-        mIterations++;
-        mTotalFps += fps;
-        if (fps && (fps < mMinFps)) {
-            mMinFps = fps;
-        }
-        if (fps > mMaxFps) {
-            mMaxFps = fps;
-        }
-        SetCaption("FPS cur: " + std::to_string(fps) + ", avg: " + std::to_string(mTotalFps / mIterations)
-            + ", min: " + std::to_string(mMinFps) + ", max: " + std::to_string(mMaxFps) + ", cnt: " + std::to_string(mIterations));
-        Label::refresh();
-    }
-};
 
 TEST_CASE("GfxEngine")
 {
-    rsp::logging::Logger logger;
-    rsp::logging::LoggerInterface::SetDefault(&logger);
-    TestHelpers::AddConsoleLogger(logger);
+    GuiHelper gh;
 
-    const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
-    const char* cFontName = "Exo 2";
-
-    CHECK_NOTHROW(Font::RegisterFont(cFontFile));
-    CHECK_NOTHROW(Font::SetDefaultFont(cFontName));
-
-    CHECK_NOTHROW(TimerQueue::CreateInstance());
-
-    // Make framebuffer
-#ifdef USE_GFX_SW
-    std::filesystem::path p;
-    CHECK_NOTHROW(p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"}));
-    Renderer::SetDevicePath(p.string());
-#endif
-
-    CHECK_NOTHROW(Renderer::Init(480, 800));
     auto& renderer = Renderer::Get();
 
-    // Set default scene size to screen size
-    CHECK_NOTHROW(Scene::SetScreenSize(renderer.GetWidth(), renderer.GetHeight()));
-
-    TestPixmap pix_map;
-
-    // Make scenes
-    CHECK_NOTHROW(SecondScene scn2);
-    CHECK_NOTHROW(InputScene scn3);
-//    CHECK_NOTHROW(Scenes dummy_scenes);
-
-    // Make TouchParser
-    TestTouchParser tp;
-
-//    CHECK_NOTHROW(GfxEngine<Scenes> dummy_gfx(GFX_FPS));
     TestEngine gfx;
 
     Overlay overlay(gfx);
@@ -145,11 +46,12 @@ TEST_CASE("GfxEngine")
 
     SUBCASE("Second Scene") {
         int topBtnClicked = 0;
+        int bottomBtnLift = 0;
         std::vector<Control::TouchCallback_t::Listener_t> cb_list;
-        SceneMap::SceneNotify::Listener_t store = gfx.GetSceneMap().GetAfterCreate().Listen([&topBtnClicked, &tp, &cb_list](Scene &arScene) {
+        SceneMap::SceneNotify::Listener_t store = gfx.GetSceneMap().GetAfterCreate().Listen([&](Scene &arScene) {
             CHECK_EQ(arScene.GetId(), Scenes::Second);
 
-            CHECK_NOTHROW(tp.SetEvents(SecondScene::GetTouchEvents().data(), SecondScene::GetTouchEvents().size()));
+            CHECK_NOTHROW(gh.mTouchParser.SetEvents(SecondScene::GetTouchEvents().data(), SecondScene::GetTouchEvents().size()));
 
             int topBtnId = static_cast<int>(arScene.GetAs<SecondScene>().GetTopBtn().GetId());
             cb_list.push_back(arScene.GetAs<SecondScene>().GetTopBtn().OnClick().Listen([&topBtnClicked, topBtnId](const TouchEvent &arEvent, uint32_t id) {
@@ -162,8 +64,9 @@ TEST_CASE("GfxEngine")
             }));
 
             // Check for lift even though we lift outside button
-            cb_list.push_back(arScene.GetAs<SecondScene>().GetBottomBtn().OnLift().Listen([](const TouchEvent &arEvent, uint32_t id) {
+            cb_list.push_back(arScene.GetAs<SecondScene>().GetBottomBtn().OnLift().Listen([&bottomBtnLift](const TouchEvent &arEvent, uint32_t id) {
                 CHECK_EQ(arEvent.mCurrent, Point(310, 390));
+                bottomBtnLift++;
             }));
         });
 
@@ -178,16 +81,17 @@ TEST_CASE("GfxEngine")
         CHECK_HEX(renderer.GetPixel(toppoint).AsUint(), cGreenColor);
         CHECK_HEX(renderer.GetPixel(botpoint).AsUint(), cGreenColor);
         CHECK_EQ(topBtnClicked, 2);
+        CHECK_EQ(bottomBtnLift, 1);
 //        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     }
 
     SUBCASE("Input Scene") {
         CHECK_NOTHROW(gfx.SetNextScene(Scenes::Input));
 
-        SceneMap::SceneNotify::Listener_t store = gfx.GetSceneMap().GetAfterCreate().Listen([&tp](Scene &arScene) {
+        SceneMap::SceneNotify::Listener_t store = gfx.GetSceneMap().GetAfterCreate().Listen([&](Scene &arScene) {
             CHECK_EQ(arScene.GetId(), uint32_t(Scenes::Input));
 
-            tp.SetEvents(InputScene::GetTouchEvents().data(), InputScene::GetTouchEvents().size());
+            gh.mTouchParser.SetEvents(InputScene::GetTouchEvents().data(), InputScene::GetTouchEvents().size());
         });
 
         int progress = 0;
@@ -262,12 +166,10 @@ TEST_CASE("GfxEngine")
         CHECK_NOTHROW(gfx.Run());
     }
 
-    MESSAGE("Finished with " << gfx.GetFPS() << " FPS and a maximum event delay of " << tp.GetMaxDelay() << "ms");
+    MESSAGE("Finished with " << gfx.GetFPS() << " FPS and a maximum event delay of " << gh.mTouchParser.GetMaxDelay() << "ms");
 #ifdef USE_GFX_SW
     MESSAGE("Video Memory Usage: " << sw::GfxHal::Get().GetVideoMemoryUsage());
 #endif
     CHECK_NOTHROW(gfx.ClearOverlays());
-
-    CHECK_NOTHROW(TimerQueue::DestroyInstance());
 }
 

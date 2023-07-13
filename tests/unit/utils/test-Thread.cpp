@@ -17,8 +17,7 @@ using namespace rsp::utils;
 
 TEST_CASE("Threads")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     CHECK_NOTHROW(Thread t);
 

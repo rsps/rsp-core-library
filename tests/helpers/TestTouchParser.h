@@ -45,7 +45,7 @@ static TestEventItem_t MakeEventItem(int aOffset, Args &&... args)
 class TestTouchParser: public rsp::graphics::GfxInputEvents, public rsp::logging::NamedLogger<TestTouchParser>
 {
 public:
-    TestTouchParser() {};
+    TestTouchParser(bool aRegisterTestTouchParser) : GfxInputEvents(aRegisterTestTouchParser) {};
     TestTouchParser(const TestTouchParser&) = delete;
     TestTouchParser& operator=(const TestTouchParser&) = delete;
 

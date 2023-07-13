@@ -11,17 +11,14 @@
 #define TESTS_HELPERS_TESTHELPERS_H_
 
 #include <string>
-#include <logging/Logger.h>
 #include <utils/StrUtils.h>
+#include "TestLogger.h"
 
 #define CHECK_HEX(a, b) CHECK_MESSAGE(a == b, rsp::utils::StrUtils::Format( "%8.8X != %8.8X" , a, b))
-
 
 class TestHelpers
 {
 public:
-    static void AddConsoleLogger(rsp::logging::Logger& arLogger);
-
     static std::uint8_t TamperWithFile(const std::string& arFileName, std::uint32_t aOffset, std::uint8_t aValue);
 
     static void ParseArguments(const char ** apArgv);
@@ -33,9 +30,6 @@ public:
 
     static bool ValidateJson(const std::string &arJson);
     static bool ValidateJsonFile(const std::string &arJsonFile);
-
-protected:
-    static rsp::logging::LogLevel mLogLevel;
 };
 
 template <class T>

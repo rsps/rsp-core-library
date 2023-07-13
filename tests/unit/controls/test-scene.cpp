@@ -10,13 +10,10 @@
 
 #include <graphics/Font.h>
 #include <graphics/Scene.h>
-#include <messaging/Subscriber.h>
-#include <messaging/Publisher.h>
 #include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <doctest.h>
 
-#include <eventTypes/ClickedEvent.h>
 #include <scenes/Scenes.h>
 #include <TestHelpers.h>
 
@@ -25,31 +22,12 @@ using namespace rsp::messaging;
 using namespace rsp::utils;
 using namespace std::chrono_literals;
 
-class TestSub : public Subscriber<ClickTopics>
-{
-  public:
-    TestSub(Broker<ClickTopics>& arBroker)
-        : Subscriber<ClickTopics>(arBroker)
-    {
-    }
-
-    void HandleEvent(Event &arNewEvent) override
-    {
-        auto event = arNewEvent.CastTo<rsp::messaging::ClickedEvent>();
-
-        message = event.mMessage;
-        calledCount++;
-    }
-    int calledCount = 0;
-    std::string message{};
-};
 
 TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("Scene Test")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
     const char* cFontName = "Exo 2";
@@ -71,16 +49,21 @@ TEST_CASE("Scene Test")
     CHECK_NOTHROW(GfxEvent event_dummy);
     TouchEvent event;
 
-    auto ac = scenes.GetAfterCreate().Listen([](Scene arScene) {
-        CHECK_EQ(arScene.GetId(), ID<SecondScene>());
+    int events_called = 0;
+
+    auto ac = scenes.GetAfterCreate().Listen([&](Scene arScene) {
+        CHECK_EQ(arScene.GetId(), uint32_t(Scenes::Second));
         MESSAGE("Created Scene: " << arScene.GetName());
+        events_called++;
     });
 
-    auto bd = scenes.GetBeforeDestroy().Listen([](Scene &arScene) {
+    auto bd = scenes.GetBeforeDestroy().Listen([&](Scene &arScene) {
+        CHECK_EQ(arScene.GetId(), uint32_t(Scenes::Second));
         MESSAGE("Destroying Scene: " << arScene.GetName());
+        events_called++;
     });
 
-    CHECK_NOTHROW(scenes.SetActiveScene<SecondScene>());
+    CHECK_NOTHROW(scenes.SetActiveScene(Scenes::Second));
     CHECK_NOTHROW(scenes.ActiveScene());
 
     Rect tr = SecondScene::GetTopRect();
@@ -144,19 +127,13 @@ TEST_CASE("Scene Test")
 
     SUBCASE("Scene Bind click Callbacks")
     {
-        Broker<ClickTopics> broker;
-        Publisher<ClickTopics> publisher(broker);
         bool clicked = false;
-        auto f1 = scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().OnClick().Listen([&publisher, &clicked](const TouchEvent&, uint32_t) {
+        auto f1 = scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().OnClick().Listen([&clicked](const TouchEvent&, uint32_t) {
             clicked = true;
             MESSAGE("Click detected");
-            rsp::messaging::ClickedEvent click_event("Button was clicked.");
-            CHECK_NOTHROW(publisher.PublishToBroker(ClickTopics::SceneChange, click_event));
         });
 
         // Arrange
-        TestSub sub(broker);
-        CHECK_NOTHROW(sub.Subscribe(ClickTopics::SceneChange));
         CHECK_NOTHROW(event.mCurrent = insideBotPoint);
 
         CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
@@ -184,10 +161,10 @@ TEST_CASE("Scene Test")
 
          // Assert
         CHECK(clicked);
-        CHECK(sub.calledCount == 1);
-        CHECK(sub.message == "Button was clicked.");
     }
     CHECK_NOTHROW(renderer.Present());
+
+    CHECK_EQ(events_called, 1);
 }
 
 TEST_SUITE_END();

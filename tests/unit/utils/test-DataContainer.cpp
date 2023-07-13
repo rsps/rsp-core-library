@@ -31,8 +31,7 @@ TEST_CASE("Data Container")
 {
     const char* cFileName = "DataContainer.bin";
 
-    Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     DataContainer<MyData> dc(cFileName);
 

@@ -10,6 +10,7 @@
 
 #include <graphics/Control.h>
 #include <logging/Logger.h>
+#include <graphics/GfxEvents.h>
 
 using namespace rsp::logging;
 
@@ -324,10 +325,8 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
                     if (IsCheckable()) {
                         SetChecked(!IsChecked());
                     }
-                    if ((touch.mTime - touch.mPressTime) < std::chrono::milliseconds(800)) {
-                        Logger::GetDefault().Debug() << GetName() << " was clicked by " << touch;
-                        doClick(touch);
-                    }
+                    Logger::GetDefault().Debug() << GetName() << " was clicked by " << touch;
+                    doClick(touch);
                 }
                 return result;
             }
@@ -342,9 +341,6 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
                 }
             }
             if (mTouchArea.IsHit(touch.mPress)) {
-//                if ((touch.mPressTime != std::chrono::steady_clock::time_point()) && (touch.mPress.Distance(touch.mCurrent) > 30)) {
-//                    touch.mPressTime = std::chrono::steady_clock::time_point();
-//                }
                 if (IsDraggable()) {
                     return doMove(touch);
                 }

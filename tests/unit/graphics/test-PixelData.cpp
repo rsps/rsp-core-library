@@ -43,8 +43,7 @@ TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("PixelData")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     SUBCASE("Constructs")
     {
