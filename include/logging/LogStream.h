@@ -33,11 +33,11 @@ class LogStream
 {
 public:
     LogStream(LoggerInterface *apOwner, LogLevel aLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext);
-    LogStream(const LogStream &arOther) = delete;
+    LogStream(const LogStream &arOther);
     LogStream(LogStream &&arOther); /* No copy, move is OK */
     virtual ~LogStream();
 
-    LogStream& operator=(const LogStream &arOther) = delete;
+    LogStream& operator=(const LogStream &arOther);
     LogStream& operator=(LogStream &&arOther);
 
     /**
@@ -77,8 +77,8 @@ public:
      * \param arValue
      * \return self
      */
-    template< class type>
-    LogStream& operator<<(const type &arValue) {
+    template< class T>
+    LogStream& operator<<(const T& arValue) {
         mBuffer << arValue;
         return *this;
     }

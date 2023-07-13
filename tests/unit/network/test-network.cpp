@@ -38,8 +38,7 @@ using namespace rsp::posix;
 
 TEST_CASE("Network")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     HttpRequestOptions opt;
     opt.CertCaPath = "webserver/ssl/ca/ca.crt";

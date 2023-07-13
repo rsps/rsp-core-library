@@ -43,8 +43,7 @@ TEST_SUITE_BEGIN("Graphics");
 TEST_CASE("Framebuffer")
 {
     using namespace std::chrono;
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     SignalHandler sig_handler;
 //    uint32_t *p = nullptr;

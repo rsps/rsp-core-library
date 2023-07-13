@@ -22,16 +22,18 @@ class Scenes : public rsp::graphics::SceneMap
 {
 public:
     enum : uint32_t {
-        InputScene = 1
+        First = 1,
+        Second,
+        Input
     };
 
     Scenes()
         : SceneMap()
     {
         using namespace rsp::graphics;
-        AddFactory<FirstScene>();
-        AddFactory<SecondScene>();
-        AddFactory<rsp::graphics::InputScene>(InputScene);
+        AddFactory<FirstScene>(First);
+        AddFactory<SecondScene>(Second);
+        AddFactory<rsp::graphics::InputScene>(Input);
     }
 };
 

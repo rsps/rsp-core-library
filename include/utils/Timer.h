@@ -11,8 +11,8 @@
 #ifndef INCLUDE_UTILS_TIMER_H_
 #define INCLUDE_UTILS_TIMER_H_
 
+#include <functional>
 #include <list>
-#include "Function.h"
 #include "Singleton.h"
 #include "RunTime.h"
 
@@ -27,7 +27,7 @@ class TimerQueue;
 class Timer
 {
 public:
-    using TimerCallback_t = rsp::utils::Function<void(Timer&)>;
+    using TimerCallback_t = std::function<void(Timer&)>;
 
     Timer() {}
     Timer(int aId, std::chrono::milliseconds aTimeout) : mId(aId), mTimeout(aTimeout) {}

@@ -21,6 +21,14 @@ LogStream::LogStream(LoggerInterface *apLogger, LogLevel aLevel, const std::stri
 {
 }
 
+LogStream::LogStream(const LogStream &arOther)
+    : mpLogger(arOther.mpLogger),
+      mLevel(arOther.mLevel),
+      mChannel(arOther.mChannel),
+      mContext(arOther.mContext)
+{
+}
+
 LogStream::LogStream(LogStream &&arOther)
     : mpLogger(std::move(arOther.mpLogger)),
       mLevel(std::move(arOther.mLevel)),
@@ -37,6 +45,17 @@ LogStream::~LogStream()
     }
     catch (...) {
     }
+}
+
+LogStream& LogStream::operator=(const LogStream &arOther)
+{
+    if (&arOther != this) {
+        mpLogger = arOther.mpLogger;
+        mLevel   = arOther.mLevel;
+        mChannel = arOther.mChannel;
+        mContext = arOther.mContext;
+    }
+    return *this;
 }
 
 LogStream& LogStream::operator=(LogStream &&arOther)

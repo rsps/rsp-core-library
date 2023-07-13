@@ -11,14 +11,16 @@
 #define CONTROL_H
 
 #include <map>
-#include <vector>
+#include <functional>
 #include <string_view>
+#include <vector>
 #include <magic_enum.hpp>
 #include <exceptions/CoreException.h>
 #include <graphics/GfxInputEvents.h>
 #include <logging/Logger.h>
+#include <messaging/EventBroker.h>
+#include <messaging/Notifier.h>
 #include <utils/ConstTypeInfo.h>
-#include <utils/Function.h>
 #include "Canvas.h"
 #include "Color.h"
 #include "Rect.h"
@@ -37,10 +39,10 @@ public:
 };
 
 
-class Control : public rsp::utils::TypeInfo
+class Control : public rsp::utils::TypeInfo, public messaging::SubscriberInterface
 {
 public:
-    using TouchCallback_t = rsp::utils::Function<void(const GfxEvent&, uint32_t)>;
+    using TouchCallback_t = rsp::messaging::Notifier<const TouchEvent&, uint32_t>;
 
     /**
      * \brief Enum type defining the available states
@@ -65,7 +67,7 @@ public:
     T& GetAs()
     try
     {
-        return reinterpret_cast<T&>(*this);
+        return dynamic_cast<T&>(*this);
     }
     catch(const std::bad_cast &e) {
         THROW_WITH_BACKTRACE2(EControlCast, GetName(), std::string(rsp::utils::NameOf<T>()));
@@ -206,11 +208,11 @@ public:
     Control& SetTexturePosition(const Point &arPoint);
 
     /**
-     * \brief Processes input for press or click callbacks
-     * \param arInput Reference to the input being processed
+     * \brief Processes events for this object
+     * \param arEvent Reference to the event being processed
      * \return True if handled
      */
-    bool ProcessInput(GfxEvent &arInput);
+    bool ProcessEvent(rsp::messaging::Event &arEvent) override;
 
     /**
      * \brief OnPress callback reference
@@ -296,10 +298,12 @@ protected:
      */
     virtual void doSetArea(const Rect &arRect);
 
-    virtual bool doPress(const GfxEvent &arEvent);
-    virtual bool doMove(const GfxEvent &arEvent);
-    virtual bool doLift(const GfxEvent &arEvent);
-    virtual bool doClick(const GfxEvent &arEvent);
+    virtual bool doPress(const TouchEvent &arEvent);
+    virtual bool doMove(const TouchEvent &arEvent);
+    virtual bool doLift(const TouchEvent &arEvent);
+    virtual bool doClick(const TouchEvent &arEvent);
+
+    bool handleTouchEvent(rsp::messaging::Event &arEvent);
 
 private:
     static Color mTouchAreaColor;

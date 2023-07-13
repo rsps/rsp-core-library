@@ -13,24 +13,24 @@
 
 #ifdef USE_GFX_SDL
 
+#include <SDL2/SDL.h>
 #include <graphics/GfxInputEvents.h>
-#include <utils/Singleton.h>
 
 namespace rsp::graphics::sdl {
 
 
-class SDLEvents: public GfxInputEvents, public rsp::utils::Singleton<SDLEvents>
+class SDLEvents: public GfxInputEvents
 {
 public:
     SDLEvents();
 
-    bool Poll(rsp::graphics::GfxEvent &arInput) override;
+    bool Poll(GfxEvent &arEvent) override;
     void Flush() override;
 
 protected:
-    rsp::graphics::GfxEvent mLastEvent{};
+    rsp::graphics::TouchEvent mLastEvent{};
 
-    void getLatestOf(std::uint32_t aEventType, SDL_Event &aEvent);
+    void getLatestOf(uint32_t aEventType, SDL_Event &aEvent);
 
 };
 

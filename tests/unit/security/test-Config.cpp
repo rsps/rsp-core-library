@@ -66,9 +66,7 @@ TEST_CASE("Config")
     const std::string cShaSeed = "HashSeed";
     SecureBuffer sb_hash(cShaSeed.data(), cShaSeed.size());
 
-    Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
-
+    TestLogger logger;
 
     MyConfig config(cFileName, sb_hash);
     config.Get().ApplicationName = "ConfigurationApp";

@@ -11,7 +11,7 @@
 #ifndef INCLUDE_UTILS_DEPENDENCYCONTAINER_H_
 #define INCLUDE_UTILS_DEPENDENCYCONTAINER_H_
 
-#include <utils/Function.h>
+#include <functional>
 
 class DependencyContainer;
 typedef DependencyContainer DC; // Alias
@@ -20,7 +20,7 @@ typedef DependencyContainer DI; // Alias
 class DependencyContainer
 {
     template<typename T>
-    DC& registerFactory(rsp::utils::Function<T(void)> aFactory)
+    DC& registerFactory(std::function<T(void)> aFactory)
     {
         return *this;
     }

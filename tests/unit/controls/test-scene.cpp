@@ -10,13 +10,10 @@
 
 #include <graphics/Font.h>
 #include <graphics/Scene.h>
-#include <messaging/Subscriber.h>
-#include <messaging/Publisher.h>
 #include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <doctest.h>
 
-#include <eventTypes/ClickedEvent.h>
 #include <scenes/Scenes.h>
 #include <TestHelpers.h>
 
@@ -25,31 +22,12 @@ using namespace rsp::messaging;
 using namespace rsp::utils;
 using namespace std::chrono_literals;
 
-class TestSub : public Subscriber<ClickTopics>
-{
-  public:
-    TestSub(Broker<ClickTopics>& arBroker)
-        : Subscriber<ClickTopics>(arBroker)
-    {
-    }
-
-    void HandleEvent(Event &arNewEvent) override
-    {
-        auto event = arNewEvent.GetAs<rsp::messaging::ClickedEvent>();
-
-        message = event.mMessage;
-        calledCount++;
-    }
-    int calledCount = 0;
-    std::string message{};
-};
 
 TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("Scene Test")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
     const char* cFontName = "Exo 2";
@@ -69,18 +47,23 @@ TEST_CASE("Scene Test")
     Scenes scenes;
 
     CHECK_NOTHROW(GfxEvent event_dummy);
-    GfxEvent event;
+    TouchEvent event;
 
-    scenes.GetAfterCreate() = [](Scene *apScene) {
-        CHECK_EQ(apScene->GetId(), ID<SecondScene>());
-        MESSAGE("Created Scene: " << apScene->GetName());
-    };
+    int events_called = 0;
 
-    scenes.GetBeforeDestroy() = [](Scene *apScene) {
-        MESSAGE("Destroying Scene: " << apScene->GetName());
-    };
+    auto ac = scenes.GetAfterCreate().Listen([&](Scene arScene) {
+        CHECK_EQ(arScene.GetId(), uint32_t(Scenes::Second));
+        MESSAGE("Created Scene: " << arScene.GetName());
+        events_called++;
+    });
 
-    CHECK_NOTHROW(scenes.SetActiveScene<SecondScene>());
+    auto bd = scenes.GetBeforeDestroy().Listen([&](Scene &arScene) {
+        CHECK_EQ(arScene.GetId(), uint32_t(Scenes::Second));
+        MESSAGE("Destroying Scene: " << arScene.GetName());
+        events_called++;
+    });
+
+    CHECK_NOTHROW(scenes.SetActiveScene(Scenes::Second));
     CHECK_NOTHROW(scenes.ActiveScene());
 
     Rect tr = SecondScene::GetTopRect();
@@ -94,7 +77,7 @@ TEST_CASE("Scene Test")
     SUBCASE("Scene Process Input")
     {
         // Arrange
-        event.mType = EventTypes::Press;
+        event.mType = TouchTypes::Press;
         CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
         CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));
 
@@ -106,11 +89,11 @@ TEST_CASE("Scene Test")
             MESSAGE("Event Point:" << event.mCurrent);
 
             // Act
-            CHECK_NOTHROW(scenes.ActiveScene().ProcessInput(event));
+            CHECK_NOTHROW(scenes.ActiveScene().ProcessEvent(event));
 
             // Assert
-            CHECK(scenes.ActiveScene<SecondScene>().GetTopBtn().IsInvalid());
-            CHECK_FALSE(scenes.ActiveScene<SecondScene>().GetBottomBtn().IsInvalid());
+            CHECK(scenes.ActiveSceneAs<SecondScene>().GetTopBtn().IsInvalid());
+            CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().IsInvalid());
         }
         SUBCASE("Process input for Bot elements")
         {
@@ -118,45 +101,39 @@ TEST_CASE("Scene Test")
             event.mCurrent = insideBotPoint;
 
             // Act
-            CHECK_NOTHROW(scenes.ActiveScene().ProcessInput(event));
+            CHECK_NOTHROW(scenes.ActiveScene().ProcessEvent(event));
 
             // Assert
-            CHECK(scenes.ActiveScene<SecondScene>().GetBottomBtn().IsInvalid());
-            CHECK_FALSE(scenes.ActiveScene<SecondScene>().GetTopBtn().IsInvalid());
+            CHECK(scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().IsInvalid());
+            CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetTopBtn().IsInvalid());
         }
     }
     SUBCASE("Scene Render Elements")
     {
         // Arrange
-        CHECK_NOTHROW(scenes.ActiveScene<SecondScene>().GetTopBtn().Invalidate());
-        CHECK_NOTHROW(scenes.ActiveScene<SecondScene>().GetBottomBtn().Invalidate());
-        CHECK(scenes.ActiveScene<SecondScene>().GetTopBtn().IsInvalid());
-        CHECK(scenes.ActiveScene<SecondScene>().GetBottomBtn().IsInvalid());
+        CHECK_NOTHROW(scenes.ActiveSceneAs<SecondScene>().GetTopBtn().Invalidate());
+        CHECK_NOTHROW(scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().Invalidate());
+        CHECK(scenes.ActiveSceneAs<SecondScene>().GetTopBtn().IsInvalid());
+        CHECK(scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().IsInvalid());
 
         // Act
         CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
         CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));
 
         // Assert
-        CHECK_FALSE(scenes.ActiveScene<SecondScene>().GetTopBtn().IsInvalid());
-        CHECK_FALSE(scenes.ActiveScene<SecondScene>().GetBottomBtn().IsInvalid());
+        CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetTopBtn().IsInvalid());
+        CHECK_FALSE(scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().IsInvalid());
     }
 
     SUBCASE("Scene Bind click Callbacks")
     {
-        Broker<ClickTopics> broker;
-        Publisher<ClickTopics> publisher(broker);
         bool clicked = false;
-        scenes.ActiveScene<SecondScene>().GetBottomBtn().OnClick() = [&publisher, &clicked](const GfxEvent &arEvent, uint32_t) {
+        auto f1 = scenes.ActiveSceneAs<SecondScene>().GetBottomBtn().OnClick().Listen([&clicked](const TouchEvent&, uint32_t) {
             clicked = true;
             MESSAGE("Click detected");
-            rsp::messaging::ClickedEvent click_event("Button was clicked.");
-            CHECK_NOTHROW(publisher.PublishToBroker(ClickTopics::SceneChange, click_event));
-        };
+        });
 
         // Arrange
-        TestSub sub(broker);
-        CHECK_NOTHROW(sub.Subscribe(ClickTopics::SceneChange));
         CHECK_NOTHROW(event.mCurrent = insideBotPoint);
 
         CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
@@ -165,17 +142,17 @@ TEST_CASE("Scene Test")
 //        std::this_thread::sleep_for(500ms);
 
         // Act
-        event.mType = EventTypes::Press;
+        event.mType = TouchTypes::Press;
         event.mPress = event.mCurrent;
-        CHECK_NOTHROW(scenes.ActiveScene().ProcessInput(event));
+        CHECK_NOTHROW(scenes.ActiveScene().ProcessEvent(event));
 
         CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
         CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));
         CHECK_NOTHROW(renderer.Present());
 //        std::this_thread::sleep_for(500ms);
 
-        event.mType = EventTypes::Lift;
-        CHECK_NOTHROW(scenes.ActiveScene().ProcessInput(event));
+        event.mType = TouchTypes::Lift;
+        CHECK_NOTHROW(scenes.ActiveScene().ProcessEvent(event));
 
         CHECK_NOTHROW(scenes.ActiveScene().UpdateData());
         CHECK_NOTHROW(scenes.ActiveScene().Render(renderer));
@@ -184,10 +161,10 @@ TEST_CASE("Scene Test")
 
          // Assert
         CHECK(clicked);
-        CHECK(sub.calledCount == 1);
-        CHECK(sub.message == "Button was clicked.");
     }
     CHECK_NOTHROW(renderer.Present());
+
+    CHECK_EQ(events_called, 1);
 }
 
 TEST_SUITE_END();

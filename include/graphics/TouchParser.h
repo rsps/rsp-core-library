@@ -46,7 +46,7 @@ std::ostream &operator<<(std::ostream &os, const RawTouchEvent &arTouchEvent);
  * flag readable to select or epoll. Reading the value could then return
  * 0 bytes if empty, so this could be done in one read operation.
  */
-class TouchParser: public GfxInputEvents, public rsp::utils::Singleton<TouchParser>
+class TouchParser: public GfxInputEvents
 {
 public:
     static const char *mpDevicePath;
@@ -69,10 +69,10 @@ public:
 protected:
     rsp::posix::FileIO mTouchDevice{};
     RawTouchEvent mRawTouchEvent{};
-    GfxEvent mLastEvent;
+    std::shared_ptr<TouchEvent> mpLastEvent{};
 
-    EventTypes readType();
-    void readBody(GfxEvent &arInput);
+    TouchTypes readType();
+    void readBody(TouchEvent &arInput);
     void readRawTouchEvent();
 };
 

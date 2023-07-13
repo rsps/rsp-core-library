@@ -13,6 +13,7 @@
 
 #include <atomic>
 #include <functional>
+#include <list>
 
 namespace rsp::utils {
 
@@ -86,7 +87,8 @@ public:
         _free(ptr);
     }
 
-    Function(const Function &arOther) : std::function<Res(ArgTypes...)>(arOther)
+    Function(const Function &arOther)
+        : std::function<Res(ArgTypes...)>(arOther)
     {
         _copy(arOther);
     }

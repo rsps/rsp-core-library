@@ -16,7 +16,7 @@ using namespace rsp::logging;
 namespace rsp::graphics {
 
 
-SceneMap::SceneCreator SceneMap::operator [](std::uint32_t aId)
+SceneMap::SceneCreator SceneMap::GetFactory(std::uint32_t aId)
 {
     try {
         return mScenes.at(aId);
@@ -40,16 +40,15 @@ Scene& SceneMap::ActiveScene()
 void SceneMap::SetActiveScene(std::uint32_t aId)
 {
     if (mpActiveScene) {
-        mOnDestroy(mpActiveScene);
+        mOnDestroy(*mpActiveScene);
         mpActiveScene->DeInit();
-        delete mpActiveScene;
         mpActiveScene = nullptr;
     }
 
-    mpActiveScene = (operator[](aId))();
-    Logger::GetDefault().Info() << "SceneChange: " << mpActiveScene->GetName();
+    mpActiveScene = GetFactory(aId)();
+    Logger::GetDefault().Notice() << "SceneChange: " << mpActiveScene->GetName();
     mpActiveScene->Init();
-    mOnCreated(mpActiveScene);
+    mOnCreated(*mpActiveScene);
 }
 
 } /* namespace rsp::graphics */

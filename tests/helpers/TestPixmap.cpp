@@ -16,7 +16,15 @@
 TestPixmap::TestPixmap()
 {
     SetInstance(this);
+}
 
+TestPixmap::~TestPixmap()
+{
+    SetInstance(nullptr);
+}
+
+void TestPixmap::Boot()
+{
     MakePixelData(cLowerCase   , uint32_t(rsp::graphics::Keyboard::TextureId::LowerCase));
     MakePixelData(cErase       , uint32_t(rsp::graphics::Keyboard::TextureId::Erase));
     MakePixelData(cBigSpecial  , uint32_t(rsp::graphics::Keyboard::TextureId::BigSpecial));
@@ -24,10 +32,5 @@ TestPixmap::TestPixmap()
     MakePixelData(cKey         , uint32_t(rsp::graphics::Keyboard::TextureId::Key));
     MakePixelData(cSmallSpecial, uint32_t(rsp::graphics::Keyboard::TextureId::SmallSpecial));
     MakePixelData(cUpperCase   , uint32_t(rsp::graphics::Keyboard::TextureId::UpperCase));
-}
-
-TestPixmap::~TestPixmap()
-{
-    SetInstance(nullptr);
 }
 

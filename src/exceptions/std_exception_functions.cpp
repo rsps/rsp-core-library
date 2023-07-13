@@ -11,6 +11,8 @@
 #include <exceptions/ExceptionHelper.h>
 #include <new>
 #include <typeinfo>
+#include <functional>
+#include <future>
 
 /**
  * \brief Override all standard exception functions with backtraced alternatives.
@@ -133,12 +135,19 @@ __throw_system_error(int __v)
 }
 
 // Helpers for exception objects in <future>
-//void
-//__throw_future_error(int);
+void
+__throw_future_error(int __v)
+{
+    THROW_WITH_BACKTRACE1(future_error, future_errc(__v));
+}
 
 // Helpers for exception objects in <functional>
-//void
-//__throw_bad_function_call();
+void
+__throw_bad_function_call()
+{
+    THROW_WITH_BACKTRACE(bad_function_call);
+}
+
 
 
 } /* namespace std */

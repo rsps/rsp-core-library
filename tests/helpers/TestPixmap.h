@@ -19,6 +19,8 @@ class TestPixmap: public rsp::graphics::GfxCache
 public:
     TestPixmap();
     ~TestPixmap();
+
+    void Boot();
 };
 
 #endif /* TESTS_HELPERS_TESTPIXMAP_H_ */

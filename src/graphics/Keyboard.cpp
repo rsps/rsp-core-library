@@ -15,7 +15,6 @@
 #include <codecvt>
 #include <graphics/GfxCache.h>
 #include <graphics/Keyboard.h>
-#include <utils/Function.h>
 
 using namespace rsp::utils;
 
@@ -209,7 +208,7 @@ Keyboard::Keyboard()
 void Keyboard::addBtn(Key &arBtn)
 {
     AddChild(&arBtn);
-    arBtn.OnClick() = Method(this, &Keyboard::doKeyClick);
+    mKeyClicks.push_back(arBtn.OnClick().Listen(std::bind(&Keyboard::doKeyClick, this, std::placeholders::_1, std::placeholders::_2)));
 }
 
 void Keyboard::setSymbols(const std::string &arSymbols)
@@ -232,7 +231,7 @@ Keyboard::~Keyboard()
 {
 }
 
-void Keyboard::doKeyClick(const GfxEvent &arEvent, uint32_t aSymbol)
+void Keyboard::doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol)
 {
     switch(aSymbol) {
         case cKEY_SHIFT:

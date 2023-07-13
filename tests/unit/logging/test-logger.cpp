@@ -175,6 +175,8 @@ TEST_CASE("Logging") {
     CHECK_MESSAGE(fin.eof() == true, line);
 
     CHECK(&(logging::LoggerInterface::GetDefault()) == &log);
+
+    CHECK_NOTHROW(logging::LoggerInterface::SetDefault(nullptr));
 }
 
 

@@ -11,9 +11,10 @@
 #ifndef INCLUDE_GRAPHICS_KEYBOARD_H_
 #define INCLUDE_GRAPHICS_KEYBOARD_H_
 
-#include <map>
 #include <array>
+#include <map>
 #include <string>
+#include <vector>
 #include "Bitmap.h"
 #include "BitmapView.h"
 #include "Button.h"
@@ -71,16 +72,16 @@ namespace rsp::graphics {
 #define _N KEY(290, 152)
 #define _M KEY(332, 152)
 
-#define _1 _Q
-#define _2 _W
-#define _3 _E
-#define _4 _R
-#define _5 _T
-#define _6 _Y
-#define _7 _U
-#define _8 _I
-#define _9 _O
-#define _0 _P
+#define _NUM_1 _Q
+#define _NUM_2 _W
+#define _NUM_3 _E
+#define _NUM_4 _R
+#define _NUM_5 _T
+#define _NUM_6 _Y
+#define _NUM_7 _U
+#define _NUM_8 _I
+#define _NUM_9 _O
+#define _NUM_0 _P
 #define _MINUS _A
 #define _UNDERSCORE _S
 #define _COLON _D
@@ -127,7 +128,7 @@ public:
 class Keyboard: public Control
 {
 public:
-    using KeyboardCallback_t = rsp::utils::Function<void(const std::string &)>;
+    using KeyboardCallback_t = rsp::messaging::Notifier<const std::string &>;
 
     static constexpr int cKEY_SHIFT    = 1000000;
     static constexpr int cKEY_LETTERS  = 1000001;
@@ -162,10 +163,11 @@ protected:
     Key mBtnSpace{};
     std::string mInput{};
     Rect mBigSpecialRect{};
+    std::vector<TouchCallback_t::Listener_t> mKeyClicks{};
 
     void addBtn(Key &arBtn);
     void setSymbols(const std::string &arSymbols);
-    void doKeyClick(const GfxEvent &arEvent, uint32_t aSymbol);
+    void doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol);
     const PixelData& getPixelData(TextureId aId);
 };
 

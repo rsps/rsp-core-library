@@ -11,7 +11,9 @@
 #include <iostream>
 #include "TestTouchParser.h"
 
-TestTouchParser& TestTouchParser::SetEvents(const rsp::graphics::GfxEvent *apTouchEvents, size_t aCount)
+using namespace rsp::graphics;
+
+TestTouchParser& TestTouchParser::SetEvents(const TestEventItem_t *apTouchEvents, size_t aCount)
 {
     mpTouchEvents = apTouchEvents;
     mEventCount = aCount;
@@ -19,11 +21,23 @@ TestTouchParser& TestTouchParser::SetEvents(const rsp::graphics::GfxEvent *apTou
     return *this;
 }
 
-bool TestTouchParser::Poll(rsp::graphics::GfxEvent &arInput)
+bool TestTouchParser::Poll(GfxEvent &arInput)
 {
-    if ((mIndex < mEventCount) && (std::chrono::steady_clock::now() >= mpTouchEvents[mIndex].mTime)) {
-        mLastEvent.Assign(mpTouchEvents[mIndex++]);
-        arInput = mLastEvent;
+    auto now = std::chrono::steady_clock::now();
+    if ((mIndex < mEventCount) && (now >= mpTouchEvents[mIndex].Time)) {
+        auto delay = std::chrono::duration_cast<std::chrono::milliseconds>(now - mpTouchEvents[mIndex].Time).count();
+        if (delay > mMaxDelay) {
+            mMaxDelay = int64_t(delay);
+            mLogger.Debug() << "New maximum event delay: " << delay << "ms";
+        }
+        if (mpTouchEvents[mIndex].Event->IsType<TouchEvent>()) {
+            mLastEvent.Assign(mpTouchEvents[mIndex].Event->CastTo<TouchEvent>());
+            arInput = std::make_shared<TouchEvent>(mLastEvent);
+        }
+        else {
+            arInput = mpTouchEvents[mIndex].Event;
+        }
+        mIndex++;
         return true;
     }
     return false;
@@ -31,7 +45,11 @@ bool TestTouchParser::Poll(rsp::graphics::GfxEvent &arInput)
 
 void TestTouchParser::Flush()
 {
-    std::cout << "Flushing touch queue." << std::endl;
+    mLogger.Info() << "Flushing touch queue.";
     mIndex = mEventCount;
 }
 
+int64_t TestTouchParser::GetMaxDelay() const
+{
+    return mMaxDelay;
+}

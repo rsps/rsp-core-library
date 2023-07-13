@@ -8,31 +8,42 @@
  * \author      Steffen Brummer
  */
 
-#include <utils/Singleton.h>
-#include "GfxEvent.h"
-#include "Point.h"
+#ifndef INCLUDE_GRAPHICS_GFXINPUTEVENTS_H_
+#define INCLUDE_GRAPHICS_GFXINPUTEVENTS_H_
 
-#ifndef INCLUDE_GRAPHICS_GFXEVENTS_H_
-#define INCLUDE_GRAPHICS_GFXEVENTS_H_
+#include <utils/Singleton.h>
+#include "GfxEvents.h"
+#include "Point.h"
+#include <utils/Timer.h>
 
 namespace rsp::graphics {
 
 /**
  * \brief Interface for GFX events parser
  */
-class GfxInputEvents
+class GfxInputEvents : public rsp::utils::Singleton<GfxInputEvents>
 {
 public:
-    static GfxInputEvents& Get();
+    GfxInputEvents(bool aSelfRegister = true)
+    {
+        if (aSelfRegister) {
+            SetInstance(this);
+        }
+    }
 
-    virtual ~GfxInputEvents() {}
+    virtual ~GfxInputEvents()
+    {
+        if (&GetInstance() == this) {
+            SetInstance(nullptr);
+        }
+    }
 
     /**
      * \brief Parse input from event driver
      * \param Reference to the event object to be populated
      * \return bool True if the event is successfully filled
      */
-    virtual bool Poll(GfxEvent &arInput) = 0;
+    virtual bool Poll(GfxEvent &arEvent) = 0;
 
     /**
      * \brief Flush the input buffer for remaining input events
@@ -42,4 +53,4 @@ public:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_GFXEVENTS_H_ */
+#endif /* INCLUDE_GRAPHICS_GFXINPUTEVENTS_H_ */

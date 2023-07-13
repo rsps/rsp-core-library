@@ -43,8 +43,7 @@ static bool stemCompare(std::filesystem::path a1, std::filesystem::path a2)
 
 TEST_CASE("Bitmap to C")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     std::string root = FileSystem::GetCurrentWorkingDirectory() + "testImages";
     std::vector<std::filesystem::path> list;

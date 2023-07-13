@@ -21,6 +21,7 @@
 #include <graphics/Renderer.h>
 #include <utils/Singleton.h>
 #include <exceptions/CoreException.h>
+#include "SDLEvents.h"
 
 
 namespace rsp::graphics::sdl {
@@ -68,6 +69,7 @@ protected:
     std::vector<Rect> mClipRectList{};
     SDL_Window* mpWindow = nullptr;
     SDL_Renderer* mpRenderer = nullptr;
+    SDLEvents mInputEvents{};
 
     void setClipRect();
 };

@@ -20,8 +20,7 @@ TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("Font")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
     const char* cFontName = "Exo 2";
