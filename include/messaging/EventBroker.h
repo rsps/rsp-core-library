@@ -14,47 +14,32 @@
 #include <memory>
 #include <vector>
 #include <logging/LogChannel.h>
-#include "Event.h"
+#include <utils/Singleton.h>
+#include "BrokerInterface.h"
 
 namespace rsp::messaging {
 
-class SubscriberInterface
-{
-public:
-    virtual ~SubscriberInterface() {}
-    /**
-     * \brief Processes events for this subscriber object
-     * \param arEvent Reference to the event being processed
-     * \return True to stop propagation
-     */
-    virtual bool ProcessEvent(Event &arEvent) = 0;
-};
-
-class BrokerInterface
-{
-public:
-    virtual ~BrokerInterface() {}
-
-    virtual size_t ProcessEvents() = 0;
-
-    virtual BrokerInterface& Publish(EventPtr_t apEvent) = 0;
-
-    virtual BrokerInterface& Subscribe(SubscriberInterface &arSubscriber) = 0;
-    virtual BrokerInterface& Unsubscribe(SubscriberInterface &arSubscriber) = 0;
-
-    BrokerInterface& Subscribe(SubscriberInterface *apSubscriber) { return Subscribe(*apSubscriber); }
-    BrokerInterface& Unsubscribe(SubscriberInterface *apSubscriber) { return Unsubscribe(*apSubscriber); }
-};
 
 class EventBroker : public BrokerInterface
 {
 public:
     EventBroker();
-    virtual ~EventBroker() {}
 
     size_t ProcessEvents() override;
 
     EventBroker& Publish(EventPtr_t apEvent) override;
+
+    template<class T, std::enable_if_t<std::is_base_of<rsp::messaging::Event, T>::value, bool> = true>
+    EventBroker& Publish(const T& arEvent)
+    {
+        return Publish(std::make_shared<T>(arEvent)); // Copy given event
+    }
+
+    template<class T, typename ... Args, std::enable_if_t<std::is_base_of<rsp::messaging::Event, T>::value, bool> = true>
+    EventBroker& Publish(Args... args)
+    {
+        return Publish(std::make_shared<T>(args...)); // Create given event
+    }
 
     EventBroker& Subscribe(SubscriberInterface &arSubscriber) override;
     EventBroker& Unsubscribe(SubscriberInterface &arSubscriber) override;
