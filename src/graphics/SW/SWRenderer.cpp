@@ -20,7 +20,7 @@ namespace rsp::graphics {
 
 void Renderer::SetDevicePath(const std::string &arPath)
 {
-    sw::Framebuffer::mpDevicePath = arPath.empty() ? nullptr : arPath.c_str();
+    sw::Framebuffer::mDevicePath = arPath;
 }
 
 Renderer& Renderer::Init(GuiUnit_t aWidth, GuiUnit_t aHeight)

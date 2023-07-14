@@ -93,7 +93,7 @@ TEST_CASE("TestImage")
     // Arrange
 #ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    sw::Framebuffer::mpDevicePath = p.c_str();
+    sw::Framebuffer::mDevicePath = p;
 #endif
 
     auto& renderer = Renderer::Init(480, 800);

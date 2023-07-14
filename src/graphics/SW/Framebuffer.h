@@ -23,7 +23,7 @@ namespace rsp::graphics::sw {
 class Framebuffer
 {
 public:
-    static const char *mpDevicePath;
+    static std::string mDevicePath;
 
     Framebuffer();
     virtual ~Framebuffer();

@@ -25,16 +25,16 @@
 
 namespace rsp::graphics::sw {
 
-const char* Framebuffer::mpDevicePath = nullptr;
+std::string Framebuffer::mDevicePath{};
 
 Framebuffer::Framebuffer()
     : mrGfxHal(GfxHal::Get()),
       mFramebufferFile(-1)
 {
-    if (mpDevicePath) {
-        mFramebufferFile = open(mpDevicePath, O_RDWR);
+    if (!mDevicePath.empty()) {
+        mFramebufferFile = open(mDevicePath.c_str(), O_RDWR);
         if (mFramebufferFile == -1) {
-            std::clog << "Failed to open framebuffer at " << mpDevicePath << " trying /dev/fb0" << std::endl;
+            std::clog << "Failed to open framebuffer at " << mDevicePath << " trying /dev/fb0" << std::endl;
         }
     }
     if (mFramebufferFile == -1) {
