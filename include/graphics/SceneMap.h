@@ -91,6 +91,7 @@ protected:
     std::unique_ptr<Scene> mpActiveScene = nullptr;
     SceneNotify mOnCreated{};
     SceneNotify mOnDestroy{};
+    uint32_t mCurrentSceneId = 0;
 };
 
 } /* namespace rsp::graphics */

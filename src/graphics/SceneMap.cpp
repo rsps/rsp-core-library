@@ -39,6 +39,11 @@ Scene& SceneMap::ActiveScene()
 
 void SceneMap::SetActiveScene(std::uint32_t aId)
 {
+    if (mCurrentSceneId == aId) {
+        return;
+    }
+    mCurrentSceneId = aId;
+
     if (mpActiveScene) {
         mOnDestroy(*mpActiveScene);
         mpActiveScene->DeInit();
