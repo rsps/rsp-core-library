@@ -14,7 +14,6 @@
 
 namespace rsp::messaging {
 
-
 // http://nercury.github.io/c++/interesting/2016/02/22/weak_ptr-and-event-cleanup.html
 // https://stackoverflow.com/a/39920584
 
@@ -23,7 +22,6 @@ class Notifier final
 {
 public:
     // Tokens held by listeners
-//    using Listener_t = std::shared_ptr<std::function<void(Args...)> >;
     using Listener_t = std::shared_ptr<void>;
 
     void operator()(Args ...args)
@@ -37,7 +35,8 @@ public:
             }
         }
     }
-    Listener_t Listen(std::shared_ptr<std::function<void(Args...)>> f)
+
+    Listener_t Listen(std::shared_ptr<std::function<void(Args...)> > f)
     {
         mCallbacks.push_back(f);
         return f;
@@ -45,13 +44,34 @@ public:
 
     Listener_t Listen(std::function<void(Args...)> f)
     {
-        auto ptr = std::make_shared<std::function<void(Args...)>>(std::move(f));
+        auto ptr = std::make_shared<std::function<void(Args...)> >(std::move(f));
         return Listen(ptr);
     }
 
 protected:
     std::vector<std::weak_ptr<std::function<void(Args...)> > > mCallbacks{};
 };
+
+
+class Endpoints
+{
+public:
+    Endpoints& operator<<(std::shared_ptr<void> aEndpoint)
+    {
+        mListeners.push_back(aEndpoint);
+        return *this;
+    }
+
+    Endpoints& Clear()
+    {
+        mListeners.clear();
+        return *this;
+    }
+
+protected:
+    std::vector<Notifier::Listener_t> mListeners{};
+};
+
 
 } /* namespace rsp::messaging */
 
