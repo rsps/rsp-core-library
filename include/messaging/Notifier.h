@@ -69,7 +69,7 @@ public:
     }
 
 protected:
-    std::vector<Notifier::Listener_t> mListeners{};
+    std::vector<std::shared_ptr<void>> mListeners{};
 };
 
 
