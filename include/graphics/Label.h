@@ -43,6 +43,7 @@ public:
     Label& ScaleToFit(bool aValue);
 
     Text& GetText() { return mText; }
+    const Text& GetText() const { return mText; }
 
 protected:
     Text mText{};
