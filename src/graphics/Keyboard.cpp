@@ -48,7 +48,7 @@ void KeyboardBase::addBtn(Key &arBtn)
 
 void KeyboardBase::setSymbols(const std::string &arSymbols, bool aUpperCase)
 {
-    ASSERT(arSymbols.length() >= 26);
+    ASSERT(arSymbols.length() >= mKeys.size());
     std::u32string utf32 = std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.from_bytes(arSymbols);
     unsigned int index = 0;
     for (char32_t symbol : utf32) {
