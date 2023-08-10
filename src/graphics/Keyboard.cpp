@@ -135,6 +135,8 @@ Keyboard::Keyboard()
     initTypeInfo<Keyboard>();
     SetTransparent(true);
 
+    mKeys.resize(26);
+
     auto small_special = Texture::Create(getPixelData(TextureId::SmallSpecial), Color::White);
     auto small_special_dark = Texture::Create(getPixelData(TextureId::SmallSpecial), cRspDarkBlue);
     auto lower_case = getPixelData(TextureId::LowerCase);

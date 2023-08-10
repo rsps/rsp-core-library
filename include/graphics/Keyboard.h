@@ -137,7 +137,7 @@ public:
 
 protected:
     KeyboardCallback_t mOnKeyClick{};
-    std::array<Key, 26u> mKeys{};
+    std::vector<Key> mKeys{};
     std::string mInput{};
     std::vector<TouchCallback_t::Listener_t> mKeyClicks{};
 
