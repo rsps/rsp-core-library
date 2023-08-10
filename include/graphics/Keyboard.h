@@ -125,11 +125,30 @@ public:
     Key& Symbol(int aSymbol);
 };
 
-class Keyboard: public Control
+class KeyboardBase: public Control
 {
 public:
     using KeyboardCallback_t = rsp::messaging::Notifier<const std::string &>;
 
+    const std::string GetInput() { return mInput; }
+    KeyboardBase& SetInput(const std::string &arText);
+
+    KeyboardCallback_t& OnKeyClick() { return mOnKeyClick; }
+
+protected:
+    KeyboardCallback_t mOnKeyClick{};
+    std::array<Key, 26u> mKeys{};
+    std::string mInput{};
+    std::vector<TouchCallback_t::Listener_t> mKeyClicks{};
+
+    void addBtn(Key &arBtn);
+    void setSymbols(const std::string &arSymbols, bool aUpperCase = false);
+    virtual void doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol) = 0;
+};
+
+class Keyboard: public KeyboardBase
+{
+public:
     static constexpr int cKEY_SHIFT    = 1000000;
     static constexpr int cKEY_LETTERS  = 1000001;
     static constexpr int cKEY_NUMBERS  = 1000002;
@@ -146,14 +165,7 @@ public:
     ~Keyboard();
 
     void SetLayout(LayoutType aLayout);
-
-    const std::string GetInput() { return mInput; }
-    Keyboard& SetInput(const std::string &arText);
-
-    KeyboardCallback_t& OnKeyClick() { return mOnKeyClick; }
 protected:
-    KeyboardCallback_t mOnKeyClick{};
-    std::array<Key, 26u> mKeys{};
     Key mBtnShift{};
     Key mBtnLettersLeft{};
     Key mBtnLettersRight{};
@@ -161,13 +173,9 @@ protected:
     Key mBtnSpecials{};
     Key mBtnErase{};
     Key mBtnSpace{};
-    std::string mInput{};
     Rect mBigSpecialRect{};
-    std::vector<TouchCallback_t::Listener_t> mKeyClicks{};
 
-    void addBtn(Key &arBtn);
-    void setSymbols(const std::string &arSymbols);
-    void doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol);
+    void doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol) override;
     const PixelData& getPixelData(TextureId aId);
 };
 

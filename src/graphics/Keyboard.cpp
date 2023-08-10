@@ -40,6 +40,36 @@ Key& Key::Symbol(int aSymbol)
     return *this;
 }
 
+void KeyboardBase::addBtn(Key &arBtn)
+{
+    AddChild(&arBtn);
+    mKeyClicks.push_back(arBtn.OnClick().Listen(std::bind(&KeyboardBase::doKeyClick, this, std::placeholders::_1, std::placeholders::_2)));
+}
+
+void KeyboardBase::setSymbols(const std::string &arSymbols, bool aUpperCase)
+{
+    ASSERT(arSymbols.length() >= 26);
+    std::u32string utf32 = std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.from_bytes(arSymbols);
+    unsigned int index = 0;
+    for (char32_t symbol : utf32) {
+        Button &btn = mKeys[index++];
+        symbol = aUpperCase ? std::towupper(symbol) : std::towlower(symbol);
+        btn.SetId(uint32_t(symbol));
+        std::wstring ws(1, wchar_t(symbol));
+        std::string utf8 = std::wstring_convert<std::codecvt_utf8<wchar_t>>{}.to_bytes(ws);
+        btn.SetCaption(utf8).SetName(utf8);
+    }
+}
+
+KeyboardBase& KeyboardBase::SetInput(const std::string &arText)
+{
+    mInput = arText;
+    Invalidate();
+    mOnKeyClick(mInput);
+    return *this;
+}
+
+
 static Rect cKeyTouchAreas[26] = {
     {_Q, 59, 83}, // Q
     {_W, 42, 83}, // W
@@ -205,28 +235,6 @@ Keyboard::Keyboard()
     SetLayout(LayoutType::Letters);
 }
 
-void Keyboard::addBtn(Key &arBtn)
-{
-    AddChild(&arBtn);
-    mKeyClicks.push_back(arBtn.OnClick().Listen(std::bind(&Keyboard::doKeyClick, this, std::placeholders::_1, std::placeholders::_2)));
-}
-
-void Keyboard::setSymbols(const std::string &arSymbols)
-{
-    ASSERT(arSymbols.length() >= 26);
-    bool checked = mBtnShift.IsChecked();
-    std::u32string utf32 = std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.from_bytes(arSymbols);
-    unsigned int index = 0;
-    for (char32_t symbol : utf32) {
-        Button &btn = mKeys[index++];
-        symbol = checked ? std::towupper(symbol) : std::towlower(symbol);
-        btn.SetId(uint32_t(symbol));
-        std::wstring ws(1, wchar_t(symbol));
-        std::string utf8 = std::wstring_convert<std::codecvt_utf8<wchar_t>>{}.to_bytes(ws);
-        btn.SetCaption(utf8).SetName(utf8);
-    }
-}
-
 Keyboard::~Keyboard()
 {
 }
@@ -271,7 +279,7 @@ void Keyboard::SetLayout(LayoutType aLayout)
 
     switch (aLayout) {
         case LayoutType::Letters:
-            setSymbols(std::string(cLetters));
+            setSymbols(std::string(cLetters), mBtnShift.IsChecked());
             mBtnShift.Show();
             mBtnLettersLeft.Hide();
             mBtnLettersRight.Hide();
@@ -280,7 +288,7 @@ void Keyboard::SetLayout(LayoutType aLayout)
             break;
 
         case LayoutType::Numbers:
-            setSymbols(std::string(cNumbers));
+            setSymbols(std::string(cNumbers), mBtnShift.IsChecked());
             mBtnShift.Hide();
             mBtnLettersLeft.Show();
             mBtnLettersRight.Hide();
@@ -289,7 +297,7 @@ void Keyboard::SetLayout(LayoutType aLayout)
             break;
 
         case LayoutType::Special:
-            setSymbols(std::string(cSpecials));
+            setSymbols(std::string(cSpecials), mBtnShift.IsChecked());
             mBtnShift.Hide();
             mBtnLettersLeft.Hide();
             mBtnLettersRight.Show();
@@ -298,14 +306,6 @@ void Keyboard::SetLayout(LayoutType aLayout)
             break;
     }
 
-}
-
-Keyboard& Keyboard::SetInput(const std::string &arText)
-{
-    mInput = arText;
-    Invalidate();
-    mOnKeyClick(mInput);
-    return *this;
 }
 
 const PixelData& Keyboard::getPixelData(TextureId aId)
