@@ -136,7 +136,7 @@ void Text::scaleToFit(int aWidth, int aHeight)
 void Text::loadGlyphs()
 {
     DEBUG("Loading glyphs")
-    mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing);
+    mpGlyphs = mFont.MakeGlyphs(mValue, mLineSpacing, int(mHAlign));
     mBoundingRect = mpGlyphs->mBoundingRect;
 }
 

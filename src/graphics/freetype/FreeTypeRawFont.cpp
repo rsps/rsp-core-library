@@ -98,7 +98,7 @@ FreeTypeRawFont::~FreeTypeRawFont()
     freeFace();
 }
 
-std::shared_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aLineSpacing)
+std::shared_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, int aLineSpacing, int aHAlignment)
 {
     /**
      * For general font terms
@@ -149,9 +149,26 @@ std::shared_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
             }
         }
     }
+    glyphs->mLineWidths.push_back(line_left);
+
     if (glyphs->mGlyphs.size() && (glyphs->mGlyphs.back().mWidth > glyphs->mGlyphs.back().mAdvanceX)) {
         max_left++;
     }
+
+    if (aHAlignment > 0) {
+        size_t line = 0;
+        int offset = (aHAlignment == 1) ? ((max_left - glyphs->mLineWidths[line]) / 2) : (max_left - glyphs->mLineWidths[line]);
+        for (Glyph &glyph : glyphs->mGlyphs) {
+            if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
+                line++;
+                offset = (aHAlignment == 1) ? ((max_left - glyphs->mLineWidths[line]) / 2) : (max_left - glyphs->mLineWidths[line]);
+            }
+            else {
+                glyph.mLeft += offset;
+            }
+        }
+    }
+
     glyphs->mBoundingRect = Rect(min_left, 0, max_left, max_height);
     return glyphs;
 }

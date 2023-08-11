@@ -96,7 +96,7 @@ public:
 
     virtual ~FontRawInterface() {};
 
-    virtual std::shared_ptr<Glyphs> MakeGlyphs(const std::string &arText, int aLineSpacing) = 0;
+    virtual std::shared_ptr<Glyphs> MakeGlyphs(const std::string &arText, int aLineSpacing, int aHAlignment) = 0;
     virtual std::string GetFamilyName() const = 0;
     virtual void SetSize(int aWidthPx, int aHeightPx) = 0;
 

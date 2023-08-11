@@ -612,29 +612,28 @@ TEST_CASE("Framebuffer")
         Font::RegisterFont(cFontFile);
         Rect r(10, 10, 460, 780);
 
-        Text text("Exo 2", "Hello\nWorld");
+        Text text("Exo 2", "Hello\nUniverse");
         CHECK_NOTHROW(text.GetFont().SetSize(50));
         CHECK_NOTHROW(text.Reload());
-
-        auto panel = Texture::Create(text.GetWidth(), text.GetHeight());
-
-        CHECK_NOTHROW(panel->SetBlendOperation(Texture::BlendOperation::ColorKey, Color::None));
-        CHECK_NOTHROW(text.Reload());
-        CHECK_NOTHROW(panel->Fill(Color::None).Update(text, Color::Yellow));
 
         const Text::VAlign cVertical[] = { Text::VAlign::Top, Text::VAlign::Center, Text::VAlign::Bottom };
         const Text::HAlign cHorizontal[] = { Text::HAlign::Left, Text::HAlign::Center, Text::HAlign::Right };
 
         for (int h = 0 ; h < 3 ; h++) {
+            CHECK_NOTHROW(text.SetHAlignment(cHorizontal[h]));
+            CHECK_NOTHROW(text.Reload());
+            auto panel = Texture::Create(text.GetWidth(), text.GetHeight());
+            CHECK_NOTHROW(panel->SetBlendOperation(Texture::BlendOperation::ColorKey, Color::None));
+            CHECK_NOTHROW(panel->Fill(Color::None).Update(text, Color::Yellow));
             for (int v = 0 ; v < 3 ; v++) {
-                CHECK_NOTHROW(text.SetVAlignment(cVertical[v]).SetHAlignment(cHorizontal[h]));
+                CHECK_NOTHROW(text.SetVAlignment(cVertical[v]));
                 CHECK_NOTHROW(panel->SetDestination(text.GetPosition(r)));
 
                 CHECK_NOTHROW(renderer.Fill(Color::Black));
                 CHECK_NOTHROW(renderer.Blit(*panel));
                 CHECK_NOTHROW(renderer.DrawRect(Color::White, r));
                 CHECK_NOTHROW(renderer.Present());
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
             }
         }
     }

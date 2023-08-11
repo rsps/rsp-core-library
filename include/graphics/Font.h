@@ -76,9 +76,10 @@ public:
      *
      * \param arText
      * \param aLineSpacing
+     * \param aHAlignment Horizontal text alignment. 0 = Left, 1 = Center, 2 = Right
      * \return
      */
-    std::shared_ptr<Glyphs> MakeGlyphs(const std::string &arText, int aLineSpacing = 0);
+    std::shared_ptr<Glyphs> MakeGlyphs(const std::string &arText, int aLineSpacing = 0, int aHAlignment = 0);
 
     /**
      * Get the family name of the font.
