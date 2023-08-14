@@ -11,6 +11,7 @@
 #include <list>
 #include <memory>
 #include <vector>
+#include <utils/Function.h>
 
 namespace rsp::messaging {
 
