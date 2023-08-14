@@ -49,9 +49,11 @@ public:
      * Not class scoped on purpose, they are used as array indexes
      */
     enum States {
+        Disabled,
         Normal,
         Pressed,
         Dragged,
+        CheckedDisabled,// Read only
         CheckedNormal,  // Read only
         CheckedPressed, // Read only
         CheckedDragged  // Read only
