@@ -31,13 +31,13 @@ TEST_CASE("Functions") {
     Function<void(void)> vv;
     CHECK_NOTHROW(vv());
 
-    Function<int(void)> iv = []() { return 42; };
+    Function<int(void)> iv = []() noexcept { return 42; };
     CHECK(iv() == 42);
 
     iv = test_func;
     CHECK(iv() == 84);
 
-    Function<int(int)> ii = [](int value) { return value; };
+    Function<int(int)> ii = [](int value) noexcept { return value; };
     CHECK(ii(43) == 43);
 
     TestClass o;
