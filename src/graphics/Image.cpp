@@ -64,7 +64,7 @@ void Image::update()
         else {
             mpTexture->SetBlendOperation(Texture::BlendOperation::Copy);
         }
-        mpTexture->Update(mBitmap.GetPixelData(), mStyles[mState].mForegroundColor);
+        mpTexture->Update(mBitmap.GetPixelData(), GetStyle(GetState()).mForegroundColor);
 
         auto sr = Rect(0, 0, mBitmap.GetWidth(), mBitmap.GetHeight());
         if (mpParent) {

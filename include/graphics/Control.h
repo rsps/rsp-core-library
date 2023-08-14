@@ -76,15 +76,9 @@ public:
     }
 
     /**
-     * \brief Sets the state of the object
-     * \param aState State object should be set to
-     */
-    void SetState(States aState);
-
-    /**
      * \brief Gets the state of the object
      */
-    States GetState() const { return mState; }
+    Control::States GetState() const;
 
     /**
      * \brief Set the object as invalidated marking it to be re-rendered
@@ -110,8 +104,11 @@ public:
     Control& Hide() { return Show(false); }
 
     virtual bool IsEnabled() const { return mEnabled; }
-    virtual Control& Enable(bool aEnable = true) { mEnabled = aEnable; return *this; }
+    virtual Control& Enable(bool aEnable = true);
     Control& Disable() { return Enable(false); }
+
+    virtual Control& SetPressed(bool aValue);
+    virtual Control& SetDragged(bool aValue);
 
     /**
      * \brief Set the object to transparent or not
@@ -263,11 +260,12 @@ protected:
     bool mDirty = true;
     bool mDraggable = false;
     bool mVisible = true;
-    bool mEnabled = true;
     bool mCheckable = false;
     bool mChecked = false;
+    bool mEnabled = true;
+    bool mPressed = false;
+    bool mDragged = false;
 
-    States mState = States::Normal;
     TouchCallback_t mOnPress{};
     TouchCallback_t mOnMove{};
     TouchCallback_t mOnLift{};

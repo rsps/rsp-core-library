@@ -72,7 +72,7 @@ void Label::update()
         mpTexture->SetBlendOperation(Texture::BlendOperation::SourceAlpha);
     }
 
-    Color &color = mStyles[mState].mForegroundColor;
+    Color &color = GetStyle(GetState()).mForegroundColor;
 
     mpTexture->Fill(Color::None).Update(mText.GetPixelData(), (color == Color::None) ? mText.GetFont().GetColor() : color);
 

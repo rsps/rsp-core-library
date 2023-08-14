@@ -78,7 +78,7 @@ TEST_CASE("Control")
         CHECK_FALSE(myControl.IsInvalid());
 
         SUBCASE("State") {
-            CHECK_NOTHROW(myControl.SetState(Control::States::Pressed));
+            CHECK_NOTHROW(myControl.SetPressed(true));
             CHECK(myControl.GetState() == Control::States::Pressed);
         }
 

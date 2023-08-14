@@ -49,25 +49,31 @@ void Control::setId(uint32_t aId)
     Invalidate();
 }
 
-void Control::SetState(States aState)
+Control::States Control::GetState() const
 {
-    if (aState > States::Dragged) {
-        aState = States(uint32_t(aState) % uint32_t(States::CheckedNormal));
+    States result = States::Normal;
+
+    if (!mEnabled) {
+        result = States::Disabled;
     }
-    if (mState != aState) {
-        mState = aState;
-        Invalidate();
-        for (Control* child : mChildren) {
-            child->SetState(aState);
+    else if (mPressed) {
+        result = States::Pressed;
+        if (mDragged) {
+            result = States::Dragged;
         }
     }
+    if (mChecked) {
+        result = States(uint32_t(result) + uint32_t(States::CheckedDisabled));
+    }
+
+    return result;
 }
 
 void Control::Invalidate()
 {
     if (!mDirty) {
         mDirty = true;
-        for (Control* child : mChildren) {
+        for (Control *child : mChildren) {
             child->Invalidate();
         }
     }
@@ -87,7 +93,7 @@ Control& Control::SetArea(Rect aRect)
                 }
             }
         }
-        for (Control* child : mChildren) {
+        for (Control *child : mChildren) {
             child->SetOrigin((child->GetOrigin() - mArea.GetTopLeft()) + aRect.GetTopLeft());
         }
         mArea = aRect;
@@ -130,7 +136,7 @@ Control& Control::SetOrigin(const Point &arPoint)
             texture->SetDestination(texture->GetDestination() + difference);
         }
     }
-    for (Control* child : mChildren) {
+    for (Control *child : mChildren) {
         child->SetOrigin(child->GetOrigin() + difference);
     }
     doSetArea(mArea);
@@ -203,7 +209,7 @@ bool Control::UpdateData()
         mDirty = false;
         result = true;
     }
-    for (Control* child : mChildren) {
+    for (Control *child : mChildren) {
         if (child->UpdateData()) {
             result = true;
         }
@@ -219,7 +225,7 @@ void Control::Render(Renderer &arRenderer) const
 
 //    GFXLOG("Rendering: " << GetName() << " " << mArea);
 
-    auto &style = mStyles[mState];
+    auto &style = mStyles[GetState()];
 
     if (!mTransparent) {
         arRenderer.Fill(style.mBackgroundColor, mArea);
@@ -227,13 +233,13 @@ void Control::Render(Renderer &arRenderer) const
 
     arRenderer.PushClipRect(mArea);
 
-    for (const TexturePtr_t& texture : style.mTextures) {
+    for (const TexturePtr_t &texture : style.mTextures) {
         arRenderer.Blit(*texture);
     }
 
     if (!render(arRenderer)) {
         if (mChildren.size() > 0) {
-            for (Control* child : mChildren) {
+            for (Control *child : mChildren) {
                 child->Render(arRenderer);
             }
         }
@@ -284,6 +290,18 @@ Control& Control::Show(bool aVisible)
     return *this;
 }
 
+Control& Control::Enable(bool aEnable)
+{
+    if (mEnabled != aEnable) {
+        mEnabled = aEnable;
+        Invalidate();
+        for (Control *child : mChildren) {
+            child->Enable(aEnable);
+        }
+    }
+    return *this;
+}
+
 Control& Control::SetTransparent(bool aValue)
 {
     if (mTransparent != aValue) {
@@ -300,7 +318,7 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
     switch (touch.mType) {
         case TouchTypes::Press:
             if (mArea.IsHit(touch.mCurrent)) {
-                for(Control *child : mChildren) {
+                for (Control *child : mChildren) {
                     if (child->ProcessEvent(arEvent)) {
                         return true;
                     }
@@ -313,7 +331,7 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
 
         case TouchTypes::Lift:
             if (mArea.IsHit(touch.mPress)) {
-                for(Control *child : mChildren) {
+                for (Control *child : mChildren) {
                     if (child->ProcessEvent(arEvent)) {
                         return true;
                     }
@@ -334,7 +352,7 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
 
         case TouchTypes::Drag:
             if (mArea.IsHit(touch.mPress)) {
-                for(Control *child : mChildren) {
+                for (Control *child : mChildren) {
                     if (child->ProcessEvent(arEvent)) {
                         return true;
                     }
@@ -377,23 +395,48 @@ bool Control::ProcessEvent(rsp::messaging::Event &arEvent)
     return false;
 }
 
+Control& Control::SetPressed(bool aValue)
+{
+    if (mPressed != aValue) {
+        mPressed = aValue;
+        Invalidate();
+        for (Control *child : mChildren) {
+            child->SetPressed(aValue);
+        }
+    }
+    return *this;
+}
+
+Control& Control::SetDragged(bool aValue)
+{
+    if (mDragged != aValue) {
+        mDragged = aValue;
+        Invalidate();
+        for (Control *child : mChildren) {
+            child->SetDragged(aValue);
+        }
+    }
+    return *this;
+}
+
 bool Control::doPress(const TouchEvent &arEvent)
 {
-    SetState(Control::States::Pressed);
+    SetPressed(true);
     mOnPress(arEvent, GetId());
     return true;
 }
 
 bool Control::doMove(const TouchEvent &arEvent)
 {
-    SetState(Control::States::Dragged);
+    SetDragged(true);
     mOnMove(arEvent, GetId());
     return true;
 }
 
 bool Control::doLift(const TouchEvent &arEvent)
 {
-    SetState(Control::States::Normal);
+    SetPressed(false);
+    SetDragged(false);
     mOnLift(arEvent, GetId());
     return true;
 }
