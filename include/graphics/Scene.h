@@ -26,9 +26,7 @@ public:
         SetArea(arRect);
     }
 
-    virtual ~Scene()
-    {
-    }
+    virtual ~Scene();
 
     /**
      * \brief Activation function, called after scene has been fully constructed

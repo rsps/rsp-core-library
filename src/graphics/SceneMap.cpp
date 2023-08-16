@@ -45,13 +45,14 @@ void SceneMap::SetActiveScene(std::uint32_t aId)
     mCurrentSceneId = aId;
 
     if (mpActiveScene) {
+        mLogger.Notice() << "Destroying Scene: " << mpActiveScene->GetName();
         mOnDestroy(*mpActiveScene);
         mpActiveScene->DeInit();
         mpActiveScene = nullptr;
     }
 
     mpActiveScene = GetFactory(aId)();
-    Logger::GetDefault().Notice() << "SceneChange: " << mpActiveScene->GetName();
+    mLogger.Notice() << "SceneChange: " << mpActiveScene->GetName();
     mpActiveScene->Init();
     mOnCreated(*mpActiveScene);
 }

@@ -17,7 +17,7 @@
 #include <magic_enum.hpp>
 #include <exceptions/CoreException.h>
 #include <graphics/GfxInputEvents.h>
-#include <logging/Logger.h>
+#include <logging/LogChannel.h>
 #include <messaging/EventBroker.h>
 #include <messaging/Notifier.h>
 #include <utils/ConstTypeInfo.h>
@@ -59,7 +59,7 @@ public:
         CheckedDragged  // Read only
     };
 
-    Control() { initTypeInfo<Control>(); }
+    Control() : mLogger("Gfx") { initTypeInfo<Control>(); }
     virtual ~Control();
 
     Control(const Control &arOther) = default;
@@ -265,6 +265,7 @@ protected:
     bool mEnabled = true;
     bool mPressed = false;
     bool mDragged = false;
+    rsp::logging::LogChannel mLogger;
 
     TouchCallback_t mOnPress{};
     TouchCallback_t mOnMove{};

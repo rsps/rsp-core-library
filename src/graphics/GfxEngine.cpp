@@ -20,7 +20,7 @@ namespace rsp::graphics {
 
 GfxEngineBase::GfxEngineBase(int aMaxFPS)
     : mFrameTime(1000 / aMaxFPS),
-      mLogger("GfxEngine")
+      mLogger("Gfx")
 {
 }
 

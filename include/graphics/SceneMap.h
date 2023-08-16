@@ -18,7 +18,7 @@
 #include <exceptions/CoreException.h>
 #include <graphics/Scene.h>
 #include <messaging/Notifier.h>
-#include <logging/Logger.h>
+#include <logging/LogChannel.h>
 #include <magic_enum.hpp>
 
 namespace rsp::graphics {
@@ -41,16 +41,16 @@ public:
     using SceneCreator = std::function<std::unique_ptr<Scene>()>;
     using SceneNotify = rsp::messaging::Notifier<Scene&>;
 
-    SceneMap() {};
+    SceneMap() : mLogger("Gfx") {};
     SceneMap(const SceneMap&) = default;
 
     template <typename T>
     void AddFactory()
     {
-        GFXLOG("Adding scene factory: " << rsp::utils::NameOf<T>() << " with id: " << rsp::utils::ID<T>());
-        mScenes[rsp::utils::ID<T>()] = []() { \
-            GFXLOG("Creating scene: " << rsp::utils::NameOf<T>()); \
-            return std::make_unique<T>(); \
+        mLogger.Info() << "Adding scene factory: " << rsp::utils::NameOf<T>() << " with id: " << rsp::utils::ID<T>();
+        mScenes[rsp::utils::ID<T>()] = [this]() {
+            mLogger.Info() << "Creating scene: " << rsp::utils::NameOf<T>();
+            return std::make_unique<T>();
         };
     }
 
@@ -58,10 +58,10 @@ public:
     void AddFactory(E e)
     {
         std::string_view sv = magic_enum::enum_name(e);
-        GFXLOG("Adding scene factory: " << rsp::utils::NameOf<T>() << " with id: " << sv);
-        mScenes[uint32_t(e)] = [id=uint32_t(e), sv]() {
-            GFXLOG("Creating scene: " << rsp::utils::NameOf<T>()); \
-            auto result = std::make_unique<T>(); \
+        mLogger.Info() << "Adding scene factory: " << rsp::utils::NameOf<T>() << " with id: " << sv;
+        mScenes[uint32_t(e)] = [id=uint32_t(e), sv, this]() {
+            mLogger.Info() << "Creating scene: " << rsp::utils::NameOf<T>();
+            auto result = std::make_unique<T>();
             result->SetId(id);
             result->SetName(sv.data());
             return result;
@@ -92,6 +92,7 @@ protected:
     SceneNotify mOnCreated{};
     SceneNotify mOnDestroy{};
     uint32_t mCurrentSceneId = 0;
+    rsp::logging::LogChannel mLogger;
 };
 
 } /* namespace rsp::graphics */

@@ -57,4 +57,18 @@ rsp::logging::LogStream LogChannel::Debug()
     return mrLogger.Debug().SetChannel(mChannel);
 }
 
+LogChannel::LogChannel(const LogChannel &arOther)
+    : mrLogger(LoggerInterface::GetDefault()),
+      mChannel(arOther.mChannel)
+{
+}
+
+LogChannel& LogChannel::operator =(const LogChannel &arOther)
+{
+    if (this != &arOther) {
+        mChannel = arOther.mChannel;
+    }
+    return *this;
+}
+
 } /* namespace rsp::logging */

@@ -9,12 +9,17 @@
  */
 
 #include <graphics/Scene.h>
-#include <functional>
 
 namespace rsp::graphics
 {
 
 Rect Scene::mScreenSize{0, 0, 480, 800};
+
+Scene::~Scene()
+{
+    mLogger.Debug() << "Scene::Destructor called for " << GetName();
+}
+
 
 void Scene::SetScreenSize(GuiUnit_t aWidth, GuiUnit_t aHeight)
 {
