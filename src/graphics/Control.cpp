@@ -172,6 +172,7 @@ Control& Control::AddChild(Control *apChild)
         mChildren.push_back(apChild);
         apChild->mpParent = this;
         apChild->SetOrigin(apChild->GetOrigin() + GetOrigin());
+        Invalidate();
     }
     return *this;
 }
