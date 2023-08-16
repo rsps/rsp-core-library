@@ -32,7 +32,7 @@ GfxEngineBase& GfxEngineBase::SetNextScene(std::uint32_t aId)
 
 bool GfxEngineBase::Iterate()
 {
-    mLogger.Debug() << "Iteration: " << mIterations++;
+//    mLogger.Debug() << "Iteration: " << mIterations++;
 
     iterateTimers();
     iterateEvents();

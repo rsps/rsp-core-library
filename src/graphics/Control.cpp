@@ -181,6 +181,7 @@ Control& Control::RemoveChild(Control *apChild)
     if (apChild) {
         auto it = std::find(mChildren.begin(), mChildren.end(), apChild);
         if (it != mChildren.end()) {
+            apChild->mpParent = nullptr;
             mChildren.erase(it);
             Invalidate();
         }
