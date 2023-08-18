@@ -315,7 +315,7 @@ Control& Control::SetTransparent(bool aValue)
 
 bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
 {
-    const TouchEvent &touch = arEvent.CastTo<const TouchEvent>();
+    TouchEvent &touch = arEvent.CastTo<TouchEvent>();
 
     switch (touch.mType) {
         case TouchTypes::Press:
@@ -327,11 +327,16 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
                 }
             }
             if (mTouchArea.IsHit(touch.mCurrent)) {
+                touch.mpCtrl = this;
                 return doPress(touch);
             }
             break;
 
         case TouchTypes::Lift:
+            if (touch.mpCtrl == this) {
+                SetPressed(false);
+                SetDragged(false);
+            }
             if (mArea.IsHit(touch.mPress)) {
                 for (Control *child : mChildren) {
                     if (child->ProcessEvent(arEvent)) {

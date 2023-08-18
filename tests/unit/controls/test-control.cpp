@@ -39,12 +39,15 @@ TEST_CASE("Control")
     {
         Control childControl;
         CHECK_NOTHROW(myControl.AddChild(&childControl));
-        CHECK_FALSE(myControl.IsInvalid());
+        CHECK(myControl.IsInvalid());
         CHECK(childControl.IsInvalid());
 
         CHECK_NOTHROW(childControl.UpdateData());
-        CHECK_FALSE(myControl.IsInvalid());
+        CHECK(myControl.IsInvalid());
         CHECK_FALSE(childControl.IsInvalid());
+
+        CHECK_NOTHROW(myControl.UpdateData());
+        CHECK_FALSE(myControl.IsInvalid());
 
         CHECK_NOTHROW(myControl.Invalidate());
 
