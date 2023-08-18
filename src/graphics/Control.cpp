@@ -327,16 +327,11 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
                 }
             }
             if (mTouchArea.IsHit(touch.mCurrent)) {
-                touch.mpCtrl = this;
                 return doPress(touch);
             }
             break;
 
         case TouchTypes::Lift:
-            if (touch.mpCtrl == this) {
-                SetPressed(false);
-                SetDragged(false);
-            }
             if (mArea.IsHit(touch.mPress)) {
                 for (Control *child : mChildren) {
                     if (child->ProcessEvent(arEvent)) {
@@ -380,15 +375,11 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
 
 bool Control::ProcessEvent(rsp::messaging::Event &arEvent)
 {
-    if (!IsVisible()) {
-        return false;
-    }
-    if (!IsEnabled()) {
-        return (arEvent.Type == TouchEvent::ClassType && mTouchArea.IsHit(arEvent.CastTo<TouchEvent>().mCurrent));
-    }
-
     switch (arEvent.Type) {
         case TouchEvent::ClassType:
+            if (!IsEnabled()) {
+                return (mTouchArea.IsHit(arEvent.CastTo<TouchEvent>().mCurrent));
+            }
             return handleTouchEvent(arEvent);
 
         case RefreshEvent::ClassType:

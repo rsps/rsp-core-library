@@ -67,7 +67,6 @@ void TouchEvent::Assign(const TouchEvent &arOther)
     mTime = arOther.mTime;
     mType = arOther.mType;
     mCurrent = arOther.mCurrent;
-    mpCtrl = arOther.mpCtrl;
     if (arOther.mPressTime != std::chrono::steady_clock::time_point()) {
         mPress = arOther.mPress;
         mPressTime = arOther.mPressTime;

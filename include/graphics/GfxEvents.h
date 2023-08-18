@@ -26,8 +26,6 @@ enum class TouchTypes : uint32_t {
     Lift
 };
 
-class Control;
-
 /**
  * \brief Object tracking touch interface events
  */
@@ -47,10 +45,6 @@ struct TouchEvent: public rsp::messaging::EventBase<TouchEvent>
 //    TouchEvent& operator=(TouchEvent&&);
 
     void Assign(const TouchEvent &arOther);
-
-protected:
-    friend Control;
-    Control *mpCtrl = nullptr;
 };
 
 std::ostream &operator<<(std::ostream &os, const TouchEvent &arEvent);
