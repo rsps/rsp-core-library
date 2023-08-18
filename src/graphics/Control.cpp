@@ -377,6 +377,9 @@ bool Control::ProcessEvent(rsp::messaging::Event &arEvent)
 {
     switch (arEvent.Type) {
         case TouchEvent::ClassType:
+            if (!IsVisible()) {
+                break;
+            }
             if (!IsEnabled()) {
                 return (mTouchArea.IsHit(arEvent.CastTo<TouchEvent>().mCurrent));
             }
