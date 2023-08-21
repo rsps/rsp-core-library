@@ -30,6 +30,8 @@ TEST_CASE("Touch Events" * doctest::skip())
 {
     GuiHelper gh(false);
 
+    Control::SetTouchAreaColor(Color::Yellow);
+
     auto& renderer = Renderer::Get();
 
     // SDL Renderer creates

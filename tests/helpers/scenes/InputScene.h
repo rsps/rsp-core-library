@@ -11,7 +11,7 @@
 #define TESTS_HELPERS_SCENES_INPUTSCENE_H_
 
 #define KB_X 12
-#define KB_Y 450
+#define KB_Y 400
 
 #include <array>
 #include <graphics/Button.h>
@@ -72,7 +72,8 @@ public:
         mLabel.GetStyle(States::Normal).mForegroundColor = Color::Black;
         mLabel.GetStyle(States::Normal).mBackgroundColor = Color::White;
 
-        mKeyboard.SetArea(Rect(KB_X, KB_Y, 460, 350));
+//        mKeyboard.SetArea(Rect(KB_X, KB_Y, 460, 350));
+        mKeyboard.SetOrigin(Point(KB_X, KB_Y));
         mKeyboard.SetName("Keyboard");
         mListener = mKeyboard.OnKeyClick().Listen(rsp::utils::Method(this, &InputScene::onInputChange));
 //        mKeyboard.SetInput("qwertyuiopzxcvbnm");

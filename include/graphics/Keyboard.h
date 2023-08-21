@@ -177,6 +177,7 @@ public:
     ~Keyboard();
 
     Keyboard& SetLayout(LayoutType aLayout);
+    LayoutType GetLayout() const { return mLayout; }
 
     Keyboard& AllowedButtons(utils::EnumFlags<Buttons> aMask);
 protected:
@@ -189,6 +190,7 @@ protected:
     Key mBtnSpace{};
     Rect mBigSpecialRect{};
     utils::EnumFlags<Buttons> mButtonMask = Buttons::All;
+    LayoutType mLayout{};
 
     void doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol) override;
     const PixelData& getPixelData(TextureId aId);

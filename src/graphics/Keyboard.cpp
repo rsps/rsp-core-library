@@ -235,6 +235,8 @@ Keyboard::Keyboard()
     }
 
     SetLayout(LayoutType::Letters);
+
+    SetArea(Rect(Point(0, 0), mBtnSpecials.GetTouchArea().GetBottomRight()));
 }
 
 Keyboard::~Keyboard()
@@ -279,6 +281,7 @@ Keyboard& Keyboard::SetLayout(LayoutType aLayout)
     const char* cNumbers  = "1234567890-_:;()&@\".,?!'/*";
     const char* cSpecials = " []{}#%+~ =¤\\≈<>£€$.,?!'/*";
 
+    mLayout = aLayout;
     switch (aLayout) {
         case LayoutType::Letters:
             setSymbols(std::string(cLetters), mBtnShift.IsChecked());
@@ -318,6 +321,7 @@ const PixelData& Keyboard::getPixelData(TextureId aId)
 Keyboard& Keyboard::AllowedButtons(utils::EnumFlags<Buttons> aMask)
 {
     mButtonMask = aMask;
+    SetLayout(mLayout);
     return *this;
 }
 
