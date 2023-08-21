@@ -273,7 +273,7 @@ void Keyboard::doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol)
     }
 }
 
-void Keyboard::SetLayout(LayoutType aLayout)
+Keyboard& Keyboard::SetLayout(LayoutType aLayout)
 {
     const char* cLetters = "qwertyuiopasdfghjklzxcvbnm";
     const char* cNumbers  = "1234567890-_:;()&@\".,?!'/*";
@@ -282,37 +282,43 @@ void Keyboard::SetLayout(LayoutType aLayout)
     switch (aLayout) {
         case LayoutType::Letters:
             setSymbols(std::string(cLetters), mBtnShift.IsChecked());
-            mBtnShift.Show();
+            mBtnShift.Show(mButtonMask.Isset(Buttons::Shift));
             mBtnLettersLeft.Hide();
             mBtnLettersRight.Hide();
-            mBtnNumbers.Show();
-            mBtnSpecials.Show();
+            mBtnNumbers.Show(mButtonMask.Isset(Buttons::Numbers));
+            mBtnSpecials.Show(mButtonMask.Isset(Buttons::Specials));
             break;
 
         case LayoutType::Numbers:
             setSymbols(std::string(cNumbers), mBtnShift.IsChecked());
             mBtnShift.Hide();
-            mBtnLettersLeft.Show();
+            mBtnLettersLeft.Show(mButtonMask.Isset(Buttons::Letters));
             mBtnLettersRight.Hide();
             mBtnNumbers.Hide();
-            mBtnSpecials.Show();
+            mBtnSpecials.Show(mButtonMask.Isset(Buttons::Specials));
             break;
 
         case LayoutType::Special:
             setSymbols(std::string(cSpecials), mBtnShift.IsChecked());
             mBtnShift.Hide();
             mBtnLettersLeft.Hide();
-            mBtnLettersRight.Show();
-            mBtnNumbers.Show();
+            mBtnLettersRight.Show(mButtonMask.Isset(Buttons::Letters));
+            mBtnNumbers.Show(mButtonMask.Isset(Buttons::Numbers));
             mBtnSpecials.Hide();
             break;
     }
-
+    return *this;
 }
 
 const PixelData& Keyboard::getPixelData(TextureId aId)
 {
     return GfxCache::GetInstance().GetPixelData(std::uint32_t(aId));
+}
+
+Keyboard& Keyboard::AllowedButtons(utils::EnumFlags<Buttons> aMask)
+{
+    mButtonMask = aMask;
+    return *this;
 }
 
 } /* namespace rsp::graphics */

@@ -146,6 +146,31 @@ public:
             ~static_cast<utype>(mValue));
     }
 
+    /**
+     * \brief Check if all flags in subset is set.
+     * \param aValue Mask with subset of enums that all must be set.
+     * \return bool True if this contains all from mask
+     */
+    constexpr bool HasAll(T aValue)
+    {
+        return (static_cast<utype>(mValue) & static_cast<utype>(aValue)) == static_cast<utype>(aValue);
+    }
+
+    /**
+     * \brief Alias of HasAll
+     */
+    constexpr bool Isset(T aValue) { return HasAll(aValue); }
+
+    /**
+     * \brief Check if any flags in subset is set.
+     * \param aValue Mask with subset of enums.
+     * \return bool True if this contains any from mask
+     */
+    constexpr bool HasAny(T aValue)
+    {
+        return (static_cast<utype>(mValue) & static_cast<utype>(aValue)) != 0;
+    }
+
 } __attribute__((packed));
 
 

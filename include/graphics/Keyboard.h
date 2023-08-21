@@ -22,6 +22,7 @@
 #include "Control.h"
 #include "Point.h"
 #include "Rect.h"
+#include <utils/EnumFlags.h>
 
 namespace rsp::graphics {
 
@@ -161,10 +162,23 @@ public:
 
     enum class TextureId { BigSpecial = 1000, Erase, Key, LowerCase, SmallSpecial, Space, UpperCase };
 
+    enum class Buttons {
+        None      = 0x00,
+        Shift     = 0x01,
+        Letters   = 0x02,
+        Numbers   = 0x04,
+        Specials  = 0x08,
+        Backspace = 0x10,
+        Space     = 0x20,
+        All       = 0x3F
+    };
+
     Keyboard();
     ~Keyboard();
 
-    void SetLayout(LayoutType aLayout);
+    Keyboard& SetLayout(LayoutType aLayout);
+
+    Keyboard& AllowedButtons(utils::EnumFlags<Buttons> aMask);
 protected:
     Key mBtnShift{};
     Key mBtnLettersLeft{};
@@ -174,6 +188,7 @@ protected:
     Key mBtnErase{};
     Key mBtnSpace{};
     Rect mBigSpecialRect{};
+    utils::EnumFlags<Buttons> mButtonMask = Buttons::All;
 
     void doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol) override;
     const PixelData& getPixelData(TextureId aId);
