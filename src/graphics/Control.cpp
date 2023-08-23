@@ -364,6 +364,7 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
                 if (IsDraggable()) {
                     return doMove(touch);
                 }
+                return true;
             }
             break;
 
