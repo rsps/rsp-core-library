@@ -26,7 +26,10 @@ GfxEngineBase::GfxEngineBase(int aMaxFPS)
 
 GfxEngineBase& GfxEngineBase::SetNextScene(std::uint32_t aId)
 {
-    mNextScene = aId;
+    if (GetSceneMap().ActiveScene().GetId() != aId) {
+        GfxInputEvents::GetInstance().Flush();
+        GetSceneMap().SetActiveScene(aId);
+    }
     return *this;
 }
 
@@ -36,8 +39,6 @@ bool GfxEngineBase::Iterate()
 
     iterateTimers();
     iterateEvents();
-
-    actualizeNextScene();
 
     bool changed = updateData();
     if (changed) {
@@ -69,15 +70,6 @@ GfxEngineBase& GfxEngineBase::ClearOverlays()
 void GfxEngineBase::iterateTimers()
 {
     rsp::utils::TimerQueue::GetInstance().Poll();
-}
-
-void GfxEngineBase::actualizeNextScene()
-{
-    if (mNextScene) {
-        GfxInputEvents::GetInstance().Flush();
-        GetSceneMap().SetActiveScene(mNextScene);
-        mNextScene = 0;
-    }
 }
 
 void GfxEngineBase::iterateEvents()
@@ -129,7 +121,6 @@ void GfxEngineBase::updateFPS()
 
 void GfxEngineBase::afterSceneCreated(Scene &arScene)
 {
-
     GetEventBroker().Subscribe(arScene);
 }
 
@@ -137,5 +128,6 @@ void GfxEngineBase::beforeSceneDestroyed(Scene &arScene)
 {
     GetEventBroker().Unsubscribe(arScene);
 }
+
 
 } /* namespace rsp::graphics */

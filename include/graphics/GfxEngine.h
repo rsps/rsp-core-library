@@ -26,6 +26,12 @@ public:
     GfxEngineBase(int aMaxFPS = 1000);
     virtual ~GfxEngineBase() {};
 
+    /**
+     * \brief Set the active scene. Call this from Broker event handler or other pace in sync with Iterate flow
+     *
+     * \param aId 32-bit id of scene
+     * \return self
+     */
     GfxEngineBase& SetNextScene(std::uint32_t aId);
 
     template <class E, typename = typename std::enable_if<std::is_enum<E>::value, E>::type>
@@ -52,7 +58,6 @@ protected:
     rsp::logging::LogChannel mLogger;
 
     virtual void iterateTimers();
-    virtual void actualizeNextScene();
     virtual void iterateEvents();
     virtual bool updateData();
     virtual void render();
