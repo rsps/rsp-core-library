@@ -25,7 +25,9 @@ EventBroker::EventBroker()
 size_t EventBroker::ProcessEvents()
 {
     size_t result = 0;
-    for (EventPtr_t event : mQueue) {
+    std::vector<EventPtr_t> q = mQueue;
+    mQueue.clear();
+    for (EventPtr_t event : q) {
         for (SubscriberInterface* &sub : mSubscribers) {
             rsp::graphics::Control *ctrl = dynamic_cast<rsp::graphics::Control*>(sub);
             mLogger.Debug() << "Propagating " << *event << " to " << (ctrl ? ctrl->GetName() : "Unknown");
@@ -35,7 +37,6 @@ size_t EventBroker::ProcessEvents()
         }
         result++;
     }
-    mQueue.clear();
     return result;
 }
 
