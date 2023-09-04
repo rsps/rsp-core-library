@@ -38,6 +38,14 @@ public:
         return Translate(rsp::utils::crc32::HashConst(apText), apText);
     }
 
+    constexpr std::string_view operator()(const std::string_view aText) const {
+        return Translate(rsp::utils::crc32::HashConst(aText.data()), aText);
+    }
+
+    std::string_view operator()(const std::string arText) const {
+        return Translate(rsp::utils::crc32::HashConst(arText.data()), arText);
+    }
+
 protected:
     std::locale mDefaultLocale{};
 };
