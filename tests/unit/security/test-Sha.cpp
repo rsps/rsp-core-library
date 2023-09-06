@@ -25,6 +25,13 @@ TEST_CASE("SHA")
 {
     const std::string cTestStr("How much wood would a woodchuck chuck, if a woodchuck would chuck wood.");
 
+    SUBCASE("Library Version")
+    {
+        Sha sha(HashAlgorithms::Sha3);
+        CHECK_EQ(sha.GetLibraryName(), std::string("openssl"));
+        CHECK_EQ(sha.GetLibraryVersion(), std::string("3.0.2"));
+    }
+
     SUBCASE("SHA1-HMAC")
     {
         Sha sha("MySecret", HashAlgorithms::Sha1);

@@ -36,6 +36,8 @@ struct DigestImpl {
     virtual ~DigestImpl() {};
     virtual void Update(const uint8_t *apBuffer, std::size_t aSize) = 0;
     virtual SecureBuffer Finalize() = 0;
+    virtual std::string GetLibraryVersion() const = 0;
+    virtual std::string GetLibraryName() const = 0;
 };
 
 /**
@@ -70,6 +72,20 @@ public:
      * \return SecureBuffer with hash result.
      */
     SecureBuffer Get() { return mPimpl->Finalize(); }
+
+    /**
+     * \brief Get version of encryption library
+     *
+     * \return string
+     */
+    std::string GetLibraryVersion() const { return mPimpl->GetLibraryVersion(); }
+
+    /**
+     * \brief Get name of encryption library
+     *
+     * \return string
+     */
+    std::string GetLibraryName() const { return mPimpl->GetLibraryName(); }
 
 protected:
     std::unique_ptr<DigestImpl> mPimpl;

@@ -138,6 +138,16 @@ public:
         return result;
     }
 
+    std::string GetLibraryVersion() const override
+    {
+        return OPENSSL_FULL_VERSION_STR;
+    }
+
+    std::string GetLibraryName() const override
+    {
+        return "openssl";
+    }
+
 protected:
     EVP_MAC * mpMac;
     EVP_MAC_CTX *mpCtx;
@@ -187,6 +197,16 @@ public:
         result.resize(std::size_t(len));
 
         return result;
+    }
+
+    std::string GetLibraryVersion() const override
+    {
+        return OPENSSL_FULL_VERSION_STR;
+    }
+
+    std::string GetLibraryName() const override
+    {
+        return "openssl";
     }
 
     OpenSSLSha(const OpenSSLSha&) = delete;
