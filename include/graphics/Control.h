@@ -150,6 +150,13 @@ public:
     Rect GetArea() const;
 
     /**
+     * \brief Expand this area to fit to the size of the parent, if it is smaller.
+     *
+     * \return self
+     */
+    Control& ExpandToParent();
+
+    /**
      * \brief Set the origin for this Control object in screen coordinates
      *
      * \param arPoint

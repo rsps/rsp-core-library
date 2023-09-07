@@ -122,6 +122,30 @@ Rect Control::GetArea() const
     return r;
 }
 
+Control& Control::ExpandToParent()
+{
+    if (!mpParent) {
+        return *this;
+    }
+    bool changed = false;
+    auto r = mpParent->GetArea();
+    if (mArea.GetWidth() < r.GetWidth()) {
+        mArea.SetWidth(r.GetWidth());
+        changed = true;
+    }
+    if (mArea.GetHeight() < r.GetHeight()) {
+        mArea.SetHeight(r.GetHeight());
+        changed = true;
+    }
+
+    if (changed) {
+        mpParent->Invalidate();
+        doSetArea(mArea);
+    }
+
+    return *this;
+}
+
 Control& Control::SetOrigin(const Point &arPoint)
 {
     Point difference = arPoint - mArea.GetTopLeft();
