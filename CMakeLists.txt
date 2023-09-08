@@ -12,6 +12,7 @@ OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by defaul
 OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
 OPTION(SDL2 "Use SDL2 for graphic accelleration." OFF)
 OPTION(ZLIB "Build with ZLib Inflate/Deflate compression." OFF)
+OPTION(NET_WPA_SUPPLICANT "Build with libwpa-client wpa_supplicant library." ON) # Enabled by default.
 
 if(ARCH_ARM)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
@@ -85,6 +86,13 @@ if (NET_LIBCURL)
 #    include_directories(${CURL_INCLUDE_DIR})
 endif()
 
+if (NET_WPA_SUPPLICANT)
+    #sudo apt install libwpa-client-dev
+    #find_package(WPA_SUPPLICANT REQUIRED)
+    set(LIBWPA_BUILD_OPTIONS -DUSE_WPA_SUPPLICANT)
+    set(LIBWPA libwpa)
+endif()
+
 if (OPENSSL_CRYPTO)
     find_package(OpenSSL REQUIRED)
     set(OPENSSL_BUILD_OPTIONS -DUSE_OPENSSL)
@@ -103,6 +111,7 @@ target_link_libraries ("rsp-core-lib"
     ${NETWORK_LIB}
     ${SDL_LIB}
     ${ZLIB_LIB}
+    ${LIBWPA}
 )
 
 # Keep symbol information for exception stack traces
@@ -136,6 +145,7 @@ target_compile_options(rsp-core-lib PUBLIC
     ${LIBCURL_BUILD_OPTIONS}
     ${SDL_BUILD_OPTIONS}
     ${ZLIB_BUILD_OPTIONS}
+    ${LIBWPA_BUILD_OPTIONS}
 )
 
 if (NOT RELEASE_BUILD)
