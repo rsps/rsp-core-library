@@ -48,9 +48,11 @@ public:
     virtual IWlanInterface& SetEnable(bool aEnable) = 0;
     virtual const APInfo& GetStatus() = 0;
 
-    virtual std::vector<APInfo> GetNetworkList() = 0;
-    virtual IWlanInterface& Connect(const std::string &arSSID, const rsp::security::SecureString &arPassword) = 0;
-    virtual IWlanInterface& Disconnect() = 0;
+    virtual std::vector<struct APInfo> GetAvailableNetworks() = 0;
+    virtual std::vector<struct APInfo> GetKnownNetworks() = 0;
+    virtual IWlanInterface& AddNetwork(const std::string &arSSID, const rsp::security::SecureString &arPassword) = 0;
+    virtual IWlanInterface& RemoveNetwork(const std::string &arSSID) = 0;
+    virtual IWlanInterface& SelectNetwork(const std::string &arSSID) = 0;
 };
 
 } /* namespace rsp::network */

@@ -68,7 +68,7 @@ public:
     /**
      * \brief Return a string_view to the current content.
      */
-    operator std::string_view()
+    operator std::string_view() const
     {
         return data();
     }
@@ -76,7 +76,7 @@ public:
     /**
      * \brief Return a std::string with the current content.
      */
-    operator std::string()
+    operator std::string() const
     {
         return data();
     }

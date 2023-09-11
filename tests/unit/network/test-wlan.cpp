@@ -10,18 +10,22 @@
 
 #include <doctest.h>
 #include <network/WLan.h>
+#include <TestHelpers.h>
 
 using namespace rsp::network;
 
 
 TEST_CASE("WLAN")
 {
+    TestLogger logger;
+
     CHECK_NOTHROW(WLan());
     WLan wlan;
 
     SUBCASE("Scan")
     {
-        wlan.GetNetworkList();
+        auto networks = wlan.GetAvailableNetworks();
+        CHECK_EQ(networks.size(), 1);
     }
 }
 

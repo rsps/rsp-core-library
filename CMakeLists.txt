@@ -90,7 +90,7 @@ if (NET_WPA_SUPPLICANT)
     #sudo apt install libwpa-client-dev
     #find_package(WPA_SUPPLICANT REQUIRED)
     set(LIBWPA_BUILD_OPTIONS -DUSE_WPA_SUPPLICANT)
-    set(LIBWPA libwpa)
+    set(LIBWPA wpa_client)
 endif()
 
 if (OPENSSL_CRYPTO)
