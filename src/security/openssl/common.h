@@ -16,6 +16,7 @@
 #include <openssl/evp.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
+#include <security/CryptBase.h>
 #include <security/SecureBuffer.h>
 #include <security/Sha.h>
 #include <utils/DataContainer.h>
@@ -31,14 +32,14 @@ public:
         return data() + mOffset;
     }
 
-    void grow(std::size_t aSize)
+    void grow(size_t aSize)
     {
         resize(size() + aSize + EVP_MAX_BLOCK_LENGTH);
     }
 
     void moveOffset(int aLength)
     {
-        mOffset += static_cast<std::size_t>(aLength);
+        mOffset += static_cast<size_t>(aLength);
     }
 
     void shrinkToOffset()
@@ -47,7 +48,7 @@ public:
     }
 
 protected:
-    std::size_t mOffset = 0;
+    size_t mOffset = 0;
 };
 
 class OpenSSLCryptBase : public CryptBase

@@ -54,7 +54,7 @@ public:
      * \param apData Pointer to data to operate on.
      * \param aSize Size of data
      */
-    virtual void Update(const std::uint8_t *apData, std::size_t aSize) = 0;
+    virtual void Update(const std::uint8_t *apData, size_t aSize) = 0;
 
     /**
      * \brief End the current crypto operation.
@@ -68,7 +68,7 @@ public:
      * \param aDesiredKeyLen Length of key in bytes.
      * \return SecureBuffer with new key
      */
-    static SecureBuffer KeyGen(const SecureBuffer& arSeed, std::size_t aDesiredKeyLen = 64);
+    static SecureBuffer KeyGen(const SecureBuffer& arSeed, size_t aDesiredKeyLen = 64);
 
 protected:
     CipherTypes mCipherType;

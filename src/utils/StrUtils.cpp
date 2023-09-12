@@ -109,7 +109,7 @@ std::string GetConfigDir()
 
 bool StartsWith(const std::string &aText, const std::string &aPrefix)
 {
-    return (aPrefix == aText.substr(0, aPrefix.length()));
+    return (aText.compare(0, aPrefix.length(), aPrefix.c_str()) == 0);
 }
 
 bool EndsWith(const std::string &aText, const std::string &aAffix)

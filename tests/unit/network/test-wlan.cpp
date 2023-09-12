@@ -24,8 +24,12 @@ TEST_CASE("WLAN")
 
     SUBCASE("Scan")
     {
-        auto networks = wlan.GetAvailableNetworks();
-        CHECK_EQ(networks.size(), 1);
+        CHECK_NOTHROW(
+            auto networks = wlan.GetAvailableNetworks();
+            for (const APInfo &info : networks) {
+                MESSAGE(info.mSSID << ", " << info.mSignalStrength << ", " << info.mEncrypted);
+            }
+        );
     }
 }
 

@@ -37,7 +37,7 @@ struct APInfo
 {
     std::string mSSID{};
     int  mSignalStrength = 0;
-    uint32_t mFlags = 0;
+    bool mEncrypted = false;
 };
 
 class IWlanInterface
