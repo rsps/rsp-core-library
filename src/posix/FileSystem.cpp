@@ -437,5 +437,15 @@ void SetFileModifiedTime(const std::filesystem::path &arFileName, const DateTime
     std::filesystem::last_write_time(arFileName, arTime);
 }
 
+uint32_t GetUserId()
+{
+    return uint32_t(geteuid());
+}
+
+uint32_t GetGroupId()
+{
+    return uint32_t(getegid());
+}
+
 } // namespace FileSystem
 

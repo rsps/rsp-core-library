@@ -35,9 +35,28 @@ public:
 
 struct APInfo
 {
-    std::string mSSID{};
-    int  mSignalStrength = 0;
-    bool mEncrypted = false;
+    std::string mSSID;
+    std::string mIpAddress;
+    std::string mMacAddress;
+    int  mSignalStrength;
+    bool mEncrypted;
+
+    APInfo(const std::string &arSSID = std::string(), int aStrength = 0, bool aEncrypted = false, const std::string &arIpAddr = std::string(), const std::string &arMacAddr = std::string())
+        : mSSID(arSSID),
+          mIpAddress(arIpAddr),
+          mMacAddress(arMacAddr),
+          mSignalStrength(aStrength),
+          mEncrypted(aEncrypted)
+    {
+    }
+};
+
+struct NetworkInfo
+{
+    uint32_t mId;
+    std::string mSSID;
+
+    NetworkInfo(uint32_t aId = uint32_t(-1), const std::string &arSSID = std::string()) : mId(aId), mSSID(arSSID) {}
 };
 
 class IWlanInterface
@@ -46,13 +65,14 @@ public:
     virtual ~IWlanInterface() {}
 
     virtual IWlanInterface& SetEnable(bool aEnable) = 0;
-    virtual const APInfo& GetStatus() = 0;
+    virtual APInfo GetStatus() = 0;
 
     virtual std::vector<struct APInfo> GetAvailableNetworks() = 0;
-    virtual std::vector<struct APInfo> GetKnownNetworks() = 0;
-    virtual IWlanInterface& AddNetwork(const std::string &arSSID, const rsp::security::SecureString &arPassword) = 0;
-    virtual IWlanInterface& RemoveNetwork(const std::string &arSSID) = 0;
-    virtual IWlanInterface& SelectNetwork(const std::string &arSSID) = 0;
+    virtual std::vector<NetworkInfo> GetKnownNetworks() = 0;
+    virtual NetworkInfo AddNetwork(const std::string &arSSID, const rsp::security::SecureString &arPassword) = 0;
+    virtual IWlanInterface& RemoveNetwork(const NetworkInfo &arNetwork) = 0;
+    virtual IWlanInterface& SelectNetwork(const NetworkInfo &arNetwork) = 0;
+    virtual NetworkInfo FindNetwork(const std::string &arSSID) = 0;
 };
 
 } /* namespace rsp::network */

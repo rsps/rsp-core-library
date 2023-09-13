@@ -10,20 +10,52 @@
 
 #include <doctest.h>
 #include <network/WLan.h>
+#include <posix/NetworkInterfaces.h>
+#include <posix/FileSystem.h>
 #include <TestHelpers.h>
 
 using namespace rsp::network;
+using namespace rsp::posix;
 
 
-TEST_CASE("WLAN")
+TEST_CASE("WLAN" * doctest::skip())
 {
-    TestLogger logger;
+//    const char* cSSID = "MyWLan";
+//    const char* cPSK = "VerySecurePW";
+    const char* cSSID = "RSPsystems-Guest";
+    const char* cPSK = "GuestAtRSP";
 
-    CHECK_NOTHROW(WLan());
-    WLan wlan;
+    TestLogger logger;
+    if (FileSystem::GetUserId()) {
+        FAIL("The WLAN test needs root privileges");
+    }
+
+    SUBCASE("Interfaces")
+    {
+        CHECK_NOTHROW(NetworkInterfaces dummy;);
+        NetworkInterfaces ifs;
+
+        std::stringstream out;
+        out << "\nWireless:\n";
+        for (auto &w : ifs.GetWireless()) {
+            out << "  " << w << "\n";
+        }
+
+        out << "\nCabled:\n";
+        for (auto &c : ifs.GetCabled()) {
+            out << "  " << c << "\n";
+        }
+
+        MESSAGE(out.str());
+    }
+
+    SUBCASE("Constructors") {
+        CHECK_NOTHROW(WLan());
+    }
 
     SUBCASE("Scan")
     {
+        WLan wlan;
         CHECK_NOTHROW(
             auto networks = wlan.GetAvailableNetworks();
             for (const APInfo &info : networks) {
@@ -31,6 +63,70 @@ TEST_CASE("WLAN")
             }
         );
     }
+
+    SUBCASE("Status")
+    {
+        WLan wlan;
+        CHECK_NOTHROW(
+            auto info = wlan.GetStatus();
+            MESSAGE("Status: " << info.mSSID << ", " << info.mSignalStrength << ", " << info.mEncrypted << ", " << info.mIpAddress << ", " << info.mMacAddress);
+        );
+    }
+
+    SUBCASE("AddNetwork")
+    {
+        WLan wlan;
+        NetworkInfo network;
+        CHECK_NOTHROW(
+            network = wlan.AddNetwork(cSSID, cPSK);
+        );
+        MESSAGE("Network: " << network.mId << ", " << network.mSSID);
+        CHECK_EQ(network.mSSID, std::string(cSSID));
+        CHECK_NE(network.mId, uint32_t(-1));
+    }
+
+    SUBCASE("ListNetworks")
+    {
+        WLan wlan;
+        CHECK_NOTHROW(
+            auto networks = wlan.GetKnownNetworks();
+            for (auto &network : networks) {
+                MESSAGE("Network: " << network.mId << ", " << network.mSSID);
+            }
+        );
+    }
+
+    SUBCASE("SelectNetwork")
+    {
+        WLan wlan;
+        CHECK_NOTHROW(wlan.SelectNetwork(wlan.FindNetwork(cSSID)));
+        CHECK_THROWS_AS(wlan.SelectNetwork(wlan.FindNetwork(std::string("Not") + cSSID)), EWlanException);
+    }
+
+    SUBCASE("Get IP")
+    {
+        WLan wlan;
+        CHECK_NOTHROW(wlan.SetEnable(true));
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        auto info = wlan.GetStatus();
+        CHECK_EQ(info.mSSID, std::string(cSSID));
+        CHECK_FALSE(info.mIpAddress.empty());
+
+        CHECK_NOTHROW(wlan.SetEnable(false));
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        info = wlan.GetStatus();
+        CHECK_EQ(info.mSSID, std::string(cSSID));
+        CHECK(info.mIpAddress.empty());
+    }
+
+    SUBCASE("RemoveNetwork")
+    {
+        WLan wlan;
+        CHECK_NOTHROW(wlan.RemoveNetwork(wlan.FindNetwork(cSSID)));
+    }
+
 }
 
 

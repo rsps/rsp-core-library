@@ -23,24 +23,23 @@ IWlanInterface& WLan::SetEnable(bool aEnable)
     return *this;
 }
 
-const APInfo& WLan::GetStatus()
+APInfo WLan::GetStatus()
 {
     return mPimpl->GetStatus();
 }
 
-IWlanInterface& WLan::AddNetwork(const std::string &arSSID, const rsp::security::SecureString &arPassword)
+NetworkInfo WLan::AddNetwork(const std::string &arSSID, const rsp::security::SecureString &arPassword)
 {
-    mPimpl->AddNetwork(arSSID, arPassword);
+    return mPimpl->AddNetwork(arSSID, arPassword);
+}
+
+IWlanInterface& WLan::SelectNetwork(const NetworkInfo &arNetwork)
+{
+    mPimpl->SelectNetwork(arNetwork);
     return *this;
 }
 
-IWlanInterface& WLan::SelectNetwork(const std::string &arSSID)
-{
-    mPimpl->SelectNetwork(arSSID);
-    return *this;
-}
-
-std::vector<APInfo> WLan::GetKnownNetworks()
+std::vector<NetworkInfo> WLan::GetKnownNetworks()
 {
     return mPimpl->GetKnownNetworks();
 }
@@ -50,10 +49,15 @@ std::vector<APInfo> WLan::GetAvailableNetworks()
     return mPimpl->GetAvailableNetworks();
 }
 
-IWlanInterface& WLan::RemoveNetwork(const std::string &arSSID)
+IWlanInterface& WLan::RemoveNetwork(const NetworkInfo &arNetwork)
 {
-    mPimpl->RemoveNetwork(arSSID);
+    mPimpl->RemoveNetwork(arNetwork);
     return *this;
+}
+
+rsp::network::NetworkInfo WLan::FindNetwork(const std::string &arSSID)
+{
+    return mPimpl->FindNetwork(arSSID);
 }
 
 } /* namespace tgm::network */

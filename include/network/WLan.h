@@ -20,13 +20,14 @@ class WLan: public IWlanInterface
 public:
     WLan();
 
-    const APInfo& GetStatus() override;
+    APInfo GetStatus() override;
     IWlanInterface& SetEnable(bool aEnable) override;
-    IWlanInterface& AddNetwork(const std::string &arSSID, const rsp::security::SecureString &arPassword) override;
-    IWlanInterface& SelectNetwork(const std::string &arSSID) override;
-    IWlanInterface& RemoveNetwork(const std::string &arSSID) override;
-    std::vector<APInfo> GetKnownNetworks() override;
+    NetworkInfo AddNetwork(const std::string &arSSID, const rsp::security::SecureString &arPassword) override;
+    IWlanInterface& SelectNetwork(const NetworkInfo &arNetwork) override;
+    IWlanInterface& RemoveNetwork(const NetworkInfo &arNetwork) override;
+    std::vector<NetworkInfo> GetKnownNetworks() override;
     std::vector<APInfo> GetAvailableNetworks() override;
+    NetworkInfo FindNetwork(const std::string &arSSID) override;
 
 protected:
     std::unique_ptr<IWlanInterface> mPimpl;

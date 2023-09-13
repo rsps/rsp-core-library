@@ -173,6 +173,22 @@ rsp::utils::DateTime GetFileModifiedTime(const std::filesystem::path &arFileName
  */
 void SetFileModifiedTime(const std::filesystem::path &arFileName, const rsp::utils::DateTime &arTime);
 
+/**
+ * \fn uint32_t GetUserId()
+ * \brief Get the current user id of this program
+ *
+ * \return Posix user id
+ */
+uint32_t GetUserId();
+
+/**
+ * \fn uint32_t GetGroupId()
+ * \brief Get the current group id of this program
+ *
+ * \return Posix group id
+ */
+uint32_t GetGroupId();
+
 }
 
 #endif /* SRC_POSIX_FILESYSTEM_H_ */
