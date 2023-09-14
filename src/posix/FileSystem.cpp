@@ -10,6 +10,8 @@
 
 #include <sys/stat.h>
 #include <unistd.h>
+#include <pwd.h>
+#include <grp.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -197,13 +199,27 @@ std::string GetCurrentWorkingDirectory()
     return result + "/";
 }
 
-void SetPermissions(const std::string aPath, int aPermissions)
+void SetPermissions(const std::string &arPath, uint32_t aPermissions)
 {
-    if (chmod(aPath.c_str(), static_cast<mode_t>(aPermissions)) != 0) {
+    if (chmod(arPath.c_str(), static_cast<mode_t>(aPermissions)) != 0) {
         std::stringstream ss;
-        ss << "FileSystem - Could not set file permissions on " << aPath << " to " << std::oct << aPermissions;
+        ss << "FileSystem - Could not set file permissions on " << arPath << " to " << std::oct << aPermissions;
         THROW_SYSTEM(ss.str());
     }
+}
+
+uint32_t GetPermissions(const std::string &arPath)
+{
+    struct stat info;
+
+    int statRC = stat(arPath.c_str(), &info);
+    if (statRC != 0) {
+        std::stringstream ss;
+        ss << "FileSystem - Could not read file permissions on " << arPath;
+        THROW_SYSTEM(ss.str());
+    }
+
+    return info.st_mode;
 }
 
 std::string GetCurrentIpAddress()
@@ -447,5 +463,19 @@ uint32_t GetGroupId()
     return uint32_t(getegid());
 }
 
+/*
+void GetFileInfo(const std::string &arPath)
+{
+    struct stat info;
+    stat(filename, &info);  // Error check omitted
+
+    struct passwd *pw = getpwuid(info.st_uid);
+    struct group  *gr = getgrgid(info.st_gid);
+
+    // If pw != 0, pw->pw_name contains the user name
+    // If gr != 0, gr->gr_name contains the group name
+
+}
+*/
 } // namespace FileSystem
 

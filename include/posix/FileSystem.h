@@ -85,7 +85,8 @@ void Sleep(unsigned int aMilliSeconds);
  */
 std::string GetCurrentWorkingDirectory();
 
-void SetPermissions(const std::string aPath, int aPermissions);
+void SetPermissions(const std::string &arPath, uint32_t aPermissions);
+uint32_t GetPermissions(const std::string &arPath);
 
 /**
  * Get the current IP address of the default outgoing interface.
