@@ -20,10 +20,8 @@ using namespace rsp::posix;
 
 TEST_CASE("WLAN" * doctest::skip())
 {
-//    const char* cSSID = "MyWLan";
-//    const char* cPSK = "VerySecurePW";
-    const char* cSSID = "RSPsystems-Guest";
-    const char* cPSK = "GuestAtRSP";
+    const char* cSSID = "MyWLan";
+    const char* cPSK = "VerySecurePW";
 
     TestLogger logger;
     if (FileSystem::GetUserId()) {
@@ -105,20 +103,22 @@ TEST_CASE("WLAN" * doctest::skip())
 
     SUBCASE("Get IP")
     {
-        WLan wlan;
-        CHECK_NOTHROW(wlan.SetEnable(true));
+        if (std::string("MyWLan").compare(0, 6, cSSID) != 0) {
+            WLan wlan;
+            CHECK_NOTHROW(wlan.SetEnable(true));
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        auto info = wlan.GetStatus();
-        CHECK_EQ(info.mSSID, std::string(cSSID));
-        CHECK_FALSE(info.mIpAddress.empty());
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            auto info = wlan.GetStatus();
+            CHECK_EQ(info.mSSID, std::string(cSSID));
+            CHECK_FALSE(info.mIpAddress.empty());
 
-        CHECK_NOTHROW(wlan.SetEnable(false));
+            CHECK_NOTHROW(wlan.SetEnable(false));
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        info = wlan.GetStatus();
-        CHECK_EQ(info.mSSID, std::string(cSSID));
-        CHECK(info.mIpAddress.empty());
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            info = wlan.GetStatus();
+            CHECK_EQ(info.mSSID, std::string(cSSID));
+            CHECK(info.mIpAddress.empty());
+        }
     }
 
     SUBCASE("RemoveNetwork")

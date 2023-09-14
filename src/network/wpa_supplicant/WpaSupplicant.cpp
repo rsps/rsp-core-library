@@ -155,15 +155,17 @@ std::vector<APInfo> WpaSupplicant::GetAvailableNetworks()
 
 IWlanInterface& WpaSupplicant::SetEnable(bool aEnable)
 {
-    std::string command("dhclient " + mInterfaceName);
+    std::string command("dhclient -v " + mInterfaceName);
     if (!aEnable) {
         command += " -r";
     }
     mLogger.Debug() << "Executing " << command;
     std::string result;
     std::string errors;
-    FileSystem::ExecuteCommand(command, &result, &errors);
-    mLogger.Debug() << "dhclient:  " << result << "\n  Errors: (" << errors << ")";
+    int status = FileSystem::ExecuteCommand(command, &result, &errors);
+//    if (status) {
+        mLogger.Error() << "dhclient -> " << status << "\n" << result << errors;
+//    }
 
     return *this;
 }
