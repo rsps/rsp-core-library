@@ -24,9 +24,6 @@ TEST_CASE("WLAN" * doctest::skip())
     const char* cPSK = "VerySecurePW";
 
     TestLogger logger;
-    if (FileSystem::GetUserId()) {
-        FAIL("The WLAN test needs root privileges");
-    }
 
     SUBCASE("Interfaces")
     {
