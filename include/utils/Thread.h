@@ -70,10 +70,22 @@ public:
     Thread& Start();
 
     /**
-     * \brief Stops the thread. If the thread have thrown any exceptions, this method will also throw.
+     * \brief Stops the thread and sync result. If the thread have thrown any exceptions, this method will also throw.
      * \return self
      */
     Thread& Stop();
+
+    /**
+     * \brief Flag the thread for termination. This will stop the execution after the current iteration.
+     * \return self
+     */
+    Thread& Terminate() { mTerminated = true; return *this; }
+
+    /**
+     * \brief Check if the thread is terminating
+     * \return True if the thread is stopping or stopped.
+     */
+    bool IsTerminated() const { return mTerminated; }
 
     /**
      * \brief Callback for running simple method in own thread
