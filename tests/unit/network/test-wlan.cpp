@@ -18,7 +18,7 @@ using namespace rsp::network;
 using namespace rsp::posix;
 
 
-TEST_CASE("WLAN" * doctest::skip())
+TEST_CASE("WLAN")
 {
     const char* cSSID = "MyWLan";
     const char* cPSK = "VerySecurePW";
@@ -42,6 +42,10 @@ TEST_CASE("WLAN" * doctest::skip())
         }
 
         MESSAGE(out.str());
+
+        std::string wpa_dir("/var/run/wpa_supplicant/");
+        std::string wifi_if(ifs.GetWireless()[0]);
+        REQUIRE_MESSAGE(FileSystem::FileExists(wpa_dir + wifi_if), "The wpa_supplicant directory " << wpa_dir << wifi_if << " is not accessible by this program/user");
     }
 
     SUBCASE("Constructors") {
