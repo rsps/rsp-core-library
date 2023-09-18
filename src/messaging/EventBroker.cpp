@@ -25,8 +25,13 @@ EventBroker::EventBroker()
 size_t EventBroker::ProcessEvents()
 {
     size_t result = 0;
-    std::vector<EventPtr_t> q = mQueue;
-    mQueue.clear();
+    std::vector<EventPtr_t> q;
+
+    {
+        std::lock_guard<std::mutex> guard(mEventBrokerMutex);
+        q = mQueue;
+        mQueue.clear();
+    }
     for (EventPtr_t event : q) {
         for (SubscriberInterface* &sub : mSubscribers) {
             rsp::graphics::Control *ctrl = dynamic_cast<rsp::graphics::Control*>(sub);
@@ -43,6 +48,7 @@ size_t EventBroker::ProcessEvents()
 EventBroker& EventBroker::Publish(EventPtr_t apEvent)
 {
     mLogger.Debug() << "Publishing " << *apEvent;
+    std::lock_guard<std::mutex> guard(mEventBrokerMutex);
     mQueue.push_back(apEvent);
     return *this;
 }

@@ -12,6 +12,7 @@
 #define INCLUDE_MESSAGING_EVENTBROKER_H_
 
 #include <memory>
+#include <mutex>
 #include <vector>
 #include <logging/LogChannel.h>
 #include <utils/Singleton.h>
@@ -48,6 +49,7 @@ protected:
     rsp::logging::LogChannel mLogger;
     std::vector<SubscriberInterface*> mSubscribers{};
     std::vector<EventPtr_t> mQueue{};
+    std::mutex mEventBrokerMutex{};
 };
 
 } /* namespace rsp::messaging */
