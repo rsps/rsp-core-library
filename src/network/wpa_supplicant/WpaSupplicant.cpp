@@ -29,42 +29,6 @@ using namespace rsp::utils;
 
 namespace rsp::network {
 
-Unsolicited::Unsolicited()
-    : mLogger("WpaSupplicant")
-{
-}
-
-Unsolicited& Unsolicited::Get()
-{
-    static Unsolicited instance;
-    return instance;
-}
-
-bool Unsolicited::HasMessages() const
-{
-    return mMessages.size() > 0;
-}
-
-std::string Unsolicited::GetNext()
-{
-    std::string result = mMessages.front();
-    mMessages.erase(mMessages.cbegin());
-    return result;
-}
-
-Unsolicited& Unsolicited::Clear()
-{
-    mMessages.clear();
-    return *this;
-}
-
-void Unsolicited::unsolicitedHandler(char *msg, size_t len)
-{
-    auto &ref = Get().mMessages.emplace_back(msg, len);
-    Get().mLogger.Debug() << "Unsolicited reply: " << ref;
-}
-
-
 
 WpaSupplicant::WpaSupplicant()
     : mLogger("WpaSupplicant")
@@ -81,10 +45,22 @@ WpaSupplicant::WpaSupplicant()
     if (!ping()) {
         THROW_WITH_BACKTRACE1(EWlanException, "wpa_supplicant is not running");
     }
+
+    mpMonitorCtrl = wpa_ctrl_open(socket.c_str());
+    if (!mpMonitorCtrl) {
+        THROW_WITH_BACKTRACE1(EWlanException, "Could not connect monitor to wpa_supplicant on " + socket);
+    }
+    if (wpa_ctrl_attach(mpMonitorCtrl) < 0) {
+        THROW_WITH_BACKTRACE1(EWlanException, "Could not attach monitor to wpa_supplicant");
+    }
 }
 
 WpaSupplicant::~WpaSupplicant()
 {
+    if (mpMonitorCtrl) {
+        wpa_ctrl_detach(mpMonitorCtrl);
+        wpa_ctrl_close(mpMonitorCtrl);
+    }
     if (mpWpaCtrl) {
         wpa_ctrl_close(mpWpaCtrl);
     }
@@ -197,6 +173,12 @@ APInfo WpaSupplicant::GetStatus()
         else if(fields[0] == "RSSI") {
             status.mSignalStrength = std::stoi(fields[1]);
         }
+        else if(fields[0] == "id") {
+            status.mNetworkId = std::stoul(fields[1]);
+        }
+        else if(fields[0] == "wpa_state") {
+            status.mConnected = (fields[1] == std::string("COMPLETED"));
+        }
     }
 
     return status;
@@ -272,17 +254,12 @@ std::string WpaSupplicant::request(std::string_view aCmd)
     size_t reply_len = sizeof(mReplyBuffer);
 
     mLogger.Debug() << "Request " << aCmd;
-    int res = wpa_ctrl_request(mpWpaCtrl, aCmd.data(), aCmd.size(), mReplyBuffer, &reply_len, &Unsolicited::unsolicitedHandler);
+    int res = wpa_ctrl_request(mpWpaCtrl, aCmd.data(), aCmd.size(), mReplyBuffer, &reply_len, nullptr);
     if (res < 0) {
         THROW_WITH_BACKTRACE1(EWlanException, "wpa_ctrl_request failed: " + std::to_string(res));
     }
 
     std::string result(mReplyBuffer, reply_len);
-
-    while (Unsolicited::Get().HasMessages()) {
-        // TODO: Add prober handling...
-        mLogger.Debug() << "Unsolicited message: " << Unsolicited::Get().GetNext();
-    }
 
     mLogger.Debug() << "Reply: " << result << ";";
 //    mLogger.Debug() << "Reply: " << HexStream(reinterpret_cast<const uint8_t*>(result.data()), std::min(96ul, result.size()), 1) << ";";
@@ -320,6 +297,38 @@ void WpaSupplicant::save(const std::string &arSSID)
 IWlanInterface* WLan::MakePimpl()
 {
     return new WpaSupplicant();
+}
+
+WpaEvents WpaSupplicant::GetMonitorEvent(std::string &arMessage)
+{
+    int res = wpa_ctrl_pending(mpMonitorCtrl);
+    if (res == -1) {
+        THROW_WITH_BACKTRACE1(EWlanException, "Failed check for WPA monitor events");
+    }
+    else if (res == 0) {
+        return WpaEvents::None;
+    }
+
+    char mReplyBuffer[4096];
+    size_t reply_len = sizeof(mReplyBuffer);
+
+    if (wpa_ctrl_recv(mpMonitorCtrl, mReplyBuffer, &reply_len) == -1) {
+        THROW_WITH_BACKTRACE1(EWlanException, "Failed reading WPA monitor event");
+    }
+
+    arMessage = std::string(mReplyBuffer, reply_len);
+
+    if (StrUtils::StartsWith(arMessage, WPA_EVENT_CONNECTED)) {
+        return WpaEvents::Connected;
+    }
+    else if (StrUtils::StartsWith(arMessage, WPA_EVENT_DISCONNECTED)) {
+        return WpaEvents::Disconnected;
+    }
+    else if (StrUtils::StartsWith(arMessage, WPA_EVENT_AUTH_REJECT)) {
+        return WpaEvents::AuthRejected;
+    }
+
+    return WpaEvents::Other;
 }
 
 } /* namespace rsp::network */

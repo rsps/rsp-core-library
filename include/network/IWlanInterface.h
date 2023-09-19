@@ -40,6 +40,8 @@ struct APInfo
     std::string mMacAddress;
     int  mSignalStrength;
     bool mEncrypted;
+    uint32_t mNetworkId = 0;
+    bool mConnected = false;
 
     APInfo(const std::string &arSSID = std::string(), int aStrength = 0, bool aEncrypted = false, const std::string &arIpAddr = std::string(), const std::string &arMacAddr = std::string())
         : mSSID(arSSID),
@@ -59,6 +61,8 @@ struct NetworkInfo
     NetworkInfo(uint32_t aId = uint32_t(-1), const std::string &arSSID = std::string()) : mId(aId), mSSID(arSSID) {}
 };
 
+enum class WpaEvents { None, Connected, Disconnected, AuthRejected, Other };
+
 class IWlanInterface
 {
 public:
@@ -73,6 +77,8 @@ public:
     virtual IWlanInterface& RemoveNetwork(const NetworkInfo &arNetwork) = 0;
     virtual IWlanInterface& SelectNetwork(const NetworkInfo &arNetwork) = 0;
     virtual NetworkInfo FindNetwork(const std::string &arSSID) = 0;
+
+    virtual WpaEvents GetMonitorEvent(std::string &arMessage) = 0;
 };
 
 } /* namespace rsp::network */

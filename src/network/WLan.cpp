@@ -60,4 +60,9 @@ rsp::network::NetworkInfo WLan::FindNetwork(const std::string &arSSID)
     return mPimpl->FindNetwork(arSSID);
 }
 
+WpaEvents WLan::GetMonitorEvent(std::string &arMessage)
+{
+    return mPimpl->GetMonitorEvent(arMessage);
+}
+
 } /* namespace tgm::network */

@@ -19,27 +19,6 @@
 
 namespace rsp::network {
 
-class Unsolicited
-{
-public:
-    static Unsolicited& Get();
-
-    bool HasMessages() const;
-
-    std::string GetNext();
-
-    Unsolicited& Clear();
-
-    static void unsolicitedHandler(char *msg, size_t len);
-
-protected:
-    std::list<std::string> mMessages{};
-    rsp::logging::LogChannel mLogger;
-
-private:
-    Unsolicited();
-};
-
 
 class WpaSupplicant : public IWlanInterface
 {
@@ -56,8 +35,11 @@ public:
     IWlanInterface& RemoveNetwork(const NetworkInfo &arNetwork) override;
     NetworkInfo FindNetwork(const std::string &arSSID) override;
 
+    WpaEvents GetMonitorEvent(std::string &arMessage) override;
+
 protected:
     struct wpa_ctrl *mpWpaCtrl = nullptr;
+    struct wpa_ctrl *mpMonitorCtrl = nullptr;
     rsp::logging::LogChannel mLogger;
     std::string mInterfaceName{};
 
