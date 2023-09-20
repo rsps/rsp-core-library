@@ -65,7 +65,8 @@ TEST_CASE("EventBroker")
     );
     CHECK_THROWS_AS(EventBroker::GetInstance(), rsp::exceptions::ENoInstance); // Check that default instance has disappeared.
 
-    EventBroker eb;
+    EventBroker broker;
+    BrokerInterface &eb = broker;
 
     Subscriber sub1;
     Subscriber sub2;

@@ -30,18 +30,6 @@ public:
 
     EventBroker& Publish(EventPtr_t apEvent) override;
 
-    template<class T, std::enable_if_t<std::is_base_of<rsp::messaging::Event, T>::value, bool> = true>
-    EventBroker& Publish(const T& arEvent)
-    {
-        return Publish(std::make_shared<T>(arEvent)); // Copy given event
-    }
-
-    template<class T, typename ... Args, std::enable_if_t<std::is_base_of<rsp::messaging::Event, T>::value, bool> = true>
-    EventBroker& Publish(Args... args)
-    {
-        return Publish(std::make_shared<T>(args...)); // Create given event
-    }
-
     EventBroker& Subscribe(SubscriberInterface &arSubscriber) override;
     EventBroker& Unsubscribe(SubscriberInterface &arSubscriber) override;
 

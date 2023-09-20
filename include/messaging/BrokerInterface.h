@@ -12,6 +12,7 @@
 #ifndef INCLUDE_MESSAGING_BROKERINTERFACE_H_
 #define INCLUDE_MESSAGING_BROKERINTERFACE_H_
 
+#include <memory>
 #include "SubscriberInterface.h"
 #include <utils/Singleton.h>
 
@@ -36,6 +37,18 @@ public:
     virtual size_t ProcessEvents() = 0;
 
     virtual BrokerInterface& Publish(EventPtr_t apEvent) = 0;
+
+    template<class T, std::enable_if_t<std::is_base_of<rsp::messaging::Event, T>::value, bool> = true>
+    BrokerInterface& Publish(const T& arEvent)
+    {
+        return Publish(std::make_shared<T>(arEvent)); // Copy given event
+    }
+
+    template<class T, typename ... Args, std::enable_if_t<std::is_base_of<rsp::messaging::Event, T>::value, bool> = true>
+    BrokerInterface& Publish(Args... args)
+    {
+        return Publish(std::make_shared<T>(args...)); // Create given event
+    }
 
     virtual BrokerInterface& Subscribe(SubscriberInterface &arSubscriber) = 0;
     virtual BrokerInterface& Unsubscribe(SubscriberInterface &arSubscriber) = 0;
