@@ -361,6 +361,14 @@ WpaEvents WpaSupplicant::GetMonitorEvent(std::string &arMessage)
     else if (StrUtils::StartsWith(arMessage, WPA_EVENT_AUTH_REJECT)) {
         return WpaEvents::AuthRejected;
     }
+    else if (StrUtils::StartsWith(arMessage, WPA_EVENT_SCAN_STARTED)) {
+        return WpaEvents::APScanStarted;
+    }
+    else if (StrUtils::StartsWith(arMessage, WPA_EVENT_SCAN_RESULTS) ||
+        StrUtils::StartsWith(arMessage, WPA_EVENT_SCAN_FAILED) ||
+        StrUtils::StartsWith(arMessage, WPA_EVENT_NETWORK_NOT_FOUND)) {
+        return WpaEvents::APScanComplete;
+    }
 
     return WpaEvents::Other;
 }
