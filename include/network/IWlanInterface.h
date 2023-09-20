@@ -57,8 +57,9 @@ struct NetworkInfo
 {
     uint32_t mId;
     std::string mSSID;
+    bool mSelected;
 
-    NetworkInfo(uint32_t aId = uint32_t(-1), const std::string &arSSID = std::string()) : mId(aId), mSSID(arSSID) {}
+    NetworkInfo(uint32_t aId = uint32_t(-1), const std::string &arSSID = std::string(), bool aSelected = false) : mId(aId), mSSID(arSSID), mSelected(aSelected) {}
 };
 
 enum class WpaEvents { None, Connected, Disconnected, AuthRejected, Other };

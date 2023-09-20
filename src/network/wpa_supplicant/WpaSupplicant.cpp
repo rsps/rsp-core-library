@@ -53,6 +53,9 @@ WpaSupplicant::WpaSupplicant()
     if (wpa_ctrl_attach(mpMonitorCtrl) < 0) {
         THROW_WITH_BACKTRACE1(EWlanException, "Could not attach monitor to wpa_supplicant");
     }
+
+//    std::cout << "ctrl fd is " << wpa_ctrl_get_fd(mpWpaCtrl) << std::endl;
+//    std::cout << "monitor fd is " << wpa_ctrl_get_fd(mpMonitorCtrl) << std::endl;
 }
 
 WpaSupplicant::~WpaSupplicant()
@@ -105,7 +108,7 @@ std::vector<APInfo> WpaSupplicant::GetAvailableNetworks()
 
         for (const std::string &line : lines) {
             std::vector<std::string> fields;
-            if (StrUtils::Split(line, fields, '\t') != 5) {
+            if (StrUtils::Split(line, fields, '\t', true) != 5) {
                 THROW_WITH_BACKTRACE1(EWlanException, "Wrong field count in scan result: " + std::to_string(fields.size()));
             }
 
@@ -131,7 +134,20 @@ std::vector<APInfo> WpaSupplicant::GetAvailableNetworks()
 
 IWlanInterface& WpaSupplicant::SetEnable(bool aEnable)
 {
-    std::string command("dhclient -v " + mInterfaceName);
+    /**
+     * If it exists, then use sudo to call dhclient
+     * Setting suid bit or network capabilities on dhclient was not enough to avoid permission errors.
+     * suid bit only sets effective user id, not real uid.
+     */
+    std::string sudo("/usr/bin/sudo");
+    if (FileSystem::FileExists(sudo)) {
+        sudo += " ";
+    }
+    else {
+        sudo.clear();
+    }
+
+    std::string command(sudo + "dhclient " + mInterfaceName);
     if (!aEnable) {
         command += " -r";
     }
@@ -139,9 +155,7 @@ IWlanInterface& WpaSupplicant::SetEnable(bool aEnable)
     std::string result;
     std::string errors;
     int status = FileSystem::ExecuteCommand(command, &result, &errors);
-//    if (status) {
-        mLogger.Error() << "dhclient -> " << status << "\n" << result << errors;
-//    }
+    mLogger.Info() << "dhclient -> " << status << "\n" << result << errors;
 
     return *this;
 }
@@ -201,7 +215,7 @@ std::vector<NetworkInfo> WpaSupplicant::GetKnownNetworks()
     for (auto &line : lines) {
         std::vector<std::string> fields;
         StrUtils::Split(line, fields, '\t');
-        result.emplace_back(std::stoul(fields[0]), fields[1]);
+        result.emplace_back(std::stoul(fields[0]), fields[1], StrUtils::Contains(fields[3], "CURRENT"));
     }
 
     return result;
@@ -209,6 +223,16 @@ std::vector<NetworkInfo> WpaSupplicant::GetKnownNetworks()
 
 NetworkInfo WpaSupplicant::AddNetwork(const std::string &arSSID, const SecureString &arPassword)
 {
+    try {
+        while (true) {
+            NetworkInfo network = FindNetwork(arSSID);
+            RemoveNetwork(network);
+        }
+    }
+    catch(const EWlanException &e) {
+        // Do nothing, we are out of while loop.
+    }
+
     std::string id = request("ADD_NETWORK");
     StrUtils::RightTrim(id);
 
@@ -316,7 +340,17 @@ WpaEvents WpaSupplicant::GetMonitorEvent(std::string &arMessage)
         THROW_WITH_BACKTRACE1(EWlanException, "Failed reading WPA monitor event");
     }
 
-    arMessage = std::string(mReplyBuffer, reply_len);
+    const char *p = mReplyBuffer;
+    if (*p == '<') {
+        while (*p != '>') {
+            p++;
+            reply_len--;
+        }
+        p++;
+        reply_len--;
+    }
+
+    arMessage = std::string(p, reply_len);
 
     if (StrUtils::StartsWith(arMessage, WPA_EVENT_CONNECTED)) {
         return WpaEvents::Connected;

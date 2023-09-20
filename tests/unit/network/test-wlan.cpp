@@ -61,6 +61,14 @@ TEST_CASE("WLAN")
                 MESSAGE(info.mSSID << ", " << info.mSignalStrength << ", " << info.mEncrypted);
             }
         );
+
+        rsp::network::WpaEvents event;
+        do {
+            std::string msg;
+            CHECK_NOTHROW(event = wlan.GetMonitorEvent(msg));
+            MESSAGE("Monitor: (" << int(event) << ") " << msg);
+        }
+        while (event != rsp::network::WpaEvents::None);
     }
 
     SUBCASE("Status")
@@ -100,6 +108,14 @@ TEST_CASE("WLAN")
         WLan wlan;
         CHECK_NOTHROW(wlan.SelectNetwork(wlan.FindNetwork(cSSID)));
         CHECK_THROWS_AS(wlan.SelectNetwork(wlan.FindNetwork(std::string("Not") + cSSID)), EWlanException);
+
+        rsp::network::WpaEvents event;
+        do {
+            std::string msg;
+            CHECK_NOTHROW(event = wlan.GetMonitorEvent(msg));
+            MESSAGE("Monitor: (" << int(event) << ") " << msg);
+        }
+        while (event != rsp::network::WpaEvents::None);
     }
 
     SUBCASE("Get IP")
@@ -113,12 +129,22 @@ TEST_CASE("WLAN")
             CHECK_EQ(info.mSSID, std::string(cSSID));
             CHECK_FALSE(info.mIpAddress.empty());
 
+            MESSAGE("Obtained IP: " << info.mIpAddress);
+
             CHECK_NOTHROW(wlan.SetEnable(false));
 
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             info = wlan.GetStatus();
             CHECK_EQ(info.mSSID, std::string(cSSID));
             CHECK(info.mIpAddress.empty());
+
+            rsp::network::WpaEvents event;
+            do {
+                std::string msg;
+                CHECK_NOTHROW(event = wlan.GetMonitorEvent(msg));
+                MESSAGE("Monitor: (" << int(event) << ") " << msg);
+            }
+            while (event != rsp::network::WpaEvents::None);
         }
     }
 
@@ -126,6 +152,14 @@ TEST_CASE("WLAN")
     {
         WLan wlan;
         CHECK_NOTHROW(wlan.RemoveNetwork(wlan.FindNetwork(cSSID)));
+    }
+
+    SUBCASE("Monitor")
+    {
+        WLan wlan;
+        std::string msg;
+        rsp::network::WpaEvents event = wlan.GetMonitorEvent(msg);
+        MESSAGE("Monitor: (" << int(event) << ") " << msg);
     }
 
 }

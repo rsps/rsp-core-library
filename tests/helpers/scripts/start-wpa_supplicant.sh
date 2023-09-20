@@ -14,3 +14,4 @@ $SUDO systemctl mask wpa_supplicant.service
 $SUDO systemctl stop wpa_supplicant.service
 
 $SUDO wpa_supplicant -B -i $INTERFACE -c /etc/wpa_supplicant/wpa_supplicant.conf
+
