@@ -358,7 +358,8 @@ WpaEvents WpaSupplicant::GetMonitorEvent(std::string &arMessage)
     else if (StrUtils::StartsWith(arMessage, WPA_EVENT_DISCONNECTED)) {
         return WpaEvents::Disconnected;
     }
-    else if (StrUtils::StartsWith(arMessage, WPA_EVENT_AUTH_REJECT)) {
+    else if (StrUtils::StartsWith(arMessage, WPA_EVENT_AUTH_REJECT) ||
+        (StrUtils::StartsWith(arMessage, WPA_EVENT_TEMP_DISABLED) && StrUtils::Contains(arMessage, "WRONG_KEY"))) {
         return WpaEvents::AuthRejected;
     }
     else if (StrUtils::StartsWith(arMessage, WPA_EVENT_SCAN_STARTED)) {
