@@ -181,7 +181,7 @@ APInfo WpaSupplicant::GetStatus()
             status.mNetworkId = std::stoul(fields[1]);
         }
         else if(fields[0] == "wpa_state") {
-            status.mConnected = (fields[1] == std::string("COMPLETED"));
+            status.mStatus = parseWpaStatus(fields[1]);
         }
     }
 
@@ -414,6 +414,29 @@ void WpaSupplicant::runCommand(const std::string &arCommand)
     std::string errors;
     int status = FileSystem::ExecuteCommand(command, &result, &errors);
     mLogger.Info() << command << " -> " << status << "\n" << result << errors;
+}
+
+WpaStatus WpaSupplicant::parseWpaStatus(const std::string &arStatus) const
+{
+    struct cStatusMap {
+        WpaStatus mStatus;
+        const char *mpText;
+    };
+    const cStatusMap map[] = {
+        { WpaStatus::Completed, "COMPLETED" },
+        { WpaStatus::Scanning, "SCANNING" },
+        { WpaStatus::Authenticating, "AUTHENTICATING" },
+        { WpaStatus::Disabled, "INTERFACE_DISABLED" },
+        { WpaStatus::Disconnected, "DISCONNECTED" },
+        { WpaStatus::Inactive, "INACTIVE" }
+    };
+
+    for (auto &pair : map) {
+        if (arStatus == pair.mpText) {
+            return pair.mStatus;
+        }
+    }
+    return WpaStatus::None;
 }
 
 

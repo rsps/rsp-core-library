@@ -54,6 +54,7 @@ protected:
     bool ping();
     void save(const std::string &arSSID);
     void runCommand(const std::string &arCommand);
+    WpaStatus parseWpaStatus(const std::string &arStatus) const;
 };
 
 

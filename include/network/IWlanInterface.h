@@ -33,6 +33,8 @@ public:
 };
 
 
+enum class WpaStatus { None, Disabled, Inactive, Scanning, Authenticating, Disconnected, Completed };
+
 struct APInfo
 {
     std::string mSSID;
@@ -41,7 +43,7 @@ struct APInfo
     int  mSignalStrength;
     bool mEncrypted;
     uint32_t mNetworkId = 0;
-    bool mConnected = false;
+    WpaStatus mStatus = WpaStatus::None;
 
     APInfo(const std::string &arSSID = std::string(), int aStrength = 0, bool aEncrypted = false, const std::string &arIpAddr = std::string(), const std::string &arMacAddr = std::string())
         : mSSID(arSSID),

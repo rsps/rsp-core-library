@@ -13,6 +13,7 @@
 #include <posix/NetworkInterfaces.h>
 #include <posix/FileSystem.h>
 #include <TestHelpers.h>
+#include <cstdlib>
 
 using namespace rsp::network;
 using namespace rsp::posix;
@@ -28,12 +29,19 @@ static void FetchMonitorEvents(WLan &arWlan)
     while (event != rsp::network::WpaEvents::None);
 }
 
+static const char* GetEnv(const char *apName, const char *apDefault)
+{
+    const char *p = std::getenv(apName);
+    if (p) {
+        return p;
+    }
+    return apDefault;
+}
+
 TEST_CASE("WLAN")
 {
-    const char* cSSID = "RSPsystems-Guest";
-    const char* cPSK = "GuestAtRSP";
-//    const char* cSSID = "MyWLan";
-//    const char* cPSK = "VerySecurePW";
+    const char* cSSID = GetEnv("SSID", "MyWLan");
+    const char* cPSK = GetEnv("PSK", "VerySecurePW");
 
     TestLogger logger;
 
@@ -61,6 +69,8 @@ TEST_CASE("WLAN")
     }
 
     SUBCASE("Constructors") {
+        NetworkInterfaces ifs;
+        MESSAGE("Using interface " << ifs.GetWireless()[0] << " with ssid=" << std::string(cSSID) << " and psk=" << std::string(cPSK));
         CHECK_NOTHROW(WLan());
     }
 
@@ -139,6 +149,8 @@ TEST_CASE("WLAN")
         CHECK_FALSE(network.mSelected);
 
         CHECK_NOTHROW(wlan.SetEnable(true));
+        CHECK_NOTHROW(wlan.SelectNetwork(wlan.FindNetwork(cSSID)));
+//        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         FetchMonitorEvents(wlan);
 
         CHECK_NOTHROW(network = wlan.FindNetwork(cSSID));
@@ -155,21 +167,21 @@ TEST_CASE("WLAN")
 
             APInfo status;
             CHECK_NOTHROW(status = wlan.GetStatus());
-            CHECK(status.mConnected);
+            CHECK(status.mStatus == WpaStatus::Completed);
 
             CHECK_NOTHROW(wlan.Disconnect());
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             FetchMonitorEvents(wlan);
 
             CHECK_NOTHROW(status = wlan.GetStatus());
-            CHECK_FALSE(status.mConnected);
+            CHECK(status.mStatus != WpaStatus::Completed);
 
             CHECK_NOTHROW(wlan.Reconnect());
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             FetchMonitorEvents(wlan);
 
             CHECK_NOTHROW(status = wlan.GetStatus());
-            CHECK(status.mConnected);
+            CHECK(status.mStatus == WpaStatus::Completed);
         }
     }
 
