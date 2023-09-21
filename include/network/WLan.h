@@ -29,6 +29,10 @@ public:
     std::vector<APInfo> GetAvailableNetworks() override;
     NetworkInfo FindNetwork(const std::string &arSSID) override;
     WpaEvents GetMonitorEvent(std::string &arMessage) override;
+    IWlanInterface& Reconnect() override;
+    IWlanInterface& Disconnect() override;
+    IWlanInterface& ReleaseIP() override;
+    std::string AquireIP() override;
 
 protected:
     std::unique_ptr<IWlanInterface> mPimpl;

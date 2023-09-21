@@ -17,11 +17,23 @@
 using namespace rsp::network;
 using namespace rsp::posix;
 
+static void FetchMonitorEvents(WLan &arWlan)
+{
+    rsp::network::WpaEvents event;
+    do {
+        std::string msg;
+        CHECK_NOTHROW(event = arWlan.GetMonitorEvent(msg));
+        MESSAGE("Monitor: (" << int(event) << ") " << msg);
+    }
+    while (event != rsp::network::WpaEvents::None);
+}
 
 TEST_CASE("WLAN")
 {
-    const char* cSSID = "MyWLan";
-    const char* cPSK = "VerySecurePW";
+    const char* cSSID = "RSPsystems-Guest";
+    const char* cPSK = "GuestAtRSP";
+//    const char* cSSID = "MyWLan";
+//    const char* cPSK = "VerySecurePW";
 
     TestLogger logger;
 
@@ -62,13 +74,7 @@ TEST_CASE("WLAN")
             }
         );
 
-        rsp::network::WpaEvents event;
-        do {
-            std::string msg;
-            CHECK_NOTHROW(event = wlan.GetMonitorEvent(msg));
-            MESSAGE("Monitor: (" << int(event) << ") " << msg);
-        }
-        while (event != rsp::network::WpaEvents::None);
+        FetchMonitorEvents(wlan);
     }
 
     SUBCASE("Status")
@@ -106,34 +112,84 @@ TEST_CASE("WLAN")
     SUBCASE("SelectNetwork")
     {
         WLan wlan;
-        CHECK_NOTHROW(wlan.SelectNetwork(wlan.FindNetwork(cSSID)));
         CHECK_THROWS_AS(wlan.SelectNetwork(wlan.FindNetwork(std::string("Not") + cSSID)), EWlanException);
+        CHECK_NOTHROW(wlan.SelectNetwork(wlan.FindNetwork(cSSID)));
 
-        rsp::network::WpaEvents event;
-        do {
-            std::string msg;
-            CHECK_NOTHROW(event = wlan.GetMonitorEvent(msg));
-            MESSAGE("Monitor: (" << int(event) << ") " << msg);
+        NetworkInfo network;
+        CHECK_NOTHROW(network = wlan.FindNetwork(cSSID));
+        CHECK(network.mSelected);
+
+        FetchMonitorEvents(wlan);
+    }
+
+    SUBCASE("Enable")
+    {
+        WLan wlan;
+
+        FetchMonitorEvents(wlan);
+
+        NetworkInfo network;
+        CHECK_NOTHROW(network = wlan.FindNetwork(cSSID));
+        CHECK(network.mSelected);
+
+        CHECK_NOTHROW(wlan.SetEnable(false));
+        FetchMonitorEvents(wlan);
+
+        CHECK_NOTHROW(network = wlan.FindNetwork(cSSID));
+        CHECK_FALSE(network.mSelected);
+
+        CHECK_NOTHROW(wlan.SetEnable(true));
+        FetchMonitorEvents(wlan);
+
+        CHECK_NOTHROW(network = wlan.FindNetwork(cSSID));
+        CHECK(network.mSelected);
+    }
+
+    SUBCASE("Connect")
+    {
+        if (std::string("MyWLan").compare(0, 6, cSSID) != 0) {
+            WLan wlan;
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            FetchMonitorEvents(wlan);
+
+            APInfo status;
+            CHECK_NOTHROW(status = wlan.GetStatus());
+            CHECK(status.mConnected);
+
+            CHECK_NOTHROW(wlan.Disconnect());
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            FetchMonitorEvents(wlan);
+
+            CHECK_NOTHROW(status = wlan.GetStatus());
+            CHECK_FALSE(status.mConnected);
+
+            CHECK_NOTHROW(wlan.Reconnect());
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            FetchMonitorEvents(wlan);
+
+            CHECK_NOTHROW(status = wlan.GetStatus());
+            CHECK(status.mConnected);
         }
-        while (event != rsp::network::WpaEvents::None);
     }
 
     SUBCASE("Get IP")
     {
         if (std::string("MyWLan").compare(0, 6, cSSID) != 0) {
             WLan wlan;
-            CHECK_NOTHROW(wlan.SetEnable(true));
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            CHECK_NOTHROW(wlan.AquireIP());
+
+            FetchMonitorEvents(wlan);
             auto info = wlan.GetStatus();
             CHECK_EQ(info.mSSID, std::string(cSSID));
             CHECK_FALSE(info.mIpAddress.empty());
 
             MESSAGE("Obtained IP: " << info.mIpAddress);
 
-            CHECK_NOTHROW(wlan.SetEnable(false));
+            CHECK_NOTHROW(wlan.ReleaseIP());
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            FetchMonitorEvents(wlan);
             info = wlan.GetStatus();
             CHECK_EQ(info.mSSID, std::string(cSSID));
             CHECK(info.mIpAddress.empty());
@@ -152,16 +208,14 @@ TEST_CASE("WLAN")
     {
         WLan wlan;
         CHECK_NOTHROW(wlan.RemoveNetwork(wlan.FindNetwork(cSSID)));
+        FetchMonitorEvents(wlan);
     }
 
     SUBCASE("Monitor")
     {
         WLan wlan;
-        std::string msg;
-        rsp::network::WpaEvents event = wlan.GetMonitorEvent(msg);
-        MESSAGE("Monitor: (" << int(event) << ") " << msg);
+        CHECK_NOTHROW(FetchMonitorEvents(wlan));
     }
-
 }
 
 

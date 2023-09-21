@@ -65,4 +65,27 @@ WpaEvents WLan::GetMonitorEvent(std::string &arMessage)
     return mPimpl->GetMonitorEvent(arMessage);
 }
 
+IWlanInterface& WLan::Reconnect()
+{
+    mPimpl->Reconnect();
+    return *this;
+}
+
+IWlanInterface& WLan::Disconnect()
+{
+    mPimpl->Disconnect();
+    return *this;
+}
+
+IWlanInterface& WLan::ReleaseIP()
+{
+    mPimpl->ReleaseIP();
+    return *this;
+}
+
+std::string WLan::AquireIP()
+{
+    return mPimpl->AquireIP();
+}
+
 } /* namespace tgm::network */

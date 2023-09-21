@@ -36,6 +36,10 @@ public:
     NetworkInfo FindNetwork(const std::string &arSSID) override;
 
     WpaEvents GetMonitorEvent(std::string &arMessage) override;
+    IWlanInterface& Reconnect() override;
+    IWlanInterface& Disconnect() override;
+    IWlanInterface& ReleaseIP() override;
+    std::string AquireIP() override;
 
 protected:
     struct wpa_ctrl *mpWpaCtrl = nullptr;
@@ -49,6 +53,7 @@ protected:
     std::string request(std::string_view aCmd);
     bool ping();
     void save(const std::string &arSSID);
+    void runCommand(const std::string &arCommand);
 };
 
 

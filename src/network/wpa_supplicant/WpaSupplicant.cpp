@@ -134,28 +134,18 @@ std::vector<APInfo> WpaSupplicant::GetAvailableNetworks()
 
 IWlanInterface& WpaSupplicant::SetEnable(bool aEnable)
 {
-    /**
-     * If it exists, then use sudo to call dhclient
-     * Setting suid bit or network capabilities on dhclient was not enough to avoid permission errors.
-     * suid bit only sets effective user id, not real uid.
-     */
-    std::string sudo("/usr/bin/sudo");
-    if (FileSystem::FileExists(sudo)) {
-        sudo += " ";
+    if (aEnable) {
+        std::string reply = request("ENABLE_NETWORK all");
+        if (!StrUtils::StartsWith(reply, "OK")) {
+            THROW_WITH_BACKTRACE1(EWlanException, "Failed enabling network");
+        }
     }
     else {
-        sudo.clear();
+        std::string reply = request("DISABLE_NETWORK all");
+        if (!StrUtils::StartsWith(reply, "OK")) {
+            THROW_WITH_BACKTRACE1(EWlanException, "Failed disabling network");
+        }
     }
-
-    std::string command(sudo + "dhclient " + mInterfaceName);
-    if (!aEnable) {
-        command += " -r";
-    }
-    mLogger.Debug() << "Executing " << command;
-    std::string result;
-    std::string errors;
-    int status = FileSystem::ExecuteCommand(command, &result, &errors);
-    mLogger.Info() << "dhclient -> " << status << "\n" << result << errors;
 
     return *this;
 }
@@ -271,25 +261,6 @@ IWlanInterface& WpaSupplicant::RemoveNetwork(const NetworkInfo &arNetwork)
     return *this;
 }
 
-
-std::string WpaSupplicant::request(std::string_view aCmd)
-{
-    char mReplyBuffer[4096];
-    size_t reply_len = sizeof(mReplyBuffer);
-
-    mLogger.Debug() << "Request " << aCmd;
-    int res = wpa_ctrl_request(mpWpaCtrl, aCmd.data(), aCmd.size(), mReplyBuffer, &reply_len, nullptr);
-    if (res < 0) {
-        THROW_WITH_BACKTRACE1(EWlanException, "wpa_ctrl_request failed: " + std::to_string(res));
-    }
-
-    std::string result(mReplyBuffer, reply_len);
-
-    mLogger.Debug() << "Reply: " << result << ";";
-//    mLogger.Debug() << "Reply: " << HexStream(reinterpret_cast<const uint8_t*>(result.data()), std::min(96ul, result.size()), 1) << ";";
-    return result;
-}
-
 NetworkInfo WpaSupplicant::FindNetwork(const std::string &arSSID)
 {
     auto networks = GetKnownNetworks();
@@ -303,24 +274,40 @@ NetworkInfo WpaSupplicant::FindNetwork(const std::string &arSSID)
     return *it;
 }
 
-bool WpaSupplicant::ping()
-{
-    return (request("PING").compare(0, 4, "PONG") == 0);
-}
 
-void WpaSupplicant::save(const std::string &arSSID)
+
+rsp::network::IWlanInterface& WpaSupplicant::Reconnect()
 {
-    std::string reply = request(std::string("SAVE_CONFIG"));
+    std::string reply = request("RECONNECT");
     if (!StrUtils::StartsWith(reply, "OK")) {
-        THROW_WITH_BACKTRACE1(EWlanException, "Failed to save network configuration for " + arSSID);
+        THROW_WITH_BACKTRACE1(EWlanException, "Failed network reconnect");
     }
-    mLogger.Debug() << "Config saved.";
+    return *this;
 }
 
-
-IWlanInterface* WLan::MakePimpl()
+rsp::network::IWlanInterface& WpaSupplicant::Disconnect()
 {
-    return new WpaSupplicant();
+    std::string reply = request("DISCONNECT");
+    if (!StrUtils::StartsWith(reply, "OK")) {
+        THROW_WITH_BACKTRACE1(EWlanException, "Failed network reconnect");
+    }
+    return *this;
+}
+
+rsp::network::IWlanInterface& WpaSupplicant::ReleaseIP()
+{
+    std::string command("dhclient -r " + mInterfaceName);
+    runCommand(command);
+    return *this;
+}
+
+std::string WpaSupplicant::AquireIP()
+{
+    std::string command("dhclient " + mInterfaceName);
+    runCommand(command);
+
+    APInfo info = GetStatus();
+    return info.mIpAddress;
 }
 
 WpaEvents WpaSupplicant::GetMonitorEvent(std::string &arMessage)
@@ -372,6 +359,67 @@ WpaEvents WpaSupplicant::GetMonitorEvent(std::string &arMessage)
     }
 
     return WpaEvents::Other;
+}
+
+
+std::string WpaSupplicant::request(std::string_view aCmd)
+{
+    char mReplyBuffer[4096];
+    size_t reply_len = sizeof(mReplyBuffer);
+
+    mLogger.Debug() << "Request " << aCmd;
+    int res = wpa_ctrl_request(mpWpaCtrl, aCmd.data(), aCmd.size(), mReplyBuffer, &reply_len, nullptr);
+    if (res < 0) {
+        THROW_WITH_BACKTRACE1(EWlanException, "wpa_ctrl_request failed: " + std::to_string(res));
+    }
+
+    std::string result(mReplyBuffer, reply_len);
+
+    mLogger.Debug() << "Reply: " << result << ";";
+//    mLogger.Debug() << "Reply: " << HexStream(reinterpret_cast<const uint8_t*>(result.data()), std::min(96ul, result.size()), 1) << ";";
+    return result;
+}
+
+bool WpaSupplicant::ping()
+{
+    return (request("PING").compare(0, 4, "PONG") == 0);
+}
+
+void WpaSupplicant::save(const std::string &arSSID)
+{
+    std::string reply = request(std::string("SAVE_CONFIG"));
+    if (!StrUtils::StartsWith(reply, "OK")) {
+        THROW_WITH_BACKTRACE1(EWlanException, "Failed to save network configuration for " + arSSID);
+    }
+    mLogger.Debug() << "Config saved.";
+}
+
+void WpaSupplicant::runCommand(const std::string &arCommand)
+{
+    /**
+     * If it exists, then use sudo to call dhclient
+     * Setting suid bit or network capabilities on dhclient was not enough to avoid permission errors.
+     * suid bit only sets effective user id, not real uid.
+     */
+    std::string sudo("/usr/bin/sudo");
+    if (FileSystem::FileExists(sudo)) {
+        sudo += " ";
+    }
+    else {
+        sudo.clear();
+    }
+    std::string command(sudo + arCommand);
+    mLogger.Debug() << "Executing " << command;
+    std::string result;
+    std::string errors;
+    int status = FileSystem::ExecuteCommand(command, &result, &errors);
+    mLogger.Info() << command << " -> " << status << "\n" << result << errors;
+}
+
+
+IWlanInterface* WLan::MakePimpl()
+{
+    return new WpaSupplicant();
 }
 
 } /* namespace rsp::network */

@@ -51,6 +51,11 @@ struct APInfo
           mEncrypted(aEncrypted)
     {
     }
+
+    APInfo(const APInfo&) = default;
+    APInfo(APInfo&&) = default;
+    APInfo& operator=(const APInfo&) = default;
+    APInfo& operator=(APInfo&&) = default;
 };
 
 struct NetworkInfo
@@ -60,6 +65,11 @@ struct NetworkInfo
     bool mSelected;
 
     NetworkInfo(uint32_t aId = uint32_t(-1), const std::string &arSSID = std::string(), bool aSelected = false) : mId(aId), mSSID(arSSID), mSelected(aSelected) {}
+
+    NetworkInfo(const NetworkInfo&) = default;
+    NetworkInfo(NetworkInfo&&) = default;
+    NetworkInfo& operator=(const NetworkInfo&) = default;
+    NetworkInfo& operator=(NetworkInfo&&) = default;
 };
 
 enum class WpaEvents { None, Connected, Disconnected, AuthRejected, APScanStarted, APScanComplete, Other };
@@ -70,7 +80,11 @@ public:
     virtual ~IWlanInterface() {}
 
     virtual IWlanInterface& SetEnable(bool aEnable) = 0;
+
     virtual APInfo GetStatus() = 0;
+
+    virtual IWlanInterface& Disconnect() = 0;
+    virtual IWlanInterface& Reconnect() = 0;
 
     virtual std::vector<struct APInfo> GetAvailableNetworks() = 0;
     virtual std::vector<NetworkInfo> GetKnownNetworks() = 0;
@@ -78,6 +92,9 @@ public:
     virtual IWlanInterface& RemoveNetwork(const NetworkInfo &arNetwork) = 0;
     virtual IWlanInterface& SelectNetwork(const NetworkInfo &arNetwork) = 0;
     virtual NetworkInfo FindNetwork(const std::string &arSSID) = 0;
+
+    virtual std::string AquireIP() = 0;
+    virtual IWlanInterface& ReleaseIP() = 0;
 
     virtual WpaEvents GetMonitorEvent(std::string &arMessage) = 0;
 };
