@@ -38,6 +38,7 @@ TEST_CASE("Control")
     SUBCASE("Child Invalidation")
     {
         Control childControl;
+        CHECK_NOTHROW(myControl.AddChild(nullptr));
         CHECK_NOTHROW(myControl.AddChild(&childControl));
         CHECK(myControl.IsInvalid());
         CHECK(childControl.IsInvalid());
@@ -69,6 +70,16 @@ TEST_CASE("Control")
         CHECK_NOTHROW(myControl.RemoveChild(&childControl));
         CHECK(myControl.IsInvalid());
         CHECK_FALSE(childControl.IsInvalid());
+
+        Control anotherChildControl;
+
+        CHECK_NOTHROW(myControl.AddChild(&childControl));
+        CHECK_NOTHROW(myControl.AddChild(&anotherChildControl));
+        CHECK_NOTHROW(childControl.AddChild(&anotherChildControl)); // Reassign to another parent
+
+        CHECK_NOTHROW(myControl.RemoveChild(&anotherChildControl));
+        CHECK_NOTHROW(childControl.RemoveChild(&anotherChildControl));
+        CHECK_NOTHROW(myControl.RemoveChild(nullptr));
     }
 
     SUBCASE("Default State")

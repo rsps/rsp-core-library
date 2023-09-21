@@ -192,12 +192,18 @@ Control& Control::SetTouchArea(Rect aRect)
 
 Control& Control::AddChild(Control *apChild)
 {
-    if (apChild && (apChild->mpParent != this)) {
-        mChildren.push_back(apChild);
-        apChild->mpParent = this;
-        apChild->SetOrigin(apChild->GetOrigin() + GetOrigin());
-        Invalidate();
+    if (!apChild) {
+        return *this;
     }
+    if (apChild->mpParent) {
+        apChild->mpParent->RemoveChild(apChild); // Remove from other parent
+    }
+
+    mChildren.push_back(apChild);
+    apChild->mpParent = this;
+    apChild->SetOrigin(apChild->GetOrigin() + GetOrigin());
+    Invalidate();
+
     return *this;
 }
 
