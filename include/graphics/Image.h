@@ -33,7 +33,7 @@ protected:
     BitmapView mBitmap{};
     TexturePtr_t mpTexture = nullptr;
 
-    void doSetArea(const Rect &arRect) override;
+    void doSetArea(const Rect &arRect, const Point &arOriginDifference) override;
     void update() override;
     bool render(Renderer &arRenderer) const override;
 };

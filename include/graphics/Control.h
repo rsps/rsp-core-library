@@ -303,8 +303,9 @@ protected:
     /**
      * \brief Override this to handle resizing events
      * \param arRect
+     * \param arPoint
      */
-    virtual void doSetArea(const Rect &arRect);
+    virtual void doSetArea(const Rect &arRect, const Point &arOriginDifference);
 
     virtual bool doPress(const TouchEvent &arEvent);
     virtual bool doMove(const TouchEvent &arEvent);

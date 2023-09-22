@@ -104,12 +104,12 @@ Control& Control::SetArea(Rect aRect)
         else {
             Invalidate();
         }
+        doSetArea(aRect, difference);
     }
-    doSetArea(aRect);
     return *this;
 }
 
-void Control::doSetArea(const Rect &arRect)
+void Control::doSetArea(const Rect &arRect, const Point &arOriginDifference)
 {
 }
 
@@ -140,7 +140,7 @@ Control& Control::ExpandToParent()
 
     if (changed) {
         mpParent->Invalidate();
-        doSetArea(mArea);
+        doSetArea(mArea, Point());
     }
 
     return *this;
@@ -163,7 +163,7 @@ Control& Control::SetOrigin(const Point &arPoint)
     for (Control *child : mChildren) {
         child->SetOrigin(child->GetOrigin() + difference);
     }
-    doSetArea(mArea);
+    doSetArea(mArea, difference);
     return *this;
 }
 

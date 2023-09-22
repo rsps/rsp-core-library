@@ -86,13 +86,13 @@ TEST_CASE("GfxEngine")
     }
 
     SUBCASE("Input Scene") {
-        CHECK_NOTHROW(gfx.SetNextScene(Scenes::Input));
-
         SceneMap::SceneNotify::Listener_t store = gfx.GetSceneMap().GetAfterCreate().Listen([&](Scene &arScene) {
             CHECK_EQ(arScene.GetId(), uint32_t(Scenes::Input));
 
             gh.mTouchParser.SetEvents(InputScene::GetTouchEvents().data(), InputScene::GetTouchEvents().size());
         });
+
+        CHECK_NOTHROW(gfx.SetNextScene(Scenes::Input));
 
         int progress = 0;
         Timer t1(1, 2800ms);

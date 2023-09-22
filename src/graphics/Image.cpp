@@ -76,7 +76,7 @@ void Image::update()
     }
 }
 
-void Image::doSetArea(const rsp::graphics::Rect &arRect)
+void Image::doSetArea(const rsp::graphics::Rect &arRect, const Point &arOriginDifference)
 {
     mpTexture = Texture::Create(arRect.GetWidth(), arRect.GetHeight());
 }
