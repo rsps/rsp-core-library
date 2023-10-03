@@ -16,7 +16,7 @@ namespace rsp::utils {
 
 std::ostream& operator <<(std::ostream &os, const HexStream &arHX)
 {
-    std::string delim = ", ";
+    std::string_view delim = ", ";
     std::string line;
     size_t mod = arHX.mElementsPerLine / arHX.mSizeOf;
     const std::uint8_t *data = arHX.mpData;
