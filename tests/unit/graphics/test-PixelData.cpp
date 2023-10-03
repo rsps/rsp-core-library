@@ -202,7 +202,6 @@ TEST_CASE("PixelData")
 
     }
 
-
     SUBCASE("Compress RGBA")
     {
         PixelData in(2, 4, ColorDepth::RGBA, cImageRGBA, sizeof(cImageRGBA));
@@ -228,6 +227,75 @@ TEST_CASE("PixelData")
         CHECK_EQ(pd.GetDataSize(), 32);
     }
 
+    SUBCASE("Fade Out")
+    {
+        PixelData pd(2, 4, ColorDepth::RGBA, cImageRGBA, sizeof(cImageRGBA));
+
+        pd.Fade(-64);
+        CHECK_HEX(pd.GetPixelAt(0,0).AsUint(), 0xBFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,0).AsUint(), 0xBF000000);
+        CHECK_HEX(pd.GetPixelAt(0,1).AsUint(), 0xBF000000);
+        CHECK_HEX(pd.GetPixelAt(1,1).AsUint(), 0xBFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(0,2).AsUint(), 0x40FFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,2).AsUint(), 0x40000000);
+        CHECK_HEX(pd.GetPixelAt(0,3).AsUint(), 0x40000000);
+        CHECK_HEX(pd.GetPixelAt(1,3).AsUint(), 0x40FFFFFF);
+
+        pd.Fade(-64);
+        CHECK_HEX(pd.GetPixelAt(0,0).AsUint(), 0x7FFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,0).AsUint(), 0x7F000000);
+        CHECK_HEX(pd.GetPixelAt(0,1).AsUint(), 0x7F000000);
+        CHECK_HEX(pd.GetPixelAt(1,1).AsUint(), 0x7FFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(0,2).AsUint(), 0x00FFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,2).AsUint(), 0x00000000);
+        CHECK_HEX(pd.GetPixelAt(0,3).AsUint(), 0x00000000);
+        CHECK_HEX(pd.GetPixelAt(1,3).AsUint(), 0x00FFFFFF);
+
+        pd.Fade(-64);
+        CHECK_HEX(pd.GetPixelAt(0,0).AsUint(), 0x3FFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,0).AsUint(), 0x3F000000);
+        CHECK_HEX(pd.GetPixelAt(0,1).AsUint(), 0x3F000000);
+        CHECK_HEX(pd.GetPixelAt(1,1).AsUint(), 0x3FFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(0,2).AsUint(), 0x00FFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,2).AsUint(), 0x00000000);
+        CHECK_HEX(pd.GetPixelAt(0,3).AsUint(), 0x00000000);
+        CHECK_HEX(pd.GetPixelAt(1,3).AsUint(), 0x00FFFFFF);
+    }
+
+    SUBCASE("Fade In")
+    {
+        PixelData pd(2, 4, ColorDepth::RGBA, cImageRGBA, sizeof(cImageRGBA));
+
+        pd.Fade(64);
+        CHECK_HEX(pd.GetPixelAt(0,0).AsUint(), 0xFFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,0).AsUint(), 0xFF000000);
+        CHECK_HEX(pd.GetPixelAt(0,1).AsUint(), 0xFF000000);
+        CHECK_HEX(pd.GetPixelAt(1,1).AsUint(), 0xFFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(0,2).AsUint(), 0xC0FFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,2).AsUint(), 0xC0000000);
+        CHECK_HEX(pd.GetPixelAt(0,3).AsUint(), 0xC0000000);
+        CHECK_HEX(pd.GetPixelAt(1,3).AsUint(), 0xC0FFFFFF);
+
+        pd.Fade(64);
+        CHECK_HEX(pd.GetPixelAt(0,0).AsUint(), 0xFFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,0).AsUint(), 0xFF000000);
+        CHECK_HEX(pd.GetPixelAt(0,1).AsUint(), 0xFF000000);
+        CHECK_HEX(pd.GetPixelAt(1,1).AsUint(), 0xFFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(0,2).AsUint(), 0xFFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,2).AsUint(), 0xFF000000);
+        CHECK_HEX(pd.GetPixelAt(0,3).AsUint(), 0xFF000000);
+        CHECK_HEX(pd.GetPixelAt(1,3).AsUint(), 0xFFFFFFFF);
+
+        pd.Fade(64);
+        CHECK_HEX(pd.GetPixelAt(0,0).AsUint(), 0xFFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,0).AsUint(), 0xFF000000);
+        CHECK_HEX(pd.GetPixelAt(0,1).AsUint(), 0xFF000000);
+        CHECK_HEX(pd.GetPixelAt(1,1).AsUint(), 0xFFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(0,2).AsUint(), 0xFFFFFFFF);
+        CHECK_HEX(pd.GetPixelAt(1,2).AsUint(), 0xFF000000);
+        CHECK_HEX(pd.GetPixelAt(0,3).AsUint(), 0xFF000000);
+        CHECK_HEX(pd.GetPixelAt(1,3).AsUint(), 0xFFFFFFFF);
+    }
 }
 
 TEST_SUITE_END();

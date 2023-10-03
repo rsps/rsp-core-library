@@ -422,6 +422,44 @@ void PixelData::Fill(Color aColor)
     }
 }
 
+PixelData& PixelData::Fade(int aAlphaInc)
+{
+    if (mColorDepth != ColorDepth::RGBA) {
+        return *this;
+    }
+
+    if (mData.size() == 0) {
+        // Copy const data to internal mData buffer
+        mData.resize(GetDataSize());
+        for (auto &v : mData) {
+            v = *mpData;
+            mpData++;
+        }
+        mpData = mData.data();
+    }
+    std::uint8_t *pdata = mData.data();
+
+
+    for (GuiUnit_t y = 0 ; y < GetHeight() ; y++) {
+        for (GuiUnit_t x = 0 ; x < GetWidth() ; x++) {
+            int offset = ((y * GetWidth()) + x) * 4;
+            Color col;
+            col.FromRaw(*reinterpret_cast<const std::uint32_t*>(uintptr_t(pdata + offset)));
+            int alpha = int(col.GetAlpha());
+
+            if (aAlphaInc > 0) {
+                alpha = std::min(alpha + aAlphaInc, 255);
+            }
+            else {
+                alpha = std::max(alpha + aAlphaInc, 0);
+            }
+            col.SetAlpha(uint8_t(alpha));
+            *reinterpret_cast<std::uint32_t*>(uintptr_t(pdata + offset)) = col.AsRaw();
+        }
+    }
+    return *this;
+}
+
 bool PixelData::SetBlend(bool aValue)
 {
     bool result = mBlend;

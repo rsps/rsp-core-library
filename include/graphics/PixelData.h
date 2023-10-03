@@ -53,6 +53,13 @@ public:
 
     void Fill(Color aColor);
 
+    /**
+     * \brief Adjust alpha channel on all pixels with the given value.
+     * \param aAlphaInc
+     * \return self
+     */
+    PixelData& Fade(int aAlphaInc);
+
     uint32_t GetId() const { return mId; }
 
     const std::uint8_t* GetData() const { return mpData; }
