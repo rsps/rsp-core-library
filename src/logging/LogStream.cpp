@@ -19,6 +19,7 @@ LogStream::LogStream(LoggerInterface *apLogger, LogLevel aLevel, const std::stri
       mChannel(arChannel),
       mContext(arContext)
 {
+    mBuffer.imbue(std::locale{"C"});
 }
 
 LogStream::LogStream(const LogStream &arOther)
@@ -27,6 +28,7 @@ LogStream::LogStream(const LogStream &arOther)
       mChannel(arOther.mChannel),
       mContext(arOther.mContext)
 {
+    mBuffer.imbue(std::locale{"C"});
 }
 
 LogStream::LogStream(LogStream &&arOther)
