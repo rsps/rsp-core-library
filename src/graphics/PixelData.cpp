@@ -445,6 +445,9 @@ PixelData& PixelData::Fade(int aAlphaInc)
             int offset = ((y * GetWidth()) + x) * 4;
             Color col;
             col.FromRaw(*reinterpret_cast<const std::uint32_t*>(uintptr_t(pdata + offset)));
+            if (col == Color::None) {
+                continue;
+            }
             int alpha = int(col.GetAlpha());
 
             if (aAlphaInc > 0) {
