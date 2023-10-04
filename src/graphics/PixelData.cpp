@@ -422,7 +422,7 @@ void PixelData::Fill(Color aColor)
     }
 }
 
-PixelData& PixelData::Fade(int aAlphaInc)
+PixelData& PixelData::Fade(int aAlphaInc, bool aFixed)
 {
     if (mColorDepth != ColorDepth::RGBA) {
         return *this;
@@ -450,7 +450,10 @@ PixelData& PixelData::Fade(int aAlphaInc)
             }
             int alpha = int(col.GetAlpha());
 
-            if (aAlphaInc > 0) {
+            if (aFixed) {
+                alpha = aAlphaInc;
+            }
+            else if (aAlphaInc > 0) {
                 alpha = std::min(alpha + aAlphaInc, 255);
             }
             else {

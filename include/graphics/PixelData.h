@@ -56,9 +56,10 @@ public:
     /**
      * \brief Adjust alpha channel on all pixels with the given value.
      * \param aAlphaInc
+     * \param aFixed Set to set the alpha values to the given value, clear to add.
      * \return self
      */
-    PixelData& Fade(int aAlphaInc);
+    PixelData& Fade(int aAlphaInc, bool aFixed = false);
 
     uint32_t GetId() const { return mId; }
 
