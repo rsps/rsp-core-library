@@ -11,11 +11,13 @@
 #ifndef RSP_UTILS_ROUNDING_H_
 #define RSP_UTILS_ROUNDING_H_
 
+#include <cmath>
+
 // Precision: 1 (all integers)
-#define ROUND1(a) (static_cast<int>(static_cast<float>(a) + 0.5f))
+#define ROUND1(a) (std::lround(static_cast<float>(a)))
 
 // Precision: 2 (Round to nearest even number)
-#define ROUND2(a) (static_cast<int>((static_cast<float>(a) * 0.5) + 0.5) * 2)
+#define ROUND2(a) (std::lround(static_cast<float>(a) * 0.5) * 2)
 
 // Precision: 0.01
 #define ROUND001(a) (ROUND1((a) * 100.0f) * 0.01f)
