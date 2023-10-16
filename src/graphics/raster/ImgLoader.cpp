@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * \copyright   Copyright 2022 RSP Systems A/S. All rights reserved.
+ * \copyright   Copyright 2022-2023 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
@@ -14,13 +14,13 @@
 
 namespace rsp::graphics {
 
-std::shared_ptr<ImgLoader> ImgLoader::GetRasterLoader(const std::string aFileType)
+std::shared_ptr<ImgLoader> ImgLoader::GetRasterLoader(const std::string &arFileType)
 {
-    if (aFileType == ".bmp") {
+    if (arFileType == ".bmp") {
         return std::make_shared<BmpLoader>();
     }
     else {
-        THROW_WITH_BACKTRACE1(EUnsupportedFileformat, std::string("Raster loader not found for file type: ") + aFileType);
+        THROW_WITH_BACKTRACE1(EUnsupportedFileFormat, std::string("Raster loader not found for file type: ") + arFileType);
     }
 }
 

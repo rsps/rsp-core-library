@@ -39,13 +39,13 @@ class ConsoleStream : public std::stringstream
 {
 public:
     ConsoleStream(Console *apConsole, TextColor aColor);
-    ConsoleStream(ConsoleStream &&aFrom);
+    ConsoleStream(ConsoleStream &&aFrom) noexcept;
     ConsoleStream(const ConsoleStream &) = delete;
 
     ConsoleStream& operator=(const ConsoleStream &) = delete;
 
     friend class Console;
-    ~ConsoleStream();
+    ~ConsoleStream() override;
 
 protected:
     Console *mpConsole = nullptr;
@@ -78,10 +78,10 @@ public:
 
     static Console& Get();
 
-    static ConsoleStream Debug() { return ConsoleStream(&Get(), TextColor::Debug); }
-    static ConsoleStream Error() { return ConsoleStream(&Get(), TextColor::Error); }
-    static ConsoleStream HighLightInfo()  { return ConsoleStream(&Get(), TextColor::InfoHighLight); }
-    static ConsoleStream Info()  { return ConsoleStream(&Get(), TextColor::Info); }
+    static ConsoleStream Debug() { return {&Get(), TextColor::Debug}; }
+    static ConsoleStream Error() { return {&Get(), TextColor::Error}; }
+    static ConsoleStream HighLightInfo()  { return {&Get(), TextColor::InfoHighLight}; }
+    static ConsoleStream Info()  { return {&Get(), TextColor::Info}; }
 
     static void SetUseColors(bool aEnable) { mUseColors = aEnable; }
     static bool GetUseColors() { return mUseColors; }

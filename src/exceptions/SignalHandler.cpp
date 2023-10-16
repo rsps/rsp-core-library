@@ -8,7 +8,6 @@
  * \author      Steffen Brummer
  */
 
-#include <iostream>
 #include <exceptions/SignalHandler.h>
 #include <logging/Logger.h>
 #include <magic_enum.hpp>
@@ -76,7 +75,7 @@ void SignalHandler::signalHandler(int aSignalCode) noexcept
 
 void SignalHandler::Register(Signals aSignal, SignalCallback_t aHandler)
 {
-    mHandlers[static_cast<int>(aSignal)] = aHandler;
+    mHandlers[static_cast<int>(aSignal)] = std::move(aHandler);
 }
 
 void SignalHandler::Unregister(Signals aSignal)

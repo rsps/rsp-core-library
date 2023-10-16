@@ -13,7 +13,7 @@
 
 #include <exceptions/BackTrace.h>
 #include <functional>
-#include <signal.h>
+#include <csignal>
 
 namespace rsp::exceptions {
 
@@ -49,8 +49,8 @@ public:
     SignalHandler();
     ~SignalHandler();
 
-    void Register(Signals aSignal, SignalCallback_t aHandler);
-    void Unregister(Signals aSignal);
+    static void Register(Signals aSignal, SignalCallback_t aHandler);
+    static void Unregister(Signals aSignal);
 
 protected:
     static SignalCallback_t mHandlers[_NSIG];

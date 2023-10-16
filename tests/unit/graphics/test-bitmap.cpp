@@ -144,7 +144,7 @@ TEST_CASE("Bitmap")
         std::string filepath = "testImages/testImage.txt";
 
         // Act Assert
-        CHECK_THROWS_AS(Bitmap bitmap(filepath), EUnsupportedFileformat);
+        CHECK_THROWS_AS(Bitmap bitmap(filepath), EUnsupportedFileFormat);
     }
 }
 

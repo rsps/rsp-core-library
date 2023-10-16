@@ -20,30 +20,30 @@ namespace rsp::graphics {
 class BitmapView
 {
 public:
-    BitmapView() {};
-    BitmapView(const PixelData &arPixelData);
+    BitmapView() = default;
+    explicit BitmapView(const PixelData &arPixelData);
     BitmapView(const PixelData &arPixelData, const Rect& arSection);
 
     BitmapView(const BitmapView &) = default;
-    BitmapView(BitmapView &&) = default;
+    BitmapView(BitmapView &&) noexcept = default;
 
     BitmapView& operator=(const BitmapView&) = default;
     BitmapView& operator=(BitmapView&&) = default;
 
     BitmapView& SetPixelData(const PixelData &arPixelData);
-    const PixelData& GetPixelData() const;
+    [[nodiscard]] const PixelData& GetPixelData() const;
 
     BitmapView& ClearSection();
     BitmapView& SetSection(const Rect &arSection);
-    const Rect& GetSection() const { return mSection; }
+    [[nodiscard]] const Rect& GetSection() const { return mSection; }
 
     BitmapView& SetPixelColor(const Color &arColor);
-    const Color& GetPixelColor() const { return mPixelColor; }
+    [[nodiscard]] const Color& GetPixelColor() const { return mPixelColor; }
 
     GuiUnit_t GetWidth();
     GuiUnit_t GetHeight();
 
-    Rect GetBoundingRect(Point aPoint = {0,0}) { return Rect(aPoint, GetWidth(), GetHeight()); }
+    Rect GetBoundingRect(Point aPoint = {0,0}) { return {aPoint, GetWidth(), GetHeight()}; }
 
 protected:
     Color mPixelColor = Color::White;

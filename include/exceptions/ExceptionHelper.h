@@ -26,14 +26,14 @@ namespace rsp::exceptions {
  * @see https://stackoverflow.com/questions/16945787/how-is-it-possible-to-overload-the-throw-function-while-writing-a-custom-excepti
  */
 template<typename BaseException>
-class backtraced_exception: public BaseException
+class BackTracedException: public BaseException
 {
 private:
     std::string mWhat{};
 
 public:
     template<typename... Args>
-    backtraced_exception(const char *aFilename, int aLineNum, Args &&... args)
+    BackTracedException(const char *aFilename, int aLineNum, Args &&... args)
             : BaseException(std::forward<Args>(args)...)
     {
         BackTrace bt(1);
@@ -44,18 +44,7 @@ public:
         mWhat = ss.str();
     }
 
-//    template<typename... Args>
-//    backtraced_exception(Args &&... args)
-//        : BaseException(std::forward<Args>(args)...)
-//    {
-//        BackTrace bt(2);
-//
-//        std::stringstream ss;
-//        ss << BaseException::what() << "\n" << bt;
-//        mWhat = ss.str();
-//    }
-
-    backtraced_exception(const std::exception &e, const char *aFilename, int aLineNum)
+    BackTracedException(const std::exception &e, const char *aFilename, int aLineNum)
             : BaseException(static_cast<const BaseException&>(e))
     {
         BackTrace bt(1);
@@ -65,25 +54,27 @@ public:
         mWhat = ss.str();
     }
 
-    virtual ~backtraced_exception() noexcept
+/*
+    BackTracedException() noexcept
     {
     }
+*/
 
-    virtual const char* what() const noexcept
+    [[nodiscard]] virtual const char* what() const noexcept
     {
         return mWhat.c_str();
     }
 };
 
-#define THROW_WITH_BACKTRACE(EXCEPTION) throw rsp::exceptions::backtraced_exception< EXCEPTION >(__FILE__, __LINE__)
-#define THROW_WITH_BACKTRACE1(EXCEPTION, ARG1) throw rsp::exceptions::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1)
-#define THROW_WITH_BACKTRACE2(EXCEPTION, ARG1, ARG2) throw rsp::exceptions::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2)
-#define THROW_WITH_BACKTRACE3(EXCEPTION, ARG1, ARG2, ARG3) throw rsp::exceptions::backtraced_exception< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2, ARG3)
+#define THROW_WITH_BACKTRACE(EXCEPTION) throw rsp::exceptions::BackTracedException< EXCEPTION >(__FILE__, __LINE__)
+#define THROW_WITH_BACKTRACE1(EXCEPTION, ARG1) throw rsp::exceptions::BackTracedException< EXCEPTION >(__FILE__, __LINE__, ARG1)
+#define THROW_WITH_BACKTRACE2(EXCEPTION, ARG1, ARG2) throw rsp::exceptions::BackTracedException< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2)
+#define THROW_WITH_BACKTRACE3(EXCEPTION, ARG1, ARG2, ARG3) throw rsp::exceptions::BackTracedException< EXCEPTION >(__FILE__, __LINE__, ARG1, ARG2, ARG3)
 
 // The CATCH macro does not work in all cases.
-//#define CATCH_WITH_BACKTRACE(EXCEPTION, EXCEPT_NAME) catch(const rsp::backtraced_exception< EXCEPTION >& EXCEPT_NAME)
+//#define CATCH_WITH_BACKTRACE(EXCEPTION, EXCEPT_NAME) catch(const rsp::BackTracedException< EXCEPTION >& EXCEPT_NAME)
 
-//#define RETHROW_WITH_BACKTRACE(EXCEPT_NAME) throw rsp::backtraced_exception< std::decay< decltype(EXCEPT_NAME) >::type >(EXCEPT_NAME, __FILE__, __LINE__)
+//#define RETHROW_WITH_BACKTRACE(EXCEPT_NAME) throw rsp::BackTracedException< std::decay< decltype(EXCEPT_NAME) >::type >(EXCEPT_NAME, __FILE__, __LINE__)
 #define RETHROW_WITH_BACKTRACE(aMsg, aOriginalException) THROW_WITH_BACKTRACE1(std::decay< decltype(aOriginalException) >::type, (std::string(aMsg) + " <- " + aOriginalException.what()).c_str())
 
 

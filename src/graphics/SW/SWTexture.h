@@ -32,7 +32,7 @@ public:
 
     Texture& Fill(const Color &arColor, GfxHal::OptionalRect arRect = nullptr) override;
     Texture& Update(const PixelData &arPixelData, const Color &arColor) override;
-    Texture& SetBlendOperation(Texture::BlendOperation aOp, const Color &arColorKey = Color::None) override;
+    Texture& SetBlendOperation(Texture::BlendOperation aOp, const Color &arColorKey = Colors::None) override;
     Texture& SetSourceRect(const Rect &arRect) override;
     Texture& SetDestination(const Point &arPoint) override;
     Point GetDestination() const override;

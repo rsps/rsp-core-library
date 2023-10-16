@@ -313,7 +313,7 @@ Control& Control::SetChecked(bool aValue)
     return *this;
 }
 
-Control& Control::Show(bool aVisible)
+Control& Control::SetVisible(bool aVisible)
 {
     if (mVisible != aVisible) {
         mVisible = aVisible;
@@ -322,13 +322,13 @@ Control& Control::Show(bool aVisible)
     return *this;
 }
 
-Control& Control::Enable(bool aEnable)
+Control& Control::SetEnable(bool aEnable)
 {
     if (mEnabled != aEnable) {
         mEnabled = aEnable;
         Invalidate();
         for (Control *child : mChildren) {
-            child->Enable(aEnable);
+            child->SetEnable(aEnable);
         }
     }
     return *this;

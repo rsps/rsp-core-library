@@ -12,7 +12,7 @@
 #define COLOR_H
 
 #include <exceptions/CoreException.h>
-#include <stdint.h>
+#include <cstdint>
 
 namespace rsp::graphics
 {
@@ -27,30 +27,30 @@ namespace rsp::graphics
  */
 class Color
 {
-  public:
-    typedef uint32_t ARGB_t;
+public:
+    using ARGB_t = uint32_t;
 
-    /**
-     * \brief Predefined basic colors
-     */
-    enum : ARGB_t {
-        None = 0,
-        White =   0xFFFFFFFF,
-        Silver =  0xFFC0C0C0,
-        Grey =    0xFF808080,
-        Black =   0xFF000000,
-        Red =     0xFFFF0000,
-        Maroon =  0xFF800000,
-        Yellow =  0xFFFFFF00,
-        Olive =   0xFF808000,
-        Lime =    0xFF00FF00,
-        Green =   0xFF008000,
-        Aqua =    0xFF00FFFF,
-        Teal =    0xFF008080,
-        Blue =    0xFF0000FF,
-        Navy =    0xFF000080,
+/**
+ * \brief Predefined basic colors
+ */
+    enum BasicColors : uint32_t {
+        None    = 0,
+        White   = 0xFFFFFFFF,
+        Silver  = 0xFFC0C0C0,
+        Grey    = 0xFF808080,
+        Black   = 0xFF000000,
+        Red     = 0xFFFF0000,
+        Maroon  = 0xFF800000,
+        Yellow  = 0xFFFFFF00,
+        Olive   = 0xFF808000,
+        Lime    = 0xFF00FF00,
+        Green   = 0xFF008000,
+        Aqua    = 0xFF00FFFF,
+        Teal    = 0xFF008080,
+        Blue    = 0xFF0000FF,
+        Navy    = 0xFF000080,
         Fuchsia = 0xFFFF00FF,
-        Purple =  0xFF800080
+        Purple  = 0xFF800080,
     };
 
     Color() noexcept : mValue{} {}
@@ -77,21 +77,21 @@ class Color
      *
      * \param aColor
      */
-    Color(const Color &arColor);
+    Color(const Color &arColor) = default;
 
     /**
      * \brief Move constructor.
      *
      * \param aColor
      */
-    Color(Color &&arColor);
+    Color(Color &&arColor) noexcept = default;
 
     /**
      * \brief Get the red base color value.
      *
      * \return Red value
      */
-    uint8_t GetRed() const;
+    [[nodiscard]] uint8_t GetRed() const;
     /**
      * \brief Set the red base color value.
      *
@@ -104,7 +104,7 @@ class Color
      *
      * \return Green value
      */
-    uint8_t GetGreen() const;
+    [[nodiscard]] uint8_t GetGreen() const;
     /**
      * \brief Set the green base color value.
      *
@@ -117,7 +117,7 @@ class Color
      *
      * \return Blue value
      */
-    uint8_t GetBlue() const;
+    [[nodiscard]] uint8_t GetBlue() const;
     /**
      * \brief Set the blue base color value.
      *
@@ -130,7 +130,7 @@ class Color
      *
      * \return Alpha value
      */
-    uint8_t GetAlpha() const;
+    [[nodiscard]] uint8_t GetAlpha() const;
     /**
      * \brief Set the alpha channel value.
      *
@@ -142,8 +142,8 @@ class Color
      * \brief Get the ARGB value.
      * \return ARGB
      */
-    operator ARGB_t() const;
-    uint32_t AsUint() const { return static_cast<ARGB_t>(*this); }
+    operator uint32_t() const;
+    [[nodiscard]] uint32_t AsUint() const { return static_cast<ARGB_t>(*this); }
 
     /**
      * \brief For fast color value in native 32-bit format
@@ -151,7 +151,7 @@ class Color
      * \return uint32
      */
 
-    uint32_t AsRaw() const { return mValue.rgba; }
+    [[nodiscard]] uint32_t AsRaw() const { return mValue.rgba; }
     Color& FromRaw(uint32_t aValue) { mValue.rgba = aValue; return *this; }
 
     /**
@@ -166,7 +166,16 @@ class Color
      *
      * \param aValue
      */
-    Color& operator=(Color &&arColor);
+    Color& operator=(Color &&arColor) noexcept;
+
+    Color& operator=(ARGB_t aValue);
+
+    bool operator!=(ARGB_t aValue) const;
+    bool operator!=(const Color &arOther) const;
+
+    bool operator==(ARGB_t aValue) const;
+    bool operator==(const Color &arOther) const;
+
 
     /**
      * \fn Color Blend(Color&, Color&)
@@ -179,7 +188,7 @@ class Color
     static Color Blend(const Color &a, const Color &b);
 
   protected:
-    struct __abgr {
+    struct color_components {
         uint32_t red : 8;
         uint32_t green : 8;
         uint32_t blue : 8;
@@ -191,7 +200,7 @@ class Color
      */
     union ColorValue_t {
         uint32_t rgba;
-        __abgr item;
+        color_components item;
     };
 
     ColorValue_t mValue{};

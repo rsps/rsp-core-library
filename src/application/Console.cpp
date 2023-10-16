@@ -69,11 +69,11 @@ ConsoleStream::ConsoleStream(Console *apConsole, TextColor aColor)
     mColor = aColor;
 }
 
-ConsoleStream::ConsoleStream(ConsoleStream &&aFrom)
+ConsoleStream::ConsoleStream(ConsoleStream &&aFrom) noexcept
     : std::stringstream(static_cast<std::stringstream&&>(aFrom))
 {
-    mpConsole = std::move(aFrom.mpConsole);
-    mColor = std::move(aFrom.mColor);
+    mpConsole = aFrom.mpConsole;
+    mColor = aFrom.mColor;
 }
 
 ConsoleStream::~ConsoleStream()
@@ -94,8 +94,6 @@ Console& Console::Get()
 Console::Console()
     : mPrintToDisplay(false),
       mLcdDisplay(mTtyDeviceFile)
-//      mCoutBuf(this, std::cout, TextColor::Info),
-//      mCerrBuf(this, std::cerr, TextColor::Error)
 {
     if (mLcdDisplay.is_open()) {
         mLcdDisplay << ec::TputClear << ec::ResetAll << ec::DisableScreenSaver << ec::HideCursor << std::flush;

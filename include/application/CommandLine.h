@@ -44,7 +44,7 @@ public:
      * \param aStr
      * \return True if the option exists
      */
-    bool HasOption(const std::string aStr);
+    bool HasOption(const std::string &arStr);
     bool HasOption(const char *apStr) { return HasOption(std::string(apStr)); }
 
     /**
@@ -54,7 +54,7 @@ public:
      * \param arValue Reference to string that is loaded with value.
      * \return bool True if the option exists
      */
-    bool GetOptionValue(const std::string aOption, std::string &arValue);
+    bool GetOptionValue(const std::string &arOption, std::string &arValue);
     bool GetOptionValue(const char *apOption, std::string &arValue) { return GetOptionValue(std::string(apOption), arValue); }
 
     /**

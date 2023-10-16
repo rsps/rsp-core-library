@@ -9,7 +9,6 @@
  */
 
 #include <graphics/Color.h>
-#include <logging/Logger.h>
 
 namespace rsp::graphics {
 
@@ -28,17 +27,6 @@ Color::Color(ARGB_t aARGB)
     mValue.item.blue = (aARGB & 0x000000FF);
     mValue.item.alpha = (aARGB & 0xFF000000) >> 24;
 }
-
-Color::Color(const Color &arColor)
-    : mValue(arColor.mValue)
-{
-}
-
-Color::Color(Color &&arColor)
-    : mValue(std::move(arColor.mValue))
-{
-}
-
 
 uint8_t Color::GetRed() const
 {
@@ -80,7 +68,7 @@ void Color::SetAlpha(uint8_t aValue)
     mValue.item.alpha = aValue;
 }
 
-Color::operator Color::ARGB_t() const
+Color::operator uint32_t() const
 {
     return
         uint32_t(mValue.item.red) << 16 |
@@ -97,11 +85,20 @@ Color &Color::operator=(const Color &arColor)
     return *this;
 }
 
-Color& Color::operator=(Color &&arColor)
+Color& Color::operator=(Color &&arColor) noexcept
 {
     if (this != &arColor) {
-        mValue = std::move(arColor.mValue);
+        mValue = arColor.mValue;
     }
+    return *this;
+}
+
+Color &Color::operator=(Color::ARGB_t aValue)
+{
+    mValue.item.red = (aValue & 0x00FF0000) >> 16;
+    mValue.item.green = (aValue & 0x0000FF00) >> 8;
+    mValue.item.blue = (aValue & 0x000000FF);
+    mValue.item.alpha = (aValue & 0xFF000000) >> 24;
     return *this;
 }
 
@@ -131,6 +128,26 @@ Color Color::Blend(const Color &arBg, const Color &arFg)
     uint32_t result = 0xff000000 | ((rb | g) >> 8);
 
     return Color(result);
+}
+
+bool Color::operator!=(Color::ARGB_t aValue) const
+{
+    return (mValue.rgba != aValue);
+}
+
+bool Color::operator!=(const Color &arOther) const
+{
+    return (mValue.rgba != arOther.mValue.rgba);
+}
+
+bool Color::operator==(Color::ARGB_t aValue) const
+{
+    return (mValue.rgba == aValue);
+}
+
+bool Color::operator==(const Color &arOther) const
+{
+    return (mValue.rgba == arOther.mValue.rgba);
 }
 
 } // namespace rsp::graphics

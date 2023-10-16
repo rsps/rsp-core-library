@@ -3,9 +3,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \copyright   Copyright 2021-2023 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
+ * \author      Steffen Brummer
  */
 #ifndef CONTROL_H
 #define CONTROL_H
@@ -60,7 +61,7 @@ public:
     };
 
     Control() : mLogger("Gfx") { initTypeInfo<Control>(); }
-    virtual ~Control();
+    ~Control() override;
 
     Control(const Control &arOther) = default;
     Control &operator=(const Control &arOther) = default;
@@ -78,7 +79,7 @@ public:
     /**
      * \brief Gets the state of the object
      */
-    Control::States GetState() const;
+    [[nodiscard]] Control::States GetState() const;
 
     /**
      * \brief Set the object as invalidated marking it to be re-rendered
@@ -86,26 +87,28 @@ public:
     void Invalidate();
 
     /**
-     * \brief Get wether or not the object is currently marked invalid
+     * \brief Get whether or not the object is currently marked invalid
      * \return True if the object is currently marked as invalid
      */
-    bool IsInvalid() const { return mDirty; }
+    [[nodiscard]] bool IsInvalid() const { return mDirty; }
 
     virtual Control& SetDraggable(bool aValue);
-    virtual bool IsDraggable() const { return mDraggable; }
+    [[nodiscard]] virtual bool IsDraggable() const { return mDraggable; }
 
     virtual Control& SetCheckable(bool aValue);
-    virtual bool IsCheckable() const { return mCheckable; }
+    [[nodiscard]] virtual bool IsCheckable() const { return mCheckable; }
     virtual Control& SetChecked(bool aValue);
-    virtual bool IsChecked() const { return mChecked; }
+    [[nodiscard]] virtual bool IsChecked() const { return mChecked; }
 
-    virtual bool IsVisible() const {return mVisible; }
-    virtual Control& Show(bool aVisible = true);
-    Control& Hide() { return Show(false); }
+    virtual Control& SetVisible(bool aVisible);
+    [[nodiscard]] virtual bool IsVisible() const {return mVisible; }
+    Control& Show() { return SetVisible(true); };
+    Control& Hide() { return SetVisible(false); }
 
-    virtual bool IsEnabled() const { return mEnabled; }
-    virtual Control& Enable(bool aEnable = true);
-    Control& Disable() { return Enable(false); }
+    [[nodiscard]] virtual bool IsEnabled() const { return mEnabled; }
+    virtual Control& SetEnable(bool aEnable);
+    Control& Enable() { return SetEnable(true); };
+    Control& Disable() { return SetEnable(false); }
 
     virtual Control& SetPressed(bool aValue);
     virtual Control& SetDragged(bool aValue);

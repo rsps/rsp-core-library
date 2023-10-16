@@ -35,7 +35,7 @@ public:
      * \param argc Number of arguments
      * \param argv Pointer to arguments
      */
-    ApplicationBase(int argc = 0, const char **argv = nullptr);
+    explicit ApplicationBase(int argc = 0, const char **argv = nullptr);
     virtual ~ApplicationBase();
     /**
      * Inhibit copy and move of the application object.

@@ -11,7 +11,7 @@
 #ifndef INCLUDE_UTILS_CONSTTYPEINFO_H_
 #define INCLUDE_UTILS_CONSTTYPEINFO_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <string_view>
 #include "Crc32.h"
 #include "Fnv1a.h"
@@ -93,14 +93,14 @@ constexpr std::uint32_t ID()
 class TypeInfo
 {
 public:
-    virtual ~TypeInfo() {}
+    virtual ~TypeInfo() = default;
 
     /**
      * \brief Get the name of the specific scene.
      *
      * \return string with name of scene
      */
-    const std::string& GetName() const
+    [[nodiscard]] const std::string& GetName() const
     {
         return mName;
     }
@@ -108,7 +108,7 @@ public:
     void SetName(const std::string &arName) { setName(arName); }
     void SetName(const char *apName) { setName(std::string(apName)); }
 
-    std::uint32_t GetId() const { return mId; }
+    [[nodiscard]] std::uint32_t GetId() const { return mId; }
 
     void SetId(uint32_t aId) { setId(aId); }
     void SetId(int aId) { setId(static_cast<uint32_t>(aId)); }

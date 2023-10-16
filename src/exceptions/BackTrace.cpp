@@ -10,13 +10,10 @@
 
 #ifdef __GNUC__
 
-#include <stdio.h>
 #include <execinfo.h>
 #include <cxxabi.h>
-#include <dlfcn.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <ostream>
-#include <sstream>
 #include <exceptions/BackTrace.h>
 #include <filesystem>
 
@@ -49,11 +46,11 @@ BackTrace::BackTrace(size_t aEntriesToDiscard)
     int stack_depth = backtrace(trace, MAX_DEPTH);
 
     strings = backtrace_symbols(trace, stack_depth);
-    if (strings == NULL) {
+    if (strings == nullptr) {
         return;
     }
 
-    for (int j = aEntriesToDiscard; j < stack_depth; j++) {
+    for (size_t j = aEntriesToDiscard; j < size_t(stack_depth); j++) {
         const char* symbol_name = strings[j];
         std::string s(symbol_name);
 
@@ -62,13 +59,13 @@ BackTrace::BackTrace(size_t aEntriesToDiscard)
         std::string offset;
 
         size_t start = s.find_first_of('(', 0);
-        if (start != s.npos) {
+        if (start != std::string::npos) {
             file = s.substr(0, start);
             file = std::filesystem::path(file).stem();
 
             size_t end = s.find_first_of("+)", start);
             std::string mangled = s.substr(start+1, end-1-start);
-            function = demangle(mangled);
+            function = BackTrace::demangle(mangled);
             offset = s.substr(end, s.length());
         }
 
@@ -78,13 +75,16 @@ BackTrace::BackTrace(size_t aEntriesToDiscard)
     free(strings);
 }
 
-std::string BackTrace::demangle(const std::string &arMangled) const
+std::string BackTrace::demangle(const std::string &arMangled)
 {
-    std::string result = arMangled;
+    std::string result;
     int status;
-    char* demangled = abi::__cxa_demangle(arMangled.c_str(), nullptr, 0, &status);
+    char* demangled = abi::__cxa_demangle(arMangled.c_str(), nullptr, nullptr, &status);
     if(status == 0 && demangled) {
         result = demangled;
+    }
+    else {
+        result = arMangled;
     }
     if (demangled) {
         free(demangled);

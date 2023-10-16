@@ -21,8 +21,9 @@ class Image : public Control
 {
 public:
     Image();
-    Image(const BitmapView &arBitmap);
-    Image(const BitmapView &&arBitmap);
+    Image(const PixelData &arPixelData);
+    explicit Image(const BitmapView &arBitmap);
+    explicit Image(BitmapView &&arBitmap);
 
     Image& operator=(const BitmapView &arBitmap);
     Image& operator=(const BitmapView &&arBitmap);

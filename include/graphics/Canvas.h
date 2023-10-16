@@ -83,7 +83,7 @@ public:
     void DrawPixelData(const Point &arDestination, const PixelData &arPixelData) { DrawPixelData(arDestination, arPixelData, arPixelData.GetRect(), Color::White); }
 
     PixelData& GetPixelData() { return *this; }
-    const PixelData& GetPixelData() const { return *this; }
+    [[nodiscard]] const PixelData& GetPixelData() const { return *this; }
 
 protected:
     void plot4Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, GuiUnit_t aY, const Color &arColor);

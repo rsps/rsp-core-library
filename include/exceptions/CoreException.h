@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
+ * \copyright   Copyright 2021-2023 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  * \author      Steffen Brummer
@@ -26,7 +26,7 @@ public:
         : std::runtime_error(std::string(apMsg))
     {
     }
-    CoreException(const std::string &arMsg)
+    explicit CoreException(const std::string &arMsg)
         : std::runtime_error(arMsg)
     {
     }
@@ -39,7 +39,7 @@ public:
         : CoreException(aMsg)
     {
     }
-    NotImplementedException(const std::string &arMsg)
+    explicit NotImplementedException(const std::string &arMsg)
         : CoreException(arMsg)
     {
     }
@@ -57,7 +57,7 @@ public:
 class DecimalConversionError : public CoreException
 {
 public:
-    DecimalConversionError(const std::string &arMsg)
+    explicit DecimalConversionError(const std::string &arMsg)
         : CoreException(arMsg)
     {
     }
@@ -121,7 +121,7 @@ public:
     {
     }
 
-    int GetCode() const { return mCode; }
+    [[nodiscard]] int GetCode() const { return mCode; }
 
 protected:
     int mCode = 0;

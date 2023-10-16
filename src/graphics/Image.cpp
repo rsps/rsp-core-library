@@ -27,7 +27,12 @@ Image::Image(const BitmapView &arBitmap)
     SetArea(mBitmap.GetBoundingRect());
 }
 
-Image::Image(const BitmapView &&arBitmap)
+Image::Image(const PixelData &arPixelData)
+    : Image(BitmapView(arPixelData))
+{
+}
+
+Image::Image(BitmapView &&arBitmap)
     : mBitmap(std::move(arBitmap))
 {
     initTypeInfo<Image>();

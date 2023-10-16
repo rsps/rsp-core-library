@@ -6,9 +6,10 @@
  * \copyright   Copyright 2021 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
+ * \author      Steffen Brummer
  */
-#ifndef IMGLOADER_H
-#define IMGLOADER_H
+#ifndef GRAPHICS_RASTER_IMGLOADER_H
+#define GRAPHICS_RASTER_IMGLOADER_H
 
 #include <exceptions/CoreException.h>
 #include <graphics/PixelData.h>
@@ -23,7 +24,7 @@ namespace rsp::graphics
 class ImgLoaderException: public exceptions::CoreException
 {
 public:
-    explicit ImgLoaderException(const std::string arMsg)
+    explicit ImgLoaderException(const std::string &arMsg)
         : CoreException(arMsg)
     {
     }
@@ -38,10 +39,10 @@ public:
     }
 };
 
-class EUnsupportedFileformat : public ImgLoaderException
+class EUnsupportedFileFormat : public ImgLoaderException
 {
 public:
-    explicit EUnsupportedFileformat(const std::string &arMsg)
+    explicit EUnsupportedFileFormat(const std::string &arMsg)
         : ImgLoaderException(arMsg)
     {
     }
@@ -51,9 +52,9 @@ public:
 class ImgLoader
 {
   public:
-    static std::shared_ptr<ImgLoader> GetRasterLoader(const std::string aFileType);
+    static std::shared_ptr<ImgLoader> GetRasterLoader(const std::string &arFileType);
 
-    ImgLoader() noexcept {}
+    ImgLoader() noexcept = default;
     virtual ~ImgLoader() = default;
 
     /**
@@ -66,7 +67,7 @@ class ImgLoader
      * \brief Get the bitmap of the loaded image
      * \return A reference to the vector holding the pixel values
      */
-    PixelData GetPixelData() const
+    [[nodiscard]] const PixelData& GetPixelData() const
     {
         return mPixelData;
     }
@@ -75,7 +76,7 @@ class ImgLoader
      * \brief Get the height of the bitmap
      * \return Value of the height
      */
-    GuiUnit_t GetHeight() const
+    [[nodiscard]] GuiUnit_t GetHeight() const
     {
         return mPixelData.GetHeight();
     }
@@ -84,7 +85,7 @@ class ImgLoader
      * \brief Get the width of the bitmap
      * \return Value of the width
      */
-    GuiUnit_t GetWidth() const
+    [[nodiscard]] GuiUnit_t GetWidth() const
     {
         return mPixelData.GetWidth();
     }
@@ -97,4 +98,4 @@ class ImgLoader
 
 } // namespace rsp::graphics
 
-#endif // IMGLOADER_H
+#endif // GRAPHICS_RASTER_IMGLOADER_H
