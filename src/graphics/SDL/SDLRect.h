@@ -22,6 +22,7 @@ class SDLRect : public SDL_Rect
 {
 public:
     SDLRect(int aX, int aY, int aW, int aH)
+        : SDL_Rect()
     {
         x = aX;
         y = aY;
@@ -29,7 +30,8 @@ public:
         h = aH;
     }
 
-    SDLRect(const Rect &arRect)
+    explicit SDLRect(const Rect &arRect)
+        : SDL_Rect()
     {
         x = arRect.GetLeft();
         y = arRect.GetTop();

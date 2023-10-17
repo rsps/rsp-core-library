@@ -124,7 +124,7 @@ public:
      * \brief Gets if the object is transparent
      * \return True if transparent
      */
-    bool IsTransparent() const { return mTransparent; }
+    [[nodiscard]] bool IsTransparent() const { return mTransparent; }
 
     /**
      * \brief Virtual method for traversing all GUI elements before rendering.
@@ -150,7 +150,7 @@ public:
      * \brief Gets the area of the object as a rectangle in parent coordinates
      * \return A reference to the rectangle defining the objects area
      */
-    Rect GetArea() const;
+    [[nodiscard]] Rect GetArea() const;
 
     /**
      * \brief Expand this area to fit to the size of the parent, if it is smaller.
@@ -170,13 +170,13 @@ public:
      * \brief Get the origin for this Control object in screen coordinates
      * \return Point
      */
-    Point GetOrigin() const;
+    [[nodiscard]] Point GetOrigin() const;
 
     /**
      * \brief Gets the touch area in parent coordinates
      * \return The current defined area as a Rectangle
      */
-    Rect GetTouchArea() const;
+    [[nodiscard]] Rect GetTouchArea() const;
 
     /**
      * \brief Set the touch area in parent coordinates
@@ -191,7 +191,7 @@ public:
      * \param arPoint
      * \return bool
      */
-    bool IsHit(const Point &arPoint) const { return mTouchArea.IsHit(arPoint); }
+    [[nodiscard]] bool IsHit(const Point &arPoint) const { return mTouchArea.IsHit(arPoint); }
 
     /**
      * \brief Adds a child to the vector of child control pointer objects
@@ -322,7 +322,7 @@ private:
 };
 
 std::string to_string(Control::States aState);
-std::ostream& operator<<(std::ostream& os, const Control::States aState);
+std::ostream& operator<<(std::ostream& os, Control::States aState);
 
 
 } // namespace rsp::graphics

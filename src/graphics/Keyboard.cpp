@@ -8,7 +8,6 @@
  * \author      Steffen Brummer
  */
 
-#include <cctype>
 #include <functional>
 #include <string>
 #include <locale>
@@ -48,7 +47,7 @@ void KeyboardBase::addBtn(Key &arBtn)
 
 void KeyboardBase::setSymbols(const std::string &arSymbols, bool aUpperCase)
 {
-    ASSERT(arSymbols.length() >= mKeys.size());
+    ASSERT(arSymbols.length() >= mKeys.size())
     std::u32string utf32 = std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.from_bytes(arSymbols);
     unsigned int index = 0;
     for (char32_t symbol : utf32) {
@@ -71,32 +70,32 @@ KeyboardBase& KeyboardBase::SetInput(const std::string &arText)
 
 
 static Rect cKeyTouchAreas[26] = {
-    {_Q, 59, 83}, // Q
-    {_W, 42, 83}, // W
-    {_E, 42, 83}, // E
-    {_R, 42, 83}, // R
-    {_T, 42, 83}, // T
-    {_Y, 42, 83}, // Y
-    {_U, 42, 83}, // U
-    {_I, 42, 83}, // I
-    {_O, 42, 83}, // O
-    {_P, 59, 83}, // P
-    {_A, 80, 69}, // A
-    {_S, 42, 69}, // S
-    {_D, 42, 69}, // D
-    {_F, 42, 69}, // F
-    {_G, 42, 69}, // G
-    {_H, 42, 69}, // H
-    {_J, 42, 69}, // J
-    {_K, 42, 69}, // K
-    {_L, 80, 69}, // L
-    {_Z, 42, 71}, // Z
-    {_X, 42, 71}, // X
-    {_C, 42, 71}, // C
-    {_V, 42, 71}, // V
-    {_B, 42, 71}, // B
-    {_N, 42, 71}, // N
-    {_M, 42, 71}  // M
+    {K_Q, 59, 83}, // Q
+    {K_W, 42, 83}, // W
+    {K_E, 42, 83}, // E
+    {K_R, 42, 83}, // R
+    {K_T, 42, 83}, // T
+    {K_Y, 42, 83}, // Y
+    {K_U, 42, 83}, // U
+    {K_I, 42, 83}, // I
+    {K_O, 42, 83}, // O
+    {K_P, 59, 83}, // P
+    {K_A, 80, 69}, // A
+    {K_S, 42, 69}, // S
+    {K_D, 42, 69}, // D
+    {K_F, 42, 69}, // F
+    {K_G, 42, 69}, // G
+    {K_H, 42, 69}, // H
+    {K_J, 42, 69}, // J
+    {K_K, 42, 69}, // K
+    {K_L, 80, 69}, // L
+    {K_Z, 42, 71}, // Z
+    {K_X, 42, 71}, // X
+    {K_C, 42, 71}, // C
+    {K_V, 42, 71}, // V
+    {K_B, 42, 71}, // B
+    {K_N, 42, 71}, // N
+    {K_M, 42, 71}  // M
 };
 
 static Point cKeyPositions[26] = {
@@ -243,7 +242,7 @@ Keyboard::~Keyboard()
 {
 }
 
-void Keyboard::doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol)
+void Keyboard::doKeyClick(const TouchEvent &/*arEvent*/, uint32_t aSymbol)
 {
     switch(aSymbol) {
         case cKEY_SHIFT:
@@ -326,4 +325,3 @@ Keyboard& Keyboard::AllowedButtons(utils::EnumFlags<Buttons> aMask)
 }
 
 } /* namespace rsp::graphics */
-

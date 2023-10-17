@@ -27,11 +27,14 @@ namespace rsp::graphics {
 class FontException : public exceptions::CoreException
 {
 public:
-    explicit FontException(const char *aMsg, int aCode);
-    FontException(const char *aMsg) : CoreException(aMsg) {};
-    FontException(const std::string &arMsg) : CoreException(arMsg.c_str()) {};
+    explicit FontException(const char *aMsg, int aCode)
+            : CoreException(std::string(aMsg) + formatCode(aCode))
+    {
+    }
+    explicit FontException(const char *aMsg) : CoreException(aMsg) {};
+    explicit FontException(const std::string &arMsg) : CoreException(arMsg.c_str()) {};
 
-    std::string formatCode(int aCode);
+    static std::string formatCode(int aCode);
 };
 
 /**
@@ -51,7 +54,7 @@ public:
     static void SetDefaultFont(const std::string &arFontName) { mDefaultFontName = arFontName; }
     static const std::string& GetDefaultFont() { return mDefaultFontName; }
 
-    Font(FontStyles aStyle = FontStyles::Normal);
+    explicit Font(FontStyles aStyle = FontStyles::Normal);
 
     /**
      * Constructs a Font object based on the given font name (font family) in the given style.
@@ -59,7 +62,7 @@ public:
      * \param arFontName
      * \param aStyle
      */
-    Font(const std::string &arFontName, FontStyles aStyle = FontStyles::Normal);
+    explicit Font(const std::string &arFontName, FontStyles aStyle = FontStyles::Normal);
 
     Font(const Font&) = default;
     Font(Font&&) = default;
@@ -86,7 +89,7 @@ public:
      *
      * \return string
      */
-    std::string GetFamilyName() const;
+    [[nodiscard]] std::string GetFamilyName() const;
 
     /**
      * Set the size of the font in pixels.
@@ -107,7 +110,7 @@ public:
      * Get the pixel size of the font
      * \return integer
      */
-    int GetSize() const;
+    [[nodiscard]] int GetSize() const;
 
     /**
      * Store a color inside the Font object.
@@ -121,7 +124,7 @@ public:
      *
      * \return Color
      */
-    Color GetColor() const { return mColor; }
+    [[nodiscard]] Color GetColor() const { return mColor; }
 
     /**
      * \brief Set the background color for the characters in the font
@@ -147,14 +150,14 @@ public:
      *
      * \return Font::Styles
      */
-    FontStyles GetStyle() const;
+    [[nodiscard]] FontStyles GetStyle() const;
 
     /**
      * \brief Get if the font attributes has changed since last creation
      *
      * \return True if font needs updating
      */
-    bool IsDirty() const { return mDirty; }
+    [[nodiscard]] bool IsDirty() const { return mDirty; }
 
 protected:
     static std::string mDefaultFontName;

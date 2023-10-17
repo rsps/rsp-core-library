@@ -8,7 +8,6 @@
  * \author      Steffen Brummer
  */
 
-#include <algorithm>
 #include <string>
 #include <graphics/Image.h>
 
@@ -81,7 +80,7 @@ void Image::update()
     }
 }
 
-void Image::doSetArea(const rsp::graphics::Rect &arRect, const Point &arOriginDifference)
+void Image::doSetArea(const rsp::graphics::Rect &arRect, const Point &/*arOriginDifference*/)
 {
     mpTexture = Texture::Create(arRect.GetWidth(), arRect.GetHeight());
 }

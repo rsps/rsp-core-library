@@ -126,7 +126,7 @@ class Point
      * \param aPoint
      * \return True if not equal
      */
-    bool operator!=(const Point &aPoint) noexcept
+    bool operator!=(const Point &aPoint) const noexcept
     {
         return (mX != aPoint.mX) || (mY != aPoint.mY);
     }
@@ -135,7 +135,7 @@ class Point
      * \brief Gets the value of the X coordinate
      * \return Integer
      */
-    GuiUnit_t GetX() const noexcept
+    [[nodiscard]] GuiUnit_t GetX() const noexcept
     {
         return mX;
     }
@@ -153,7 +153,7 @@ class Point
      * \brief Gets the value of the Y coordinate
      * \return Integer
      */
-    GuiUnit_t GetY() const noexcept
+    [[nodiscard]] GuiUnit_t GetY() const noexcept
     {
         return mY;
     }
@@ -167,7 +167,7 @@ class Point
         mY = aValue;
     }
 
-    int Distance(const Point &arOther) const;
+    [[nodiscard]] int Distance(const Point &arOther) const;
 
   protected:
     // Allow friends to access members for speed optimizations.

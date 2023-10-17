@@ -167,21 +167,21 @@ TEST_CASE("WLAN")
 
             APInfo status;
             CHECK_NOTHROW(status = wlan.GetStatus());
-            CHECK(status.mStatus == WpaStatus::Completed);
+            CHECK_EQ(status.mStatus, WpaStatus::Completed);
 
             CHECK_NOTHROW(wlan.Disconnect());
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             FetchMonitorEvents(wlan);
 
             CHECK_NOTHROW(status = wlan.GetStatus());
-            CHECK(status.mStatus != WpaStatus::Completed);
+            CHECK_NE(status.mStatus, WpaStatus::Completed);
 
             CHECK_NOTHROW(wlan.Reconnect());
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             FetchMonitorEvents(wlan);
 
             CHECK_NOTHROW(status = wlan.GetStatus());
-            CHECK(status.mStatus == WpaStatus::Completed);
+            CHECK_EQ(status.mStatus, WpaStatus::Completed);
         }
     }
 
@@ -229,5 +229,3 @@ TEST_CASE("WLAN")
         CHECK_NOTHROW(FetchMonitorEvents(wlan));
     }
 }
-
-

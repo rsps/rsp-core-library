@@ -12,7 +12,6 @@
 #include <graphics/GfxCompressor.h>
 #include <magic_enum.hpp>
 #include <iostream>
-#include <exceptions/BackTrace.h>
 
 namespace rsp::graphics {
 
@@ -20,8 +19,6 @@ namespace rsp::graphics {
 GfxCompressor::CompressedData GfxCompressor::Compress(CompressionType aType, const data_type *apData, size_type aSize)
 {
     std::cout << "GfxCompress(" << magic_enum::enum_name(aType) << ")" << std::endl;
-//    exceptions::BackTrace bt(0);
-//    std::cout << bt << std::endl;
 
     switch (aType) {
         default:
@@ -47,8 +44,6 @@ GfxCompressor::DecompressedData GfxCompressor::Decompress(const CompressedData &
 GfxCompressor::DecompressedData GfxCompressor::Decompress(CompressionType aType, const data_type *apData, size_type aSize)
 {
     std::cout << "GfxDecompress(" << magic_enum::enum_name(aType) << ")" << std::endl;
-//    exceptions::BackTrace bt(0);
-//    std::cout << bt << std::endl;
 
     switch (aType) {
         default:
@@ -140,7 +135,7 @@ GfxCompressor::CompressedData GfxCompressor::rgbCompress(const data_type *apData
     data_type count = 0;
 
     for (size_t i = 0; i < aSize ; i += 3) {
-        if (memcmp(val, &apData[i], 3) || (count == 255)) {
+        if ((memcmp(val, &apData[i], 3) != 0) || (count == 255)) {
             result.mData.push_back(count);
             result.mData.insert(result.mData.end(), &val[0], &val[3]);
             val[0] = apData[i+0];
@@ -185,7 +180,7 @@ GfxCompressor::CompressedData GfxCompressor::rgbaCompress(const data_type *apDat
     data_type count = 0;
 
     for (size_t i = 0; i < aSize ; i += 4) {
-        if (memcmp(val, &apData[i], 4) || (count == 255)) {
+        if ((memcmp(val, &apData[i], 4) != 0) || (count == 255)) {
             result.mData.push_back(count);
             result.mData.insert(result.mData.end(), &val[0], &val[4]);
             val[0] = apData[i+0];

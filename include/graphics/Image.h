@@ -21,7 +21,13 @@ class Image : public Control
 {
 public:
     Image();
-    Image(const PixelData &arPixelData);
+
+    /**
+     * \brief Make Image from raw pixel data. This is a conversion constructor.
+     *
+     * \param arPixelData
+     */
+    Image(const PixelData &arPixelData); // NOLINT
     explicit Image(const BitmapView &arBitmap);
     explicit Image(BitmapView &&arBitmap);
 

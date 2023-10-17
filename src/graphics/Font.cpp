@@ -13,7 +13,6 @@
 #include <string>
 #include <locale>
 #include <codecvt>
-#include <algorithm>
 #include <logging/Logger.h>
 
 namespace rsp::graphics {

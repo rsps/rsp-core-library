@@ -37,7 +37,7 @@ struct TouchEvent: public rsp::messaging::EventBase<TouchEvent>
     std::chrono::steady_clock::time_point mPressTime{};
     Point mPress{-1, -1}; // Absolute coordinate of latest press
 
-    TouchEvent() {};
+    TouchEvent() = default;
     TouchEvent(int aOffset, TouchTypes aType, const Point &arPoint);
     TouchEvent(const TouchEvent&);
 //    TouchEvent(TouchEvent&&);

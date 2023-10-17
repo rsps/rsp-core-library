@@ -39,30 +39,24 @@ static const char* FreeTypeErrorToString(int aCode)
     #define FT_ERRORDEF( e, v, s )    case v: return s;
     #define FT_ERROR_END_LIST       default: break; }
     #include FT_ERRORS_H
-    return "Unknown Error";
-}
-
-FontException::FontException(const char *aMsg, FT_Error aCode)
-    : CoreException(std::string(aMsg) + formatCode(aCode))
-{
+    auto result = FT_Error_String(FT_Error(aCode));
+    return (result) ? result : "Unknown Error";
 }
 
 std::string FontException::formatCode(int aCode)
 {
     std::string result;
     result += ": (" + std::to_string(aCode) + ") ";
-    const char *err = FreeTypeErrorToString(aCode);
-    result.append((err) ? err : "N");
+    result.append(FreeTypeErrorToString(aCode));
     return result;
 }
 
 
-inline static uint unsign(int aValue)
+inline static uint unSign(long aValue)
 {
     if (aValue < 0) {
         return 0;
     }
-
     return static_cast<uint>(aValue);
 }
 
@@ -77,11 +71,10 @@ FTGlyph::FTGlyph(FT_Face apFace)
     mAdvanceX = apFace->glyph->advance.x >> 6;
     mAdvanceY = apFace->glyph->advance.y >> 6;
 
-    mPixels.resize(static_cast<std::vector<uint8_t>::size_type>(unsign(mPitch)) * unsign(mHeight), 0xFF);
+    mPixels.resize(static_cast<std::vector<uint8_t>::size_type>(unSign(mPitch)) * unSign(mHeight), 0xFF);
     memcpy(mPixels.data(), apFace->glyph->bitmap.buffer, mPixels.size());
 
-    Rect r(apFace->bbox.xMin, apFace->bbox.yMin, apFace->bbox.xMax, apFace->bbox.yMax);
-
+//    Rect r(apFace->bbox.xMin, apFace->bbox.yMin, apFace->bbox.xMax, apFace->bbox.yMax);
 //    std::cout << "BBOX: " << r << std::endl;
 //    mpPixels = apFace->glyph->bitmap.buffer;
 }
@@ -125,11 +118,11 @@ std::shared_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
 //    glyphs->mBaseLine = (mpFace->size->metrics.ascender * glyphs->mLineHeight) / (mpFace->size->metrics.ascender + std::abs(mpFace->size->metrics.descender));
     glyphs->mBaseLine = (mpFace->ascender * glyphs->mLineHeight) / (mpFace->ascender + std::abs(mpFace->descender));
 
-    int baseline = glyphs->mBaseLine;
-    int min_left = 0;
-    int max_left = 0;
-    int line_left = 0;
-    int max_height = glyphs->mLineHeight;
+    long baseline = glyphs->mBaseLine;
+    long min_left = 0;
+    long max_left = 0;
+    long line_left = 0;
+    long max_height = glyphs->mLineHeight;
     for (Glyph &glyph : glyphs->mGlyphs) {
         if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
             baseline += glyphs->mLineHeight + aLineSpacing;
@@ -151,13 +144,13 @@ std::shared_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
     }
     glyphs->mLineWidths.push_back(line_left);
 
-    if (glyphs->mGlyphs.size() && (glyphs->mGlyphs.back().mWidth > glyphs->mGlyphs.back().mAdvanceX)) {
+    if (!glyphs->mGlyphs.empty() && (glyphs->mGlyphs.back().mWidth > glyphs->mGlyphs.back().mAdvanceX)) {
         max_left++;
     }
 
     if (aHAlignment > 0) {
         size_t line = 0;
-        int offset = (aHAlignment == 1) ? ((max_left - glyphs->mLineWidths[line]) / 2) : (max_left - glyphs->mLineWidths[line]);
+        long offset = (aHAlignment == 1) ? ((max_left - glyphs->mLineWidths[line]) / 2) : (max_left - glyphs->mLineWidths[line]);
         for (Glyph &glyph : glyphs->mGlyphs) {
             if (glyph.mSymbolUnicode == static_cast<uint32_t>('\n')) {
                 line++;
@@ -169,7 +162,7 @@ std::shared_ptr<Glyphs> FreeTypeRawFont::MakeGlyphs(const std::string &arText, i
         }
     }
 
-    glyphs->mBoundingRect = Rect(min_left, 0, max_left, max_height);
+    glyphs->mBoundingRect = Rect(GuiUnit_t(min_left), 0, GuiUnit_t(max_left), GuiUnit_t(max_height));
     return glyphs;
 }
 
@@ -225,7 +218,7 @@ FTGlyph FreeTypeRawFont::getSymbol(char32_t aSymbolCode, FontStyles aStyle) cons
     return result;
 }
 
-int FreeTypeRawFont::getKerning(char32_t aFirst, char32_t aSecond, uint aKerningMode) const
+long FreeTypeRawFont::getKerning(char32_t aFirst, char32_t aSecond, uint aKerningMode) const
 {
     if (aKerningMode == 0) {
         aKerningMode = FT_KERNING_DEFAULT;
@@ -263,27 +256,27 @@ void FreeTypeRawFont::freeFace()
     }
 }
 
-std::u32string FreeTypeRawFont::stringToU32(const std::string &arText) const
+std::u32string FreeTypeRawFont::stringToU32(const std::string &arText)
 {
     std::u32string result;
 
     for (size_t i = 0 ; i < arText.size() ;) {
-        int a = arText[i++];
+        auto a = char32_t(arText[i++]);
 
         if ((a & 0xE0) == 0xC0) {
             a = (a & 0x1F) << 6;
-            a |= arText[i++] & 0x3F;
+            a |= char32_t(arText[i++]) & 0x3F;
         }
         else if ((a & 0xF0) == 0xE0) {
             a = (a & 0xF) << 12;
-            a |= (arText[i++] & 0x3F) << 6;
-            a |= arText[i++] & 0x3F;
+            a |= (char32_t(arText[i++]) & 0x3F) << 6;
+            a |= char32_t(arText[i++]) & 0x3F;
         }
         else if ((a & 0xF8) == 0xF0) {
             a = (a & 0x7) << 18;
             a |= (a & 0x3F) << 12;
-            a |= (arText[i++] & 0x3F) << 6;
-            a |= arText[i++] & 0x3F;
+            a |= (char32_t(arText[i++]) & 0x3F) << 6;
+            a |= char32_t(arText[i++]) & 0x3F;
         }
         result.push_back(static_cast<char32_t>(a));
     }
@@ -294,4 +287,3 @@ std::u32string FreeTypeRawFont::stringToU32(const std::string &arText) const
 }
 
 #endif /* USE_FREETYPE */
-

@@ -18,7 +18,7 @@ namespace rsp::graphics {
 
 enum class ColorDepth : uint16_t { Monochrome = 1, Alpha = 8, RGB = 24, RGBA = 32 };
 
-std::ostream& operator<<(std::ostream& os, const ColorDepth arDepth);
+std::ostream& operator<<(std::ostream& os, ColorDepth aDepth);
 
 struct GfxResource
 {

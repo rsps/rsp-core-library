@@ -9,10 +9,7 @@
  */
 
 #include <sstream>
-#include <exceptions/CoreException.h>
 #include <graphics/Rect.h>
-
-using namespace rsp::exceptions;
 
 namespace rsp::graphics
 {
@@ -61,16 +58,16 @@ Rect::Rect(const Point &aLeftTop, GuiUnit_t aWidth, GuiUnit_t aHeight)
 Rect Rect::operator &(const Rect &arOther) const
 {
     if (mLeftTop.mX > (arOther.mLeftTop.mX + arOther.mWidth)) {
-        return Rect();
+        return {};
     }
     if ((mLeftTop.mX + mWidth) < arOther.mLeftTop.mX) {
-        return Rect();
+        return {};
     }
     if (mLeftTop.mY > (arOther.mLeftTop.mY + arOther.mHeight)) {
-        return Rect();
+        return {};
     }
     if ((mLeftTop.mY + mHeight) < arOther.mLeftTop.mY) {
-        return Rect();
+        return {};
     }
 
     int minX = std::max(mLeftTop.mX, arOther.mLeftTop.mX);
@@ -78,7 +75,7 @@ Rect Rect::operator &(const Rect &arOther) const
     int maxX = std::min(mLeftTop.mX + mWidth, arOther.mLeftTop.mX + arOther.mWidth);
     int maxY = std::min(mLeftTop.mY + mHeight, arOther.mLeftTop.mY + arOther.mHeight);
 
-    return Rect(minX, minY, maxX - minX, maxY - minY);
+    return {minX, minY, maxX - minX, maxY - minY};
 }
 
 Rect& Rect::operator &=(const Rect &arOther)

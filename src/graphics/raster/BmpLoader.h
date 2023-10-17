@@ -132,8 +132,8 @@ protected:
     void ReadData(rsp::posix::FileIO &arFile);
     Color ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::uint32_t aY, size_t aPaddedRowSize);
 
-    ColorDepth bitsPerPixelToColorDepth(std::uint32_t aBpp);
-    int maskToIndex(uint32_t aMask);
+    static ColorDepth bitsPerPixelToColorDepth(std::uint32_t aBpp);
+    static int maskToIndex(uint32_t aMask);
 
 };
 

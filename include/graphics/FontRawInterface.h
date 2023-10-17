@@ -25,15 +25,15 @@ namespace rsp::graphics {
 class Glyph
 {
 public:
-    virtual ~Glyph() {};
+    virtual ~Glyph() = default;
 
     char32_t mSymbolUnicode = 0;
-    int mTop = 0;
-    int mLeft = 0;
-    int mWidth = 0;
-    int mHeight = 0;
-    int mAdvanceX = 0;
-    int mAdvanceY = 0;
+    long mTop = 0;
+    long mLeft = 0;
+    long mWidth = 0;
+    long mHeight = 0;
+    long mAdvanceX = 0;
+    long mAdvanceY = 0;
 
     /**
      * \brief Get a pointer to a row of alpha values, with a length equal to the glyph width.
@@ -41,23 +41,23 @@ public:
      * \param aY Row index to return
      * \return Pointer to alpha values
      */
-    virtual const uint8_t* GetPixelRow(int aY) const = 0;
+    [[nodiscard]] virtual const uint8_t* GetPixelRow(size_t aY) const = 0;
 };
 
 class Glyphs
 {
 public:
-    virtual ~Glyphs() {}
-    virtual unsigned GetCount() const = 0;
+    virtual ~Glyphs() = default;
+    [[nodiscard]] virtual unsigned GetCount() const = 0;
     virtual Glyph& GetGlyph(unsigned int aIndex) = 0;
-    virtual const Glyph& GetGlyph(unsigned int aIndex) const = 0;
+    [[nodiscard]] virtual const Glyph& GetGlyph(unsigned int aIndex) const = 0;
 
     int mUnderlineYCenter = 0;
     int mUnderlineThickness = 0;
-    int mLineHeight = 0;
-    int mBaseLine = 0;
+    long mLineHeight = 0;
+    long mBaseLine = 0;
     Rect mBoundingRect{};
-    std::vector<int> mLineWidths{};
+    std::vector<long> mLineWidths{};
 };
 
 /**
@@ -94,16 +94,16 @@ class FontRawInterface
 public:
     static void RegisterFont(std::string_view aFileName);
 
-    virtual ~FontRawInterface() {};
+    virtual ~FontRawInterface() = default;
 
     virtual std::shared_ptr<Glyphs> MakeGlyphs(const std::string &arText, int aLineSpacing, int aHAlignment) = 0;
-    virtual std::string GetFamilyName() const = 0;
+    [[nodiscard]] virtual std::string GetFamilyName() const = 0;
     virtual void SetSize(int aWidthPx, int aHeightPx) = 0;
 
-    int GetSize() const { return mSizePx; }
+    [[nodiscard]] int GetSize() const { return mSizePx; }
 
     virtual void SetStyle(FontStyles aStyle) { mStyle = aStyle; }
-    FontStyles GetStyle() const { return mStyle; }
+    [[nodiscard]] FontStyles GetStyle() const { return mStyle; }
 
 protected:
     FontStyles mStyle = FontStyles::Normal;

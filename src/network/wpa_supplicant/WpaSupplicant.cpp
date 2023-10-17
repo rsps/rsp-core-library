@@ -11,10 +11,8 @@
 
 #include <algorithm>
 #include <list>
-#include <memory>
 #include <string>
 #include <string_view>
-#include <logging/LogChannel.h>
 #include <network/WLan.h>
 #include <posix/FileSystem.h>
 #include <posix/NetworkInterfaces.h>
@@ -80,14 +78,14 @@ std::vector<APInfo> WpaSupplicant::GetAvailableNetworks()
 
         // Available networks are tickling in as their SSID's are broadcast. See "beacon interval"
         // Poor mans solution: Loop repeatedly until result is stable
-        while(true) {
+        for(;;) {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             std::string s = request("SCAN_RESULTS");
             if (reply == s) {
                 break;
             }
             reply = s;
-        };
+        }
 
         const std::string header("bssid / frequency / signal level / flags / ssid\n");
         if (!StrUtils::StartsWith(reply, header)) {

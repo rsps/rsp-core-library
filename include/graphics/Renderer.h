@@ -61,11 +61,11 @@ public:
      */
     static Renderer& Get();
 
-    virtual ~Renderer() {}
+    virtual ~Renderer() =default;
 
-    virtual GuiUnit_t GetHeight() const = 0;
-    virtual GuiUnit_t GetWidth() const = 0;
-    virtual ColorDepth GetColorDepth() const = 0;
+    [[nodiscard]] virtual GuiUnit_t GetHeight() const = 0;
+    [[nodiscard]] virtual GuiUnit_t GetWidth() const = 0;
+    [[nodiscard]] virtual ColorDepth GetColorDepth() const = 0;
 
     /**
      * \brief Draw a rectangle of width 1px
@@ -83,7 +83,7 @@ public:
      * \param aDestination Optional area on the surface to fill
      * \return self
      */
-    virtual Renderer& Fill(const Color &arColor, OptionalRect aDestination = nullptr) = 0;
+    virtual Renderer& Fill(const Color &arColor, OptionalRect aDestination = nullptr) = 0; // NOLINT
 
     /**
      * \brief Copy the given texture onto this presentation surface
@@ -142,8 +142,8 @@ public:
      * \brief Gets a single pixel to the given Color
      * \param aPoint Reference to the coordinate for the pixel to get
      */
-    virtual Color GetPixel(GuiUnit_t aX, GuiUnit_t aY) const = 0;
-    Color GetPixel(const Point &arPoint) const { return GetPixel(arPoint.GetX(), arPoint.GetY()); }
+    [[nodiscard]] virtual Color GetPixel(GuiUnit_t aX, GuiUnit_t aY) const = 0;
+    [[nodiscard]] Color GetPixel(const Point &arPoint) const { return GetPixel(arPoint.GetX(), arPoint.GetY()); }
 };
 
 } /* namespace rsp::graphics */

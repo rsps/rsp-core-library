@@ -20,22 +20,11 @@
 #include <graphics/Rect.h>
 #include <graphics/Renderer.h>
 #include <utils/Singleton.h>
-#include <exceptions/CoreException.h>
+#include "SDLException.h"
 #include "SDLEvents.h"
 
 
 namespace rsp::graphics::sdl {
-
-
-class SDLException: public exceptions::CoreException
-{
-public:
-    explicit SDLException(const char *apMsg)
-        : CoreException(std::string(apMsg) + ": " + std::string(SDL_GetError()))
-    {
-    }
-};
-
 
 class SDLRenderer: public rsp::graphics::Renderer, public rsp::utils::Singleton<SDLRenderer>
 {
@@ -52,16 +41,16 @@ public:
     Renderer& PushClipRect(const Rect &arClipRect) override;
     Renderer& PopClipRect() override;
     Renderer& Fill(const Color &arColor, OptionalRect aDestination) override;
-    GuiUnit_t GetWidth() const override;
+    [[nodiscard]] GuiUnit_t GetWidth() const override;
     Renderer& Flush() override;
     void Present() override;
-    GuiUnit_t GetHeight() const override;
+    [[nodiscard]] GuiUnit_t GetHeight() const override;
     Renderer& DrawRect(const Color &arColor, const Rect &arRect) override;
     Renderer& SetPixel(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) override;
-    Color GetPixel(GuiUnit_t aX, rsp::graphics::GuiUnit_t aY) const override;
-    ColorDepth GetColorDepth() const override;
+    [[nodiscard]] Color GetPixel(GuiUnit_t aX, rsp::graphics::GuiUnit_t aY) const override;
+    [[nodiscard]] ColorDepth GetColorDepth() const override;
 
-    SDL_Renderer* GetSDLRenderer() const { return mpRenderer; }
+    [[nodiscard]] SDL_Renderer* GetSDLRenderer() const { return mpRenderer; }
 
 protected:
     Rect mArea;

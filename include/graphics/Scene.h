@@ -21,12 +21,12 @@ class Scene: public Control
 public:
     static void SetScreenSize(GuiUnit_t aWidth, GuiUnit_t aHeight);
 
-    Scene(const Rect &arRect = mScreenSize)
+    explicit Scene(const Rect &arRect = mScreenSize)
     {
         SetArea(arRect);
     }
 
-    virtual ~Scene();
+    ~Scene() override;
 
     /**
      * \brief Activation function, called after scene has been fully constructed
@@ -55,7 +55,7 @@ public:
         initTypeInfo<T>();
     }
 
-    SceneBase(const Rect &arRect)
+    explicit SceneBase(const Rect &arRect)
         : Scene(arRect)
     {
         initTypeInfo<T>();

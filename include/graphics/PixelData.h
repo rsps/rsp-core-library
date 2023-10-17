@@ -35,19 +35,19 @@ public:
 class PixelData
 {
 public:
-    PixelData() noexcept {}
+    PixelData() = default;
     PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth = ColorDepth::RGBA);
     PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData, size_t aDataSize, bool aCompressed = false);
-    PixelData(const GfxResource &arResource);
+    explicit PixelData(const GfxResource &arResource);
 
     PixelData(const PixelData& arOther);
-    PixelData(PixelData&& arOther);
+    PixelData(PixelData&& arOther) noexcept;
     PixelData& operator=(const PixelData& arOther);
-    PixelData& operator=(PixelData&& arOther);
+    PixelData& operator=(PixelData&& arOther) noexcept;
 
     PixelData& CopyFrom(const Point &arDestination, const PixelData &arOther, const Rect &arSourceRect, Color aColor);
 
-    PixelData ChangeColorDepth(ColorDepth aDepth, Color aColor = Color::Black) const;
+    [[nodiscard]] PixelData ChangeColorDepth(ColorDepth aDepth, Color aColor = Color::Black) const;
 
     PixelData& Init(uint32_t aId, GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData);
 
@@ -61,21 +61,21 @@ public:
      */
     PixelData& Fade(int aAlphaInc, bool aFixed = false);
 
-    uint32_t GetId() const { return mId; }
+    [[nodiscard]] uint32_t GetId() const { return mId; }
 
-    const std::uint8_t* GetData() const { return mpData; }
+    [[nodiscard]] const std::uint8_t* GetData() const { return mpData; }
     std::vector<std::uint8_t>& GetData() { return mData; }
 
     PixelData& SetData(const std::uint8_t *apData) { mpData = const_cast<std::uint8_t*>(apData); return *this; }
 
-    size_t GetDataSize() const;
+    [[nodiscard]] size_t GetDataSize() const;
 
-    GuiUnit_t GetWidth() const { return mRect.GetWidth(); }
-    GuiUnit_t GetHeight() const { return mRect.GetHeight(); }
-    ColorDepth GetColorDepth() const { return mColorDepth; }
-    const Rect& GetRect() const { return mRect; }
-    bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const { return mRect.IsHit(aX, aY); }
-    bool IsHit(const Point &arPoint) const { return mRect.IsHit(arPoint); }
+    [[nodiscard]] GuiUnit_t GetWidth() const { return mRect.GetWidth(); }
+    [[nodiscard]] GuiUnit_t GetHeight() const { return mRect.GetHeight(); }
+    [[nodiscard]] ColorDepth GetColorDepth() const { return mColorDepth; }
+    [[nodiscard]] const Rect& GetRect() const { return mRect; }
+    [[nodiscard]] bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const { return mRect.IsHit(aX, aY); }
+    [[nodiscard]] bool IsHit(const Point &arPoint) const { return mRect.IsHit(arPoint); }
 
     /**
      * \brief Get the color value for the pixel at given position
@@ -88,8 +88,8 @@ public:
      * \param aColor
      * \return Color
      */
-    Color GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color& arColor = Color::Black) const;
-    Color GetPixel(const Point &arPoint, Color aColor = Color::Black) const { return GetPixelAt(arPoint.mX, arPoint.mY, aColor); }
+    [[nodiscard]] Color GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color& arColor = Color::Black) const;
+    [[nodiscard]] Color GetPixel(const Point &arPoint, Color aColor = Color::Black) const { return GetPixelAt(arPoint.mX, arPoint.mY, aColor); }
 
     PixelData& SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor);
     PixelData& SetPixel(const Point &arPoint, Color aColor) { return SetPixelAt(arPoint.mX, arPoint.mY, aColor); }
@@ -98,9 +98,9 @@ public:
 
     bool SetBlend(bool aValue);
 
-    GfxCompressor::CompressedData Compress(bool aCompress = true) const;
+    [[nodiscard]] GfxCompressor::CompressedData Compress(bool aCompress = true) const;
     PixelData& Decompress(const GfxCompressor::CompressedData &arCompressedData);
-    PixelData& Decompress(const GfxCompressor::CompressionType aType, const uint8_t* apData, size_t aSize);
+    PixelData& Decompress(GfxCompressor::CompressionType aType, const uint8_t* apData, size_t aSize);
 
 protected:
     ColorDepth mColorDepth = ColorDepth::RGB;
@@ -110,7 +110,7 @@ protected:
     bool mBlend = true;
     uint32_t mId = 0;
 
-    GfxCompressor::CompressionType getCompressionType(bool aCompress) const;
+    [[nodiscard]] GfxCompressor::CompressionType getCompressionType(bool aCompress) const;
 
     friend class ImgLoader;
     void initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth);

@@ -80,19 +80,15 @@ SDLTexture::SDLTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestP
     }
 }
 
-SDLTexture::~SDLTexture()
-{
-}
-
-constexpr uint32_t* offset(uint32_t *addr, uintptr_t pitch, uintptr_t x, uintptr_t y) {
+inline uint32_t* offset(uint32_t *addr, uintptr_t pitch, uintptr_t x, uintptr_t y) {
     return reinterpret_cast<uint32_t*>(uintptr_t(addr) + (y * pitch) + (x * sizeof(uint32_t)));
 }
 
-constexpr uint32_t* offset(uint32_t *addr, uintptr_t pitch, GuiUnit_t x, GuiUnit_t y) {
+inline uint32_t* offset(uint32_t *addr, uintptr_t pitch, GuiUnit_t x, GuiUnit_t y) {
     return offset(addr, pitch, uintptr_t(x), uintptr_t(y));
 }
 
-Texture& SDLTexture::Update(const PixelData &arPixelData, const Color &arColor)
+Texture& SDLTexture::Update(const PixelData &arPixelData, const Color &arColor) // NOLINT
 {
     uint32_t *dst;
     int pitch;
@@ -103,7 +99,7 @@ Texture& SDLTexture::Update(const PixelData &arPixelData, const Color &arColor)
     Rect dr(mArea);
     Rect sr(arPixelData.GetRect());
 
-    GuiUnit_t y_end = uintptr_t(std::min(dr.GetHeight(), sr.GetHeight()));
+    GuiUnit_t y_end = std::min(dr.GetHeight(), sr.GetHeight());
     size_t w = size_t(std::min(dr.GetWidth(), sr.GetWidth()));
     GuiUnit_t src_y = sr.GetTop();
 
@@ -151,7 +147,7 @@ Texture& SDLTexture::Update(const PixelData &arPixelData, const Color &arColor)
     return *this;
 }
 
-Texture& SDLTexture::Fill(const Color &arColor, OptionalRect arRect)
+Texture& SDLTexture::Fill(const Color &arColor, OptionalRect arRect) // NOLINT
 {
     uint32_t *dst;
     int pitch;
@@ -165,7 +161,7 @@ Texture& SDLTexture::Fill(const Color &arColor, OptionalRect arRect)
     }
 
     GuiUnit_t h = dr.GetHeight();
-    size_t w = size_t(dr.GetWidth());
+    auto w = size_t(dr.GetWidth());
     uint32_t cl = arColor.AsRaw();
 
     for (GuiUnit_t y = dr.GetTop(); y < h ; ++y) {
@@ -179,7 +175,7 @@ Texture& SDLTexture::Fill(const Color &arColor, OptionalRect arRect)
     return *this;
 }
 
-Texture& SDLTexture::SetBlendOperation(Texture::BlendOperation aOp, const Color &arColorKey)
+Texture& SDLTexture::SetBlendOperation(Texture::BlendOperation aOp, const Color &arColorKey) // NOLINT
 {
     mBlendOperation = aOp;
     mColorKey = arColorKey;
@@ -245,7 +241,7 @@ GuiUnit_t SDLTexture::GetHeight() const
 
 TexturePtr_t SDLTexture::Clone() const
 {
-    return std::unique_ptr<SDLTexture>(new SDLTexture(*this));
+    return std::make_unique<SDLTexture>(*this);
 }
 
 } /* namespace rsp::graphics::sdl */

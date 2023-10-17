@@ -23,11 +23,12 @@ namespace rsp::graphics {
 class FTGlyph : public Glyph
 {
 public:
-    FTGlyph() {}
-    FTGlyph(FT_Face apFace);
+    FTGlyph() = default;
+    explicit FTGlyph(FT_Face apFace);
 
-    const uint8_t* GetPixelRow(int aY) const override {
-        return &mPixels.data()[mPitch * aY];
+    [[nodiscard]] const uint8_t* GetPixelRow(size_t aY) const override
+    {
+        return &mPixels[size_t(mPitch) * aY];
     }
 protected:
     std::vector<uint8_t> mPixels{};
@@ -37,11 +38,11 @@ protected:
 class FTGlyphs : public Glyphs
 {
 public:
-    FTGlyphs() noexcept {}
+    FTGlyphs() noexcept = default;
 
-    unsigned int GetCount() const override { return mGlyphs.size(); }
+    [[nodiscard]] unsigned int GetCount() const override { return mGlyphs.size(); }
     Glyph& GetGlyph(unsigned aIndex) override { return *static_cast<Glyph*>(&mGlyphs.at(aIndex)); };
-    const Glyph& GetGlyph(unsigned aIndex) const override { return *static_cast<const Glyph*>(&mGlyphs.at(aIndex)); };
+    [[nodiscard]] const Glyph& GetGlyph(unsigned aIndex) const override { return *static_cast<const Glyph*>(&mGlyphs.at(aIndex)); };
 
     std::vector<FTGlyph> mGlyphs{};
 };
@@ -53,25 +54,26 @@ public:
 class FreeTypeRawFont : public FontRawInterface
 {
 public:
-    FreeTypeRawFont(const std::string &arFontName, int aFaceIndex = 0);
-    ~FreeTypeRawFont();
+    explicit FreeTypeRawFont(const std::string &arFontName, int aFaceIndex = 0);
+    ~FreeTypeRawFont() override;
+
+    FreeTypeRawFont(const FreeTypeRawFont&) = delete;
+    FreeTypeRawFont& operator=(const FreeTypeRawFont&) = delete;
 
     std::shared_ptr<Glyphs> MakeGlyphs(const std::string &arText, int aLineSpacing, int aHAlignment) override;
-    std::string GetFamilyName() const override;
+    [[nodiscard]] std::string GetFamilyName() const override;
     void SetSize(int aWidthPx, int aHeightPx) override;
     void SetStyle(FontStyles aStyle) override;
 
 protected:
     FT_Face mpFace = nullptr;
     std::string mFontName{};
-    FreeTypeRawFont(const FreeTypeRawFont&) = delete;
-    FreeTypeRawFont& operator=(const FreeTypeRawFont&) = delete;
 
     void createFace();
     void freeFace();
-    FTGlyph getSymbol(char32_t aSymbolCode, FontStyles aStyle) const;
-    int getKerning(char32_t aFirst, char32_t aSecond, uint aKerningMode = 0) const;
-    std::u32string stringToU32(const std::string &arText) const;
+    [[nodiscard]] FTGlyph getSymbol(char32_t aSymbolCode, FontStyles aStyle) const;
+    [[nodiscard]] long getKerning(char32_t aFirst, char32_t aSecond, uint aKerningMode = 0) const;
+    [[nodiscard]] static std::u32string stringToU32(const std::string &arText);
 };
 
 }
@@ -79,4 +81,3 @@ protected:
 #endif /* USE_FREETYPE */
 
 #endif /* SRC_GRAPHICS_FREETYPE_FREETYPERAWFONT_H_ */
-

@@ -36,21 +36,22 @@ struct FontInfo {
 class FreeTypeLibrary
 {
 public:
+    FreeTypeLibrary(const FreeTypeLibrary&) = delete;
+    FreeTypeLibrary& operator =(const FreeTypeLibrary&) = delete;
+
     static FreeTypeLibrary& Get();
 
     void RegisterFont(const std::string &arFileName);
 
-    operator FT_Library() const {
+    explicit operator FT_Library() const {
         return mFtLib;
     }
 
     FT_Face CreateFontFace(const std::string &arFontName, FontStyles aStyle);
 
 private:
-    FreeTypeLibrary(void);
-    ~FreeTypeLibrary(void);
-    FreeTypeLibrary(const FreeTypeLibrary&) = delete;
-    FreeTypeLibrary& operator =(const FreeTypeLibrary&) = delete;
+    FreeTypeLibrary();
+    ~FreeTypeLibrary();
 
     FT_Library mFtLib { };
 

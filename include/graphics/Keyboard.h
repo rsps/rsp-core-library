@@ -39,84 +39,84 @@ namespace rsp::graphics {
 
 #define KEY(x,y) {KB_X + x, KB_Y + y}
 
-#define _SPACE   KEY( 98, 224)
-#define _NUMBERS KEY(  0, 224)
-#define _LETTERS KEY(  0, 224)
-#define _SPECIAL KEY(358, 224)
-#define _SHIFT   KEY(  0, 152)
-#define _ERASE   KEY(375, 152)
+#define K_SPACE   KEY( 98, 224)
+#define K_NUMBERS KEY(  0, 224)
+#define K_LETTERS KEY(  0, 224)
+#define K_SPECIAL KEY(358, 224)
+#define K_SHIFT   KEY(  0, 152)
+#define K_ERASE   KEY(375, 152)
 
-#define _Q KEY(  0,   0)
-#define _W KEY( 59,   0)
-#define _E KEY(101,   0)
-#define _R KEY(143,   0)
-#define _T KEY(185,   0)
-#define _Y KEY(227,   0)
-#define _U KEY(269,   0)
-#define _I KEY(311,   0)
-#define _O KEY(353,   0)
-#define _P KEY(395,   0)
-#define _A KEY(  0,  83)
-#define _S KEY( 80,  83)
-#define _D KEY(122,  83)
-#define _F KEY(164,  83)
-#define _G KEY(206,  83)
-#define _H KEY(248,  83)
-#define _J KEY(290,  83)
-#define _K KEY(332,  83)
-#define _L KEY(374,  83)
-#define _Z KEY( 80, 152)
-#define _X KEY(122, 152)
-#define _C KEY(164, 152)
-#define _V KEY(206, 152)
-#define _B KEY(248, 152)
-#define _N KEY(290, 152)
-#define _M KEY(332, 152)
+#define K_Q KEY(  0,   0)
+#define K_W KEY( 59,   0)
+#define K_E KEY(101,   0)
+#define K_R KEY(143,   0)
+#define K_T KEY(185,   0)
+#define K_Y KEY(227,   0)
+#define K_U KEY(269,   0)
+#define K_I KEY(311,   0)
+#define K_O KEY(353,   0)
+#define K_P KEY(395,   0)
+#define K_A KEY(  0,  83)
+#define K_S KEY( 80,  83)
+#define K_D KEY(122,  83)
+#define K_F KEY(164,  83)
+#define K_G KEY(206,  83)
+#define K_H KEY(248,  83)
+#define K_J KEY(290,  83)
+#define K_K KEY(332,  83)
+#define K_L KEY(374,  83)
+#define K_Z KEY( 80, 152)
+#define K_X KEY(122, 152)
+#define K_C KEY(164, 152)
+#define K_V KEY(206, 152)
+#define K_B KEY(248, 152)
+#define K_N KEY(290, 152)
+#define K_M KEY(332, 152)
 
-#define _NUM_1 _Q
-#define _NUM_2 _W
-#define _NUM_3 _E
-#define _NUM_4 _R
-#define _NUM_5 _T
-#define _NUM_6 _Y
-#define _NUM_7 _U
-#define _NUM_8 _I
-#define _NUM_9 _O
-#define _NUM_0 _P
-#define _MINUS _A
-#define _UNDERSCORE _S
-#define _COLON _D
-#define _SEMICOLON _F
-#define _LEFT_PARANTHESES _G
-#define _RIGHT_PARANTHESES _H
-#define _AMPERSAND _J
-#define _CURLY_A _K
-#define _QUOTE _L
-#define _DOT _Z
-#define _COMMA _X
-#define _QUESTION_MARK _C
-#define _EXCLAMATION _V
-#define _APOSTROPHE _B
-#define _SLASH _N
-#define _ASTERISK _M
+#define K_NUM_1 K_Q
+#define K_NUM_2 K_W
+#define K_NUM_3 K_E
+#define K_NUM_4 K_R
+#define K_NUM_5 K_T
+#define K_NUM_6 K_Y
+#define K_NUM_7 K_U
+#define K_NUM_8 K_I
+#define K_NUM_9 K_O
+#define K_NUM_0 K_P
+#define K_MINUS K_A
+#define K_UNDERSCORE K_S
+#define K_COLON K_D
+#define K_SEMICOLON K_F
+#define K_LEFT_PARANTHESES K_G
+#define K_RIGHT_PARANTHESES K_H
+#define K_AMPERSAND K_J
+#define K_CURLY_A K_K
+#define K_QUOTE K_L
+#define K_DOT K_Z
+#define K_COMMA K_X
+#define K_QUESTION_MARK K_C
+#define K_EXCLAMATION K_V
+#define K_APOSTROPHE K_B
+#define K_SLASH K_N
+#define K_ASTERISK K_M
 
-#define _LEFT_BRACKET _W
-#define _RIGHT_BRACKET _E
-#define _LEFT_BRACE _R
-#define _RIGHT_BRACE _T
-#define _NUMBER_SIGN _Y
-#define _PERCENT_SIGN _U
-#define _PLUS_SIGN _I
-#define _TILDE _O
-#define _EQUAL_SIGN _A
-#define _CURRENCY_SIGN _S
-#define _BACKSLASH _D
-#define _ALMOST_EQUAL _F
-#define _LESS_THAN _G
-#define _GREATER_THAN _H
-#define _POUND_SIGN _J
-#define _EURO_SIGN _K
-#define _DOLLAR_SIGN _L
+#define K_LEFT_BRACKET K_W
+#define K_RIGHT_BRACKET K_E
+#define K_LEFT_BRACE K_R
+#define K_RIGHT_BRACE K_T
+#define K_NUMBER_SIGN K_Y
+#define K_PERCENT_SIGN K_U
+#define K_PLUS_SIGN K_I
+#define K_TILDE K_O
+#define K_EQUAL_SIGN K_A
+#define K_CURRENCY_SIGN K_S
+#define K_BACKSLASH K_D
+#define K_ALMOST_EQUAL K_F
+#define K_LESS_THAN K_G
+#define K_GREATER_THAN K_H
+#define K_POUND_SIGN K_J
+#define K_EURO_SIGN K_K
+#define K_DOLLAR_SIGN K_L
 
 
 class Key : public Button
@@ -131,7 +131,7 @@ class KeyboardBase: public Control
 public:
     using KeyboardCallback_t = rsp::messaging::Notifier<const std::string &>;
 
-    const std::string GetInput() { return mInput; }
+    [[nodiscard]] const std::string& GetInput() const { return mInput; }
     KeyboardBase& SetInput(const std::string &arText);
 
     KeyboardCallback_t& OnKeyClick() { return mOnKeyClick; }
@@ -174,10 +174,10 @@ public:
     };
 
     Keyboard();
-    ~Keyboard();
+    ~Keyboard() override;
 
     Keyboard& SetLayout(LayoutType aLayout);
-    LayoutType GetLayout() const { return mLayout; }
+    [[nodiscard]] LayoutType GetLayout() const { return mLayout; }
 
     Keyboard& AllowedButtons(utils::EnumFlags<Buttons> aMask);
 protected:

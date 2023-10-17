@@ -66,11 +66,11 @@ public:
     Color(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha);
 
     /**
-     * \brief Construct from ARGB value.
+     * \brief Construct from ARGB value. This is a conversion constructor.
      *
      * \param aARGB
      */
-    Color(ARGB_t aARGB);
+    Color(ARGB_t aARGB); // NOLINT
 
     /**
      * \brief Copy constructor.
@@ -139,10 +139,10 @@ public:
     void SetAlpha(uint8_t aValue);
 
     /**
-     * \brief Get the ARGB value.
+     * \brief Get the ARGB value. This is a conversion function.
      * \return ARGB
      */
-    operator uint32_t() const;
+    operator uint32_t() const; // NOLINT
     [[nodiscard]] uint32_t AsUint() const { return static_cast<ARGB_t>(*this); }
 
     /**

@@ -90,7 +90,7 @@ SDLRenderer::~SDLRenderer()
 
 Renderer& SDLRenderer::Blit(const Texture &arTexture)
 {
-    const SDLTexture &tex = dynamic_cast<const SDLTexture&>(arTexture);
+    auto &tex = dynamic_cast<const SDLTexture&>(arTexture);
     Rect dst = tex.GetDestinationRect();
     Rect src = tex.GetSourceRect() & Rect(0, 0, tex.GetWidth(), tex.GetHeight());
 

@@ -37,26 +37,37 @@ public:
     /**
      * \brief Construct a Singleton
      */
-    Singleton() {}
+    Singleton() = default;
 
     /**
      * \brief Prohibit copy of Singleton
      */
-    Singleton(Singleton<T> &other) = delete;
+    Singleton(const Singleton<T> &) = delete;
 
-    virtual ~Singleton() {}
+    /**
+     * \brief Move constructor
+     * \param other
+     */
+    Singleton(Singleton<T> &&) = default;
+
+    virtual ~Singleton() = default;
 
     /**
      * \brief Prohibit singleton assignment.
      */
-    void operator=(const Singleton &) = delete;
+    Singleton& operator=(const Singleton &) = delete;
+
+    /**
+     * \brief Move assignment
+     */
+    Singleton& operator=(Singleton &&) = default;
 
     /**
      * \brief Check if this singleton is instantiated
      * \return bool
      */
     static bool HasInstance() {
-        return (mpInstance) ? true : false;
+        return (mpInstance);
     }
 
     /**

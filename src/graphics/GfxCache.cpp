@@ -23,7 +23,7 @@ PixelData& GfxCache::MakePixelData(const GfxResource &arResource, uint32_t aId)
     auto pd = findPixelData(aId);
     if (!pd) {
         auto pair = mPixelDataList.emplace(aId, arResource);
-        if (pair.second == false) {
+        if (!pair.second) {
             THROW_WITH_BACKTRACE1(ResourceExists, aId);
         }
         pd = &(pair.first->second);
@@ -36,7 +36,7 @@ PixelData& GfxCache::MakePixelData(uint32_t aId, const PixelData &arPixelData, c
     auto pd = findPixelData(aId);
     if (!pd) {
         auto pair = mPixelDataList.emplace(std::piecewise_construct, std::forward_as_tuple(aId), std::forward_as_tuple(arSourceRect.GetWidth(), arSourceRect.GetHeight(), arPixelData.GetColorDepth()));
-        if (pair.second == false) {
+        if (!pair.second) {
             THROW_WITH_BACKTRACE1(ResourceExists, aId);
         }
         pd = &(pair.first->second);
@@ -74,7 +74,7 @@ TexturePtr_t& GfxCache::MakeTexture(const PixelData &arPixelData, uint32_t aId, 
     auto result = findTexture(aId);
     if (!result) {
         auto pair = mTextureList.insert({aId, Texture::Create(arPixelData, arColor)});
-        if (pair.second == false) {
+        if (!pair.second) {
             THROW_WITH_BACKTRACE1(ResourceExists, aId);
         }
         result = &(pair.first->second);

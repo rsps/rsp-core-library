@@ -24,13 +24,16 @@ class SDLEvents: public GfxInputEvents
 public:
     SDLEvents();
 
+    SDLEvents(SDLEvents&&) = default;
+    SDLEvents& operator=(SDLEvents&&) = default;
+
     bool Poll(GfxEvent &arEvent) override;
     void Flush() override;
 
 protected:
     rsp::graphics::TouchEvent mLastEvent{};
 
-    void getLatestOf(uint32_t aEventType, SDL_Event &aEvent);
+    static void getLatestOf(uint32_t aEventType, SDL_Event &aEvent);
 
 };
 

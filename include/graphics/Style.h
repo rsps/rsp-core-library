@@ -20,7 +20,7 @@ namespace rsp::graphics {
 class Style
 {
 public:
-    Style() noexcept {}
+    Style() noexcept = default;
 
     Style(const Style &arOther) {
         for(const TexturePtr_t &tex : arOther.mTextures) {

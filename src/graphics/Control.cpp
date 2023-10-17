@@ -24,7 +24,7 @@ std::string to_string(Control::States aState)
     return std::string(magic_enum::enum_name<Control::States>(aState));
 }
 
-std::ostream& operator <<(std::ostream &os, const Control::States aState)
+std::ostream& operator <<(std::ostream &os, Control::States aState)
 {
     os << to_string(aState);
     return os;
@@ -69,7 +69,7 @@ Control::States Control::GetState() const
     return result;
 }
 
-void Control::Invalidate()
+void Control::Invalidate() // NOLINT
 {
     if (!mDirty) {
         mDirty = true;
@@ -109,7 +109,7 @@ Control& Control::SetArea(Rect aRect)
     return *this;
 }
 
-void Control::doSetArea(const Rect &arRect, const Point &arOriginDifference)
+void Control::doSetArea(const Rect &/*arRect*/, const Point &/*arOriginDifference*/)
 {
 }
 
@@ -146,7 +146,7 @@ Control& Control::ExpandToParent()
     return *this;
 }
 
-Control& Control::SetOrigin(const Point &arPoint)
+Control& Control::SetOrigin(const Point &arPoint) // NOLINT
 {
     Point difference = arPoint - mArea.GetTopLeft();
     if (difference == Point()) {
@@ -231,9 +231,8 @@ Control& Control::SetTexturePosition(const Point &arPoint)
     return *this;
 }
 
-bool Control::UpdateData()
+bool Control::UpdateData()// NOLINT
 {
-//    GFXLOG("Updating Data: " << GetName() << " " << mArea);
     bool result = false;
     refresh();
     if (mDirty) {
@@ -249,13 +248,11 @@ bool Control::UpdateData()
     return result;
 }
 
-void Control::Render(Renderer &arRenderer) const
+void Control::Render(Renderer &arRenderer) const // NOLINT
 {
     if (!mVisible) {
         return;
     }
-
-//    GFXLOG("Rendering: " << GetName() << " " << mArea);
 
     auto &style = mStyles[GetState()];
 
@@ -270,7 +267,7 @@ void Control::Render(Renderer &arRenderer) const
     }
 
     if (!render(arRenderer)) {
-        if (mChildren.size() > 0) {
+        if (!mChildren.empty()) {
             for (Control *child : mChildren) {
                 child->Render(arRenderer);
             }
@@ -322,7 +319,7 @@ Control& Control::SetVisible(bool aVisible)
     return *this;
 }
 
-Control& Control::SetEnable(bool aEnable)
+Control& Control::SetEnable(bool aEnable) // NOLINT
 {
     if (mEnabled != aEnable) {
         mEnabled = aEnable;
@@ -343,9 +340,9 @@ Control& Control::SetTransparent(bool aValue)
     return *this;
 }
 
-bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
+bool Control::handleTouchEvent(rsp::messaging::Event &arEvent) // NOLINT
 {
-    TouchEvent &touch = arEvent.CastTo<TouchEvent>();
+    auto &touch = arEvent.CastTo<TouchEvent>();
 
     switch (touch.mType) {
         case TouchTypes::Press:
@@ -404,7 +401,7 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent)
     return false;
 }
 
-bool Control::ProcessEvent(rsp::messaging::Event &arEvent)
+bool Control::ProcessEvent(rsp::messaging::Event &arEvent) // NOLINT
 {
     switch (arEvent.Type) {
         case TouchEvent::ClassType:
@@ -427,7 +424,7 @@ bool Control::ProcessEvent(rsp::messaging::Event &arEvent)
     return false;
 }
 
-Control& Control::SetPressed(bool aValue)
+Control& Control::SetPressed(bool aValue) // NOLINT
 {
     if (mPressed != aValue) {
         mPressed = aValue;
@@ -439,7 +436,7 @@ Control& Control::SetPressed(bool aValue)
     return *this;
 }
 
-Control& Control::SetDragged(bool aValue)
+Control& Control::SetDragged(bool aValue) // NOLINT
 {
     if (mDragged != aValue) {
         mDragged = aValue;

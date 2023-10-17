@@ -23,8 +23,8 @@ namespace rsp::graphics {
 class GfxEngineBase
 {
 public:
-    GfxEngineBase(int aMaxFPS = 1000);
-    virtual ~GfxEngineBase() {};
+    explicit GfxEngineBase(int aMaxFPS = 1000);
+    virtual ~GfxEngineBase() = default;
 
     /**
      * \brief Set the active scene. Call this from Broker event handler or other pace in sync with Iterate flow
@@ -39,13 +39,13 @@ public:
 
     bool Iterate();
 
-    int GetFPS() const;
+    [[nodiscard]] int GetFPS() const;
 
     GfxEngineBase& AddOverlay(Control &arControl);
     GfxEngineBase& ClearOverlays();
 
-    virtual SceneMap& GetSceneMap() = 0;
-    virtual rsp::messaging::BrokerInterface& GetEventBroker() = 0;
+    [[nodiscard]] virtual SceneMap& GetSceneMap() = 0;
+    [[nodiscard]] virtual rsp::messaging::BrokerInterface& GetEventBroker() = 0;
 
 protected:
     int mFrameTime;
@@ -72,7 +72,7 @@ template <class TSceneMap, class TBroker = rsp::messaging::EventBroker>
 class GfxEngine : public GfxEngineBase
 {
 public:
-    GfxEngine(int aMaxFPS = 1000)
+    explicit GfxEngine(int aMaxFPS = 1000)
         : GfxEngineBase(aMaxFPS)
     {
         mListeners[0] = mSceneMap.GetAfterCreate().Listen(std::bind(&GfxEngine::afterSceneCreated, this, std::placeholders::_1));

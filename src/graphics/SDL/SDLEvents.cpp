@@ -11,6 +11,7 @@
 #ifdef USE_GFX_SDL
 
 #include "SDLEvents.h"
+#include "SDLException.h"
 
 namespace rsp::graphics::sdl {
 
@@ -60,16 +61,12 @@ bool SDLEvents::Poll(GfxEvent &arInput)
             arInput = std::make_shared<TouchEvent>(mLastEvent);
             break;
 
-        case SDL_MOUSEWHEEL:
-            return false;
-
         case SDL_QUIT:
             arInput = std::make_shared<QuitEvent>();
             break;
 
+        case SDL_MOUSEWHEEL:
         case SDL_WINDOWEVENT:
-            return false;
-
         default:
             return false;
     }
@@ -80,17 +77,19 @@ bool SDLEvents::Poll(GfxEvent &arInput)
 void SDLEvents::getLatestOf(uint32_t aEventType, SDL_Event &aEvent)
 {
     SDL_PumpEvents();
-    while (SDL_PeepEvents(&aEvent, 1, SDL_GETEVENT, aEventType, aEventType)) {
-        continue;
+    for (int err = 1; err ; ) {
+        err = SDL_PeepEvents(&aEvent, 1, SDL_GETEVENT, aEventType, aEventType);
+        if (err < 0) {
+            THROW_WITH_BACKTRACE1(SDLException, "SDL_PeepEvents failed.");
+        }
     }
 }
 
 void SDLEvents::Flush()
 {
     SDL_Event event;
-
-    while (SDL_PollEvent(&event)) {
-        continue;
+    for (int count = 1; count ; ) {
+        count = SDL_PollEvent(&event);
     }
 }
 

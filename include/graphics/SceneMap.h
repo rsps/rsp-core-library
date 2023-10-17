@@ -26,7 +26,7 @@ namespace rsp::graphics {
 class SceneNotFound : public rsp::exceptions::CoreException
 {
 public:
-    SceneNotFound(const std::string &arName) : rsp::exceptions::CoreException("Scene " + arName + " does not exist") {};
+    explicit SceneNotFound(const std::string &arName) : rsp::exceptions::CoreException("Scene " + arName + " does not exist") {};
 };
 
 class ActiveSceneNotSet : public rsp::exceptions::CoreException
@@ -42,7 +42,6 @@ public:
     using SceneNotify = rsp::messaging::Notifier<Scene&>;
 
     SceneMap() : mLogger("Gfx") {};
-    SceneMap(const SceneMap&) = default;
 
     template <typename T>
     void AddFactory()
@@ -67,8 +66,6 @@ public:
             return result;
         };
     }
-
-    SceneMap& operator=(const SceneMap&) = default;
 
     SceneCreator GetFactory(std::uint32_t aId);
 

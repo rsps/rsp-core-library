@@ -18,14 +18,10 @@ Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
 {
 }
 
-//Canvas::Canvas(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData, size_t aDataSize)
-//    : PixelData(aWidth, aHeight, aDepth, aData, aDataSize)
-//{
-//}
-
 void Canvas::DrawArc(const Point &arCenter, GuiUnit_t aRadius1, GuiUnit_t aRadius2,
     int aStartAngel, int aSweepAngle, const Color &arColor)
 {
+    // TODO: Implement this!!
     THROW_WITH_BACKTRACE1(exceptions::NotImplementedException, "Canvas::DrawArc has not been implemented yet.");
 }
 
@@ -138,4 +134,3 @@ void Canvas::plot8Points(GuiUnit_t aCenterX, GuiUnit_t aCenterY, GuiUnit_t aX, G
 }
 
 } /* namespace rsp::graphics */
-

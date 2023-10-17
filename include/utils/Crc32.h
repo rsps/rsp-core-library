@@ -23,7 +23,7 @@ namespace rsp::utils {
  */
 class ECrcError : public exceptions::CoreException {
 public:
-    ECrcError(const char *apMsg) : CoreException(apMsg) {};
+    explicit ECrcError(const char *apMsg) : CoreException(apMsg) {};
 };
 
 /**
@@ -38,7 +38,7 @@ public:
      *
      * \param aInitial
      */
-    Crc32(uint32_t aInitial = 0);
+    explicit Crc32(uint32_t aInitial = 0);
 
     /**
      * \fn std::uint32_t Calc(const void*, std::size_t, std::uint32_t=0)
@@ -114,7 +114,7 @@ namespace crc32 {
             0xb3667a2eL, 0xc4614ab8L, 0x5d681b02L, 0x2a6f2b94L, 0xb40bbe37L, 0xc30c8ea1L, 0x5a05df1bL, 0x2d02ef8dL
         };
 
-        constexpr uint32_t crc32_add( const char *apU, uint32_t aC=0xFFFFFFFF )
+        constexpr uint32_t crc32_add( const char *apU, uint32_t aC=0xFFFFFFFF ) // NOLINT
         {
             return (*apU == '\0') ? aC : crc32_add(apU + 1, (aC >> 8) ^ crc_table[(aC ^ static_cast<uint8_t>(*apU)) & 0x000000FF]);
         }
@@ -126,7 +126,7 @@ namespace crc32 {
     }
 } /* namespace crc32 */
 
-size_t constexpr operator "" _crc32( const char* str, size_t len )
+size_t constexpr operator "" _crc32( const char* str, size_t /*len*/ )
 {
     return crc32::HashConst(str);
 }

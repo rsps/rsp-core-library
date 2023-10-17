@@ -24,19 +24,23 @@ namespace rsp::graphics {
 class GfxInputEvents : public rsp::utils::Singleton<GfxInputEvents>
 {
 public:
-    GfxInputEvents(bool aSelfRegister = true)
+    explicit GfxInputEvents(bool aSelfRegister = true)
     {
         if (aSelfRegister) {
             SetInstance(this);
         }
     }
 
-    virtual ~GfxInputEvents()
+    GfxInputEvents(GfxInputEvents &&) = default;
+
+    ~GfxInputEvents() override
     {
         if (&GetInstance() == this) {
             SetInstance(nullptr);
         }
     }
+
+    GfxInputEvents& operator=(GfxInputEvents &&) = default;
 
     /**
      * \brief Parse input from event driver

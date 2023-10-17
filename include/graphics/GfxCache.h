@@ -24,13 +24,13 @@ namespace rsp::graphics {
 class ResourceNotFound : public exceptions::CoreException
 {
 public:
-    ResourceNotFound(uint32_t aId) : CoreException("GFX Resource with id " + std::to_string(aId) + " does not exist") {};
+    explicit ResourceNotFound(uint32_t aId) : CoreException("GFX Resource with id " + std::to_string(aId) + " does not exist") {};
 };
 
 class ResourceExists : public exceptions::CoreException
 {
 public:
-    ResourceExists(uint32_t aId) : CoreException("GFX Resource with id " + std::to_string(aId) + " already exists") {};
+    explicit ResourceExists(uint32_t aId) : CoreException("GFX Resource with id " + std::to_string(aId) + " already exists") {};
 };
 
 

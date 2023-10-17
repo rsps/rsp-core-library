@@ -10,9 +10,7 @@
 
 #include <exceptions/CoreException.h>
 #include <graphics/Bitmap.h>
-#include <algorithm>
 #include <filesystem>
-#include <logging/Logger.h>
 #include <utils/Crc32.h>
 
 using namespace rsp::utils;
@@ -33,7 +31,7 @@ Bitmap::Bitmap(const std::string &arImgName)
 }
 
 Bitmap::Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, ColorDepth aDepth)
-    : Canvas(aHeight, aWidth, aDepth)
+    : Canvas(aWidth, aHeight, aDepth)
 {
     Init(uint32_t(uintptr_t(this)), aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
 }

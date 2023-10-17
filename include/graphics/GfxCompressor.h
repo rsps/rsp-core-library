@@ -36,22 +36,22 @@ public:
         std::vector<data_type> mData{};
     };
 
-    CompressedData Compress(CompressionType aType, const data_type* apData, size_type aSize);
-    DecompressedData Decompress(const CompressedData &arCompressedData);
-    DecompressedData Decompress(CompressionType aType, const data_type* apData, size_type aSize);
+    static CompressedData Compress(CompressionType aType, const data_type* apData, size_type aSize);
+    static DecompressedData Decompress(const CompressedData &arCompressedData);
+    static DecompressedData Decompress(CompressionType aType, const data_type* apData, size_type aSize);
 
 protected:
-    CompressedData nullCompress(const data_type* apData, size_type aSize);
-    DecompressedData nullDecompress(const data_type* apData, size_type aSize);
+    static CompressedData nullCompress(const data_type* apData, size_type aSize);
+    static DecompressedData nullDecompress(const data_type* apData, size_type aSize);
 
-    CompressedData alphaCompress(const data_type* apData, size_type aSize);
-    DecompressedData alphaDecompress(const data_type* apData, size_type aSize);
+    static CompressedData alphaCompress(const data_type* apData, size_type aSize);
+    static DecompressedData alphaDecompress(const data_type* apData, size_type aSize);
 
-    CompressedData rgbCompress(const data_type* apData, size_type aSize);
-    DecompressedData rgbDecompress(const data_type* apData, size_type aSize);
+    static CompressedData rgbCompress(const data_type* apData, size_type aSize);
+    static DecompressedData rgbDecompress(const data_type* apData, size_type aSize);
 
-    CompressedData rgbaCompress(const data_type* apData, size_type aSize);
-    DecompressedData rgbaDecompress(const data_type* apData, size_type aSize);
+    static CompressedData rgbaCompress(const data_type* apData, size_type aSize);
+    static DecompressedData rgbaDecompress(const data_type* apData, size_type aSize);
 };
 
 }; // namespace rsp::graphics

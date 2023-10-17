@@ -57,7 +57,7 @@ public:
      *
      * \param arFontName
      */
-    Text(const std::string &arFontName);
+    explicit Text(const std::string &arFontName);
 
     /**
      * \brief Constructs a Text object with the given font and content.
@@ -81,14 +81,14 @@ public:
      */
     Text& operator<<(const Typography &arTypography);
 
-    operator std::string() const { return mValue; }
+    explicit operator std::string() const { return mValue; }
 
     /**
      * Getter for the string content
      *
      * \return std::string
      */
-    const std::string& GetValue() const { return mValue; }
+    [[nodiscard]] const std::string& GetValue() const { return mValue; }
     /**
      * Setter for the string content.
      *
@@ -112,7 +112,7 @@ public:
      * \return Reference to Font.
      */
     Font& GetFont() { return mFont; }
-    const Font& GetFont() const { return mFont; }
+    [[nodiscard]] const Font& GetFont() const { return mFont; }
 
     /**
      * Get the current value of the line spacing.
@@ -120,7 +120,7 @@ public:
      * \param aSpacing
      * \return
      */
-    int GetLineSpacing() const { return mLineSpacing; }
+    [[nodiscard]] int GetLineSpacing() const { return mLineSpacing; }
     /**
      * Set the current line spacing.
      *
@@ -135,14 +135,14 @@ public:
      *
      * \return number of lines in the text content.
      */
-    int GetLineCount() const { return mLineCount; }
+    [[nodiscard]] int GetLineCount() const { return mLineCount; }
 
     /**
      * Get the current vertical alignment setting.
      *
      * \return a VAlign type.
      */
-    VAlign GetVAlignment() { return mVAlign; }
+    [[nodiscard]] VAlign GetVAlignment() const { return mVAlign; }
     /**
      * Set the vertical alignment setting.
      *
@@ -156,7 +156,7 @@ public:
      *
      * \return a HAlign type.
      */
-    HAlign GetHAlignment() { return mHAlign; }
+    [[nodiscard]] HAlign GetHAlignment() const { return mHAlign; }
     /**
      * Set the horizontal alignment setting.
      *
@@ -170,7 +170,7 @@ public:
      * \param arArea
      * \return Point
      */
-    Point GetPosition(const Rect &arArea) const;
+    [[nodiscard]] Point GetPosition(const Rect &arArea) const;
 
     /**
      * \brief Set the font size and mark text for refreshing
@@ -193,14 +193,14 @@ public:
      *
      * \return True if glyphs needs to be reloaded.
      */
-    bool IsDirty() { return mDirty | mFont.IsDirty(); }
+    [[nodiscard]] bool IsDirty() const { return mDirty | mFont.IsDirty(); }
 
     /**
      * Get the minimum bounding rectangle containing all the glyphs.
      *
      * \return Rect
      */
-    const Rect& GetBoundingRect() const { return mBoundingRect; }
+    [[nodiscard]] const Rect& GetBoundingRect() const { return mBoundingRect; }
 
 protected:
     Font mFont;
@@ -217,7 +217,6 @@ protected:
 
     void scaleToFit(int aWidth, int aHeight);
     void loadGlyphs();
-    void alignGlyphs();
     void draw();
 };
 

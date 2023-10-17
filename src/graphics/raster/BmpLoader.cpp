@@ -10,9 +10,7 @@
 
 #include <exceptions/CoreException.h>
 #include "BmpLoader.h"
-#include <algorithm>
 #include <iostream>
-#include <iomanip>
 #include <string>
 #include <logging/Logger.h>
 #include <utils/FourCC.h>
@@ -176,8 +174,8 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
     arFile.ExactRead(pixelRows.data(), pixelRows.size());
 
     // Height can be negative, showing the image is stored from top to bottom
-    size_t h = static_cast<size_t>(abs(mBmpHeader.v1.heigth));
-    size_t w = static_cast<size_t>(mBmpHeader.v1.width);
+    auto h = static_cast<size_t>(abs(mBmpHeader.v1.heigth));
+    auto w = static_cast<size_t>(mBmpHeader.v1.width);
 
     std::uint8_t *data = pixelRows.data();
     if (mBmpHeader.v1.heigth < 0) { // If height is negative, then image is stored top to bottom.
@@ -199,7 +197,7 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
     }
 
     std::cout << "Loaded " << arFile.GetFileName() << " into PixelData (" << w << "x" << h << ")," << std::endl;
-    mPixelData.GetPixelAt(0, 0, Color::White);
+//    mPixelData.GetPixelAt(0, 0, Color::White);
 }
 
 int BmpLoader::maskToIndex(uint32_t aMask)
@@ -260,7 +258,6 @@ Color BmpLoader::ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::ui
 
         default:
             THROW_WITH_BACKTRACE1(rsp::exceptions::NotImplementedException, "BmpLoader does not support images with a color depth of " + std::to_string(int(mBmpHeader.v1.bitsPerPixel)) + " bpp");
-            break;
     }
 
     return pixel;

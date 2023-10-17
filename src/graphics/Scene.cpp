@@ -20,7 +20,6 @@ Scene::~Scene()
     mLogger.Debug() << "Scene::Destructor called for " << GetName();
 }
 
-
 void Scene::SetScreenSize(GuiUnit_t aWidth, GuiUnit_t aHeight)
 {
     mScreenSize = Rect(0, 0, aWidth, aHeight);

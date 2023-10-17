@@ -96,7 +96,7 @@ bool GfxEngineBase::updateData()
             changed = true;
         }
     }
-    return true;
+    return changed;
 }
 
 void GfxEngineBase::render()

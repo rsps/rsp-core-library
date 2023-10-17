@@ -25,7 +25,7 @@ void FontRawInterface::RegisterFont(std::string_view aFileName)
     FreeTypeLibrary::Get().RegisterFont(std::string(aFileName));
 }
 
-FreeTypeLibrary::FreeTypeLibrary(void)
+FreeTypeLibrary::FreeTypeLibrary()
 {
     FT_Error error = FT_Init_FreeType(&mFtLib);
     if (error) {
@@ -33,7 +33,7 @@ FreeTypeLibrary::FreeTypeLibrary(void)
     }
 }
 
-FreeTypeLibrary::~FreeTypeLibrary(void)
+FreeTypeLibrary::~FreeTypeLibrary()
 {
     FT_Done_FreeType(mFtLib);
 }

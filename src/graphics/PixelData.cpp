@@ -9,19 +9,16 @@
  */
 
 #include <cstring>
-#include <cstdlib>
 #include <graphics/PixelData.h>
-#include <logging/Logger.h>
-#include <posix/FileSystem.h>
 #include <utils/Crc32.h>
 #include <utils/CppObjectFile.h>
 #include <utils/StrUtils.h>
 
 namespace rsp::graphics {
 
-std::ostream& operator<<(std::ostream& os, const ColorDepth arDepth)
+std::ostream& operator<<(std::ostream& os, ColorDepth aDepth)
 {
-    switch (arDepth) {
+    switch (aDepth) {
         case ColorDepth::Monochrome:
             os << "Monochrome";
             break;
@@ -78,7 +75,7 @@ PixelData::PixelData(const PixelData &arOther)
     assign(arOther);
 }
 
-PixelData::PixelData(PixelData &&arOther)
+PixelData::PixelData(PixelData &&arOther) noexcept
 {
     move(std::move(arOther));
 }
@@ -91,7 +88,7 @@ PixelData& PixelData::operator=(const PixelData &arOther)
     return *this;
 }
 
-PixelData& PixelData::operator=(PixelData &&arOther)
+PixelData& PixelData::operator=(PixelData &&arOther) noexcept
 {
     if (this != &arOther) {
         move(std::move(arOther));
@@ -105,7 +102,7 @@ void PixelData::assign(const PixelData& arOther)
     mColorDepth = arOther.mColorDepth;
     mRect = arOther.mRect;
     mData = arOther.mData;
-    if (mData.size() > 0) {
+    if (!mData.empty()) {
         mpData = mData.data();
     }
     else {
@@ -117,9 +114,9 @@ void PixelData::move(PixelData &&arOther)
 {
     mId = arOther.mId;
     mColorDepth = arOther.mColorDepth;
-    mRect = std::move(arOther.mRect);
+    mRect = arOther.mRect;
     mData = std::move(arOther.mData);
-    if (mData.size() > 0) {
+    if (!mData.empty()) {
         mpData = mData.data();
     }
     else {
@@ -167,7 +164,6 @@ size_t PixelData::GetDataSize() const
 
         default:
             THROW_WITH_BACKTRACE(EIllegalColorDepth);
-            break;
     }
 
     return size_t(result);
@@ -206,7 +202,6 @@ Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) co
 
         default:
             THROW_WITH_BACKTRACE(EIllegalColorDepth);
-            break;
     }
 //    DUMP(aX << ", " << aY << ", " << aColor, result << " from " << GetWidth() << ", " << GetHeight() << ", " << mColorDepth);
     return result;
@@ -219,7 +214,7 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
 //        THROW_WITH_BACKTRACE1(std::out_of_range, "Pixel coordinates out of range (" + std::to_string(aX) + "<" + std::to_string(GetWidth()) + "," + std::to_string(aY) + "<" + std::to_string(GetHeight()) + ")");
     }
 
-    if (mData.size() == 0) {
+    if (mData.empty()) {
         // Copy const data to internal mData buffer
         mData.resize(GetDataSize());
         for (auto &v : mData) {
@@ -228,7 +223,7 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
         }
         mpData = mData.data();
     }
-    std::uint8_t *pdata = mData.data();
+    std::uint8_t *p_data = mData.data();
 
 //    Color result;
     int offset;
@@ -236,40 +231,39 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
         case ColorDepth::Monochrome:
             offset = (((GetWidth() + 7) >> 3) * aY) + (aX >> 3);
             if (aColor.GetAlpha() > 0) {
-                pdata[offset] |= (1 << (aX % 8));
+                p_data[offset] |= (1 << (aX % 8));
             }
             else {
-                pdata[offset] &= ~(1 << (aX % 8));
+                p_data[offset] &= ~(1 << (aX % 8));
             }
             break;
 
         case ColorDepth::Alpha:
             offset = (aY * GetWidth()) + aX;
-            pdata[offset] = aColor.GetAlpha();
+            p_data[offset] = aColor.GetAlpha();
             break;
 
         case ColorDepth::RGB:
             offset = ((aY * GetWidth()) + aX) * 3;
-            pdata[offset + 0] = aColor.GetRed();
-            pdata[offset + 1] = aColor.GetGreen();
-            pdata[offset + 2] = aColor.GetBlue();
+            p_data[offset + 0] = aColor.GetRed();
+            p_data[offset + 1] = aColor.GetGreen();
+            p_data[offset + 2] = aColor.GetBlue();
             break;
 
         case ColorDepth::RGBA:
             offset = ((aY * GetWidth()) + aX) * 4;
             if (!mBlend || aColor.GetAlpha() == 255) {
-                *reinterpret_cast<std::uint32_t*>(uintptr_t(pdata + offset)) = aColor.AsRaw();
+                *reinterpret_cast<std::uint32_t*>(uintptr_t(p_data + offset)) = aColor.AsRaw();
             }
             else {
                 Color bg;
-                bg.FromRaw(*reinterpret_cast<std::uint32_t*>(uintptr_t(pdata + offset)));
-                *reinterpret_cast<std::uint32_t*>(uintptr_t(pdata + offset)) = Color::Blend(bg, aColor).AsRaw();
+                bg.FromRaw(*reinterpret_cast<std::uint32_t*>(uintptr_t(p_data + offset)));
+                *reinterpret_cast<std::uint32_t*>(uintptr_t(p_data + offset)) = Color::Blend(bg, aColor).AsRaw();
             }
             break;
 
         default:
             THROW_WITH_BACKTRACE(EIllegalColorDepth);
-            break;
     }
 
     return *this;
@@ -310,22 +304,19 @@ GfxCompressor::CompressionType PixelData::getCompressionType(bool aCompress) con
 
 GfxCompressor::CompressedData PixelData::Compress(bool aCompress) const
 {
-    GfxCompressor cmp;
-    return cmp.Compress(getCompressionType(aCompress), mpData, GetDataSize());
+    return GfxCompressor::Compress(getCompressionType(aCompress), mpData, GetDataSize());
 }
 
 PixelData& PixelData::Decompress(const GfxCompressor::CompressedData &arCompressedData)
 {
-    GfxCompressor cmp;
-    mData = cmp.Decompress(arCompressedData.mType, arCompressedData.mData.data(), arCompressedData.mData.size());
+    mData = GfxCompressor::Decompress(arCompressedData.mType, arCompressedData.mData.data(), arCompressedData.mData.size());
     mpData = mData.data();
     return *this;
 }
 
-PixelData& PixelData::Decompress(const GfxCompressor::CompressionType aType, const uint8_t* apData, size_t aSize)
+PixelData& PixelData::Decompress(GfxCompressor::CompressionType aType, const uint8_t* apData, size_t aSize)
 {
-    GfxCompressor cmp;
-    mData = cmp.Decompress(aType, apData, aSize);
+    mData = GfxCompressor::Decompress(aType, apData, aSize);
     mpData = mData.data();
     return *this;
 }
@@ -368,7 +359,7 @@ void PixelData::SaveToCFile(const std::filesystem::path &arFileName, bool aCompr
 PixelData PixelData::ChangeColorDepth(ColorDepth aDepth, Color aColor) const
 {
     if (aDepth == mColorDepth) {
-        return PixelData(*this);
+        return {*this};
     }
     PixelData result(GetWidth(), GetHeight(), aDepth);
     result.CopyFrom(Point(0,0), *this, GetRect(), aColor);
@@ -396,12 +387,12 @@ PixelData& PixelData::CopyFrom(const Point &arDestination, const PixelData &arOt
 
 void PixelData::Fill(Color aColor)
 {
-    if (mData.size() == 0) {
+    if (mData.empty()) {
         return;
     }
     switch (mColorDepth) {
         case ColorDepth::RGBA: {
-            std::uint32_t *p = reinterpret_cast<std::uint32_t*>(mData.data());
+            auto *p = reinterpret_cast<std::uint32_t*>(mData.data());
             std::fill_n(p, mData.size() / sizeof(std::uint32_t), aColor.AsRaw());
             break;
         }
@@ -428,7 +419,7 @@ PixelData& PixelData::Fade(int aAlphaInc, bool aFixed)
         return *this;
     }
 
-    if (mData.size() == 0) {
+    if (mData.empty()) {
         // Copy const data to internal mData buffer
         mData.resize(GetDataSize());
         for (auto &v : mData) {
@@ -437,14 +428,13 @@ PixelData& PixelData::Fade(int aAlphaInc, bool aFixed)
         }
         mpData = mData.data();
     }
-    std::uint8_t *pdata = mData.data();
-
+    std::uint8_t *p_data = mData.data();
 
     for (GuiUnit_t y = 0 ; y < GetHeight() ; y++) {
         for (GuiUnit_t x = 0 ; x < GetWidth() ; x++) {
             int offset = ((y * GetWidth()) + x) * 4;
             Color col;
-            col.FromRaw(*reinterpret_cast<const std::uint32_t*>(uintptr_t(pdata + offset)));
+            col.FromRaw(*reinterpret_cast<const std::uint32_t*>(uintptr_t(p_data + offset)));
             if (col == Color::None) {
                 continue;
             }
@@ -460,7 +450,7 @@ PixelData& PixelData::Fade(int aAlphaInc, bool aFixed)
                 alpha = std::max(alpha + aAlphaInc, 0);
             }
             col.SetAlpha(uint8_t(alpha));
-            *reinterpret_cast<std::uint32_t*>(uintptr_t(pdata + offset)) = col.AsRaw();
+            *reinterpret_cast<std::uint32_t*>(uintptr_t(p_data + offset)) = col.AsRaw();
         }
     }
     return *this;

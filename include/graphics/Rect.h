@@ -31,7 +31,7 @@ class Framebuffer;
 class Rect
 {
   public:
-    Rect() {};
+    Rect() = default;
 
     /**
      * \brief Constructs a Rect from coordinate and size.
@@ -68,6 +68,13 @@ class Rect
     Rect(const Rect &aOther) = default;
 
     /**
+     * \brief Move constructor
+     *
+     * \param aOther
+     */
+    Rect(Rect &&aOther) = default;
+
+    /**
      * \brief Assignment operator
      *
      * \param arRect
@@ -79,7 +86,7 @@ class Rect
      * \brief Check if the rect covers no area
      * \return true if height or width is zero.
      */
-    bool empty() const;
+    [[nodiscard]] bool empty() const;
 
     /**
      * \brief Equal to operator
@@ -122,7 +129,7 @@ class Rect
      *
      * \return int
      */
-    GuiUnit_t GetTop() const;
+    [[nodiscard]] GuiUnit_t GetTop() const;
     /**
      * \brief Set the top value of the Rect.
      *
@@ -135,7 +142,7 @@ class Rect
      *
      * \return int
      */
-    GuiUnit_t GetBottom() const;
+    [[nodiscard]] GuiUnit_t GetBottom() const;
     /**
      * \brief Set the bottom value of the Rect.
      *
@@ -148,7 +155,7 @@ class Rect
      *
      * \return int
      */
-    GuiUnit_t GetLeft() const;
+    [[nodiscard]] GuiUnit_t GetLeft() const;
     /**
      * \brief Set the left value of the Rect.
      *
@@ -161,7 +168,7 @@ class Rect
      *
      * \return int
      */
-    GuiUnit_t GetRight() const;
+    [[nodiscard]] GuiUnit_t GetRight() const;
     /**
      * \brief Set the right value of the Rect.
      *
@@ -174,7 +181,7 @@ class Rect
      * \param arPoint
      */
     Rect& MoveTo(const Point &arPoint);
-    Rect& operator=(const Point &arPosition) { return MoveTo(arPosition); }
+    Rect& operator=(const Point &arPosition) { MoveTo(arPosition); return *this; }
 
     /**
      * \brief Move this rect by the given x/y offsets.
@@ -205,11 +212,11 @@ class Rect
      *
      * \return Point
      */
-    Point& GetTopLeft()
-    {
-        return mLeftTop;
-    }
-    const Point& GetTopLeft() const
+//    [[nodiscard]] Point& GetTopLeft()
+//    {
+//        return mLeftTop;
+//    }
+    [[nodiscard]] const Point& GetTopLeft() const
     {
         return mLeftTop;
     }
@@ -220,9 +227,9 @@ class Rect
      *
      * \return Point
      */
-    Point GetBottomRight() const
+    [[nodiscard]] Point GetBottomRight() const
     {
-        return Point(GetRight(), GetBottom());
+        return {GetRight(), GetBottom()};
     }
 
     /**
@@ -230,7 +237,7 @@ class Rect
      *
      * \return GuiUnit_t
      */
-    GuiUnit_t GetWidth() const;
+    [[nodiscard]] GuiUnit_t GetWidth() const;
     /**
      * \brief Set the width of the Rect.
      *
@@ -243,7 +250,7 @@ class Rect
      *
      * \return GuiUnit_t
      */
-    GuiUnit_t GetHeight() const;
+    [[nodiscard]] GuiUnit_t GetHeight() const;
 
     /**
      * \brief Set the height of the Rect.
@@ -258,8 +265,8 @@ class Rect
      * \param aPoint
      * \return bool
      */
-    bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const;
-    bool IsHit(const Point &arPoint) const { return IsHit(arPoint.mX, arPoint.mY); }
+    [[nodiscard]] bool IsHit(GuiUnit_t aX, GuiUnit_t aY) const;
+    [[nodiscard]] bool IsHit(const Point &arPoint) const { return IsHit(arPoint.mX, arPoint.mY); }
 
     /**
      * \brief Limits the dimensions of the rectangle by checking if height and width are above zero

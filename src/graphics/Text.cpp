@@ -75,8 +75,8 @@ Text& Text::Reload(utils::OptionalPtr<const Rect> aRect)
     mLineMaxChar = 1; // Avoid division by zero
     int count = 0;
 
-    for (long unsigned int i = 0; i < mValue.size(); i++) {
-        if (mValue[i] == '\n') {
+    for (auto &value : mValue) {
+        if (value == '\n') {
             mLineCount++;
             count = 0;
         }
@@ -142,38 +142,38 @@ void Text::loadGlyphs()
 
 Point Text::GetPosition(const Rect &arArea) const
 {
-    int voffset = 0;
-    int hoffset = 0;
+    int v_offset;
+    int h_offset;
     switch(mVAlign) {
         default:
         case VAlign::Top:
-            voffset = 0;
+            v_offset = 0;
             break;
         case VAlign::Center:
-            voffset = (arArea.GetHeight() - GetHeight()) / 2;
+            v_offset = (arArea.GetHeight() - GetHeight()) / 2;
             break;
         case VAlign::Bottom:
-            voffset = (arArea.GetHeight() - GetHeight());
+            v_offset = (arArea.GetHeight() - GetHeight());
             break;
     }
     switch(mHAlign) {
         default:
         case HAlign::Left:
-            hoffset = 0;
+            h_offset = 0;
             break;
         case HAlign::Center:
             if (arArea.GetWidth() < GetWidth()) {
-                hoffset = 0;
+                h_offset = 0;
             }
             else {
-                hoffset = (arArea.GetWidth() - GetWidth()) / 2;
+                h_offset = (arArea.GetWidth() - GetWidth()) / 2;
             }
             break;
         case HAlign::Right:
-            hoffset = (arArea.GetWidth()- GetWidth());
+            h_offset = (arArea.GetWidth() - GetWidth());
             break;
     }
-    Point p(hoffset, voffset);
+    Point p(h_offset, v_offset);
     p += arArea.GetTopLeft();
     DEBUG("GetPosition(" << arArea << ") -> " << p)
     return p;
@@ -187,13 +187,13 @@ void Text::draw()
         return;
     }
     Color aColor = Color::None;
-    Fill(aColor); // TODO: Test if this is faster than writing alpha=0 via SetPixel below.
+    Fill(aColor);
     for (unsigned i=0; i < glyphs->GetCount() ; ++i) {
         Glyph &glyph = glyphs->GetGlyph(i);
-        GuiUnit_t py = GuiUnit_t(glyph.mTop);
+        auto py = GuiUnit_t(glyph.mTop);
         for (int y = 0; y < glyph.mHeight; y++) {
-            const uint8_t* p_row = glyph.GetPixelRow(y);
-            GuiUnit_t px = GuiUnit_t(glyph.mLeft);
+            const uint8_t* p_row = glyph.GetPixelRow(size_t(y));
+            auto px = GuiUnit_t(glyph.mLeft);
             for (int x = 0; x < glyph.mWidth; x++) {
                 auto c = *p_row++;
                 if (!c) {
