@@ -31,7 +31,7 @@ public:
      *
      * \param std::string
      */
-    JsonDecoder(std::string_view aJson);
+    explicit JsonDecoder(std::string_view aJson);
 
     /**
      * Decode a value object from the content. The result can be a complex hierarchy of value objects.
@@ -44,7 +44,7 @@ protected:
     std::string::iterator mEnd; // Current end iterator, to limit the end of the current extraction.
     std::vector<std::string::iterator> mStack{}; // Used to stack end iterators when parsing sub-strings.
 
-    void findSubString(const char aToken1, const char aToken2);
+    void findSubString(char aToken1, char aToken2);
     void push();
     void pop();
     void skipWhiteSpace();

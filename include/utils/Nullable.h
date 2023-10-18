@@ -22,7 +22,7 @@ namespace rsp::utils {
 
 /**
  * \class ENullableException
- * \brief Base class for some helpful Nullable excetpions.
+ * \brief Base class for some helpful Nullable exceptions.
  */
 class ENullableException : public exceptions::CoreException {
 public:
@@ -57,9 +57,9 @@ public:
 class Nullable
 {
 public:
-    virtual ~Nullable() {};
+    virtual ~Nullable() = default;
 
-    virtual bool IsNull() const = 0;
+    [[nodiscard]] virtual bool IsNull() const = 0;
     virtual void Clear() = 0;
 };
 

@@ -56,10 +56,10 @@ std::string Json::Encode(bool aPrettyPrint, bool aForceToUCS2, unsigned int aArr
     return Encode(*this, aPrettyPrint, aForceToUCS2, aArrayLineLength);
 }
 
-DynamicData Json::Decode(std::string_view aJson)
+Json Json::Decode(std::string_view aJson)
 {
     JsonDecoder js(aJson);
-    return js.Decode();
+    return Json(js.Decode());
 }
 
 
@@ -108,4 +108,3 @@ Json::Types Json::GetJsonType()
 }
 
 } // namespace rsp::json
-

@@ -52,7 +52,7 @@ public:
      */
     struct Decoder
     {
-        virtual ~Decoder() {};
+        virtual ~Decoder() = default;
         virtual DynamicData Decode(const std::string &arStream) = 0;
     };
 
@@ -62,7 +62,7 @@ public:
      */
     struct Encoder
     {
-        virtual ~Encoder() {};
+        virtual ~Encoder() = default;
         virtual std::string Encode(const DynamicData &arData) = 0;
     };
 
@@ -73,9 +73,9 @@ public:
     class Serializable
     {
     public:
-        virtual ~Serializable() {};
-        virtual DynamicData ToData() const = 0;
-        virtual void FromData(const DynamicData &arData) { THROW_WITH_BACKTRACE(exceptions::NotImplementedException); }
+        virtual ~Serializable() = default;
+        [[nodiscard]] virtual DynamicData ToData() const = 0;
+        virtual void FromData(const DynamicData &arData);
     };
 
     typedef unsigned int  size_type;
@@ -86,8 +86,9 @@ public:
      */
     DynamicData() : Variant() {}
 
-    DynamicData(const DynamicData&);
-    DynamicData(DynamicData&&);
+    DynamicData(const DynamicData&) = default;
+    DynamicData(DynamicData&&) noexcept = default;
+
     /**
      * \brief Construct a DynamicData holding the given value
      * \tparam T Type of value to contain
@@ -96,12 +97,11 @@ public:
      * Use template to declare inherited constructors
      */
     template<class T>
-    DynamicData(T aValue) : Variant(aValue) {}
+    DynamicData(T aValue) : Variant(aValue) {} // NOLINT
 
-    virtual ~DynamicData() {}
+    DynamicData& operator=(const DynamicData&) = default;
+    DynamicData& operator=(DynamicData&&) noexcept = default;
 
-    DynamicData& operator=(const DynamicData&);
-    DynamicData& operator=(DynamicData&&);
     /**
      * \brief Assign all types supported by Variant class
      *
@@ -121,7 +121,7 @@ public:
     template<class T, class I>
     bool TryAssign(T& arLValue, const I& arIndex) const try
     {
-        arLValue = (*this)[arIndex];
+        arLValue = static_cast<T>((*this)[arIndex]);
         return true;
     }
     catch(...) {
@@ -139,7 +139,7 @@ public:
     template<class T, class I>
     T TryGet(I &arIndex, const T& arDefault) try
     {
-        return (*this)[arIndex];
+        return static_cast<T>((*this)[arIndex]);
     }
     catch(...) {
         return arDefault;
@@ -149,12 +149,12 @@ public:
      * \brief Check if value content is an array
      * \return True if content is an array
      */
-    bool IsArray() const { return (GetType() == Types::Array); }
+    [[nodiscard]] bool IsArray() const { return (GetType() == Types::Array); }
     /**
      * \brief Check if value content is an object
      * \return True if content is an object
      */
-    bool IsObject() const { return (GetType() == Types::Object); }
+    [[nodiscard]] bool IsObject() const { return (GetType() == Types::Object); }
 
     /**
      * \brief Index operators for object members
@@ -186,21 +186,21 @@ public:
      * \brief Get the number of element in a object or array
      * \return unsigned int Number of elements
      */
-    size_type GetCount() const;
+    [[nodiscard]] size_type GetCount() const;
 
     /**
      * \brief Get a list of member names if this is a data object.
      *
      * \return Vector of strings
      */
-    std::vector<std::string> GetMemberNames() const;
+    [[nodiscard]] std::vector<std::string> GetMemberNames() const;
 
     /**
      * \brief Check if a data object has a member with the specified name
      * \param aKey
      * \return
      */
-    bool MemberExists(std::string_view aKey) const;
+    [[nodiscard]] bool MemberExists(std::string_view aKey) const;
 
     /**
      * \brief Add a new element to the array
@@ -253,8 +253,8 @@ public:
         return !((*this) == arOther);
     }
 
-    const std::string GetName() const { return mName; }
-    const std::vector<DynamicData>& GetItems() const { return mItems; }
+    [[nodiscard]] const std::string& GetName() const { return mName; }
+    [[nodiscard]] const std::vector<DynamicData>& GetItems() const { return mItems; }
 
 protected:
     std::string mName{}; // Name if this value is an object member

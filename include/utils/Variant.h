@@ -26,16 +26,16 @@ namespace rsp::utils {
 class EVariantException : public exceptions::CoreException {
 public:
     explicit EVariantException(const char *apMsg) : CoreException(apMsg) {}
+    explicit EVariantException(const std::string& arMsg) : CoreException(arMsg) {}
 };
 
 /**
  * \class EConversionError
- * \brief Thrown if tried to read a value as a type which is not convertible from the vurrent type of a Variant.
- *
+ * \brief Thrown if tried to read a value as a type which is not convertible from the current type of a Variant.
  */
 class EConversionError : public EVariantException {
 public:
-    explicit EConversionError(const std::string aFrom, const std::string aTo) : EVariantException(std::string("Variant Conversion Error. From " + aFrom + " to " + aTo).c_str()) {}
+    explicit EConversionError(const std::string& arFrom, const std::string& arTo) : EVariantException(std::string("Variant Conversion Error. From " + arFrom + " to " + arTo)) {}
 };
 
 /**
@@ -59,13 +59,16 @@ public:
     Variant();
 
     Variant(const Variant &arOther);
-    Variant(Variant &&arOther);
+    Variant(Variant &&arOther) noexcept;
 
     template<class T>
-    Variant(const rsp::utils::StructElement<T>& arOther) : Variant(ToVariant(arOther)) {}
+    explicit Variant(const rsp::utils::StructElement<T>& arOther)
+        : Variant(ToVariant(arOther))
+    {
+    }
 
     Variant& operator=(const Variant &arOther);
-    Variant& operator=(Variant &&arOther);
+    Variant& operator=(Variant &&arOther) noexcept ;
 
     template<class T>
     Variant& operator=(const rsp::utils::StructElement<T>& arOther) {
@@ -77,10 +80,10 @@ public:
      * \brief operator overload for Variant
      */
     template<class T>
-    Variant ToVariant(const rsp::utils::StructElement<T>& arOther)
+    Variant ToVariant(const rsp::utils::StructElement<T>& arOther) noexcept
     {
         if (arOther.IsNull()) {
-            return Variant();
+            return {};
         }
         return Variant(arOther.Get());
     }
@@ -91,23 +94,24 @@ public:
      *
      * \param aValue
      */
-    Variant(bool aValue);
-    Variant(int aValue);
-    Variant(std::int64_t aValue);
-    Variant(std::uint64_t aValue);
-    Variant(std::uint32_t aValue);
-    Variant(std::uint16_t aValue);
-    Variant(float aValue);
-    Variant(double aValue);
-    Variant(void* apValue);
-    Variant(const std::string &arValue);
-    Variant(const char *apValue);
+    explicit Variant(bool aValue);
+    explicit Variant(int aValue);
+    explicit Variant(std::int64_t aValue);
+    explicit Variant(std::uint64_t aValue);
+    explicit Variant(std::uint32_t aValue);
+    explicit Variant(std::uint16_t aValue);
+    explicit Variant(float aValue);
+    explicit Variant(double aValue);
+    explicit Variant(void* apValue);
+    explicit Variant(const std::string& arValue);
+    explicit Variant(std::string &&arValue) noexcept;
+    explicit Variant(const char *apValue);
 
     /**
      * \fn  ~Variant()
      * \brief Virtual destructor
      */
-    virtual ~Variant();
+    ~Variant() override;
 
     /**
      * \fn bool IsNull()const
@@ -115,7 +119,7 @@ public:
      *
      * \return bool
      */
-    bool IsNull() const override { return mType == Types::Null; }
+    [[nodiscard]] bool IsNull() const override { return mType == Types::Null; }
     /**
      * \fn void Clear()
      * \brief Resets the Variant content to null
@@ -127,29 +131,28 @@ public:
      *
      * \return Variant::Types
      */
-    Types GetType() const { return mType; }
+    [[nodiscard]] Types GetType() const { return mType; }
 
     /**
      * \brief Get a textual representation of the Variant content type
      * \return string
      */
-    std::string TypeToText() const;
+    [[nodiscard]] std::string TypeToText() const;
 
     /**
      * \fn  operator <T>()const
      * \brief Operator overloads for all native types.
      */
-    operator bool() const              { return AsBool(); }
-    operator int() const               { return static_cast<int>(AsInt()); }
-    operator std::int64_t() const      { return AsInt(); }
-    operator std::uint64_t() const     { return static_cast<std::uint64_t>(AsInt()); }
-    operator std::uint32_t() const     { return static_cast<std::uint32_t>(AsInt()); }
-    operator std::uint16_t() const     { return static_cast<std::uint16_t>(AsInt()); }
-    operator float() const             { return static_cast<float>(AsDouble()); }
-    operator double() const            { return AsDouble(); }
-    operator void*() const             { return AsPointer(); }
-    operator const std::string() const { return AsString(); }
-    operator const char*() const       { return AsString().c_str(); }
+    explicit operator bool() const              { return AsBool(); }
+    explicit operator int() const               { return static_cast<int>(AsInt()); }
+    explicit operator std::int64_t() const      { return AsInt(); }
+    explicit operator std::uint64_t() const     { return static_cast<std::uint64_t>(AsInt()); }
+    explicit operator std::uint32_t() const     { return static_cast<std::uint32_t>(AsInt()); }
+    explicit operator std::uint16_t() const     { return static_cast<std::uint16_t>(AsInt()); }
+    explicit operator float() const             { return static_cast<float>(AsDouble()); }
+    explicit operator double() const            { return AsDouble(); }
+    explicit operator void*() const             { return AsPointer(); }
+    explicit operator std::string() const { return AsString(); }
 
     /**
      * \fn Variant operator =&(T)
@@ -176,17 +179,17 @@ public:
      *
      * \return T
      */
-    bool AsBool() const;
-    std::int64_t AsInt() const;
-    double AsDouble() const;
-    float AsFloat() const { return static_cast<float>(AsDouble()); }
-    std::string AsString() const;
-    void* AsPointer() const;
+    [[nodiscard]] bool AsBool() const;
+    [[nodiscard]] std::int64_t AsInt() const;
+    [[nodiscard]] double AsDouble() const;
+    [[nodiscard]] float AsFloat() const { return static_cast<float>(AsDouble()); }
+    [[nodiscard]] std::string AsString() const;
+    [[nodiscard]] void* AsPointer() const;
 
-    std::int64_t RawAsInt() const { return mInt; }
+    [[nodiscard]] std::int64_t RawAsInt() const { return mInt; }
 
 protected:
-    Types mType;
+    Types mType = Types::Null;
     union {
         bool mBool;
         std::int64_t mInt{0};

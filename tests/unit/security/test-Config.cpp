@@ -31,7 +31,7 @@ class MyConfig : public Config<ConfigData>
 public:
     using Config<ConfigData>::Config;
 
-    DynamicData ToData() const override
+    [[nodiscard]] DynamicData ToData() const override
     {
         DynamicData result;
 
@@ -46,9 +46,9 @@ public:
     void FromData(const DynamicData &arData) override
     {
         Get().ApplicationName = arData["ApplicationName"].AsString();
-        Get().PlacementCount = arData["PlacementCount"];
-        Get().Power = arData["Power"];
-        Get().Pi = arData["Pi"];
+        Get().PlacementCount = int(arData["PlacementCount"]);
+        Get().Power = int(arData["Power"]);
+        Get().Pi = arData["Pi"].AsDouble();
     }
 
     void Validate() override
@@ -122,4 +122,3 @@ TEST_CASE("Config")
 
     CHECK_NOTHROW(config.Validate());
 }
-

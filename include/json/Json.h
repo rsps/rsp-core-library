@@ -24,10 +24,15 @@ public:
     enum class Types : unsigned int { Null, Bool, Number, String, Object, Array };
 
     Json() : DynamicData() {}
-    Json(std::string_view aJson);
-    Json(const std::string &arJson) : Json(std::string_view(arJson)) {}
-    Json(const rsp::utils::DynamicData &arData);
-    Json(rsp::utils::DynamicData&& arData);
+    explicit Json(std::string_view aJson);
+    explicit Json(const std::string &arJson) : Json(std::string_view(arJson)) {}
+    explicit Json(const rsp::utils::DynamicData &arData);
+    explicit Json(rsp::utils::DynamicData&& arData);
+
+    Json(const Json &arOther) = default;
+    Json(Json &&arOther) noexcept = default;
+    Json& operator=(const Json& arData) = default;
+    Json& operator=(Json&& arData) = default;
 
     /**
      * \brief Encode a DynamicData object to a JSON formatted string
@@ -36,14 +41,14 @@ public:
      * \return JSON formatted string
      */
     static std::string Encode(const rsp::utils::DynamicData &arData, bool aPrettyPrint = false, bool aForceToUCS2 = false, unsigned int aArrayLineLength = 0);
-    std::string Encode(bool aPrettyPrint = false, bool aForceToUCS2 = false, unsigned int aArrayLineLength = 0) const;
+    [[nodiscard]] std::string Encode(bool aPrettyPrint = false, bool aForceToUCS2 = false, unsigned int aArrayLineLength = 0) const;
 
     /**
      * \brief Decode a string into a DynamicData object
      * \param aJson JSON formatted string
      * \return JsonValue object
      */
-    static rsp::utils::DynamicData Decode(std::string_view aJson);
+    static Json Decode(std::string_view aJson);
 
     /**
      * \brief Get the type of the value content

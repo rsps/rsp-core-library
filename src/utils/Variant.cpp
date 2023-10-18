@@ -14,7 +14,7 @@
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
 
-//#define JLOG(a) DLOG(a)
+//#define JLOG(a) DLOG(a);
 #define JLOG(a)
 
 namespace rsp::utils {
@@ -23,7 +23,7 @@ Variant::Variant()
     : mType(Types::Null),
       mPointer(reinterpret_cast<uintptr_t>(nullptr))
 {
-    JLOG("Variant default constructor");
+    JLOG("Variant default constructor")
 }
 
 Variant::Variant(const Variant &arOther)
@@ -31,22 +31,22 @@ Variant::Variant(const Variant &arOther)
       mInt(arOther.mInt),
       mString(arOther.mString)
 {
-    JLOG("Variant copy constructor");
+    JLOG("Variant copy constructor")
 }
 
-Variant::Variant(Variant &&arOther)
+Variant::Variant(Variant &&arOther) noexcept
     : mType(arOther.mType),
       mInt(arOther.mInt),
-      mString(arOther.mString)
+      mString(std::move(arOther.mString))
 {
-    JLOG("Variant move constructor");
+    JLOG("Variant move constructor")
     arOther.mType = Types::Null;
 }
 
 Variant& Variant::operator=(const Variant &arOther)
 {
     if (&arOther != this) {
-        JLOG("Variant copy assignment");
+        JLOG("Variant copy assignment")
         mType = arOther.mType;
         mInt = arOther.mInt,
         mString = arOther.mString;
@@ -54,12 +54,12 @@ Variant& Variant::operator=(const Variant &arOther)
     return *this;
 }
 
-Variant& Variant::operator=(Variant &&arOther)
+Variant& Variant::operator=(Variant &&arOther) noexcept
 {
     if (&arOther != this) {
-        JLOG("Variant move assignment");
+        JLOG("Variant move assignment")
         mType = arOther.mType;
-        mInt = std::move(arOther.mInt),
+        mInt = arOther.mInt;
         mString = std::move(arOther.mString);
         arOther.mType = Types::Null;
     }
@@ -71,68 +71,74 @@ Variant::Variant(bool aValue)
     : mType(Types::Bool),
       mBool(aValue)
 {
-    JLOG("Variant bool constructor");
+    JLOG("Variant bool constructor")
 }
 
 Variant::Variant(int aValue)
     : mType(Types::Int),
       mInt(aValue)
 {
-    JLOG("Variant int constructor");
+    JLOG("Variant int constructor")
 }
 
 Variant::Variant(std::int64_t aValue)
     : mType(Types::Int64),
       mInt(aValue)
 {
-    JLOG("Variant int64 constructor");
+    JLOG("Variant int64 constructor")
 }
 
 Variant::Variant(std::uint64_t aValue)
     : mType(Types::Uint64),
       mInt(static_cast<std::int64_t>(aValue))
 {
-    JLOG("Variant uint64 constructor");
+    JLOG("Variant uint64 constructor")
 }
 
 Variant::Variant(std::uint32_t aValue)
     : mType(Types::Uint32),
       mInt(aValue)
 {
-    JLOG("Variant uint32 constructor");
+    JLOG("Variant uint32 constructor")
 }
 
 Variant::Variant(std::uint16_t aValue)
     : mType(Types::Uint16),
       mInt(aValue)
 {
-    JLOG("Variant uint16 constructor");
+    JLOG("Variant uint16 constructor")
 }
 
 Variant::Variant(float aValue)
     : mType(Types::Float),
       mFloat(aValue)
 {
-    JLOG("Variant float constructor");
+    JLOG("Variant float constructor")
 }
 
 Variant::Variant(double aValue)
     : mType(Types::Double),
       mDouble(aValue)
 {
-    JLOG("Variant double constructor");
+    JLOG("Variant double constructor")
 }
 
 Variant::Variant(void *apValue)
     : mType(Types::Pointer),
       mPointer(reinterpret_cast<uintptr_t>(apValue))
 {
-    JLOG("Variant pointer constructor");
+    JLOG("Variant pointer constructor")
 }
 
-Variant::Variant(const std::string &arValue)
+Variant::Variant(const std::string& arValue)
     : mType(Types::String),
       mString(arValue)
+{
+}
+
+Variant::Variant(std::string&& arValue) noexcept
+        : mType(Types::String),
+          mString(std::move(arValue))
 {
 }
 
@@ -259,9 +265,7 @@ bool Variant::AsBool() const
 
         default:
             THROW_WITH_BACKTRACE2(EConversionError, TypeToText(), "bool");
-            break;
     }
-    return false;
 }
 
 std::int64_t Variant::AsInt() const
@@ -290,9 +294,7 @@ std::int64_t Variant::AsInt() const
 
         default:
             THROW_WITH_BACKTRACE2(EConversionError, TypeToText(), "int");
-            break;
     }
-    return 0;
 }
 
 double Variant::AsDouble() const
@@ -321,9 +323,7 @@ double Variant::AsDouble() const
 
         default:
             THROW_WITH_BACKTRACE2(EConversionError, TypeToText(), "double");
-            break;
     }
-    return 0.0f;
 }
 
 std::string Variant::AsString() const
@@ -355,7 +355,7 @@ std::string Variant::AsString() const
         {
             char buf[40];
             sprintf(buf, "%p", reinterpret_cast<void*>(mPointer));
-            return std::string(buf);
+            return {buf};
         }
 
         case Types::String:
@@ -363,9 +363,7 @@ std::string Variant::AsString() const
 
         default:
             THROW_WITH_BACKTRACE2(EConversionError, TypeToText(), "string");
-            break;
     }
-    return "";
 }
 
 void* Variant::AsPointer() const
@@ -379,9 +377,7 @@ void* Variant::AsPointer() const
 
         default:
             THROW_WITH_BACKTRACE2(EConversionError, TypeToText(), "pointer");
-            break;
     }
-    return nullptr;
 }
 
 std::string Variant::TypeToText() const

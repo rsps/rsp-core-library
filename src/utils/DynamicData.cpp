@@ -9,7 +9,7 @@
 
 using namespace rsp::logging;
 
-//#define DDLOG(a) DLOG(a)
+//#define DDLOG(a) DLOG(a);
 #define DDLOG(a)
 
 namespace rsp::utils {
@@ -21,46 +21,53 @@ std::ostream& operator<< (std::ostream& os, const DynamicData& arValue)
     return os;
 }
 
+/*
 DynamicData::DynamicData(const DynamicData& arOther)
     : Variant(arOther),
       mName(arOther.mName),
       mItems(arOther.mItems)
 {
-    DDLOG("DynamicData copy constructor");
+    DDLOG("DynamicData copy constructor")
 }
 
-DynamicData::DynamicData(DynamicData&& arOther)
-    : Variant(std::move(arOther)),
-      mName(std::move(arOther.mName)),
+DynamicData::DynamicData(DynamicData&& arOther) noexcept
+    : mName(std::move(arOther.mName)),
       mItems(std::move(arOther.mItems))
 {
-    DDLOG("DynamicData move constructor");
+    DDLOG("DynamicData move constructor")
+    mType = arOther.mType;
+    mInt = arOther.mInt;
+    mString = std::move(arOther.mString);
+    arOther.mType = Types::Null;
 }
+*/
 
+/*
 DynamicData& DynamicData::operator =(const DynamicData& arOther)
 {
     if (&arOther != this) {
         Variant::operator=(arOther);
         mName = arOther.mName;
         mItems = arOther.mItems;
-        DDLOG("DynamicData copy assignment");
+        DDLOG("DynamicData copy assignment")
     }
     return *this;}
 
-DynamicData& DynamicData::operator =(DynamicData&& arOther)
+DynamicData& DynamicData::operator=(DynamicData&& arOther) noexcept
 {
     if (&arOther != this) {
-        Variant::operator=(std::move(arOther));
         mName = std::move(arOther.mName);
         mItems = std::move(arOther.mItems);
-        DDLOG("DynamicData move assignment");
+        Variant::operator=(std::move(arOther));
+        DDLOG("DynamicData move assignment")
     }
     return *this;
 }
+*/
 
 DynamicData& DynamicData::operator [](std::string_view aKey)
 {
-    DDLOG("DynamicData - Access member " << aKey);
+    DDLOG("DynamicData - Access member " << aKey)
     forceObject();
     for (DynamicData &v : mItems) {
         if (v.mName == aKey) {
@@ -72,7 +79,7 @@ DynamicData& DynamicData::operator [](std::string_view aKey)
 
 const DynamicData& DynamicData::operator [](std::string_view aKey) const
 {
-    DDLOG("DynamicData - Getting member " << aKey);
+    DDLOG("DynamicData - Getting member " << aKey)
     tryObject();
     for (const DynamicData &v : mItems) {
         if (v.mName == aKey) {
@@ -84,14 +91,14 @@ const DynamicData& DynamicData::operator [](std::string_view aKey) const
 
 DynamicData& DynamicData::operator [](size_type aIndex)
 {
-    DDLOG("DynamicData - Access item " << aIndex);
+    DDLOG("DynamicData - Access item " << aIndex)
     forceArray();
     return mItems.at(aIndex);
 }
 
 const DynamicData& DynamicData::operator [](size_type aIndex) const
 {
-    DDLOG("DynamicData - Getting item " << aIndex);
+    DDLOG("DynamicData - Getting item " << aIndex)
     tryArray();
     return mItems.at(aIndex);
 }
@@ -255,6 +262,12 @@ void DynamicData::forceObject()
         return;
     }
     tryObject();
+}
+
+void DynamicData::Serializable::FromData(const DynamicData &arData)
+{
+    // Subclasses must implement this
+    THROW_WITH_BACKTRACE(exceptions::NotImplementedException);
 }
 
 } /* namespace rsp::utils */
