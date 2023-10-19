@@ -14,8 +14,8 @@ using namespace rsp::utils;
 
 namespace rsp::json {
 
-JsonEncoder::JsonEncoder(const PrintFormat &arPf)
-    : mPf(arPf)
+JsonEncoder::JsonEncoder(PrintFormat aPf)
+    : mPf(std::move(aPf))
 {
 }
 
@@ -37,7 +37,7 @@ std::string JsonEncoder::Encode(const rsp::utils::DynamicData &arData)
 }
 
 
-void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int aLevel)
+void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int /*aLevel*/)
 {
     std::string s = arData.AsString();
     std::size_t i = 0;
@@ -69,7 +69,7 @@ void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int a
                 break;
             default:
                 if (mPf.ForceToUCS2 && static_cast<uint8_t>(c) > 127) {
-                    int v = 0;
+                    int v;
                     char buf[12];
                     switch (static_cast<uint8_t>(c) & 0xE0) {
                         case 0xE0:
@@ -90,8 +90,7 @@ void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int a
                             break;
 
                         default:
-                            THROW_WITH_BACKTRACE1(EJsonParseError, "DynamicData of type string has illegal JSON character: " + c);
-                            break;
+                            THROW_WITH_BACKTRACE1(EJsonParseError, std::string("DynamicData of type string has illegal JSON character: ") + c);
                     }
                 }
                 else {
@@ -104,11 +103,11 @@ void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int a
     mResult << "\"";
 }
 
-void JsonEncoder::arrayToStringStream(const DynamicData &arData, unsigned int aLevel)
+void JsonEncoder::arrayToStringStream(const DynamicData &arData, unsigned int aLevel) // NOLINT
 {
     std::string in(static_cast<std::string::size_type>(mPf.indent) * (aLevel + 1), ' ');
     std::string c = ",";
-    int min_witdh = 0;
+    int min_width = 0;
 
     mResult << "[" << mPf.nl;
 
@@ -121,27 +120,27 @@ void JsonEncoder::arrayToStringStream(const DynamicData &arData, unsigned int aL
         switch (items[0].GetType()) {
             case DynamicData::Types::Int:
             case DynamicData::Types::Uint32:
-                min_witdh = 10;
+                min_width = 10;
                 break;
 
             case DynamicData::Types::Int64:
             case DynamicData::Types::Uint64:
-                min_witdh = 20;
+                min_width = 20;
                 break;
 
             case DynamicData::Types::Uint16:
-                min_witdh = 5;
+                min_width = 5;
                 break;
 
             default:
-                min_witdh = 7;
+                min_width = 7;
                 break;
         }
     }
 
     for (const DynamicData &el : items) {
-        if (min_witdh) {
-            mResult << std::setw(min_witdh) << std::setfill(' ');
+        if (min_width) {
+            mResult << std::setw(min_width) << std::setfill(' ');
         }
         toStringStream(el, aLevel + 1);
         if (--rest == 0) {
@@ -161,7 +160,7 @@ void JsonEncoder::arrayToStringStream(const DynamicData &arData, unsigned int aL
     mResult << in1 << "]";
 }
 
-void JsonEncoder::objectToStringStream(const DynamicData &arData, unsigned int aLevel)
+void JsonEncoder::objectToStringStream(const DynamicData &arData, unsigned int aLevel) // NOLINT
 {
     std::string in(static_cast<std::string::size_type>(mPf.indent) * (aLevel+1), ' ');
     std::string c = ",";
@@ -170,11 +169,11 @@ void JsonEncoder::objectToStringStream(const DynamicData &arData, unsigned int a
 
     auto& items = arData.GetItems();
 
-    JLOG("Members:");
+    JLOG("Members:")
 
     auto rest = items.size();
     for (const DynamicData &value : items) {
-        JLOG("  " << value.mName << ": " << value.AsString());
+        JLOG("  " << value.mName << ": " << value.AsString())
         mResult << in << "\"" << value.GetName() << "\":" << mPf.sp;
 
         toStringStream(value, aLevel+1);
@@ -187,7 +186,7 @@ void JsonEncoder::objectToStringStream(const DynamicData &arData, unsigned int a
     mResult << in1 << "}";
 }
 
-void JsonEncoder::toStringStream(const DynamicData &arData, unsigned int aLevel)
+void JsonEncoder::toStringStream(const DynamicData &arData, unsigned int aLevel) // NOLINT
 {
     switch(arData.GetType()) {
         case DynamicData::Types::String:

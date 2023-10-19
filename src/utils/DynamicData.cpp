@@ -9,7 +9,7 @@
 
 using namespace rsp::logging;
 
-//#define DDLOG(a) DLOG(a);
+//#define DDLOG(a) DLOG(a)
 #define DDLOG(a)
 
 namespace rsp::utils {
@@ -20,50 +20,6 @@ std::ostream& operator<< (std::ostream& os, const DynamicData& arValue)
     os << je.Encode(arValue);
     return os;
 }
-
-/*
-DynamicData::DynamicData(const DynamicData& arOther)
-    : Variant(arOther),
-      mName(arOther.mName),
-      mItems(arOther.mItems)
-{
-    DDLOG("DynamicData copy constructor")
-}
-
-DynamicData::DynamicData(DynamicData&& arOther) noexcept
-    : mName(std::move(arOther.mName)),
-      mItems(std::move(arOther.mItems))
-{
-    DDLOG("DynamicData move constructor")
-    mType = arOther.mType;
-    mInt = arOther.mInt;
-    mString = std::move(arOther.mString);
-    arOther.mType = Types::Null;
-}
-*/
-
-/*
-DynamicData& DynamicData::operator =(const DynamicData& arOther)
-{
-    if (&arOther != this) {
-        Variant::operator=(arOther);
-        mName = arOther.mName;
-        mItems = arOther.mItems;
-        DDLOG("DynamicData copy assignment")
-    }
-    return *this;}
-
-DynamicData& DynamicData::operator=(DynamicData&& arOther) noexcept
-{
-    if (&arOther != this) {
-        mName = std::move(arOther.mName);
-        mItems = std::move(arOther.mItems);
-        Variant::operator=(std::move(arOther));
-        DDLOG("DynamicData move assignment")
-    }
-    return *this;
-}
-*/
 
 DynamicData& DynamicData::operator [](std::string_view aKey)
 {
@@ -128,19 +84,26 @@ std::vector<std::string> DynamicData::GetMemberNames() const
 bool DynamicData::MemberExists(std::string_view aKey) const
 {
     tryObject();
-    for (const DynamicData &v : mItems) {
-        if (v.mName == aKey) {
-            return true;
-        }
-    }
-    return false;
+
+    auto hasName = [&aKey](const DynamicData &v) noexcept
+    {
+        return (v.mName == aKey);
+    };
+
+    return std::ranges::any_of(mItems, hasName);
+//    for (const DynamicData &v : mItems) {
+//        if (v.mName == aKey) {
+//            return true;
+//        }
+//    }
+//    return false;
 }
 
 DynamicData& DynamicData::Add(DynamicData aValue)
 {
     forceArray();
     Logger::GetDefault().Info() << "DynamicData::Add(): " << aValue;
-    mItems.emplace_back(aValue);
+    mItems.emplace_back(std::move(aValue));
     return *this;
 }
 
@@ -149,7 +112,7 @@ DynamicData& DynamicData::Add(std::string_view aKey, DynamicData aValue)
     forceObject();
     Logger::GetDefault().Info() << "JsonObject::Add(): \"" << aKey << "\": " << aValue;
     aValue.mName = aKey;
-    mItems.push_back(aValue);
+    mItems.push_back(std::move(aValue));
     return *this;
 }
 
@@ -180,7 +143,7 @@ void DynamicData::Clear()
     mType = Types::Null;
 }
 
-bool DynamicData::operator ==(const DynamicData &arOther) const
+bool DynamicData::operator==(const DynamicData &arOther) const // NOLINT
 {
     if (this == &arOther) {
         return true;
@@ -264,7 +227,7 @@ void DynamicData::forceObject()
     tryObject();
 }
 
-void DynamicData::Serializable::FromData(const DynamicData &arData)
+void DynamicData::Serializable::FromData(const DynamicData &/*arData*/)
 {
     // Subclasses must implement this
     THROW_WITH_BACKTRACE(exceptions::NotImplementedException);

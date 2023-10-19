@@ -148,10 +148,6 @@ Variant::Variant(const char *apValue)
 {
 }
 
-Variant::~Variant()
-{
-}
-
 Variant& Variant::operator =(bool aValue)
 {
     mType = Types::Bool;

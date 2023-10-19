@@ -34,7 +34,7 @@ JsonStream& operator <<(JsonStream &o, const Indent &arIndent)
 
 JsonStream& operator <<(JsonStream &o, const Comma &arComma)
 {
-    static_cast<std::ostringstream&>(o) << ',' << o.newLine << o.indentation;
+    static_cast<std::ostringstream&>(o) << arComma.mValue << o.newLine << o.indentation;
     return o;
 }
 
@@ -83,5 +83,3 @@ JsonStream& operator<<(JsonStream& o, const char *apStr)
 }
 
  // namespace rsp::json
-
-

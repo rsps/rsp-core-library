@@ -390,13 +390,13 @@ DynamicData JsonDecoder::getNumber()
     }
 
     if (is_float) {
-        return DynamicData(rsp::utils::StrUtils::ToDouble(result));
+        return {rsp::utils::StrUtils::ToDouble(result)};
     }
     else if (is_negative) {
-        return DynamicData(static_cast<std::int64_t>(std::strtoll(result.c_str(), nullptr, 10)));
+        return {static_cast<std::int64_t>(std::strtoll(result.c_str(), nullptr, 10))};
     }
     else {
-        return DynamicData(static_cast<std::uint64_t>(std::strtoull(result.c_str(), nullptr, 10)));
+        return {static_cast<std::uint64_t>(std::strtoull(result.c_str(), nullptr, 10))};
     }
 }
 

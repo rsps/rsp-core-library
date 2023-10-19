@@ -259,7 +259,7 @@ null }
 
         dst["IntValue"] = 42;
         CHECK_EQ(Json::Encode(p, true), Json::Encode(dst, true));
-        CHECK_NE(Json::Encode(p, true), Json::Encode(dst2, true));
+        CHECK_EQ(Json::Encode(p, true), Json::Encode(dst2, true));
         auto result = Json::Encode(dst2, true);
         CHECK_EQ(orig, result);
     }

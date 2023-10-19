@@ -86,6 +86,8 @@ public:
      */
     DynamicData() : Variant() {}
 
+//    ~DynamicData() override;
+
     DynamicData(const DynamicData&) = default;
     DynamicData(DynamicData&&) noexcept = default;
 
@@ -96,7 +98,7 @@ public:
      *
      * Use template to declare inherited constructors
      */
-    template<class T>
+    template <class T, std::enable_if_t<!std::is_base_of_v<DynamicData, T>, bool> = true>
     DynamicData(T aValue) : Variant(aValue) {} // NOLINT
 
     DynamicData& operator=(const DynamicData&) = default;

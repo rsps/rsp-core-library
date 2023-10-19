@@ -108,12 +108,6 @@ public:
     explicit Variant(const char *apValue);
 
     /**
-     * \fn  ~Variant()
-     * \brief Virtual destructor
-     */
-    ~Variant() override;
-
-    /**
      * \fn bool IsNull()const
      * \brief Returns true if the content is null, not set or empty.
      *

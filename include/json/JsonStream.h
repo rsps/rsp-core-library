@@ -21,14 +21,17 @@ namespace rsp::json {
 struct Indent
 {
     unsigned mValue;
-    Indent(unsigned aValue) : mValue(aValue) {}
+    explicit Indent(unsigned aValue) : mValue(aValue) {}
 };
-struct Comma {};
+struct Comma {
+    char mValue = ',';
+    explicit Comma(char aValue = ',') : mValue(aValue) {}
+};
 struct Key
 {
     const char *mpValue;
-    Key(const std::string &arValue) : mpValue(arValue.c_str()) {}
-    Key(const char *apValue) : mpValue(apValue) {}
+    explicit Key(const std::string &arValue) : mpValue(arValue.c_str()) {}
+    explicit Key(const char *apValue) : mpValue(apValue) {}
 };
 struct OBegin {};
 struct OEnd {};
@@ -43,12 +46,12 @@ class JsonStream : public std::ostringstream {
 public:
     /**
      * \fn JsonStream(bool aPrettyPrint, int aLevel)
-     * \brief Contructs a stream object
+     * \brief Constructs a stream object
      *
      * \param aPrettyPrint Set to format output in human readable format
      * \param aLevel Starting indentation level.
      */
-    JsonStream(bool aPrettyPrint = false, unsigned aLevel = 0);
+    explicit JsonStream(bool aPrettyPrint = false, unsigned aLevel = 0);
 
     bool mPrettyPrint;
     unsigned mRootLevel;

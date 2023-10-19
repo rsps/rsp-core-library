@@ -31,9 +31,9 @@ public:
 
     /**
      * \brief Constructor that takes a PrintFormat preset
-     * \param arPf
+     * \param aPf
      */
-    JsonEncoder(const PrintFormat &arPf);
+    explicit JsonEncoder(PrintFormat aPf);
 
     /**
      * \brief Constructor with most used formatting arguments
@@ -41,7 +41,7 @@ public:
      * \param aArrayLineLength Allows for multiple elements per line if PrettyPrint is enabled.
      * \param aForceToUCS2 Force extended UTF8 characters into u+0000 JSON format.
      */
-    JsonEncoder(bool aPrettyPrint = false, unsigned int aArrayLineLength = 0, bool aForceToUCS2 = false);
+    explicit JsonEncoder(bool aPrettyPrint = false, unsigned int aArrayLineLength = 0, bool aForceToUCS2 = false);
 
     /**
      * \brief Encodes all data in the DynamicData object into valid JSON.
