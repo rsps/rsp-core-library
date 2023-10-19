@@ -14,8 +14,8 @@ enum LogLevel {
     Notice
     Info
     Debug
-    
-    +const cDefautLogLevel = Info
+
+    +const cDefaultLogLevel = Info
     +ToLogLevel(aLevelString: std::string): LogLevel
     +ToString(aLevel: LogLevel): std::string
 }

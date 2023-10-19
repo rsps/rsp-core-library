@@ -36,13 +36,13 @@ EasyCurl::~EasyCurl()
 
 EasyCurl::EasyCurl(const EasyCurl &arOther)
 {
-    DLOG("EasyCurl Copy Construct");
+    DLOG("EasyCurl Copy Construct")
     *this = arOther;
 }
 
-EasyCurl::EasyCurl(EasyCurl &&arOther)
+EasyCurl::EasyCurl(EasyCurl &&arOther) noexcept
 {
-    DLOG("EasyCurl Move Construct");
+    DLOG("EasyCurl Move Construct")
     *this = std::move(arOther);
 }
 
@@ -51,29 +51,23 @@ void EasyCurl::prepareRequest()
     // Clear request to avoid old headers to be persistent.
     curl_easy_reset(mpCurl);
 
-    auto err = curl_easy_setopt(mpCurl, CURLOPT_ERRORBUFFER, mErrorBuffer);
-    if (err != CURLE_OK) {
-        THROW_WITH_BACKTRACE2(ECurlError, "Curl error buffer initialization failed.", err);
-    }
+    setCurlOption(CURLOPT_ERRORBUFFER, mErrorBuffer);
 
-    err = curl_easy_setopt(mpCurl, CURLOPT_PRIVATE, this);
-    if (err != CURLE_OK) {
-        THROW_WITH_BACKTRACE2(ECurlError, "Curl private pointer SET failed.", err);
-    }
+    setCurlOption(CURLOPT_PRIVATE, this);
 }
 
 EasyCurl& EasyCurl::operator =(const EasyCurl &arOther)
 {
-    DLOG("EasyCurl Copy Assignment");
+    DLOG("EasyCurl Copy Assignment")
     if (this != &arOther) {
         mpCurl = curl_easy_duphandle(arOther.mpCurl);
     }
     return *this;
 }
 
-EasyCurl& EasyCurl::operator =(EasyCurl &&arOther)
+EasyCurl& EasyCurl::operator =(EasyCurl &&arOther) noexcept
 {
-    DLOG("EasyCurl Move Assignment");
+    DLOG("EasyCurl Move Assignment")
     if (this != &arOther) {
         mpCurl = arOther.mpCurl;
         arOther.mpCurl = nullptr;

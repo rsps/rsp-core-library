@@ -30,7 +30,7 @@ public:
      * \brief Construct with contents from a SecureBuffer.
      * \param arOther SecureBuffer to copy data from
      */
-    SecureString(const SecureBuffer& arOther)
+    SecureString(const SecureBuffer& arOther) // NOLINT, conversion constructor
         : std::basic_string<char, std::char_traits<char>, SecureAllocator<char>>::basic_string()
     {
         assign(arOther.begin(), arOther.end());
@@ -40,7 +40,7 @@ public:
      * \brief Construct with contents from std::string
      * \param arOther string with contents to copy from
      */
-    SecureString(const std::string& arOther)
+    SecureString(const std::string& arOther) // NOLINT, conversion constructor
         : std::basic_string<char, std::char_traits<char>, SecureAllocator<char>>::basic_string()
     {
         assign(arOther);
@@ -66,19 +66,30 @@ public:
     }
 
     /**
-     * \brief Return a string_view to the current content.
+     * \brief Convert this to a std::string_view of the current content
+     * \return string_view
      */
-    operator std::string_view() const
+    operator std::string_view() const // NOLINT, conversion operator
     {
         return data();
     }
 
     /**
-     * \brief Return a std::string with the current content.
+     * \brief Convert this to a std::string with the current content.
+     * \return string
      */
-    operator std::string() const
+    operator std::string() const // NOLINT, conversion operator
     {
         return data();
+    }
+
+    /**
+     * \brief Convert this to a SecureBuffer with the current content.
+     * \return SecureBuffer
+     */
+    operator SecureBuffer() const // NOLINT, conversion operator
+    {
+        return {reinterpret_cast<const std::uint8_t*>(data()), size()};
     }
 
     /**
@@ -101,7 +112,7 @@ public:
      */
     bool operator==(const SecureString& arOther)
     {
-        return compare(arOther) == 0;
+        return compare(arOther) == 0; // NOLINT
     }
 
     /**
@@ -111,7 +122,7 @@ public:
      */
     bool operator==(const std::string& arOther)
     {
-        return compare(arOther) == 0;
+        return compare(arOther) == 0; // NOLINT
     }
 
     /**
@@ -121,14 +132,8 @@ public:
      */
     bool operator==(const char* apOther)
     {
-        return compare(apOther) == 0;
+        return compare(apOther) == 0; // NOLINT
     }
-
-    operator SecureBuffer() const
-    {
-        return SecureBuffer(reinterpret_cast<const std::uint8_t*>(data()), size());
-    }
-
 };
 
 } /* namespace rsp::security */

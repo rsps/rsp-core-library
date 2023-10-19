@@ -13,7 +13,6 @@
 #include <string>
 #include <iostream>
 #include <cstring>
-#include <algorithm>
 #include <ostream>
 #include <utils/AnsiEscapeCodes.h>
 #include <utils/StrUtils.h>
@@ -63,12 +62,12 @@ TerminalIO& TerminalIO::SetEcho(bool aEcho)
     return *this;
 }
 
-char TerminalIO::GetChar(EscapeCodes &arEscCode)
+char TerminalIO::GetChar(EscapeCodes &arEscCode) const
 {
     char c;
 
     do {
-        c = std::getchar();
+        c = getChar();
     }
     while (c == static_cast<char>(-1));
 
@@ -78,17 +77,17 @@ char TerminalIO::GetChar(EscapeCodes &arEscCode)
         // Escape character
         char ext[6] {0};
         ext[0] = c;
-        ext[1] = std::getchar();
+        ext[1] = getChar();
         if (ext[1] == 0) {
             return c; // The Esc key is not followed by any extended values
         }
         else
         {
-            ext[2] = std::getchar();
+            ext[2] = getChar();
             if (ext[2] < 0x3F) {
-                ext[3] = std::getchar();
+                ext[3] = getChar();
                 if (ext[3] < 0x3F) {
-                    ext[4] = std::getchar();
+                    ext[4] = getChar();
                 }
             }
         }
@@ -260,8 +259,8 @@ std::string TerminalIO::GetLine()
 
     StrUtils::Trim(line);
     if (line.length() > 0) {
-        if (mHistory.size()) {
-            if (mHistory.back().compare(line)) {
+        if (!mHistory.empty()) {
+            if (mHistory.back() != line) {
                 mHistory.push_back(line);
             }
         }
@@ -353,11 +352,16 @@ char TerminalIO::WaitForAnyKey()
 {
     char c;
     do {
-        c = std::getchar(); // getchar behavior changed by TerminalIO: timeout of 20ms on key wait.
+        c = getChar(); // getchar behavior changed by TerminalIO: timeout of 20ms on key wait.
     }
     while (c == static_cast<char>(-1));
 
     return c;
+}
+
+char TerminalIO::getChar()
+{
+    return char(std::getchar());
 }
 
 #else /* __linux__ */

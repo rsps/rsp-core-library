@@ -22,9 +22,4 @@ Sha::Sha(HashAlgorithms aAlgorithm)
 {
 }
 
-Sha::~Sha()
-{
-}
-
 } /* namespace rsp::utils */
-

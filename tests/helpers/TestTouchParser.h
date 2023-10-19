@@ -21,7 +21,7 @@ struct TestEventItem_t {
     std::chrono::steady_clock::time_point Time{};
     std::shared_ptr<rsp::messaging::Event> Event{};
 
-    TestEventItem_t() {}
+    TestEventItem_t() = default;
 
     TestEventItem_t(int aOffset, std::shared_ptr<rsp::messaging::Event> &&arEvent)
         : Time(std::chrono::steady_clock::now() + std::chrono::milliseconds(aOffset)),
@@ -45,7 +45,7 @@ static TestEventItem_t MakeEventItem(int aOffset, Args &&... args)
 class TestTouchParser: public rsp::graphics::GfxInputEvents, public rsp::logging::NamedLogger<TestTouchParser>
 {
 public:
-    TestTouchParser(bool aRegisterTestTouchParser) : GfxInputEvents(aRegisterTestTouchParser) {};
+    explicit TestTouchParser(bool aRegisterTestTouchParser) : GfxInputEvents(aRegisterTestTouchParser) {};
     TestTouchParser(const TestTouchParser&) = delete;
     TestTouchParser& operator=(const TestTouchParser&) = delete;
 
@@ -55,7 +55,7 @@ public:
 
     void Flush() override;
 
-    int64_t GetMaxDelay() const;
+    [[nodiscard]] int64_t GetMaxDelay() const;
 
 protected:
     const TestEventItem_t *mpTouchEvents = nullptr;

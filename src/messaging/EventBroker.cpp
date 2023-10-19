@@ -32,9 +32,9 @@ size_t EventBroker::ProcessEvents()
         q = mQueue;
         mQueue.clear();
     }
-    for (EventPtr_t event : q) {
+    for (auto &event : q) {
         for (SubscriberInterface* &sub : mSubscribers) {
-            rsp::graphics::Control *ctrl = dynamic_cast<rsp::graphics::Control*>(sub);
+            auto *ctrl = dynamic_cast<rsp::graphics::Control*>(sub);
             mLogger.Debug() << "Propagating " << *event << " to " << (ctrl ? ctrl->GetName() : "Unknown");
             if (sub->ProcessEvent(*event)) {
                 break;

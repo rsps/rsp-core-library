@@ -32,13 +32,13 @@ class LoggerInterface;
 class LogStream
 {
 public:
-    LogStream(LoggerInterface *apOwner, LogLevel aLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext);
+    LogStream(LoggerInterface *apOwner, LogLevel aLevel, std::string aChannel, rsp::utils::DynamicData aContext);
     LogStream(const LogStream &arOther);
-    LogStream(LogStream &&arOther); /* No copy, move is OK */
+    LogStream(LogStream &&arOther) noexcept; /* No copy, move is OK */
     virtual ~LogStream();
 
     LogStream& operator=(const LogStream &arOther);
-    LogStream& operator=(LogStream &&arOther);
+    LogStream& operator=(LogStream &&arOther) noexcept;
 
     /**
      * \brief Get the current stream acceptance log level

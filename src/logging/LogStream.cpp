@@ -13,11 +13,11 @@
 
 namespace rsp::logging {
 
-LogStream::LogStream(LoggerInterface *apLogger, LogLevel aLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
+LogStream::LogStream(LoggerInterface *apLogger, LogLevel aLevel, std::string aChannel, rsp::utils::DynamicData aContext)
     : mpLogger(apLogger),
       mLevel(aLevel),
-      mChannel(arChannel),
-      mContext(arContext)
+      mChannel(std::move(aChannel)),
+      mContext(std::move(aContext))
 {
     mBuffer.imbue(std::locale{"C"});
 }
@@ -31,9 +31,9 @@ LogStream::LogStream(const LogStream &arOther)
     mBuffer.imbue(std::locale{"C"});
 }
 
-LogStream::LogStream(LogStream &&arOther)
-    : mpLogger(std::move(arOther.mpLogger)),
-      mLevel(std::move(arOther.mLevel)),
+LogStream::LogStream(LogStream &&arOther) noexcept
+    : mpLogger(arOther.mpLogger),
+      mLevel(arOther.mLevel),
       mChannel(std::move(arOther.mChannel)),
       mContext(std::move(arOther.mContext)),
       mBuffer(std::move(arOther.mBuffer))
@@ -60,11 +60,11 @@ LogStream& LogStream::operator=(const LogStream &arOther)
     return *this;
 }
 
-LogStream& LogStream::operator=(LogStream &&arOther)
+LogStream& LogStream::operator=(LogStream &&arOther) noexcept
 {
     if (&arOther != this) {
-        mpLogger = std::move(arOther.mpLogger);
-        mLevel = std::move(arOther.mLevel);
+        mpLogger = arOther.mpLogger;
+        mLevel = arOther.mLevel;
         mChannel = std::move(arOther.mChannel);
         mContext = std::move(arOther.mContext);
         mBuffer = std::move(arOther.mBuffer);
@@ -120,4 +120,3 @@ LogStream& LogStream::operator <<(rsp::logging::SetLevel aLevel)
 }
 
 } /* namespace rsp::logging */
-

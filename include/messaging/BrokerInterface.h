@@ -27,7 +27,7 @@ public:
             SetInstance(this);
         }
     }
-    virtual ~BrokerInterface()
+    ~BrokerInterface() override
     {
         if (&GetInstance() == this) {
             SetInstance(nullptr);

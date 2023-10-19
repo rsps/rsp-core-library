@@ -13,7 +13,7 @@
 
 using namespace rsp::network;
 
-IHttpSession* rsp::network::HttpSession::MakePimpl(std::size_t aSize)
+IHttpSession* rsp::network::HttpSession::MakePimpl(size_t aSize)
 {
     return new rsp::network::curl::CurlSession(aSize);
 }

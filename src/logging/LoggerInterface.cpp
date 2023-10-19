@@ -15,10 +15,10 @@ namespace rsp::logging {
 std::shared_ptr<LoggerInterface> LoggerInterface::mpDefaultInstance = nullptr;
 
 
-LoggerInterface::Handle_t LoggerInterface::AddLogWriter(std::shared_ptr<LogWriterInterface> aWriter)
+LoggerInterface::Handle_t LoggerInterface::AddLogWriter(const std::shared_ptr<LogWriterInterface>& arWriter)
 {
-    mWriters.push_back(aWriter);
-    return reinterpret_cast<Handle_t>(aWriter.get());
+    mWriters.push_back(arWriter);
+    return reinterpret_cast<Handle_t>(arWriter.get());
 }
 
 void LoggerInterface::RemoveLogWriter(Handle_t aHandle)
@@ -71,4 +71,3 @@ void LoggerInterface::SetDefault(LoggerInterface* apLogger)
 }
 
 } /* namespace rsp::logging */
-

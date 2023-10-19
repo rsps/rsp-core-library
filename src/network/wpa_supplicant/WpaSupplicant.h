@@ -24,7 +24,10 @@ class WpaSupplicant : public IWlanInterface
 {
 public:
     WpaSupplicant();
+    WpaSupplicant(const WpaSupplicant&) = delete;
     ~WpaSupplicant() override;
+
+    WpaSupplicant& operator=(const WpaSupplicant&) = delete;
 
     std::vector<APInfo> GetAvailableNetworks() override;
     IWlanInterface& SetEnable(bool aEnable) override;
@@ -39,7 +42,7 @@ public:
     IWlanInterface& Reconnect() override;
     IWlanInterface& Disconnect() override;
     IWlanInterface& ReleaseIP() override;
-    std::string AquireIP() override;
+    std::string AcquireIp() override;
 
 protected:
     struct wpa_ctrl *mpWpaCtrl = nullptr;
@@ -47,14 +50,11 @@ protected:
     rsp::logging::LogChannel mLogger;
     std::string mInterfaceName{};
 
-    WpaSupplicant(const WpaSupplicant&) = delete;
-    WpaSupplicant& operator=(const WpaSupplicant&) = delete;
-
     std::string request(std::string_view aCmd);
     bool ping();
     void save(const std::string &arSSID);
     void runCommand(const std::string &arCommand);
-    WpaStatus parseWpaStatus(const std::string &arStatus) const;
+    static WpaStatus parseWpaStatus(const std::string &arStatus);
 };
 
 

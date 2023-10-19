@@ -26,10 +26,10 @@ class Event
     size_t Type;
     std::string_view Name;
 
-    Event(size_t aType = 0, std::string_view aName = "") : Type(aType), Name(aName) {}
-    virtual ~Event() {}
+    explicit Event(size_t aType = 0, std::string_view aName = "") : Type(aType), Name(aName) {}
+    virtual ~Event() = default;
 
-    Event(const Event& arOther) : Type(arOther.Type), Name(arOther.Name) {}
+    Event(const Event& arOther) = default;
 
     Event& operator=(const Event& arOther) {
         if (&arOther != this) {
@@ -40,7 +40,7 @@ class Event
     }
 
     template<class T>
-    bool IsType() const {
+    [[nodiscard]] bool IsType() const {
         return (T::ClassType == Type);
     }
 

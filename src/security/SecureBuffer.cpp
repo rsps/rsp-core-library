@@ -10,6 +10,7 @@
 
 #include <iomanip>
 #include <security/SecureBuffer.h>
+#include <security/SecureString.h>
 
 namespace rsp::security {
 
@@ -23,6 +24,11 @@ std::ostream& operator<<(std::ostream& os, const SecureBuffer &arBuffer)
     return os << std::dec;
 }
 
+SecureString SecureBuffer::GetHex() const
+{
+    std::stringstream ss;
+    ss << *this;
+    return { ss.str() };
+}
+
 } // rsp::security
-
-

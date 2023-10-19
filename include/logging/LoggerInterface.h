@@ -30,7 +30,7 @@ namespace rsp::logging {
 class LoggerInterface
 {
 public:
-    virtual ~LoggerInterface() {}
+    virtual ~LoggerInterface() = default;
 
     static void SetDefault(LoggerInterface* apLogger);
     static LoggerInterface& GetDefault();
@@ -44,10 +44,10 @@ public:
     virtual LogStream Info() = 0;
     virtual LogStream Debug() = 0;
 
-    bool HasWriters() const;
+    [[nodiscard]] bool HasWriters() const;
 
     typedef uintptr_t Handle_t;
-    Handle_t AddLogWriter(std::shared_ptr<LogWriterInterface> aWriter);
+    [[nodiscard]] Handle_t AddLogWriter(const std::shared_ptr<LogWriterInterface>& arWriter);
 
     void RemoveLogWriter(Handle_t aHandle);
 

@@ -33,19 +33,15 @@ class CurlHttpRequest: public rsp::network::IHttpRequest, public EasyCurl
 {
 public:
     CurlHttpRequest();
-    ~CurlHttpRequest() override;
 
     CurlHttpRequest(const CurlHttpRequest&) = default;
-    CurlHttpRequest(CurlHttpRequest&&) = default;
-
-    CurlHttpRequest& operator=(const CurlHttpRequest&) = default;
-    CurlHttpRequest& operator=(CurlHttpRequest&&) = default;
+    CurlHttpRequest(CurlHttpRequest&&) noexcept = default;
 
     IHttpResponse& Execute() override;
-    const HttpRequestOptions& GetOptions() const override;
+    [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
     IHttpRequest& SetBody(const std::string &arBody) override;
-    const std::string& GetBody() const override;
+    [[nodiscard]] const std::string& GetBody() const override;
 
     IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override;
     IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override;

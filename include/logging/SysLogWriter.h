@@ -21,9 +21,9 @@ namespace rsp::logging {
  */
 class SysLogWriter: public LogWriterInterface {
 public:
-    SysLogWriter(std::string aIdent, std::string aAcceptLevel, LogType aType);
+    SysLogWriter(std::string aIdent, const std::string& arAcceptLevel, LogType aType);
     SysLogWriter(std::string aIdent, LogLevel aAcceptLevel, LogType aType);
-    ~SysLogWriter();
+    ~SysLogWriter() override;
 
     void Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
 

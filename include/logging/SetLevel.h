@@ -29,7 +29,7 @@ public:
      *
      * \param aLevel
      */
-    SetLevel(LogLevel aLevel) : mValue(aLevel) {}
+    explicit SetLevel(LogLevel aLevel) : mValue(aLevel) {}
 
     /**
      * \brief Callable operator used by streaming operators

@@ -116,7 +116,6 @@ EscString ec::InverseScreenOn    = ESC("?5h");
 EscString ec::InverseScreenOff   = ESC("?5l");
 EscString ec::ResetAll = "\033c";
 
-EscString ec::TputClear = ESC("3J") ESC("H") ESC("2J"); //5b1b 4a33 5b1b 1b48 325b 004a
+EscString ec::TPutClear = ESC("3J") ESC("H") ESC("2J"); //5b1b 4a33 5b1b 1b48 325b 004a
 
 } // namespace AnsiEscapeCodes
-

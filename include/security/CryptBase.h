@@ -39,8 +39,8 @@ public:
      * \brief Constructor that takes a cipher to use
      * \param aCipher AES cipher to use for encryption.
      */
-    CryptBase(CipherTypes aCipher) : mCipherType(aCipher) {}
-    virtual ~CryptBase() {}
+    explicit CryptBase(CipherTypes aCipher) : mCipherType(aCipher) {}
+    virtual ~CryptBase() = default;
 
     /**
      * \brief Initialize the crypto module.

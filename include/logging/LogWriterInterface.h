@@ -24,7 +24,7 @@ namespace rsp::logging {
  */
 class LogWriterInterface {
 public:
-    virtual ~LogWriterInterface() {}
+    virtual ~LogWriterInterface() = default;
 
     /**
      * Write a string to the destination in a thread safe manner.
@@ -42,7 +42,7 @@ public:
     void SetAcceptLogLevel(LogLevel aLevel) { mAcceptLevel = aLevel; }
 
 protected:
-    LogLevel mAcceptLevel = cDefautLogLevel;
+    LogLevel mAcceptLevel = cDefaultLogLevel;
 };
 
 } /* namespace logging */

@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SECUREBUFFER_H_
-#define INCLUDE_SECURITY_SECUREBUFFER_H_
+#ifndef INCLUDE_SECURITY_SECURE_BUFFER_H_
+#define INCLUDE_SECURITY_SECURE_BUFFER_H_
 
 #include <vector>
 #include <string>
@@ -20,6 +20,7 @@
 namespace rsp::security {
 
 class SecureBuffer;
+class SecureString;
 
 /**
  * \brief Output streaming operator for SecureBuffer
@@ -38,7 +39,7 @@ class SecureBuffer : public std::vector<std::uint8_t, SecureAllocator<std::uint8
 public:
     using std::vector<std::uint8_t, SecureAllocator<std::uint8_t>>::vector;
 
-    SecureBuffer(const char* apData)
+    SecureBuffer(const char* apData) // NOLINT, conversion constructor
     {
         auto b = reinterpret_cast<const std::uint8_t*>(apData);
         auto e = reinterpret_cast<const std::uint8_t*>(apData + std::strlen(apData));
@@ -97,14 +98,9 @@ public:
      * \brief Format this content to ASCII hex.
      * \return String with ASCII hex.
      */
-    std::string GetHex() const
-    {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
+    [[nodiscard]] SecureString GetHex() const;
 };
 
 } // namespace rsp::security
 
-#endif /* INCLUDE_SECURITY_SECUREBUFFER_H_ */
+#endif /* INCLUDE_SECURITY_SECURE_BUFFER_H_ */

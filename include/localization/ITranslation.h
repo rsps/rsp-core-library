@@ -24,7 +24,10 @@ namespace rsp::localization {
 class ITranslation
 {
 public:
-    virtual ~ITranslation() { std::locale::global(mDefaultLocale); };
+    virtual ~ITranslation()
+    {
+        std::locale::global(mDefaultLocale);
+    }
 
     virtual ITranslation& SetLocale(const char *apLocale)
     {
@@ -32,7 +35,7 @@ public:
         return *this;
     }
 
-    virtual std::string_view Translate(std::uint32_t aHash, std::string_view aDefault) const = 0;
+    [[nodiscard]] virtual std::string_view Translate(std::uint32_t aHash, std::string_view aDefault) const = 0;
 
     constexpr std::string_view operator()(const char *apText) const {
         return Translate(rsp::utils::crc32::HashConst(apText), apText);
@@ -42,7 +45,7 @@ public:
         return Translate(rsp::utils::crc32::HashConst(aText.data()), aText);
     }
 
-    std::string_view operator()(const std::string arText) const {
+    std::string_view operator()(const std::string& arText) const {
         return Translate(rsp::utils::crc32::HashConst(arText.data()), arText);
     }
 

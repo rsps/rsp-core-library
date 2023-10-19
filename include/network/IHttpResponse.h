@@ -39,19 +39,21 @@ class IHttpRequest;
 class IHttpResponse
 {
 public:
+    virtual ~IHttpResponse() = default;
+
     /**
      * \brief Get a const reference to the response headers.
      *
      * \return Reference to headers.
      */
-    virtual const std::map<std::string, std::string>& GetHeaders() const = 0;
+    [[nodiscard]] virtual const std::map<std::string, std::string>& GetHeaders() const = 0;
 
     /**
      * \brief Get a const reference to the specific header value.
      * \param arName
      * \return Reference to header value
      */
-    virtual const std::string& GetHeader(const std::string &arName) const = 0;
+    [[nodiscard]] virtual const std::string& GetHeader(const std::string &arName) const = 0;
 
     /**
      * \fn int GetStatusCode()const =0
@@ -59,7 +61,7 @@ public:
      *
      * \return integer status code
      */
-    virtual int GetStatusCode() const = 0;
+    [[nodiscard]] virtual int GetStatusCode() const = 0;
 
     /**
      * \fn const IHttpRequest GetRequest&()const =0
@@ -67,7 +69,7 @@ public:
      *
      * \return Reference to the request object.
      */
-    virtual const IHttpRequest& GetRequest() const = 0;
+    [[nodiscard]] virtual const IHttpRequest& GetRequest() const = 0;
 
     /**
      * \fn const std::string GetBody&()const =0
@@ -75,11 +77,7 @@ public:
      *
      * \return String with body content
      */
-    virtual const std::string& GetBody() const = 0;
-
-    virtual ~IHttpResponse()
-    {
-    }
+    [[nodiscard]] virtual const std::string& GetBody() const = 0;
 };
 
 std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse);

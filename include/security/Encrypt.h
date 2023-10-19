@@ -24,7 +24,7 @@ namespace rsp::security {
 class Encrypt: public CryptBase
 {
 public:
-    Encrypt(CipherTypes aCipher = CipherTypes::AES_128_CBC);
+    explicit Encrypt(CipherTypes aCipher = CipherTypes::AES_128_CBC);
 
     void Init(const SecureBuffer& arIvSeed, const SecureBuffer& arSecret) override;
     SecureBuffer Finalize() override { return pImpl->Finalize(); }

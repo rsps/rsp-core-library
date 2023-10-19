@@ -36,6 +36,7 @@ ApplicationBase::ApplicationBase(int argc, const char **argv)
 
 ApplicationBase::~ApplicationBase()
 {
+    mLogger.RemoveLogWriter(mFileLogWriterHandle);
     rsp::logging::LoggerInterface::SetDefault(static_cast<rsp::logging::LoggerInterface*>(nullptr));
 
     mpInstance = nullptr;
@@ -86,7 +87,7 @@ void ApplicationBase::handleOptions()
             l = ToString(rsp::logging::LogLevel::Info);
         }
 
-        mLogger.AddLogWriter(std::make_shared<logging::FileLogWriter>(s, l));
+        mFileLogWriterHandle = mLogger.AddLogWriter(std::make_shared<logging::FileLogWriter>(s, l));
     }
 
     if ( mCmd.HasOption("-h") || mCmd.HasOption("--help")) {
@@ -109,4 +110,5 @@ void ApplicationBase::showVersion()
 {
     Console::Info() << "Library version: " << get_library_version() << std::endl;
 }
+
 } /* namespace rsp::application */

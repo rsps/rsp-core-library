@@ -20,9 +20,9 @@ class HttpRequest: public IHttpRequest
 {
 public:
     HttpRequest();
-    HttpRequest(const HttpRequestOptions& arOptions);
+    explicit HttpRequest(const HttpRequestOptions& arOptions);
 
-    const HttpRequestOptions& GetOptions() const override
+    [[nodiscard]] const HttpRequestOptions& GetOptions() const override
     {
         return mPimpl->GetOptions();
     }
@@ -39,7 +39,7 @@ public:
         return *this;
     }
 
-    const std::string& GetBody() const override
+    [[nodiscard]] const std::string& GetBody() const override
     {
         return mPimpl->GetBody();
     }

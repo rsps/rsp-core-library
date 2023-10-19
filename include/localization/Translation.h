@@ -18,10 +18,13 @@ namespace rsp::localization {
 class Translation: public ITranslation
 {
 public:
-    Translation() {};
-    Translation(const char *apLocale) { SetLocale(apLocale); }
+    Translation() = default;
+    explicit Translation(const char *apLocale)
+    {
+        ITranslation::SetLocale(apLocale);
+    }
 
-    std::string_view Translate(uint32_t aHash, std::string_view aDefault) const override;
+    [[nodiscard]] std::string_view Translate(uint32_t aHash, std::string_view aDefault) const override;
 };
 
 

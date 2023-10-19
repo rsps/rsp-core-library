@@ -13,7 +13,6 @@
 #include <cstring>
 #include <unistd.h>
 #include <ifaddrs.h>
-#include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <linux/wireless.h>
@@ -23,14 +22,14 @@ namespace rsp::posix {
 NetworkInterfaces::NetworkInterfaces()
     : mLogger("posix")
 {
-    struct ifaddrs *ifaddr;
+    struct ifaddrs *interface_addresses;
 
-    if (getifaddrs(&ifaddr) == -1) {
+    if (getifaddrs(&interface_addresses) == -1) {
         THROW_SYSTEM("getifaddrs failed");
     }
 
     // Walk through linked list of interfaces
-    for (struct ifaddrs *ifa = ifaddr ; ifa != nullptr ; ifa = ifa->ifa_next) {
+    for (struct ifaddrs *ifa = interface_addresses ; ifa != nullptr ; ifa = ifa->ifa_next) {
 
         if ((ifa->ifa_addr == nullptr) || (ifa->ifa_addr->sa_family != AF_PACKET)) {
             continue;
@@ -47,7 +46,7 @@ NetworkInterfaces::NetworkInterfaces()
         }
     }
 
-    freeifaddrs(ifaddr);
+    freeifaddrs(interface_addresses);
 }
 
 const std::vector<std::string>& NetworkInterfaces::GetWireless() const
@@ -63,16 +62,16 @@ const std::vector<std::string>& NetworkInterfaces::GetCabled() const
 bool NetworkInterfaces::isWireless(const std::string &arInterfaceName)
 {
     bool result = false;
-    int sock = -1;
-    struct iwreq pwrq;
-    std::memset(&pwrq, 0, sizeof(pwrq));
-    std::strncpy(pwrq.ifr_name, arInterfaceName.c_str(), IFNAMSIZ);
+    int sock;
+    struct iwreq ptr_wrq{};
+    std::memset(&ptr_wrq, 0, sizeof(ptr_wrq));
+    std::strncpy(ptr_wrq.ifr_name, arInterfaceName.c_str(), IFNAMSIZ);
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
         THROW_SYSTEM("socket failed");
     }
 
-    if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1) {
+    if (ioctl(sock, SIOCGIWNAME, &ptr_wrq) != -1) {
 //        char protocol[IFNAMSIZ] = { 0 };
 //        std::strncpy(protocol, pwrq.u.name, IFNAMSIZ);
 //        mLogger.Debug() << "Interface " << arInterfaceName << " is wireless, protocol " << std::string(protocol);

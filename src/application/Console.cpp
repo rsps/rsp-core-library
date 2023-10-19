@@ -96,7 +96,7 @@ Console::Console()
       mLcdDisplay(mTtyDeviceFile)
 {
     if (mLcdDisplay.is_open()) {
-        mLcdDisplay << ec::TputClear << ec::ResetAll << ec::DisableScreenSaver << ec::HideCursor << std::flush;
+        mLcdDisplay << ec::TPutClear << ec::ResetAll << ec::DisableScreenSaver << ec::HideCursor << std::flush;
     }
     else {
         std::cerr << mTtyDeviceFile << " could not be opened" << std::endl;
@@ -139,4 +139,3 @@ void ConsoleLogStreams::Info(const std::string &arMsg)
 
 
 } /* namespace rsp::application */
-

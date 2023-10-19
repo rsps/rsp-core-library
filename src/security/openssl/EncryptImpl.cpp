@@ -22,7 +22,7 @@ struct OpenSSLEncrypt : public OpenSSLCryptBase
 
     void Init(const SecureBuffer& arIvSeed, const SecureBuffer& arSecret) override
     {
-        int rc = EVP_EncryptInit_ex(mCtx.get(), getCipher(), NULL, arSecret.data(), arIvSeed.data());
+        int rc = EVP_EncryptInit_ex(mCtx.get(), getCipher(), nullptr, arSecret.data(), arIvSeed.data());
         if (rc != 1) {
             THROW_WITH_BACKTRACE2(CryptException, "EVP_EncryptInit_ex failed", ERR_error_string(static_cast<unsigned int>(rc), nullptr));
         }
@@ -55,7 +55,7 @@ struct OpenSSLEncrypt : public OpenSSLCryptBase
         // Set encrypted data size now that we know it
         mData.shrinkToOffset();
 
-        return mData;
+        return mData.copyToSecureBuffer();
     }
 };
 
@@ -67,4 +67,3 @@ std::unique_ptr<CryptBase> Encrypt::MakePimpl(CipherTypes aCipher)
 }
 
 #endif /* USE_OPENSSL */
-

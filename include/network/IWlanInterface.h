@@ -26,7 +26,7 @@ public:
         : CoreException(apMsg)
     {
     }
-    EWlanException(const std::string &arMsg)
+    explicit EWlanException(const std::string &arMsg)
         : CoreException(arMsg)
     {
     }
@@ -45,10 +45,10 @@ struct APInfo
     uint32_t mNetworkId = 0;
     WpaStatus mStatus = WpaStatus::None;
 
-    APInfo(const std::string &arSSID = std::string(), int aStrength = 0, bool aEncrypted = false, const std::string &arIpAddr = std::string(), const std::string &arMacAddr = std::string())
-        : mSSID(arSSID),
-          mIpAddress(arIpAddr),
-          mMacAddress(arMacAddr),
+    explicit APInfo(std::string aSSID = std::string(), int aStrength = 0, bool aEncrypted = false, std::string aIpAddr = std::string(), std::string aMacAddr = std::string())
+        : mSSID(std::move(aSSID)),
+          mIpAddress(std::move(aIpAddr)),
+          mMacAddress(std::move(aMacAddr)),
           mSignalStrength(aStrength),
           mEncrypted(aEncrypted)
     {
@@ -66,7 +66,12 @@ struct NetworkInfo
     std::string mSSID;
     bool mSelected;
 
-    NetworkInfo(uint32_t aId = uint32_t(-1), const std::string &arSSID = std::string(), bool aSelected = false) : mId(aId), mSSID(arSSID), mSelected(aSelected) {}
+    explicit NetworkInfo(uint32_t aId = uint32_t(-1), std::string aSSID = std::string(), bool aSelected = false)
+        : mId(aId),
+          mSSID(std::move(aSSID)),
+          mSelected(aSelected)
+    {
+    }
 
     NetworkInfo(const NetworkInfo&) = default;
     NetworkInfo(NetworkInfo&&) = default;
@@ -79,7 +84,7 @@ enum class WpaEvents { None, Connected, Disconnected, AuthRejected, APScanStarte
 class IWlanInterface
 {
 public:
-    virtual ~IWlanInterface() {}
+    virtual ~IWlanInterface() = default;
 
     virtual IWlanInterface& SetEnable(bool aEnable) = 0;
 
@@ -88,14 +93,14 @@ public:
     virtual IWlanInterface& Disconnect() = 0;
     virtual IWlanInterface& Reconnect() = 0;
 
-    virtual std::vector<struct APInfo> GetAvailableNetworks() = 0;
-    virtual std::vector<NetworkInfo> GetKnownNetworks() = 0;
+    [[nodiscard]] virtual std::vector<struct APInfo> GetAvailableNetworks() = 0;
+    [[nodiscard]] virtual std::vector<NetworkInfo> GetKnownNetworks() = 0;
     virtual NetworkInfo AddNetwork(const std::string &arSSID, const rsp::security::SecureString &arPassword) = 0;
     virtual IWlanInterface& RemoveNetwork(const NetworkInfo &arNetwork) = 0;
     virtual IWlanInterface& SelectNetwork(const NetworkInfo &arNetwork) = 0;
     virtual NetworkInfo FindNetwork(const std::string &arSSID) = 0;
 
-    virtual std::string AquireIP() = 0;
+    virtual std::string AcquireIp() = 0;
     virtual IWlanInterface& ReleaseIP() = 0;
 
     virtual WpaEvents GetMonitorEvent(std::string &arMessage) = 0;

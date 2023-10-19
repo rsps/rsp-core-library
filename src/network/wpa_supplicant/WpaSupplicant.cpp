@@ -299,7 +299,7 @@ rsp::network::IWlanInterface& WpaSupplicant::ReleaseIP()
     return *this;
 }
 
-std::string WpaSupplicant::AquireIP()
+std::string WpaSupplicant::AcquireIp()
 {
     std::string command("dhclient " + mInterfaceName);
     runCommand(command);
@@ -414,7 +414,7 @@ void WpaSupplicant::runCommand(const std::string &arCommand)
     mLogger.Info() << command << " -> " << status << "\n" << result << errors;
 }
 
-WpaStatus WpaSupplicant::parseWpaStatus(const std::string &arStatus) const
+WpaStatus WpaSupplicant::parseWpaStatus(const std::string &arStatus)
 {
     struct cStatusMap {
         WpaStatus mStatus;

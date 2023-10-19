@@ -24,27 +24,28 @@ namespace rsp::network::curl {
 class CurlLibrary : public rsp::network::NetworkLibrary
 {
 public:
-    ~CurlLibrary();
+    CurlLibrary(const CurlLibrary&) = delete;
+    CurlLibrary& operator=(const CurlLibrary&) = delete;
+
+    ~CurlLibrary() override;
 
     static CurlLibrary& Get();
 
-    std::string_view GetLibraryName() const override { return "libcurl"; }
-    std::string_view GetVersion() const override { return mpVersionInfo->version; }
-    std::string_view GetSslVersion() const override { return mpVersionInfo->ssl_version; }
+    [[nodiscard]] std::string_view GetLibraryName() const override { return "libcurl"; }
+    [[nodiscard]] std::string_view GetVersion() const override { return mpVersionInfo->version; }
+    [[nodiscard]] std::string_view GetSslVersion() const override { return mpVersionInfo->ssl_version; }
 
 protected:
     curl_version_info_data* mpVersionInfo = nullptr;
 
     void checkVersion();
 
-    constexpr std::uint32_t minimumCurlVersion()
+    static constexpr std::uint32_t minimumCurlVersion()
     {
         return 0x072100;
     }
 private:
     CurlLibrary();
-    CurlLibrary(const CurlLibrary&) = delete;
-    CurlLibrary& operator=(const CurlLibrary&) = delete;
 };
 
 } /* namespace rsp::network::curl */

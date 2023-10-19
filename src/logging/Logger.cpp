@@ -39,7 +39,7 @@ std::shared_ptr<std::streambuf> Logger::makeCLogStream(bool aCaptureLog)
 {
     std::streambuf *old = nullptr;
     if (aCaptureLog) {
-        old = std::clog.rdbuf(new OutStreamBuffer(this, cDefautLogLevel));
+        old = std::clog.rdbuf(new OutStreamBuffer(this, cDefaultLogLevel));
     }
     // Create shared_ptr with "do nothing" deallocator
     return std::shared_ptr<std::streambuf>(old, [](std::streambuf*){});
@@ -86,4 +86,3 @@ LogStream Logger::Debug()
 }
 
 } /* namespace rsp */
-

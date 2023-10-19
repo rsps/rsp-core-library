@@ -28,9 +28,9 @@ public:
      */
     void Init(const SecureBuffer& arSecret);
 
-    std::size_t GetSize() const override { return 32; }
+    [[nodiscard]] std::size_t GetSize() const override { return 32; }
     std::uint8_t* GetData() override { return mSignature.data(); }
-    const std::uint8_t* GetData() const override { return mSignature.data(); }
+    [[nodiscard]] const std::uint8_t* GetData() const override { return mSignature.data(); }
     void Calc(const rsp::utils::IDataContent &arContent) override;
     void Verify(const rsp::utils::IDataContent &arContent) override;
 

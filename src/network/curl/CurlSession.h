@@ -23,7 +23,7 @@ namespace rsp::network::curl {
 class CurlSession: public IHttpSession
 {
 public:
-    CurlSession(std::size_t aSize) : mPool(aSize) {}
+    explicit CurlSession(size_t aSize) : mPool(aSize) {}
     void ProcessRequests() override;
     IHttpSession& SetDefaultOptions(const HttpRequestOptions &arOptions) override;
     HttpRequestOptions& GetDefaultOptions() override { return mDefaultOptions; }

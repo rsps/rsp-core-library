@@ -57,9 +57,9 @@ protected:
 class Endpoints
 {
 public:
-    Endpoints& operator<<(std::shared_ptr<void> aEndpoint)
+    Endpoints& operator<<(const std::shared_ptr<void>& arEndpoint)
     {
-        mListeners.push_back(aEndpoint);
+        mListeners.push_back(arEndpoint);
         return *this;
     }
 

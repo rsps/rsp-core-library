@@ -24,7 +24,7 @@ namespace rsp::messaging {
 class SubscriberInterface
 {
 public:
-    virtual ~SubscriberInterface() {}
+    virtual ~SubscriberInterface() = default;
     /**
      * \brief Processes events for this subscriber object
      * \param arEvent Reference to the event being processed

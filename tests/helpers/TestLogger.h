@@ -18,9 +18,12 @@ class TestLogger : public rsp::logging::Logger
 {
 public:
     TestLogger();
-    ~TestLogger();
+    ~TestLogger() override;
 
     static rsp::logging::LogLevel mLogLevel;
+
+protected:
+    Handle_t mConsoleLogWriter = 0;
 };
 
 #endif /* TESTS_HELPERS_TESTLOGGER_H_ */

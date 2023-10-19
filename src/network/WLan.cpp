@@ -83,9 +83,9 @@ IWlanInterface& WLan::ReleaseIP()
     return *this;
 }
 
-std::string WLan::AquireIP()
+std::string WLan::AcquireIp()
 {
-    return mPimpl->AquireIP();
+    return mPimpl->AcquireIp();
 }
 
 } /* namespace tgm::network */

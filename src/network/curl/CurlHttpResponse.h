@@ -30,15 +30,15 @@ public:
 
 protected:
     friend class CurlHttpRequest;
-    void addHeader(std::string aKey, std::string aValue)
+    void addHeader(const std::string& arKey, std::string aValue)
     {
-        mHeaders[aKey] = aValue;
+        mHeaders[arKey] = std::move(aValue);
     }
     void setStatusCode(int aCode)
     {
         mStatusCode = aCode;
     }
-    std::string& getBody()
+    [[nodiscard]] std::string& getBody() // NOLINT
     {
         return mBody;
     }

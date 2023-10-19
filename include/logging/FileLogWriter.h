@@ -30,7 +30,7 @@ public:
      * \param aFileName
      * \param aAcceptLevel
      */
-    FileLogWriter(std::string aFileName, std::string aAcceptLevel);
+    FileLogWriter(const std::string& arFileName, const std::string& arAcceptLevel);
 
     /**
      * Construct a log writer with accept level given as LogLevel type.
@@ -38,7 +38,7 @@ public:
      * \param aFileName
      * \param aAcceptLevel
      */
-    FileLogWriter(std::string aFileName, LogLevel aAcceptLevel);
+    FileLogWriter(const std::string& arFileName, LogLevel aAcceptLevel);
     ~FileLogWriter() override;
 
 

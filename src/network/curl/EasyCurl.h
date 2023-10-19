@@ -21,7 +21,7 @@ class MultiCurl;
 
 /**
  * \class EasyCurl
- * \brief Low level wrapper for libcurls Easy interface.
+ * \brief Low level wrapper for libcurl's Easy interface.
  * This wrapper allocates an easy handle, but can also lookup this class object from a given handle.
  */
 class EasyCurl
@@ -29,13 +29,13 @@ class EasyCurl
 public:
     EasyCurl();
     EasyCurl(const EasyCurl& arOther);
-    EasyCurl(EasyCurl&& arOther);
+    EasyCurl(EasyCurl&& arOther) noexcept;
     virtual ~EasyCurl();
 
     static EasyCurl* GetFromHandle(CURL* apHandle);
 
     EasyCurl& operator=(const EasyCurl& arOther);
-    EasyCurl& operator=(EasyCurl&& arOther);
+    EasyCurl& operator=(EasyCurl&& arOther) noexcept;
 
 protected:
     static long const _followRedirects = 1L;
@@ -62,7 +62,7 @@ protected:
 
     template <typename T>
     void getCurlInfo(CURLINFO aInfo, T aArg) {
-        auto err = curl_easy_getinfo(mpCurl, CURLINFO_RESPONSE_CODE, aArg);
+        auto err = curl_easy_getinfo(mpCurl, aInfo, aArg);
         if (err != CURLE_OK) {
             THROW_WITH_BACKTRACE2(ECurlError, "curl_easy_getinfo() failed:", err);
         }

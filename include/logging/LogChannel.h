@@ -20,12 +20,10 @@ namespace rsp::logging {
 class LogChannel: public LoggerInterface
 {
 public:
-    LogChannel(std::string_view aChannel);
+    explicit LogChannel(std::string_view aChannel);
 
     LogChannel(const LogChannel &arOther);
     LogChannel& operator=(const LogChannel &arOther);
-    LogChannel(LogChannel&&) = default;
-    LogChannel& operator=(LogChannel&&) = default;
 
     rsp::logging::LogStream Warning() override;
     rsp::logging::LogStream Notice() override;
@@ -46,7 +44,7 @@ class NamedLogger
 {
 public:
     NamedLogger() : mLogger(rsp::utils::NameOf<T>()) {}
-    virtual ~NamedLogger() {};
+    virtual ~NamedLogger() = default;
 
 protected:
     LogChannel mLogger;

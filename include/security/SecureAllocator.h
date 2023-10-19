@@ -19,35 +19,75 @@
 namespace rsp::security {
 
 /**
- * \brief A template implementation of a secure allocator. Memory is always cleared when freed.
+ * \brief A template implementation of a secure allocator.
+ *
+ * Memory is always cleared when freed.
+ *
+ * \see https://howardhinnant.github.io/allocator_boilerplate.html
+ *
  * \tparam T The element type to use by the allocator
  */
-template <typename T>
-struct SecureAllocator: public std::allocator<T>
+template <class T>
+class SecureAllocator
 {
 public:
-    using std::allocator<T>::allocator;
+    using value_type    = T;
+
+     using pointer       = value_type*;
+     using const_pointer = typename std::pointer_traits<pointer>::template rebind<value_type const>;
+     using void_pointer       = typename std::pointer_traits<pointer>::template rebind<void>;
+     using const_void_pointer = typename std::pointer_traits<pointer>::template rebind<const void>;
+     using difference_type = typename std::pointer_traits<pointer>::difference_type;
+     using size_type       = std::make_unsigned_t<difference_type>;
+
+     template <class U> struct rebind {typedef SecureAllocator<U> other;};
+
+
+    SecureAllocator() noexcept = default;  // not required, unless used
+
+    template <class U>
+    explicit SecureAllocator(SecureAllocator<U> const&) noexcept
+    {
+    }
+
+    pointer allocate(std::size_t n)
+    {
+        return static_cast<value_type*>(::operator new (n * sizeof(value_type)));
+    }
+
+    void deallocate(pointer p, std::size_t sz) noexcept
+    {
+        cleanse(p, sz);
+        ::operator delete(p);
+    }
 
     /**
      * \brief Helper method to clear a memory range
      * \param p
      * \param n
      */
-    void cleanse(T* p, std::size_t n) {
+    void cleanse(pointer p, std::size_t n)
+    {
         std::memset(p, 0, n * sizeof(T));
     }
 
-    /**
-     * \brief Override to clear the memory before deallocation.
-     * \param p
-     * \param n
-     */
-    void deallocate(T* p, std::size_t n) {
-        cleanse(p, n);
-        std::allocator<T>::deallocate(p, n);
-    }
+     [[nodiscard]] std::size_t max_size() const noexcept
+     {
+         return std::numeric_limits<size_type>::max() / sizeof(value_type);
+     }
 };
 
+template <class T, class U>
+bool operator==(SecureAllocator<T> const&, SecureAllocator<U> const&) noexcept
+{
+    return true;
+}
+
+template <class T, class U>
+bool operator!=(SecureAllocator<T> const& x, SecureAllocator<U> const& y) noexcept
+{
+    return !(x == y);
+}
 
 } // namespace rsp::security
 

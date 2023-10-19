@@ -27,7 +27,7 @@ class HttpDownload: public HttpRequest
 {
 public:
     using HttpRequest::HttpRequest;
-    HttpDownload(const std::string &arFileName);
+    explicit HttpDownload(const std::string &arFileName);
 
     /**
      * \brief Set the filename to store the download into.

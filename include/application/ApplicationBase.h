@@ -106,6 +106,7 @@ protected:
     int mApplicationResult = 0;
     bool mTerminated = false;
     logging::Logger mLogger;
+    logging::LoggerInterface::Handle_t mFileLogWriterHandle = 0;
     CommandLine mCmd;
 
     /**

@@ -33,11 +33,11 @@ enum class HashAlgorithms {
  */
 struct DigestImpl {
     static DigestImpl* Create(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm);
-    virtual ~DigestImpl() {};
+    virtual ~DigestImpl() = default;
     virtual void Update(const uint8_t *apBuffer, std::size_t aSize) = 0;
     virtual SecureBuffer Finalize() = 0;
-    virtual std::string GetLibraryVersion() const = 0;
-    virtual std::string GetLibraryName() const = 0;
+    [[nodiscard]] virtual std::string GetLibraryVersion() const = 0;
+    [[nodiscard]] virtual std::string GetLibraryName() const = 0;
 };
 
 /**
@@ -57,8 +57,8 @@ public:
      * \brief Constructor for message digest SHA that takes the algorithm to use
      * \param aAlgorithm SHA algorithm to use
      */
-    Sha(HashAlgorithms aAlgorithm);
-    ~Sha();
+    explicit Sha(HashAlgorithms aAlgorithm);
+    ~Sha() = default;
 
     /**
      * \brief Call Update with the data to calculate the hash on. Can be called multiple times.
@@ -78,14 +78,14 @@ public:
      *
      * \return string
      */
-    std::string GetLibraryVersion() const { return mPimpl->GetLibraryVersion(); }
+    [[nodiscard]] std::string GetLibraryVersion() const { return mPimpl->GetLibraryVersion(); }
 
     /**
      * \brief Get name of encryption library
      *
      * \return string
      */
-    std::string GetLibraryName() const { return mPimpl->GetLibraryName(); }
+    [[nodiscard]] std::string GetLibraryName() const { return mPimpl->GetLibraryName(); }
 
 protected:
     std::unique_ptr<DigestImpl> mPimpl;

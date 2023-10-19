@@ -47,6 +47,11 @@ public:
         resize(mOffset);
     }
 
+    SecureBuffer copyToSecureBuffer()
+    {
+        return {data(), size()};
+    }
+
 protected:
     size_t mOffset = 0;
 };
@@ -56,14 +61,14 @@ class OpenSSLCryptBase : public CryptBase
 public:
     using EvpCipherCtxPtr = std::unique_ptr<EVP_CIPHER_CTX, decltype(&::EVP_CIPHER_CTX_free)>;
 
-    OpenSSLCryptBase(CipherTypes aCipher)
+    explicit OpenSSLCryptBase(CipherTypes aCipher)
         : CryptBase(aCipher),
           mCtx(EVP_CIPHER_CTX_new(), ::EVP_CIPHER_CTX_free)
     {
     }
 
 protected:
-    constexpr std::size_t getKeySize() const { return EVP_MAX_IV_LENGTH; }
+    [[nodiscard]] static constexpr std::size_t getKeySize() { return EVP_MAX_IV_LENGTH; }
     BlockBuffer mData{};
     EvpCipherCtxPtr mCtx;
 

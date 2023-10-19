@@ -27,14 +27,14 @@ class NetworkInterfaces
 public:
     NetworkInterfaces();
 
-    const std::vector<std::string>& GetWireless() const;
-    const std::vector<std::string>& GetCabled() const;
+    [[nodiscard]] const std::vector<std::string>& GetWireless() const;
+    [[nodiscard]] const std::vector<std::string>& GetCabled() const;
 protected:
     std::vector<std::string> mWireless{};
     std::vector<std::string> mCabled{};
     rsp::logging::LogChannel mLogger;
 
-    bool isWireless(const std::string &arInterfaceName);
+    static bool isWireless(const std::string &arInterfaceName);
 };
 
 } /* namespace rsp::posix */

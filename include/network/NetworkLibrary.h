@@ -24,7 +24,7 @@ namespace rsp::network {
 class NetworkLibrary
 {
 public:
-    virtual ~NetworkLibrary() {}
+    virtual ~NetworkLibrary() = default;
 
     /**
      * \fn NetworkLibrary Get&()
@@ -40,7 +40,7 @@ public:
      *
      * \return string
      */
-    virtual std::string_view GetLibraryName() const = 0;
+    [[nodiscard]] virtual std::string_view GetLibraryName() const = 0;
 
     /**
      * \fn std::string_view GetVersion()const =0
@@ -48,7 +48,7 @@ public:
      *
      * \return string
      */
-    virtual std::string_view GetVersion() const = 0;
+    [[nodiscard]] virtual std::string_view GetVersion() const = 0;
 
     /**
      * \fn std::string_view GetSslVersion()const =0
@@ -56,7 +56,7 @@ public:
      *
      * \return
      */
-    virtual std::string_view GetSslVersion() const = 0;
+    [[nodiscard]] virtual std::string_view GetSslVersion() const = 0;
 };
 
 } // namespace rsp::network

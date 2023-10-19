@@ -32,7 +32,7 @@ public:
     IWlanInterface& Reconnect() override;
     IWlanInterface& Disconnect() override;
     IWlanInterface& ReleaseIP() override;
-    std::string AquireIP() override;
+    std::string AcquireIp() override;
 
 protected:
     std::unique_ptr<IWlanInterface> mPimpl;

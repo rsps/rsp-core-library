@@ -8,7 +8,6 @@
  * \author      Steffen Brummer
  */
 
-#include <iostream>
 #include "TestTouchParser.h"
 
 using namespace rsp::graphics;

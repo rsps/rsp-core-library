@@ -22,7 +22,7 @@ namespace rsp::security
 class Decrypt: public CryptBase
 {
 public:
-    Decrypt(CipherTypes aCipher = CipherTypes::AES_128_CBC);
+    explicit Decrypt(CipherTypes aCipher = CipherTypes::AES_128_CBC);
 
     void Init(const SecureBuffer& arIvSeed, const SecureBuffer& arSecret) override;
     SecureBuffer Finalize() override { return pImpl->Finalize(); }

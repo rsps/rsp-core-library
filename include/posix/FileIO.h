@@ -45,7 +45,7 @@ public:
     const std::string& GetFileName() { return mFileName; }
 
     /**
-     * Opens the given file or create it if aPersmissions are given.
+     * Opens the given file or create it if aPermissions are given.
      * Open modes can be in, out and inout.
      *
      * \param aFileName
@@ -64,7 +64,7 @@ public:
      *
      * \return True if file is open.
      */
-    bool IsOpen()
+    [[nodiscard]] bool IsOpen() const
     {
         return (mHandle >= 0);
     }
@@ -143,7 +143,7 @@ public:
      *
      * \return
      */
-    int GetHandle()
+    [[nodiscard]] int GetHandle() const
     {
         return mHandle;
     }
@@ -153,7 +153,7 @@ public:
      *
      * \return uint size of file.
      */
-    size_t GetSize();
+    [[nodiscard]] size_t GetSize();
 
     /**
      * Set size of the file.
@@ -168,10 +168,10 @@ public:
      * Wait for data to become ready in the open file or timeout.
      * This is useful when waiting for at character device file to become ready.
      *
-     * \param aTimeoutms
+     * \param aTimeoutMs
      * \return True if data in the file awaits reading.
      */
-    bool WaitForDataReady(int aTimeoutms);
+    bool WaitForDataReady(int aTimeoutMs) const;
 
   protected:
     std::string mFileName{};

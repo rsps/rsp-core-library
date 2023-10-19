@@ -22,7 +22,7 @@ struct OpenSSLDecrypt : public OpenSSLCryptBase
 
     void Init(const SecureBuffer& arIvSeed, const SecureBuffer& arSecret) override
     {
-        int rc = EVP_DecryptInit_ex(mCtx.get(), getCipher(), NULL, arSecret.data(), arIvSeed.data());
+        int rc = EVP_DecryptInit_ex(mCtx.get(), getCipher(), nullptr, arSecret.data(), arIvSeed.data());
         if (rc != 1) {
             THROW_WITH_BACKTRACE2(CryptException, "EVP_DecryptInit_ex failed", ERR_error_string(static_cast<unsigned int>(rc), nullptr));
         }
@@ -56,7 +56,7 @@ struct OpenSSLDecrypt : public OpenSSLCryptBase
         // Set decrypted data size now that we know it
         mData.shrinkToOffset();
 
-        return mData;
+        return mData.copyToSecureBuffer();
     }
 };
 
@@ -68,6 +68,3 @@ std::unique_ptr<CryptBase> Decrypt::MakePimpl(CipherTypes aCipher)
 }
 
 #endif /* USE_OPENSSL */
-
-
-

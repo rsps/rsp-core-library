@@ -18,11 +18,11 @@ rsp::logging::LogLevel TestLogger::mLogLevel = rsp::logging::LogLevel::Notice;
 TestLogger::TestLogger()
 {
     LoggerInterface::SetDefault(this);
-    AddLogWriter(std::make_shared<rsp::logging::ConsoleLogWriter>(mLogLevel));
+    mConsoleLogWriter = AddLogWriter(std::make_shared<rsp::logging::ConsoleLogWriter>(mLogLevel));
 }
 
 TestLogger::~TestLogger()
 {
+    RemoveLogWriter(mConsoleLogWriter);
     rsp::logging::LoggerInterface::SetDefault(nullptr);
 }
-

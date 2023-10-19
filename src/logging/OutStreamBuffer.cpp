@@ -10,7 +10,6 @@
 
 #include <thread>
 #include <logging/OutStreamBuffer.h>
-#include <logging/Logger.h>
 
 namespace rsp::logging {
 
@@ -36,7 +35,7 @@ int OutStreamBuffer::overflow(int c)
 int OutStreamBuffer::sync()
 {
     if (mMutex.try_lock()) {
-        DEBUG("mutex was not locked!!! " << std::this_thread::get_id());
+        DEBUG("mutex was not locked!!! " << std::this_thread::get_id())
     }
 
     // Remove one ending newline, writeToLogger enforces a newline on every write
@@ -46,16 +45,15 @@ int OutStreamBuffer::sync()
     }
 
     if (result.length() > 0) {
-        DEBUG("Message: (" << result.length() << ") " << result);
+        DEBUG("Message: (" << result.length() << ") " << result)
         writeToLogger(result);
     }
     mBuffer.str(std::string());
 
     mMutex.unlock();
-    DEBUG("Unlocked by " << std::this_thread::get_id());
+    DEBUG("Unlocked by " << std::this_thread::get_id())
     return 0;
 }
 
 
 } /* namespace rsp::logging */
-

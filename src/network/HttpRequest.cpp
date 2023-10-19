@@ -28,8 +28,7 @@ HttpRequest::HttpRequest()
 HttpRequest::HttpRequest(const HttpRequestOptions& arOptions)
     : mPimpl(MakeRequest())
 {
-    SetOptions(arOptions);
+    mPimpl->SetOptions(arOptions);
 }
 
 }
-

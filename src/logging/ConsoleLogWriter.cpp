@@ -31,23 +31,21 @@ public:
     }
 };
 
-ConsoleLogWriter::ConsoleLogWriter(std::string aAcceptLevel, ConsoleLogStreamsInterface *apConsole, const ConsoleColors_t *apColors)
-    : ConsoleLogWriter(ToLogLevel(aAcceptLevel), apConsole, apColors)
+ConsoleLogWriter::ConsoleLogWriter(const std::string& arAcceptLevel, ConsoleLogStreamsInterface *apConsole, const ConsoleColors_t *apColors)
+    : ConsoleLogWriter(ToLogLevel(arAcceptLevel), apConsole, apColors)
 {
 }
 
 ConsoleLogWriter::ConsoleLogWriter(LogLevel aAcceptLevel, ConsoleLogStreamsInterface *apConsole, const ConsoleColors_t *apColors)
     : mpConsole(apConsole ? apConsole : new DefaultConsoleStream()),
-	  mpColors(apColors)
+      mpColors(apColors)
 {
     mAcceptLevel = aAcceptLevel;
 }
 
 ConsoleLogWriter::~ConsoleLogWriter()
 {
-    if (mpConsole) {
-        delete mpConsole;
-    }
+    delete mpConsole;
 }
 
 void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
@@ -80,4 +78,3 @@ void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, c
 }
 
 } /* namespace logging */
-

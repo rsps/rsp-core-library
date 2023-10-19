@@ -31,7 +31,7 @@ enum class LogLevel {
     Debug      = LOG_DEBUG   /**< Debug */
 };
 
-constexpr LogLevel cDefautLogLevel = LogLevel::Info;
+constexpr LogLevel cDefaultLogLevel = LogLevel::Info;
 
 /**
  * The syslog program types.
@@ -62,7 +62,7 @@ enum class LogType
  * \param aLevelString
  * \return LogLevel
  */
-logging::LogLevel ToLogLevel(std::string aLevelString);
+logging::LogLevel ToLogLevel(const std::string& arLevelString);
 
 /**
  * C++ LogLevel to string operator

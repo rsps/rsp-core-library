@@ -25,12 +25,12 @@ void Clock::SetTime(Types aClockType, const rsp::utils::DateTime &arDT)
 
 DateTime Clock::GetTime(Types aClockType)
 {
-    timespec ts;
+    timespec ts{};
     int res = clock_gettime(static_cast<int>(aClockType), &ts);
     if (res < 0) {
         THROW_SYSTEM("Failed to get system clock");
     }
-    return DateTime(ts);
+    return {ts};
 }
 
 } /* namespace rsp::posix */

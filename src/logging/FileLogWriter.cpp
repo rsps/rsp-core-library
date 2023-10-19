@@ -9,9 +9,6 @@
  */
 
 #include <iostream>
-#include <fstream>
-#include <sstream>
-#include <iomanip>
 #include <utils/DateTime.h>
 #include <logging/FileLogWriter.h>
 #include <json/JsonEncoder.h>
@@ -20,14 +17,14 @@ using namespace rsp::utils;
 
 namespace rsp::logging {
 
-FileLogWriter::FileLogWriter(std::string aFileName, std::string aAcceptLevel)
-    : mOutput(aFileName, std::ios_base::out | std::ios_base::app),
-      mAcceptLevel(ToLogLevel(aAcceptLevel))
+FileLogWriter::FileLogWriter(const std::string& arFileName, const std::string& arAcceptLevel)
+    : mOutput(arFileName, std::ios_base::out | std::ios_base::app),
+      mAcceptLevel(ToLogLevel(arAcceptLevel))
 {
 }
 
-FileLogWriter::FileLogWriter(std::string aFileName, LogLevel aAcceptLevel)
-    : mOutput(aFileName, std::ios_base::out | std::ios_base::app),
+FileLogWriter::FileLogWriter(const std::string& arFileName, LogLevel aAcceptLevel)
+    : mOutput(arFileName, std::ios_base::out | std::ios_base::app),
       mAcceptLevel(aAcceptLevel)
 {
 }
@@ -55,4 +52,3 @@ void FileLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, cons
 
 
 } /* namespace logging */
-

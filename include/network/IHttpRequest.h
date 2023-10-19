@@ -29,7 +29,7 @@ class IHttpResponse;
 class IHttpRequest
 {
 public:
-    virtual ~IHttpRequest() {}
+    virtual ~IHttpRequest() = default;
 
     /**
      * \fn const HttpRequestOptions GetOptions&()const =0
@@ -37,7 +37,7 @@ public:
      *
      * \return Reference to options
      */
-    virtual const HttpRequestOptions& GetOptions() const = 0;
+    [[nodiscard]] virtual const HttpRequestOptions& GetOptions() const = 0;
 
     /**
      * \fn IHttpRequest SetOptions&(const HttpRequestOptions&)=0
@@ -61,7 +61,7 @@ public:
      * \brief Get the body content of this request
      * \return string
      */
-    virtual const std::string& GetBody() const = 0;
+    [[nodiscard]] virtual const std::string& GetBody() const = 0;
 
     /**
      * \fn IHttpForm AddField&(std::string_view, std::string_view)

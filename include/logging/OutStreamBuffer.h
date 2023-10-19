@@ -24,7 +24,7 @@ namespace rsp::logging {
 /**
  * \class OutStreamBuf
  *
- * \brief A streambuf implementation of LogStream can be used to replace std::cout/cerr/clog streambuf's.
+ * \brief A std::streambuf implementation of LogStream can be used to replace std::cout/cerr/clog streambuf's.
  *
  * This is not intended to be used directly, instead simply instantiate a Logger with the aCaptureClog argument.
  */

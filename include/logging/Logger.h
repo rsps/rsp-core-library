@@ -56,7 +56,7 @@ constexpr const char* stem(std::string_view path)
 class Logger : public LoggerInterface
 {
 public:
-    Logger(bool aCaptureClog = false);
+    explicit Logger(bool aCaptureClog = false);
     Logger(const Logger&) = delete;
     ~Logger() override;
 
@@ -73,7 +73,7 @@ public:
 
 protected:
     // Use shared_ptr to use compilers default move operations.
-    // It is instantiated with "do nothing" deallocator in Logger constructor initialization.
+    // It is instantiated with "do nothing" de-allocator in Logger constructor initialization.
     std::shared_ptr<std::streambuf> mpClogBackup;
 
     std::shared_ptr<std::streambuf> makeCLogStream(bool aCaptureLog);

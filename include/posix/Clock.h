@@ -10,7 +10,7 @@
 #ifndef INCLUDE_POSIX_CLOCK_H_
 #define INCLUDE_POSIX_CLOCK_H_
 
-#include <time.h>
+#include <ctime>
 #include <utils/DateTime.h>
 
 namespace rsp::posix {

@@ -190,7 +190,7 @@ TEST_CASE("WLAN")
         if (std::string("MyWLan").compare(0, 6, cSSID) != 0) {
             WLan wlan;
 
-            CHECK_NOTHROW(wlan.AquireIP());
+            CHECK_NOTHROW(wlan.AcquireIp());
 
             FetchMonitorEvents(wlan);
             auto info = wlan.GetStatus();

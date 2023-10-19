@@ -14,8 +14,6 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <posix/FileIO.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 
@@ -85,10 +83,10 @@ void FileIO::Close()
     }
 }
 
-size_t FileIO::Seek(size_t aOffset, std::ios_base::seekdir aSeekdir)
+size_t FileIO::Seek(size_t aOffset, std::ios_base::seekdir aSeekDir)
 {
-    int base = 0;
-    switch (aSeekdir) {
+    int base;
+    switch (aSeekDir) {
         default:
         case std::ios_base::beg:
             base = SEEK_SET;
@@ -100,7 +98,7 @@ size_t FileIO::Seek(size_t aOffset, std::ios_base::seekdir aSeekdir)
             base = SEEK_END;
             break;
     }
-    int ret = lseek(mHandle, static_cast<off_t>(aOffset), base);
+    off_t ret = lseek(mHandle, static_cast<off_t>(aOffset), base);
     if (ret < 0) {
         THROW_SYSTEM("Error moving cursor in file " + mFileName);
     }
@@ -110,7 +108,7 @@ size_t FileIO::Seek(size_t aOffset, std::ios_base::seekdir aSeekdir)
 
 size_t FileIO::Read(void *apBuffer, size_t aNumberOfBytesToRead)
 {
-    int ret = read(mHandle, apBuffer, aNumberOfBytesToRead);
+    off_t ret = read(mHandle, apBuffer, aNumberOfBytesToRead);
     if (ret < 0) {
         THROW_SYSTEM("Error reading from file " + mFileName);
     }
@@ -135,7 +133,7 @@ void FileIO::ExactRead(void *apBuffer, size_t aNumberOfBytesToRead)
 
 size_t FileIO::Write(const void *apBuffer, size_t aNumberOfBytesToWrite)
 {
-    int ret = write(mHandle, apBuffer, aNumberOfBytesToWrite);
+    ssize_t ret = write(mHandle, apBuffer, aNumberOfBytesToWrite);
     if (ret < 0) {
         THROW_SYSTEM("Error writing to file " + mFileName);
     }
@@ -203,16 +201,16 @@ void FileIO::SetSize(size_t aSize)
     }
 }
 
-bool FileIO::WaitForDataReady(int aTimeoutms)
+bool FileIO::WaitForDataReady(int aTimeoutMs) const
 {
-    struct pollfd fd;
+    struct pollfd fd{};
     int ret;
     bool result = false;
 
     fd.fd = mHandle;
     fd.events = POLLIN;
 
-    ret = poll(&fd, 1, aTimeoutms);
+    ret = poll(&fd, 1, aTimeoutMs);
 
     if (ret > 0) {
         if (fd.revents & POLLIN) {
@@ -229,10 +227,10 @@ std::string FileIO::GetContents()
 
     std::stringstream ss;
     char buf[1024];
-    size_t rlen;
+    size_t read_len;
 
-    while ((rlen = Read(buf, 1024)) > 0) {
-        ss.write(buf, static_cast<long int>(rlen));
+    while ((read_len = Read(buf, 1024)) > 0) {
+        ss.write(buf, static_cast<std::streamsize>(read_len));
     }
 
     return ss.str();

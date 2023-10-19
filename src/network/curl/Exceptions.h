@@ -47,7 +47,7 @@ public:
     {
     }
 
-    std::string formatError(const std::string &arMsg, CURLcode aCode)
+    static std::string formatError(const std::string &arMsg, CURLcode aCode)
     {
         std::string result(arMsg);
         if (aCode != CURLE_OK) {
@@ -68,7 +68,7 @@ public:
     {
     }
 
-    std::string formatError(const std::string &arMsg, CURLMcode aCode)
+    static std::string formatError(const std::string &arMsg, CURLMcode aCode)
     {
         std::string result(arMsg);
         if (aCode != CURLM_OK) {

@@ -32,11 +32,6 @@ CurlHttpRequest::CurlHttpRequest()
 {
 }
 
-
-CurlHttpRequest::~CurlHttpRequest()
-{
-}
-
 void CurlHttpRequest::writeToFile(rsp::posix::FileIO* apFile)
 {
     setCurlOption(CURLOPT_WRITEFUNCTION, fileWriteFunction);

@@ -10,28 +10,23 @@
 
 #include <sys/stat.h>
 #include <unistd.h>
-#include <pwd.h>
-#include <grp.h>
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <exceptions/ExceptionHelper.h>
 #include <linux/limits.h>
 #include <fts.h>
-#include <glob.h>
 #include <sys/sysmacros.h>
 #include <posix/FileSystem.h>
 #include <pthread.h>
 #include <sys/resource.h>
 #include <system_error>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <sstream>
 #include <fstream>
 #include <iostream>
 #include <cstring>
-#include <algorithm>
 #include <regex>
 #include <utils/StrUtils.h>
 
@@ -41,11 +36,11 @@ using namespace rsp::utils;
 namespace rsp::posix::FileSystem
 {
 
-bool DirectoryExists(const std::string aPath)
+bool DirectoryExists(const std::string& arPath)
 {
-    struct stat info;
+    struct stat info{};
 
-    int statRC = stat(aPath.c_str(), &info);
+    int statRC = stat(arPath.c_str(), &info);
     if (statRC != 0) {
         if (errno == ENOENT) {
             return false;
@@ -56,14 +51,14 @@ bool DirectoryExists(const std::string aPath)
         return false;
     }
 
-    return (info.st_mode & S_IFDIR) ? true : false;
+    return (info.st_mode & S_IFDIR) != 0;
 }
 
-bool FileExists(const std::string aPath)
+bool FileExists(const std::string& arPath)
 {
-    struct stat info;
+    struct stat info{};
 
-    int statRC = stat(aPath.c_str(), &info);
+    int statRC = stat(arPath.c_str(), &info);
     if (statRC != 0) {
         if (errno == ENOENT) {
             return false;
@@ -74,7 +69,7 @@ bool FileExists(const std::string aPath)
         return false;
     }
 
-    return (info.st_mode & (S_IFCHR | S_IFBLK | S_IFREG)) ? true : false;
+    return (info.st_mode & (S_IFCHR | S_IFBLK | S_IFREG)) != 0;
 }
 
 void DeleteFile(const std::string &arFileName)
@@ -87,27 +82,26 @@ void DeleteFile(const std::string &arFileName)
     }
 }
 
-void RecursiveDeleteDir(const std::string aDir)
+void RecursiveDeleteDir(const std::string& arDir)
 {
-    FTS *ftsp = nullptr;
     FTSENT *curr;
 
     // Cast needed (in C) because fts_open() takes a "char * const *", instead
     // of a "const char * const *", which is only allowed in C++. fts_open()
     // does not modify the argument.
-    char *files[] = { const_cast<char*>(aDir.c_str()), nullptr };
+    char *files[] = {const_cast<char*>(arDir.c_str()), nullptr };
 
     // FTS_NOCHDIR  - Avoid changing cwd, which could cause unexpected behavior
-    //                in multithreaded programs
+    //                in multi threaded programs
     // FTS_PHYSICAL - Don't follow symlinks. Prevents deletion of files outside
     //                of the specified directory
     // FTS_XDEV     - Don't cross filesystem boundaries
-    ftsp = fts_open(files, FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV, nullptr);
-    if (!ftsp) {
-        THROW_SYSTEM("FileSystem - fts_open failed: " + aDir);
+    FTS *fts_ptr = fts_open(files, FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV, nullptr);
+    if (!fts_ptr) {
+        THROW_SYSTEM("FileSystem - fts_open failed: " + arDir);
     }
 
-    while ((curr = fts_read(ftsp))) {
+    while ((curr = fts_read(fts_ptr))) {
         switch (curr->fts_info) {
             case FTS_NS:
             case FTS_DNR:
@@ -116,14 +110,13 @@ void RecursiveDeleteDir(const std::string aDir)
                     break; // Ignore "No such file or directory", dir does not exist, so nothing to delete.
                 }
                 THROW_SYSTEM("FileSystem - fts_read error: " + std::string(curr->fts_accpath));
-                break;
 
             case FTS_DC:
             case FTS_DOT:
             case FTS_NSOK:
                 // Not reached unless FTS_LOGICAL, FTS_SEEDOT, or FTS_NOSTAT were
                 // passed to fts_open()
-                break;
+//                break;
 
             case FTS_D:
                 // Do nothing. Need depth-first search, so directories are deleted
@@ -144,40 +137,37 @@ void RecursiveDeleteDir(const std::string aDir)
         }
     }
 
-    if (ftsp) {
-        fts_close(ftsp);
-    }
+    fts_close(fts_ptr);
 }
 
-void MakeDirectory(const std::string aDir)
+void MakeDirectory(const std::string& arDir)
 {
-    std::string work = aDir;
+    std::string work = arDir;
 
     char *tmp = &work[0];
-    char *p = nullptr;
     size_t len = work.length();
 
     if (tmp[len - 1] == '/')
         tmp[len - 1] = 0;
-    for (p = tmp + 1; *p; p++) {
+    for (char *p = tmp + 1; *p; p++) {
         if (*p == '/') {
             *p = 0;
             if ((mkdir(tmp, 0755) != 0) && (errno != EEXIST)) {
-                THROW_SYSTEM("FileSystem - Could not create directory: " + aDir);
+                THROW_SYSTEM("FileSystem - Could not create directory: " + arDir);
             }
             *p = '/';
         }
     }
 
     if ((mkdir(tmp, 0755) != 0) && (errno != EEXIST)) {
-        THROW_SYSTEM("FileSystem - Could not create directory: " + aDir);
+        THROW_SYSTEM("FileSystem - Could not create directory: " + arDir);
     }
 }
 
-void MakeSymlink(const std::string aExisting, const std::string aSymlink)
+void MakeSymlink(const std::string& arExisting, const std::string& arSymlink)
 {
-    if ((symlink(aExisting.c_str(), aSymlink.c_str()) != 0) && (errno != EEXIST)) {
-        THROW_SYSTEM("FileSystem - Could not create symlink: " + aSymlink);
+    if ((symlink(arExisting.c_str(), arSymlink.c_str()) != 0) && (errno != EEXIST)) {
+        THROW_SYSTEM("FileSystem - Could not create symlink: " + arSymlink);
     }
 }
 
@@ -210,7 +200,7 @@ void SetPermissions(const std::string &arPath, uint32_t aPermissions)
 
 uint32_t GetPermissions(const std::string &arPath)
 {
-    struct stat info;
+    struct stat info{};
 
     int statRC = stat(arPath.c_str(), &info);
     if (statRC != 0) {
@@ -231,7 +221,7 @@ std::string GetCurrentIpAddress()
 
     const char *kExternalIp = "1.1.1.1";
     uint16_t kDnsPort = 53;
-    struct sockaddr_in serv;
+    struct sockaddr_in serv{};
 
     memset(&serv, 0, sizeof(serv));
     serv.sin_family = AF_INET;
@@ -239,13 +229,13 @@ std::string GetCurrentIpAddress()
     serv.sin_port = htons(kDnsPort);
 
     int err = connect(sock, reinterpret_cast<const sockaddr*>(&serv), sizeof(serv));
-    if (sock == -1) {
+    if (err == -1) {
         THROW_SYSTEM("FileSystem - Could connect socket");
     }
 
-    sockaddr_in name;
-    socklen_t namelen = sizeof(name);
-    err = getsockname(sock, reinterpret_cast<sockaddr*>(&name), &namelen);
+    sockaddr_in name{};
+    socklen_t name_len = sizeof(name);
+    err = getsockname(sock, reinterpret_cast<sockaddr*>(&name), &name_len);
     if (err == -1) {
         THROW_SYSTEM("FileSystem - Could not get socket name");
     }
@@ -314,9 +304,9 @@ std::string GetLastResumeId()
 
 void SetThreadPriority(std::thread &arThread, unsigned int aPriority)
 {
-    sched_param sch;
+    sched_param sch{};
     int policy;
-    struct rlimit limit;
+    struct rlimit limit{};
 
     if (getrlimit(RLIMIT_RTPRIO, &limit)) {
         THROW_SYSTEM("FileSystem - Failed to get realtime limits");
@@ -389,7 +379,7 @@ std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, boo
 
 std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriverName, const std::filesystem::path &arPath)
 {
-    struct stat stat_buf;
+    struct stat stat_buf{};
 
     auto list = Glob(arPath, false, false);
 
@@ -445,7 +435,7 @@ std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriver
 
 DateTime GetFileModifiedTime(const std::filesystem::path &arFileName)
 {
-    return DateTime(std::chrono::file_clock::to_sys(std::filesystem::last_write_time(arFileName)));
+    return {std::chrono::file_clock::to_sys(std::filesystem::last_write_time(arFileName))};
 }
 
 void SetFileModifiedTime(const std::filesystem::path &arFileName, const DateTime &arTime)
@@ -478,4 +468,3 @@ void GetFileInfo(const std::string &arPath)
 }
 */
 } // namespace FileSystem
-

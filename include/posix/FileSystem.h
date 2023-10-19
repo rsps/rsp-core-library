@@ -32,15 +32,15 @@ namespace rsp::posix::FileSystem
  * \param aPath
  * \return bool
  */
-bool DirectoryExists(const std::string aPath);
+bool DirectoryExists(const std::string& arPath);
 
 /**
- * Chekc if a file exists.
+ * Check if a file exists.
  *
  * \param aPath
  * \return bool
  */
-bool FileExists(const std::string aPath);
+bool FileExists(const std::string& arPath);
 
 /**
  * Delete a file
@@ -54,14 +54,14 @@ void DeleteFile(const std::string &arFileName);
  *
  * \param aDir
  */
-void RecursiveDeleteDir(const std::string aDir);
+void RecursiveDeleteDir(const std::string& arDir);
 
 /**
  * Recursively create directories.
  *
  * \param aDir
  */
-void MakeDirectory(const std::string aDir);
+void MakeDirectory(const std::string& arDir);
 
 /**
  * Make a symlink to an existing path.
@@ -69,7 +69,7 @@ void MakeDirectory(const std::string aDir);
  * \param aExisting
  * \param aSymlink
  */
-void MakeSymlink(const std::string aExisting, const std::string aSymlink);
+void MakeSymlink(const std::string& arExisting, const std::string& arSymlink);
 
 /**
  * Sleep for the given number of milliseconds.

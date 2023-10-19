@@ -145,7 +145,7 @@ public:
     static EscString InverseScreenOff;
 
     static EscString ResetAll;
-    static EscString TputClear;
+    static EscString TPutClear;
 };
 
 } /* namespace AnsiEscapeCodes */
