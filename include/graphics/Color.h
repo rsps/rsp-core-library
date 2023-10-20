@@ -18,7 +18,7 @@ namespace rsp::graphics
 {
 
 /**
- * Color class
+ * \class Color
  *
  * A color consist of tree base colors: Red, green and blue,
  * and an optional alpha channel that determines transparency.

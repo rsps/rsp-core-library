@@ -301,7 +301,7 @@ protected:
      * \param arRenderer
      * \result Boolean true if children is already rendered
      */
-    virtual bool render(Renderer &arRenderer) const { return false; }
+    virtual bool render(Renderer &/*arRenderer*/) const { return false; }
 
     /**
      * \brief Override this to handle resizing events

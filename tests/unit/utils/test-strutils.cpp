@@ -28,7 +28,7 @@ TEST_CASE("StrUtils") {
     std::string s("Hello World");
 
     StrUtils::ReplaceAll(s, "llo", "ll of a");
-    CHECK(s == "Hell of a World");
+    CHECK_EQ(s, "Hell of a World");
 
 //    std::chrono::system_clock::time_point tp;
 //    CHECK(StrUtils::TimeStamp(tp) == "1970-01-01 00:00:00.000");

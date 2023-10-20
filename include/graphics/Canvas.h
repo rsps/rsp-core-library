@@ -19,9 +19,9 @@ namespace rsp::graphics
 {
 
 /**
- * Canvas class
+ * \class Canvas
  *
- * Class function declarations for low level drawing operations, storage is internal memory.
+ * Descents from PixelData and adds functions for low level drawing operations.
  */
 class Canvas : public PixelData
 {

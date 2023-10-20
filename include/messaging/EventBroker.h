@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_MESSAGING_EVENTBROKER_H_
-#define INCLUDE_MESSAGING_EVENTBROKER_H_
+#ifndef RSP_CORE_LIB_INCLUDE_MESSAGING_EVENTBROKER_H
+#define RSP_CORE_LIB_INCLUDE_MESSAGING_EVENTBROKER_H
 
 #include <memory>
 #include <mutex>
@@ -42,4 +42,4 @@ protected:
 
 } /* namespace rsp::messaging */
 
-#endif /* INCLUDE_MESSAGING_EVENTBROKER_H_ */
+#endif /* RSP_CORE_LIB_INCLUDE_MESSAGING_EVENTBROKER_H */

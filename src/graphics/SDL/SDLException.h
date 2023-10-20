@@ -26,4 +26,4 @@ public:
 
 } // namespace rsp::graphics::sdl
 
-#endif //RSP_CORE_LIB_SDLEXCEPTION_H
+#endif // RSP_CORE_LIB_SDLEXCEPTION_H
