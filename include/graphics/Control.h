@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  * \author      Steffen Brummer
  */
-#ifndef CONTROL_H
-#define CONTROL_H
+#ifndef RSP_CORE_LIB_GRAPHICS_CONTROL_H
+#define RSP_CORE_LIB_GRAPHICS_CONTROL_H
 
 #include <map>
 #include <functional>
@@ -327,4 +327,4 @@ std::ostream& operator<<(std::ostream& os, Control::States aState);
 
 } // namespace rsp::graphics
 
-#endif // CONTROL_H
+#endif // RSP_CORE_LIB_GRAPHICS_CONTROL_H

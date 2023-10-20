@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_COMPRESSION_ZLIB_H_
-#define INCLUDE_COMPRESSION_ZLIB_H_
+#ifndef RSP_CORE_LIB_COMPRESSION_Z_LIB_H
+#define RSP_CORE_LIB_COMPRESSION_Z_LIB_H
 
 #ifdef USE_ZLIB
 
@@ -55,4 +55,4 @@ protected:
 
 #endif /* USE_ZLIB */
 
-#endif /* INCLUDE_COMPRESSION_ZLIB_H_ */
+#endif // RSP_CORE_LIB_COMPRESSION_Z_LIB_H

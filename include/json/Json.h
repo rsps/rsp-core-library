@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_JSON_JSON_H_
-#define INCLUDE_JSON_JSON_H_
+#ifndef RSP_CORE_LIB_JSON_JSON_H
+#define RSP_CORE_LIB_JSON_JSON_H
 
 #include <json/JsonExceptions.h>
 #include <json/JsonDecoder.h>
@@ -66,4 +66,4 @@ std::ostream& operator<<(std::ostream& os, const Json &arJson);
 
 } /* namespace rsp::json */
 
-#endif /* INCLUDE_JSON_JSON_H_ */
+#endif // RSP_CORE_LIB_JSON_JSON_H

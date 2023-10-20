@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SHA256DATASIGNATURE_H_
-#define INCLUDE_SECURITY_SHA256DATASIGNATURE_H_
+#ifndef RSP_CORE_LIB_SECURITY_SHA256_DATA_SIGNATURE_H
+#define RSP_CORE_LIB_SECURITY_SHA256_DATA_SIGNATURE_H
 
 #include "SecureBuffer.h"
 #include <utils/DataContainer.h>
@@ -41,4 +41,4 @@ protected:
 
 } /* namespace rsp::security */
 
-#endif /* INCLUDE_SECURITY_SHA256DATASIGNATURE_H_ */
+#endif // RSP_CORE_LIB_SECURITY_SHA256_DATA_SIGNATURE_H

@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  * \author      Steffen Brummer
  */
-#ifndef RECT_H
-#define RECT_H
+#ifndef RSP_CORE_LIB_GRAPHICS_RECT_H
+#define RSP_CORE_LIB_GRAPHICS_RECT_H
 
 #include <graphics/Point.h>
 #include <utils/OptionalPtr.h>
@@ -292,4 +292,4 @@ std::string to_string(const Rect &arRect);
 
 } // namespace rsp::graphics
 
-#endif // RECT_H
+#endif // RSP_CORE_LIB_GRAPHICS_RECT_H

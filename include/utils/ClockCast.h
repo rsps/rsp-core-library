@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_UTILS_CLOCK_CAST_H_
-#define SRC_UTILS_CLOCK_CAST_H_
+#ifndef RSP_CORE_LIB_UTILS_CLOCK_CAST_H
+#define RSP_CORE_LIB_UTILS_CLOCK_CAST_H
 
 #include <exceptions/CoreException.h>
 #include <chrono>
@@ -96,4 +96,4 @@ DstTimePointT ClockCast(const SrcTimePointT tp,
 
 } // namespace rsp
 
-#endif /* SRC_UTILS_CLOCK_CAST_H_ */
+#endif // RSP_CORE_LIB_UTILS_CLOCK_CAST_H

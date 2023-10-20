@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_LABEL_H
-#define INCLUDE_GRAPHICS_LABEL_H
+#ifndef RSP_CORE_LIB_GRAPHICS_LABEL_H
+#define RSP_CORE_LIB_GRAPHICS_LABEL_H
 
 #include <string>
 #include <string_view>
@@ -57,4 +57,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif // INCLUDE_GRAPHICS_LABEL_H
+#endif // RSP_CORE_LIB_GRAPHICS_LABEL_H

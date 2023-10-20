@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_DECRYPT_H_
-#define INCLUDE_SECURITY_DECRYPT_H_
+#ifndef RSP_CORE_LIB_SECURITY_DECRYPT_H
+#define RSP_CORE_LIB_SECURITY_DECRYPT_H
 
 #include <security/CryptBase.h>
 
@@ -34,4 +34,4 @@ protected:
 
 } /* namespace rsp::security */
 
-#endif /* INCLUDE_SECURITY_DECRYPT_H_ */
+#endif // RSP_CORE_LIB_SECURITY_DECRYPT_H

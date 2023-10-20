@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_APPLICATION_APPLICATIONBASE_H_
-#define INCLUDE_APPLICATION_APPLICATIONBASE_H_
+#ifndef RSP_CORE_LIB_APPLICATION_APPLICATION_BASE_H
+#define RSP_CORE_LIB_APPLICATION_APPLICATION_BASE_H
 
 #include <logging/Logger.h>
 #include <application/CommandLine.h>
@@ -133,4 +133,4 @@ private:
 
 } /* namespace rsp::application */
 
-#endif /* INCLUDE_APPLICATION_APPLICATIONBASE_H_ */
+#endif // RSP_CORE_LIB_APPLICATION_APPLICATION_BASE_H

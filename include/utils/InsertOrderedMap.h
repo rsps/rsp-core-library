@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_UTILS_INSERTORDEREDMAP_H_
-#define INCLUDE_UTILS_INSERTORDEREDMAP_H_
+#ifndef RSP_CORE_LIB_UTILS_INSERT_ORDERED_MAP_H
+#define RSP_CORE_LIB_UTILS_INSERT_ORDERED_MAP_H
 
 #include <exceptions/CoreException.h>
 #include <algorithm>
@@ -196,4 +196,4 @@ protected:
 
 } // rsp::utils
 
-#endif /* INCLUDE_UTILS_INSERTORDEREDMAP_H_ */
+#endif // RSP_CORE_LIB_UTILS_INSERT_ORDERED_MAP_H

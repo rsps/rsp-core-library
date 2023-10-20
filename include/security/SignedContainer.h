@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SIGNEDCONTAINER_H_
-#define INCLUDE_SECURITY_SIGNEDCONTAINER_H_
+#ifndef RSP_CORE_LIB_SECURITY_SIGNED_CONTAINER_H
+#define RSP_CORE_LIB_SECURITY_SIGNED_CONTAINER_H
 
 #include <utils/DataContainer.h>
 #include <security/SecureBuffer.h>
@@ -39,4 +39,4 @@ public:
 
 
 
-#endif /* INCLUDE_SECURITY_SIGNEDCONTAINER_H_ */
+#endif // RSP_CORE_LIB_SECURITY_SIGNED_CONTAINER_H

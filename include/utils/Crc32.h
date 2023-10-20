@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_UTILS_CRC32_H_
-#define SRC_UTILS_CRC32_H_
+#ifndef RSP_CORE_LIB_UTILS_CRC32_H
+#define RSP_CORE_LIB_UTILS_CRC32_H
 
 #include <exceptions/CoreException.h>
 #include <cstdint>
@@ -133,4 +133,4 @@ size_t constexpr operator "" _crc32( const char* str, size_t /*len*/ )
 
 } /* namespace rsp */
 
-#endif /* SRC_UTILS_CRC32_H_ */
+#endif // RSP_CORE_LIB_UTILS_CRC32_H

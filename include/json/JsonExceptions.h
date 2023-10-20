@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_JSON_JSONEXCEPTIONS_H_
-#define INCLUDE_JSON_JSONEXCEPTIONS_H_
+#ifndef RSP_CORE_LIB_JSON_JSON_EXCEPTIONS_H
+#define RSP_CORE_LIB_JSON_JSON_EXCEPTIONS_H
 
 #include <exceptions/CoreException.h>
 
@@ -46,4 +46,4 @@ public:
 
 } /* namespace rsp::json */
 
-#endif /* INCLUDE_JSON_JSONEXCEPTIONS_H_ */
+#endif // RSP_CORE_LIB_JSON_JSON_EXCEPTIONS_H

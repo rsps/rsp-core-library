@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_POSIX_TERMINALIO_H_
-#define INCLUDE_POSIX_TERMINALIO_H_
+#ifndef RSP_CORE_LIB_POSIX_TERMINAL_IO_H
+#define RSP_CORE_LIB_POSIX_TERMINAL_IO_H
 
 #include <string>
 #include <vector>
@@ -142,4 +142,4 @@ protected:
 
 } /* namespace rsp::posix */
 
-#endif /* INCLUDE_POSIX_TERMINALIO_H_ */
+#endif // RSP_CORE_LIB_POSIX_TERMINAL_IO_H

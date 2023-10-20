@@ -9,8 +9,8 @@
  */
 
 
-#ifndef INCLUDE_MESSAGING_BROKERINTERFACE_H_
-#define INCLUDE_MESSAGING_BROKERINTERFACE_H_
+#ifndef RSP_CORE_LIB_MESSAGING_BROKER_INTERFACE_H
+#define RSP_CORE_LIB_MESSAGING_BROKER_INTERFACE_H
 
 #include <memory>
 #include "SubscriberInterface.h"
@@ -59,4 +59,4 @@ public:
 
 } // namespace rsp::messaging
 
-#endif /* INCLUDE_MESSAGING_BROKERINTERFACE_H_ */
+#endif // RSP_CORE_LIB_MESSAGING_BROKER_INTERFACE_H

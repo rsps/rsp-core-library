@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_POSIX_FILESYSTEM_H_
-#define SRC_POSIX_FILESYSTEM_H_
+#ifndef RSP_CORE_LIB_POSIX_FILE_SYSTEM_H
+#define RSP_CORE_LIB_POSIX_FILE_SYSTEM_H
 
 #include <string>
 #include <vector>
@@ -192,4 +192,4 @@ uint32_t GetGroupId();
 
 }
 
-#endif /* SRC_POSIX_FILESYSTEM_H_ */
+#endif // RSP_CORE_LIB_POSIX_FILE_SYSTEM_H

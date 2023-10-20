@@ -9,8 +9,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDE_NETWORK_IHTTPSESSION_H
-#define INCLUDE_NETWORK_IHTTPSESSION_H
+#ifndef RSP_CORE_LIB_NETWORK_I_HTTP_SESSION_H
+#define RSP_CORE_LIB_NETWORK_I_HTTP_SESSION_H
 
 #include <network/IHttpRequest.h>
 #include <network/HttpRequestOptions.h>
@@ -80,4 +80,4 @@ public:
 
 } // namespace rsp::network
 
-#endif
+#endif // RSP_CORE_LIB_NETWORK_I_HTTP_SESSION_H

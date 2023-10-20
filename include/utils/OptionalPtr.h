@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_OPTIONALPTR_H_
-#define INCLUDE_UTILS_OPTIONALPTR_H_
+#ifndef RSP_CORE_LIB_UTILS_OPTIONAL_PTR_H
+#define RSP_CORE_LIB_UTILS_OPTIONAL_PTR_H
 
 namespace rsp::utils {
 
@@ -35,4 +35,4 @@ protected:
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_OPTIONALPTR_H_ */
+#endif // RSP_CORE_LIB_UTILS_OPTIONAL_PTR_H

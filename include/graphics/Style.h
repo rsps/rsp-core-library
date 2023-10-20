@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_STYLE_H_
-#define INCLUDE_GRAPHICS_STYLE_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_STYLE_H
+#define RSP_CORE_LIB_GRAPHICS_STYLE_H
 
 #include <vector>
 #include <graphics/Color.h>
@@ -46,4 +46,4 @@ public:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_STYLE_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_STYLE_H

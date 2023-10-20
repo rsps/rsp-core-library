@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_KEYBOARD_H_
-#define INCLUDE_GRAPHICS_KEYBOARD_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_KEYBOARD_H
+#define RSP_CORE_LIB_GRAPHICS_KEYBOARD_H
 
 #include <array>
 #include <map>
@@ -198,4 +198,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_KEYBOARD_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_KEYBOARD_H

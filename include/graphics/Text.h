@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_TEXT_H_
-#define INCLUDE_GRAPHICS_TEXT_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_TEXT_H
+#define RSP_CORE_LIB_GRAPHICS_TEXT_H
 
 #include <string>
 #include <memory>
@@ -233,4 +233,4 @@ struct Typography {
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_TEXT_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_TEXT_H

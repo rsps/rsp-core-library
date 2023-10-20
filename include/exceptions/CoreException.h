@@ -9,8 +9,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef RSPCOREEXCEPTION_H
-#define RSPCOREEXCEPTION_H
+#ifndef RSP_CORE_LIB_EXCEPTIONS_CORE_EXCEPTION_H
+#define RSP_CORE_LIB_EXCEPTIONS_CORE_EXCEPTION_H
 
 #include <string_view>
 #include <exceptions/ExceptionHelper.h>
@@ -151,4 +151,4 @@ public:
 
 } /* namespace rsp::utils */
 
-#endif // RSPCOREEXCEPTION_H
+#endif // RSP_CORE_LIB_EXCEPTIONS_CORE_EXCEPTION_H

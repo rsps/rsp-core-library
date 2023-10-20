@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
-#ifndef EVENT_H
-#define EVENT_H
+#ifndef RSP_CORE_LIB_MESSAGING_EVENT_H
+#define RSP_CORE_LIB_MESSAGING_EVENT_H
 
 #include <memory>
 #include <string_view>
@@ -80,4 +80,4 @@ class EventBase : public Event
 
 
 } // namespace rsp::messaging
-#endif // EVENT_H
+#endif // RSP_CORE_LIB_MESSAGING_EVENT_H

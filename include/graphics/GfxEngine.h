@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_GFXENGINE_H_
-#define INCLUDE_GRAPHICS_GFXENGINE_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_GFX_ENGINE_H
+#define RSP_CORE_LIB_GRAPHICS_GFX_ENGINE_H
 
 #include <vector>
 #include "Renderer.h"
@@ -96,4 +96,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_GFXENGINE_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_GFX_ENGINE_H

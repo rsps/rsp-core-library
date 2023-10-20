@@ -7,8 +7,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_POSIX_CLOCK_H_
-#define INCLUDE_POSIX_CLOCK_H_
+#ifndef RSP_CORE_LIB_POSIX_CLOCK_H
+#define RSP_CORE_LIB_POSIX_CLOCK_H
 
 #include <ctime>
 #include <utils/DateTime.h>
@@ -41,4 +41,4 @@ public:
 
 } /* namespace rsp::posix */
 
-#endif /* INCLUDE_POSIX_CLOCK_H_ */
+#endif // RSP_CORE_LIB_POSIX_CLOCK_H

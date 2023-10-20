@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef RSP_UTILS_NULLABLE_H_
-#define RSP_UTILS_NULLABLE_H_
+#ifndef RSP_CORE_LIB_UTILS_NULLABLE_H
+#define RSP_CORE_LIB_UTILS_NULLABLE_H
 
 #include <exceptions/CoreException.h>
 #include <type_traits>
@@ -65,4 +65,4 @@ public:
 
 } /* namespace rsp::utils */
 
-#endif /* RSP_UTILS_NULLABLE_H_ */
+#endif // RSP_CORE_LIB_UTILS_NULLABLE_H

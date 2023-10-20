@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_JSON_JSONSTREAM_H_
-#define INCLUDE_JSON_JSONSTREAM_H_
+#ifndef RSP_CORE_LIB_JSON_JSON_STREAM_H
+#define RSP_CORE_LIB_JSON_JSON_STREAM_H
 
 #include <string>
 #include <sstream>
@@ -78,4 +78,4 @@ JsonStream& operator<<(JsonStream& o, T v) {
 
 } // namespace rsp::json
 
-#endif /* INCLUDE_JSON_JSONSTREAM_H_ */
+#endif // RSP_CORE_LIB_JSON_JSON_STREAM_H

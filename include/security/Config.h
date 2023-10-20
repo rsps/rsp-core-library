@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_CONFIG_H_
-#define INCLUDE_SECURITY_CONFIG_H_
+#ifndef RSP_CORE_LIB_SECURITY_CONFIG_H
+#define RSP_CORE_LIB_SECURITY_CONFIG_H
 
 #include <utils/DynamicData.h>
 #include <security/SignedContainer.h>
@@ -43,4 +43,4 @@ public:
 } // namespace rsp::security
 
 
-#endif /* INCLUDE_SECURITY_CONFIG_H_ */
+#endif // RSP_CORE_LIB_SECURITY_CONFIG_H

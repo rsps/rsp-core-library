@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_LOGGING_LOGSTREAM_H_
-#define INCLUDE_LOGGING_LOGSTREAM_H_
+#ifndef RSP_CORE_LIB_LOGGING_LOG_STREAM_H
+#define RSP_CORE_LIB_LOGGING_LOG_STREAM_H
 
 #include <ostream>
 #include <sstream>
@@ -112,4 +112,4 @@ protected:
 
 } /* namespace rsp::logging */
 
-#endif /* INCLUDE_LOGGING_LOGSTREAM_H_ */
+#endif // RSP_CORE_LIB_LOGGING_LOG_STREAM_H

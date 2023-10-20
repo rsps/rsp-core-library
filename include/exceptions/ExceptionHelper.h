@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_EXCEPTIONS_EXCEPTIONHELPER_H_
-#define INCLUDE_EXCEPTIONS_EXCEPTIONHELPER_H_
+#ifndef RSP_CORE_LIB_EXCEPTIONS_EXCEPTION_HELPER_H
+#define RSP_CORE_LIB_EXCEPTIONS_EXCEPTION_HELPER_H
 
 #include <system_error>
 #include <exception>
@@ -85,4 +85,4 @@ public:
 
 } // namespace rsp::exceptions
 
-#endif /* INCLUDE_EXCEPTIONS_EXCEPTIONHELPER_H_ */
+#endif // RSP_CORE_LIB_EXCEPTIONS_EXCEPTION_HELPER_H

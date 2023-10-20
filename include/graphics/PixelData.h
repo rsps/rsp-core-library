@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_PIXELDATA_H_
-#define INCLUDE_GRAPHICS_PIXELDATA_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_PIXEL_DATA_H
+#define RSP_CORE_LIB_GRAPHICS_PIXEL_DATA_H
 
 #include <exceptions/CoreException.h>
 #include <graphics/Color.h>
@@ -121,4 +121,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_PIXELDATA_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_PIXEL_DATA_H

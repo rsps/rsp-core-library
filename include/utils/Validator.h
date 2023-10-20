@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_VALIDATOR_H_
-#define INCLUDE_UTILS_VALIDATOR_H_
+#ifndef RSP_CORE_LIB_UTILS_VALIDATOR_H
+#define RSP_CORE_LIB_UTILS_VALIDATOR_H
 
 #include <exceptions/CoreException.h>
 #include <string>
@@ -87,4 +87,4 @@ public:
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_VALIDATOR_H_ */
+#endif // RSP_CORE_LIB_UTILS_VALIDATOR_H

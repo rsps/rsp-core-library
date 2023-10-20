@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_TIMER_H_
-#define INCLUDE_UTILS_TIMER_H_
+#ifndef RSP_CORE_LIB_UTILS_TIMER_H
+#define RSP_CORE_LIB_UTILS_TIMER_H
 
 #include <functional>
 #include <list>
@@ -83,4 +83,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_UTILS_TIMER_H_ */
+#endif // RSP_CORE_LIB_UTILS_TIMER_H

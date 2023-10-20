@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_GRAPHICS_FONTRAWINTERFACE_H_
-#define INCLUDE_GRAPHICS_FONTRAWINTERFACE_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_FONT_RAW_INTERFACE_H
+#define RSP_CORE_LIB_GRAPHICS_FONT_RAW_INTERFACE_H
 
 #include <graphics/Rect.h>
 #include <string>
@@ -112,4 +112,4 @@ protected:
 
 }
 
-#endif /* INCLUDE_GRAPHICS_FONTRAWINTERFACE_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_FONT_RAW_INTERFACE_H

@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_DATETIME_H_
-#define INCLUDE_UTILS_DATETIME_H_
+#ifndef RSP_CORE_LIB_UTILS_DATE_TIME_H
+#define RSP_CORE_LIB_UTILS_DATE_TIME_H
 
 #include <cstdint>
 #include <chrono>
@@ -266,4 +266,4 @@ std::ostream& operator<< (std::ostream& os, const DateTime &arDateTime);
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_DATETIME_H_ */
+#endif // RSP_CORE_LIB_UTILS_DATE_TIME_H

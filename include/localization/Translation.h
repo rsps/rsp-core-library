@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_LOCALIZATION_TRANSLATION_H_
-#define INCLUDE_LOCALIZATION_TRANSLATION_H_
+#ifndef RSP_CORE_LIB_LOCALIZATION_TRANSLATION_H
+#define RSP_CORE_LIB_LOCALIZATION_TRANSLATION_H
 
 #include <localization/ITranslation.h>
 
@@ -30,4 +30,4 @@ public:
 
 } /* namespace rsp::localization */
 
-#endif /* INCLUDE_LOCALIZATION_TRANSLATION_H_ */
+#endif // RSP_CORE_LIB_LOCALIZATION_TRANSLATION_H

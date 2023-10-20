@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_LOGGING_OUTSTREAMBUFFER_H_
-#define INCLUDE_LOGGING_OUTSTREAMBUFFER_H_
+#ifndef RSP_CORE_LIB_LOGGING_OUT_STREAM_BUFFER_H
+#define RSP_CORE_LIB_LOGGING_OUT_STREAM_BUFFER_H
 
 #include <iostream>
 #include <mutex>
@@ -45,4 +45,4 @@ protected:
 
 } /* namespace rsp::logging */
 
-#endif /* INCLUDE_LOGGING_OUTSTREAMBUFFER_H_ */
+#endif // RSP_CORE_LIB_LOGGING_OUT_STREAM_BUFFER_H

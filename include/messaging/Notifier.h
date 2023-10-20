@@ -3,8 +3,8 @@
  * \author      steffen
  */
 
-#ifndef INCLUDE_MESSAGING_NOTIFIER_H_
-#define INCLUDE_MESSAGING_NOTIFIER_H_
+#ifndef RSP_CORE_LIB_MESSAGING_NOTIFIER_H
+#define RSP_CORE_LIB_MESSAGING_NOTIFIER_H
 
 #include <algorithm>
 #include <functional>
@@ -77,4 +77,4 @@ protected:
 } /* namespace rsp::messaging */
 
 
-#endif /* INCLUDE_MESSAGING_NOTIFIER_H_ */
+#endif // RSP_CORE_LIB_MESSAGING_NOTIFIER_H

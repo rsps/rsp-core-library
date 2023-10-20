@@ -9,8 +9,8 @@
  */
 
 
-#ifndef COMMON_CONTRACTS_IWLANINTERFACE_H_
-#define COMMON_CONTRACTS_IWLANINTERFACE_H_
+#ifndef RSP_CORE_LIB_NETWORK_I_WLAN_INTERFACE_H
+#define RSP_CORE_LIB_NETWORK_I_WLAN_INTERFACE_H
 
 #include <string>
 #include <vector>
@@ -108,4 +108,4 @@ public:
 
 } /* namespace rsp::network */
 
-#endif /* COMMON_CONTRACTS_IWLANINTERFACE_H_ */
+#endif // RSP_CORE_LIB_NETWORK_I_WLAN_INTERFACE_H

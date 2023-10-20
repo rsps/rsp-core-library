@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SHA_H_
-#define INCLUDE_SECURITY_SHA_H_
+#ifndef RSP_CORE_LIB_SECURITY_SHA_H
+#define RSP_CORE_LIB_SECURITY_SHA_H
 
 #include <security/SecureBuffer.h>
 #include <cstdint>
@@ -93,4 +93,4 @@ protected:
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_SECURITY_SHA_H_ */
+#endif // RSP_CORE_LIB_SECURITY_SHA_H

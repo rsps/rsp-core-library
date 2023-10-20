@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef RSP_UTILS_VARIANT_H_
-#define RSP_UTILS_VARIANT_H_
+#ifndef RSP_CORE_LIB_UTILS_VARIANT_H
+#define RSP_CORE_LIB_UTILS_VARIANT_H
 
 #include <exceptions/CoreException.h>
 #include <utils/Nullable.h>
@@ -198,4 +198,4 @@ std::ostream& operator<< (std::ostream& os, const Variant& arValue);
 
 } /* namespace rsp::utils */
 
-#endif /* RSP_UTILS_VARIANT_H_ */
+#endif // RSP_CORE_LIB_UTILS_VARIANT_H

@@ -10,8 +10,8 @@
 
 #include "Nullable.h"
 
-#ifndef INCLUDE_UTILS_STRUCTELEMENT_H_
-#define INCLUDE_UTILS_STRUCTELEMENT_H_
+#ifndef RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
+#define RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
 
 namespace rsp::utils {
 
@@ -273,4 +273,4 @@ std::ostream & operator<< (std::ostream &out, StructElement<T> const &t) {
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_STRUCTELEMENT_H_ */
+#endif // RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H

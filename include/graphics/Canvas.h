@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef CANVAS_H
-#define CANVAS_H
+#ifndef RSP_CORE_LIB_GRAPHICS_CANVAS_H
+#define RSP_CORE_LIB_GRAPHICS_CANVAS_H
 
 #include <graphics/Color.h>
 #include <graphics/PixelData.h>
@@ -91,4 +91,4 @@ protected:
 };
 
 } // namespace rsp::graphics
-#endif // CANVAS_H
+#endif // RSP_CORE_LIB_GRAPHICS_CANVAS_H

@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_DEPENDENCYCONTAINER_H_
-#define INCLUDE_UTILS_DEPENDENCYCONTAINER_H_
+#ifndef RSP_CORE_LIB_UTILS_DEPENDENCY_CONTAINER_H
+#define RSP_CORE_LIB_UTILS_DEPENDENCY_CONTAINER_H
 
 #include <functional>
 
@@ -27,4 +27,4 @@ class DependencyContainer
 };
 
 
-#endif /* INCLUDE_UTILS_DEPENDENCYCONTAINER_H_ */
+#endif // RSP_CORE_LIB_UTILS_DEPENDENCY_CONTAINER_H

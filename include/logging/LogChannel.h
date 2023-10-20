@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_LOGGING_LOGCHANNEL_H_
-#define INCLUDE_LOGGING_LOGCHANNEL_H_
+#ifndef RSP_CORE_LIB_LOGGING_LOG_CHANNEL_H
+#define RSP_CORE_LIB_LOGGING_LOG_CHANNEL_H
 
 #include <string_view>
 #include <logging/LoggerInterface.h>
@@ -52,4 +52,4 @@ protected:
 
 } /* namespace rsp::logging */
 
-#endif /* INCLUDE_LOGGING_LOGCHANNEL_H_ */
+#endif // RSP_CORE_LIB_LOGGING_LOG_CHANNEL_H

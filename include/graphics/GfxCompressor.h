@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_GFXCOMPRESSOR_H_
-#define INCLUDE_GRAPHICS_GFXCOMPRESSOR_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_GFX_COMPRESSOR_H
+#define RSP_CORE_LIB_GRAPHICS_GFX_COMPRESSOR_H
 
 #include <cstdint>
 #include <cstddef>
@@ -56,4 +56,4 @@ protected:
 
 }; // namespace rsp::graphics
 
-#endif /* INCLUDE_GRAPHICS_GFXCOMPRESSOR_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_GFX_COMPRESSOR_H

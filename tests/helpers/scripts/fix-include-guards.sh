@@ -19,9 +19,13 @@ do
   GUARD=${PREFIX}${tmp^^}
   echo "${GUARD}"
 
-  perl -0777 -plE "print if \$t ||= s/#ifndef\s+([A-Z_]+)\n#define \1\n(.*)\n#endif\s*(\/\/\s*\1|\/\*\s*\1\s*\*\/)/#ifdef $GUARD\n#define $GUARD\n\2\n#endif \/\/ $GUARD/s }{ exit 1 if !\$t" "$f"
+  regex="s/#ifndef\s+([A-Z0-9_]+)\n#define \1\n(.*)\n#endif\s*(\/\/\s*\1|\/\*\s*\1\s*\*\/|\n)/#ifndef $GUARD\n#define $GUARD\n\2\n#endif \/\/ $GUARD/s"
+
+  perl -0777 -pE "if ($regex) { exit 0 } else { exit 1 }" "$f"
   retVal=$?
   if [ $retVal -ne 0 ]; then
-      echo "No match in $f"
+      echo "ERROR: No match in $f"
+  else
+    perl -0777 -pi -plE "$regex" "$f"
   fi
 done

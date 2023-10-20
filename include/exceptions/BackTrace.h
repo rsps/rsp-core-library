@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_EXCEPTIONS_BACKTRACE_H_
-#define INCLUDE_EXCEPTIONS_BACKTRACE_H_
+#ifndef RSP_CORE_LIB_EXCEPTIONS_BACK_TRACE_H
+#define RSP_CORE_LIB_EXCEPTIONS_BACK_TRACE_H
 
 #include <string>
 #include <ostream>
@@ -58,4 +58,4 @@ std::ostream& operator<<(std::ostream& o, const BackTrace& arBackTrace);
 
 } /* namespace rsp::exceptions */
 
-#endif /* INCLUDE_EXCEPTIONS_BACKTRACE_H_ */
+#endif // RSP_CORE_LIB_EXCEPTIONS_BACK_TRACE_H

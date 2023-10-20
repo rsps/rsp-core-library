@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_NETWORK_HTTPSESSION_H_
-#define INCLUDE_NETWORK_HTTPSESSION_H_
+#ifndef RSP_CORE_LIB_NETWORK_HTTP_SESSION_H
+#define RSP_CORE_LIB_NETWORK_HTTP_SESSION_H
 
 #include <network/IHttpSession.h>
 
@@ -34,4 +34,4 @@ protected:
 
 } /* namespace rsp::network */
 
-#endif /* INCLUDE_NETWORK_HTTPSESSION_H_ */
+#endif // RSP_CORE_LIB_NETWORK_HTTP_SESSION_H

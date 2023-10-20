@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef IMAGE_H
-#define IMAGE_H
+#ifndef RSP_CORE_LIB_GRAPHICS_IMAGE_H
+#define RSP_CORE_LIB_GRAPHICS_IMAGE_H
 
 #include "Control.h"
 #include "BitmapView.h"
@@ -47,4 +47,4 @@ protected:
 
 } // namespace rsp::graphics
 
-#endif // IMAGE_H
+#endif // RSP_CORE_LIB_GRAPHICS_IMAGE_H

@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_CPPOBJECTFILE_H_
-#define INCLUDE_UTILS_CPPOBJECTFILE_H_
+#ifndef RSP_CORE_LIB_UTILS_CPP_OBJECT_FILE_H
+#define RSP_CORE_LIB_UTILS_CPP_OBJECT_FILE_H
 
 #include <cstddef>
 #include <filesystem>
@@ -47,4 +47,4 @@ protected:
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_CPPOBJECTFILE_H_ */
+#endif // RSP_CORE_LIB_UTILS_CPP_OBJECT_FILE_H

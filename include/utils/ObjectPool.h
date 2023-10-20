@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_OBJECTPOOL_H_
-#define INCLUDE_UTILS_OBJECTPOOL_H_
+#ifndef RSP_CORE_LIB_UTILS_OBJECT_POOL_H
+#define RSP_CORE_LIB_UTILS_OBJECT_POOL_H
 
 #include <exceptions/CoreException.h>
 #include <unordered_set>
@@ -77,4 +77,4 @@ private:
 
 } // namespace rsp::utils
 
-#endif /* INCLUDE_UTILS_OBJECTPOOL_H_ */
+#endif // RSP_CORE_LIB_UTILS_OBJECT_POOL_H

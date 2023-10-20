@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_FOURCC_H_
-#define INCLUDE_UTILS_FOURCC_H_
+#ifndef RSP_CORE_LIB_UTILS_FOUR_CC_H
+#define RSP_CORE_LIB_UTILS_FOUR_CC_H
 
 #include <cstdint>
 #include <iostream>
@@ -66,4 +66,4 @@ std::ostream& operator<<(std::ostream& os, const FourCC &arChunk);
 
 } // namespace rsp::utils
 
-#endif /* INCLUDE_UTILS_FOURCC_H_ */
+#endif // RSP_CORE_LIB_UTILS_FOUR_CC_H

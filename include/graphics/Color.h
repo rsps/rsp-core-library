@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  * \author      Steffen Brummer
  */
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef RSP_CORE_LIB_GRAPHICS_COLOR_H
+#define RSP_CORE_LIB_GRAPHICS_COLOR_H
 
 #include <exceptions/CoreException.h>
 #include <cstdint>
@@ -207,4 +207,4 @@ public:
 };
 
 } // namespace rsp::graphics
-#endif // COLOR_H
+#endif // RSP_CORE_LIB_GRAPHICS_COLOR_H

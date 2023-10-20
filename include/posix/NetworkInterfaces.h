@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_POSIX_NETWORKINTERFACES_H_
-#define INCLUDE_POSIX_NETWORKINTERFACES_H_
+#ifndef RSP_CORE_LIB_POSIX_NETWORK_INTERFACES_H
+#define RSP_CORE_LIB_POSIX_NETWORK_INTERFACES_H
 
 #include <string>
 #include <vector>
@@ -39,4 +39,4 @@ protected:
 
 } /* namespace rsp::posix */
 
-#endif /* INCLUDE_POSIX_NETWORKINTERFACES_H_ */
+#endif // RSP_CORE_LIB_POSIX_NETWORK_INTERFACES_H

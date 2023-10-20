@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_LOGGING_LOGTYPES_H_
-#define INCLUDE_LOGGING_LOGTYPES_H_
+#ifndef RSP_CORE_LIB_LOGGING_LOG_TYPES_H
+#define RSP_CORE_LIB_LOGGING_LOG_TYPES_H
 
 #include <string>
 #include <syslog.h>
@@ -88,4 +88,4 @@ std::ostream& operator<<(std::ostream &o, LogLevel aLevel);
 
 
 
-#endif /* INCLUDE_LOGGING_LOGTYPES_H_ */
+#endif // RSP_CORE_LIB_LOGGING_LOG_TYPES_H

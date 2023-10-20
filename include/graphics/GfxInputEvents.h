@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_GFXINPUTEVENTS_H_
-#define INCLUDE_GRAPHICS_GFXINPUTEVENTS_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_GFX_INPUT_EVENTS_H
+#define RSP_CORE_LIB_GRAPHICS_GFX_INPUT_EVENTS_H
 
 #include <utils/Singleton.h>
 #include "GfxEvents.h"
@@ -57,4 +57,4 @@ public:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_GFXINPUTEVENTS_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_GFX_INPUT_EVENTS_H

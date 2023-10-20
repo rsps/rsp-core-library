@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_APPLICATION_CONSOLE_H_
-#define INCLUDE_APPLICATION_CONSOLE_H_
+#ifndef RSP_CORE_LIB_APPLICATION_CONSOLE_H
+#define RSP_CORE_LIB_APPLICATION_CONSOLE_H
 
 #include <string>
 #include <iostream>
@@ -108,4 +108,4 @@ protected:
 
 } /* namespace rsp::application */
 
-#endif /* INCLUDE_APPLICATION_CONSOLE_H_ */
+#endif // RSP_CORE_LIB_APPLICATION_CONSOLE_H

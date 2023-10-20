@@ -9,8 +9,8 @@
  */
 
 
-#ifndef INCLUDE_GRAPHICS_GFXCACHE_H_
-#define INCLUDE_GRAPHICS_GFXCACHE_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_GFX_CACHE_H
+#define RSP_CORE_LIB_GRAPHICS_GFX_CACHE_H
 
 #include <map>
 #include "GfxResource.h"
@@ -61,4 +61,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_GFXCACHE_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_GFX_CACHE_H

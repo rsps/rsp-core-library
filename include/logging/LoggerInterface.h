@@ -14,8 +14,8 @@
 #include "LogStream.h"
 #include "LogWriterInterface.h"
 
-#ifndef INCLUDE_LOGGING_LOGGERINTERFACE_H_
-#define INCLUDE_LOGGING_LOGGERINTERFACE_H_
+#ifndef RSP_CORE_LIB_LOGGING_LOGGER_INTERFACE_H
+#define RSP_CORE_LIB_LOGGING_LOGGER_INTERFACE_H
 
 namespace rsp::logging {
 
@@ -67,4 +67,4 @@ protected:
 
 } /* namespace rsp::logging */
 
-#endif /* INCLUDE_LOGGING_LOGGERINTERFACE_H_ */
+#endif // RSP_CORE_LIB_LOGGING_LOGGER_INTERFACE_H

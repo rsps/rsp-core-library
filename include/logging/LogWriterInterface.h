@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_LOGGING_LOGWRITER_H_
-#define SRC_LOGGING_LOGWRITER_H_
+#ifndef RSP_CORE_LIB_LOGGING_LOG_WRITER_INTERFACE_H
+#define RSP_CORE_LIB_LOGGING_LOG_WRITER_INTERFACE_H
 
 #include <string>
 #include <utils/DynamicData.h>
@@ -47,4 +47,4 @@ protected:
 
 } /* namespace logging */
 
-#endif /* SRC_LOGGING_LOGWRITER_H_ */
+#endif // RSP_CORE_LIB_LOGGING_LOG_WRITER_INTERFACE_H

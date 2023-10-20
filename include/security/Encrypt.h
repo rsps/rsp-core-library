@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_ENCRYPT_H_
-#define INCLUDE_SECURITY_ENCRYPT_H_
+#ifndef RSP_CORE_LIB_SECURITY_ENCRYPT_H
+#define RSP_CORE_LIB_SECURITY_ENCRYPT_H
 
 #include <string>
 #include <memory>
@@ -36,4 +36,4 @@ protected:
 
 } /* namespace rsp::security */
 
-#endif /* INCLUDE_SECURITY_ENCRYPT_H_ */
+#endif // RSP_CORE_LIB_SECURITY_ENCRYPT_H

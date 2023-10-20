@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef RSP_UTILS_ROUNDING_H_
-#define RSP_UTILS_ROUNDING_H_
+#ifndef RSP_CORE_LIB_UTILS_ROUNDING_H
+#define RSP_CORE_LIB_UTILS_ROUNDING_H
 
 #include <cmath>
 
@@ -29,4 +29,4 @@
 #define ROUND02(a) (ROUND2((a) * 10.0f) * 0.1f)
 
 
-#endif /* RSP_UTILS_ROUNDING_H_ */
+#endif // RSP_CORE_LIB_UTILS_ROUNDING_H

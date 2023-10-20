@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_APPLICATION_COMMANDLINE_H_
-#define INCLUDE_APPLICATION_COMMANDLINE_H_
+#ifndef RSP_CORE_LIB_APPLICATION_COMMAND_LINE_H
+#define RSP_CORE_LIB_APPLICATION_COMMAND_LINE_H
 
 #include <string>
 #include <vector>
@@ -82,4 +82,4 @@ protected:
 
 } /* namespace rsp::application */
 
-#endif /* INCLUDE_APPLICATION_COMMANDLINE_H_ */
+#endif // RSP_CORE_LIB_APPLICATION_COMMAND_LINE_H

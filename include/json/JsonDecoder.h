@@ -9,8 +9,8 @@
  */
 
 
-#ifndef INCLUDE_JSON_JSONDECODER_H_
-#define INCLUDE_JSON_JSONDECODER_H_
+#ifndef RSP_CORE_LIB_JSON_JSON_DECODER_H
+#define RSP_CORE_LIB_JSON_JSON_DECODER_H
 
 #include <string>
 #include <string_view>
@@ -61,4 +61,4 @@ protected:
 
 } /* rsp::json */
 
-#endif /* INCLUDE_JSON_JSONDECODER_H_ */
+#endif // RSP_CORE_LIB_JSON_JSON_DECODER_H

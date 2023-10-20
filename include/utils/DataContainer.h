@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_DATACONTAINER_H_
-#define INCLUDE_UTILS_DATACONTAINER_H_
+#ifndef RSP_CORE_LIB_UTILS_DATA_CONTAINER_H
+#define RSP_CORE_LIB_UTILS_DATA_CONTAINER_H
 
 #include <exceptions/CoreException.h>
 #include <memory>
@@ -332,4 +332,4 @@ public:
 } /* namespace rsp::utils */
 
 
-#endif /* INCLUDE_UTILS_DATACONTAINER_H_ */
+#endif // RSP_CORE_LIB_UTILS_DATA_CONTAINER_H

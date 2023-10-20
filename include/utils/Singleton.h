@@ -9,8 +9,8 @@
  */
 
 
-#ifndef INCLUDE_UTILS_SINGLETON_H_
-#define INCLUDE_UTILS_SINGLETON_H_
+#ifndef RSP_CORE_LIB_UTILS_SINGLETON_H
+#define RSP_CORE_LIB_UTILS_SINGLETON_H
 
 #ifdef MT
 #include <mutex>
@@ -157,4 +157,4 @@ bool Singleton<T>::mOwnsInstance = false;
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_SINGLETON_H_ */
+#endif // RSP_CORE_LIB_UTILS_SINGLETON_H

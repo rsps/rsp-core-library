@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_UTILS_STRUTILS_H_
-#define SRC_UTILS_STRUTILS_H_
+#ifndef RSP_CORE_LIB_UTILS_STR_UTILS_H
+#define RSP_CORE_LIB_UTILS_STR_UTILS_H
 
 #include <algorithm>
 #include <memory>
@@ -213,4 +213,4 @@ std::string ToString(float aValue, int aDigits = -1, bool aFixed = false);
 
 }
 
-#endif /* SRC_UTILS_STRUTILS_H_ */
+#endif // RSP_CORE_LIB_UTILS_STR_UTILS_H

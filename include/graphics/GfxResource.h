@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_GFXRESOURCE_H_
-#define INCLUDE_GRAPHICS_GFXRESOURCE_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_GFX_RESOURCE_H
+#define RSP_CORE_LIB_GRAPHICS_GFX_RESOURCE_H
 
 #include <cstdint>
 #include <ostream>
@@ -33,4 +33,4 @@ struct GfxResource
 
 } // namespace rsp::graphics
 
-#endif /* INCLUDE_GRAPHICS_GFXRESOURCE_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_GFX_RESOURCE_H

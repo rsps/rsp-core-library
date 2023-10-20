@@ -3,8 +3,8 @@
  * \author      steffen
  */
 
-#ifndef INCLUDE_JSON_JSONENCODER_H_
-#define INCLUDE_JSON_JSONENCODER_H_
+#ifndef RSP_CORE_LIB_JSON_JSON_ENCODER_H
+#define RSP_CORE_LIB_JSON_JSON_ENCODER_H
 
 #include <string>
 #include <sstream>
@@ -63,4 +63,4 @@ protected:
 
 } /* namespace rsp::json */
 
-#endif /* INCLUDE_JSON_JSONENCODER_H_ */
+#endif // RSP_CORE_LIB_JSON_JSON_ENCODER_H

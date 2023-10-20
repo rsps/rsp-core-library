@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SECURESTRING_H_
-#define INCLUDE_SECURITY_SECURESTRING_H_
+#ifndef RSP_CORE_LIB_SECURITY_SECURE_STRING_H
+#define RSP_CORE_LIB_SECURITY_SECURE_STRING_H
 
 #include <string>
 #include <sstream>
@@ -138,4 +138,4 @@ public:
 
 } /* namespace rsp::security */
 
-#endif /* INCLUDE_SECURITY_SECURESTRING_H_ */
+#endif // RSP_CORE_LIB_SECURITY_SECURE_STRING_H

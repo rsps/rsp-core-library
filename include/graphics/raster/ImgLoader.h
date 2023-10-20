@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  * \author      Steffen Brummer
  */
-#ifndef GRAPHICS_RASTER_IMGLOADER_H
-#define GRAPHICS_RASTER_IMGLOADER_H
+#ifndef RSP_CORE_LIB_GRAPHICS_RASTER_IMG_LOADER_H
+#define RSP_CORE_LIB_GRAPHICS_RASTER_IMG_LOADER_H
 
 #include <exceptions/CoreException.h>
 #include <graphics/PixelData.h>
@@ -98,4 +98,4 @@ class ImgLoader
 
 } // namespace rsp::graphics
 
-#endif // GRAPHICS_RASTER_IMGLOADER_H
+#endif // RSP_CORE_LIB_GRAPHICS_RASTER_IMG_LOADER_H

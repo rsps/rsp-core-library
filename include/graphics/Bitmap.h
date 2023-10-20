@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  * \author      Steffen Brummer
  */
-#ifndef BITMAP_H
-#define BITMAP_H
+#ifndef RSP_CORE_LIB_GRAPHICS_BITMAP_H
+#define RSP_CORE_LIB_GRAPHICS_BITMAP_H
 
 #include <graphics/Canvas.h>
 #include <graphics/raster/ImgLoader.h>
@@ -50,4 +50,4 @@ protected:
 std::ostream& operator<<(std::ostream &os, const Bitmap &arBmp);
 
 } // namespace rsp::graphics
-#endif // BITMAP_H
+#endif // RSP_CORE_LIB_GRAPHICS_BITMAP_H

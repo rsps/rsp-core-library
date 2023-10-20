@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_FIXEDSTRING_H_
-#define INCLUDE_UTILS_FIXEDSTRING_H_
+#ifndef RSP_CORE_LIB_UTILS_FIXED_STRING_H
+#define RSP_CORE_LIB_UTILS_FIXED_STRING_H
 
 #include <string>
 #include <cstring>
@@ -88,4 +88,4 @@ private:
 
 } // namespace rsp::utils
 
-#endif /* INCLUDE_UTILS_FIXEDSTRING_H_ */
+#endif // RSP_CORE_LIB_UTILS_FIXED_STRING_H

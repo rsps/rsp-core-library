@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  * \author      Steffen Brummer
  */
-#ifndef POINT_H
-#define POINT_H
+#ifndef RSP_CORE_LIB_GRAPHICS_POINT_H
+#define RSP_CORE_LIB_GRAPHICS_POINT_H
 
 #include <graphics/GuiUnit.h>
 #include <ostream>
@@ -183,4 +183,4 @@ class Point
 std::ostream &operator<<(std::ostream &os, const Point &p);
 
 } // namespace rsp::graphics
-#endif // POINT_H
+#endif // RSP_CORE_LIB_GRAPHICS_POINT_H

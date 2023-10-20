@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  */
 
-#ifndef SCENE_H
-#define SCENE_H
+#ifndef RSP_CORE_LIB_GRAPHICS_SCENE_H
+#define RSP_CORE_LIB_GRAPHICS_SCENE_H
 
 #include "Control.h"
 #include <vector>
@@ -64,4 +64,4 @@ public:
 
 } // namespace rsp::graphics
 
-#endif // SCENE_H
+#endif // RSP_CORE_LIB_GRAPHICS_SCENE_H

@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_BITMAPVIEW_H_
-#define INCLUDE_GRAPHICS_BITMAPVIEW_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_BITMAP_VIEW_H
+#define RSP_CORE_LIB_GRAPHICS_BITMAP_VIEW_H
 
 #include <graphics/Bitmap.h>
 #include <graphics/Color.h>
@@ -53,4 +53,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_BITMAPVIEW_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_BITMAP_VIEW_H

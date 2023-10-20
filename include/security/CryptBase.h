@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_SECURITY_CRYPTBASE_H_
-#define INCLUDE_SECURITY_CRYPTBASE_H_
+#ifndef RSP_CORE_LIB_SECURITY_CRYPT_BASE_H
+#define RSP_CORE_LIB_SECURITY_CRYPT_BASE_H
 
 #include <exceptions/CoreException.h>
 #include <string_view>
@@ -90,4 +90,4 @@ public:
 
 } // namespace rsp::security
 
-#endif /* INCLUDE_SECURITY_CRYPTBASE_H_ */
+#endif // RSP_CORE_LIB_SECURITY_CRYPT_BASE_H

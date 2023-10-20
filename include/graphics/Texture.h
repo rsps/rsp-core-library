@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_TEXTURE_H_
-#define INCLUDE_GRAPHICS_TEXTURE_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_TEXTURE_H
+#define RSP_CORE_LIB_GRAPHICS_TEXTURE_H
 
 #include <memory>
 #include <graphics/Color.h>
@@ -93,4 +93,4 @@ public:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_TEXTURE_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_TEXTURE_H

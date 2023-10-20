@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_RUNTIME_H_
-#define INCLUDE_UTILS_RUNTIME_H_
+#ifndef RSP_CORE_LIB_UTILS_RUN_TIME_H
+#define RSP_CORE_LIB_UTILS_RUN_TIME_H
 
 #include <chrono>
 #include <ostream>
@@ -42,4 +42,4 @@ std::ostream &operator<<(std::ostream &os, const RunTime &arRunTime);
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_RUNTIME_H_ */
+#endif // RSP_CORE_LIB_UTILS_RUN_TIME_H

@@ -8,8 +8,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef HTTPREQUEST_H
-#define HTTPREQUEST_H
+#ifndef RSP_CORE_LIB_NETWORK_HTTP_REQUEST_H
+#define RSP_CORE_LIB_NETWORK_HTTP_REQUEST_H
 
 #include <network/IHttpRequest.h>
 #include <network/HttpResponse.h>
@@ -71,4 +71,4 @@ protected:
 
 } // rsp::network
 
-#endif
+#endif // RSP_CORE_LIB_NETWORK_HTTP_REQUEST_H

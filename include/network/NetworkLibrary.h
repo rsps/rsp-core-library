@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_NETWORK_NETWORKLIBRARY_H_
-#define INCLUDE_NETWORK_NETWORKLIBRARY_H_
+#ifndef RSP_CORE_LIB_NETWORK_NETWORK_LIBRARY_H
+#define RSP_CORE_LIB_NETWORK_NETWORK_LIBRARY_H
 
 #include <string_view>
 
@@ -61,4 +61,4 @@ public:
 
 } // namespace rsp::network
 
-#endif /* INCLUDE_NETWORK_NETWORKLIBRARY_H_ */
+#endif // RSP_CORE_LIB_NETWORK_NETWORK_LIBRARY_H

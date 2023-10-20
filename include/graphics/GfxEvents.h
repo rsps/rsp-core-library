@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_GFXEVENTS_H_
-#define INCLUDE_GRAPHICS_GFXEVENTS_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_GFX_EVENTS_H
+#define RSP_CORE_LIB_GRAPHICS_GFX_EVENTS_H
 
 #include <chrono>
 #include <memory>
@@ -61,4 +61,4 @@ using GfxEvent = rsp::messaging::EventPtr_t;
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_GFXEVENTS_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_GFX_EVENTS_H

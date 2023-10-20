@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_POSIX_FILEIO_H_
-#define SRC_POSIX_FILEIO_H_
+#ifndef RSP_CORE_LIB_POSIX_FILE_IO_H
+#define RSP_CORE_LIB_POSIX_FILE_IO_H
 
 #include <chrono>
 #include <fstream>
@@ -180,4 +180,4 @@ public:
 
 } // namespace rsp::posix
 
-#endif /* SRC_POSIX_FILEIO_H_ */
+#endif // RSP_CORE_LIB_POSIX_FILE_IO_H

@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_LOCALIZATION_ITRANSLATION_H_
-#define INCLUDE_LOCALIZATION_ITRANSLATION_H_
+#ifndef RSP_CORE_LIB_LOCALIZATION_I_TRANSLATION_H
+#define RSP_CORE_LIB_LOCALIZATION_I_TRANSLATION_H
 
 #include <locale>
 #include <memory>
@@ -55,4 +55,4 @@ protected:
 
 } /* rsp::localization */
 
-#endif /* INCLUDE_LOCALIZATION_ITRANSLATION_H_ */
+#endif // RSP_CORE_LIB_LOCALIZATION_I_TRANSLATION_H

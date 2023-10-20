@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef RSP_CORE_LIB_RANDOM_H
-#define RSP_CORE_LIB_RANDOM_H
+#ifndef RSP_CORE_LIB_UTILS_RANDOM_H
+#define RSP_CORE_LIB_UTILS_RANDOM_H
 
 #include <random>
 
@@ -46,4 +46,4 @@ public:
 
 } // namespace rsp::utils
 
-#endif //RSP_CORE_LIB_RANDOM_H
+#endif // RSP_CORE_LIB_UTILS_RANDOM_H

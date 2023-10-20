@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SECURE_BUFFER_H_
-#define INCLUDE_SECURITY_SECURE_BUFFER_H_
+#ifndef RSP_CORE_LIB_SECURITY_SECURE_BUFFER_H
+#define RSP_CORE_LIB_SECURITY_SECURE_BUFFER_H
 
 #include <vector>
 #include <string>
@@ -103,4 +103,4 @@ public:
 
 } // namespace rsp::security
 
-#endif /* INCLUDE_SECURITY_SECURE_BUFFER_H_ */
+#endif // RSP_CORE_LIB_SECURITY_SECURE_BUFFER_H

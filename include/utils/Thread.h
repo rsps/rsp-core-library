@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_THREAD_H_
-#define INCLUDE_UTILS_THREAD_H_
+#ifndef RSP_CORE_LIB_UTILS_THREAD_H
+#define RSP_CORE_LIB_UTILS_THREAD_H
 
 #include <exceptions/CoreException.h>
 #include <exception>
@@ -110,4 +110,4 @@ protected:
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_THREAD_H_ */
+#endif // RSP_CORE_LIB_UTILS_THREAD_H

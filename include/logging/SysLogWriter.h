@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_LOGGING_SYSLOGWRITER_H_
-#define SRC_LOGGING_SYSLOGWRITER_H_
+#ifndef RSP_CORE_LIB_LOGGING_SYS_LOG_WRITER_H
+#define RSP_CORE_LIB_LOGGING_SYS_LOG_WRITER_H
 
 #include <logging/LogWriterInterface.h>
 
@@ -34,4 +34,4 @@ protected:
 
 } /* namespace logging */
 
-#endif /* SRC_LOGGING_SYSLOGWRITER_H_ */
+#endif // RSP_CORE_LIB_LOGGING_SYS_LOG_WRITER_H

@@ -3,8 +3,8 @@
  * \author      steffen
  */
 
-#ifndef INCLUDE_UTILS_DYNAMICDATA_H_
-#define INCLUDE_UTILS_DYNAMICDATA_H_
+#ifndef RSP_CORE_LIB_UTILS_DYNAMIC_DATA_H
+#define RSP_CORE_LIB_UTILS_DYNAMIC_DATA_H
 
 #include <exceptions/CoreException.h>
 #include <vector>
@@ -272,4 +272,4 @@ std::ostream& operator<< (std::ostream& os, const DynamicData& arValue);
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_DYNAMICDATA_H_ */
+#endif // RSP_CORE_LIB_UTILS_DYNAMIC_DATA_H

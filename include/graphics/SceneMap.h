@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_SCENEMAP_H_
-#define INCLUDE_GRAPHICS_SCENEMAP_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_SCENE_MAP_H
+#define RSP_CORE_LIB_GRAPHICS_SCENE_MAP_H
 
 #include <functional>
 #include <map>
@@ -94,4 +94,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_SCENEMAP_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_SCENE_MAP_H

@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SECUREALLOCATOR_H_
-#define INCLUDE_SECURITY_SECUREALLOCATOR_H_
+#ifndef RSP_CORE_LIB_SECURITY_SECURE_ALLOCATOR_H
+#define RSP_CORE_LIB_SECURITY_SECURE_ALLOCATOR_H
 
 #include <memory>
 #include <limits>
@@ -91,4 +91,4 @@ bool operator!=(SecureAllocator<T> const& x, SecureAllocator<U> const& y) noexce
 
 } // namespace rsp::security
 
-#endif /* INCLUDE_SECURITY_SECUREALLOCATOR_H_ */
+#endif // RSP_CORE_LIB_SECURITY_SECURE_ALLOCATOR_H

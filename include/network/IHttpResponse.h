@@ -8,8 +8,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef I_HTTPRESPONSE_H
-#define I_HTTPRESPONSE_H
+#ifndef RSP_CORE_LIB_NETWORK_I_HTTP_RESPONSE_H
+#define RSP_CORE_LIB_NETWORK_I_HTTP_RESPONSE_H
 
 #include <exceptions/CoreException.h>
 #include <ostream>
@@ -84,4 +84,4 @@ std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse);
 
 } // rsp::network
 
-#endif
+#endif // RSP_CORE_LIB_NETWORK_I_HTTP_RESPONSE_H

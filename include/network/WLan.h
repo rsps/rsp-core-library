@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef COMMON_NETWORK_WLAN_H_
-#define COMMON_NETWORK_WLAN_H_
+#ifndef RSP_CORE_LIB_NETWORK_W_LAN_H
+#define RSP_CORE_LIB_NETWORK_W_LAN_H
 
 #include "IWlanInterface.h"
 
@@ -41,4 +41,4 @@ protected:
 
 } /* namespace tgm::network */
 
-#endif /* COMMON_NETWORK_WLAN_H_ */
+#endif // RSP_CORE_LIB_NETWORK_W_LAN_H

@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_LOGGING_LOGGER_H_
-#define SRC_LOGGING_LOGGER_H_
+#ifndef RSP_CORE_LIB_LOGGING_LOGGER_H
+#define RSP_CORE_LIB_LOGGING_LOGGER_H
 
 #include <string>
 #include <vector>
@@ -81,4 +81,4 @@ protected:
 
 } /* namespace logging */
 
-#endif /* SRC_LOGGING_LOGGER_H_ */
+#endif // RSP_CORE_LIB_LOGGING_LOGGER_H

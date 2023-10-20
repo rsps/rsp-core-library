@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_BUTTON_H_
-#define INCLUDE_GRAPHICS_BUTTON_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_BUTTON_H
+#define RSP_CORE_LIB_GRAPHICS_BUTTON_H
 
 #include <map>
 #include "Bitmap.h"
@@ -37,4 +37,4 @@ public:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_BUTTON_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_BUTTON_H

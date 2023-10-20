@@ -8,8 +8,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef HTTPREQUESTOPTIONS_H
-#define HTTPREQUESTOPTIONS_H
+#ifndef RSP_CORE_LIB_NETWORK_HTTP_REQUEST_OPTIONS_H
+#define RSP_CORE_LIB_NETWORK_HTTP_REQUEST_OPTIONS_H
 
 #include <network/ConnectionOptions.h>
 #include <memory>
@@ -66,6 +66,6 @@ public:
 
 std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions);
 
-}
+} // namespace rsp::network
 
-#endif
+#endif // RSP_CORE_LIB_NETWORK_HTTP_REQUEST_OPTIONS_H

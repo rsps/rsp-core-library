@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_EXCEPTIONS_SIGNALHANDLER_H_
-#define INCLUDE_EXCEPTIONS_SIGNALHANDLER_H_
+#ifndef RSP_CORE_LIB_EXCEPTIONS_SIGNAL_HANDLER_H
+#define RSP_CORE_LIB_EXCEPTIONS_SIGNAL_HANDLER_H
 
 #include <exceptions/BackTrace.h>
 #include <functional>
@@ -60,4 +60,4 @@ protected:
 
 } /* namespace rsp::exceptions */
 
-#endif /* INCLUDE_EXCEPTIONS_SIGNALHANDLER_H_ */
+#endif // RSP_CORE_LIB_EXCEPTIONS_SIGNAL_HANDLER_H

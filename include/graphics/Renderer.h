@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_GRAPHICS_RENDERER_H_
-#define INCLUDE_GRAPHICS_RENDERER_H_
+#ifndef RSP_CORE_LIB_GRAPHICS_RENDERER_H
+#define RSP_CORE_LIB_GRAPHICS_RENDERER_H
 
 #include <functional>
 #include <memory>
@@ -148,4 +148,4 @@ public:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_GRAPHICS_RENDERER_H_ */
+#endif // RSP_CORE_LIB_GRAPHICS_RENDERER_H

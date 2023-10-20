@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_LOGGING_SETLEVEL_H_
-#define INCLUDE_LOGGING_SETLEVEL_H_
+#ifndef RSP_CORE_LIB_LOGGING_SET_LEVEL_H
+#define RSP_CORE_LIB_LOGGING_SET_LEVEL_H
 
 #include <ostream>
 #include "LogTypes.h"
@@ -53,4 +53,4 @@ std::ostream& operator<<(std::ostream &o, SetLevel aLevel);
 
 } /* namespace rsp::logging */
 
-#endif /* INCLUDE_LOGGING_SETLEVEL_H_ */
+#endif // RSP_CORE_LIB_LOGGING_SET_LEVEL_H

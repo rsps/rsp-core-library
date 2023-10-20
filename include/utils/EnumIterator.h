@@ -9,8 +9,8 @@
  */
 
 
-#ifndef INCLUDE_UTILS_ENUMITERATOR_H_
-#define INCLUDE_UTILS_ENUMITERATOR_H_
+#ifndef RSP_CORE_LIB_UTILS_ENUM_ITERATOR_H
+#define RSP_CORE_LIB_UTILS_ENUM_ITERATOR_H
 
 #include <iostream>
 #include <ranges>
@@ -72,4 +72,4 @@ private:
 
 } // namespace rsp::utils
 
-#endif /* INCLUDE_UTILS_ENUMITERATOR_H_ */
+#endif // RSP_CORE_LIB_UTILS_ENUM_ITERATOR_H
