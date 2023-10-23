@@ -94,18 +94,20 @@ public:
      *
      * \param aValue
      */
-    explicit Variant(bool aValue);
-    explicit Variant(int aValue);
-    explicit Variant(std::int64_t aValue);
-    explicit Variant(std::uint64_t aValue);
-    explicit Variant(std::uint32_t aValue);
-    explicit Variant(std::uint16_t aValue);
-    explicit Variant(float aValue);
-    explicit Variant(double aValue);
-    explicit Variant(void* apValue);
-    explicit Variant(const std::string& arValue);
-    explicit Variant(std::string &&arValue) noexcept;
-    explicit Variant(const char *apValue);
+    // NOLINTBEGIN, Conversion constructors.
+    Variant(bool aValue);
+    Variant(int aValue);
+    Variant(std::int64_t aValue);
+    Variant(std::uint64_t aValue);
+    Variant(std::uint32_t aValue);
+    Variant(std::uint16_t aValue);
+    Variant(float aValue);
+    Variant(double aValue);
+    Variant(void* apValue);
+    Variant(const std::string& arValue);
+    Variant(std::string &&arValue) noexcept;
+    Variant(const char *apValue);
+    // NOLINTEND
 
     /**
      * \fn bool IsNull()const
@@ -135,18 +137,20 @@ public:
 
     /**
      * \fn  operator <T>()const
-     * \brief Operator overloads for all native types.
+     * \brief Conversion operators for all native types.
      */
-    explicit operator bool() const              { return AsBool(); }
-    explicit operator int() const               { return static_cast<int>(AsInt()); }
-    explicit operator std::int64_t() const      { return AsInt(); }
-    explicit operator std::uint64_t() const     { return static_cast<std::uint64_t>(AsInt()); }
-    explicit operator std::uint32_t() const     { return static_cast<std::uint32_t>(AsInt()); }
-    explicit operator std::uint16_t() const     { return static_cast<std::uint16_t>(AsInt()); }
-    explicit operator float() const             { return static_cast<float>(AsDouble()); }
-    explicit operator double() const            { return AsDouble(); }
-    explicit operator void*() const             { return AsPointer(); }
-    explicit operator std::string() const { return AsString(); }
+    // NOLINTBEGIN, Conversion operators.
+    operator bool() const              { return AsBool(); }
+    operator int() const               { return static_cast<int>(AsInt()); }
+    operator std::int64_t() const      { return AsInt(); }
+    operator std::uint64_t() const     { return static_cast<std::uint64_t>(AsInt()); }
+    operator std::uint32_t() const     { return static_cast<std::uint32_t>(AsInt()); }
+    operator std::uint16_t() const     { return static_cast<std::uint16_t>(AsInt()); }
+    operator float() const             { return static_cast<float>(AsDouble()); }
+    operator double() const            { return AsDouble(); }
+    operator void*() const             { return AsPointer(); }
+    operator std::string() const { return AsString(); }
+    // NOLINTEND
 
     /**
      * \fn Variant operator =&(T)
