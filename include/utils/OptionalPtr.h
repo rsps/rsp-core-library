@@ -23,9 +23,9 @@ template <class T>
 class OptionalPtr
 {
 public:
-    OptionalPtr(const T* apValue = nullptr) : mPtr(apValue) {}
-    OptionalPtr(const T &arValue) : mPtr(&arValue) {}
-    operator bool() const { return (mPtr); }
+    OptionalPtr(const T* apValue = nullptr) : mPtr(apValue) {} // NOLINT, Conversion constructor
+    OptionalPtr(const T &arValue) : mPtr(&arValue) {} // NOLINT, Conversion constructor
+    explicit operator bool() const { return (mPtr); }
     const T& operator->() const { return *mPtr; }
     const T& operator*() const { return *mPtr; }
     const T& Get() const { return *mPtr; }

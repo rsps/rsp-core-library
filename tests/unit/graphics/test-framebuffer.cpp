@@ -17,11 +17,9 @@
 #include <graphics/Renderer.h>
 #include <thread>
 #include <filesystem>
-#include <posix/FileSystem.h>
 #include <utils/StopWatch.h>
 #include <TestHelpers.h>
 #include <utils/Random.h>
-#include <TestHelpers.h>
 #include <magic_enum.hpp>
 
 using namespace rsp::graphics;
@@ -60,8 +58,8 @@ TEST_CASE("Framebuffer")
 
     Canvas canvas(renderer.GetWidth(), renderer.GetHeight());
     CHECK_NOTHROW(Texture::Create(renderer.GetWidth(), renderer.GetHeight()));
-    auto __tx = Texture::Create(renderer.GetWidth(), renderer.GetHeight());
-    auto &texture = *__tx;
+    auto tx = Texture::Create(renderer.GetWidth(), renderer.GetHeight());
+    auto &texture = *tx;
 
     milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
@@ -388,8 +386,8 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(renderer.Flush());
 
         // Assert
-        CHECK(largeImgMap.GetHeight() > renderer.GetHeight());
-        CHECK(largeImgMap.GetWidth() > renderer.GetWidth());
+        CHECK_GT(largeImgMap.GetHeight(), renderer.GetHeight());
+        CHECK_GT(largeImgMap.GetWidth(), renderer.GetWidth());
         CHECK_NE(largeImgMap.GetPixel(randomPoint).AsUint(), 0);
         CHECK_NE(renderer.GetPixel(randomPoint).AsUint(), 0);
         CHECK_NOTHROW(renderer.Present());
@@ -478,10 +476,10 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(renderer.Present());
         }
 
-        int fps = (1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
+        int fps = int((1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1));
 
         // Assert
-        CHECK(fps > 10);
+        CHECK_GT(fps, 10);
         MESSAGE("Fps: " << fps);
     }
 
@@ -516,10 +514,10 @@ TEST_CASE("Framebuffer")
             pos.SetY(200 - i);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
-        int fps = (1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
+        int fps = int((1000 * iterations) / (sw.Elapsed<std::chrono::milliseconds>() + 1));
 
         // Assert
-        CHECK(fps > 10);
+        CHECK_GT(fps, 10);
         MESSAGE("Fps: " << fps);
     }
 
@@ -589,7 +587,7 @@ TEST_CASE("Framebuffer")
 
             rsp::utils::StopWatch sw;
             for (int i = 0 ; i < 300 ; i++) {
-                int fps = (1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1);
+                int fps = int((1000 * i) / (sw.Elapsed<std::chrono::milliseconds>() + 1));
                 std::stringstream ss;
                 ss << "FPS:\n" << fps;
                 CHECK_NOTHROW(text.SetValue(ss.str()).Reload());
@@ -619,14 +617,14 @@ TEST_CASE("Framebuffer")
         const Text::VAlign cVertical[] = { Text::VAlign::Top, Text::VAlign::Center, Text::VAlign::Bottom };
         const Text::HAlign cHorizontal[] = { Text::HAlign::Left, Text::HAlign::Center, Text::HAlign::Right };
 
-        for (int h = 0 ; h < 3 ; h++) {
-            CHECK_NOTHROW(text.SetHAlignment(cHorizontal[h]));
+        for (auto &h: cHorizontal) {
+            CHECK_NOTHROW(text.SetHAlignment(h));
             CHECK_NOTHROW(text.Reload());
             auto panel = Texture::Create(text.GetWidth(), text.GetHeight());
             CHECK_NOTHROW(panel->SetBlendOperation(Texture::BlendOperation::ColorKey, Color::None));
             CHECK_NOTHROW(panel->Fill(Color::None).Update(text, Color::Yellow));
-            for (int v = 0 ; v < 3 ; v++) {
-                CHECK_NOTHROW(text.SetVAlignment(cVertical[v]));
+            for (auto &v : cVertical) {
+                CHECK_NOTHROW(text.SetVAlignment(v));
                 CHECK_NOTHROW(panel->SetDestination(text.GetPosition(r)));
 
                 CHECK_NOTHROW(renderer.Fill(Color::Black));

@@ -9,7 +9,6 @@
  */
 
 #include <utils/Crc32.h>
-#include <iomanip>
 
 namespace rsp::utils {
 
@@ -58,7 +57,7 @@ std::uint32_t Crc32::Calc(const void* aBuf, size_t aLen, std::uint32_t aInitial)
 {
     const std::uint32_t* table = getTable();
     uint32_t c = aInitial ^ cCRC32_XOR_MASK;
-    const uint8_t* u = static_cast<const uint8_t*>(aBuf);
+    const auto* u = static_cast<const uint8_t*>(aBuf);
 
     for (size_t i = 0 ; i < aLen ; i++) {
         c = table[(c ^ u[i]) & 0xFF] ^ (c >> 8);
@@ -80,11 +79,11 @@ std::uint32_t Crc32::Add(uint8_t aU)
     return mC ^ cCRC32_XOR_MASK;
 }
 
-bool Crc32::Verify(uint32_t aResult, bool aThrowOnMismatch)
+bool Crc32::Verify(uint32_t aResult, bool aThrowOnMismatch) const
 {
     if ((mC ^ cCRC32_XOR_MASK) != aResult) {
         if (aThrowOnMismatch) {
-            throw ECrcError("CRC Error");
+            THROW_WITH_BACKTRACE1(ECrcError, "CRC Error");
         }
         return false;
     }

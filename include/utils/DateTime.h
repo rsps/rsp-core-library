@@ -15,11 +15,11 @@
 #include <chrono>
 #include <ostream>
 #include <filesystem>
-#include <time.h>
+#include <ctime>
 
 namespace rsp::utils {
 
-constexpr timespec timepointToTimespec(
+constexpr timespec timePointToTimespec(
     std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> tp)
 {
     using namespace std::chrono;
@@ -66,7 +66,7 @@ public:
      * \brief Static factory function.
      * \return DateTime object initialized to current time and date.
      */
-    static DateTime Now() { return DateTime(); }
+    static DateTime Now() { return {}; }
 
     /**
      * \brief Default constructor, initializes to current time
@@ -87,17 +87,17 @@ public:
      * \brief Construct from a duration. The time is set to the duration since Unix epoch.
      * \param aDuration
      */
-    DateTime(std::chrono::system_clock::duration aDuration);
+    explicit DateTime(std::chrono::system_clock::duration aDuration);
     /**
      * \brief Construct from af system_clock time_point.
      * \param aTimePoint
      */
-    DateTime(std::chrono::system_clock::time_point aTimePoint);
+    explicit DateTime(std::chrono::system_clock::time_point aTimePoint);
     /**
      * \brief Construct from a file_time_type (file_clock)
      * \param aFileTime
      */
-    DateTime(std::filesystem::file_time_type aFileTime);
+    explicit DateTime(std::filesystem::file_time_type aFileTime);
     /**
      * \brief Construct from the given string, using the given format.
      * \param arTimeString
@@ -114,24 +114,24 @@ public:
      * \brief Construct from seconds since Unix epoch
      * \param aSeconds
      */
-    DateTime(std::time_t aSeconds);
+    explicit DateTime(std::time_t aSeconds);
     /**
      * \brief Construct from old C-style time struct.
      * \param arTm
      */
-    DateTime(std::tm &arTm);
+    explicit DateTime(std::tm &arTm);
     /**
      * \brief Construct from posix timespec struct
      * \param arTimeSpec
      */
-    DateTime(timespec &arTimeSpec);
+    explicit DateTime(timespec &arTimeSpec);
     /**
      * \brief Destructor
      */
-    virtual ~DateTime() {};
+    virtual ~DateTime() = default;
 
     /**
-     * \brief Copy and move contructors
+     * \brief Copy and move constructors
      * \param other
      */
     DateTime(const DateTime &other) = default;
@@ -174,26 +174,27 @@ public:
      * \param arOther
      * \return int64_t
      */
-    int64_t SecondsBetween(const DateTime &arOther) const;
+    [[nodiscard]] int64_t SecondsBetween(const DateTime &arOther) const;
     /**
      * \brief Get the count of milliseconds between two DateTime objects.
      * \param arOther
      * \return int64_t
      */
-    int64_t MilliSecondsBetween(const DateTime &arOther) const;
+    [[nodiscard]] int64_t MilliSecondsBetween(const DateTime &arOther) const;
     /**
      * \brief Get the count of microseconds between two DateTime objects.
      * \param arOther
      * \return int64_t
      */
-    int64_t MicroSecondsBetween(const DateTime &arOther) const;
+    [[nodiscard]] int64_t MicroSecondsBetween(const DateTime &arOther) const;
     /**
      * \brief Get the count of nanoseconds between two DateTime objects.
      * \param arOther
      * \return int64_t
      */
-    int64_t NanoSecondsBetween(const DateTime &arOther) const;
+    [[nodiscard]] int64_t NanoSecondsBetween(const DateTime &arOther) const;
 
+    // NOLINTBEGIN
     /**
      * \brief Implicit cast operators
      */
@@ -202,8 +203,9 @@ public:
     operator std::filesystem::file_time_type() const;
     operator std::time_t() const;
     operator std::tm() const;
+    // NOLINTEND
 
-    timespec GetTimeSpec() const;
+    [[nodiscard]] timespec GetTimeSpec() const;
 
     /**
      * \brief Format the timestamp to a string using the given format.
@@ -217,13 +219,13 @@ public:
      * \param aFormat
      * \return string
      */
-    std::string ToString(Formats aFormat) const;
-    std::string ToRFC3339() const;
-    std::string ToRFC3339Milli() const;
-    std::string ToISO8601() const;
-    std::string ToISO8601UTC() const;
-    std::string ToLogging() const;
-    std::string ToHTTP() const;
+    [[nodiscard]] std::string ToString(Formats aFormat) const;
+    [[nodiscard]] std::string ToRFC3339() const;
+    [[nodiscard]] std::string ToRFC3339Milli() const;
+    [[nodiscard]] std::string ToISO8601() const;
+    [[nodiscard]] std::string ToISO8601UTC() const;
+    [[nodiscard]] std::string ToLogging() const;
+    [[nodiscard]] std::string ToHTTP() const;
 
     /**
      * \brief Decode the given string, using the given format. \see std::get_time for supported format.
@@ -237,21 +239,21 @@ public:
      * \brief Get the Date part of this object.
      * \return Date
      */
-    Date GetDate() const;
+    [[nodiscard]] Date GetDate() const;
     /**
      * \brief Get the time par of this object.
      * \return Time with millisecond resolution.
      */
-    Time GetTime() const;
+    [[nodiscard]] Time GetTime() const;
 
 protected:
     std::chrono::system_clock::time_point mTp{};
 
-    std::chrono::system_clock::duration decodeFractions(uint64_t aFractions) const;
-    std::ostream& encodeFractions(std::ostream& os, std::chrono::system_clock::time_point aTp) const;
+    [[nodiscard]] static std::chrono::system_clock::duration decodeFractions(uint64_t aFractions) ;
+    static std::ostream& encodeFractions(std::ostream& os, std::chrono::system_clock::time_point aTp) ;
 
 private:
-    std::chrono::seconds getTimezoneOffset(std::tm &arTm) const;
+    static std::chrono::seconds getTimezoneOffset(std::tm &arTm) ;
 };
 
 /**

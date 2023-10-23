@@ -25,7 +25,7 @@ class TestEvent1 : public EventBase<TestEvent1>
 class TestEvent2 : public EventBase<TestEvent2>
 {
 public:
-    TestEvent2(int aValue = 1) : mValue(aValue) {}
+    explicit TestEvent2(int aValue = 1) : mValue(aValue) {}
     int mValue;
 };
 

@@ -22,7 +22,7 @@ namespace rsp::utils {
 class CppObjectFile
 {
 public:
-    CppObjectFile(const std::filesystem::path &arFileName);
+    explicit CppObjectFile(const std::filesystem::path &arFileName);
 
     std::string Name() { return mVariableName; }
 

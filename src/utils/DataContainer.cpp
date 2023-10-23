@@ -10,8 +10,6 @@
 
 #include <iostream>
 #include <iomanip>
-#include <algorithm>
-#include <cstring>
 #include <utils/DataContainer.h>
 #include <utils/Crc32.h>
 

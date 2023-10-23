@@ -13,7 +13,6 @@
 #include <string>
 #include <fstream>
 #include <chrono>
-#include <locale>
 #include <utils/StrUtils.h>
 #include <utils/DateTime.h>
 #include <algorithm>
@@ -68,9 +67,9 @@ TEST_CASE("FileSystem") {
 
         CHECK_NOTHROW(FileSystem::Sleep(100));
 
-        auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
+        auto milli_sec = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
 
-        CHECK(msec.count() >= 100);
+        CHECK_GE(milli_sec.count(), 100);
     }
 
     SUBCASE("Get IP Address") {
@@ -80,7 +79,7 @@ TEST_CASE("FileSystem") {
 
         MESSAGE(("Current IP: " + ip));
 
-        CHECK(ip.length() >= 7);
+        CHECK_GE(ip.length(), 7);
         CHECK(!StrUtils::Contains(ip, "127.0.0.1"));
     }
 

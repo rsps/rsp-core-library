@@ -52,39 +52,39 @@ TEST_CASE("Exceptions") {
                         result1 << "First caught this exception:\n" << e.what()
                                 << std::endl;
                         RETHROW_WITH_BACKTRACE("Rethrowing of type CoreException: ", e);
-                    };
+                    }
                 }
                 catch (const CoreException &e) {  // can also catch normally.
                     result2 << "Got exception of type " << typeid(e).name() << ":\n" << e.what() << std::endl;
                     // and even rethrow again, with backtrace:
                     RETHROW_WITH_BACKTRACE("Rethrowing as type rsp::utils::CoreException: ", e);
-                };
+                }
             }
             catch (const std::runtime_error &e) {  // can also catch normally.
                 result3 << "Got exception of type " << typeid(e).name() << ":\n" << e.what() << std::endl;
                 // and even rethrow again, with backtrace:
                 RETHROW_WITH_BACKTRACE("Rethrowing as type std::runtime_error: ", e);
-            };
+            }
         }
         catch (const std::exception &e) {
             result4 << "Finally, got this exception of type " << typeid(e).name() << ":\n" << e.what() << std::endl;
-        };
+        }
 
         MESSAGE(result1.str());
-        CHECK(StrUtils::Contains(result1.str(), "This is an example!\n") == true);
-        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:45") == true);
+        CHECK_EQ(StrUtils::Contains(result1.str(), "This is an example!\n"), true);
+        CHECK_EQ(StrUtils::Contains(result1.str(), "test-exceptions.cpp:45"), true);
 
         MESSAGE(result2.str());
-        CHECK(StrUtils::Contains(result2.str(), "This is an example!\n") == true);
-        CHECK(StrUtils::Contains(result2.str(), "test-exceptions.cpp:54") == true);
+        CHECK_EQ(StrUtils::Contains(result2.str(), "This is an example!\n"), true);
+        CHECK_EQ(StrUtils::Contains(result2.str(), "test-exceptions.cpp:54"), true);
 
         MESSAGE(result3.str());
-        CHECK(StrUtils::Contains(result3.str(), "This is an example!\n") == true);
-        CHECK(StrUtils::Contains(result3.str(), "test-exceptions.cpp:60") == true);
+        CHECK_EQ(StrUtils::Contains(result3.str(), "This is an example!\n"), true);
+        CHECK_EQ(StrUtils::Contains(result3.str(), "test-exceptions.cpp:60"), true);
 
         MESSAGE(result4.str());
-        CHECK(StrUtils::Contains(result4.str(), "This is an example!\n") == true);
-        CHECK(StrUtils::Contains(result4.str(), "test-exceptions.cpp:66") == true);
+        CHECK_EQ(StrUtils::Contains(result4.str(), "This is an example!\n"), true);
+        CHECK_EQ(StrUtils::Contains(result4.str(), "test-exceptions.cpp:66"), true);
     }
 
 
@@ -99,22 +99,22 @@ TEST_CASE("Exceptions") {
         }
 
         MESSAGE(result1.str());
-        CHECK(StrUtils::Contains(result1.str(), "File IO error: Input/output error\n") == true);
-        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:95") == true);
+        CHECK_EQ(StrUtils::Contains(result1.str(), "File IO error: Input/output error\n"), true);
+        CHECK_EQ(StrUtils::Contains(result1.str(), "test-exceptions.cpp:95"), true);
     }
 
     SUBCASE("Assertions") {
         std::stringstream result1;
         try {
-            ASSERT(true == false);
+            ASSERT(true == false)
         }
         catch(const std::exception &e) {
             result1 << "Caught exception:\n" << e.what() << std::endl;
         }
 
         MESSAGE(result1.str());
-        CHECK(StrUtils::Contains(result1.str(), "true == false\n") == true);
-        CHECK(StrUtils::Contains(result1.str(), "test-exceptions.cpp:109") == true);
+        CHECK_EQ(StrUtils::Contains(result1.str(), "true == false\n"), true);
+        CHECK_EQ(StrUtils::Contains(result1.str(), "test-exceptions.cpp:109"), true);
 
         CHECK_NOTHROW(ASSERT(true));
     }

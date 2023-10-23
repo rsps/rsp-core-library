@@ -60,22 +60,21 @@ TEST_CASE("Crypt")
 
     CHECK_NOTHROW(SecureBuffer siv1(iv.data(), iv.size()));
     SecureBuffer siv(iv.data(), iv.size());
-    SecureBuffer skey(key.data(), key.size());
+    SecureBuffer secure_key(key.data(), key.size());
 
     Encrypt e(cipher);
-    e.Init(siv, skey);
+    e.Init(siv, secure_key);
     e.Update(reinterpret_cast<const std::uint8_t*>(cTestStr.data()), cTestStr.size());
     SecureBuffer encrypted = e.Finalize();
 
-    CHECK(encrypted == expected_result);
+    CHECK_EQ(encrypted, expected_result);
 
     Decrypt d(cipher);
-    d.Init(siv, skey);
+    d.Init(siv, secure_key);
     d.Update(encrypted.data(), encrypted.size());
     SecureString plain = d.Finalize();
 
     CHECK(bool(cTestStr == plain));
-
 }
 
 

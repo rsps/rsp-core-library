@@ -11,9 +11,9 @@
 #include <sstream>
 #include <cstdio>
 #include <utils/Variant.h>
-#include <logging/Logger.h>
 #include <utils/StrUtils.h>
 
+//#include <logging/Logger.h>
 //#define JLOG(a) DLOG(a);
 #define JLOG(a)
 

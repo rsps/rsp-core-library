@@ -284,28 +284,28 @@ Keyboard& Keyboard::SetLayout(LayoutType aLayout)
     switch (aLayout) {
         case LayoutType::Letters:
             setSymbols(std::string(cLetters), mBtnShift.IsChecked());
-            mBtnShift.SetVisible(mButtonMask.Isset(Buttons::Shift));
+            mBtnShift.SetVisible(mButtonMask.IsSet(Buttons::Shift));
             mBtnLettersLeft.Hide();
             mBtnLettersRight.Hide();
-            mBtnNumbers.SetVisible(mButtonMask.Isset(Buttons::Numbers));
-            mBtnSpecials.SetVisible(mButtonMask.Isset(Buttons::Specials));
+            mBtnNumbers.SetVisible(mButtonMask.IsSet(Buttons::Numbers));
+            mBtnSpecials.SetVisible(mButtonMask.IsSet(Buttons::Specials));
             break;
 
         case LayoutType::Numbers:
             setSymbols(std::string(cNumbers), mBtnShift.IsChecked());
             mBtnShift.Hide();
-            mBtnLettersLeft.SetVisible(mButtonMask.Isset(Buttons::Letters));
+            mBtnLettersLeft.SetVisible(mButtonMask.IsSet(Buttons::Letters));
             mBtnLettersRight.Hide();
             mBtnNumbers.Hide();
-            mBtnSpecials.SetVisible(mButtonMask.Isset(Buttons::Specials));
+            mBtnSpecials.SetVisible(mButtonMask.IsSet(Buttons::Specials));
             break;
 
         case LayoutType::Special:
             setSymbols(std::string(cSpecials), mBtnShift.IsChecked());
             mBtnShift.Hide();
             mBtnLettersLeft.Hide();
-            mBtnLettersRight.SetVisible(mButtonMask.Isset(Buttons::Letters));
-            mBtnNumbers.SetVisible(mButtonMask.Isset(Buttons::Numbers));
+            mBtnLettersRight.SetVisible(mButtonMask.IsSet(Buttons::Letters));
+            mBtnNumbers.SetVisible(mButtonMask.IsSet(Buttons::Numbers));
             mBtnSpecials.Hide();
             break;
     }

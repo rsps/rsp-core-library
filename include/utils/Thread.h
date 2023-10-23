@@ -43,9 +43,9 @@ class Thread
 public:
     using ThreadCallback_t = std::function<void(void)>;
 
-    Thread() {}
-    Thread(std::string_view aName) : mName(aName) {}
-    virtual ~Thread() {}
+    Thread() = default;
+    explicit Thread(std::string_view aName) : mName(aName) {}
+    virtual ~Thread() = default;
 
     Thread(const Thread &) = delete;
     Thread& operator=(const Thread &) = delete;
@@ -85,7 +85,7 @@ public:
      * \brief Check if the thread is terminating
      * \return True if the thread is stopping or stopped.
      */
-    bool IsTerminated() const { return mTerminated; }
+    [[nodiscard]] bool IsTerminated() const { return mTerminated; }
 
     /**
      * \brief Callback for running simple method in own thread

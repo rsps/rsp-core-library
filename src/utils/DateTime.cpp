@@ -149,7 +149,7 @@ DateTime::operator std::time_t() const
 
 DateTime::operator std::tm() const
 {
-    std::tm result;
+    std::tm result{};
     auto t = system_clock::to_time_t(mTp );
     gmtime_r(&t, &result);
 //    t -= getTimezoneOffset(result).count();
@@ -159,7 +159,7 @@ DateTime::operator std::tm() const
 
 timespec DateTime::GetTimeSpec() const
 {
-    return timepointToTimespec(mTp);
+    return timePointToTimespec(mTp);
 }
 
 std::string DateTime::ToString(const char *apFormat) const
@@ -318,10 +318,10 @@ bool DateTime::operator !=(const DateTime &arOther) const
     return mTp != arOther.mTp;
 }
 
-std::chrono::seconds DateTime::getTimezoneOffset(std::tm &arTm) const
+std::chrono::seconds DateTime::getTimezoneOffset(std::tm &arTm)
 {
     std::time_t t = std::mktime(&arTm);
-    std::tm gm_tm;
+    std::tm gm_tm{};
     gmtime_r(&t, &gm_tm);
     gm_tm.tm_isdst = false;
     std::time_t tz_offset = (std::mktime(&gm_tm) - t);
@@ -330,7 +330,7 @@ std::chrono::seconds DateTime::getTimezoneOffset(std::tm &arTm) const
 
 DateTime::Date DateTime::GetDate() const
 {
-    return Date(time_point_cast<days>(mTp));
+    return {time_point_cast<days>(mTp)};
 }
 
 DateTime::Time DateTime::GetTime() const
@@ -365,7 +365,7 @@ std::ostream& operator <<(std::ostream &os, const DateTime &arDateTime)
     return os;
 }
 
-std::chrono::system_clock::duration DateTime::decodeFractions(uint64_t aFractions) const
+std::chrono::system_clock::duration DateTime::decodeFractions(uint64_t aFractions)
 {
     if (aFractions >= 1000000) {
         return nanoseconds(aFractions);
@@ -376,10 +376,10 @@ std::chrono::system_clock::duration DateTime::decodeFractions(uint64_t aFraction
     return milliseconds(aFractions);
 }
 
-std::ostream& DateTime::encodeFractions(std::ostream& os, std::chrono::system_clock::time_point aTp) const
+std::ostream& DateTime::encodeFractions(std::ostream& os, std::chrono::system_clock::time_point aTp)
 {
     time_point<system_clock, milliseconds> msd = time_point_cast<milliseconds>(aTp);
-    unsigned msecs = msd.time_since_epoch().count() % 1000;
+    long msecs = msd.time_since_epoch().count() % 1000;
 
     os << std::setfill('0') << std::setw(3) << msecs;
     return os;

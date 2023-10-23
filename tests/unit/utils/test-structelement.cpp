@@ -12,7 +12,6 @@
 #include <doctest.h>
 #include <utils/StructElement.h>
 #include <utils/DynamicData.h>
-#include <linux/input.h>
 
 using namespace rsp::utils;
 
@@ -41,7 +40,7 @@ TEST_CASE("StructElement") {
         CHECK_THROWS_AS(i = data.mInteger.Get(), const ENullValueError&);
 
         CHECK_NOTHROW(i = data.mInteger.Get(defaultItem<int>::default_value()));
-        CHECK(i == 0);
+        CHECK_EQ(i, 0);
 
         std::string s;
         CHECK_NOTHROW(s = data.mString.Get(defaultItem<std::string>::default_value()));
@@ -61,7 +60,7 @@ TEST_CASE("StructElement") {
         int i;
         data.mInteger = 42;
         CHECK_NOTHROW(i = data.mInteger);
-        CHECK(i == 42);
+        CHECK_EQ(i, 42);
 
         data.mInteger.Clear();
         CHECK_THROWS_AS(i = data.mInteger.Get(), const ENullValueError&);
@@ -70,8 +69,8 @@ TEST_CASE("StructElement") {
     SUBCASE("Comparison") {
         data.mInteger = 42;
 
-        CHECK(data.mInteger == 42);
-        CHECK(42 == data.mInteger);
+        CHECK_EQ(data.mInteger, 42);
+        CHECK_EQ(42, data.mInteger);
 
         data.mFloat.SetMargin(0.002f);
         data.mFloat = 1.2345f;
@@ -79,7 +78,7 @@ TEST_CASE("StructElement") {
         CHECK(data.mFloat.Compare(1.2345f));
         CHECK(data.mFloat.Compare(1.2359f));
         CHECK(data.mFloat.Compare(1.2365f));
-        CHECK(data.mFloat.Compare(1.2366f) == false);
+        CHECK_FALSE(data.mFloat.Compare(1.2366f));
 
         CHECK_THROWS_AS(data.mInteger == data.mFloat, const ETypeMismatchError&);
     }

@@ -31,7 +31,7 @@ TEST_CASE("DateTime")
 
     SUBCASE("Zero") {
         DateTime dt(0);
-        DMESG("DateTime(0) = " << dt);
+        DMESG("DateTime(0) = " << dt)
         CHECK_EQ(dt.ToRFC3339Milli(), "1970-01-01T00:00:00.000Z");
 
         std::tm tm = dt;
@@ -52,50 +52,50 @@ TEST_CASE("DateTime")
         }
         SUBCASE("From values") {
             DateTime dt(2022, 11, 8, 15, 43, 23, 813);
-            DMESG("DateTime(2022, 11, 08, 15, 43, 23, 813) = " << dt);
+            DMESG("DateTime(2022, 11, 08, 15, 43, 23, 813) = " << dt)
             CHECK_EQ(dt.ToLogging(), cLogging);
         }
 
         SUBCASE("From RFC3339Milli string") {
             DateTime dt(cRFC3339Milli, DateTime::Formats::RFC3339Milli);
-            DMESG("DateTime(" << cRFC3339Milli << ") = " << dt);
+            DMESG("DateTime(" << cRFC3339Milli << ") = " << dt)
             CHECK_EQ(dt.ToLogging(), cLogging);
             CHECK_EQ(dt.ToRFC3339Milli(), cRFC3339Milli);
         }
 
         SUBCASE("From RFC3339 string") {
             DateTime dt(cRFC3339Milli, DateTime::Formats::RFC3339);
-            DMESG("DateTime(" << cRFC3339Milli << ") = " << dt);
+            DMESG("DateTime(" << cRFC3339Milli << ") = " << dt)
             CHECK_EQ(dt.ToRFC3339(), cRFC3339);
         }
 
         SUBCASE("From ISO8601 string") {
             DateTime dt(cISO8601, DateTime::Formats::ISO8601);
-            DMESG("DateTime(" << cISO8601 << ") = " << dt);
+            DMESG("DateTime(" << cISO8601 << ") = " << dt)
             CHECK_EQ(dt.ToISO8601(), cISO8601);
         }
 
         SUBCASE("From ISO8601UTC string") {
             DateTime dt(cISO8601UTC, DateTime::Formats::ISO8601UTC);
-            DMESG("DateTime(" << cISO8601UTC << ") = " << dt);
+            DMESG("DateTime(" << cISO8601UTC << ") = " << dt)
             CHECK_EQ(dt.ToISO8601UTC(), cISO8601UTC);
         }
 
         SUBCASE("From Logging string") {
             DateTime dt(cLogging, DateTime::Formats::Logging);
-            DMESG("DateTime(" << cLogging << ") = " << dt);
+            DMESG("DateTime(" << cLogging << ") = " << dt)
             CHECK_EQ(dt.ToLogging(), cLogging);
         }
 
         SUBCASE("From HTTP string") {
             DateTime dt(cHTTP, DateTime::Formats::HTTP);
-            DMESG("DateTime(" << cHTTP << ") = " << dt);
+            DMESG("DateTime(" << cHTTP << ") = " << dt)
             CHECK_EQ(dt.ToHTTP(), cHTTP);
         }
 
         SUBCASE("From custom format") {
             DateTime dt(cCustom, "%d-%Y-%m %S:%M(%H).");
-            DMESG("DateTime(" << cCustom << ") = " << dt);
+            DMESG("DateTime(" << cCustom << ") = " << dt)
             CHECK_EQ(dt.ToRFC3339Milli(), cRFC3339Milli);
         }
 
@@ -103,14 +103,14 @@ TEST_CASE("DateTime")
             const char* common_id = "20230130T104540.925Z200037";
             DateTime dt(common_id, "%Y%m%dT%H%M%S.");
             DateTime same(2023,01,30,10,45,40,925);
-            DMESG("DateTime(2023,01,30,10,45,40,925) = " << dt);
+            DMESG("DateTime(2023,01,30,10,45,40,925) = " << dt)
             CHECK_EQ(dt, same);
         }
 
         SUBCASE("From duration") {
             auto t = std::time(nullptr);
             DateTime dt(std::chrono::milliseconds((t * 1000) + 813));
-            DMESG("DateTime(" << t << ".813) = " << dt);
+            DMESG("DateTime(" << t << ".813) = " << dt)
             std::time_t result = dt;
             CHECK_EQ(result, t);
         }
@@ -118,7 +118,7 @@ TEST_CASE("DateTime")
         SUBCASE("From time_point") {
             auto tp = std::chrono::system_clock::now();
             DateTime dt(tp);
-            DMESG("DateTime(" << tp.time_since_epoch().count() << ") = " << dt);
+            DMESG("DateTime(" << tp.time_since_epoch().count() << ") = " << dt)
             std::chrono::system_clock::time_point result = dt;
             CHECK_EQ(result, tp);
         }
@@ -126,7 +126,7 @@ TEST_CASE("DateTime")
         SUBCASE("From file_time") {
             auto tp = std::chrono::file_clock::now();
             DateTime dt(tp);
-            DMESG("DateTime(" << tp.time_since_epoch().count() << ") = " << dt);
+            DMESG("DateTime(" << tp.time_since_epoch().count() << ") = " << dt)
             std::filesystem::file_time_type result = dt;
             CHECK_EQ(result, tp);
         }
@@ -134,7 +134,7 @@ TEST_CASE("DateTime")
         SUBCASE("From time_t") {
             auto t = std::time(nullptr);
             DateTime dt(t);
-            DMESG("DateTime(" << t << ") = " << dt);
+            DMESG("DateTime(" << t << ") = " << dt)
             std::time_t result = dt;
             CHECK_EQ(result, t);
         }
@@ -151,22 +151,22 @@ TEST_CASE("DateTime")
 
             DateTime dt(tm);
             std::stringstream ss;
-            ss << tm;
-            DMESG("DateTime(" << ss.str() << ") = " << dt);
-            DMESG("DateTime(" << cISO8601UTC << ") = " << dt.ToISO8601UTC());
+            ss << std::asctime(&tm);
+            DMESG("DateTime(" << ss.str() << ") = " << dt)
+            DMESG("DateTime(" << cISO8601UTC << ") = " << dt.ToISO8601UTC())
             CHECK_EQ(dt.ToISO8601UTC(), cISO8601UTC);
             std::tm result = dt;
             CHECK_EQ(result.tm_year, tm.tm_year);
-            CHECK_EQ(result.tm_mon,  tm.tm_mon);
+            CHECK_EQ(result.tm_mon, tm.tm_mon);
             CHECK_EQ(result.tm_mday, tm.tm_mday);
             CHECK_EQ(result.tm_hour, tm.tm_hour);
-            CHECK_EQ(result.tm_min,  tm.tm_min);
-            CHECK_EQ(result.tm_sec,  tm.tm_sec);
-            CHECK_EQ(result.tm_isdst,  tm.tm_isdst);
+            CHECK_EQ(result.tm_min, tm.tm_min);
+            CHECK_EQ(result.tm_sec, tm.tm_sec);
+            CHECK_EQ(result.tm_isdst, tm.tm_isdst);
         }
     }
 
-    SUBCASE("Betweens") {
+    SUBCASE("Between") {
         DateTime dt(cRFC3339Milli, DateTime::Formats::RFC3339Milli);
         std::chrono::system_clock::time_point sc = dt;
         auto offset = std::chrono::nanoseconds(42666444023L); // 42 seconds and a bit...
@@ -184,13 +184,13 @@ TEST_CASE("DateTime")
         SUBCASE("durations") {
             dt2 += std::chrono::milliseconds(12);
             CHECK_EQ(dt.MilliSecondsBetween(dt2), 12);
-            CHECK(dt != dt2);
+            CHECK_NE(dt, dt2);
 
             CHECK_EQ(dt2, (dt + std::chrono::milliseconds(12)));
             CHECK_EQ((dt2 - std::chrono::milliseconds(12)) , dt);
 
             dt2 -= std::chrono::milliseconds(12);
-            CHECK(dt == dt2);
+            CHECK_EQ(dt, dt2);
         }
 
         SUBCASE("DateTime") {

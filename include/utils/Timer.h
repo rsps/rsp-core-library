@@ -29,18 +29,18 @@ class Timer
 public:
     using TimerCallback_t = std::function<void(Timer&)>;
 
-    Timer() {}
+    Timer() = default;
     Timer(int aId, std::chrono::milliseconds aTimeout) : mId(aId), mTimeout(aTimeout) {}
     virtual ~Timer();
 
     Timer& SetId(int aId) { mId = aId; return *this; }
-    int GetId() const { return mId; }
+    [[nodiscard]] int GetId() const { return mId; }
 
     Timer& SetTimeout(std::chrono::milliseconds aTimeout);
-    std::chrono::milliseconds GetTimeout() const { return mTimeout; }
+    [[nodiscard]] std::chrono::milliseconds GetTimeout() const { return mTimeout; }
 
     Timer& Enable(bool aOn = true);
-    bool IsEnabled() const { return mEnabled; }
+    [[nodiscard]] bool IsEnabled() const { return mEnabled; }
 
     TimerCallback_t& Callback() { return mCallback; }
 
@@ -63,7 +63,7 @@ class TimerQueue : public rsp::utils::Singleton<TimerQueue>
 {
 public:
     TimerQueue();
-    ~TimerQueue();
+    ~TimerQueue() override;
 
     /**
      * \brief Poll the timer queue to trigger expired timers

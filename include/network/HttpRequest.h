@@ -54,7 +54,7 @@ public:
         return mPimpl->AddFile(arFieldName, arFile);
     }
 
-    IHttpResponse& Execute() override
+    [[nodiscard]] IHttpResponse& Execute() override
     {
         return mPimpl->Execute();
     }

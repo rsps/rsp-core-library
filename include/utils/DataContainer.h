@@ -30,7 +30,7 @@ struct DataContainerException : public exceptions::CoreException
 };
 
 /**
- * \brief Predefined exeption thrown on invalid signatures on stored data.
+ * \brief Predefined exception thrown on invalid signatures on stored data.
  */
 struct EInvalidSignature : public DataContainerException
 {
@@ -48,13 +48,13 @@ struct IDataContent;
  */
 struct IDataSignature
 {
-    virtual ~IDataSignature() {}
+    virtual ~IDataSignature() = default;
 
     /**
      * \brief Get size of signature buffer
      * \return size_t
      */
-    virtual std::size_t GetSize() const = 0;
+    [[nodiscard]] virtual std::size_t GetSize() const = 0;
 
     /**
      * \brief Get start address of signature buffer
@@ -66,7 +66,7 @@ struct IDataSignature
      * \brief Get const start address of signature buffer
      * \return const uint8_t*
      */
-    virtual const std::uint8_t* GetData() const = 0;
+    [[nodiscard]] virtual const std::uint8_t* GetData() const = 0;
 
     /**
      * \brief Calculate the signature on the given data. Store the signature in internal buffer.
@@ -75,7 +75,7 @@ struct IDataSignature
     virtual void Calc(const IDataContent &arContent) = 0;
 
     /**
-     * \brief Verify if the internal signature mathes the one calulcated for the given data.
+     * \brief Verify if the internal signature matches the one calculated for the given data.
      * \param arContent const reference to IDataContent instance
      */
     virtual void Verify(const IDataContent &arContent) = 0;
@@ -90,7 +90,7 @@ struct IDataSignature
  */
 struct IDataStorage
 {
-    virtual ~IDataStorage() {}
+    virtual ~IDataStorage() = default;
 
     /**
      * \brief Read the signature from data store into given buffer
@@ -128,13 +128,13 @@ struct IDataStorage
  */
 struct IDataContent
 {
-    virtual ~IDataContent() {}
+    virtual ~IDataContent() = default;
 
     /**
      * \brief Get the size of the data content buffer
      * \return size_t
      */
-    virtual std::size_t GetSize() const = 0;
+    [[nodiscard]] virtual std::size_t GetSize() const = 0;
 
     /**
      * \brief Get a pointer to the start address of the content buffer
@@ -146,7 +146,7 @@ struct IDataContent
      * \brief Get a const pointer to the start address of the content buffer
      * \return const uint8_t*
      */
-    virtual const std::uint8_t* GetData() const = 0;
+    [[nodiscard]] virtual const std::uint8_t* GetData() const = 0;
 };
 
 /**
@@ -180,8 +180,8 @@ public:
     void Init(std::string_view aSecret);
 
     std::uint8_t* GetData() override { return reinterpret_cast<std::uint8_t*>(&mCRC); }
-    const std::uint8_t* GetData() const override { return reinterpret_cast<const std::uint8_t*>(&mCRC); }
-    std::size_t GetSize() const override { return sizeof(std::uint32_t); }
+    [[nodiscard]] const std::uint8_t* GetData() const override { return reinterpret_cast<const std::uint8_t*>(&mCRC); }
+    [[nodiscard]] std::size_t GetSize() const override { return sizeof(std::uint32_t); }
     void Calc(const rsp::utils::IDataContent &arContent) override;
     void Verify(const rsp::utils::IDataContent &arContent) override;
 
@@ -217,18 +217,16 @@ protected:
 /**
  * \brief Generic base class for high integrity data containers with basic load and save functionality.
  */
-template <class _DATA, class _SIGNATURE, class _STORAGE>
+template <class DATA_T, class SIGNATURE_T, class STORAGE_T>
 class DataContainerBase : public IDataContent
 {
-    static_assert(std::is_base_of<IDataSignature, _SIGNATURE>::value, "_SIGNATURE must inherit from IDataSignature");
-    static_assert(std::is_base_of<IDataStorage, _STORAGE>::value, "_STORAGE must inherit from IDataStorage");
+    static_assert(std::is_base_of<IDataSignature, SIGNATURE_T>::value, "SIGNATURE_T must inherit from IDataSignature");
+    static_assert(std::is_base_of<IDataStorage, STORAGE_T>::value, "STORAGE_T must inherit from IDataStorage");
 
-    static constexpr bool has_size = requires(const _DATA& t) { t.size(); };
-    static constexpr bool has_data = requires(const _DATA& t) { t.data(); };
+    static constexpr bool has_size = requires(const DATA_T& t) { t.size(); };
+    static constexpr bool has_data = requires(const DATA_T& t) { t.data(); };
 
 public:
-
-    virtual ~DataContainerBase() {}
 
     /**
      * \brief Load signature and content from file, using the given interfaces
@@ -257,31 +255,31 @@ public:
      * \brief Get a reference to the internal content object.
      * \return Reference to content. (struct or class)
      */
-    _DATA& Get() { return mData; }
+    DATA_T& Get() { return mData; }
 
     /**
      * \brief Get a const reference to the internal content object.
      * \return const reference to content.
      */
-    const _DATA& Get() const { return mData; }
+    const DATA_T& Get() const { return mData; }
 
     /**
      * \brief Get the internal signature object.
      * \return Reference to signature object
      */
-    _SIGNATURE& GetSignature() { return mSignature; }
+    SIGNATURE_T& GetSignature() { return mSignature; }
 
     /**
      * \brief Get the internal storage object
      * \return Reference to storage object
      */
-    _STORAGE& GetStorage() { return mStorage; }
+    STORAGE_T& GetStorage() { return mStorage; }
 
 
     /*
      * IDataContent interface implementation
      */
-    std::size_t GetSize() const override
+    [[nodiscard]] std::size_t GetSize() const override
     {
         if constexpr (has_size) {
             return mData.size();
@@ -299,7 +297,7 @@ public:
             return reinterpret_cast<std::uint8_t*>(&mData);
         }
     }
-    const std::uint8_t* GetData() const override
+    [[nodiscard]] const std::uint8_t* GetData() const override
     {
         if constexpr (has_data) {
             return reinterpret_cast<const std::uint8_t*>(mData.data());
@@ -310,10 +308,10 @@ public:
     }
 
 protected:
-    _SIGNATURE mSignature{};
-    _STORAGE   mStorage{};
+    SIGNATURE_T mSignature{};
+    STORAGE_T   mStorage{};
 #pragma pack(1)
-    _DATA mData{};
+    DATA_T mData{};
 #pragma pack()
 };
 
@@ -322,7 +320,7 @@ template<class T>
 class DataContainer : public DataContainerBase<T, Crc32DataSignature, FileDataStorage>
 {
 public:
-    DataContainer(std::string_view aFileName, std::string_view mSecret = "")
+    explicit DataContainer(std::string_view aFileName, std::string_view mSecret = "")
     {
         this->GetSignature().Init(mSecret);
         this->GetStorage().Init(aFileName);

@@ -30,7 +30,7 @@ DateTime Clock::GetTime(Types aClockType)
     if (res < 0) {
         THROW_SYSTEM("Failed to get system clock");
     }
-    return {ts};
+    return DateTime(ts);
 }
 
 } /* namespace rsp::posix */

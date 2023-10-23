@@ -55,7 +55,6 @@ constexpr std::string_view NameOf() noexcept
                 break;
         }
     }
-    return {};
 }
 
 namespace fnv1a {

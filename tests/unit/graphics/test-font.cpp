@@ -35,11 +35,11 @@ TEST_CASE("Font")
         font.SetSize(16);
 
         auto glyphs = font.MakeGlyphs("A");
-        CHECK(glyphs->GetCount() == 1);
-        CHECK(glyphs->GetGlyph(0).mHeight > 0);
-        CHECK(glyphs->GetGlyph(0).mHeight < 16);
-        CHECK(glyphs->GetGlyph(0).mWidth > 0);
-        CHECK(glyphs->GetGlyph(0).mWidth < 16);
+        CHECK_EQ(glyphs->GetCount(), 1);
+        CHECK_GT(glyphs->GetGlyph(0).mHeight, 0);
+        CHECK_LT(glyphs->GetGlyph(0).mHeight, 16);
+        CHECK_GT(glyphs->GetGlyph(0).mWidth, 0);
+        CHECK_LT(glyphs->GetGlyph(0).mWidth, 16);
     }
 
     SUBCASE("Get Text Mask") {
@@ -51,14 +51,13 @@ TEST_CASE("Font")
 
         Rect r = text.Reload().GetBoundingRect();
 
-        CHECK(r.GetHeight() < size+4);
-        CHECK(r.GetWidth() < (size * text.GetValue().size()));
+        CHECK_LT(r.GetHeight(), size+4);
+        CHECK_LT(r.GetWidth(), (size * text.GetValue().size()));
     }
 
     SUBCASE("Scale To fit") {
         CHECK_NOTHROW(Font::RegisterFont(cFontFile));
         Text text(cFontName, "Hello World");
-        const int size = 16;
 
         Rect dst(100, 200, 280, 200);
         text.Reload(dst);
@@ -67,8 +66,8 @@ TEST_CASE("Font")
 
         MESSAGE(r.GetHeight(), " < ", dst.GetHeight());
         MESSAGE(r.GetWidth(), " < ", dst.GetWidth());
-        CHECK(r.GetHeight() < dst.GetHeight());
-        CHECK(r.GetWidth() < dst.GetWidth());
+        CHECK_LT(r.GetHeight(), dst.GetHeight());
+        CHECK_LT(r.GetWidth(), dst.GetWidth());
     }
 }
 

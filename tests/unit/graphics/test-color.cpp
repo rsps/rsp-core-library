@@ -32,10 +32,10 @@ TEST_CASE("Color")
             Color col(cRed, cGreen, cBlue, cAlpha);
 
             // Assert
-            CHECK(col.GetAlpha() == cAlpha);
-            CHECK(col.GetRed() == cRed);
-            CHECK(col.GetGreen() == cGreen);
-            CHECK(col.GetBlue() == cBlue);
+            CHECK_EQ(col.GetAlpha(), cAlpha);
+            CHECK_EQ(col.GetRed(), cRed);
+            CHECK_EQ(col.GetGreen(), cGreen);
+            CHECK_EQ(col.GetBlue(), cBlue);
             CHECK_HEX(col.AsUint(), cColorVal);
 #if __BYTE_ORDER == __LITTLE_ENDIAN
             CHECK_HEX(col.AsRaw(), 0x12785634);
@@ -49,10 +49,10 @@ TEST_CASE("Color")
             Color col(cColorVal);
 
             // Assert
-            CHECK(col.GetAlpha() == cAlpha);
-            CHECK(col.GetRed() == cRed);
-            CHECK(col.GetGreen() == cGreen);
-            CHECK(col.GetBlue() == cBlue);
+            CHECK_EQ(col.GetAlpha(), cAlpha);
+            CHECK_EQ(col.GetRed(), cRed);
+            CHECK_EQ(col.GetGreen(), cGreen);
+            CHECK_EQ(col.GetBlue(), cBlue);
             CHECK_HEX(col.AsUint(), cColorVal);
         }
         SUBCASE("Copy constructor")
@@ -62,10 +62,10 @@ TEST_CASE("Color")
             Color col(testCol);
 
             // Assert
-            CHECK(col.GetAlpha() == cAlpha);
-            CHECK(col.GetRed() == cRed);
-            CHECK(col.GetGreen() == cGreen);
-            CHECK(col.GetBlue() == cBlue);
+            CHECK_EQ(col.GetAlpha(), cAlpha);
+            CHECK_EQ(col.GetRed(), cRed);
+            CHECK_EQ(col.GetGreen(), cGreen);
+            CHECK_EQ(col.GetBlue(), cBlue);
         }
     }
 
@@ -80,10 +80,10 @@ TEST_CASE("Color")
             testCol.SetAlpha(newCol);
 
             // Assert only wanted part has changed
-            CHECK(testCol.GetAlpha() == newCol);
-            CHECK(testCol.GetRed() == cRed);
-            CHECK(testCol.GetGreen() == cGreen);
-            CHECK(testCol.GetBlue() == cBlue);
+            CHECK_EQ(testCol.GetAlpha(), newCol);
+            CHECK_EQ(testCol.GetRed(), cRed);
+            CHECK_EQ(testCol.GetGreen(), cGreen);
+            CHECK_EQ(testCol.GetBlue(), cBlue);
         }
         SUBCASE("Set Red")
         {
@@ -91,10 +91,10 @@ TEST_CASE("Color")
             testCol.SetRed(newCol);
 
             // Assert only wanted part has changed
-            CHECK(testCol.GetRed() == newCol);
-            CHECK(testCol.GetGreen() == cGreen);
-            CHECK(testCol.GetBlue() == cBlue);
-            CHECK(testCol.GetAlpha() == cAlpha);
+            CHECK_EQ(testCol.GetRed(), newCol);
+            CHECK_EQ(testCol.GetGreen(), cGreen);
+            CHECK_EQ(testCol.GetBlue(), cBlue);
+            CHECK_EQ(testCol.GetAlpha(), cAlpha);
         }
         SUBCASE("Set Green")
         {
@@ -102,10 +102,10 @@ TEST_CASE("Color")
             testCol.SetGreen(newCol);
 
             // Assert only wanted part has changed
-            CHECK(testCol.GetGreen() == newCol);
-            CHECK(testCol.GetRed() == cRed);
-            CHECK(testCol.GetBlue() == cBlue);
-            CHECK(testCol.GetAlpha() == cAlpha);
+            CHECK_EQ(testCol.GetGreen(), newCol);
+            CHECK_EQ(testCol.GetRed(), cRed);
+            CHECK_EQ(testCol.GetBlue(), cBlue);
+            CHECK_EQ(testCol.GetAlpha(), cAlpha);
         }
         SUBCASE("Set Blue")
         {
@@ -113,10 +113,10 @@ TEST_CASE("Color")
             testCol.SetBlue(newCol);
 
             // Assert only wanted part has changed
-            CHECK(testCol.GetBlue() == newCol);
-            CHECK(testCol.GetRed() == cRed);
-            CHECK(testCol.GetGreen() == cGreen);
-            CHECK(testCol.GetAlpha() == cAlpha);
+            CHECK_EQ(testCol.GetBlue(), newCol);
+            CHECK_EQ(testCol.GetRed(), cRed);
+            CHECK_EQ(testCol.GetGreen(), cGreen);
+            CHECK_EQ(testCol.GetAlpha(), cAlpha);
         }
     }
 
@@ -130,7 +130,7 @@ TEST_CASE("Color")
             uint32_t newUint32 = testCol;
 
             // Assert
-            CHECK(newUint32 == cColorVal);
+            CHECK_EQ(newUint32, cColorVal);
         }
         SUBCASE("= Operator")
         {
@@ -138,7 +138,7 @@ TEST_CASE("Color")
             Color newColour = testCol;
 
             // Assert
-            CHECK(static_cast<uint32_t>(newColour) == static_cast<uint32_t>(testCol));
+            CHECK_EQ(static_cast<uint32_t>(newColour), static_cast<uint32_t>(testCol));
         }
         SUBCASE("Blend")
         {
@@ -158,26 +158,26 @@ TEST_CASE("Color")
     {
         SUBCASE("Red") {
             Color cl(Color::Red);
-            CHECK(cl.GetAlpha() == 0xFF);
-            CHECK(cl.GetRed() == 0xFF);
-            CHECK(cl.GetGreen() == 0);
-            CHECK(cl.GetBlue() == 0);
+            CHECK_EQ(cl.GetAlpha(), 0xFF);
+            CHECK_EQ(cl.GetRed(), 0xFF);
+            CHECK_EQ(cl.GetGreen(), 0);
+            CHECK_EQ(cl.GetBlue(), 0);
         }
 
         SUBCASE("Green") {
             Color cl(Color::Green);
-            CHECK(cl.GetAlpha() == 0xFF);
-            CHECK(cl.GetRed() == 0);
-            CHECK(cl.GetGreen() == 0x80);
-            CHECK(cl.GetBlue() == 0);
+            CHECK_EQ(cl.GetAlpha(), 0xFF);
+            CHECK_EQ(cl.GetRed(), 0);
+            CHECK_EQ(cl.GetGreen(), 0x80);
+            CHECK_EQ(cl.GetBlue(), 0);
         }
 
         SUBCASE("Blue") {
             Color cl(Color::Blue);
-            CHECK(cl.GetAlpha() == 0xFF);
-            CHECK(cl.GetRed() == 0);
-            CHECK(cl.GetGreen() == 0);
-            CHECK(cl.GetBlue() == 0xFF);
+            CHECK_EQ(cl.GetAlpha(), 0xFF);
+            CHECK_EQ(cl.GetRed(), 0);
+            CHECK_EQ(cl.GetGreen(), 0);
+            CHECK_EQ(cl.GetBlue(), 0xFF);
         }
     }
 

@@ -31,12 +31,12 @@ public:
     }
 
     /**
-     * \brief Template constructor to take any type object as argument
+     * \brief Template conversion constructor to take any type object as argument
      * \tparam T
      * \param arT
      */
     template <class T>
-    HexStream(const T &arT) : HexStream(arT.data(), arT.size(), 1) {}
+    HexStream(const T &arT) : HexStream(arT.data(), arT.size(), 1) {} // NOLINT, Conversion constructor
 
     /**
      * \brief Set the size of the formatted hex elements in output

@@ -69,7 +69,7 @@ public:
      * \param aThrowOnMismatch
      * \return
      */
-    bool Verify(uint32_t aResult, bool aThrowOnMismatch = false);
+    [[nodiscard]] bool Verify(uint32_t aResult, bool aThrowOnMismatch = false) const;
 
 protected:
     static const std::uint32_t* getTable();

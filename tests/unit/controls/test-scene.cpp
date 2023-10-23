@@ -10,7 +10,6 @@
 
 #include <graphics/Font.h>
 #include <graphics/Scene.h>
-#include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <doctest.h>
 
@@ -51,13 +50,13 @@ TEST_CASE("Scene Test")
 
     int events_called = 0;
 
-    auto ac = scenes.GetAfterCreate().Listen([&](Scene arScene) {
+    auto ac = scenes.GetAfterCreate().Listen([&](const Scene& arScene) {
         CHECK_EQ(arScene.GetId(), uint32_t(Scenes::Second));
         MESSAGE("Created Scene: " << arScene.GetName());
         events_called++;
     });
 
-    auto bd = scenes.GetBeforeDestroy().Listen([&](Scene &arScene) {
+    auto bd = scenes.GetBeforeDestroy().Listen([&](const Scene &arScene) {
         CHECK_EQ(arScene.GetId(), uint32_t(Scenes::Second));
         MESSAGE("Destroying Scene: " << arScene.GetName());
         events_called++;

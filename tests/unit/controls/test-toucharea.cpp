@@ -44,8 +44,8 @@ TEST_CASE("TouchArea Constructor")
         TestControl area;
 
         // Assert
-        CHECK(area.GetArea().GetHeight() == 0);
-        CHECK(area.GetArea().GetWidth() == 0);
+        CHECK_EQ(area.GetArea().GetHeight(), 0);
+        CHECK_EQ(area.GetArea().GetWidth(), 0);
     }
 
     SUBCASE("Construct From Rect")
@@ -107,19 +107,19 @@ TEST_CASE("Input Processing")
     MESSAGE("Touch Point: " << event.mCurrent);
     CHECK(aRect.IsHit(event.mCurrent));
 
-    auto f1 = area.OnPress().Listen([&](const TouchEvent &arEvent, uint32_t aId) noexcept {
+    auto f1 = area.OnPress().Listen([&](const TouchEvent &/*arEvent*/, uint32_t /*aId*/) noexcept {
         hit_count++;
         pressed = true;
     });
-    auto f2 = area.OnMove().Listen([&](const TouchEvent &arEvent, uint32_t aId) noexcept {
+    auto f2 = area.OnMove().Listen([&](const TouchEvent &/*arEvent*/, uint32_t /*aId*/) noexcept {
         hit_count++;
         moved = true;
     });
-    auto f3 = area.OnLift().Listen([&](const TouchEvent &arEvent, uint32_t aId) noexcept {
+    auto f3 = area.OnLift().Listen([&](const TouchEvent &/*arEvent*/, uint32_t /*aId*/) noexcept {
         hit_count++;
         lifted = true;
     });
-    auto f4 = area.OnClick().Listen([&](const TouchEvent &arEvent, uint32_t aId) noexcept {
+    auto f4 = area.OnClick().Listen([&](const TouchEvent &/*arEvent*/, uint32_t /*aId*/) noexcept {
         hit_count++;
         clicked = true;
     });
@@ -136,7 +136,7 @@ TEST_CASE("Input Processing")
         area.ProcessEvent(event);
 
         // Assert
-        CHECK(hit_count == 1);
+        CHECK_EQ(hit_count, 1);
         CHECK(pressed);
 
         SUBCASE("Pressed Callback - Press Miss-Input")
@@ -152,7 +152,7 @@ TEST_CASE("Input Processing")
 
             // Assert
             CHECK_FALSE(aRect.IsHit(event.mCurrent));
-            CHECK(hit_count == 1);
+            CHECK_EQ(hit_count, 1);
             CHECK_FALSE(pressed);
         }
 
@@ -165,7 +165,7 @@ TEST_CASE("Input Processing")
             area.ProcessEvent(event);
 
             // Assert
-            CHECK(hit_count == 3);
+            CHECK_EQ(hit_count, 3);
             CHECK(lifted);
             CHECK(clicked);
         }
@@ -182,7 +182,7 @@ TEST_CASE("Input Processing")
 
             // Assert
             CHECK_FALSE(aRect.IsHit(event.mCurrent));
-            CHECK(hit_count == 2);
+            CHECK_EQ(hit_count, 2);
             CHECK(lifted);
             CHECK_FALSE(clicked);
         }
@@ -196,7 +196,7 @@ TEST_CASE("Input Processing")
             area.ProcessEvent(event);
 
             // Assert
-            CHECK(hit_count == 2);
+            CHECK_EQ(hit_count, 2);
             CHECK(moved);
         }
 
@@ -212,7 +212,7 @@ TEST_CASE("Input Processing")
 
             // Assert
             CHECK_FALSE(aRect.IsHit(event.mCurrent));
-            CHECK(hit_count == 2);
+            CHECK_EQ(hit_count, 2);
             CHECK(moved);
         }
     }
@@ -232,7 +232,7 @@ TEST_CASE("Input Processing")
             MESSAGE("Processed Lift");
 
             // Assert
-            CHECK(hit_count == 3);
+            CHECK_EQ(hit_count, 3);
             CHECK(pressed);
             CHECK_FALSE(moved);
             CHECK(lifted);
@@ -256,7 +256,7 @@ TEST_CASE("Input Processing")
             area.ProcessEvent(event);
 
             // Assert
-            CHECK(hit_count == 0);
+            CHECK_EQ(hit_count, 0);
             CHECK_FALSE(pressed);
             CHECK_FALSE(moved);
             CHECK_FALSE(lifted);
@@ -279,7 +279,7 @@ TEST_CASE("Input Processing")
             area.ProcessEvent(event);
 
             // Assert
-            CHECK(hit_count == 3);
+            CHECK_EQ(hit_count, 3);
             CHECK(pressed);
             CHECK(moved);
             CHECK(lifted);
@@ -299,7 +299,7 @@ TEST_CASE("Input Processing")
             area.ProcessEvent(event);
 
             // Assert
-            CHECK(hit_count == 0);
+            CHECK_EQ(hit_count, 0);
             CHECK_FALSE(pressed);
             CHECK_FALSE(moved);
             CHECK_FALSE(lifted);

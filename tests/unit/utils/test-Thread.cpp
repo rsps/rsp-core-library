@@ -31,18 +31,18 @@ TEST_CASE("Threads")
 
     SUBCASE("Execute") {
         int count = 0;
-        t.GetExecute() = [&](void) noexcept {
+        t.GetExecute() = [&]() noexcept {
             count++;
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         };
         CHECK_NOTHROW(t.Start());
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
         CHECK_NOTHROW(t.Stop());
-        CHECK(count > 10);
+        CHECK_GT(count, 10);
     }
 
     SUBCASE("Throw") {
-        t.GetExecute() = [&](void) {
+        t.GetExecute() = [&]() {
             throw std::runtime_error("Oh no!");
         };
         CHECK_NOTHROW(t.Start());
@@ -55,7 +55,7 @@ TEST_CASE("Threads")
         CHECK_NOTHROW(t.GetName());
         CHECK(t.GetName() != "");
 
-        t.GetExecute() = [&](void) {
+        t.GetExecute() = [&]() {
             throw std::runtime_error("Oh no!");
         };
 

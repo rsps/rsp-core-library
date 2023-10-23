@@ -22,16 +22,16 @@ public:
     static void Init();
 
     RunTime();
-    RunTime(const std::chrono::milliseconds &arValue);
+    explicit RunTime(const std::chrono::milliseconds &arValue);
     RunTime(const RunTime&) = default;
     RunTime& operator=(const RunTime&) = default;
 
     bool operator<=(const RunTime& arOther);
     bool operator<(const RunTime& arOther);
 
-    std::int64_t Milliseconds() const;
+    [[nodiscard]] std::int64_t Milliseconds() const;
 
-    operator std::chrono::milliseconds() { return mValue; }
+    explicit operator std::chrono::milliseconds() { return mValue; }
 
 protected:
     static std::chrono::milliseconds mStartedAt;

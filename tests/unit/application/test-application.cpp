@@ -14,6 +14,7 @@
 #include <application/CommandLine.h>
 #include <exceptions/CoreException.h>
 #include <utils/StrUtils.h>
+#include <utils/Function.h>
 #include "../../helpers/TestApplication.h"
 
 using namespace rsp::application;
@@ -36,8 +37,8 @@ TEST_CASE("Application")
     SUBCASE("Instantiate ApplicationBase") {
         ApplicationBase app;
 
-        CHECK(app.GetCommandLine().GetOptions().size() == 0);
-        CHECK(app.GetCommandLine().GetCommands().size() == 0);
+        CHECK_EQ(app.GetCommandLine().GetOptions().size(), 0);
+        CHECK_EQ(app.GetCommandLine().GetCommands().size(), 0);
     }
 
     SUBCASE("Instantiate TestApplication") {
@@ -53,10 +54,10 @@ TEST_CASE("Application")
 
         std::ifstream fin;
         fin.open(cLogFileName);
-        CHECK(fin.is_open() == true);
+        CHECK_EQ(fin.is_open(), true);
         std::string line;
         std::getline(fin, line);
-        CHECK(rsp::utils::StrUtils::EndsWith(line, "\"Hello World.\"") == true);
+        CHECK_EQ(rsp::utils::StrUtils::EndsWith(line, "\"Hello World.\""), true);
     }
 
     SUBCASE("Execute Callback") {
@@ -70,17 +71,17 @@ TEST_CASE("Application")
 
         std::ifstream fin;
         fin.open(cLogFileName);
-        CHECK(fin.is_open() == true);
+        CHECK_EQ(fin.is_open(), true);
         std::string line;
         std::getline(fin, line);
         std::getline(fin, line);
-        CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback.") == true);
+        CHECK_EQ(rsp::utils::StrUtils::EndsWith(line, "Logged from callback."), true);
     }
 
     SUBCASE("Execute Callback to member function") {
         class MyClass {
         public:
-            bool MyFunction(TestApplication &arApp) {
+            bool MyFunction(TestApplication &arApp) { // NOLINT, signature must match expected in callback
                 arApp.GetLog().Notice() << "Logged from callback to member function.";
                 return true;
             }
@@ -89,18 +90,18 @@ TEST_CASE("Application")
         MyClass cls;
         TestApplication app(1, arguments);
 
-        app.SetCallback(std::bind(&MyClass::MyFunction, &cls, std::placeholders::_1));
+        app.SetCallback(rsp::utils::Method(&cls, &MyClass::MyFunction));
 
         ApplicationBase::Get<TestApplication>().Run();
 
         std::ifstream fin;
         fin.open(cLogFileName);
-        CHECK(fin.is_open() == true);
+        CHECK_EQ(fin.is_open(), true);
         std::string line;
         std::getline(fin, line);
         std::getline(fin, line);
         std::getline(fin, line);
-        CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback to member function.") == true);
+        CHECK_EQ(rsp::utils::StrUtils::EndsWith(line, "Logged from callback to member function."), true);
     }
 
 }

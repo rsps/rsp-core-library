@@ -55,7 +55,7 @@ public:
      *
      * \param aValue
      */
-    StructElement(const T& aValue) : mIsNull(false), mData(aValue), mMargin(defaultItem<T>::default_value()) {}
+    StructElement(const T& aValue) : mIsNull(false), mData(aValue), mMargin(defaultItem<T>::default_value()) {} // NOLINT, Conversion constructor
 
     StructElement(const StructElement<T> &arOther) = default;
     StructElement(StructElement<T> &&arOther) = default;
@@ -69,7 +69,7 @@ public:
      *
      * \return bool
      */
-    bool IsNull() const override { return mIsNull; }
+    [[nodiscard]] bool IsNull() const override { return mIsNull; }
 
     /**
      * \fn void Clear()
@@ -104,10 +104,9 @@ public:
     }
 
     /**
-     * \fn  operator #0()const
-     * \brief Operator overload.
+     * \brief Conversion operator overload.
      */
-    operator T() const { return Get(); }
+    operator T() const { return Get(); } // NOLINT, Conversion operator
 
     /**
      * \fn void Set(T)
@@ -133,7 +132,7 @@ public:
      * \return bool
      */
     bool Compare(const T& aValue) const {
-        return (mIsNull) ? false : !differs(mData, aValue, mMargin);
+        return !(mIsNull) && !differs(mData, aValue, mMargin);
     }
 
     /**
@@ -172,23 +171,23 @@ protected:
     /*
      * Simple overloaded functions for difference check
      */
-    bool differs(double aVal1, double aVal2, double aMargin) const {
+    [[nodiscard]] bool differs(double aVal1, double aVal2, double aMargin) const {
         return std::fabs(aVal1 - aVal2) > aMargin;
     }
 
-    bool differs(float aVal1, float aVal2, float aMargin) const {
+    [[nodiscard]] bool differs(float aVal1, float aVal2, float aMargin) const {
         return std::fabs(aVal1 - aVal2) > aMargin;
     }
 
-    bool differs(int aVal1, int aVal2, int aMargin) const {
+    [[nodiscard]] bool differs(int aVal1, int aVal2, int aMargin) const {
         return std::abs(aVal1 - aVal2) > aMargin;
     }
 
-    bool differs(unsigned int aVal1, unsigned int aVal2, unsigned int aMargin) const {
-        return std::abs(static_cast<int>(aVal1 - aVal2)) > aMargin;
+    [[nodiscard]] bool differs(unsigned int aVal1, unsigned int aVal2, unsigned int aMargin) const {
+        return uint(std::abs(static_cast<int>(aVal1 - aVal2))) > aMargin;
     }
 
-    bool differs(bool aVal1, bool aVal2, bool) const {
+    [[nodiscard]] bool differs(bool aVal1, bool aVal2, bool) const {
         return (aVal1 != aVal2);
     }
 };
@@ -222,7 +221,7 @@ bool operator==(const StructElement<T>& aEl1, const StructElement<T>& aEl2 ) {
 
 /**
  * \fn bool operator !=(const StructElement<T>&, const StructElement<E>&)
- * \brief In-eaquality operator for StructElements of different types. Always throws.
+ * \brief In-equality operator for StructElements of different types. Always throws.
  *
  * \tparam T
  * \tparam E
@@ -231,13 +230,13 @@ bool operator==(const StructElement<T>& aEl1, const StructElement<T>& aEl2 ) {
  * \return
  */
 template <class T, class E>
-bool operator!=(const StructElement<T>& aEl1, const StructElement<E>& aEl2 ) {
+bool operator!=(const StructElement<T>& /*aEl1*/, const StructElement<E>& /*aEl2*/ ) {
     THROW_WITH_BACKTRACE(ETypeMismatchError);
 }
 
 /**
  * \fn bool operator !=(const StructElement<T>&, const StructElement<E>&)
- * \brief Eaquality operator for StructElements of different types. Always throws.
+ * \brief Equality operator for StructElements of different types. Always throws.
  *
  * \tparam T
  * \tparam E
@@ -246,7 +245,7 @@ bool operator!=(const StructElement<T>& aEl1, const StructElement<E>& aEl2 ) {
  * \return
  */
 template <class T, class E>
-bool operator==(const StructElement<T>& aEl1, const StructElement<E>& aEl2 ) {
+bool operator==(const StructElement<T>& /*aEl1*/, const StructElement<E>& /*aEl2*/ ) {
     THROW_WITH_BACKTRACE(ETypeMismatchError);
 }
 

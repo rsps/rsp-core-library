@@ -11,10 +11,7 @@
 #include <doctest.h>
 #include <cstring>
 #include <iostream>
-#include <sstream>
 #include <chrono>
-#include <filesystem>
-#include <logging/Logger.h>
 #include <network/IHttpRequest.h>
 #include <network/HttpRequest.h>
 #include <network/HttpDownload.h>
@@ -23,17 +20,15 @@
 #include <network/NetworkException.h>
 #include <posix/FileSystem.h>
 #include <posix/FileIO.h>
-#include <utils/AnsiEscapeCodes.h>
 #include <utils/StrUtils.h>
 #include <TestHelpers.h>
 #include <cstdlib>
 #include <unistd.h>
-#include <sys/types.h>
 
 using namespace rsp::logging;
 using namespace rsp::network;
 using namespace rsp::utils;
-using namespace rsp::utils::AnsiEscapeCodes;
+//using namespace rsp::utils::AnsiEscapeCodes;
 using namespace rsp::posix;
 
 TEST_CASE("Network")
@@ -46,7 +41,7 @@ TEST_CASE("Network")
     opt.KeyPath = "webserver/ssl/private/SN1234.key";
 
     // Run lighttpd directly from build directory, no need to install it.
-    CHECK(0 == std::system("_deps/lighttpd_src-build/build/lighttpd -f webserver/lighttpd.conf -m _deps/lighttpd_src-build/build"));
+    CHECK_EQ(0, std::system("_deps/lighttpd_src-build/build/lighttpd -f webserver/lighttpd.conf -m _deps/lighttpd_src-build/build"));
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     SUBCASE("Library Version"){
@@ -107,9 +102,8 @@ TEST_CASE("Network")
 
         request.SetOptions(opt);
 
-        IHttpResponse *resp = nullptr;
-        CHECK_THROWS_AS(resp = &request.Execute(), NetworkException);
-        CHECK_THROWS_WITH_AS(resp = &request.Execute(), doctest::Contains(" (56) Failure when receiving data from the peer"), NetworkException);
+        CHECK_THROWS_AS(auto *resp = &request.Execute(), NetworkException);
+        CHECK_THROWS_WITH_AS(auto *resp = &request.Execute(), doctest::Contains(" (56) Failure when receiving data from the peer"), NetworkException);
     }
 
     SUBCASE("Validated Client") {
@@ -152,7 +146,7 @@ TEST_CASE("Network")
 
             CHECK_EQ(resp->GetBody().size(), source.size());
             CHECK_EQ(resp->GetStatusCode(), 200);
-            CHECK(std::memcmp(source.data(), resp->GetBody().data(), source.size()) == 0);
+            CHECK_EQ(std::memcmp(source.data(), resp->GetBody().data(), source.size()), 0);
         }
 
         SUBCASE("To File") {
@@ -165,7 +159,7 @@ TEST_CASE("Network")
         }
 
         SUBCASE("Partial To File") {
-            CHECK(0 == truncate(cFile.c_str(), 20*1024)); // This changes mtime
+            CHECK_EQ(0, truncate(cFile.c_str(), 20*1024)); // This changes mtime
 
             CHECK_NOTHROW(resp = &request.Execute());
 
@@ -177,7 +171,7 @@ TEST_CASE("Network")
             using namespace std::literals::chrono_literals;
 
             auto mtime = FileSystem::GetFileModifiedTime(cFile);
-            CHECK(0 == truncate(cFile.c_str(), 20*1024)); // This changes mtime
+            CHECK_EQ(0, truncate(cFile.c_str(), 20*1024)); // This changes mtime
             // This line will work, as the result is the partial data from an unmodified file.
             FileSystem::SetFileModifiedTime(cFile, mtime + 2h);
 
@@ -194,7 +188,7 @@ TEST_CASE("Network")
 //            request.SetOptions(opt);
 
             auto mtime = FileSystem::GetFileModifiedTime(cFile);
-            CHECK(0 == truncate(cFile.c_str(), 20*1024)); // This changes mtime
+            CHECK_EQ(0, truncate(cFile.c_str(), 20*1024)); // This changes mtime
             // FIXME: This line should fail with a "412 Precondition Failed", lighttpd does not send the correct result.
             FileSystem::SetFileModifiedTime(cFile, mtime - 2h);
 
@@ -216,7 +210,7 @@ TEST_CASE("Network")
             FileIO file2(cFile, std::ios_base::in);
             auto s2 = file2.GetContents();
             CHECK_EQ(s2.size(), source.size());
-            CHECK(std::memcmp(source.data(), s2.data(), source.size()) == 0);
+            CHECK_EQ(std::memcmp(source.data(), s2.data(), source.size()), 0);
         }
     }
 
@@ -248,7 +242,7 @@ TEST_CASE("Network")
         FileIO file2(cUploadedFile, std::ios_base::in);
         auto s2 = file2.GetContents();
         CHECK_EQ(s2.size(), source.size());
-        CHECK(std::memcmp(source.data(), s2.data(), source.size()) == 0);
+        CHECK_EQ(std::memcmp(source.data(), s2.data(), source.size()), 0);
 
         FileSystem::DeleteFile(std::string(cUploadedFile));
     }
@@ -294,7 +288,7 @@ TEST_CASE("Network")
         FileIO file2(cUploadedFile, std::ios_base::in);
         auto s2 = file2.GetContents();
         CHECK_EQ(s2.size(), source.size());
-        CHECK(std::memcmp(source.data(), s2.data(), source.size()) == 0);
+        CHECK_EQ(std::memcmp(source.data(), s2.data(), source.size()), 0);
 
         FileSystem::DeleteFile(std::string(cUploadedFile));
     }
@@ -349,5 +343,5 @@ TEST_CASE("Network")
         CHECK(resp2);
     }
 
-    CHECK(0 == std::system("killall lighttpd"));
+    CHECK_EQ(0, std::system("killall lighttpd"));
 }

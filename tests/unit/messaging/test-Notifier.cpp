@@ -17,7 +17,7 @@ using namespace rsp::messaging;
 static std::string s_param = "Hello World";
 static int checker_called = 0;
 
-static void checker(int i, std::string s)
+static void checker(int i, const std::string& s)
 {
     checker_called++;
     CHECK_EQ(i, 42);
@@ -43,6 +43,7 @@ TEST_CASE("Emitter")
         Notifier emitter;
         checker_called = 0;
         Notifier::Listener_t subscriber3 = emitter.Listen(checker);
+        CHECK(bool(subscriber3));
         CHECK_NOTHROW(emitter(42, s_param));
         CHECK_EQ(checker_called, 1);
     }
@@ -51,12 +52,15 @@ TEST_CASE("Emitter")
         Notifier emitter;
         checker_called = 0;
         Notifier::Listener_t subscriber3 = emitter.Listen(checker);
+        CHECK(bool(subscriber3));
         CHECK_NOTHROW(emitter(42, s_param));
         CHECK_EQ(checker_called, 1);
         subscriber3 = nullptr;
+        CHECK_FALSE(bool(subscriber3));
         CHECK_NOTHROW(emitter(42, s_param));
         CHECK_EQ(checker_called, 1);
         subscriber3 = emitter.Listen(checker);
+        CHECK(bool(subscriber3));
         CHECK_NOTHROW(emitter(42, s_param));
         CHECK_EQ(checker_called, 2);
     }
@@ -74,6 +78,7 @@ TEST_CASE("Emitter")
             CHECK_EQ(s, s_param);
         });
 
+        CHECK(bool(subscriber1));
         CHECK_NOTHROW(emitter(42, s_param));
         CHECK_EQ(sub1_called, 1);
 
@@ -82,8 +87,10 @@ TEST_CASE("Emitter")
             CHECK_EQ(i, 42);
             CHECK_EQ(s, s_param);
         });
+        CHECK(bool(subscriber2));
 
         Notifier::Listener_t subscriber3 = emitter.Listen(checker);
+        CHECK(bool(subscriber3));
 
         CHECK_NOTHROW(emitter(42, s_param));
 

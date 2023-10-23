@@ -93,7 +93,7 @@ class Rect
      * \param arRect
      * \return True if equal
      */
-    inline bool operator==(const Rect &arRect)
+    inline bool operator==(const Rect &arRect) const
     {
         return !(*this != arRect);
     }
@@ -103,7 +103,7 @@ class Rect
      * \param arRect
      * \return True if not equal
      */
-    inline bool operator!=(const Rect &arOther)
+    inline bool operator!=(const Rect &arOther) const
     {
         return (mLeftTop != arOther.mLeftTop) || (mWidth != arOther.mWidth) || (mHeight != arOther.mHeight);
     }

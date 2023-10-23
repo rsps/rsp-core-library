@@ -14,7 +14,7 @@
 
 TEST_CASE("Rounding") {
 
-#define COMPARE_AND_CHECK(a, b) CHECK(std::fabs(a - b) < 0.00000001f)
+#define COMPARE_AND_CHECK(a, b) CHECK_LT(std::fabs(a - b), 0.00000001f)
 
     SUBCASE("Test 0.01 precision") {
         COMPARE_AND_CHECK(ROUND001(0.0f), 0.00f);

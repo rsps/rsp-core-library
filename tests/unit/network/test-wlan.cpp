@@ -20,13 +20,19 @@ using namespace rsp::posix;
 
 static void FetchMonitorEvents(WLan &arWlan)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    int retries = 2;
     rsp::network::WpaEvents event;
     do {
         std::string msg;
         CHECK_NOTHROW(event = arWlan.GetMonitorEvent(msg));
         MESSAGE("Monitor: (" << int(event) << ") " << msg);
+        if (event == rsp::network::WpaEvents::None) {
+            retries--;
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
     }
-    while (event != rsp::network::WpaEvents::None);
+    while (retries);
 }
 
 static const char* GetEnv(const char *apName, const char *apDefault)
@@ -136,8 +142,6 @@ TEST_CASE("WLAN")
     {
         WLan wlan;
 
-        FetchMonitorEvents(wlan);
-
         NetworkInfo network;
         CHECK_NOTHROW(network = wlan.FindNetwork(cSSID));
         CHECK(network.mSelected);
@@ -149,9 +153,8 @@ TEST_CASE("WLAN")
         CHECK_FALSE(network.mSelected);
 
         CHECK_NOTHROW(wlan.SetEnable(true));
-        CHECK_NOTHROW(wlan.SelectNetwork(wlan.FindNetwork(cSSID)));
-//        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         FetchMonitorEvents(wlan);
+        CHECK_NOTHROW(wlan.SelectNetwork(network));
 
         CHECK_NOTHROW(network = wlan.FindNetwork(cSSID));
         CHECK(network.mSelected);

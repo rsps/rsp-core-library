@@ -39,7 +39,8 @@ public:
 
     static std::default_random_engine& Generator()
     {
-        static std::default_random_engine generator{};
+        std::random_device r;
+        static std::default_random_engine generator(r());
         return generator;
     }
 };

@@ -12,8 +12,8 @@
 #include <logging/Logger.h>
 #include <application/ApplicationBase.h>
 
-#ifndef TESTS_TESTAPPLICATION_H_
-#define TESTS_TESTAPPLICATION_H_
+#ifndef TESTS_TEST_APPLICATION_H_
+#define TESTS_TEST_APPLICATION_H_
 
 /**
  * \class TestApplication
@@ -22,8 +22,8 @@
 class TestApplication: public rsp::application::ApplicationBase
 {
 public:
-    TestApplication(int argc = 0, const char **argv = nullptr);
-    virtual ~TestApplication();
+    explicit TestApplication(int argc = 0, const char **argv = nullptr);
+    ~TestApplication() override;
 
     typedef std::function<bool(TestApplication&)> Callback_t;
 
@@ -33,7 +33,7 @@ public:
      * \param aCb
      * \return
      */
-    TestApplication& SetCallback(Callback_t aCb) { mCallback = aCb; return *this; }
+    TestApplication& SetCallback(Callback_t aCb) { mCallback = std::move(aCb); return *this; }
 
 protected:
     std::function<bool(TestApplication&)> mCallback{};
@@ -46,4 +46,4 @@ private:
     rsp::logging::LoggerInterface::Handle_t mLogHandle = 0;
 };
 
-#endif /* TESTS_TESTAPPLICATION_H_ */
+#endif /* TESTS_TEST_APPLICATION_H_ */

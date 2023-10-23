@@ -12,6 +12,7 @@
 #include <exceptions/CoreException.h>
 #include <graphics/Bitmap.h>
 #include <graphics/Color.h>
+#include <utils/Random.h>
 #include <TestHelpers.h>
 
 using namespace rsp::utils;
@@ -32,7 +33,7 @@ TEST_CASE("Bitmap")
     {
         Bitmap bitmap(200, 200, ColorDepth::RGBA);
 
-        Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
+        Color col(Random::Roll(55, 255), Random::Roll(55, 255), Random::Roll(55, 255), 0xff);
         Point pt(100, 100);
         CHECK(bitmap.IsHit(pt));
         CHECK_NE(bitmap.GetPixel(pt), col);
@@ -54,8 +55,8 @@ TEST_CASE("Bitmap")
         Bitmap bitmap(filepath);
 
         // Assert
-        CHECK(bitmap.GetHeight() == height);
-        CHECK(bitmap.GetWidth() == width);
+        CHECK_EQ(bitmap.GetHeight(), height);
+        CHECK_EQ(bitmap.GetWidth(), width);
         CHECK_EQ(bitmap.GetPixelData().GetDataSize(), (width * height * 3));
         CHECK_HEX(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White).AsUint(), 0xFF020A8F);
         CHECK_HEX(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White).AsUint(), 0xFF020A8F);
@@ -63,7 +64,7 @@ TEST_CASE("Bitmap")
 
         SUBCASE("Drawing on loaded Img") {
             // Arrange
-            Color cl(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
+            Color cl(Random::Roll(55, 255), Random::Roll(55, 255), Random::Roll(55, 255), 0xff);
             Point pt(100, 100);
 
             // Act
@@ -89,10 +90,10 @@ TEST_CASE("Bitmap")
         Color col2(bitmap2.GetPixelData().GetPixelAt(0,0,Color::White));
 
         // Assert
-        CHECK(bitmap2.GetHeight() == height);
-        CHECK(bitmap2.GetWidth() == width);
-        CHECK(bitmap2.GetPixelData().GetDataSize() == (width * height * 3));
-        CHECK(col2 == bitmap2.GetPixelData().GetPixelAt(0,0,Color::White));
+        CHECK_EQ(bitmap2.GetHeight(), height);
+        CHECK_EQ(bitmap2.GetWidth(), width);
+        CHECK_EQ(bitmap2.GetPixelData().GetDataSize(), (width * height * 3));
+        CHECK_EQ(col2, bitmap2.GetPixelData().GetPixelAt(0,0,Color::White));
     }
 
     SUBCASE("Monochrome Bmp file")
@@ -107,11 +108,10 @@ TEST_CASE("Bitmap")
 
         // Arrange
         Bitmap bitmap3(filepath);
-        Color col3(bitmap3.GetPixelData().GetPixelAt(0,0,Color::White));
 
         // Assert
-        CHECK(bitmap3.GetHeight() == height);
-        CHECK(bitmap3.GetWidth() == width);
+        CHECK_EQ(bitmap3.GetHeight(), height);
+        CHECK_EQ(bitmap3.GetWidth(), width);
         CHECK_EQ(bitmap3.GetPixelData().GetDataSize(), (((width + 7) >> 3) * height));
         CHECK_EQ(bitmap3.GetPixelData().GetPixelAt(0,0,Color::White), Color(0x00FFFFFF));
         CHECK_EQ(bitmap3.GetPixelData().GetPixelAt(32,50,Color::White), Color(Color::White));
@@ -127,8 +127,8 @@ TEST_CASE("Bitmap")
 //        REQUIRE_NOTHROW(Bitmap png1(filepath));
         Bitmap png(filepath);
 
-        CHECK(png.GetHeight() == height);
-        CHECK(png.GetWidth() == width);
+        CHECK_EQ(png.GetHeight(), height);
+        CHECK_EQ(png.GetWidth(), width);
         CHECK_EQ(png.GetPixelData().GetDataSize(), (width * height * 3));
         CHECK_EQ(png.GetPixelData().GetPixelAt(0, 0, Color::White).AsUint(), 0xFF020A8F);
         CHECK_EQ(png.GetPixelData().GetPixelAt(1, 0, Color::White).AsUint(), 0xFF020A8F);

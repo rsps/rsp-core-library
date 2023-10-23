@@ -7,14 +7,14 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef TESTS_HELPERS_TESTHELPERS_H_
-#define TESTS_HELPERS_TESTHELPERS_H_
+#ifndef TESTS_HELPERS_TEST_HELPERS_H_
+#define TESTS_HELPERS_TEST_HELPERS_H_
 
 #include <string>
 #include <utils/StrUtils.h>
 #include "TestLogger.h"
 
-#define CHECK_HEX(a, b) CHECK_MESSAGE(a == b, rsp::utils::StrUtils::Format( "%8.8X != %8.8X" , a, b))
+#define CHECK_HEX(a, b) CHECK_MESSAGE((a == b), rsp::utils::StrUtils::Format( "%8.8X != %8.8X" , a, b))
 
 class TestHelpers
 {
@@ -38,4 +38,4 @@ std::string ToHex(const T* apData, std::uint32_t aSize)
     return TestHelpers::ToHex(reinterpret_cast<const uint8_t*>(apData), aSize, sizeof(T));
 }
 
-#endif /* TESTS_HELPERS_TESTHELPERS_H_ */
+#endif /* TESTS_HELPERS_TEST_HELPERS_H_ */

@@ -33,7 +33,7 @@ template<class T>
 class ObjectPool
 {
 public:
-    ObjectPool(std::size_t aSize)
+    explicit ObjectPool(std::size_t aSize)
         : mPool(aSize),
           mAvailable(aSize),
           mUsed(aSize)
@@ -64,7 +64,7 @@ public:
         *t = nullptr;
     }
 
-    int Available() const
+    [[nodiscard]] int Available() const
     {
         return mAvailable.size();
     }

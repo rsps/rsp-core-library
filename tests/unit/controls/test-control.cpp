@@ -8,7 +8,6 @@
  * \author      Simon Glashoff
  */
 
-#include <chrono>
 #include <doctest.h>
 #include <graphics/Control.h>
 #include <graphics/Renderer.h>
@@ -84,7 +83,7 @@ TEST_CASE("Control")
 
     SUBCASE("Default State")
     {
-        CHECK(myControl.GetState() == Control::States::Normal);
+        CHECK_EQ(myControl.GetState(), Control::States::Normal);
     }
 
     SUBCASE("Change")
@@ -93,7 +92,7 @@ TEST_CASE("Control")
 
         SUBCASE("State") {
             CHECK_NOTHROW(myControl.SetPressed(true));
-            CHECK(myControl.GetState() == Control::States::Pressed);
+            CHECK_EQ(myControl.GetState(), Control::States::Pressed);
         }
 
         SUBCASE("Transparent") {
@@ -121,10 +120,10 @@ TEST_CASE("Control")
 
         SUBCASE("Size") {
             CHECK_NOTHROW(myControl.SetArea(Rect(10, 10, 20, 30)));
-            CHECK(myControl.GetArea() == Rect(10, 10, 20, 30));
+            CHECK_EQ(myControl.GetArea(), Rect(10, 10, 20, 30));
 
             CHECK_NOTHROW(myControl.SetOrigin(Point(12, 12)));
-            CHECK(myControl.GetArea() == Rect(12, 12, 20, 30));
+            CHECK_EQ(myControl.GetArea(), Rect(12, 12, 20, 30));
         }
 
         CHECK(myControl.IsInvalid());
@@ -150,7 +149,7 @@ TEST_CASE("Control")
         CHECK_NOTHROW(myControl.Render(renderer));
         CHECK_NOTHROW(renderer.Present());
 
-        // Paint again on backbuffer to allow checks below
+        // Paint again on back-buffer to allow checks below
         CHECK_NOTHROW(renderer.Fill(Color::Grey));
         CHECK_NOTHROW(myControl.Render(renderer));
         CHECK_NOTHROW(renderer.Flush());

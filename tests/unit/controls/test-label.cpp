@@ -12,9 +12,7 @@
 #include <graphics/Label.h>
 #include <graphics/Renderer.h>
 #include <posix/FileSystem.h>
-#include <utils/Random.h>
 #include <TestHelpers.h>
-#include "../../../src/graphics/SW/Framebuffer.h"
 
 using namespace rsp::graphics;
 using namespace rsp::utils;

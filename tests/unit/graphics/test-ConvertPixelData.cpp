@@ -21,21 +21,21 @@ using namespace rsp::posix;
 
 TEST_SUITE_BEGIN("Graphics");
 
-static ColorDepth getDepth(std::string aPath)
+static ColorDepth getDepth(const std::string& arPath)
 {
-    if (StrUtils::Contains(aPath, "/alpha/")) {
+    if (StrUtils::Contains(arPath, "/alpha/")) {
         return ColorDepth::Alpha;
     }
-    if (StrUtils::Contains(aPath, "/monochrome/")) {
+    if (StrUtils::Contains(arPath, "/monochrome/")) {
         return ColorDepth::Monochrome;
     }
-    if (StrUtils::Contains(aPath, "/rgb/")) {
+    if (StrUtils::Contains(arPath, "/rgb/")) {
         return ColorDepth::RGB;
     }
     return ColorDepth::RGBA;
 }
 
-static bool stemCompare(std::filesystem::path a1, std::filesystem::path a2)
+static bool stemCompare(const std::filesystem::path& a1, const std::filesystem::path& a2)
 {
     return  a1.stem().compare(a2.stem()) < 0;
 }

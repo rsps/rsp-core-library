@@ -8,18 +8,13 @@
  * \author      Steffen Brummer
  */
 
-#include <ctime>
 #include <chrono>
 #include <algorithm>
-#include <locale>
 #include <sstream>
-#include <iomanip>
 #include <iostream>
 #include <cstdarg>
 #include <unistd.h>
-#include <sys/types.h>
 #include <pwd.h>
-#include <time.h>
 #include <utils/ClockCast.h>
 #include <utils/StrUtils.h>
 
@@ -98,10 +93,10 @@ std::string GetHomeDir()
 
 std::string GetConfigDir()
 {
-    const char *configdir;
+    const char *config_dir;
 
-    if ((configdir = getenv("XDG_CONFIG_HOME")) != nullptr) {
-        return configdir;
+    if ((config_dir = getenv("XDG_CONFIG_HOME")) != nullptr) {
+        return config_dir;
     }
 
     return GetHomeDir();
@@ -109,7 +104,7 @@ std::string GetConfigDir()
 
 bool StartsWith(const std::string &aText, const std::string &aPrefix)
 {
-    return (aText.compare(0, aPrefix.length(), aPrefix.c_str()) == 0);
+    return (aText.compare(0, aPrefix.length(), aPrefix) == 0);
 }
 
 bool EndsWith(const std::string &aText, const std::string &aAffix)
@@ -119,15 +114,15 @@ bool EndsWith(const std::string &aText, const std::string &aAffix)
 
 bool Contains(const std::string &aText, const std::string &aMatch)
 {
-    return (aText.find(aMatch, 0) != aText.npos);
+    return (aText.find(aMatch, 0) != std::string::npos);
 }
 
 
-std::vector<std::string> FindMatches(std::string aText, std::vector<std::string> &arList)
+std::vector<std::string> FindMatches(const std::string& arText, std::vector<std::string> &arList)
 {
     std::vector<std::string> found;
     for (std::string &s : arList) {
-        if(aText == s.substr(0, aText.length())) {
+        if(arText == s.substr(0, arText.length())) {
             found.push_back(s);
         }
     }

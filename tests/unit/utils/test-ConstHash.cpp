@@ -8,11 +8,9 @@
  * \author      Steffen Brummer
  */
 
-#include <utils/ConstTypeInfo.h>
 #include "doctest.h"
 #include <utils/Crc32.h>
 #include <utils/Fnv1a.h>
-#include <iostream>
 
 using namespace rsp::utils;
 

@@ -15,10 +15,10 @@
 
 namespace rsp::utils {
 
-template<typename Res, typename ... ArgTypes>
-class Function;
+//template<typename Res, typename ... ArgTypes>
+//class Function;
 
-
+/*
 template<typename Res, typename ... ArgTypes>
 class Function<Res(ArgTypes...)> : public std::function<Res(ArgTypes...)>
 {
@@ -31,9 +31,9 @@ public:
     }
 
 };
-
+*/
 template<class Ptr, class Class, class Res, class ... ArgTypes>
-Function<Res(ArgTypes...)> Method(Ptr object, Res (Class::*method)(ArgTypes...))
+std::function<Res(ArgTypes...)> Method(Ptr object, Res (Class::*method)(ArgTypes...))
 {
     return [=](ArgTypes ... args)
     {

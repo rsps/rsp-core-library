@@ -435,7 +435,7 @@ std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriver
 
 DateTime GetFileModifiedTime(const std::filesystem::path &arFileName)
 {
-    return {std::chrono::file_clock::to_sys(std::filesystem::last_write_time(arFileName))};
+    return DateTime(std::chrono::file_clock::to_sys(std::filesystem::last_write_time(arFileName)));
 }
 
 void SetFileModifiedTime(const std::filesystem::path &arFileName, const DateTime &arTime)

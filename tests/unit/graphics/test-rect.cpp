@@ -9,7 +9,6 @@
  */
 
 #include <doctest.h>
-#include <exceptions/CoreException.h>
 #include <graphics/Point.h>
 #include <graphics/Rect.h>
 #include <iostream>
@@ -21,13 +20,13 @@ constexpr int cTop = 50;
 constexpr int cWidth = 400;
 constexpr int cHeight = 600;
 
-#define checkRect(aRect) \
-    CHECK(aRect.GetTop() == cTop); \
-    CHECK(aRect.GetBottom() == cTop + cHeight); \
-    CHECK(aRect.GetLeft() == cLeft); \
-    CHECK(aRect.GetRight() == cLeft + cWidth); \
-    CHECK(aRect.GetWidth() == cWidth); \
-    CHECK(aRect.GetHeight() == cHeight);
+#define CHECK_RECT(aRect) \
+    CHECK_EQ(aRect.GetTop(), cTop); \
+    CHECK_EQ(aRect.GetBottom(), cTop + cHeight); \
+    CHECK_EQ(aRect.GetLeft(), cLeft); \
+    CHECK_EQ(aRect.GetRight(), cLeft + cWidth); \
+    CHECK_EQ(aRect.GetWidth(), cWidth); \
+    CHECK_EQ(aRect.GetHeight(), cHeight)
 
 
 TEST_SUITE_BEGIN("Graphics");
@@ -55,7 +54,7 @@ TEST_CASE("Rect Constructors")
         Rect rect_base_values(cLeft, cTop, cWidth, cHeight);
 
         // Assert
-        checkRect(rect_base_values);
+        CHECK_RECT(rect_base_values);
     }
     SUBCASE("Points Rect")
     {
@@ -73,7 +72,7 @@ TEST_CASE("Rect Constructors")
         Rect rect_points(Point(cLeft, cTop), cWidth, cHeight);
 
         // Assert
-        checkRect(rect_points);
+        CHECK_RECT(rect_points);
     }
     SUBCASE("Mixed Rect")
     {
@@ -81,7 +80,7 @@ TEST_CASE("Rect Constructors")
         Rect rect_mix(Point(cLeft, cTop), cWidth, cHeight);
 
         // Assert
-        checkRect(rect_mix);
+        CHECK_RECT(rect_mix);
     }
 }
 
@@ -96,8 +95,8 @@ TEST_CASE("Rect Swapping Edges")
         CHECK_NOTHROW(rect.SetHeight(-1));
 
         // Assert
-        CHECK(rect.GetTop() == cTop);
-        CHECK(rect.GetBottom() == cTop);
+        CHECK_EQ(rect.GetTop(), cTop);
+        CHECK_EQ(rect.GetBottom(), cTop);
         CHECK_EQ(rect.GetHeight(), 0);
     }
 //    SUBCASE("Set Top below Bottom")
@@ -118,8 +117,8 @@ TEST_CASE("Rect Swapping Edges")
         CHECK_NOTHROW(rect.SetWidth(-1));
 
         // Assert
-        CHECK(rect.GetRight() == cLeft);
-        CHECK(rect.GetLeft() == cLeft);
+        CHECK_EQ(rect.GetRight(), cLeft);
+        CHECK_EQ(rect.GetLeft(), cLeft);
         CHECK_EQ(rect.GetWidth(), 0);
     }
 //    SUBCASE("Set Left right of Right")
@@ -129,8 +128,8 @@ TEST_CASE("Rect Swapping Edges")
 //        CHECK_NOTHROW(rect.SetLeft(cLeft + cWidth + 1));
 //
 //        // Assert
-//        CHECK(rect.GetRight() == (cLeft + cWidth + cWidth));
-//        CHECK(rect.GetLeft() == cLeft + cWidth + 1);
+//        CHECK_EQ(rect.GetRight(), (cLeft + cWidth + cWidth));
+//        CHECK_EQ(rect.GetLeft(), cLeft + cWidth + 1);
 //        CHECK_EQ(rect.GetWidth(), cWidth);
 //    }
 }
@@ -146,8 +145,8 @@ TEST_CASE("Rect Height and Width")
         rect.SetHeight(cHeight + 1);
 
         // Assert
-        CHECK(rect.GetHeight() == (cHeight + 1));
-        CHECK(rect.GetBottom() == (oldBottom + 1));
+        CHECK_EQ(rect.GetHeight(), (cHeight + 1));
+        CHECK_EQ(rect.GetBottom(), (oldBottom + 1));
     }
     SUBCASE("Set Width set correctly")
     {
@@ -156,8 +155,8 @@ TEST_CASE("Rect Height and Width")
         rect.SetWidth(cWidth + 1);
 
         // Assert
-        CHECK(rect.GetWidth() == (cWidth + 1));
-        CHECK(rect.GetRight() == (oldRight + 1));
+        CHECK_EQ(rect.GetWidth(), (cWidth + 1));
+        CHECK_EQ(rect.GetRight(), (oldRight + 1));
     }
 }
 

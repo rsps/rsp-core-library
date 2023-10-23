@@ -17,7 +17,7 @@ using namespace rsp::exceptions;
 TEST_CASE("Singleton") {
 
     struct MyClass : Singleton<MyClass> {
-        bool Compare(int a, int b) {
+        [[nodiscard]] bool Compare(int a, int b) const { // NOLINT, Not static since we are testing singleton
             return a == b;
         }
     };

@@ -9,7 +9,6 @@
  */
 
 #include <doctest.h>
-#include <cstring>
 #include <utils/FixedString.h>
 
 using namespace rsp::utils;
@@ -26,8 +25,8 @@ TEST_CASE("Fixed String")
     CHECK_EQ(fs.size(), 10);
     CHECK_EQ(fs, "Hello Worl");
 
-    CHECK(fs != std::string(p));
-    CHECK(fs != p);
+    CHECK_NE(fs, std::string(p));
+    CHECK_NE(fs, p);
 
     std::string s = fs;
 

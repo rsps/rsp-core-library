@@ -32,21 +32,21 @@ class FourCC
 {
 public:
     FourCC() noexcept {}
-    FourCC(std::uint32_t aValue)
+    explicit FourCC(std::uint32_t aValue)
     {
         mValue = htobe32(aValue);
     }
 
-    FourCC(const char *apValue)
+    explicit FourCC(const char *apValue)
     {
         for (unsigned int i = 0; i < sizeof(mAscii) ; i++) {
             mAscii[i] = apValue[i];
         }
     }
 
-    operator std::uint32_t() { return mValue; }
+    explicit operator std::uint32_t() const { return mValue; }
 
-    bool operator==(const FourCC &arOther)
+    bool operator==(const FourCC &arOther) const
     {
 //        std::cout << "FourCC compare(" << mValue << ", " << arOther.mValue << ")" << std::endl;
         return mValue == arOther.mValue;

@@ -35,7 +35,7 @@ TEST_CASE("File IO") {
         FileIO f(cFileName, std::ios_base::in);
         std::string s = f.GetContents();
 
-        CHECK(s == "Hello World");
+        CHECK_EQ(s, "Hello World");
     }
 
     SUBCASE("Seek And Read") {
@@ -43,7 +43,7 @@ TEST_CASE("File IO") {
         f.Seek(6, std::ios_base::beg);
         std::string s = f.GetLine();
 
-        CHECK(s == "World");
+        CHECK_EQ(s, "World");
     }
 
     SUBCASE("Seek And Write") {
@@ -58,7 +58,7 @@ TEST_CASE("File IO") {
         FileIO f(cFileName, std::ios_base::in);
         std::string s = f.GetContents();
 
-        CHECK(s == "Hello File");
+        CHECK_EQ(s, "Hello File");
     }
 
     SUBCASE("Cleanup") {
