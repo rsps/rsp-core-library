@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
-#ifndef BMPLOADER_H
-#define BMPLOADER_H
+#ifndef RSP_CORE_LIB_SRC_GRAPHICS_RASTER_BMP_LOADER_H
+#define RSP_CORE_LIB_SRC_GRAPHICS_RASTER_BMP_LOADER_H
 
 #include <graphics/Color.h>
 #include <graphics/raster/ImgLoader.h>
@@ -140,4 +140,4 @@ protected:
 std::ostream &operator<<(std::ostream &os, const BmpLoader::BmpHeader_t &arHeader);
 
 } // namespace rsp::graphics
-#endif // BMPLOADER_H
+#endif // RSP_CORE_LIB_SRC_GRAPHICS_RASTER_BMP_LOADER_H

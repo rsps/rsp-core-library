@@ -21,6 +21,9 @@
 #include <TestHelpers.h>
 #include <utils/Random.h>
 #include <magic_enum.hpp>
+#ifdef USE_GFX_SW
+#include <posix/FileSystem.h>
+#endif
 
 using namespace rsp::graphics;
 using namespace rsp::utils;

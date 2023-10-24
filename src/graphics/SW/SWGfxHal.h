@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_GRAPHICS_SW_SWGFXHAL_H_
-#define SRC_GRAPHICS_SW_SWGFXHAL_H_
+#ifndef RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_GFX_HAL_H
+#define RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_GFX_HAL_H
 
 #ifdef USE_GFX_SW
 
@@ -22,13 +22,13 @@ class SWGfxHal: public GfxHal, public rsp::utils::Singleton<SWGfxHal>
 {
 public:
     std::shared_ptr<VideoSurface> Alloc(int aWidth, int aHeight) override;
-    std::uint64_t GetVideoMemoryUsage() const override;
+    [[nodiscard]] std::uint64_t GetVideoMemoryUsage() const override;
     void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalRect aDstRect, OptionalRect aSrcRect) override;
     void CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint32_t aColor, OptionalRect aDstRect, OptionalRect aSrcRect) override;
     void DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect) override;
     void Fill(VideoSurface &arDst, uint32_t aColor, OptionalRect aDest) override;
     void Sync() override;
-    uint32_t GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, bool aFrontBuffer) const override;
+    [[nodiscard]] uint32_t GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY) const override;
     void SetPixel(VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, uint32_t aColor) override;
 
     static std::uint64_t mAllocated;
@@ -38,4 +38,4 @@ public:
 
 #endif /* USE_GFX_SW */
 
-#endif /* SRC_GRAPHICS_SW_SWGFXHAL_H_ */
+#endif // RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_GFX_HAL_H

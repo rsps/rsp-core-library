@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef SRC_SECURITY_OPENSSL_COMMON_H_
-#define SRC_SECURITY_OPENSSL_COMMON_H_
+#ifndef RSP_CORE_LIB_SRC_SECURITY_OPENSSL_COMMON_H
+#define RSP_CORE_LIB_SRC_SECURITY_OPENSSL_COMMON_H
 
 #ifdef USE_OPENSSL
 
@@ -98,4 +98,4 @@ protected:
 
 #endif /* USE_OPENSSL */
 
-#endif /* SRC_SECURITY_OPENSSL_COMMON_H_ */
+#endif // RSP_CORE_LIB_SRC_SECURITY_OPENSSL_COMMON_H

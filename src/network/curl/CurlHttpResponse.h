@@ -9,8 +9,8 @@
  */
 
 
-#ifndef SRC_NETWORK_CURL_CURLHTTPRESPONSE_H_
-#define SRC_NETWORK_CURL_CURLHTTPRESPONSE_H_
+#ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_RESPONSE_H
+#define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_RESPONSE_H
 
 #include <network/HttpResponse.h>
 
@@ -54,4 +54,4 @@ protected:
 
 } /* namespace rsp::network::curl */
 
-#endif /* SRC_NETWORK_CURL_CURLHTTPRESPONSE_H_ */
+#endif // RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_RESPONSE_H

@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_GRAPHICS_SW_SWRENDERER_H_
-#define SRC_GRAPHICS_SW_SWRENDERER_H_
+#ifndef RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_RENDERER_H
+#define RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_RENDERER_H
 
 #ifdef USE_GFX_SW
 
@@ -32,7 +32,7 @@ public:
     ColorDepth GetColorDepth() const override;
 
     Renderer& DrawRect(const Color &arColor, const Rect &arRect) override;
-    Renderer& Fill(const Color &arColor, OptionalRect aDestination = nullptr) override;
+    Renderer& Fill(const Color &arColor, OptionalRect aDestination) override;
     Renderer& Blit(const Texture &arTexture) override;
     Renderer& PushClipRect(const Rect &arClipRect) override;
     Renderer& PopClipRect() override;
@@ -52,4 +52,4 @@ protected:
 } /* namespace rsp::graphics::sw */
 
 #endif /* USE_GFX_SW */
-#endif /* SRC_GRAPHICS_SW_SWRENDERER_H_ */
+#endif // RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_RENDERER_H

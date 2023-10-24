@@ -11,7 +11,6 @@
 #ifdef USE_GFX_SW
 
 #include <cstring>
-#include <cstdlib>
 #include <algorithm>
 #include "SWGfxHal.h"
 
@@ -34,9 +33,9 @@ std::uint64_t SWGfxHal::mAllocated = 0;
 
 struct VideoDeleter
 {
-    VideoDeleter(size_t aSize) : mSize(aSize) {}
+    explicit VideoDeleter(size_t aSize) : mSize(aSize) {}
 
-    void operator()(uint32_t p[]) noexcept {
+    void operator()(const uint32_t p[]) const noexcept {
         try {
             delete[] p;
         }
@@ -53,8 +52,8 @@ protected:
 std::shared_ptr<VideoSurface> SWGfxHal::Alloc(int aWidth, int aHeight)
 {
     auto surface = std::make_shared<VideoSurface>();
-    size_t size = size_t(aWidth * aHeight);
-    surface->mpVirtAddr = std::unique_ptr<uint32_t[], VideoDeleter>(new uint32_t[size], VideoDeleter(size));
+    auto size = size_t(aWidth) * size_t(aHeight);
+    surface->mpVirtualAddr = std::unique_ptr<uint32_t[], VideoDeleter>(new uint32_t[size], VideoDeleter(size));
     mAllocated += (size * sizeof(uint32_t));
     surface->mRowPitch = uintptr_t(aWidth) * sizeof(uint32_t);
     surface->mWidth = aWidth;
@@ -91,11 +90,11 @@ static inline uint32_t alphaBlend(uint32_t bg, uint32_t fg)
     return result;
 }
 
-constexpr uint32_t* offset(uint32_t *addr, uintptr_t pitch, uintptr_t x, uintptr_t y) {
+inline uint32_t* offset(uint32_t *addr, uintptr_t pitch, uintptr_t x, uintptr_t y) {
     return reinterpret_cast<uint32_t*>(uintptr_t(addr) + (y * pitch) + (x * sizeof(uint32_t)));
 }
 
-constexpr uint32_t* offset(uint32_t *addr, uintptr_t pitch, GuiUnit_t x, GuiUnit_t y) {
+inline uint32_t* offset(uint32_t *addr, uintptr_t pitch, GuiUnit_t x, GuiUnit_t y) {
     return offset(addr, pitch, uintptr_t(x), uintptr_t(y));
 }
 
@@ -132,8 +131,8 @@ void SWGfxHal::Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalRect
         sr &= *aSrcRect;
     }
 
-    uint32_t *src = arSrc.mpVirtAddr.get();
-    uint32_t *dst = arDst.mpVirtAddr.get();
+    uint32_t *src = arSrc.mpVirtualAddr.get();
+    uint32_t *dst = arDst.mpVirtualAddr.get();
 
     GuiUnit_t y_end = std::min(dr.GetHeight(), sr.GetHeight()) + dr.GetTop();
     size_t w = size_t(std::min(dr.GetWidth(), sr.GetWidth()));
@@ -197,9 +196,9 @@ void SWGfxHal::CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint3
         sr &= *aSrcRect;
     }
 
-    uint32_t *dst = arDst.mpVirtAddr.get();
+    uint32_t *dst = arDst.mpVirtualAddr.get();
 
-    GuiUnit_t y_end = uintptr_t(std::min(dr.GetHeight(), sr.GetHeight()));
+    GuiUnit_t y_end = GuiUnit_t(std::min(dr.GetHeight(), sr.GetHeight()));
     size_t w = size_t(std::min(dr.GetWidth(), sr.GetWidth()));
     GuiUnit_t src_y = sr.GetTop();
 
@@ -266,7 +265,7 @@ void SWGfxHal::DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect
     if (left < arDst.mWidth && right > 0) {
         // Top horizontal
         if (top >= 0 && top < arDst.mHeight) {
-            auto *lp = offset(arDst.mpVirtAddr.get(), pitch, left, top);
+            auto *lp = offset(arDst.mpVirtualAddr.get(), pitch, left, top);
             for (GuiUnit_t i = left; i < right ; ++i) {
                 paintPixel(arDst.mBlendOperation, lp, aColor);
                 lp++;
@@ -274,8 +273,8 @@ void SWGfxHal::DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect
         }
 
         // Bottom horizontal
-        if (bottom >= 0 && bottom < arDst.mHeight && left < arDst.mWidth && right > 0) {
-            auto *lp = offset(arDst.mpVirtAddr.get(), pitch, left, bottom);
+        if (bottom >= 0 && bottom < arDst.mHeight && left < arDst.mWidth) {
+            auto *lp = offset(arDst.mpVirtualAddr.get(), pitch, left, bottom);
             for (GuiUnit_t i = left; i < right ; ++i) {
                 paintPixel(arDst.mBlendOperation, lp, aColor);
                 lp++;
@@ -290,7 +289,7 @@ void SWGfxHal::DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect
         // Left vertical
         left = arRect.GetLeft();
         if (left >= 0 && left < arDst.mWidth) {
-            auto *lp = offset(arDst.mpVirtAddr.get(), pitch, left, top);
+            auto *lp = offset(arDst.mpVirtualAddr.get(), pitch, left, top);
             for (GuiUnit_t i = top; i < bottom ; ++i) {
                 paintPixel(arDst.mBlendOperation, lp, aColor);
                 lp = reinterpret_cast<uint32_t*>(uintptr_t(lp) + pitch);
@@ -300,7 +299,7 @@ void SWGfxHal::DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect
         // Right Vertical
         right = arRect.GetRight() - 1;
         if (right >= 0 && right < arDst.mWidth) {
-            auto *lp = offset(arDst.mpVirtAddr.get(), pitch, right, top);
+            auto *lp = offset(arDst.mpVirtualAddr.get(), pitch, right, top);
             for (GuiUnit_t i = top; i < bottom ; ++i) {
                 paintPixel(arDst.mBlendOperation, lp, aColor);
                 lp = reinterpret_cast<uint32_t*>(uintptr_t(lp) + pitch);
@@ -320,7 +319,7 @@ void SWGfxHal::Fill(VideoSurface &arDst, uint32_t aColor, OptionalRect aDstRect)
     GuiUnit_t x_end = dr.GetRight();
 
     for (GuiUnit_t y = dr.GetTop(); y < y_end ; ++y) {
-        uint32_t *dst = offset(arDst.mpVirtAddr.get(), arDst.mRowPitch, dr.GetLeft(), y);
+        uint32_t *dst = offset(arDst.mpVirtualAddr.get(), arDst.mRowPitch, dr.GetLeft(), y);
         for (GuiUnit_t x = dr.GetLeft() ; x < x_end ; ++x) {
             *dst = aColor;
             ++dst;
@@ -333,10 +332,10 @@ void SWGfxHal::Sync()
     // The software operations perform immediately so we do nothing here.
 }
 
-uint32_t SWGfxHal::GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, bool aFrontBuffer) const
+uint32_t SWGfxHal::GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY) const
 {
     if (aX >= 0 && aX < arSurface.mWidth && aY >= 0 && aY < arSurface.mHeight) {
-        return *offset(arSurface.mpVirtAddr.get(), arSurface.mRowPitch, aX, aY);
+        return *offset(arSurface.mpVirtualAddr.get(), arSurface.mRowPitch, aX, aY);
     }
     return 0;
 }
@@ -344,7 +343,7 @@ uint32_t SWGfxHal::GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit
 void SWGfxHal::SetPixel(VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, uint32_t aColor)
 {
     if (aX >= 0 && aX < arSurface.mWidth && aY >= 0 && aY < arSurface.mHeight) {
-        uint32_t *dst = offset(arSurface.mpVirtAddr.get(), arSurface.mRowPitch, aX, aY);
+        uint32_t *dst = offset(arSurface.mpVirtualAddr.get(), arSurface.mRowPitch, aX, aY);
         paintPixel(arSurface.mBlendOperation, dst, aColor);
     }
 }

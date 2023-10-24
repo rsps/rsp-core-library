@@ -25,7 +25,7 @@ TEST_CASE("Label")
 
 #ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    sw::Framebuffer::mDevicePath = p;
+    Renderer::SetDevicePath(p.string());
 #endif
 
     CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-Italic-VariableFont_wght.ttf"));

@@ -12,9 +12,11 @@
 #include <graphics/Scene.h>
 #include <utils/Random.h>
 #include <doctest.h>
-
 #include <scenes/Scenes.h>
 #include <TestHelpers.h>
+#ifdef USE_GFX_SW
+#include <posix/FileSystem.h>
+#endif
 
 using namespace rsp::graphics;
 using namespace rsp::messaging;

@@ -8,12 +8,12 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_GRAPHICS_SW_GFXHAL_H_
-#define SRC_GRAPHICS_SW_GFXHAL_H_
+#ifndef RSP_CORE_LIB_SRC_GRAPHICS_SW_GFX_HAL_H
+#define RSP_CORE_LIB_SRC_GRAPHICS_SW_GFX_HAL_H
 
 #ifdef USE_GFX_SW
 
-#include <stdint.h>
+#include <cstdint>
 #include <memory>
 #include <functional>
 #include <utils/OptionalPtr.h>
@@ -33,7 +33,7 @@ struct VideoSurface
 {
     using PixelPtr_t = std::unique_ptr<uint32_t[], std::function<void(uint32_t[])> >;
 
-    PixelPtr_t mpVirtAddr{}; // Pointer to 32-bit ARGB pixels, accessible from user space
+    PixelPtr_t mpVirtualAddr{}; // Pointer to 32-bit ARGB pixels, accessible from user space
     uintptr_t mRowPitch = 0; // Number of bytes per row in physical memory (alignment vs. pixel width)
     GuiUnit_t mWidth = 0;
     GuiUnit_t mHeight = 0;
@@ -60,16 +60,16 @@ public:
      */
     static GfxHal& Get();
 
-    virtual ~GfxHal() {}
+    virtual ~GfxHal() = default;
 
     /**
      * \brief Allocate a buffer in video memory
      *
      * This allocates the requested amount of video memory returns a VideoSurface object with
      * the attributes of allocation.
-     * The mpVirtAddr unique pointer is allocated with a specialized deallocator so
+     * The mpVirtualAddr unique pointer is allocated with a specialized de-allocator so
      * standard smart pointer operations work on designated memory.
-     * To free it, simply destroy the VideoSurface or set mpVirtAddr to null.
+     * To free it, simply destroy the VideoSurface or set mpVirtualAddr to null.
      *
      * \param arSurface The surface struct to fill
      * \param aWidth
@@ -83,7 +83,7 @@ public:
      *
      * \return AllocaStatus
      */
-    virtual std::uint64_t GetVideoMemoryUsage() const = 0;
+    [[nodiscard]] virtual std::uint64_t GetVideoMemoryUsage() const = 0;
 
     /**
      * \brief Copy an area onto another
@@ -93,7 +93,7 @@ public:
      * \param aDstRect Optional area on destination surface, if null the entire destination is filled
      * \param aSrcRect Optional area from source surface, if null, the entire source is copied
      */
-    virtual void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalRect aDstRect = nullptr, OptionalRect aSrcRect = nullptr) = 0;
+    virtual void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalRect aDstRect = nullptr, OptionalRect aSrcRect = nullptr) = 0; // NOLINT, default arguments intended on interface
 
     /**
      * \brief Copy an area of PixelData into a VideoSurface
@@ -102,7 +102,7 @@ public:
      * \param aDstRect
      * \param aSrcRect
      */
-    virtual void CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint32_t aColor, OptionalRect aDstRect = nullptr, OptionalRect aSrcRect = nullptr) = 0;
+    virtual void CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint32_t aColor, OptionalRect aDstRect = nullptr, OptionalRect aSrcRect = nullptr) = 0; // NOLINT, default arguments intended on interface
 
     /**
      * \brief Draw a rectangle with single pixel line width in a given color
@@ -120,7 +120,7 @@ public:
      * \param aColor
      * \param aDest Optional area to fill on destination, if not given the entire surface is filled
      */
-    virtual void Fill(VideoSurface &arDst, uint32_t aColor, OptionalRect aDest = nullptr) = 0;
+    virtual void Fill(VideoSurface &arDst, uint32_t aColor, OptionalRect aDest = nullptr) = 0; // NOLINT, default arguments intended on interface
 
     /**
      * \brief Set the value of a single pixel, with respect to the selected blend operation.
@@ -138,7 +138,7 @@ public:
      * \param aY
      * \return Color value
      */
-    virtual uint32_t GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, bool aFrontBuffer = false) const = 0;
+    [[nodiscard]] virtual uint32_t GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY) const = 0;
 
     /**
      * \brief Execute all queued operations, returns when finished
@@ -150,4 +150,4 @@ public:
 } /* namespace rsp::graphics::sw */
 
 #endif /* USE_GFX_SW */
-#endif /* SRC_GRAPHICS_SW_GFXHAL_H_ */
+#endif // RSP_CORE_LIB_SRC_GRAPHICS_SW_GFX_HAL_H

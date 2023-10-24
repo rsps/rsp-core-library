@@ -8,8 +8,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CURLHTTPREQUEST_H
-#define CURLHTTPREQUEST_H
+#ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
+#define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
 
 #include <network/IHttpRequest.h>
 #include <iostream>
@@ -80,4 +80,4 @@ private:
 
 }
 
-#endif
+#endif // RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
