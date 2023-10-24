@@ -3,7 +3,8 @@
 # Script to traverse all header files and update include guards to a common style.
 
 DIR=$1
-PREFIX="RSP_CORE_LIB_"
+DEFAULT_PREFIX="RSP_CORE_LIB_"
+PREFIX="${2:-$DEFAULT_PREFIX}"
 
 FILES=$(find "$DIR" -name "*.h" -type f -not -path "*/build/*" -not -path "*/.?*")
 
@@ -16,9 +17,11 @@ do
   tmp=${tmp//\//_} # Convert path delimiters to _
   tmp=${tmp//./_}  # Convert . to _
   tmp=${tmp//-/_}  # Convert - to _
+  tmp=${PREFIX}${tmp^^}
   tmp=${tmp//__/_} # Combine __ to _
   tmp=${tmp//__/_} # Combine __ to _ again. Bash string substitution is not global.
-  GUARD=${PREFIX}${tmp^^}
+  tmp=${tmp//__/_} # Combine __ to _ again. Bash string substitution is not global.
+  GUARD=$tmp
   echo "${GUARD}"
 
   regex="s/#ifndef\s+([A-Za-z0-9_-]+)\n#define \1\n(.*)\n#endif\s*(\/\/\s*\1|\/\*\s*\1\s*\*\/|\n)/#ifndef $GUARD\n#define $GUARD\n\2\n#endif \/\/ $GUARD/s"
