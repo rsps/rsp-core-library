@@ -15,6 +15,8 @@ do
   tmp=$(echo "$tmp" | perl -pe 's/([A-Z])([A-Z][a-z0-9])/$1_$2/g') # Convert ALLCaps to ALL_Caps
   tmp=${tmp//\//_}
   tmp=${tmp//./_}
+  tmp=${tmp//-/_}
+  tmp=${tmp//__/_}
   tmp=${tmp//__/_}
   GUARD=${PREFIX}${tmp^^}
   echo "${GUARD}"
