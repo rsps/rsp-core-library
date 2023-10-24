@@ -5,7 +5,7 @@
 DIR=$1
 PREFIX="RSP_CORE_LIB_"
 
-FILES=$(find "$DIR" -name "*.h" -type f)
+FILES=$(find "$DIR" -name "*.h" -type f -not -path "*/build/*" -not -path "*/.?*")
 
 for f in $FILES
 do
