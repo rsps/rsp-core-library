@@ -57,8 +57,10 @@ class Logger : public LoggerInterface
 {
 public:
     explicit Logger(bool aCaptureClog = false);
-    Logger(const Logger&) = delete;
     ~Logger() override;
+
+    Logger(const Logger&) = delete;
+    Logger& operator= (const Logger&) = delete;
 
     LogStream Emergency() override;
     LogStream Alert() override;
@@ -69,14 +71,22 @@ public:
     LogStream Info() override;
     LogStream Debug() override;
 
-    Logger& operator= (const Logger&) = delete;
+
+    [[nodiscard]] size_t GetWritersCount() const override;
+    [[nodiscard]] Handle_t AddLogWriter(const std::shared_ptr<LogWriterInterface>& arWriter) override;
+    void RemoveLogWriter(Handle_t aHandle) override;
 
 protected:
     // Use shared_ptr to use compilers default move operations.
     // It is instantiated with "do nothing" de-allocator in Logger constructor initialization.
     std::shared_ptr<std::streambuf> mpClogBackup;
 
+    std::recursive_mutex mMutex{};
+    std::vector<std::shared_ptr<LogWriterInterface>> mWriters{};
+
     std::shared_ptr<std::streambuf> makeCLogStream(bool aCaptureLog);
+    void write(const LogStream &arStream, const std::string &arMsg,
+                       const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
 };
 
 } /* namespace logging */

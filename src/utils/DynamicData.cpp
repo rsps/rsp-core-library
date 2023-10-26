@@ -102,7 +102,7 @@ bool DynamicData::MemberExists(std::string_view aKey) const
 DynamicData& DynamicData::Add(DynamicData aValue)
 {
     forceArray();
-    Logger::GetDefault().Info() << "DynamicData::Add(): " << aValue;
+    Logger::GetDefault().Debug() << "DynamicData::Add(): " << aValue;
     mItems.emplace_back(std::move(aValue));
     return *this;
 }
@@ -110,7 +110,7 @@ DynamicData& DynamicData::Add(DynamicData aValue)
 DynamicData& DynamicData::Add(std::string_view aKey, DynamicData aValue)
 {
     forceObject();
-    Logger::GetDefault().Info() << "JsonObject::Add(): \"" << aKey << "\": " << aValue;
+    Logger::GetDefault().Debug() << "DynamicData::Add(): \"" << aKey << "\": " << aValue;
     aValue.mName = aKey;
     mItems.push_back(std::move(aValue));
     return *this;

@@ -34,6 +34,15 @@ public:
     rsp::logging::LogStream Info() override;
     rsp::logging::LogStream Debug() override;
 
+    [[nodiscard]] size_t GetWritersCount() const override;
+
+    [[nodiscard]] Handle_t AddLogWriter(const std::shared_ptr<LogWriterInterface> &arWriter) override;
+
+    void RemoveLogWriter(Handle_t aHandle) override;
+
+protected:
+    void write(const LogStream &arStream, const std::string &arMsg, const std::string &arChannel, const utils::DynamicData &arContext) override;
+
 protected:
     LoggerInterface &mrLogger;
     std::string mChannel;

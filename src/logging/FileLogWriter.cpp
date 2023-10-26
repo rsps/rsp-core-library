@@ -9,9 +9,10 @@
  */
 
 #include <iostream>
-#include <utils/DateTime.h>
-#include <logging/FileLogWriter.h>
 #include <json/JsonEncoder.h>
+#include <logging/FileLogWriter.h>
+#include <utils/DateTime.h>
+#include <utils/StrUtils.h>
 
 using namespace rsp::utils;
 
@@ -40,11 +41,11 @@ void FileLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, cons
         DateTime dt;
         mOutput << "[" << dt.ToLogging() << "] ";
         if (arChannel.length()) {
-            mOutput << "<" << arChannel << "> ";
+            mOutput << arChannel;
         }
-        mOutput << "(" << ToString(aCurrentLevel) << ") " << arMsg;
+        mOutput << "." << StrUtils::ToUpper(ToString(aCurrentLevel)) << ": " << arMsg;
         if (!arContext.IsNull()) {
-            mOutput << "  " << rsp::json::JsonEncoder().Encode(arContext);
+            mOutput << " " << rsp::json::JsonEncoder().Encode(arContext);
         }
         mOutput << std::endl;
     }

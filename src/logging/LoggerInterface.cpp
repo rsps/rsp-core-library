@@ -15,42 +15,6 @@ namespace rsp::logging {
 std::shared_ptr<LoggerInterface> LoggerInterface::mpDefaultInstance = nullptr;
 
 
-LoggerInterface::Handle_t LoggerInterface::AddLogWriter(const std::shared_ptr<LogWriterInterface>& arWriter)
-{
-    mWriters.push_back(arWriter);
-    return reinterpret_cast<Handle_t>(arWriter.get());
-}
-
-void LoggerInterface::RemoveLogWriter(Handle_t aHandle)
-{
-    if (aHandle == 0) {
-        return;
-    }
-
-    auto it = std::find_if(mWriters.begin(), mWriters.end(), [&](std::shared_ptr<LogWriterInterface> const& arWriter) {
-        return aHandle == reinterpret_cast<Handle_t>(arWriter.get());
-    });
-    if (it != mWriters.end()) {
-        mWriters.erase(it);
-    }
-}
-
-bool LoggerInterface::HasWriters() const
-{
-    return !mWriters.empty();
-}
-
-void LoggerInterface::write(const LogStream &arStream, const std::string &arMsg, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
-{
-    LogLevel current_level = arStream.GetLevel();
-    std::lock_guard<std::recursive_mutex> lock(mMutex);
-
-    for (std::shared_ptr<LogWriterInterface> &w : mWriters) {
-        w->Write(arMsg, current_level, arChannel, arContext);
-    }
-}
-
-
 LoggerInterface& LoggerInterface::GetDefault()
 {
     if (!mpDefaultInstance) {

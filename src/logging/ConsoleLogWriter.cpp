@@ -59,11 +59,11 @@ void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, c
         ss << (*mpColors)[std::size_t(aCurrentLevel)];
     }
     if (arChannel.length()) {
-        ss << "<" << arChannel << "> ";
+        ss << arChannel << ": ";
     }
     ss << arMsg;
     if (!arContext.IsNull()) {
-        ss << "  " << rsp::json::JsonEncoder().Encode(arContext);
+        ss << " " << rsp::json::JsonEncoder().Encode(arContext);
     }
     if (mpColors) {
         ss << std::string(AnsiEscapeCodes::ec::ConsoleDefault);

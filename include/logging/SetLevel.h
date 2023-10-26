@@ -35,7 +35,7 @@ public:
      * \brief Callable operator used by streaming operators
      *
      * \param o
-     * \return
+     * \return o
      */
     std::ostream& operator()(std::ostream& o) const;
 
@@ -47,7 +47,7 @@ public:
  *
  * \param o
  * \param aLevel
- * \return
+ * \return o
  */
 std::ostream& operator<<(std::ostream &o, SetLevel aLevel);
 
