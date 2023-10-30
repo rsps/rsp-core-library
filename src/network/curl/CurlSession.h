@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_NETWORK_CURL_CURLSESSION_H_
-#define SRC_NETWORK_CURL_CURLSESSION_H_
+#ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_SESSION_H
+#define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_SESSION_H
 
 #include <vector>
 #include <network/IHttpSession.h>
@@ -44,4 +44,4 @@ private:
 
 } /* namespace rsp::network::curl */
 
-#endif /* SRC_NETWORK_CURL_CURLSESSION_H_ */
+#endif // RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_SESSION_H

@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_GRAPHICS_SW_SWTEXTURE_H_
-#define SRC_GRAPHICS_SW_SWTEXTURE_H_
+#ifndef RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_TEXTURE_H
+#define RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_TEXTURE_H
 
 #ifdef USE_GFX_SW
 
@@ -27,19 +27,19 @@ class SWTexture: public rsp::graphics::Texture
 public:
     SWTexture(GuiUnit_t aWidth, GuiUnit_t aHeight, const Point &arDestPos, const Point &arDestOffset);
 
-    GuiUnit_t GetWidth() const override;
-    GuiUnit_t GetHeight() const override;
+    [[nodiscard]] GuiUnit_t GetWidth() const override;
+    [[nodiscard]] GuiUnit_t GetHeight() const override;
 
-    Texture& Fill(const Color &arColor, GfxHal::OptionalRect arRect = nullptr) override;
+    Texture& Fill(const Color &arColor, GfxHal::OptionalRect) override;
     Texture& Update(const PixelData &arPixelData, const Color &arColor) override;
-    Texture& SetBlendOperation(Texture::BlendOperation aOp, const Color &arColorKey = Colors::None) override;
+    Texture& SetBlendOperation(Texture::BlendOperation aOp, const Color &arColorKey) override;
     Texture& SetSourceRect(const Rect &arRect) override;
     Texture& SetDestination(const Point &arPoint) override;
-    Point GetDestination() const override;
+    [[nodiscard]] Point GetDestination() const override;
     Texture& SetOffset(const Point &arPoint) override;
-    std::unique_ptr<Texture> Clone() const override;
-    Rect GetDestinationRect() const override;
-    const Rect& GetSourceRect() const override;
+    [[nodiscard]] std::unique_ptr<Texture> Clone() const override;
+    [[nodiscard]] Rect GetDestinationRect() const override;
+    [[nodiscard]] const Rect& GetSourceRect() const override;
 
 protected:
     SWTexture(const SWTexture& arOther) = default;
@@ -55,4 +55,4 @@ protected:
 } /* namespace rsp::graphics::sw */
 
 #endif /* USE_GFX_SW */
-#endif /* SRC_GRAPHICS_SW_SWTEXTURE_H_ */
+#endif // RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_TEXTURE_H

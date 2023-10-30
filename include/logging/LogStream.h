@@ -16,6 +16,8 @@
 #include <utils/DynamicData.h>
 #include "LogTypes.h"
 #include "SetLevel.h"
+#include "SetContext.h"
+#include "SetChannel.h"
 
 namespace rsp::logging {
 
@@ -32,7 +34,7 @@ class LoggerInterface;
 class LogStream
 {
 public:
-    LogStream(LoggerInterface *apOwner, LogLevel aLevel, std::string aChannel, rsp::utils::DynamicData aContext);
+    LogStream(LoggerInterface *apOwner, LogLevel aLevel);
     LogStream(const LogStream &arOther);
     LogStream(LogStream &&arOther) noexcept; /* No copy, move is OK */
     virtual ~LogStream();
@@ -51,8 +53,9 @@ public:
      * \brief Set the current stream acceptance log level
      *
      * \param aLevel
+     * \return self
      */
-    void SetLevel(LogLevel aLevel);
+    LogStream& SetLevel(LogLevel aLevel);
 
     /**
      * \brief Set the current stream channel
@@ -68,7 +71,7 @@ public:
      * \param arContext
      * \return self
      */
-    LogStream& SetContext(rsp::utils::DynamicData& arContext);
+    LogStream& SetContext(const rsp::utils::DynamicData &arContext);
 
     /**
      * \brief Template to declare streaming operators for individual types
@@ -84,7 +87,7 @@ public:
     }
 
     /**
-     * \brief Streaming operator for functions
+     * \brief Streaming operator specialization  for functions
      *
      * \param apFunc
      * \return self
@@ -92,18 +95,31 @@ public:
     LogStream& operator<<(std::ostream&(*apFunc)(std::ostream&));
 
     /**
-     * \brief Streaming operator for SetLevel objects
-     *
-     * \param aLevel
-     * \return
+     * \brief Streaming operator specialization for SetLevel objects
+     * \param arLevel
+     * \return self
      */
-    LogStream& operator<<(rsp::logging::SetLevel aLevel);
+    LogStream& operator<<(const class SetLevel &arLevel);
+
+    /**
+     * \brief Streaming operator specialization for SetContext objects
+     * \param arContext
+     * \return self
+     */
+    LogStream& operator<<(const class SetContext& arContext);
+
+    /**
+     * \brief Streaming operator specialization for SetChannel objects
+     * \param arChannel
+     * \return self
+     */
+    LogStream& operator<<(const class SetChannel& arChannel);
 
 protected:
     LoggerInterface *mpLogger;
     LogLevel mLevel;
-    std::string mChannel;
-    rsp::utils::DynamicData mContext;
+    std::string mChannel{};
+    rsp::utils::DynamicData mContext{};
     std::stringstream mBuffer{};
 
     void flush();

@@ -8,14 +8,13 @@
  * \author      Steffen Brummer
  */
 
-#include <thread>
 #include <logging/OutStreamBuffer.h>
 
 namespace rsp::logging {
 
 OutStreamBuffer::OutStreamBuffer(LoggerInterface *apLogger, LogLevel aLevel)
     : std::streambuf(),
-      LogStream(apLogger, aLevel, std::string(), rsp::utils::DynamicData())
+      LogStream(apLogger, aLevel)
 {
 }
 
@@ -34,8 +33,8 @@ int OutStreamBuffer::overflow(int c)
 
 int OutStreamBuffer::sync()
 {
-    if (mMutex.try_lock()) {
-        DEBUG("mutex was not locked!!! " << std::this_thread::get_id())
+    if (mLock.IsLocked()) {
+        DEBUG("OutStreamBuffer mutex was not locked!!! " << std::this_thread::get_id())
     }
 
     // Remove one ending newline, writeToLogger enforces a newline on every write
@@ -50,10 +49,9 @@ int OutStreamBuffer::sync()
     }
     mBuffer.str(std::string());
 
-    mMutex.unlock();
+    mLock.Unlock();
     DEBUG("Unlocked by " << std::this_thread::get_id())
     return 0;
 }
-
 
 } /* namespace rsp::logging */

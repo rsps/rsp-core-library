@@ -13,11 +13,9 @@
 
 namespace rsp::logging {
 
-LogStream::LogStream(LoggerInterface *apLogger, LogLevel aLevel, std::string aChannel, rsp::utils::DynamicData aContext)
+LogStream::LogStream(LoggerInterface *apLogger, LogLevel aLevel)
     : mpLogger(apLogger),
-      mLevel(aLevel),
-      mChannel(std::move(aChannel)),
-      mContext(std::move(aContext))
+      mLevel(aLevel)
 {
     mBuffer.imbue(std::locale{"C"});
 }
@@ -90,9 +88,10 @@ LogLevel LogStream::GetLevel() const
     return mLevel;
 }
 
-void LogStream::SetLevel(LogLevel aLevel)
+LogStream& LogStream::SetLevel(LogLevel aLevel)
 {
     mLevel = aLevel;
+    return *this;
 }
 
 LogStream& LogStream::SetChannel(const std::string &arChannel)
@@ -101,7 +100,7 @@ LogStream& LogStream::SetChannel(const std::string &arChannel)
     return *this;
 }
 
-LogStream& LogStream::SetContext(rsp::utils::DynamicData &arContext)
+LogStream& LogStream::SetContext(const rsp::utils::DynamicData &arContext)
 {
     mContext = arContext;
     return *this;
@@ -113,10 +112,19 @@ LogStream& LogStream::operator<<(std::ostream&(*apFunc)(std::ostream&))
     return *this;
 }
 
-LogStream& LogStream::operator <<(rsp::logging::SetLevel aLevel)
+LogStream& LogStream::operator <<(const class SetLevel &arLevel)
 {
-    SetLevel(aLevel.mValue);
-    return *this;
+    return SetLevel(arLevel.mValue);
+}
+
+LogStream &LogStream::operator<<(const class SetContext &arContext)
+{
+    return SetContext(arContext.mValue);
+}
+
+LogStream &LogStream::operator<<(const class SetChannel &arChannel)
+{
+    return SetChannel(arChannel.mValue);
 }
 
 } /* namespace rsp::logging */

@@ -16,6 +16,7 @@
 #include <doctest.h>
 #include <exceptions/CoreException.h>
 #include <logging/Logger.h>
+#include <logging/LogChannel.h>
 #include <logging/ConsoleLogWriter.h>
 #include <logging/FileLogWriter.h>
 #include <utils/StrUtils.h>
@@ -38,7 +39,6 @@ std::ostream& operator<< (std::ostream& os, const MyType &arType)
     os << "MyType: " << arType.Value;
     return os;
 }
-
 
 static std::vector<std::string> mConsoleInfoBuffer;
 static std::vector<std::string> mConsoleErrorBuffer;
@@ -72,20 +72,23 @@ TEST_CASE("Logging") {
     mConsoleErrorBuffer.clear();
     mConsoleInfoBuffer.clear();
 
-    logging::Logger log(true);
+
+    CHECK_NOTHROW(logging::Logger dummy_logger(true));
+    logging::Logger logger(true);
 
     CHECK_THROWS_AS(logging::LoggerInterface::GetDefault(), const exceptions::NotSetException &);
-    CHECK_NOTHROW(logging::LoggerInterface::SetDefault(&log));
+    CHECK_NOTHROW(logging::LoggerInterface::SetDefault(&logger));
 
-    CHECK_NOTHROW(log.SetChannel("Test Channel"));
-    CHECK_NOTHROW(log.SetContext(DynamicData().Add("Test Context").Add(42)));
+    CHECK_NOTHROW(logging::LogChannel dummy_log("Dummy Channel"));
+    logging::LogChannel log("Test Channel");
+
 
     CHECK_NOTHROW(auto h = log.AddLogWriter(std::make_shared<logging::FileLogWriter>(cFileName, logging::LogLevel::Info)));
     CHECK_NOTHROW(auto h = log.AddLogWriter(std::make_shared<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors)));
 
     CHECK_NOTHROW(log.Info() << "Test of logger");
     CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(7)));
-    CHECK_NOTHROW(log.Alert() << "Alert");
+    CHECK_NOTHROW(log.Alert() << SetContext(DynamicData().Add("Test Context").Add(42)) << "Alert");
     CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(2)));
     CHECK_NOTHROW(log.Error() << "Error");
     CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(3)));
@@ -99,20 +102,20 @@ TEST_CASE("Logging") {
     MyType type;
     CHECK_NOTHROW(log.Info() << type);
 
-    CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Critical) << "Critical to std::clog" << std::endl);
+    CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Critical) << "Critical to std::clog" << SetChannel("Main") << std::endl);
 
     CHECK_NOTHROW(log.Emergency() << "Sleeping for 1 second");
     auto end = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 
     std::thread t([&]() {
         for (int i=0; i < 12 ; i++) {
-            CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Info) << "Writing from thread " << i << std::endl);
+            CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Info) << SetChannel("Main") << "Writing from thread " << i << std::endl);
             std::this_thread::sleep_for(std::chrono::milliseconds(90));
         }
     });
 
     do {
-        CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Info) << "Writing from main" << std::endl);
+        CHECK_NOTHROW(std::clog << SetChannel("Main") << SetLevel(LogLevel::Info) << "Writing from main" << std::endl);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     while (std::chrono::high_resolution_clock::now() < end);
@@ -135,44 +138,44 @@ TEST_CASE("Logging") {
     CHECK_EQ(mConsoleInfoBuffer.size(), 0);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::EndsWith(line, "] <Test Channel> (Alert) Alert  [\"Test Context\",42]"), line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "] Test Channel.ALERT: Alert [\"Test Context\",42]"), line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "Error"), line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "ERROR:"), line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "Warning"), line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "WARNING:"), line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "Info"), line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "INFO:"), line);
 
     std::getline(fin, line);
-    CHECK_FALSE_MESSAGE(StrUtils::Contains(line, "Debug"), line);
+    CHECK_FALSE_MESSAGE(StrUtils::Contains(line, "DEBUG:"), line);
     CHECK_MESSAGE(StrUtils::Contains(line, "Dbg-Info") , line);
 
     std::getline(fin, line);
     CHECK_MESSAGE(StrUtils::Contains(line, "MyType: 666"), line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::EndsWith(line, "(Critical) Critical to std::clog"), line);
-    CHECK_MESSAGE(StrUtils::Contains(mConsoleErrorBuffer[1], std::string(AnsiEscapeCodes::ec::fg::Red) + "Critical to std::clog"), mConsoleErrorBuffer[1]);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, ".CRITICAL: Critical to std::clog"), line);
+    CHECK_MESSAGE(StrUtils::Contains(mConsoleErrorBuffer[1], std::string(AnsiEscapeCodes::ec::fg::Red) + "Main: Critical to std::clog"), mConsoleErrorBuffer[1]);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "(Emergency) Sleeping for 1 second"), line);
-    CHECK_MESSAGE(StrUtils::StartsWith(mConsoleErrorBuffer[2], std::string(AnsiEscapeCodes::ec::fg::Red) + "<Test Channel> Sleeping for 1 second"), mConsoleErrorBuffer[2]);
+    CHECK_MESSAGE(StrUtils::Contains(line, "EMERGENCY: Sleeping for 1 second"), line);
+    CHECK_MESSAGE(StrUtils::StartsWith(mConsoleErrorBuffer[2], std::string(AnsiEscapeCodes::ec::fg::Red) + "Test Channel: Sleeping for 1 second"), mConsoleErrorBuffer[2]);
 
     for (int i = 0 ; i < 22 ; i++) {
         std::getline(fin, line);
-        CHECK_MESSAGE(StrUtils::Contains(line, "] (Info) Writing from "), line);
+        CHECK_MESSAGE(StrUtils::Contains(line, "] Main.INFO: Writing from "), line);
     }
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "(Info) Wakeup..."), line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "] Main.INFO: Wakeup..."), line);
 
     std::getline(fin, line);
     CHECK_MESSAGE(fin.eof(), line);
 
-    CHECK_EQ(&(logging::LoggerInterface::GetDefault()), &log);
+    CHECK_EQ(&(logging::LoggerInterface::GetDefault()), &logger);
 
     CHECK_NOTHROW(logging::LoggerInterface::SetDefault(nullptr));
 }

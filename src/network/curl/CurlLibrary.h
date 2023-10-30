@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_NETWORK_CURL_CURLLIBRARY_H_
-#define SRC_NETWORK_CURL_CURLLIBRARY_H_
+#ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_LIBRARY_H
+#define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_LIBRARY_H
 
 #include <curl/curl.h>
 #include <string_view>
@@ -50,4 +50,4 @@ private:
 
 } /* namespace rsp::network::curl */
 
-#endif /* SRC_NETWORK_CURL_CURLLIBRARY_H_ */
+#endif // RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_LIBRARY_H

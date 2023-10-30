@@ -19,15 +19,15 @@ std::unique_ptr<Texture> Texture::Create(const PixelData &arPixelData, const Col
     switch(arPixelData.GetColorDepth()) {
         default:
         case ColorDepth::RGB:
-            result->SetBlendOperation(Texture::BlendOperation::Copy);
+            result->SetBlendOperation(Texture::BlendOperation::Copy, Color::None);
             break;
         case ColorDepth::Monochrome:
         case ColorDepth::Alpha:
         case ColorDepth::RGBA:
-            result->SetBlendOperation(Texture::BlendOperation::SourceAlpha);
+            result->SetBlendOperation(Texture::BlendOperation::SourceAlpha, Color::None);
             break;
     }
-    result->Fill(Color::None).Update(arPixelData, arColor);
+    result->Fill(Color::None, nullptr).Update(arPixelData, arColor);
     return result;
 }
 

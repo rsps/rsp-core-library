@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_NETWORK_CURL_EASYCURL_H_
-#define SRC_NETWORK_CURL_EASYCURL_H_
+#ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_EASY_CURL_H
+#define RSP_CORE_LIB_SRC_NETWORK_CURL_EASY_CURL_H
 
 #include <string>
 #include "CurlLibrary.h"
@@ -75,4 +75,4 @@ private:
 
 } /* namespace rsp::network::http::curl */
 
-#endif /* SRC_NETWORK_CURL_EASYCURL_H_ */
+#endif // RSP_CORE_LIB_SRC_NETWORK_CURL_EASY_CURL_H

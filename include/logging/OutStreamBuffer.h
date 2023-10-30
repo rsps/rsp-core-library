@@ -13,8 +13,10 @@
 
 #include <iostream>
 #include <mutex>
+#include <thread>
 #include "LoggerInterface.h"
 #include "LogStream.h"
+#include <utils/ThreadGuard.h>
 
 namespace rsp::logging {
 
@@ -33,10 +35,10 @@ class OutStreamBuffer : public std::streambuf, public LogStream
 public:
     OutStreamBuffer(LoggerInterface *apOwner, LogLevel aLevel);
 
-    void Lock() { mMutex.lock(); }
+    void Lock() { mLock.Lock(); }
 
 protected:
-    std::mutex mMutex{};
+    rsp::utils::ThreadGuard mLock{};
 
     int overflow(int c) override;
     int sync() override;

@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  * \author      Steffen Brummer
  */
-#ifndef FRAMEBUFFER_H
-#define FRAMEBUFFER_H
+#ifndef RSP_CORE_LIB_SRC_GRAPHICS_SW_FRAMEBUFFER_H
+#define RSP_CORE_LIB_SRC_GRAPHICS_SW_FRAMEBUFFER_H
 
 #ifdef USE_GFX_SW
 
@@ -28,10 +28,10 @@ public:
     Framebuffer();
     virtual ~Framebuffer();
 
-    Framebuffer(const Framebuffer&) = default;
+    Framebuffer(const Framebuffer&) = delete;
     Framebuffer(Framebuffer&&) = default;
-    Framebuffer& operator=(const Framebuffer&) = default;
-    Framebuffer& operator=(Framebuffer&&) = default;
+    Framebuffer& operator=(const Framebuffer&) = delete;
+    Framebuffer& operator=(Framebuffer&&) = delete;
 
     GuiUnit_t GetWidth() const { return mScreenSurfaces[0].mWidth; }
     GuiUnit_t GetHeight() const { return mScreenSurfaces[0].mHeight; }
@@ -43,7 +43,7 @@ protected:
     struct fb_fix_screeninfo mFixedInfo{};
     struct fb_var_screeninfo mVariableInfo{};
     mutable VideoSurface mScreenSurfaces[2]{}; // Double buffers
-    int mCurrentSurface = 0; // Index of current backbuffer
+    int mCurrentSurface = 0; // Index of current back buffer
 
     void swapBuffer();
 };
@@ -51,4 +51,4 @@ protected:
 } // namespace rsp::graphics::sw
 
 #endif /* USE_GFX_SW */
-#endif // FRAMEBUFFER_H
+#endif // RSP_CORE_LIB_SRC_GRAPHICS_SW_FRAMEBUFFER_H

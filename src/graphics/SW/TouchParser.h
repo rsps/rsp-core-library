@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
-#ifndef TOUCHPARSER_H
-#define TOUCHPARSER_H
+#ifndef RSP_CORE_LIB_SRC_GRAPHICS_SW_TOUCH_PARSER_H
+#define RSP_CORE_LIB_SRC_GRAPHICS_SW_TOUCH_PARSER_H
 
 #ifdef USE_GFX_SW
 
@@ -51,7 +51,7 @@ public:
     static const char *mpDevicePath;
 
     TouchParser();
-    virtual ~TouchParser();
+    ~TouchParser() override;
 
     /**
      * \brief Parse input from touch driver
@@ -79,4 +79,4 @@ protected:
 
 #endif // USE_GFX_SW
 
-#endif // TOUCHPARSER_H
+#endif // RSP_CORE_LIB_SRC_GRAPHICS_SW_TOUCH_PARSER_H

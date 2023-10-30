@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef RSP_CORE_LIB_SDLEXCEPTION_H
-#define RSP_CORE_LIB_SDLEXCEPTION_H
+#ifndef RSP_CORE_LIB_SRC_GRAPHICS_SDL_SDL_EXCEPTION_H
+#define RSP_CORE_LIB_SRC_GRAPHICS_SDL_SDL_EXCEPTION_H
 
 #include <exceptions/CoreException.h>
 
@@ -26,4 +26,4 @@ public:
 
 } // namespace rsp::graphics::sdl
 
-#endif // RSP_CORE_LIB_SDLEXCEPTION_H
+#endif // RSP_CORE_LIB_SRC_GRAPHICS_SDL_SDL_EXCEPTION_H

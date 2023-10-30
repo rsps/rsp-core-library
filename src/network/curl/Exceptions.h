@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_NETWORK_CURL_EXCEPTIONS_H_
-#define SRC_NETWORK_CURL_EXCEPTIONS_H_
+#ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_EXCEPTIONS_H
+#define RSP_CORE_LIB_SRC_NETWORK_CURL_EXCEPTIONS_H
 
 #include <string_view>
 #include <curl/curl.h>
@@ -84,4 +84,4 @@ public:
 
 } // rsp::network::curl
 
-#endif /* SRC_NETWORK_CURL_EXCEPTIONS_H_ */
+#endif // RSP_CORE_LIB_SRC_NETWORK_CURL_EXCEPTIONS_H

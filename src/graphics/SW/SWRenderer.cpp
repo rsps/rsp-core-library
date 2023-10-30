@@ -10,7 +10,6 @@
 
 #ifdef USE_GFX_SW
 
-#include <cstring>
 #include <posix/FileSystem.h>
 #include "SWRenderer.h"
 #include "SWTexture.h"
@@ -150,7 +149,7 @@ ColorDepth SWRenderer::GetColorDepth() const
         default:
         case 1:
         case 24:
-            ;
+            break;
     }
     THROW_WITH_BACKTRACE(EIllegalColorDepth);
 }

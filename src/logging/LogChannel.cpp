@@ -8,6 +8,7 @@
  * \author      Steffen Brummer
  */
 #include <logging/LogChannel.h>
+#include <exceptions/CoreException.h>
 
 namespace rsp::logging {
 
@@ -69,6 +70,26 @@ LogChannel& LogChannel::operator =(const LogChannel &arOther)
         mChannel = arOther.mChannel;
     }
     return *this;
+}
+
+size_t LogChannel::GetWritersCount() const
+{
+    return mrLogger.GetWritersCount();
+}
+
+LoggerInterface::Handle_t LogChannel::AddLogWriter(const std::shared_ptr<LogWriterInterface> &arWriter)
+{
+    return mrLogger.AddLogWriter(arWriter);
+}
+
+void LogChannel::RemoveLogWriter(LoggerInterface::Handle_t aHandle)
+{
+    mrLogger.RemoveLogWriter(aHandle);
+}
+
+void LogChannel::write(const LogStream &arStream, const std::string &arMsg, const std::string &arChannel, const utils::DynamicData &arContext)
+{
+    mrLogger.write(arStream, arMsg, arChannel, arContext);
 }
 
 } /* namespace rsp::logging */

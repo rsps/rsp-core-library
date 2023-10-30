@@ -11,7 +11,6 @@
 #ifdef USE_GFX_SW
 
 #include <exceptions/ExceptionHelper.h>
-#include <chrono>
 #include <cstring>
 #include <fcntl.h>
 #include <iostream>
@@ -20,7 +19,6 @@
 #include <sys/mman.h>
 #include <thread>
 #include <unistd.h>
-#include <memory>
 #include "Framebuffer.h"
 
 namespace rsp::graphics::sw {
@@ -65,7 +63,7 @@ Framebuffer::Framebuffer()
         THROW_SYSTEM("Framebuffer ioctl FBIOPUT_VSCREENINFO failed");
     }
 
-    // stop the console from drawing ontop of this programs graphics
+    // stop the console from drawing on top of this programs graphics
     if (access("/dev/tty0", O_RDWR) == 0) {
         mTtyFb = open("/dev/tty0", O_RDWR);
         if (ioctl(mTtyFb, KDSETMODE, KD_GRAPHICS) == -1) {
@@ -76,15 +74,15 @@ Framebuffer::Framebuffer()
     // calculate size of screen
     std::size_t screensize = mVariableInfo.yres * mFixedInfo.line_length;
 
-    uint32_t *fb = static_cast<uint32_t *>(mmap(nullptr, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
+    auto *fb = static_cast<uint32_t *>(mmap(nullptr, screensize * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mFramebufferFile, static_cast<off_t>(0)));
     if (uintptr_t(fb) == uintptr_t(-1)) /*MAP_FAILED*/ {
         THROW_SYSTEM("Framebuffer shared memory mapping failed");
     }
 
-    mScreenSurfaces[0].mpVirtAddr = VideoSurface::PixelPtr_t(fb, [screensize](uint32_t *p) noexcept {
+    mScreenSurfaces[0].mpVirtualAddr = VideoSurface::PixelPtr_t(fb, [screensize](uint32_t *p) noexcept {
         munmap(p, screensize*2);
     });
-    mScreenSurfaces[1].mpVirtAddr = VideoSurface::PixelPtr_t(fb + (screensize / sizeof(std::uint32_t)), [](uint32_t apPtr[]) noexcept {});
+    mScreenSurfaces[1].mpVirtualAddr = VideoSurface::PixelPtr_t(fb + (screensize / sizeof(std::uint32_t)), [](uint32_t[]) noexcept {});
 
     if (mVariableInfo.yoffset == 0) {
         mCurrentSurface = 1;

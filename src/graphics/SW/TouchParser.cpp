@@ -124,7 +124,7 @@ void TouchParser::Flush()
 {
     GfxEvent dummy;
     while(Poll(dummy)) {
-        continue;
+//        continue;
     }
 }
 

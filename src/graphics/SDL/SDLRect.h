@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_GRAPHICS_SDL_SDLRECT_H_
-#define SRC_GRAPHICS_SDL_SDLRECT_H_
+#ifndef RSP_CORE_LIB_SRC_GRAPHICS_SDL_SDL_RECT_H
+#define RSP_CORE_LIB_SRC_GRAPHICS_SDL_SDL_RECT_H
 
 #ifdef USE_GFX_SDL
 
@@ -43,4 +43,4 @@ public:
 } /* namespace rsp::graphics::sdl */
 
 #endif /* USE_GFX_SDL */
-#endif /* SRC_GRAPHICS_SDL_SDLRECT_H_ */
+#endif // RSP_CORE_LIB_SRC_GRAPHICS_SDL_SDL_RECT_H
