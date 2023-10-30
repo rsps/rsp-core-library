@@ -119,7 +119,7 @@ DynamicData& DynamicData::Add(std::string_view aKey, DynamicData aValue)
 DynamicData& DynamicData::Remove(size_type aIndex)
 {
     tryArray();
-    mItems.erase(mItems.begin() + aIndex);
+    mItems.erase(mItems.begin() + static_cast<std::vector<DynamicData>::difference_type>(aIndex));
     return *this;
 }
 
