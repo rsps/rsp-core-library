@@ -32,11 +32,18 @@ TEST_CASE("Application")
 
     SUBCASE("Instantiate CommandLine") {
         CommandLine cmd(4, arguments);
+
+        CHECK_EQ(cmd.GetAppName(), "MyApplication");
+        CHECK_EQ(cmd.GetOptions().size(), 3);
+        CHECK(cmd.HasOption("-c"));
+        CHECK(cmd.HasOption("--version"));
+        CHECK(cmd.HasOption("--help"));
     }
 
     SUBCASE("Instantiate ApplicationBase") {
-        ApplicationBase app;
+        ApplicationBase app(1, arguments);
 
+        CHECK_EQ(app.GetAppName(), "MyApplication");
         CHECK_EQ(app.GetCommandLine().GetOptions().size(), 0);
         CHECK_EQ(app.GetCommandLine().GetCommands().size(), 0);
     }
@@ -57,7 +64,7 @@ TEST_CASE("Application")
         CHECK_EQ(fin.is_open(), true);
         std::string line;
         std::getline(fin, line);
-        CHECK_EQ(rsp::utils::StrUtils::EndsWith(line, "\"Hello World.\""), true);
+        CHECK(rsp::utils::StrUtils::EndsWith(line, "MyApplication says \"Hello World.\""));
     }
 
     SUBCASE("Execute Callback") {
@@ -75,7 +82,7 @@ TEST_CASE("Application")
         std::string line;
         std::getline(fin, line);
         std::getline(fin, line);
-        CHECK_EQ(rsp::utils::StrUtils::EndsWith(line, "Logged from callback."), true);
+        CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback."));
     }
 
     SUBCASE("Execute Callback to member function") {
@@ -101,9 +108,7 @@ TEST_CASE("Application")
         std::getline(fin, line);
         std::getline(fin, line);
         std::getline(fin, line);
-        CHECK_EQ(rsp::utils::StrUtils::EndsWith(line, "Logged from callback to member function."), true);
+        CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback to member function."));
     }
 
 }
-
-

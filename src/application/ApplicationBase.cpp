@@ -10,26 +10,31 @@
 
 #include <application/ApplicationBase.h>
 #include <application/Console.h>
+#include <logging/ConsoleLogWriter.h>
 #include <logging/FileLogWriter.h>
+#include <logging/SysLogWriter.h>
 #include <version.h>
 
-using namespace rsp::utils;
 using namespace rsp::exceptions;
+using namespace rsp::logging;
+using namespace rsp::utils;
 
 namespace rsp::application {
 
 ApplicationBase* ApplicationBase::mpInstance = nullptr;
 
 
-ApplicationBase::ApplicationBase(int argc, const char **argv)
-    : mLogger(true),
+ApplicationBase::ApplicationBase(int argc, const char **argv, const char *apAppName)
+    : mAppName(apAppName ? apAppName : std::string()),
+      mLogger(true),
       mCmd(argc, argv)
 {
     if (mpInstance) {
         THROW_WITH_BACKTRACE1(rsp::exceptions::ESingletonViolation, "ApplicationBase");
     }
 
-    rsp::logging::LoggerInterface::SetDefault(&mLogger);
+    installLogWriters();
+    LoggerInterface::SetDefault(&mLogger);
 
     mpInstance = this;
 }
@@ -37,7 +42,7 @@ ApplicationBase::ApplicationBase(int argc, const char **argv)
 ApplicationBase::~ApplicationBase()
 {
     mLogger.RemoveLogWriter(mFileLogWriterHandle);
-    rsp::logging::LoggerInterface::SetDefault(static_cast<rsp::logging::LoggerInterface*>(nullptr));
+    LoggerInterface::SetDefault(static_cast<rsp::logging::LoggerInterface*>(nullptr));
 
     mpInstance = nullptr;
 }
@@ -80,16 +85,6 @@ void ApplicationBase::beforeExecute()
 
 void ApplicationBase::handleOptions()
 {
-    std::string s;
-    if (mCmd.GetOptionValue("--log=", s)) {
-        std::string l;
-        if (!mCmd.GetOptionValue("--loglevel=", l)) {
-            l = ToString(rsp::logging::LogLevel::Info);
-        }
-
-        mFileLogWriterHandle = mLogger.AddLogWriter(std::make_shared<logging::FileLogWriter>(s, l));
-    }
-
     if ( mCmd.HasOption("-h") || mCmd.HasOption("--help")) {
         showHelp();
         THROW_WITH_BACKTRACE1(ETerminate, cResultSuccess);
@@ -103,12 +98,51 @@ void ApplicationBase::handleOptions()
 
 void ApplicationBase::showHelp()
 {
-    Console::Info() << "No help text available." << std::endl;
+    Console::Info() << "No help text available.";
 }
 
 void ApplicationBase::showVersion()
 {
-    Console::Info() << "Library version: " << get_library_version() << std::endl;
+    Console::Info() << "Library version: " << get_library_version();
+}
+
+void ApplicationBase::installLogWriters()
+{
+    auto level = LogLevel::Notice;
+    if (mCmd.HasOption("-vv") || mCmd.HasOption("-vvv")) {
+        level = LogLevel::Debug;
+    }
+    else if (mCmd.HasOption("-v")) {
+        level = LogLevel::Info;
+    }
+    std::string l;
+    if (mCmd.GetOptionValue("--loglevel=", l)) {
+        level = ToLogLevel(l);
+    }
+
+    std::string s;
+    if (mCmd.GetOptionValue("--log=", s)) {
+        if (s == "syslog") {
+            mLogWriter = mLogger.AddLogWriter(std::make_shared<SysLogWriter>(GetAppName(), level, LogType::User));
+        }
+        else if (s == "console") {
+            mLogWriter = mLogger.AddLogWriter(std::make_shared<ConsoleLogWriter>(level));
+        }
+        else {
+            mLogWriter = mLogger.AddLogWriter(std::make_shared<FileLogWriter>(s, level));
+        }
+    }
+    else {
+        mLogWriter = mLogger.AddLogWriter(std::make_shared<ConsoleLogWriter>(level));
+    }
+}
+
+const std::string &ApplicationBase::GetAppName() const
+{
+    if (mAppName.empty()) {
+        return mCmd.GetAppName();
+    }
+    return mAppName;
 }
 
 } /* namespace rsp::application */

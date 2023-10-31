@@ -11,6 +11,7 @@
 #ifndef RSP_CORE_LIB_APPLICATION_APPLICATION_BASE_H
 #define RSP_CORE_LIB_APPLICATION_APPLICATION_BASE_H
 
+#include <string_view>
 #include <logging/Logger.h>
 #include <application/CommandLine.h>
 #include <exceptions/CoreException.h>
@@ -34,8 +35,9 @@ public:
      *
      * \param argc Number of arguments
      * \param argv Pointer to arguments
+     * \param apAppName Optional name of application. If null, stem from first argument, if any, is used as name.
      */
-    explicit ApplicationBase(int argc = 0, const char **argv = nullptr);
+    explicit ApplicationBase(int argc = 0, const char **argv = nullptr, const char *apAppName = nullptr);
     virtual ~ApplicationBase();
     /**
      * Inhibit copy and move of the application object.
@@ -102,12 +104,18 @@ public:
         }
     }
 
+    [[nodiscard]] const std::string& GetAppName() const;
+
 protected:
     int mApplicationResult = 0;
     bool mTerminated = false;
+    std::string mAppName;
     logging::Logger mLogger;
     logging::LoggerInterface::Handle_t mFileLogWriterHandle = 0;
     CommandLine mCmd;
+    rsp::logging::LoggerInterface::Handle_t mLogWriter{};
+
+    void installLogWriters();
 
     /**
      * Virtual helpers, override these to add functionality during the run loop.

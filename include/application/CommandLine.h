@@ -72,7 +72,7 @@ public:
      *
      * \return string
      */
-    const std::string& GetAppName() { return mAppName; }
+    [[nodiscard]] const std::string& GetAppName() const { return mAppName; }
 
 protected:
     std::string mAppName{};
