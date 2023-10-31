@@ -78,7 +78,7 @@ public:
         virtual void FromData(const DynamicData &arData);
     };
 
-    typedef unsigned int  size_type;
+    typedef size_t size_type;
 
     /**
      * \fn DynamicData()
