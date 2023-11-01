@@ -33,9 +33,10 @@ uint8_t Color::GetRed() const
     return mValue.item.red;
 }
 
-void Color::SetRed(uint8_t aValue)
+Color& Color::SetRed(uint8_t aValue)
 {
     mValue.item.red = aValue;
+    return *this;
 }
 
 uint8_t Color::GetGreen() const
@@ -43,9 +44,10 @@ uint8_t Color::GetGreen() const
     return mValue.item.green;
 }
 
-void Color::SetGreen(uint8_t aValue)
+Color& Color::SetGreen(uint8_t aValue)
 {
     mValue.item.green = aValue;
+    return *this;
 }
 
 uint8_t Color::GetBlue() const
@@ -53,9 +55,10 @@ uint8_t Color::GetBlue() const
     return mValue.item.blue;
 }
 
-void Color::SetBlue(uint8_t aValue)
+Color& Color::SetBlue(uint8_t aValue)
 {
     mValue.item.blue = aValue;
+    return *this;
 }
 
 uint8_t Color::GetAlpha() const
@@ -63,9 +66,10 @@ uint8_t Color::GetAlpha() const
     return mValue.item.alpha;
 }
 
-void Color::SetAlpha(uint8_t aValue)
+Color& Color::SetAlpha(uint8_t aValue)
 {
     mValue.item.alpha = aValue;
+    return *this;
 }
 
 Color::operator uint32_t() const
@@ -151,4 +155,3 @@ bool Color::operator==(const Color &arOther) const
 }
 
 } // namespace rsp::graphics
-

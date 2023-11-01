@@ -96,8 +96,9 @@ public:
      * \brief Set the red base color value.
      *
      * \param aValue
+     * \return self
      */
-    void SetRed(uint8_t aValue);
+    Color& SetRed(uint8_t aValue);
 
     /**
      * \brief Get the green base color value.
@@ -109,8 +110,9 @@ public:
      * \brief Set the green base color value.
      *
      * \param aValue
+     * \return self
      */
-    void SetGreen(uint8_t aValue);
+    Color& SetGreen(uint8_t aValue);
 
     /**
      * \brief Get the blue base color value.
@@ -122,8 +124,9 @@ public:
      * \brief Set the blue base color value.
      *
      * \param aValue
+     * \return self
      */
-    void SetBlue(uint8_t aValue);
+    Color& SetBlue(uint8_t aValue);
 
     /**
      * \brief Get the alpha channel value.
@@ -135,8 +138,9 @@ public:
      * \brief Set the alpha channel value.
      *
      * \param aValue
+     * \return self
      */
-    void SetAlpha(uint8_t aValue);
+    Color& SetAlpha(uint8_t aValue);
 
     /**
      * \brief Get the ARGB value. This is a conversion function.
