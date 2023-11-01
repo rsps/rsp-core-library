@@ -202,6 +202,8 @@ public:
      */
     [[nodiscard]] const Rect& GetBoundingRect() const { return mBoundingRect; }
 
+    [[nodiscard]] long GetBaseLine() const;
+
 protected:
     Font mFont;
     Rect mBoundingRect{};

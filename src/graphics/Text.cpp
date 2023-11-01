@@ -209,4 +209,12 @@ void Text::draw()
     }
 }
 
+long Text::GetBaseLine() const
+{
+    if (mpGlyphs) {
+        return mpGlyphs->mBaseLine;
+    }
+    return 0;
+}
+
 }
