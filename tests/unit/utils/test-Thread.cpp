@@ -9,8 +9,9 @@
  */
 
 #include <doctest.h>
-#include <utils/Thread.h>
 #include <utils/StrUtils.h>
+#include <utils/Thread.h>
+#include <utils/ThreadList.h>
 #include <TestHelpers.h>
 
 using namespace rsp::utils;
@@ -18,10 +19,17 @@ using namespace rsp::utils;
 TEST_CASE("Threads")
 {
     TestLogger logger;
+    ThreadList thread_list;
 
-    CHECK_NOTHROW(Thread t);
+    CHECK_NOTHROW(Thread t("Dummy"));
+    CHECK_THROWS_AS(Thread t(""), ThreadException);
+
+    CHECK_THROWS_AS(thread_list.GetThreadByName("MyThread"), rsp::exceptions::NotSetException);
 
     Thread t("MyThread");
+
+    CHECK_EQ(ThreadList::GetInstance().GetThreadNames()[0], "MyThread");
+    CHECK_NOTHROW(thread_list.GetThreadByName("MyThread"));
 
     SUBCASE("Idle Run") {
         CHECK_NOTHROW(t.Start());
@@ -31,10 +39,10 @@ TEST_CASE("Threads")
 
     SUBCASE("Execute") {
         int count = 0;
-        t.GetExecute() = [&]() noexcept {
+        t.SetExecute([&]() noexcept {
             count++;
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        };
+        });
         CHECK_NOTHROW(t.Start());
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
         CHECK_NOTHROW(t.Stop());
@@ -42,22 +50,20 @@ TEST_CASE("Threads")
     }
 
     SUBCASE("Throw") {
-        t.GetExecute() = [&]() {
+        t.SetExecute([&]() {
             throw std::runtime_error("Oh no!");
-        };
+        });
         CHECK_NOTHROW(t.Start());
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
         CHECK_THROWS_AS(t.Stop(), std::runtime_error);
     }
 
     SUBCASE("Throw NoName") {
-        CHECK_NOTHROW(t.SetName(""));
-        CHECK_NOTHROW(t.GetName());
-        CHECK(t.GetName() != "");
+        CHECK_NE(t.GetName(), "");
 
-        t.GetExecute() = [&]() {
+        t.SetExecute([&]() {
             throw std::runtime_error("Oh no!");
-        };
+        });
 
         CHECK_NOTHROW(t.Start());
         std::this_thread::sleep_for(std::chrono::milliseconds(2));

@@ -48,6 +48,10 @@ public:
 class NotSetException: public CoreException
 {
 public:
+    explicit NotSetException(const std::string& arMsg)
+            : CoreException(arMsg)
+    {
+    }
     explicit NotSetException(const char *aMsg)
         : CoreException(aMsg)
     {

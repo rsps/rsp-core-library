@@ -8,27 +8,35 @@
  * \author      Steffen Brummer
  */
 
-#include <utils/Thread.h>
 #include <logging/Logger.h>
+#include <utils/Thread.h>
+#include <utils/ThreadList.h>
 
 using namespace rsp::logging;
 
 namespace rsp::utils {
 
-
-std::string Thread::GetName()
+Thread::Thread(std::string_view aName)
+        : mName(aName)
 {
-    if (!mName.empty()) {
-        return mName;
+    if (mName.empty()) {
+        THROW_WITH_BACKTRACE2(ThreadException, "<empty>>", "A Thread name must not be empty.");
     }
 
-    std::stringstream ss;
-    ss << mThread.get_id();
-
-    return ss.str();
+    ThreadList::GetInstance().AddThread(*this);
 }
 
-Thread& Thread::Start()
+Thread::~Thread()
+{
+    ThreadList::GetInstance().RemoveThread(*this);
+}
+
+const std::string& Thread::GetName() const
+{
+    return mName;
+}
+
+ThreadInterface& Thread::Start()
 {
     mTerminated = false;
     std::thread thread(&Thread::run, this);
@@ -37,7 +45,7 @@ Thread& Thread::Start()
     return *this;
 }
 
-Thread& Thread::Stop()
+ThreadInterface& Thread::Stop()
 {
     mTerminated = true;
 
@@ -49,6 +57,23 @@ Thread& Thread::Stop()
         std::rethrow_exception(mException);
     }
 
+    return *this;
+}
+
+ThreadInterface& Thread::Terminate()
+{
+    mTerminated = true;
+    return *this;
+}
+
+bool Thread::IsTerminated() const
+{
+    return mTerminated;
+}
+
+ThreadInterface& Thread::SetExecute(Thread::ThreadCallback_t aCb)
+{
+    mWhenExecute = aCb;
     return *this;
 }
 
