@@ -41,12 +41,9 @@ ApplicationBase::ApplicationBase(int argc, const char **argv, const char *apAppN
 
 ApplicationBase::~ApplicationBase()
 {
-    mLogger.RemoveLogWriter(mFileLogWriterHandle);
     LoggerInterface::SetDefault(static_cast<rsp::logging::LoggerInterface*>(nullptr));
-
     mpInstance = nullptr;
 }
-
 
 int ApplicationBase::Run()
 {
@@ -123,17 +120,17 @@ void ApplicationBase::installLogWriters()
     std::string s;
     if (mCmd.GetOptionValue("--log=", s)) {
         if (s == "syslog") {
-            mLogWriter = mLogger.AddLogWriter(std::make_shared<SysLogWriter>(GetAppName(), level, LogType::User));
+            mLogWriter = mLogger.MakeLogWriter<SysLogWriter>(GetAppName(), level, LogType::User);
         }
         else if (s == "console") {
-            mLogWriter = mLogger.AddLogWriter(std::make_shared<ConsoleLogWriter>(level));
+            mLogWriter = mLogger.MakeLogWriter<ConsoleLogWriter>(level);
         }
         else {
-            mLogWriter = mLogger.AddLogWriter(std::make_shared<FileLogWriter>(s, level));
+            mLogWriter = mLogger.MakeLogWriter<FileLogWriter>(s, level);
         }
     }
     else {
-        mLogWriter = mLogger.AddLogWriter(std::make_shared<ConsoleLogWriter>(level));
+        mLogWriter = mLogger.MakeLogWriter<ConsoleLogWriter>(level);
     }
 }
 

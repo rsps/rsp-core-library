@@ -111,7 +111,6 @@ protected:
     bool mTerminated = false;
     std::string mAppName;
     logging::Logger mLogger;
-    logging::LoggerInterface::Handle_t mFileLogWriterHandle = 0;
     CommandLine mCmd;
     rsp::logging::LoggerInterface::Handle_t mLogWriter{};
 

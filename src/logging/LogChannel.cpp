@@ -77,14 +77,9 @@ size_t LogChannel::GetWritersCount() const
     return mrLogger.GetWritersCount();
 }
 
-LoggerInterface::Handle_t LogChannel::AddLogWriter(const std::shared_ptr<LogWriterInterface> &arWriter)
+LoggerInterface::Handle_t LogChannel::addLogWriter(std::shared_ptr<LogWriterInterface> aWriter)
 {
-    return mrLogger.AddLogWriter(arWriter);
-}
-
-void LogChannel::RemoveLogWriter(LoggerInterface::Handle_t aHandle)
-{
-    mrLogger.RemoveLogWriter(aHandle);
+    return mrLogger.addLogWriter(aWriter);
 }
 
 void LogChannel::write(const LogStream &arStream, const std::string &arMsg, const std::string &arChannel, const utils::DynamicData &arContext)

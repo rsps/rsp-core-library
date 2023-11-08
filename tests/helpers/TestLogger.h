@@ -23,7 +23,7 @@ public:
     static rsp::logging::LogLevel mLogLevel;
 
 protected:
-    Handle_t mConsoleLogWriter = 0;
+    Handle_t mConsoleLogWriter{};
 };
 
 #endif /* TESTS_HELPERS_TESTLOGGER_H_ */

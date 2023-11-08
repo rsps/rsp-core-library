@@ -23,7 +23,6 @@ class TestApplication: public rsp::application::ApplicationBase
 {
 public:
     explicit TestApplication(int argc = 0, const char **argv = nullptr);
-    ~TestApplication() override;
 
     typedef std::function<bool(TestApplication&)> Callback_t;
 

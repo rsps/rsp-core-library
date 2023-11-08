@@ -33,7 +33,7 @@ class LogChannel;
 class LoggerInterface
 {
 public:
-    using Handle_t = uintptr_t;
+    using Handle_t = std::shared_ptr<LogWriterInterface>;
 
     virtual ~LoggerInterface() = default;
 
@@ -77,24 +77,25 @@ public:
      */
     [[nodiscard]] virtual size_t GetWritersCount() const = 0;
 
-    /**
-     * \brief Add a log writer to the logger.
-     * \param arWriter
-     * \return Handle_t Handle to the registration
-     */
-    [[nodiscard]] virtual Handle_t AddLogWriter(const std::shared_ptr<LogWriterInterface>& arWriter) = 0;
 
-    /**
-     * \brief Remove a log writer from the logger
-     * \param aHandle Handle returned from AddLogWriter()
-     */
-    virtual void RemoveLogWriter(Handle_t aHandle) = 0;
+    template<class T, class ... Args>
+    Handle_t MakeLogWriter(Args ...args)
+    {
+        return addLogWriter(std::make_shared<T>(args...));
+    }
 
 protected:
     static std::shared_ptr<LoggerInterface> mpDefaultInstance;
 
     friend class LogStream;
     friend class LogChannel;
+
+    /**
+     * \brief Add a log writer to the logger.
+     * \param aWriter
+     * \return Handle_t Handle to the registration
+     */
+    virtual Handle_t addLogWriter(std::shared_ptr<LogWriterInterface> aWriter) = 0;
 
     /**
      * \brief Delegates a log message to the registered writers.

@@ -73,8 +73,6 @@ public:
 
 
     [[nodiscard]] size_t GetWritersCount() const override;
-    [[nodiscard]] Handle_t AddLogWriter(const std::shared_ptr<LogWriterInterface>& arWriter) override;
-    void RemoveLogWriter(Handle_t aHandle) override;
 
 protected:
     // Use shared_ptr to use compilers default move operations.
@@ -82,9 +80,11 @@ protected:
     std::shared_ptr<std::streambuf> mpClogBackup;
 
     std::recursive_mutex mMutex{};
-    std::vector<std::shared_ptr<LogWriterInterface>> mWriters{};
+    std::vector<std::weak_ptr<LogWriterInterface>> mWriters{};
 
     std::shared_ptr<std::streambuf> makeCLogStream(bool aCaptureLog);
+
+    Handle_t addLogWriter(std::shared_ptr<LogWriterInterface> aWriter) override;
     void write(const LogStream &arStream, const std::string &arMsg,
                        const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
 };

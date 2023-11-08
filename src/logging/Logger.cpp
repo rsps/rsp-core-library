@@ -83,24 +83,10 @@ LogStream Logger::Debug()
     return {this, LogLevel::Debug};
 }
 
-LoggerInterface::Handle_t Logger::AddLogWriter(const std::shared_ptr<LogWriterInterface>& arWriter)
+LoggerInterface::Handle_t Logger::addLogWriter(std::shared_ptr<LogWriterInterface> aWriter)
 {
-    mWriters.push_back(arWriter);
-    return reinterpret_cast<Handle_t>(arWriter.get());
-}
-
-void Logger::RemoveLogWriter(Handle_t aHandle)
-{
-    if (aHandle == 0) {
-        return;
-    }
-
-    auto it = std::find_if(mWriters.begin(), mWriters.end(), [&](std::shared_ptr<LogWriterInterface> const& arWriter) {
-        return aHandle == reinterpret_cast<Handle_t>(arWriter.get());
-    });
-    if (it != mWriters.end()) {
-        mWriters.erase(it);
-    }
+    mWriters.push_back(aWriter);
+    return aWriter;
 }
 
 size_t Logger::GetWritersCount() const
@@ -113,8 +99,13 @@ void Logger::write(const LogStream &arStream, const std::string &arMsg, const st
     LogLevel current_level = arStream.GetLevel();
     std::lock_guard<std::recursive_mutex> lock(mMutex);
 
-    for (std::shared_ptr<LogWriterInterface> &w : mWriters) {
-        w->Write(arMsg, current_level, arChannel, arContext);
+    std::erase_if(mWriters, [](auto ptr) { return ptr.expired(); });
+
+    for (const auto& weak_ptr : mWriters) {
+        auto writer = weak_ptr.lock();
+        if (writer) {
+            writer->Write(arMsg, current_level, arChannel, arContext);
+        }
     }
 }
 

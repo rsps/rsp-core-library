@@ -12,7 +12,6 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
-#include <memory>
 #include <doctest.h>
 #include <exceptions/CoreException.h>
 #include <logging/Logger.h>
@@ -82,9 +81,11 @@ TEST_CASE("Logging") {
     CHECK_NOTHROW(logging::LogChannel dummy_log("Dummy Channel"));
     logging::LogChannel log("Test Channel");
 
+    logging::LoggerInterface::Handle_t file;
+    logging::LoggerInterface::Handle_t console;
 
-    CHECK_NOTHROW(auto h = log.AddLogWriter(std::make_shared<logging::FileLogWriter>(cFileName, logging::LogLevel::Info)));
-    CHECK_NOTHROW(auto h = log.AddLogWriter(std::make_shared<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors)));
+    CHECK_NOTHROW(file = log.MakeLogWriter<logging::FileLogWriter>(cFileName, logging::LogLevel::Info));
+    CHECK_NOTHROW(console = log.MakeLogWriter<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors));
 
     CHECK_NOTHROW(log.Info() << "Test of logger");
     CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(7)));

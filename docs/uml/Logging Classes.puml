@@ -51,7 +51,7 @@ abstract LoggerInterface {
     +{abstract} Info(): LogStream
     +{abstract} Debug(): LogStream
     +HasWriters() const: bool
-    +AddLogWriter(aWriter: std::shared_ptr<LogWriterInterface>): Handle_t
+    +addLogWriter(aWriter: std::shared_ptr<LogWriterInterface>): Handle_t
     +RemoveLogWriter(aHandle: Handle_t)
     #{abstract} write(apStream: const LogStreamInterface*, arMsg: const std::string&)
 }
