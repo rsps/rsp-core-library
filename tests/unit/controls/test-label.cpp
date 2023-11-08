@@ -22,6 +22,7 @@ TEST_SUITE_BEGIN("Graphics");
 TEST_CASE("Label")
 {
     TestLogger logger;
+    MESSAGE("Step 1");
 
 #ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
@@ -31,10 +32,14 @@ TEST_CASE("Label")
     CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-Italic-VariableFont_wght.ttf"));
     CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-VariableFont_wght.ttf"));
 
+    CHECK_NOTHROW(Renderer::Init(480, 800));
     auto& renderer = Renderer::Init(480, 800);
+    MESSAGE("Step 2");
 
     Rect r(50, 100, 380, 200);
     Label label;
+
+    MESSAGE("Step 3");
 
     CHECK_NOTHROW(
         label.SetFontSize(30).SetArea(r);

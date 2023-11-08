@@ -17,6 +17,7 @@
 #include <string>
 #include <graphics/FontRawInterface.h>
 #include "FreeTypeLibrary.h"
+#include <logging/LogChannel.h>
 
 namespace rsp::graphics {
 
@@ -51,7 +52,7 @@ public:
  * \class FreeTypeRawFont
  * \brief A FontRawInterface implementation for the FreeType library.
  */
-class FreeTypeRawFont : public FontRawInterface
+class FreeTypeRawFont : public FontRawInterface, public logging::NamedLogger<FreeTypeRawFont>
 {
 public:
     explicit FreeTypeRawFont(const std::string &arFontName, int aFaceIndex = 0);

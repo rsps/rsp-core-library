@@ -73,10 +73,9 @@ TEST_CASE("Logging") {
 
 
     CHECK_NOTHROW(logging::Logger dummy_logger(true));
-    logging::Logger logger(true);
 
-    CHECK_THROWS_AS(logging::LoggerInterface::GetDefault(), const exceptions::NotSetException &);
-    CHECK_NOTHROW(logging::LoggerInterface::SetDefault(&logger));
+    CHECK_NOTHROW(logging::LoggerInterface::GetDefault());
+    CHECK_NOTHROW(logging::LoggerInterface::DestroyDefault());
 
     CHECK_NOTHROW(logging::LogChannel dummy_log("Dummy Channel"));
     logging::LogChannel log("Test Channel");
@@ -176,7 +175,5 @@ TEST_CASE("Logging") {
     std::getline(fin, line);
     CHECK_MESSAGE(fin.eof(), line);
 
-    CHECK_EQ(&(logging::LoggerInterface::GetDefault()), &logger);
-
-    CHECK_NOTHROW(logging::LoggerInterface::SetDefault(nullptr));
+    CHECK_NOTHROW(logging::LoggerInterface::DestroyDefault());
 }

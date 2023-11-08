@@ -76,10 +76,10 @@ TEST_CASE("GfxEngine")
 
         const uint32_t cGreenColor = 0xFF24B40B;
         const uint32_t cRedColor = 0xFFC41616;
-        Point toppoint = gfx.GetSceneMap().ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft() + Point(1,1);
-        Point botpoint = gfx.GetSceneMap().ActiveSceneAs<SecondScene>().GetBotRect().GetTopLeft() + Point(1,1);
-        CHECK_HEX(renderer.GetPixel(toppoint).AsUint(), cGreenColor);
-        CHECK_HEX(renderer.GetPixel(botpoint).AsUint(), cGreenColor);
+        Point top_point = gfx.GetSceneMap().ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft() + Point(1, 1);
+        Point bottom_point = gfx.GetSceneMap().ActiveSceneAs<SecondScene>().GetBotRect().GetTopLeft() + Point(1, 1);
+        CHECK_HEX(renderer.GetPixel(top_point).AsUint(), cGreenColor);
+        CHECK_HEX(renderer.GetPixel(bottom_point).AsUint(), cGreenColor);
         CHECK_EQ(topBtnClicked, 2);
         CHECK_EQ(bottomBtnLift, 1);
 //        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
@@ -98,7 +98,7 @@ TEST_CASE("GfxEngine")
         Timer t1(1, 2800ms);
         t1.Callback() = [&](Timer &arTimer) {
             auto timeout = 200ms;
-            InputScene &scene = gfx.GetSceneMap().ActiveSceneAs<InputScene>();
+            auto &scene = gfx.GetSceneMap().ActiveSceneAs<InputScene>();
             switch (progress++) {
                 case 0:
                     scene.GetLabel().SetVAlignment(Text::VAlign::Top).SetHAlignment(Text::HAlign::Left);
@@ -172,4 +172,3 @@ TEST_CASE("GfxEngine")
 #endif
     CHECK_NOTHROW(gfx.ClearOverlays());
 }
-

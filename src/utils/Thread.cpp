@@ -8,7 +8,6 @@
  * \author      Steffen Brummer
  */
 
-#include <logging/Logger.h>
 #include <utils/Thread.h>
 #include <utils/ThreadList.h>
 
@@ -79,7 +78,7 @@ ThreadInterface& Thread::SetExecute(Thread::ThreadCallback_t aCb)
 
 void Thread::run()
 {
-    Logger::GetDefault().Info() << "Running thread '" << mName << "'";
+    mLogger.Info() << "Running thread '" << mName << "'";
     try {
         try {
             while (!mTerminated) {
@@ -87,7 +86,7 @@ void Thread::run()
             }
         }
         catch (const std::exception &e) {
-            Logger::GetDefault().Error() << "Thread '" << GetName() << "'" << " excepted with: " << e.what();
+            mLogger.Error() << "Thread '" << GetName() << "'" << " excepted with: " << e.what();
             throw ThreadException(GetName(), e.what());
         }
     }

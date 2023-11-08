@@ -26,7 +26,7 @@ ApplicationBase* ApplicationBase::mpInstance = nullptr;
 
 ApplicationBase::ApplicationBase(int argc, const char **argv, const char *apAppName)
     : mAppName(apAppName ? apAppName : std::string()),
-      mLogger(true),
+      mLogger("main"),
       mCmd(argc, argv)
 {
     if (mpInstance) {
@@ -34,14 +34,12 @@ ApplicationBase::ApplicationBase(int argc, const char **argv, const char *apAppN
     }
 
     installLogWriters();
-    LoggerInterface::SetDefault(&mLogger);
 
     mpInstance = this;
 }
 
 ApplicationBase::~ApplicationBase()
 {
-    LoggerInterface::SetDefault(static_cast<rsp::logging::LoggerInterface*>(nullptr));
     mpInstance = nullptr;
 }
 

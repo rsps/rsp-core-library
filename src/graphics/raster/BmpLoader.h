@@ -12,6 +12,7 @@
 
 #include <graphics/Color.h>
 #include <graphics/raster/ImgLoader.h>
+#include <logging/LogChannel.h>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -21,7 +22,7 @@
 namespace rsp::graphics
 {
 
-class BmpLoader : public ImgLoader
+class BmpLoader : public ImgLoader, public logging::NamedLogger<BmpLoader>
 {
 public:
     /**

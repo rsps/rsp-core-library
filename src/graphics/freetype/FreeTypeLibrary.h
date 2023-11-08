@@ -16,6 +16,7 @@
 #include <string>
 #include <map>
 #include <graphics/Font.h>
+#include <logging/LogChannel.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -33,7 +34,7 @@ struct FontInfo {
  * \brief Simple object to load the freetype library
  *
  */
-class FreeTypeLibrary
+class FreeTypeLibrary: public logging::NamedLogger<FreeTypeLibrary>
 {
 public:
     FreeTypeLibrary(const FreeTypeLibrary&) = delete;
@@ -51,7 +52,7 @@ public:
 
 private:
     FreeTypeLibrary();
-    ~FreeTypeLibrary();
+    ~FreeTypeLibrary() override;
 
     FT_Library mFtLib { };
 

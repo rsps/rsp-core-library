@@ -11,6 +11,7 @@
 #ifndef RSP_CORE_LIB_UTILS_THREAD_H
 #define RSP_CORE_LIB_UTILS_THREAD_H
 
+#include <logging/LogChannel.h>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -24,7 +25,7 @@ namespace rsp::utils {
  * The object catches an holds an eventual exception terminating the thread.
  *
  */
-class Thread : public ThreadInterface
+class Thread : public ThreadInterface, public logging::NamedLogger<Thread>
 {
 public:
     using ThreadCallback_t = std::function<void(void)>;

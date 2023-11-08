@@ -372,7 +372,7 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent) // NOLINT
                     if (IsCheckable()) {
                         SetChecked(!IsChecked());
                     }
-                    Logger::GetDefault().Debug() << GetName() << " was clicked by " << touch;
+                    mLogger.Debug() << GetName() << " was clicked by " << touch;
                     doClick(touch);
                 }
                 return result;

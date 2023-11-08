@@ -13,54 +13,52 @@
 namespace rsp::logging {
 
 LogChannel::LogChannel(std::string_view aChannel)
-    : mrLogger(LoggerInterface::GetDefault()),
-      mChannel(aChannel)
+    : mChannel(aChannel)
 {
 }
 
 rsp::logging::LogStream LogChannel::Warning()
 {
-    return mrLogger.Warning().SetChannel(mChannel);
+    return LoggerInterface::GetDefault().Warning().SetChannel(mChannel);
 }
 
 rsp::logging::LogStream LogChannel::Notice()
 {
-    return mrLogger.Notice().SetChannel(mChannel);
+    return LoggerInterface::GetDefault().Notice().SetChannel(mChannel);
 }
 
 rsp::logging::LogStream LogChannel::Error()
 {
-    return mrLogger.Error().SetChannel(mChannel);
+    return LoggerInterface::GetDefault().Error().SetChannel(mChannel);
 }
 
 rsp::logging::LogStream LogChannel::Alert()
 {
-    return mrLogger.Alert().SetChannel(mChannel);
+    return LoggerInterface::GetDefault().Alert().SetChannel(mChannel);
 }
 
 rsp::logging::LogStream LogChannel::Critical()
 {
-    return mrLogger.Critical().SetChannel(mChannel);
+    return LoggerInterface::GetDefault().Critical().SetChannel(mChannel);
 }
 
 rsp::logging::LogStream LogChannel::Emergency()
 {
-    return mrLogger.Emergency().SetChannel(mChannel);
+    return LoggerInterface::GetDefault().Emergency().SetChannel(mChannel);
 }
 
 rsp::logging::LogStream LogChannel::Info()
 {
-    return mrLogger.Info().SetChannel(mChannel);
+    return LoggerInterface::GetDefault().Info().SetChannel(mChannel);
 }
 
 rsp::logging::LogStream LogChannel::Debug()
 {
-    return mrLogger.Debug().SetChannel(mChannel);
+    return LoggerInterface::GetDefault().Debug().SetChannel(mChannel);
 }
 
 LogChannel::LogChannel(const LogChannel &arOther)
-    : mrLogger(LoggerInterface::GetDefault()),
-      mChannel(arOther.mChannel)
+    : mChannel(arOther.mChannel)
 {
 }
 
@@ -74,17 +72,17 @@ LogChannel& LogChannel::operator =(const LogChannel &arOther)
 
 size_t LogChannel::GetWritersCount() const
 {
-    return mrLogger.GetWritersCount();
+    return LoggerInterface::GetDefault().GetWritersCount();
 }
 
 LoggerInterface::Handle_t LogChannel::addLogWriter(std::shared_ptr<LogWriterInterface> aWriter)
 {
-    return mrLogger.addLogWriter(aWriter);
+    return LoggerInterface::GetDefault().addLogWriter(aWriter);
 }
 
 void LogChannel::write(const LogStream &arStream, const std::string &arMsg, const std::string &arChannel, const utils::DynamicData &arContext)
 {
-    mrLogger.write(arStream, arMsg, arChannel, arContext);
+    LoggerInterface::GetDefault().write(arStream, arMsg, arChannel, arContext);
 }
 
 } /* namespace rsp::logging */

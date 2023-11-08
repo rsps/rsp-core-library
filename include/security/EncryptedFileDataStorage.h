@@ -11,6 +11,7 @@
 #ifndef RSP_CORE_LIB_SECURITY_ENCRYPTED_FILE_DATA_STORAGE_H
 #define RSP_CORE_LIB_SECURITY_ENCRYPTED_FILE_DATA_STORAGE_H
 
+#include <logging/LogChannel.h>
 #include <utils/DataContainer.h>
 #include "SecureBuffer.h"
 
@@ -22,6 +23,8 @@ namespace rsp::security {
 class EncryptedFileDataStorage: public utils::FileDataStorage
 {
 public:
+    EncryptedFileDataStorage();
+
     /**
      * \brief Initialize the encrypt storage object.
      * \param aFileName Path to file
@@ -34,6 +37,7 @@ public:
     void Read(rsp::utils::IDataContent &arContent) override;
 
 protected:
+    logging::LogChannel mLogger;
     SecureBuffer mIv{};
     SecureBuffer mKey{};
 };

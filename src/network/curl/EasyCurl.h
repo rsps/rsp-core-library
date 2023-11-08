@@ -14,6 +14,7 @@
 #include <string>
 #include "CurlLibrary.h"
 #include "Exceptions.h"
+#include <logging/LogChannel.h>
 
 namespace rsp::network::curl {
 
@@ -24,7 +25,7 @@ class MultiCurl;
  * \brief Low level wrapper for libcurl's Easy interface.
  * This wrapper allocates an easy handle, but can also lookup this class object from a given handle.
  */
-class EasyCurl
+class EasyCurl : public logging::NamedLogger<EasyCurl>
 {
 public:
     EasyCurl();

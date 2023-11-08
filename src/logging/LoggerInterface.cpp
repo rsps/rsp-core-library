@@ -9,6 +9,7 @@
  */
 
 #include <logging/LoggerInterface.h>
+#include <logging/Logger.h>
 
 namespace rsp::logging {
 
@@ -18,20 +19,15 @@ std::shared_ptr<LoggerInterface> LoggerInterface::mpDefaultInstance = nullptr;
 LoggerInterface& LoggerInterface::GetDefault()
 {
     if (!mpDefaultInstance) {
-        THROW_WITH_BACKTRACE1(exceptions::NotSetException, "Logger instance not set.");
+        mpDefaultInstance = std::make_shared<Logger>(true);
     }
 
     return *mpDefaultInstance;
 }
 
-void LoggerInterface::SetDefault(LoggerInterface* apLogger)
+void LoggerInterface::DestroyDefault()
 {
-    if (apLogger) {
-        mpDefaultInstance = std::shared_ptr<LoggerInterface>(apLogger, [](LoggerInterface*){});
-    }
-    else {
-        mpDefaultInstance.reset();
-    }
+    mpDefaultInstance.reset();
 }
 
 } /* namespace rsp::logging */

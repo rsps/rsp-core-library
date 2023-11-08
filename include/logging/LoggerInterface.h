@@ -45,15 +45,14 @@ public:
      *
      * \param apLogger
      */
-    static void SetDefault(LoggerInterface* apLogger);
+    static void DestroyDefault();
 
     /**
      * \brief Get the default logger instance.
      *
      * This is used by many modules to get a logger instance.
-     * It throws in case the instance is not set.
      *
-     * \return
+     * \return shared pointer to LoggerInterface instance
      */
     static LoggerInterface& GetDefault();
 

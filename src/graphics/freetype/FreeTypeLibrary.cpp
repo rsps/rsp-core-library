@@ -11,7 +11,6 @@
 #ifdef USE_FREETYPE
 
 #include "FreeTypeLibrary.h"
-#include <logging/Logger.h>
 #include <utils/StrUtils.h>
 #include <graphics/FontRawInterface.h>
 
@@ -46,7 +45,7 @@ FreeTypeLibrary& FreeTypeLibrary::Get()
 
 FT_Face FreeTypeLibrary::CreateFontFace(const std::string &arFontName, FontStyles aStyle)
 {
-    Logger::GetDefault().Info() << "Creating font " << arFontName << " with style " << static_cast<int>(aStyle);
+    mLogger.Info() << "Creating font " << arFontName << " with style " << static_cast<int>(aStyle);
 
     auto it = mFontSets.find(arFontName);
     if (it == mFontSets.end()) {
@@ -56,7 +55,7 @@ FT_Face FreeTypeLibrary::CreateFontFace(const std::string &arFontName, FontStyle
     if (aStyle != FontStyles::Normal) {
         auto inner = mFontSets[arFontName].find(aStyle);
         if (inner == mFontSets[arFontName].end()) {
-            Logger::GetDefault().Debug() << "Font named " << arFontName << " has no style " << static_cast<int>(aStyle) << " installed.";
+            mLogger.Debug() << "Font named " << arFontName << " has no style " << static_cast<int>(aStyle) << " installed.";
             aStyle = FontStyles::Normal;
         }
     }
@@ -117,10 +116,10 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
         }
 
         if (ignore) {
-            Logger::GetDefault().Debug() << "Ignoring font " << face->family_name << ", " << face->style_name;
+            mLogger.Debug() << "Ignoring font " << face->family_name << ", " << face->style_name;
         }
         else {
-            Logger::GetDefault().Debug() << "Adding font " << face->family_name << ", " << face->style_name << " " << static_cast<int>(style);
+            mLogger.Debug() << "Adding font " << face->family_name << ", " << face->style_name << " " << static_cast<int>(style);
             mFontSets[face->family_name][style] = info;
         }
 

@@ -41,7 +41,7 @@ enum LogType {
 
 abstract LoggerInterface {
     +{static} GetDefault(): LoggerInterface&
-    +{static} SetDefault(apLogger: LoggerInterface*)
+    +{static} DestroyDefault(apLogger: LoggerInterface*)
     +{abstract} Emergency(): LogStream
     +{abstract} Alert(): LogStream
     +{abstract} Critical(): LogStream

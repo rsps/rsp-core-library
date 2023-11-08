@@ -9,8 +9,8 @@
  */
 
 #include <exceptions/SignalHandler.h>
-#include <logging/Logger.h>
 #include <magic_enum.hpp>
+#include <logging/LogChannel.h>
 
 namespace rsp::exceptions {
 
@@ -68,7 +68,8 @@ void SignalHandler::signalHandler(int aSignalCode) noexcept
     }
 
     BackTrace bt(1);
-    logging::Logger::GetDefault().Alert() << "Caught signal (" << aSignalCode << ") " << magic_enum::enum_name(static_cast<Signals>(aSignalCode)) << "\n" << bt;
+    logging::LogChannel log("SignalHandler");
+    log.Alert() << "Caught signal (" << aSignalCode << ") " << magic_enum::enum_name(static_cast<Signals>(aSignalCode)) << "\n" << bt;
     exit(200 + aSignalCode);
 }
 

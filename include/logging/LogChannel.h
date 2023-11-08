@@ -13,6 +13,7 @@
 #include <string_view>
 #include <logging/LoggerInterface.h>
 #include <utils/ConstTypeInfo.h>
+#include <utils/DynamicData.h>
 
 
 namespace rsp::logging {
@@ -41,7 +42,6 @@ protected:
     void write(const LogStream &arStream, const std::string &arMsg, const std::string &arChannel, const utils::DynamicData &arContext) override;
 
 protected:
-    LoggerInterface &mrLogger;
     std::string mChannel;
 };
 

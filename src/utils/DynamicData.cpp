@@ -3,11 +3,9 @@
  * \author      steffen
  */
 
-#include <logging/Logger.h>
+#include <algorithm>
 #include <utils/DynamicData.h>
 #include <json/JsonEncoder.h>
-
-using namespace rsp::logging;
 
 //#define DDLOG(a) DLOG(a)
 #define DDLOG(a)
@@ -102,7 +100,6 @@ bool DynamicData::MemberExists(std::string_view aKey) const
 DynamicData& DynamicData::Add(DynamicData aValue)
 {
     forceArray();
-    Logger::GetDefault().Debug() << "DynamicData::Add(): " << aValue;
     mItems.emplace_back(std::move(aValue));
     return *this;
 }
@@ -110,7 +107,6 @@ DynamicData& DynamicData::Add(DynamicData aValue)
 DynamicData& DynamicData::Add(std::string_view aKey, DynamicData aValue)
 {
     forceObject();
-    Logger::GetDefault().Debug() << "DynamicData::Add(): \"" << aKey << "\": " << aValue;
     aValue.mName = aKey;
     mItems.push_back(std::move(aValue));
     return *this;

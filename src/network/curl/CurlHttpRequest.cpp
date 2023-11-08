@@ -8,11 +8,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include <iostream>
 #include <map>
-#include <iterator>
 #include <string>
-#include <logging/Logger.h>
 #include <network/HttpRequest.h>
 #include <posix/FileIO.h>
 #include <utils/StrUtils.h>
@@ -78,7 +75,7 @@ size_t CurlHttpRequest::stringReadFunction(void *ptr, size_t size, size_t nmemb,
     if (sz > apBuf->Remaining) {
         sz = apBuf->Remaining;
     }
-//    Logger::GetDefault().Debug() << "Copying " << sz << " characters to network buffer";
+//    mLogger.Debug() << "Copying " << sz << " characters to network buffer";
     std::memcpy(ptr, apBuf->Data, sz);
     apBuf->Data += sz;
     apBuf->Remaining -= sz;
@@ -88,8 +85,8 @@ size_t CurlHttpRequest::stringReadFunction(void *ptr, size_t size, size_t nmemb,
 size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
 {
     std::string header(data, size * nmemb);
-    size_t seperator = header.find_first_of(':');
-    if (std::string::npos == seperator) {
+    size_t separator = header.find_first_of(':');
+    if (std::string::npos == separator) {
         StrUtils::Trim(header);
         if (0 == header.length()) {
             return (size * nmemb); // blank line;
@@ -97,9 +94,9 @@ size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, Cu
         apResponse->addHeader(StrUtils::ToLower(header), "present");
     }
     else {
-        std::string key = header.substr(0, seperator);
+        std::string key = header.substr(0, separator);
         StrUtils::Trim(key);
-        std::string value = header.substr(seperator + 1);
+        std::string value = header.substr(separator + 1);
         StrUtils::Trim(value);
         apResponse->addHeader(StrUtils::ToLower(key), value);
     }
@@ -107,10 +104,9 @@ size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, Cu
     return (size * nmemb);
 }
 
-size_t CurlHttpRequest::progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
+size_t CurlHttpRequest::progressFunction(CurlHttpRequest */*aRequest*/, curl_off_t /*dltotal*/, curl_off_t /*dlnow*/, curl_off_t /*ultotal*/, curl_off_t /*ulnow*/)
 {
     // TODO: Call progress callback on request here...
-
     return CURLE_OK;
 }
 
@@ -205,7 +201,7 @@ void CurlHttpRequest::requestDone()
     getCurlInfo(CURLINFO_RESPONSE_CODE, &resp_code);
     mResponse.setStatusCode(static_cast<int>(resp_code));
 
-    Logger::GetDefault().Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << resp_code;
+    mLogger.Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << resp_code;
 
     EasyCurl::requestDone();
 }
@@ -306,7 +302,7 @@ void CurlHttpRequest::populateOptions()
     }
     for (auto const& tuple : mRequestOptions.Headers) {
         std::string header = tuple.first + ": " + tuple.second;
-        Logger::GetDefault().Debug() << "Add header: " << header;
+        mLogger.Debug() << "Add header: " << header;
         auto *temp = curl_slist_append(mpHeaders, header.c_str());
         if (temp == nullptr) {
             curl_slist_free_all(mpHeaders);

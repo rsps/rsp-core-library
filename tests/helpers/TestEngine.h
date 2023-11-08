@@ -20,7 +20,7 @@ class TestEngine : public rsp::graphics::GfxEngine<Scenes>, public rsp::messagin
 {
 public:
     TestEngine() : GfxEngine<Scenes>(1000) {
-        GetEventBroker().Subscribe(this);
+        mBroker.Subscribe(*this);
     }
 
     void Run() {

@@ -80,7 +80,7 @@ void GfxEngineBase::iterateEvents()
 
     // Fetch input events and move them to the event queue
     while (inputs.Poll(event)) {
-        Logger::GetDefault().Debug() << "Got Input Event: " << *event;
+        mLogger.Debug() << "Got Input Event: " << *event;
         broker.Publish(event);
     }
 

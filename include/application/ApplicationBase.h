@@ -12,7 +12,7 @@
 #define RSP_CORE_LIB_APPLICATION_APPLICATION_BASE_H
 
 #include <string_view>
-#include <logging/Logger.h>
+#include <logging/LogChannel.h>
 #include <application/CommandLine.h>
 #include <exceptions/CoreException.h>
 
@@ -52,7 +52,7 @@ public:
      *
      * \return Reference to Logger instance.
      */
-    logging::Logger& GetLog() { return mLogger; }
+    logging::LoggerInterface& GetLog() { return mLogger; }
 
     /**
      * Get the command line object.
@@ -110,7 +110,7 @@ protected:
     int mApplicationResult = 0;
     bool mTerminated = false;
     std::string mAppName;
-    logging::Logger mLogger;
+    logging::LogChannel mLogger;
     CommandLine mCmd;
     rsp::logging::LoggerInterface::Handle_t mLogWriter{};
 

@@ -17,11 +17,10 @@ rsp::logging::LogLevel TestLogger::mLogLevel = rsp::logging::LogLevel::Notice;
 
 TestLogger::TestLogger()
 {
-    LoggerInterface::SetDefault(this);
     mConsoleLogWriter = MakeLogWriter<rsp::logging::ConsoleLogWriter>(mLogLevel);
 }
 
 TestLogger::~TestLogger()
 {
-    rsp::logging::LoggerInterface::SetDefault(nullptr);
+    rsp::logging::LoggerInterface::DestroyDefault();
 }

@@ -12,7 +12,6 @@
 #include "BmpLoader.h"
 #include <iostream>
 #include <string>
-#include <logging/Logger.h>
 #include <utils/FourCC.h>
 
 using namespace rsp::logging;
@@ -81,7 +80,7 @@ void BmpLoader::LoadImg(const std::string &aImgName)
 
     mPixelData.GetData().clear();
 
-    Logger::GetDefault().Debug() << "Loading Bitmap: " << aImgName;
+    mLogger.Debug() << "Loading Bitmap: " << aImgName;
 
     rsp::posix::FileIO file(aImgName, std::ios::in);
 
@@ -119,7 +118,7 @@ void BmpLoader::ReadHeader(rsp::posix::FileIO &arFile)
     // Read the 54 byte header
     arFile.ExactRead(reinterpret_cast<char *>(&mBmpHeader), sizeof(mBmpHeader));
 
-//    Logger::GetDefault().Debug() << mBmpHeader;
+//    mLogger.Debug() << mBmpHeader;
 
     mBytesPerPixel = mBmpHeader.v1.bitsPerPixel / 8; // Might be 1 or 4
     if ((mBmpHeader.v1.bitsPerPixel % 8) > 0) {
@@ -163,11 +162,11 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
 {
     // Figure out amount to read per row
     size_t paddedRowSize = static_cast<size_t>(((static_cast<size_t>(std::abs(mBmpHeader.v1.width) * mBmpHeader.v1.bitsPerPixel) + 7) / 8) + 3u) & static_cast<size_t>(~3);
-    Logger::GetDefault().Debug() << "Padded Row size: " << paddedRowSize;
+    mLogger.Debug() << "Padded Row size: " << paddedRowSize;
 
     // Initialize container for reading
     std::vector<std::uint8_t> pixelRows(paddedRowSize * static_cast<size_t>(std::abs(mBmpHeader.v1.heigth)));
-    Logger::GetDefault().Debug() << "Container size: " << pixelRows.size();
+    mLogger.Debug() << "Container size: " << pixelRows.size();
 
     // Skip past the offset
     arFile.Seek(mBmpHeader.dataOffset);

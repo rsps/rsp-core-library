@@ -15,6 +15,7 @@
 #include <curl/curl.h>
 #include "Exceptions.h"
 #include "CurlSessionHttpRequest.h"
+#include <logging/LogChannel.h>
 
 namespace rsp::network::curl {
 
@@ -24,7 +25,7 @@ namespace rsp::network::curl {
  * This implementation is intended for queueing multiple requests and let libcurl execute them all.
  * This allows for utilizing HTTP 1.1 keepalive and http2 transport optimizations.
  */
-class MultiCurl
+class MultiCurl : public logging::NamedLogger<MultiCurl>
 {
 public:
     MultiCurl();

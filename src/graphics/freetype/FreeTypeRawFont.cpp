@@ -12,7 +12,6 @@
 
 #include "FreeTypeRawFont.h"
 #include <graphics/Font.h>
-#include <logging/Logger.h>
 
 #include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
@@ -180,7 +179,7 @@ void FreeTypeRawFont::SetSize(int aWidthPx, int aHeightPx)
         THROW_WITH_BACKTRACE2(FontException, "FT_Set_Pixel_Sizes() failed", error);
     }
     mSizePx = std::min(aWidthPx, aHeightPx);
-    Logger::GetDefault().Debug() << "Font.SetSize(" << aWidthPx << ", " << aHeightPx << ") -> " << mSizePx;
+    mLogger.Debug() << "Font.SetSize(" << aWidthPx << ", " << aHeightPx << ") -> " << mSizePx;
 }
 
 void FreeTypeRawFont::SetStyle(FontStyles aStyle)
