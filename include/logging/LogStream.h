@@ -12,6 +12,7 @@
 #define RSP_CORE_LIB_LOGGING_LOG_STREAM_H
 
 #include <ostream>
+#include <memory>
 #include <sstream>
 #include <utils/DynamicData.h>
 #include "LogTypes.h"
@@ -34,7 +35,7 @@ class LoggerInterface;
 class LogStream
 {
 public:
-    LogStream(LoggerInterface *apOwner, LogLevel aLevel);
+    LogStream(LoggerInterface &arOwner, LogLevel aLevel);
     LogStream(const LogStream &arOther);
     LogStream(LogStream &&arOther) noexcept; /* No copy, move is OK */
     virtual ~LogStream();
@@ -116,7 +117,7 @@ public:
     LogStream& operator<<(const class SetChannel& arChannel);
 
 protected:
-    LoggerInterface *mpLogger;
+    LoggerInterface &mrLogger;
     LogLevel mLevel;
     std::string mChannel{};
     rsp::utils::DynamicData mContext{};

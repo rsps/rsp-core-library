@@ -33,7 +33,7 @@ namespace rsp::logging {
 class OutStreamBuffer : public std::streambuf, public LogStream
 {
 public:
-    OutStreamBuffer(LoggerInterface *apOwner, LogLevel aLevel);
+    OutStreamBuffer(LoggerInterface &arOwner, LogLevel aLevel);
 
     void Lock() { mLock.Lock(); }
 

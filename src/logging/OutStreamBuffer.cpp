@@ -12,9 +12,9 @@
 
 namespace rsp::logging {
 
-OutStreamBuffer::OutStreamBuffer(LoggerInterface *apLogger, LogLevel aLevel)
+OutStreamBuffer::OutStreamBuffer(LoggerInterface& arLogger, LogLevel aLevel)
     : std::streambuf(),
-      LogStream(apLogger, aLevel)
+      LogStream(arLogger, aLevel)
 {
 }
 

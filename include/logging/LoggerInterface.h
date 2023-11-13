@@ -54,7 +54,7 @@ public:
      *
      * \return shared pointer to LoggerInterface instance
      */
-    static LoggerInterface& GetDefault();
+    static std::shared_ptr<LoggerInterface> GetDefault();
 
     /**
      * \brief Log level stream creators

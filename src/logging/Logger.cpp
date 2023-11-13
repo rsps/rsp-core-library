@@ -10,7 +10,6 @@
 
 #include <exceptions/CoreException.h>
 #include <iostream>
-#include <sstream>
 #include <map>
 #include <logging/Logger.h>
 #include <logging/OutStreamBuffer.h>
@@ -37,7 +36,7 @@ std::shared_ptr<std::streambuf> Logger::makeCLogStream(bool aCaptureLog)
 {
     std::streambuf *old = nullptr;
     if (aCaptureLog) {
-        old = std::clog.rdbuf(new OutStreamBuffer(this, cDefaultLogLevel));
+        old = std::clog.rdbuf(new OutStreamBuffer(*this, cDefaultLogLevel));
     }
     // Create shared_ptr with "do nothing" de-allocator
     return {old, [](std::streambuf*){}};
@@ -45,42 +44,42 @@ std::shared_ptr<std::streambuf> Logger::makeCLogStream(bool aCaptureLog)
 
 LogStream Logger::Emergency()
 {
-    return {this, LogLevel::Emergency};
+    return {*this, LogLevel::Emergency};
 }
 
 LogStream Logger::Alert()
 {
-    return {this, LogLevel::Alert};
+    return {*this, LogLevel::Alert};
 }
 
 LogStream Logger::Critical()
 {
-    return {this, LogLevel::Critical};
+    return {*this, LogLevel::Critical};
 }
 
 LogStream Logger::Error()
 {
-    return {this, LogLevel::Error};
+    return {*this, LogLevel::Error};
 }
 
 LogStream Logger::Warning()
 {
-    return {this, LogLevel::Warning};
+    return {*this, LogLevel::Warning};
 }
 
 LogStream Logger::Notice()
 {
-    return {this, LogLevel::Notice};
+    return {*this, LogLevel::Notice};
 }
 
 LogStream Logger::Info()
 {
-    return {this, LogLevel::Info};
+    return {*this, LogLevel::Info};
 }
 
 LogStream Logger::Debug()
 {
-    return {this, LogLevel::Debug};
+    return {*this, LogLevel::Debug};
 }
 
 LoggerInterface::Handle_t Logger::addLogWriter(std::shared_ptr<LogWriterInterface> aWriter)

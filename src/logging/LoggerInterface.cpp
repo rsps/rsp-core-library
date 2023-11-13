@@ -16,13 +16,13 @@ namespace rsp::logging {
 std::shared_ptr<LoggerInterface> LoggerInterface::mpDefaultInstance = nullptr;
 
 
-LoggerInterface& LoggerInterface::GetDefault()
+std::shared_ptr<LoggerInterface> LoggerInterface::GetDefault()
 {
     if (!mpDefaultInstance) {
         mpDefaultInstance = std::make_shared<Logger>(true);
     }
 
-    return *mpDefaultInstance;
+    return mpDefaultInstance;
 }
 
 void LoggerInterface::DestroyDefault()
