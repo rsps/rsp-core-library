@@ -15,6 +15,7 @@
 #include <logging/LogChannel.h>
 #include <application/CommandLine.h>
 #include <exceptions/CoreException.h>
+#include <utils/ThreadList.h>
 
 namespace rsp::application {
 
@@ -106,6 +107,8 @@ public:
 
     [[nodiscard]] const std::string& GetAppName() const;
 
+    [[nodiscard]] rsp::utils::ThreadList& GetThreadList() { return mThreadList; }
+
 protected:
     int mApplicationResult = 0;
     bool mTerminated = false;
@@ -113,6 +116,7 @@ protected:
     logging::LogChannel mLogger;
     CommandLine mCmd;
     rsp::logging::LoggerInterface::Handle_t mLogWriter{};
+    rsp::utils::ThreadList mThreadList{};
 
     void installLogWriters();
 
