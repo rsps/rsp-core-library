@@ -105,8 +105,16 @@ public:
         }
     }
 
+    /**
+     * \brief Get the name of this application
+     * \return string
+     */
     [[nodiscard]] const std::string& GetAppName() const;
 
+    /**
+     * \brief Get the thread list
+     * \return reference to ThreadList
+     */
     [[nodiscard]] rsp::utils::ThreadList& GetThreadList() { return mThreadList; }
 
 protected:
