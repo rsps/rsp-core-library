@@ -37,10 +37,19 @@ std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph)
 std::ostream& operator <<(std::ostream &os, const Glyphs &arGlyphs)
 {
     os << "Glyphs (" << arGlyphs.GetCount() << ")\n"
-        << "  Underline: " << arGlyphs.mUnderlineYCenter << "\n"
-        << "  Thickness: " << arGlyphs.mUnderlineThickness << "\n"
-        << "  Line height: " << arGlyphs.mLineHeight << "\n"
-        << "  BRect: " << arGlyphs.mBoundingRect;
+       << "  Underline Center: " << arGlyphs.mUnderlineYCenter << "\n"
+       << "  Underline Thickness: " << arGlyphs.mUnderlineThickness << "\n"
+       << "  Line height: " << arGlyphs.mLineHeight << "\n"
+       << "  Baseline: " << arGlyphs.mBaseLine << "\n"
+       << "  BRect: " << arGlyphs.mBoundingRect << "\n"
+       << "  Line Widths: [";
+
+    std::string d;
+    for (const auto &w : arGlyphs.mLineWidths) {
+        os << d << w;
+        d = ",";
+    }
+    os << "]";
 
     for (unsigned i=0 ; i < arGlyphs.GetCount() ; ++i) {
         os << "\n  " << arGlyphs.GetGlyph(i);
