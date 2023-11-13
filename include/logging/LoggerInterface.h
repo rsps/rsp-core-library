@@ -78,9 +78,9 @@ public:
 
 
     template<class T, class ... Args>
-    Handle_t MakeLogWriter(Args ...args)
+    Handle_t MakeLogWriter(Args &&...args)
     {
-        return addLogWriter(std::make_shared<T>(args...));
+        return addLogWriter(std::make_shared<T>(std::forward<Args>(args)...));
     }
 
 protected:
