@@ -142,7 +142,9 @@ Renderer& SDLRenderer::PushClipRect(const Rect &arClipRect)
 
 Renderer& SDLRenderer::PopClipRect()
 {
-    mClipRectList.pop_back();
+    if (!mClipRectList.empty()) {
+        mClipRectList.pop_back();
+    }
     mClipRect = mArea;
     for (const Rect& r : mClipRectList) {
         mClipRect &= r;
