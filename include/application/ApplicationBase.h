@@ -26,8 +26,8 @@ namespace rsp::application {
 class ApplicationBase
 {
 public:
-    const int cResultSuccess = 0;
-    const int cResultUnhandledError = -1;
+    static constexpr int cResultSuccess = 0;
+    static constexpr int cResultUnhandledError = -1;
 
     /**
      * Constructor that optionally takes command line arguments.
