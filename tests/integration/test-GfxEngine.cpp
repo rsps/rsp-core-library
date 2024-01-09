@@ -75,7 +75,7 @@ TEST_CASE("GfxEngine")
         CHECK_NOTHROW(gfx.Run());
 
         const uint32_t cGreenColor = 0xFF24B40B;
-        const uint32_t cRedColor = 0xFFC41616;
+//        const uint32_t cRedColor = 0xFFC41616;
         Point top_point = gfx.GetSceneMap().ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft() + Point(1, 1);
         Point bottom_point = gfx.GetSceneMap().ActiveSceneAs<SecondScene>().GetBotRect().GetTopLeft() + Point(1, 1);
         CHECK_HEX(renderer.GetPixel(top_point).AsUint(), cGreenColor);
@@ -95,7 +95,7 @@ TEST_CASE("GfxEngine")
         CHECK_NOTHROW(gfx.SetNextScene(Scenes::Input));
 
         int progress = 0;
-        Timer t1(1, 2800ms);
+        Timer t1(1, 4000ms);
         t1.Callback() = [&](Timer &arTimer) {
             auto timeout = 200ms;
             auto &scene = gfx.GetSceneMap().ActiveSceneAs<InputScene>();
@@ -149,13 +149,31 @@ TEST_CASE("GfxEngine")
                     timeout = 800ms;
                     break;
                 case 13:
+                    CHECK_EQ(scene.GetLabel().GetText().GetValue(), "æøåößđ\u014BµÅÖ");
+                    timeout = 1ms;
+                    break;
+                case 14:
+                    scene.GetLabel().SetFontSize(26);
+                    scene.GetLabel().SetCaption("Bǎochí shǒu bù dòng");
+                    timeout = 800ms;
+                    break;
+                case 15:
+                    CHECK_EQ(scene.GetLabel().GetText().GetValue(), "Bǎochí shǒu bù dòng");
+                    timeout = 1ms;
+                    break;
+                case 16:
+                    scene.GetLabel().SetFontSize(40);
+                    scene.GetLabel().SetCaption("保持手不动");
+                    timeout = 800ms;
+                    break;
+                case 17:
                     Control::SetTouchAreaColor(Color::None);
                     scene.GetLabel().GetText();
                     scene.Invalidate();
                     timeout = 200ms;
                     break;
                 default:
-                    CHECK_EQ(scene.GetLabel().GetText().GetValue(), "æøåößđŋµÅÖ");
+                    CHECK_EQ(scene.GetLabel().GetText().GetValue(), "保持手不动");
                     gfx.Terminate();
                     break;
             }

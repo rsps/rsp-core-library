@@ -17,6 +17,8 @@
 using namespace rsp::utils;
 using namespace rsp::logging;
 
+//#define DEBUG_FONTS 1
+
 namespace rsp::graphics {
 
 void FontRawInterface::RegisterFont(std::string_view aFileName)
@@ -99,7 +101,7 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
         FontStyles style{};
         bool ignore = true;
 
-        if (face->face_index == 0) {
+        if (StrUtils::StartsWith(face->style_name, "Regular")) {
             ignore = false;
             if (face->style_flags & FT_STYLE_FLAG_ITALIC) {
                 style = FontStyles::Italic;

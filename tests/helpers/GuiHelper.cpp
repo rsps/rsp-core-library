@@ -26,8 +26,10 @@ GuiHelper::GuiHelper(bool aRegisterTestTouchParser)
       mPixMap{},
       mTimerQueue{}
 {
-    const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
-    const char* cFontName = "Exo 2";
+//    const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
+//    const char* cFontName = "Exo 2";
+    const char* cFontFile = "fonts/NotoSansSC-VariableFont_wght.ttf";
+    const char* cFontName = "Noto Sans SC";
 
     CHECK_NOTHROW(Font::RegisterFont(cFontFile));
     CHECK_NOTHROW(Font::SetDefaultFont(cFontName));
@@ -56,4 +58,3 @@ GuiHelper::GuiHelper(bool aRegisterTestTouchParser)
 GuiHelper::~GuiHelper()
 {
 }
-
