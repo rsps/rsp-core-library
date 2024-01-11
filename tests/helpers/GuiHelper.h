@@ -24,7 +24,7 @@ public:
     TestPixmap mPixMap;
     rsp::utils::TimerQueue mTimerQueue;
 
-    GuiHelper(bool aRegisterTestTouchParser = true);
+    explicit GuiHelper(bool aRegisterTestTouchParser = true);
     virtual ~GuiHelper();
 };
 
