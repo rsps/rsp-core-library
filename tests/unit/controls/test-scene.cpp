@@ -30,7 +30,7 @@ TEST_CASE("Scene Test")
 {
     TestLogger logger;
 
-    const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
+    const char* cFontFile = "fonts/Exo 2/Exo2-VariableFont_wght.ttf";
     const char* cFontName = "Exo 2";
 
     CHECK_NOTHROW(Font::RegisterFont(cFontFile));

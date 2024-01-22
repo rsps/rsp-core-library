@@ -26,13 +26,11 @@ GuiHelper::GuiHelper(bool aRegisterTestTouchParser)
       mPixMap{},
       mTimerQueue{}
 {
-//    const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
-//    const char* cFontName = "Exo 2";
-    const char* cFontFile = "fonts/NotoSansSC-VariableFont_wght.ttf";
-    const char* cFontName = "Noto Sans SC";
-
-    CHECK_NOTHROW(Font::RegisterFont(cFontFile));
-    CHECK_NOTHROW(Font::SetDefaultFont(cFontName));
+//    CHECK_NOTHROW(Font::RegisterFont("fonts/Exo 2/Exo2-VariableFont_wght.ttf"));
+//    CHECK_NOTHROW(Font::SetDefaultFont("Exo 2"));
+    CHECK_NOTHROW(Font::RegisterFont("fonts/Noto Sans/NotoSans-VariableFont_wdth,wght.ttf"));
+    CHECK_NOTHROW(Font::RegisterFont("fonts/Noto Sans/NotoSansSC-VariableFont_wght.ttf"));
+    CHECK_NOTHROW(Font::SetDefaultFont("Noto Sans SC"));
 
     // Make framebuffer
 #ifdef USE_GFX_SW

@@ -526,7 +526,7 @@ TEST_CASE("Framebuffer")
 
     SUBCASE("Draw Text")
     {
-        const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
+        const char* cFontFile = "fonts/Exo 2/Exo2-VariableFont_wght.ttf";
         Font::RegisterFont(cFontFile);
         Rect r(100, 200, 280, 200);
 
@@ -609,7 +609,7 @@ TEST_CASE("Framebuffer")
 
     SUBCASE("Text Alignment")
     {
-        const char* cFontFile = "fonts/Exo2-VariableFont_wght.ttf";
+        const char* cFontFile = "fonts/Exo 2/Exo2-VariableFont_wght.ttf";
         Font::RegisterFont(cFontFile);
         Rect r(10, 10, 460, 780);
 
@@ -641,8 +641,8 @@ TEST_CASE("Framebuffer")
 
     SUBCASE("Font Styles")
     {
-        CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-Italic-VariableFont_wght.ttf"));
-        CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-VariableFont_wght.ttf"));
+        CHECK_NOTHROW(Font::RegisterFont("fonts/Exo 2/Exo2-Italic-VariableFont_wght.ttf"));
+        CHECK_NOTHROW(Font::RegisterFont("fonts/Exo 2/Exo2-VariableFont_wght.ttf"));
         Rect r(10, 10, 460, 280);
         auto r2 = r;
         r2.AddSize(2, 2).Move(-1, -1);

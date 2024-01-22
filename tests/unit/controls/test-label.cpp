@@ -29,8 +29,8 @@ TEST_CASE("Label")
     Renderer::SetDevicePath(p.string());
 #endif
 
-    CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-Italic-VariableFont_wght.ttf"));
-    CHECK_NOTHROW(Font::RegisterFont("fonts/Exo2-VariableFont_wght.ttf"));
+    CHECK_NOTHROW(Font::RegisterFont("fonts/Exo 2/Exo2-Italic-VariableFont_wght.ttf"));
+    CHECK_NOTHROW(Font::RegisterFont("fonts/Exo 2/Exo2-VariableFont_wght.ttf"));
 
     CHECK_NOTHROW(Renderer::Init(480, 800));
     auto& renderer = Renderer::Init(480, 800);
