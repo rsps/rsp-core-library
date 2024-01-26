@@ -18,12 +18,20 @@ namespace rsp::messaging {
 // http://nercury.github.io/c++/interesting/2016/02/22/weak_ptr-and-event-cleanup.html
 // https://stackoverflow.com/a/39920584
 
+/**
+ * \brief Type for Listener tokens, must be held by listeners as long as they wish to listen.
+ */
+using Listener = std::shared_ptr<void>;
+
+/**
+ * \brief Notification template class. Declares callback methods with any amount of arguments.
+ * \tparam Args Argument list to declare for callback.
+ */
 template< class ... Args >
 class Notifier final
 {
 public:
-    // Tokens held by listeners
-    using Listener_t = std::shared_ptr<void>;
+    using Listener_t = Listener;
 
     void operator()(Args ...args)
     {
@@ -53,11 +61,13 @@ protected:
     std::vector<std::weak_ptr<std::function<void(Args...)> > > mCallbacks{};
 };
 
-
+/**
+ * \brief Container to store Listener tokens returned when listening to Notifier's
+ */
 class Endpoints
 {
 public:
-    Endpoints& operator<<(const std::shared_ptr<void>& arEndpoint)
+    Endpoints& operator<<(const Listener& arEndpoint)
     {
         mListeners.push_back(arEndpoint);
         return *this;
@@ -70,7 +80,7 @@ public:
     }
 
 protected:
-    std::vector<std::shared_ptr<void>> mListeners{};
+    std::vector<Listener> mListeners{};
 };
 
 
