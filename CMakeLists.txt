@@ -79,7 +79,7 @@ if (FREETYPE_FONTS)
 endif()
 
 if (NET_LIBCURL)
-#    set(CURL_LIBRARY "-lcurl") 
+#    set(CURL_LIBRARY "-lcurl")
     find_package(CURL 7.33 REQUIRED)
     set(LIBCURL_BUILD_OPTIONS -DUSE_CURL)
     set(NETWORK_LIB CURL::libcurl)

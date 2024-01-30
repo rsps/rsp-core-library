@@ -47,8 +47,28 @@ public:
         BlueTooth   = PF_BLUETOOTH ///< Bluetooth sockets.
     };
 
+    enum class SockOptions {
+        GetAcceptConnections = SO_ACCEPTCONN, ///< Non-zero indicates that socket listening is enabled (getsockopt() only).
+        Broadcast = SO_BROADCAST,             ///< Non-zero requests permission to transmit broadcast datagrams (SOCK_DGRAM sockets only).
+        ProtocolDebug = SO_DEBUG,             ///< Non-zero requests debugging in underlying protocol modules.
+        DoNotRoute = SO_DONTROUTE,            ///< Non-zero requests bypass of normal routing; route based on destination address only.
+        GetSocketError = SO_ERROR,            ///< Requests and clears pending error information on the socket (getsockopt() only).
+        KeepAlive = SO_KEEPALIVE,             ///< Non-zero requests periodic transmission of keepalive messages (protocol-specific).
+//        Linger = SO_LINGER, /*struct linger*/ ///< Specify actions to be taken for queued, unsent data on close(): linger on/off and linger time in seconds.
+        OutOfBandInline = SO_OOBINLINE,       ///< Non-zero requests that out-of-band data be placed into normal data input queue as received.
+        ReceiveBufSize = SO_RCVBUF,           ///< Size of receive buffer (in bytes).
+        ReceiveLowAt = SO_RCVLOWAT,           ///< Minimum amount of data to return to application for input operations (in bytes).
+        ReceiveTimeout = SO_RCVTIMEO, /*struct timeval*/ ///< Timeout value for a socket receive operation.
+        ReUseAddress = SO_REUSEADDR,          ///< Non-zero requests reuse of local addresses in bind() (protocol-specific).
+        SendBufSize = SO_SNDBUF,              ///< Size of send buffer (in bytes).
+        SendLowAt = SO_SNDLOWAT,              ///< Minimum amount of data to send for output operations (in bytes).
+        SendTimeout = SO_SNDTIMEO, /*struct timeval*/ ///< Timeout value for a socket send operation.
+        GetSocketType = SO_TYPE,              ///< Identify socket type (getsockopt() only).
+    };
+
     Socket() = default;
     Socket(Domain aDomain, Type aType, Protocol aProtocol);
+    Socket(int aHandle, SockAddress_t aAddress) : mHandle(aHandle), mAddress(std::move(aAddress)) {}
 
     //---- Socket Options ----
     [[nodiscard]] bool IsConnected() const;
@@ -57,7 +77,7 @@ public:
     [[nodiscard]] bool IsBroadcastAllowed() const;
     Socket& SetBroadcastAllowed(bool aAllow = true);
 
-    [[nodiscard]] std::string GetError() const;
+    [[nodiscard]] int GetError() const;
 
     [[nodiscard]] bool IsKeepAliveEnabled() const;
     Socket& SetKeepAlive(bool aEnable = true);
@@ -73,15 +93,17 @@ public:
     Socket& SetSendTimeout(std::chrono::system_clock::duration aTimeout);
 
     //---- Socket methods ----
-    [[nodiscard]] SockAddress_t GetAddr() const;
-    [[nodiscard]] SockAddress_t GetPeerAddr() const;
+    [[nodiscard]] SockAddress_t GetAddr();
 
-    Socket& Accept(Socket &arPeer);
+    [[nodiscard]] Socket Accept() const;
     Socket& Bind(const SockAddress_t &arAddr);
     Socket& Connect(const SockAddress_t &arAddr);
+    [[nodiscard]] int GetOptions(SockOptions aOption, int aLevel = SOL_SOCKET) const;
     Socket& Listen(size_t aAcceptQueueSize = 0);
     size_t Receive(std::uint8_t *apBuffer, size_t aBufLen);
+    size_t ReceiveFrom(std::uint8_t *apBuffer, size_t aBufLen, int aFlags, Socket &arPeer);
     size_t Send(const std::uint8_t *apBuffer, size_t aBufLen);
+    Socket& SetOptions(SockOptions aOption, int aValue, int aLevel = SOL_SOCKET);
 
     //---- Async IO ----
     [[nodiscard]] bool IsDataReady() const;
@@ -89,11 +111,10 @@ public:
 
 protected:
     int mHandle = 0;
-};
+    SockAddress_t mAddress{};
 
-class ClientSocket : public Socket
-{
-
+    [[nodiscard]] std::chrono::system_clock::duration getTimeoutOption(SockOptions aOption) const;
+    void setTimeoutOption(SockOptions aOption, std::chrono::system_clock::duration aValue);
 };
 
 } // rsp::posix
