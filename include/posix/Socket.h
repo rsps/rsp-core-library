@@ -68,7 +68,8 @@ public:
 
     Socket() = default;
     Socket(Domain aDomain, Type aType, Protocol aProtocol);
-    Socket(int aHandle, SockAddress_t aAddress) : mHandle(aHandle), mAddress(std::move(aAddress)) {}
+    Socket(Domain aDomain, int aHandle, SockAddress_t aAddress)
+        : mHandle(aHandle), mAddress(std::move(aAddress)), mDomain(aDomain) {}
 
     //---- Socket Options ----
     [[nodiscard]] bool IsConnected() const;
@@ -112,6 +113,9 @@ public:
 protected:
     int mHandle = 0;
     SockAddress_t mAddress{};
+    Domain mDomain = Domain::Unspecified;
+    Type mType = Type::Stream;
+    Protocol mProtocol = Protocol::Unspecified;
 
     [[nodiscard]] std::chrono::system_clock::duration getTimeoutOption(SockOptions aOption) const;
     void setTimeoutOption(SockOptions aOption, std::chrono::system_clock::duration aValue);

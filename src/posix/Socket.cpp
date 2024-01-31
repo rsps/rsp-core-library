@@ -116,6 +116,7 @@ Socket::SockAddress_t Socket::GetAddr()
             THROW_SYSTEM("getsockname() failed.");
         }
         mAddress = SockAddress_t(sa.sa_data, std::min(std::strlen(sa.sa_data), sizeof(sa.sa_data)));
+        mDomain = Domain(sa.sa_family);
     }
     return mAddress;
 }
@@ -131,16 +132,30 @@ Socket Socket::Accept() const
     }
     auto address = SockAddress_t(sa.sa_data, std::min(std::strlen(sa.sa_data), sizeof(sa.sa_data)));
 
-    return {res, address};
+    return {Domain(sa.sa_family), res, address};
 }
 
 Socket &Socket::Bind(const Socket::SockAddress_t &arAddr)
 {
+    struct sockaddr sa{};
+    sa.sa_family = unsigned(mDomain);
+    std::memcpy(sa.sa_data, arAddr.data(), std::min(sizeof(sa.sa_data), arAddr.size()));
+    int res = bind(mHandle, &sa, sizeof(sa));
+    if (res < 0) {
+        THROW_SYSTEM("accept() failed.");
+    }
     return *this;
 }
 
 Socket &Socket::Connect(const Socket::SockAddress_t &arAddr)
 {
+    struct sockaddr sa{};
+    sa.sa_family = unsigned(mDomain);
+    std::memcpy(sa.sa_data, arAddr.data(), std::min(sizeof(sa.sa_data), arAddr.size()));
+    int res = connect(mHandle, &sa, sizeof(sa));
+    if (res < 0) {
+        THROW_SYSTEM("connect() failed.");
+    }
     return *this;
 }
 
