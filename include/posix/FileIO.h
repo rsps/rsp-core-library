@@ -171,7 +171,7 @@ public:
      * \param aTimeoutMs
      * \return True if data in the file awaits reading.
      */
-    bool WaitForDataReady(int aTimeoutMs) const;
+    [[nodiscard]] bool WaitForDataReady(int aTimeoutMs) const;
 
   protected:
     std::string mFileName{};

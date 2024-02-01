@@ -101,9 +101,9 @@ public:
     Socket& Connect(const SockAddress_t &arAddr);
     [[nodiscard]] int GetOptions(SockOptions aOption, int aLevel = SOL_SOCKET) const;
     Socket& Listen(size_t aAcceptQueueSize = 0);
-    size_t Receive(std::uint8_t *apBuffer, size_t aBufLen);
-    size_t ReceiveFrom(std::uint8_t *apBuffer, size_t aBufLen, int aFlags, Socket &arPeer);
-    size_t Send(const std::uint8_t *apBuffer, size_t aBufLen);
+    size_t Receive(std::uint8_t *apBuffer, size_t aBufLen, int aFlags = 0);
+    size_t ReceiveFrom(Socket &arPeer, std::uint8_t *apBuffer, size_t aBufLen, int aFlags = 0);
+    size_t Send(const std::uint8_t *apBuffer, size_t aBufLen, int aFlags = 0);
     Socket& SetOptions(SockOptions aOption, int aValue, int aLevel = SOL_SOCKET);
 
     //---- Async IO ----

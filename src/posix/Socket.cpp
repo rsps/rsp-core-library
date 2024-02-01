@@ -10,6 +10,7 @@
 #include <cstring>
 #include <exceptions/ExceptionHelper.h>
 #include <posix/Socket.h>
+#include <poll.h>
 
 namespace rsp::posix {
 
@@ -161,27 +162,64 @@ Socket &Socket::Connect(const Socket::SockAddress_t &arAddr)
 
 Socket &Socket::Listen(size_t aAcceptQueueSize)
 {
+    int res = listen(mHandle, int(aAcceptQueueSize));
+    if (res < 0) {
+        THROW_SYSTEM("listen() failed.");
+    }
     return *this;
 }
 
-size_t Socket::Receive(std::uint8_t *apBuffer, size_t aBufLen)
+size_t Socket::Receive(std::uint8_t *apBuffer, size_t aBufLen, int aFlags)
 {
-    return 0;
+    ssize_t res = recv(mHandle, apBuffer, aBufLen, aFlags);
+    if (res == -1) {
+        THROW_SYSTEM("recv() failed.");
+    }
+    return size_t(res);
 }
 
-size_t Socket::ReceiveFrom(std::uint8_t *apBuffer, size_t aBufLen, int aFlags, Socket &arPeer)
+size_t Socket::ReceiveFrom(Socket &arPeer, std::uint8_t *apBuffer, size_t aBufLen, int aFlags)
 {
-    return 0;
+    struct sockaddr sa{};
+    sa.sa_family = unsigned(mDomain);
+    std::memcpy(sa.sa_data, arPeer.mAddress.data(), std::min(sizeof(sa.sa_data), arPeer.mAddress.size()));
+    socklen_t len = sizeof(sa);
+
+    ssize_t res = recvfrom(mHandle, apBuffer, aBufLen, aFlags, &sa, &len);
+    if (res == -1) {
+        THROW_SYSTEM("recvfrom() failed.");
+    }
+    return size_t(res);
 }
 
-size_t Socket::Send(const std::uint8_t *apBuffer, size_t aBufLen)
+size_t Socket::Send(const std::uint8_t *apBuffer, size_t aBufLen, int aFlags)
 {
-    return 0;
+    ssize_t res = send(mHandle, apBuffer, aBufLen, aFlags);
+    if (res == -1) {
+        THROW_SYSTEM("send() failed.");
+    }
+    return size_t(res);
 }
 
 bool Socket::IsDataReady() const
 {
-    return false;
+    struct pollfd fd{};
+    int ret;
+    bool result = false;
+    int timeout = 0;
+
+    fd.fd = mHandle;
+    fd.events = POLLIN;
+
+    ret = poll(&fd, 1, timeout);
+
+    if (ret > 0) {
+        if (fd.revents & POLLIN) {
+            result = true;
+        }
+    }
+
+    return result;
 }
 
 int Socket::GetFd() const
