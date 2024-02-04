@@ -13,14 +13,22 @@
 #include <chrono>
 #include <string>
 #include <sys/socket.h>
+#include <exceptions/CoreException.h>
 
 namespace rsp::posix {
+
+class ESocketError : public rsp::exceptions::CoreException
+{
+public:
+    explicit ESocketError(const std::string &arMsg)
+            : CoreException(arMsg)
+    {
+    }
+};
 
 class Socket
 {
 public:
-    using SockAddress_t = std::string;
-
     enum class Domain {
         Unspecified = AF_UNSPEC,   ///< Unspecified
         Local       = AF_LOCAL,    ///< Local to host (pipes and file-domain).
@@ -66,10 +74,46 @@ public:
         GetSocketType = SO_TYPE,              ///< Identify socket type (getsockopt() only).
     };
 
+    enum class ShutdownFlags {
+        Read = SHUT_RD,
+        Write = SHUT_WR,
+        ReadWrite = SHUT_RDWR
+    };
+
+    class SocketAddress
+    {
+    public:
+        SocketAddress() = default;
+        explicit SocketAddress(const char *apAddr);
+        explicit SocketAddress(const std::string &arAddr);
+        explicit SocketAddress(std::string_view aAddr);
+        explicit SocketAddress(struct sockaddr &arSockAddr, socklen_t aLen);
+
+        SocketAddress& operator=(const struct sockaddr &arSockAddr);
+
+        [[nodiscard]] explicit operator std::string() const { return AsString(); }
+        [[nodiscard]] std::string AsString() const;
+
+        [[nodiscard]] const struct sockaddr& Get();
+        [[nodiscard]] struct sockaddr& Get(struct sockaddr& arAddr);
+
+        [[nodiscard]] bool IsEmpty() const { return mAddress.sa_family == int(Domain::Unspecified); }
+        [[nodiscard]] size_t Size() const;
+        [[nodiscard]] Domain GetDomain() const { return Domain(mAddress.sa_family); }
+        SocketAddress& SetDomain(Domain aDomain);
+
+    protected:
+        struct sockaddr mAddress{};
+    };
+
     Socket() = default;
     Socket(Domain aDomain, Type aType, Protocol aProtocol);
-    Socket(Domain aDomain, int aHandle, SockAddress_t aAddress)
-        : mHandle(aHandle), mAddress(std::move(aAddress)), mDomain(aDomain) {}
+    Socket(const Socket&) = delete;
+    Socket(Socket&&) noexcept;
+    virtual ~Socket();
+
+    Socket& operator=(const Socket&) = delete;
+    Socket& operator=(Socket&&) noexcept;
 
     //---- Socket Options ----
     [[nodiscard]] bool IsConnected() const;
@@ -94,17 +138,18 @@ public:
     Socket& SetSendTimeout(std::chrono::system_clock::duration aTimeout);
 
     //---- Socket methods ----
-    [[nodiscard]] SockAddress_t GetAddr();
+    [[nodiscard]] SocketAddress GetAddr();
 
     [[nodiscard]] Socket Accept() const;
-    Socket& Bind(const SockAddress_t &arAddr);
-    Socket& Connect(const SockAddress_t &arAddr);
+    Socket& Bind(const std::string &arAddr);
+    Socket& Connect(const std::string &arAddr);
     [[nodiscard]] int GetOptions(SockOptions aOption, int aLevel = SOL_SOCKET) const;
     Socket& Listen(size_t aAcceptQueueSize = 0);
-    size_t Receive(std::uint8_t *apBuffer, size_t aBufLen, int aFlags = 0);
+    size_t Receive(std::uint8_t *apBuffer, size_t aBufLen, int aFlags = 0) const;
     size_t ReceiveFrom(Socket &arPeer, std::uint8_t *apBuffer, size_t aBufLen, int aFlags = 0);
-    size_t Send(const std::uint8_t *apBuffer, size_t aBufLen, int aFlags = 0);
+    size_t Send(const std::uint8_t *apBuffer, size_t aBufLen, int aFlags = 0) const;
     Socket& SetOptions(SockOptions aOption, int aValue, int aLevel = SOL_SOCKET);
+    Socket& Shutdown(ShutdownFlags aFlag);
 
     //---- Async IO ----
     [[nodiscard]] bool IsDataReady() const;
@@ -112,13 +157,25 @@ public:
 
 protected:
     int mHandle = 0;
-    SockAddress_t mAddress{};
+    SocketAddress mLocalAddress{};
+    SocketAddress mPeerAddress{};
     Domain mDomain = Domain::Unspecified;
     Type mType = Type::Stream;
     Protocol mProtocol = Protocol::Unspecified;
 
+    void deleteOldSocketInode(const SocketAddress &arAddr) const;
+
+    /**
+     * \brief Special constructor for use in Accept
+     * \param arServer
+     * \param aHandle
+     * \param aLocalAddress
+     * \param aPeerAddress
+     */
+    Socket(const Socket &arServer, int aHandle, SocketAddress aLocalAddress, SocketAddress aPeerAddress);
+
     [[nodiscard]] std::chrono::system_clock::duration getTimeoutOption(SockOptions aOption) const;
-    void setTimeoutOption(SockOptions aOption, std::chrono::system_clock::duration aValue);
+    void setTimeoutOption(SockOptions aOption, std::chrono::system_clock::duration aValue) const;
 };
 
 } // rsp::posix
