@@ -8,78 +8,179 @@
 * \author      steffen
 */
 #include <cstring>
+#include <charconv>
 #include <exceptions/ExceptionHelper.h>
 #include <posix/Socket.h>
 #include <poll.h>
 #include <unistd.h>
 #include <filesystem>
-
+#include <arpa/inet.h>
 
 namespace rsp::posix {
 
-Socket::SocketAddress::SocketAddress(const char *apAddr)
-    : SocketAddress(std::string_view(apAddr))
+Socket::Address::Address(const char *apAddr)
+    : Address(std::string_view(apAddr))
 {
 }
 
-Socket::SocketAddress::SocketAddress(const std::string &arAddr)
-    : SocketAddress(std::string_view(arAddr))
+Socket::Address::Address(const std::string &arAddr)
+    : Address(std::string_view(arAddr))
 {
 }
 
-Socket::SocketAddress::SocketAddress(std::string_view aAddr)
+Socket::Address::Address(std::string_view aAddr)
 {
-    if (aAddr.size() > sizeof(mAddress.sa_data)) {
-        THROW_WITH_BACKTRACE1(ESocketError, "Socket address is to long.");
+    int res;
+    if (aAddr[0] == '/') {
+        if (aAddr.size() > sizeof(mAddress.Unix.sun_path)) {
+            THROW_WITH_BACKTRACE1(ESocketError, "Socket address is to long.");
+        }
+        mAddress.Unix.sun_family = int(Socket::Domain::Unix);
+        std::memcpy(mAddress.Unix.sun_path, aAddr.data(), aAddr.size());
     }
-    mAddress.sa_family = int(Socket::Domain::Unspecified);
-    std::memcpy(mAddress.sa_data, aAddr.data(), aAddr.size());
+    else if ((res = inet_pton(AF_INET, aAddr.data(), &(mAddress.Inet.sin_addr)) == 1)) {
+        mAddress.Inet.sin_family = AF_INET;
+        size_t colonPos = aAddr.find(':');
+        if(colonPos != std::string::npos) {
+            auto port_string = aAddr.substr(colonPos+1);
+            uint16_t u2;
+            auto result = std::from_chars(port_string.data(), port_string.data() + port_string.size(), u2);
+            if (result.ec == std::errc()) {
+                mAddress.Inet.sin_port = u2;
+            }
+        }
+    }
+    else if ((res = inet_pton(AF_INET6, aAddr.data(), &(mAddress.Inet6.sin6_addr)) == 1)) {
+        mAddress.Inet6.sin6_family = AF_INET6;
+        size_t colonPos = aAddr.find(']'); // IPv6 url format: [<uint16_t * 8>::]:<port>
+        if(colonPos != std::string::npos) {
+            auto port_string = aAddr.substr(colonPos+2);
+            uint16_t u2;
+            auto result = std::from_chars(port_string.data(), port_string.data() + port_string.size(), u2);
+            if (result.ec == std::errc()) {
+                mAddress.Inet6.sin6_port = u2;
+            }
+        }
+    }
+    else {
+        mAddress.Unspecified.sa_family = int(Socket::Domain::Unspecified);
+    }
 }
 
-Socket::SocketAddress::SocketAddress(sockaddr &arSockAddr, socklen_t aLen)
+Socket::Address::Address(sockaddr &arSockAddr, socklen_t aLen)
     : mAddress(arSockAddr)
 {
-    if (aLen != (Size() + sizeof(mAddress.sa_family))) {
+    if (aLen != (Size() + sizeof(mAddress.Unspecified.sa_family))) {
         THROW_WITH_BACKTRACE1(ESocketError, "Socket length is not same as Size().");
     }
 }
 
-Socket::SocketAddress& Socket::SocketAddress::operator=(const sockaddr &arSockAddr)
+Socket::Address::Address(uint32_t aIP, uint16_t aPort)
 {
-    mAddress = arSockAddr;
+    mAddress.Inet.sin_family = int(Socket::Domain::Inet);
+    mAddress.Inet.sin_addr.s_addr = aIP;
+    mAddress.Inet.sin_port = aPort;
+}
+
+Socket::Address& Socket::Address::operator=(const sockaddr &arSockAddr)
+{
+    mAddress.Unspecified.sa_family = arSockAddr.sa_family;
+    std::memcpy(&mAddress.Unspecified.sa_data, &arSockAddr.sa_data, Size());
     return *this;
 }
 
-size_t Socket::SocketAddress::Size() const
+size_t Socket::Address::Size() const
 {
-    for (size_t i = 0; i < sizeof(mAddress.sa_data) ; ++i) {
-        if (mAddress.sa_data[i] == '\0') {
-            return i;
+    if (mAddress.Unspecified.sa_family == int(Socket::Domain::Unix)) {
+        for (size_t i = 0; i < sizeof(mAddress.Unix.sun_path); ++i) {
+            if (mAddress.Unix.sun_path[i] == '\0') {
+                return i;
+            }
         }
+        return sizeof(mAddress.Unix.sun_path);
     }
-    return sizeof(mAddress.sa_data);
+    else if (mAddress.Inet.sin_family == int(Socket::Domain::Inet)) {
+        return sizeof(mAddress.Inet) - sizeof(mAddress.Unspecified.sa_family);
+    }
+    else if (mAddress.Inet6.sin6_family == int(Socket::Domain::Inet6)) {
+        return sizeof(mAddress.Inet6) - sizeof(mAddress.Unspecified.sa_family);
+    }
+    return sizeof(mAddress.Unspecified.sa_data);
 }
 
-Socket::SocketAddress &Socket::SocketAddress::SetDomain(Domain aDomain)
+Socket::Address &Socket::Address::SetDomain(Domain aDomain) noexcept
 {
-    mAddress.sa_family = int(aDomain);
+    mAddress.Unspecified.sa_family = int(aDomain);
     return *this;
 }
 
-const struct sockaddr &Socket::SocketAddress::Get()
+const struct sockaddr& Socket::Address::Get() const
 {
-    return mAddress;
+    return mAddress.Unspecified;
 }
 
-struct sockaddr &Socket::SocketAddress::Get(sockaddr &arAddr)
+struct sockaddr& Socket::Address::Get()
 {
-    arAddr = mAddress;
-    return arAddr;
+    return mAddress.Unspecified;
 }
 
-std::string Socket::SocketAddress::AsString() const
+std::string Socket::Address::AsString() const
 {
-    return std::string{mAddress.sa_data, Size()};
+    char buffer[INET6_ADDRSTRLEN+1];
+    buffer[INET6_ADDRSTRLEN] = '\0';
+
+    switch (Socket::Domain(mAddress.Unspecified.sa_family)) {
+        case Socket::Domain::Unix:
+            return std::string{mAddress.Unix.sun_path, Size()};
+
+        case Socket::Domain::Inet:
+            if (inet_ntop(AF_INET, &mAddress.Inet.sin_addr, buffer, sizeof(buffer))) {
+                return std::string(buffer);
+            }
+            break;
+
+        case Socket::Domain::Inet6:
+            if (inet_ntop(AF_INET6, &mAddress.Inet6.sin6_addr, buffer, sizeof(buffer))) {
+                return std::string(buffer);
+            }
+            break;
+
+        default:
+            break;
+    }
+    return {};
+}
+
+uint16_t Socket::Address::GetPort() const
+{
+    switch (Socket::Domain(mAddress.Unspecified.sa_family)) {
+        case Socket::Domain::Inet:
+            return mAddress.Inet.sin_port;
+        case Socket::Domain::Inet6:
+            return mAddress.Inet6.sin6_port;
+        default:
+            return 0;
+    }
+}
+
+Socket::Address& Socket::Address::SetPort(uint16_t aPort) noexcept
+{
+    switch (Socket::Domain(mAddress.Unspecified.sa_family)) {
+        case Socket::Domain::Inet:
+            mAddress.Inet.sin_port = aPort;
+            break;
+        case Socket::Domain::Inet6:
+            mAddress.Inet6.sin6_port = aPort;
+            break;
+        default:
+            break;
+    }
+    return *this;
+}
+
+bool Socket::Address::IsEmpty() const
+{
+    return mAddress.Unspecified.sa_family == int(Domain::Unspecified);
 }
 
 Socket::Socket(Socket::Domain aDomain, Socket::Type aType, Socket::Protocol aProtocol)
@@ -93,10 +194,10 @@ Socket::Socket(Socket::Domain aDomain, Socket::Type aType, Socket::Protocol aPro
     mProtocol = aProtocol;
 }
 
-Socket::Socket(const Socket &arServer, int aHandle, Socket::SocketAddress aLocalAddress, Socket::SocketAddress aPeerAddress)
+Socket::Socket(const Socket &arServer, int aHandle, Socket::Address aLocalAddress, Socket::Address aPeerAddress)
     : mHandle(aHandle),
-      mLocalAddress(std::move(aLocalAddress)),
-      mPeerAddress(std::move(aPeerAddress)),
+      mLocalAddress(aLocalAddress),
+      mPeerAddress(aPeerAddress),
       mDomain(arServer.mDomain),
       mType(arServer.mType),
       mProtocol(arServer.mProtocol)
@@ -105,8 +206,8 @@ Socket::Socket(const Socket &arServer, int aHandle, Socket::SocketAddress aLocal
 
 Socket::Socket(Socket &&arOther) noexcept
     : mHandle(arOther.mHandle),
-      mLocalAddress(std::move(arOther.mLocalAddress)),
-      mPeerAddress(std::move(arOther.mPeerAddress)),
+      mLocalAddress(arOther.mLocalAddress),
+      mPeerAddress(arOther.mPeerAddress),
       mDomain(arOther.mDomain)
 {
     arOther.mHandle = 0;
@@ -123,8 +224,8 @@ Socket::~Socket()
 Socket& Socket::operator=(Socket &&arOther) noexcept
 {
     mHandle = arOther.mHandle;
-    mLocalAddress = std::move(arOther.mLocalAddress);
-    mPeerAddress  = std::move(arOther.mPeerAddress);
+    mLocalAddress = arOther.mLocalAddress;
+    mPeerAddress  = arOther.mPeerAddress;
     mDomain = arOther.mDomain;
     arOther.mHandle = 0;
     return *this;
@@ -216,7 +317,7 @@ Socket &Socket::SetSendTimeout(std::chrono::system_clock::duration aTimeout)
     return *this;
 }
 
-Socket::SocketAddress Socket::GetAddr()
+Socket::Address Socket::GetAddr()
 {
     if (mLocalAddress.IsEmpty()) {
         struct sockaddr sa{};
@@ -226,7 +327,7 @@ Socket::SocketAddress Socket::GetAddr()
         if (res < 0) {
             THROW_SYSTEM("getsockname() failed.");
         }
-        mLocalAddress = SocketAddress(sa, len);
+        mLocalAddress = Address(sa, len);
         mDomain = Domain(sa.sa_family);
     }
     return mLocalAddress;
@@ -242,14 +343,18 @@ Socket Socket::Accept() const
         THROW_SYSTEM("accept() failed. Handle: " + std::to_string(mHandle));
     }
 
-    return {*this, res, SocketAddress(sa, len), mLocalAddress};
+    return {*this, res, Address(sa, len), mLocalAddress};
 }
 
 Socket &Socket::Bind(const std::string &arAddr)
 {
-    SocketAddress sa(arAddr);
+    Address sa(arAddr);
     sa.SetDomain(mDomain);
-    deleteOldSocketInode(sa);
+
+    if (sa.GetDomain() == Domain::Unix) {
+        std::filesystem::remove(sa.AsString());
+    }
+
     int res = bind(mHandle, &sa.Get(), sizeof(sa));
     if (res < 0) {
         THROW_SYSTEM("bind() failed.");
@@ -260,7 +365,7 @@ Socket &Socket::Bind(const std::string &arAddr)
 
 Socket &Socket::Connect(const std::string &arAddr)
 {
-    SocketAddress sa(arAddr);
+    Address sa(arAddr);
     sa.SetDomain(mDomain);
     int res = connect(mHandle, &sa.Get(), sizeof(sa));
     if (res < 0) {
@@ -288,16 +393,16 @@ size_t Socket::Receive(std::uint8_t *apBuffer, size_t aBufLen, int aFlags) const
     return size_t(res);
 }
 
-size_t Socket::ReceiveFrom(Socket &arPeer, std::uint8_t *apBuffer, size_t aBufLen, int aFlags)
+size_t Socket::ReceiveFrom(Socket &arPeer, std::uint8_t *apBuffer, size_t aBufLen, int aFlags) const
 {
-    struct sockaddr sa{};
+    Address sa{};
     socklen_t len = sizeof(sa);
 
-    ssize_t res = recvfrom(mHandle, apBuffer, aBufLen, aFlags, &sa, &len);
+    ssize_t res = recvfrom(mHandle, apBuffer, aBufLen, aFlags, &sa.Get(), &len);
     if (res == -1) {
         THROW_SYSTEM("recvfrom() failed.");
     }
-    arPeer.mLocalAddress = SocketAddress(sa, len);
+    arPeer.mLocalAddress = sa;
     return size_t(res);
 }
 
@@ -387,19 +492,6 @@ Socket& Socket::Shutdown(ShutdownFlags aFlag)
         THROW_SYSTEM("shutdown() failed.");
     }
     return *this;
-}
-
-void Socket::deleteOldSocketInode(const SocketAddress &arAddr) const
-{
-    switch (arAddr.GetDomain()) {
-        case Domain::Local:
-//        case Domain::Unix:
-//        case Domain::File:
-            std::filesystem::remove(arAddr.AsString());
-            break;
-        default:
-            break;
-    }
 }
 
 } // rsp::posix

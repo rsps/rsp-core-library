@@ -14,9 +14,9 @@ using namespace rsp::posix;
 
 TEST_CASE("Socket")
 {
-    SUBCASE("SocketAddress") {
-        CHECK_THROWS_AS(Socket::SocketAddress socket_path("/tmp/test-socket"), ESocketError);
-        CHECK_NOTHROW(Socket::SocketAddress socket_path("/tmp/test-sock"));
+    SUBCASE("Address") {
+        CHECK_THROWS_AS(Socket::Address socket_path("/tmp/test-socket"), ESocketError);
+        CHECK_NOTHROW(Socket::Address socket_path("/tmp/test-sock"));
     }
 
     SUBCASE("Construct") {
@@ -47,4 +47,29 @@ TEST_CASE("Socket")
         MESSAGE(result);
         CHECK_EQ(result, msg);
     }
+
+    SUBCASE("TCP Socket") {
+        const std::string msg("Hello Client");
+        std::string socket_path("localhost:46555");
+
+        Socket server(Socket::Domain::Inet, Socket::Type::Stream);
+        CHECK_NOTHROW(server.Bind(socket_path));
+        CHECK_NOTHROW(server.Listen(2));
+
+        Socket client(Socket::Domain::Inet, Socket::Type::Stream);
+        CHECK_NOTHROW(client.Connect(socket_path));
+        Socket sc;
+        CHECK_NOTHROW(sc = server.Accept());
+        CHECK_FALSE(client.IsDataReady());
+        CHECK_NOTHROW(sc.Send(reinterpret_cast<const std::uint8_t*>(msg.data()), msg.size()));
+        CHECK(client.IsDataReady());
+
+        std::string result(20, 'A');
+        size_t len;
+        CHECK_NOTHROW(len = client.Receive(reinterpret_cast<std::uint8_t*>(result.data()), result.size()));
+        CHECK_NOTHROW(result.resize(len));
+        MESSAGE(result);
+        CHECK_EQ(result, msg);
+    }
+
 }
