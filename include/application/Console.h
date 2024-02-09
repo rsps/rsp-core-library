@@ -86,10 +86,10 @@ public:
     static void SetUseColors(bool aEnable) { mUseColors = aEnable; }
     static bool GetUseColors() { return mUseColors; }
 
-    static void SetTtyDevice(const std::string &arTtyDevice) { mTtyDeviceFile = arTtyDevice; }
+    static void SetTtyDevice(const std::string &arTtyDevice);
     static std::string GetTtyDevice() { return mTtyDeviceFile; }
 
-    static void SetPrintToDisplay(bool aEnable) { Get().mPrintToDisplay = aEnable; }
+    static void SetPrintToDisplay(bool aEnable);
     static bool PrintToDisplay() { return Get().mPrintToDisplay; }
 
 protected:
@@ -100,6 +100,7 @@ protected:
     static bool mUseColors;
 
     Console();
+    void updatePrintToDisplay(const std::string &arTtyDevice, bool aEnable);
 
     friend class ConsoleStream;
     void write(const std::string &arMsg, TextColor aColor);

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <doctest.h>
 #include <application/CommandLine.h>
+#include <application/Console.h>
 #include <exceptions/CoreException.h>
 #include <utils/StrUtils.h>
 #include <utils/Function.h>
@@ -99,7 +100,7 @@ TEST_CASE("Application")
 
         app.SetCallback(rsp::utils::Method(&cls, &MyClass::MyFunction));
 
-        ApplicationBase::Get<TestApplication>().Run();
+        ApplicationBase::Get().Run();
 
         std::ifstream fin;
         fin.open(cLogFileName);
@@ -111,4 +112,20 @@ TEST_CASE("Application")
         CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback to member function."));
     }
 
+    SUBCASE("Console") {
+        std::remove(cLogFileName);
+        Console::SetPrintToDisplay(true);
+        TestApplication app(2, arguments);
+
+        ApplicationBase::Get().Run();
+
+        CHECK(std::filesystem::exists(std::filesystem::path(cLogFileName)));
+
+        std::ifstream fin;
+        fin.open(cLogFileName);
+        CHECK_EQ(fin.is_open(), true);
+        std::string line;
+        std::getline(fin, line);
+        CHECK(rsp::utils::StrUtils::EndsWith(line, "MyApplication says \"Hello World.\""));
+    }
 }

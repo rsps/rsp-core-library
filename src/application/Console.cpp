@@ -93,14 +93,8 @@ Console& Console::Get()
 
 Console::Console()
     : mPrintToDisplay(false),
-      mLcdDisplay(mTtyDeviceFile)
+      mLcdDisplay()
 {
-    if (mLcdDisplay.is_open()) {
-        mLcdDisplay << ec::TPutClear << ec::ResetAll << ec::DisableScreenSaver << ec::HideCursor << std::flush;
-    }
-    else {
-        std::cerr << mTtyDeviceFile << " could not be opened" << std::endl;
-    }
 }
 
 Console::~Console()
@@ -124,6 +118,35 @@ void Console::write(const std::string &arMsg, TextColor aColor)
     if (mPrintToDisplay) {
         mLcdDisplay << arMsg;
         mLcdDisplay.flush();
+    }
+}
+
+void Console::SetTtyDevice(const std::string &arTtyDevice)
+{
+    Get().updatePrintToDisplay(mTtyDeviceFile, Get().mPrintToDisplay);
+}
+
+void Console::SetPrintToDisplay(bool aEnable)
+{
+    Get().updatePrintToDisplay(mTtyDeviceFile, aEnable);
+}
+
+void Console::updatePrintToDisplay(const std::string &arTtyDevice, bool aEnable)
+{
+    mTtyDeviceFile = arTtyDevice;
+    mPrintToDisplay = aEnable;
+
+    if (mPrintToDisplay && !mTtyDeviceFile.empty()) {
+        mLcdDisplay.open(mTtyDeviceFile);
+        if (mLcdDisplay.is_open()) {
+            mLcdDisplay << ec::TPutClear << ec::ResetAll << ec::DisableScreenSaver << ec::HideCursor << std::flush;
+        }
+        else {
+            std::cerr << mTtyDeviceFile << " could not be opened" << std::endl;
+        }
+    }
+    else if (mLcdDisplay.is_open()) {
+        mLcdDisplay.close();
     }
 }
 
