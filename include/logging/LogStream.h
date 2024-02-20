@@ -87,6 +87,12 @@ public:
         return *this;
     }
 
+    template< class T>
+    LogStream& operator<<(T& arValue) {
+        mBuffer << arValue;
+        return *this;
+    }
+
     /**
      * \brief Streaming operator specialization  for functions
      *
