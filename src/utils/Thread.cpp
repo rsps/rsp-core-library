@@ -78,7 +78,7 @@ ThreadInterface& Thread::SetExecute(Thread::ThreadCallback_t aCb)
 
 void Thread::run()
 {
-    mLogger.Info() << "Running thread '" << mName << "'";
+    mLogger.Debug() << "Running thread '" << mName << "'";
     try {
         try {
             while (!mTerminated) {
