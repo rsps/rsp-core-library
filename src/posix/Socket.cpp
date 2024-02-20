@@ -30,7 +30,6 @@ Socket::Address::Address(const std::string &arAddr)
 
 Socket::Address::Address(std::string_view aAddr)
 {
-    int res;
     if (aAddr[0] == '/') {
         if (aAddr.size() > sizeof(mAddress.Unix.sun_path)) {
             THROW_WITH_BACKTRACE1(ESocketError, "Socket address is to long.");
@@ -38,7 +37,7 @@ Socket::Address::Address(std::string_view aAddr)
         mAddress.Unix.sun_family = int(Socket::Domain::Unix);
         std::memcpy(mAddress.Unix.sun_path, aAddr.data(), aAddr.size());
     }
-    else if ((res = inet_pton(AF_INET, aAddr.data(), &(mAddress.Inet.sin_addr)) == 1)) {
+    else if (inet_pton(AF_INET, aAddr.data(), &(mAddress.Inet.sin_addr)) == 1) {
         mAddress.Inet.sin_family = AF_INET;
         size_t colonPos = aAddr.find(':');
         if(colonPos != std::string::npos) {
@@ -50,7 +49,7 @@ Socket::Address::Address(std::string_view aAddr)
             }
         }
     }
-    else if ((res = inet_pton(AF_INET6, aAddr.data(), &(mAddress.Inet6.sin6_addr)) == 1)) {
+    else if (inet_pton(AF_INET6, aAddr.data(), &(mAddress.Inet6.sin6_addr)) == 1) {
         mAddress.Inet6.sin6_family = AF_INET6;
         size_t colonPos = aAddr.find(']'); // IPv6 url format: [<uint16_t * 8>::]:<port>
         if(colonPos != std::string::npos) {
@@ -135,13 +134,13 @@ std::string Socket::Address::AsString() const
 
         case Socket::Domain::Inet:
             if (inet_ntop(AF_INET, &mAddress.Inet.sin_addr, buffer, sizeof(buffer))) {
-                return std::string(buffer);
+                return {buffer};
             }
             break;
 
         case Socket::Domain::Inet6:
             if (inet_ntop(AF_INET6, &mAddress.Inet6.sin6_addr, buffer, sizeof(buffer))) {
-                return std::string(buffer);
+                return {buffer};
             }
             break;
 

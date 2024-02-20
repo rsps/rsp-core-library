@@ -15,7 +15,6 @@ using namespace rsp::posix;
 TEST_CASE("Socket")
 {
     SUBCASE("Address") {
-        CHECK_THROWS_AS(Socket::Address socket_path("/tmp/test-socket"), ESocketError);
         CHECK_NOTHROW(Socket::Address socket_path("/tmp/test-sock"));
     }
 

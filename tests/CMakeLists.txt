@@ -51,7 +51,7 @@ target_include_directories(${TEST_BINARY}
 )
 
 if (NOT RELEASE_BUILD)
-target_compile_options(${TEST_BINARY} PRIVATE 
+target_compile_options(${TEST_BINARY} PRIVATE
     -DGFX_FPS=20
     -DDEBUG_LOG
     -g
@@ -76,13 +76,13 @@ target_sources(${TEST_BINARY} PRIVATE
     ${SRC_FILES}
 )
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/testImages 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/testImages
     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/fonts 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/fonts
     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/scripts 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/scripts
     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/webserver/public
@@ -92,5 +92,5 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/webserver/ssl
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/webserver/cgi
     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/)
 
-    
+
 install(TARGETS ${TEST_BINARY} DESTINATION tgm/)
