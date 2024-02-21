@@ -55,7 +55,8 @@ TEST_CASE("Touch Events" * doctest::skip())
             if (gfx.GetSceneMap().ActiveSceneAs<InputScene>().GetLabel().GetText().GetValue() == "Quit") {
                 gfx.Terminate();
             }
-            if (++progress > 200) {
+            progress++;
+            if (progress > 200) {
                 gfx.Terminate();
             }
             CHECK_NOTHROW(arTimer.SetTimeout(500ms).Enable());
@@ -67,4 +68,3 @@ TEST_CASE("Touch Events" * doctest::skip())
 
     MESSAGE("Finished with " << gfx.GetFPS() << " FPS and a maximum event delay of " << gh.mTouchParser.GetMaxDelay() << "ms");
 }
-

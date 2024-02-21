@@ -98,7 +98,7 @@ void Logger::write(const LogStream &arStream, const std::string &arMsg, const st
     LogLevel current_level = arStream.GetLevel();
     std::lock_guard<std::recursive_mutex> lock(mMutex);
 
-    std::erase_if(mWriters, [](auto ptr) { return ptr.expired(); });
+    std::erase_if(mWriters, [](auto ptr) noexcept { return ptr.expired(); });
 
     for (const auto& weak_ptr : mWriters) {
         auto writer = weak_ptr.lock();

@@ -45,7 +45,7 @@ struct APInfo
     uint32_t mNetworkId = 0;
     WpaStatus mStatus = WpaStatus::None;
 
-    explicit APInfo(std::string aSSID = std::string(), int aStrength = 0, bool aEncrypted = false, std::string aIpAddr = std::string(), std::string aMacAddr = std::string())
+    explicit APInfo(std::string aSSID = std::string(), int aStrength = 0, bool aEncrypted = false, std::string aIpAddr = std::string(), std::string aMacAddr = std::string()) noexcept
         : mSSID(std::move(aSSID)),
           mIpAddress(std::move(aIpAddr)),
           mMacAddress(std::move(aMacAddr)),
@@ -66,7 +66,7 @@ struct NetworkInfo
     std::string mSSID;
     bool mSelected;
 
-    explicit NetworkInfo(uint32_t aId = uint32_t(-1), std::string aSSID = std::string(), bool aSelected = false)
+    explicit NetworkInfo(uint32_t aId = uint32_t(-1), std::string aSSID = std::string(), bool aSelected = false) noexcept
         : mId(aId),
           mSSID(std::move(aSSID)),
           mSelected(aSelected)

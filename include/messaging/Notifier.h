@@ -35,7 +35,7 @@ public:
 
     void operator()(Args ...args)
     {
-        std::erase_if(mCallbacks, [](auto ptr) { return ptr.expired(); });
+        std::erase_if(mCallbacks, [](auto ptr) noexcept { return ptr.expired(); });
         auto tmp = mCallbacks;
         for (auto wp : tmp) {
             auto pf = wp.lock();
