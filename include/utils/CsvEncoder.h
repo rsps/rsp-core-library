@@ -11,6 +11,7 @@
 #define RSP_CORE_LIB_CSVENCODER_H
 
 #include "DynamicData.h"
+#include <functional>
 #include <map>
 #include <ostream>
 #include <string>
@@ -22,9 +23,12 @@ namespace rsp::utils {
 class CsvEncoder : public rsp::utils::DynamicData::Encoder
 {
 public:
+    using ValueFormatter_t = std::function<std::string(const DynamicData &arValue)>;
+
     explicit CsvEncoder(bool aIncludeHeaders = true, char aSeparator = ',', bool aPrettyPrint = true);
 
     CsvEncoder& SetHeaders(std::vector<std::string> aHeaders);
+    CsvEncoder& SetValueFormatter(ValueFormatter_t aFormatter);
     std::string Encode(const DynamicData &arData) override;
 
 protected:
@@ -32,6 +36,7 @@ protected:
     char mSeparator;
     bool mPrettyPrint;
     std::vector<std::string> mHeaders{};
+    ValueFormatter_t mFormatter{};
 
     void makeHeaders(const DynamicData &arData);
     [[nodiscard]] std::string format(const DynamicData &arValue) const;

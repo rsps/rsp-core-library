@@ -9,6 +9,7 @@
  */
 #include <exceptions/CoreException.h>
 #include <utils/CsvEncoder.h>
+#include <utils/InRange.h>
 
 namespace rsp::utils {
 
@@ -71,7 +72,11 @@ void CsvEncoder::makeHeaders(const DynamicData &arData)
 
 std::string CsvEncoder::format(const DynamicData &arValue) const
 {
-    if (arValue.IsArray()) {
+    std::string value;
+    if (mFormatter) {
+        value = mFormatter(arValue);
+    }
+    else if (arValue.IsArray()) {
         return "array";
     }
     else if(arValue.IsObject()) {
@@ -80,8 +85,9 @@ std::string CsvEncoder::format(const DynamicData &arValue) const
     else if (arValue.IsNull()) {
         return "";
     }
-
-    std::string value = arValue.AsString();
+    else {
+        value = arValue.AsString();
+    }
 
     if (mPrettyPrint && value == "NotAvailable") {
         return "N/A";
@@ -91,7 +97,7 @@ std::string CsvEncoder::format(const DynamicData &arValue) const
     bool first = true;
     bool need_quote = false;
     for (char chr : value) {
-        if (mPrettyPrint && std::isupper(chr) && !first && result.back() != ' ') {
+        if (mPrettyPrint && std::isupper(chr) && !first && IsInRange(result.back(), 'a', 'z')) {
             result += ' ';
         }
         if ((chr == '\n') || (chr == mSeparator)) {
@@ -126,6 +132,12 @@ void CsvEncoder::streamRow(std::ostream &arResult, const DynamicData &arRow)
             separator = mSeparator;
         }
     }
+}
+
+CsvEncoder &CsvEncoder::SetValueFormatter(CsvEncoder::ValueFormatter_t aFormatter)
+{
+    mFormatter = std::move(aFormatter);
+    return *this;
 }
 
 } // rsp::utils
