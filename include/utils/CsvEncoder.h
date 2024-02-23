@@ -12,6 +12,7 @@
 
 #include "DynamicData.h"
 #include <map>
+#include <ostream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -21,20 +22,20 @@ namespace rsp::utils {
 class CsvEncoder : public rsp::utils::DynamicData::Encoder
 {
 public:
-    explicit CsvEncoder(bool aIncludeHeaders = true, std::string aSeparator = ",", bool aPrettyPrint = true);
+    explicit CsvEncoder(bool aIncludeHeaders = true, char aSeparator = ',', bool aPrettyPrint = true);
 
     CsvEncoder& SetHeaders(std::vector<std::string> aHeaders);
     std::string Encode(const DynamicData &arData) override;
 
 protected:
     bool mIncludeHeaders;
-    std::string mSeparator;
+    char mSeparator;
     bool mPrettyPrint;
     std::vector<std::string> mHeaders{};
-    std::map<std::string, std::uint32_t > mObjectHeadersCount;
 
-    void makeHeaders(const DynamicData &arData, const std::string &arKey, bool &arFoundNull);
-    [[nodiscard]] std::string format(std::string_view aString) const;
+    void makeHeaders(const DynamicData &arData);
+    [[nodiscard]] std::string format(const DynamicData &arValue) const;
+    void streamRow(std::ostream &arResult, const DynamicData &arRow);
 };
 
 } // rsp::utils

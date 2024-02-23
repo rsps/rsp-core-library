@@ -8,11 +8,11 @@
  * \author      Steffen Brummer
  */
 #include <exceptions/CoreException.h>
-#include "utils/CsvEncoder.h"
+#include <utils/CsvEncoder.h>
 
 namespace rsp::utils {
 
-CsvEncoder::CsvEncoder(bool aIncludeHeaders, std::string aSeparator, bool aPrettyPrint)
+CsvEncoder::CsvEncoder(bool aIncludeHeaders, char aSeparator, bool aPrettyPrint)
     : mIncludeHeaders(aIncludeHeaders),
       mSeparator(aSeparator),
       mPrettyPrint(aPrettyPrint)
@@ -27,18 +27,12 @@ std::string CsvEncoder::Encode(const DynamicData &arData)
     std::stringstream result;
     if (mIncludeHeaders) {
         if (mHeaders.empty()) {
-            bool found_null = false;
-            for (size_t i = 0; i < arData.GetCount(); ++i) {
-                makeHeaders(arData[i], "", found_null);
-                if (!found_null) {
-                    break; // No unknown members. We are done.
-                }
-            }
+            makeHeaders(arData);
         }
 
-        std::string_view sep = "";
+        std::string sep;
         for (auto &name : mHeaders) {
-            result << sep << "\"" << format(name) << "\"";
+            result << sep << format(name);
             sep = mSeparator;
         }
         result << "\n";
@@ -46,10 +40,11 @@ std::string CsvEncoder::Encode(const DynamicData &arData)
 
     for (size_t i = 0; i < arData.GetCount() ;++i) {
         // TODO: Stream data recursively...
-        streamValue(result, arData[i]);
+        streamRow(result, arData[i]);
+        result << "\n";
     }
 
-    return std::string();
+    return result.str();
 }
 
 CsvEncoder& CsvEncoder::SetHeaders(std::vector<std::string> aHeaders)
@@ -58,45 +53,53 @@ CsvEncoder& CsvEncoder::SetHeaders(std::vector<std::string> aHeaders)
     return *this;
 }
 
-void CsvEncoder::makeHeaders(const DynamicData &arData, const std::string &arKey, bool &arFoundNull)
+void CsvEncoder::makeHeaders(const DynamicData &arData)
 {
-    if (!arKey.empty()) {
-        mHeaders.push_back(arKey);
-    }
-
-    if (arData.IsNull()) {
-        arFoundNull = true;
-    }
-    else if (arData.IsObject()) {
-        for (auto &name : arData.GetMemberNames()) {
-            makeHeaders(arKey[name], name, arFoundNull);
+    if (arData.IsObject()) {
+        std::string_view sep;
+        const DynamicData &h = arData["Headers"];
+        for (size_t i = 0; i < h.GetCount() ; ++i) {
+            mHeaders.push_back(h[i].AsString());
         }
     }
     else if (arData.IsArray()) {
-        for (size_t i = 0; i < arData.GetCount(); ++i) {
-            makeHeaders(arKey[i], "", arFoundNull);
+        for (auto &name : arData[0].GetMemberNames()) {
+            mHeaders.push_back(name);
         }
     }
 }
 
-std::string CsvEncoder::format(std::string_view aString) const
+std::string CsvEncoder::format(const DynamicData &arValue) const
 {
-    if (!mPrettyPrint) {
-        return "\"" + std::string(aString) + "\"";
+    if (arValue.IsArray()) {
+        return "array";
     }
-    if (aString == "NotAvailable") {
+    else if(arValue.IsObject()) {
+        return "object";
+    }
+    else if (arValue.IsNull()) {
+        return "";
+    }
+
+    std::string value = arValue.AsString();
+
+    if (mPrettyPrint && value == "NotAvailable") {
         return "N/A";
     }
     std::string result;
-    result.reserve(aString.size() + 5);
+    result.reserve(result.size() + 5);
     bool first = true;
     bool need_quote = false;
-    for (char chr : aString) {
-        if (std::isupper(chr) && !first) {
-            result += " ";
+    for (char chr : value) {
+        if (mPrettyPrint && std::isupper(chr) && !first && result.back() != ' ') {
+            result += ' ';
         }
-        if (chr == '"' || chr == '\n') {
+        if ((chr == '\n') || (chr == mSeparator)) {
             need_quote = true;
+        }
+        else if (chr == '"') {
+            need_quote = true;
+            result += '"';
         }
         result += chr;
         first = false;
@@ -105,6 +108,24 @@ std::string CsvEncoder::format(std::string_view aString) const
         result = "\"" + result + "\"";
     }
     return result;
+}
+
+void CsvEncoder::streamRow(std::ostream &arResult, const DynamicData &arRow)
+{
+    std::string separator;
+    if (arRow.IsObject()) {
+        for (auto &name : arRow.GetMemberNames()) {
+            arResult << separator << format(arRow[name]);
+            separator = mSeparator;
+        }
+
+    }
+    else if (arRow.IsArray()) {
+        for (size_t i = 0; i < arRow.GetCount(); ++i) {
+            arResult << separator << format(arRow[i]);
+            separator = mSeparator;
+        }
+    }
 }
 
 } // rsp::utils
