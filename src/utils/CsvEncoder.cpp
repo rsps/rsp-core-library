@@ -23,6 +23,12 @@ CsvEncoder::CsvEncoder(bool aIncludeHeaders, char aSeparator, bool aPrettyPrint)
 std::string CsvEncoder::Encode(const DynamicData &arData)
 {
     std::stringstream result;
+    Encode(result, arData);
+    return result.str();
+}
+
+std::ostream& CsvEncoder::Encode(std::ostream &o, const DynamicData &arData)
+{
     if (mIncludeHeaders) {
         if (mHeaders.empty()) {
             makeHeaders(arData);
@@ -30,29 +36,29 @@ std::string CsvEncoder::Encode(const DynamicData &arData)
 
         std::string sep;
         for (auto &name : mHeaders) {
-            result << sep << format(name);
+            o << sep << format(name);
             sep = mSeparator;
         }
-        result << "\n";
+        o << "\n";
     }
 
     if (arData.IsArray()) {
         for (size_t i = 0; i < arData.GetCount() ;++i) {
-            streamRow(result, arData[i]);
-            result << "\n";
+            streamRow(o, arData[i]);
+            o << "\n";
         }
     }
     else if (arData.IsObject() && arData.MemberExists("Data") && arData["Data"].IsArray()) {
         auto &data = arData["Data"];
         for (size_t i = 0; i < data.GetCount() ;++i) {
-            streamRow(result, data[i]);
-            result << "\n";
+            streamRow(o, data[i]);
+            o << "\n";
         }
     }
     else {
         THROW_WITH_BACKTRACE1(ENotAnArray, "CsvEncoder data is not an array");
     }
-    return result.str();
+    return o;
 }
 
 CsvEncoder& CsvEncoder::SetHeaders(std::vector<std::string> aHeaders)

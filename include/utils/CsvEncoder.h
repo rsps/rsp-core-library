@@ -42,6 +42,8 @@ public:
     CsvEncoder& SetValueFormatter(ValueFormatter_t aFormatter);
     std::string Encode(const DynamicData &arData) override;
 
+    std::ostream& Encode(std::ostream &o, const DynamicData &arData);
+
 protected:
     bool mIncludeHeaders;
     char mSeparator;

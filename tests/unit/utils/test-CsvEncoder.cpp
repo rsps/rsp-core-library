@@ -49,10 +49,10 @@ TEST_CASE("CSV")
     SUBCASE("Encode") {
         DynamicData row;
         row
-                .Add("StringValue", "Some text")
-                .Add("NumberValue", 42)
-                .Add("ArrayValue", DynamicData())
-                .Add("ObjectValue", DynamicData());
+            .Add("StringValue", "Some text")
+            .Add("NumberValue", 42)
+            .Add("ArrayValue", DynamicData())
+            .Add("ObjectValue", DynamicData());
 
         DynamicData set;
         set.Add(row);
@@ -77,8 +77,8 @@ TEST_CASE("CSV")
         set.Clear();
         DynamicData row;
         row
-                .Add("StringValue", "Some text")
-                .Add("NumberValue", 42);
+            .Add("StringValue", "Some text")
+            .Add("NumberValue", 42);
         CHECK_THROWS_AS(csv.Encode(row), ENotAnArray);
     }
 
@@ -101,8 +101,8 @@ TEST_CASE("CSV")
     SUBCASE("Single Column") {
         DynamicData set;
         set
-                .Add("Headers", DynamicData())
-                .Add("Data", DynamicData());
+            .Add("Headers", DynamicData())
+            .Add("Data", DynamicData());
         set["Headers"].Add("Column1");
         for (size_t i = 0; i < 5; ++i) {
             set["Data"].Add(42+i); // Data is only array of single values
