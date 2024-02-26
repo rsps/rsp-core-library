@@ -134,7 +134,7 @@ DynamicData& DynamicData::Remove(std::string_view aKey)
 
 void DynamicData::Clear()
 {
-    mName.clear();
+//    mName.clear();
     mItems.clear();
     mType = Types::Null;
 }

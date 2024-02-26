@@ -11,6 +11,7 @@
 #define RSP_CORE_LIB_CSVENCODER_H
 
 #include "DynamicData.h"
+#include <exceptions/CoreException.h>
 #include <functional>
 #include <map>
 #include <ostream>
@@ -19,6 +20,16 @@
 #include <vector>
 
 namespace rsp::utils {
+
+class ENotAnArray : public exceptions::CoreException
+{
+public:
+    explicit ENotAnArray(const char *aMsg)
+            : CoreException(aMsg)
+    {
+    }
+};
+
 
 class CsvEncoder : public rsp::utils::DynamicData::Encoder
 {

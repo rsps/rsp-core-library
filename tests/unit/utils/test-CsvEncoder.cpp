@@ -49,10 +49,10 @@ TEST_CASE("CSV")
     SUBCASE("Encode") {
         DynamicData row;
         row
-            .Add("StringValue", "Some text")
-            .Add("NumberValue", 42)
-            .Add("ArrayValue", DynamicData())
-            .Add("ObjectValue", DynamicData());
+                .Add("StringValue", "Some text")
+                .Add("NumberValue", 42)
+                .Add("ArrayValue", DynamicData())
+                .Add("ObjectValue", DynamicData());
 
         DynamicData set;
         set.Add(row);
@@ -64,7 +64,51 @@ TEST_CASE("CSV")
 
         CsvEncoder csv;
         auto result = csv.SetValueFormatter(&Formatter).Encode(set);
-        MESSAGE("Result:\n" << result);
+//        MESSAGE("Result:\n" << result);
         CHECK_EQ(result, "String Value,Number Value,Array Value,Object Value\nSome text,42,,\nN/A,43,10|Twenty|true,\"First:1,Second:Two\"\n");
+    }
+
+    SUBCASE("Bad Data") {
+        DynamicData set;
+        set.Add(42).Add(43).Add(44);
+        CsvEncoder csv;
+        CHECK_THROWS_AS(csv.Encode(set), EDynamicTypeError);
+
+        set.Clear();
+        DynamicData row;
+        row
+                .Add("StringValue", "Some text")
+                .Add("NumberValue", 42);
+        CHECK_THROWS_AS(csv.Encode(row), ENotAnArray);
+    }
+
+    SUBCASE("Formatted Data") {
+        DynamicData set;
+        set
+            .Add("Headers", DynamicData())
+            .Add("Data", DynamicData());
+        set["Headers"].Add("Column1").Add("Column2");
+
+        for (size_t i = 0; i < 10; i+=2) {
+            set["Data"].Add(DynamicData().Add(42+i).Add(43+i));
+        }
+
+        auto result = CsvEncoder().Encode(set);
+//        MESSAGE("Result:\n" << result);
+        CHECK_EQ(result, "Column1,Column2\n42,43\n44,45\n46,47\n48,49\n50,51\n");
+    }
+
+    SUBCASE("Single Column") {
+        DynamicData set;
+        set
+                .Add("Headers", DynamicData())
+                .Add("Data", DynamicData());
+        set["Headers"].Add("Column1");
+        for (size_t i = 0; i < 5; ++i) {
+            set["Data"].Add(42+i); // Data is only array of single values
+        }
+        auto result = CsvEncoder().Encode(set);
+//        MESSAGE("Result:\n" << result);
+        CHECK_EQ(result, "Column1\n42\n43\n44\n45\n46\n");
     }
 }

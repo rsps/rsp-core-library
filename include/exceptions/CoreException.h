@@ -76,15 +76,6 @@ public:
     }
 };
 
-class ENotAnArray : public CoreException
-{
-public:
-    explicit ENotAnArray(const char *aMsg)
-            : CoreException(aMsg)
-    {
-    }
-};
-
 #ifndef NDEBUG
 #define ASSERT(a)                  \
     if (!(a)) {                       \
