@@ -87,7 +87,9 @@ std::string CsvEncoder::format(const DynamicData &arValue) const
 {
     std::string value;
     if (mFormatter) {
-        value = mFormatter(arValue);
+        if (mFormatter(value, arValue)) {
+            return value;
+        }
     }
     else if (arValue.IsArray()) {
         return "array";

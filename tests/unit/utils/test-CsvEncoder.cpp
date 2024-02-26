@@ -13,29 +13,30 @@
 
 using namespace rsp::utils;
 
-static std::string Formatter(const DynamicData &arValue)
+static bool Formatter(std::string &arResult, const DynamicData &arValue)
 {
     std::string sep;
-    std::string result;
     if (arValue.IsNull()) {
         ;
     }
     else if (arValue.IsArray()) {
         for (size_t i=0 ; i < arValue.GetCount() ; ++i) {
-            result += sep + Formatter(arValue[i]);
+            arResult += sep;
+            Formatter(arResult, arValue[i]);
             sep = "|";
         }
     }
     else if (arValue.IsObject()) {
         for (auto &name : arValue.GetMemberNames()) {
-            result += sep + name + ":" + Formatter(arValue[name]);
+            arResult += sep + name + ":";
+            Formatter(arResult, arValue[name]);
             sep = ",";
         }
     }
     else {
-        result = arValue.AsString();
+        arResult += arValue.AsString();
     }
-    return result;
+    return false;
 }
 
 TEST_CASE("CSV")
@@ -64,7 +65,7 @@ TEST_CASE("CSV")
 
         CsvEncoder csv;
         auto result = csv.SetValueFormatter(&Formatter).Encode(set);
-//        MESSAGE("Result:\n" << result);
+        MESSAGE("Result:\n" << result);
         CHECK_EQ(result, "String Value,Number Value,Array Value,Object Value\nSome text,42,,\nN/A,43,10|Twenty|true,\"First:1,Second:Two\"\n");
     }
 

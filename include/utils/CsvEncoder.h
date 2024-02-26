@@ -34,7 +34,7 @@ public:
 class CsvEncoder : public rsp::utils::DynamicData::Encoder
 {
 public:
-    using ValueFormatter_t = std::function<std::string(const DynamicData &arValue)>;
+    using ValueFormatter_t = std::function<bool(std::string &arResult, const DynamicData &arValue)>;
 
     explicit CsvEncoder(bool aIncludeHeaders = true, char aSeparator = ',', bool aPrettyPrint = true);
 
