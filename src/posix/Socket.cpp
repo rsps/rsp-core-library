@@ -15,6 +15,8 @@
 #include <unistd.h>
 #include <filesystem>
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <netdb.h>
 
 namespace rsp::posix {
 
@@ -30,6 +32,7 @@ Socket::Address::Address(const std::string &arAddr)
 
 Socket::Address::Address(std::string_view aAddr)
 {
+    size_t colonPos;
     if (aAddr[0] == '/') {
         if (aAddr.size() > sizeof(mAddress.Unix.sun_path)) {
             THROW_WITH_BACKTRACE1(ESocketError, "Socket address is to long.");
@@ -37,7 +40,21 @@ Socket::Address::Address(std::string_view aAddr)
         mAddress.Unix.sun_family = int(Socket::Domain::Unix);
         std::memcpy(mAddress.Unix.sun_path, aAddr.data(), aAddr.size());
     }
-    else if (inet_pton(AF_INET, aAddr.data(), &(mAddress.Inet.sin_addr)) == 1) {
+    else if ((colonPos = aAddr.find(']')) != std::string::npos) { // IPv6 with service/port
+        struct addrinfo ainfo{};
+        size_t colonPos = aAddr.find(':');
+        if(colonPos != std::string::npos) {
+            auto port_string = aAddr.substr(colonPos+1);
+            uint16_t u2;
+            auto result = std::from_chars(port_string.data(), port_string.data() + port_string.size(), u2);
+            if (result.ec == std::errc()) {
+                mAddress.Inet.sin_port = u2;
+            }
+        }
+
+    }
+    if (inet_pton(AF_INET, aAddr.data(), &(mAddress.Inet.sin_addr)) == 1) {
+
         mAddress.Inet.sin_family = AF_INET;
         size_t colonPos = aAddr.find(':');
         if(colonPos != std::string::npos) {
@@ -69,9 +86,9 @@ Socket::Address::Address(std::string_view aAddr)
 Socket::Address::Address(sockaddr &arSockAddr, socklen_t aLen)
     : mAddress(arSockAddr)
 {
-    if (aLen != (Size() + sizeof(mAddress.Unspecified.sa_family))) {
-        THROW_WITH_BACKTRACE1(ESocketError, "Socket length is not same as Size().");
-    }
+//    if (aLen != (Size() + sizeof(mAddress.Unspecified.sa_family))) {
+//        THROW_WITH_BACKTRACE1(ESocketError, "Socket length is not same as Size().");
+//    }
 }
 
 Socket::Address::Address(uint32_t aIP, uint16_t aPort)
@@ -91,12 +108,12 @@ Socket::Address& Socket::Address::operator=(const sockaddr &arSockAddr)
 size_t Socket::Address::Size() const
 {
     if (mAddress.Unspecified.sa_family == int(Socket::Domain::Unix)) {
-        for (size_t i = 0; i < sizeof(mAddress.Unix.sun_path); ++i) {
-            if (mAddress.Unix.sun_path[i] == '\0') {
-                return i;
-            }
-        }
-        return sizeof(mAddress.Unix.sun_path);
+//        for (size_t i = 0; i < sizeof(mAddress.Unix.sun_path); ++i) {
+//            if (mAddress.Unix.sun_path[i] == '\0') {
+//                return i;
+//            }
+//        }
+        return SUN_LEN(&mAddress.Unix);
     }
     else if (mAddress.Inet.sin_family == int(Socket::Domain::Inet)) {
         return sizeof(mAddress.Inet) - sizeof(mAddress.Unspecified.sa_family);
@@ -354,7 +371,7 @@ Socket &Socket::Bind(const std::string &arAddr)
         std::filesystem::remove(sa.AsString());
     }
 
-    int res = bind(mHandle, &sa.Get(), sizeof(sa));
+    int res = bind(mHandle, &sa.Get(), sa.Size());
     if (res < 0) {
         THROW_SYSTEM("bind() failed.");
     }
@@ -366,7 +383,7 @@ Socket &Socket::Connect(const std::string &arAddr)
 {
     Address sa(arAddr);
     sa.SetDomain(mDomain);
-    int res = connect(mHandle, &sa.Get(), sizeof(sa));
+    int res = connect(mHandle, &sa.Get(), sa.Size());
     if (res < 0) {
         THROW_SYSTEM("connect() failed.");
     }

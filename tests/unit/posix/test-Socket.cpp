@@ -20,18 +20,18 @@ TEST_CASE("Socket")
 
     SUBCASE("Construct") {
         CHECK_NOTHROW(Socket s);
-        CHECK_NOTHROW(Socket s(Socket::Domain::Unix, Socket::Type::Stream, Socket::Protocol::Unix));
+        CHECK_NOTHROW(Socket s(Socket::Domain::Unix, Socket::Type::Stream, Socket::Protocol::Unspecified));
     }
 
     SUBCASE("Unix Socket") {
         const std::string msg("Hello Client");
         std::string socket_path("/tmp/test-sock");
 
-        Socket server(Socket::Domain::Unix, Socket::Type::Stream, Socket::Protocol::Unix);
+        Socket server(Socket::Domain::Unix, Socket::Type::Stream, Socket::Protocol::Unspecified);
         CHECK_NOTHROW(server.Bind(socket_path));
         CHECK_NOTHROW(server.Listen(2));
 
-        Socket client(Socket::Domain::Unix, Socket::Type::Stream, Socket::Protocol::Unix);
+        Socket client(Socket::Domain::Unix, Socket::Type::Stream, Socket::Protocol::Unspecified);
         CHECK_NOTHROW(client.Connect(socket_path));
         Socket sc;
         CHECK_NOTHROW(sc = server.Accept());
