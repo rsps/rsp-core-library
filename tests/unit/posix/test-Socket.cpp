@@ -9,29 +9,30 @@
 */
 #include <doctest.h>
 #include <posix/Socket.h>
+#include <posix/SocketAddress.h>
 
 using namespace rsp::posix;
 
 TEST_CASE("Socket")
 {
     SUBCASE("Address") {
-        CHECK_NOTHROW(Socket::Address socket_path("/tmp/test-sock"));
+        CHECK_NOTHROW(SocketAddress socket_path("/tmp/test-sock"));
     }
 
     SUBCASE("Construct") {
         CHECK_NOTHROW(Socket s);
-        CHECK_NOTHROW(Socket s(Socket::Domain::Unix, Socket::Type::Stream, Socket::Protocol::Unspecified));
+        CHECK_NOTHROW(Socket s(Domain::Unix, Type::Stream, Protocol::Unspecified));
     }
 
     SUBCASE("Unix Socket") {
         const std::string msg("Hello Client");
         std::string socket_path("/tmp/test-sock");
 
-        Socket server(Socket::Domain::Unix, Socket::Type::Stream, Socket::Protocol::Unspecified);
+        Socket server(Domain::Unix, Type::Stream, Protocol::Unspecified);
         CHECK_NOTHROW(server.Bind(socket_path));
         CHECK_NOTHROW(server.Listen(2));
 
-        Socket client(Socket::Domain::Unix, Socket::Type::Stream, Socket::Protocol::Unspecified);
+        Socket client(Domain::Unix, Type::Stream, Protocol::Unspecified);
         CHECK_NOTHROW(client.Connect(socket_path));
         Socket sc;
         CHECK_NOTHROW(sc = server.Accept());
@@ -51,11 +52,11 @@ TEST_CASE("Socket")
         const std::string msg("Hello Client");
         std::string socket_path("localhost:46555");
 
-        Socket server(Socket::Domain::Inet, Socket::Type::Stream);
+        Socket server(Domain::Inet, Type::Stream);
         CHECK_NOTHROW(server.Bind(socket_path));
         CHECK_NOTHROW(server.Listen(2));
 
-        Socket client(Socket::Domain::Inet, Socket::Type::Stream);
+        Socket client(Domain::Inet, Type::Stream);
         CHECK_NOTHROW(client.Connect(socket_path));
         Socket sc;
         CHECK_NOTHROW(sc = server.Accept());

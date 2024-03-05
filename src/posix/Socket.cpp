@@ -7,7 +7,7 @@
 * \license     Mozilla Public License 2.0
 * \author      steffen
 */
-#include <cstring>
+
 #include <charconv>
 #include <exceptions/ExceptionHelper.h>
 #include <posix/Socket.h>
@@ -16,190 +16,10 @@
 #include <filesystem>
 #include <arpa/inet.h>
 #include <sys/types.h>
-#include <netdb.h>
 
 namespace rsp::posix {
 
-Socket::Address::Address(const char *apAddr)
-    : Address(std::string_view(apAddr))
-{
-}
-
-Socket::Address::Address(const std::string &arAddr)
-    : Address(std::string_view(arAddr))
-{
-}
-
-Socket::Address::Address(std::string_view aAddr)
-{
-    size_t colonPos;
-    if (aAddr[0] == '/') {
-        if (aAddr.size() > sizeof(mAddress.Unix.sun_path)) {
-            THROW_WITH_BACKTRACE1(ESocketError, "Socket address is to long.");
-        }
-        mAddress.Unix.sun_family = int(Socket::Domain::Unix);
-        std::memcpy(mAddress.Unix.sun_path, aAddr.data(), aAddr.size());
-    }
-    else if ((colonPos = aAddr.find(']')) != std::string::npos) { // IPv6 with service/port
-        struct addrinfo ainfo{};
-        size_t colonPos = aAddr.find(':');
-        if(colonPos != std::string::npos) {
-            auto port_string = aAddr.substr(colonPos+1);
-            uint16_t u2;
-            auto result = std::from_chars(port_string.data(), port_string.data() + port_string.size(), u2);
-            if (result.ec == std::errc()) {
-                mAddress.Inet.sin_port = u2;
-            }
-        }
-
-    }
-    if (inet_pton(AF_INET, aAddr.data(), &(mAddress.Inet.sin_addr)) == 1) {
-
-        mAddress.Inet.sin_family = AF_INET;
-        size_t colonPos = aAddr.find(':');
-        if(colonPos != std::string::npos) {
-            auto port_string = aAddr.substr(colonPos+1);
-            uint16_t u2;
-            auto result = std::from_chars(port_string.data(), port_string.data() + port_string.size(), u2);
-            if (result.ec == std::errc()) {
-                mAddress.Inet.sin_port = u2;
-            }
-        }
-    }
-    else if (inet_pton(AF_INET6, aAddr.data(), &(mAddress.Inet6.sin6_addr)) == 1) {
-        mAddress.Inet6.sin6_family = AF_INET6;
-        size_t colonPos = aAddr.find(']'); // IPv6 url format: [<uint16_t * 8>::]:<port>
-        if(colonPos != std::string::npos) {
-            auto port_string = aAddr.substr(colonPos+2);
-            uint16_t u2;
-            auto result = std::from_chars(port_string.data(), port_string.data() + port_string.size(), u2);
-            if (result.ec == std::errc()) {
-                mAddress.Inet6.sin6_port = u2;
-            }
-        }
-    }
-    else {
-        mAddress.Unspecified.sa_family = int(Socket::Domain::Unspecified);
-    }
-}
-
-Socket::Address::Address(sockaddr &arSockAddr, socklen_t aLen)
-    : mAddress(arSockAddr)
-{
-//    if (aLen != (Size() + sizeof(mAddress.Unspecified.sa_family))) {
-//        THROW_WITH_BACKTRACE1(ESocketError, "Socket length is not same as Size().");
-//    }
-}
-
-Socket::Address::Address(uint32_t aIP, uint16_t aPort)
-{
-    mAddress.Inet.sin_family = int(Socket::Domain::Inet);
-    mAddress.Inet.sin_addr.s_addr = aIP;
-    mAddress.Inet.sin_port = aPort;
-}
-
-Socket::Address& Socket::Address::operator=(const sockaddr &arSockAddr)
-{
-    mAddress.Unspecified.sa_family = arSockAddr.sa_family;
-    std::memcpy(&mAddress.Unspecified.sa_data, &arSockAddr.sa_data, Size());
-    return *this;
-}
-
-size_t Socket::Address::Size() const
-{
-    if (mAddress.Unspecified.sa_family == int(Socket::Domain::Unix)) {
-//        for (size_t i = 0; i < sizeof(mAddress.Unix.sun_path); ++i) {
-//            if (mAddress.Unix.sun_path[i] == '\0') {
-//                return i;
-//            }
-//        }
-        return SUN_LEN(&mAddress.Unix);
-    }
-    else if (mAddress.Inet.sin_family == int(Socket::Domain::Inet)) {
-        return sizeof(mAddress.Inet) - sizeof(mAddress.Unspecified.sa_family);
-    }
-    else if (mAddress.Inet6.sin6_family == int(Socket::Domain::Inet6)) {
-        return sizeof(mAddress.Inet6) - sizeof(mAddress.Unspecified.sa_family);
-    }
-    return sizeof(mAddress.Unspecified.sa_data);
-}
-
-Socket::Address &Socket::Address::SetDomain(Domain aDomain) noexcept
-{
-    mAddress.Unspecified.sa_family = int(aDomain);
-    return *this;
-}
-
-const struct sockaddr& Socket::Address::Get() const
-{
-    return mAddress.Unspecified;
-}
-
-struct sockaddr& Socket::Address::Get()
-{
-    return mAddress.Unspecified;
-}
-
-std::string Socket::Address::AsString() const
-{
-    char buffer[INET6_ADDRSTRLEN+1];
-    buffer[INET6_ADDRSTRLEN] = '\0';
-
-    switch (Socket::Domain(mAddress.Unspecified.sa_family)) {
-        case Socket::Domain::Unix:
-            return std::string{mAddress.Unix.sun_path, Size()};
-
-        case Socket::Domain::Inet:
-            if (inet_ntop(AF_INET, &mAddress.Inet.sin_addr, buffer, sizeof(buffer))) {
-                return {buffer};
-            }
-            break;
-
-        case Socket::Domain::Inet6:
-            if (inet_ntop(AF_INET6, &mAddress.Inet6.sin6_addr, buffer, sizeof(buffer))) {
-                return {buffer};
-            }
-            break;
-
-        default:
-            break;
-    }
-    return {};
-}
-
-uint16_t Socket::Address::GetPort() const
-{
-    switch (Socket::Domain(mAddress.Unspecified.sa_family)) {
-        case Socket::Domain::Inet:
-            return mAddress.Inet.sin_port;
-        case Socket::Domain::Inet6:
-            return mAddress.Inet6.sin6_port;
-        default:
-            return 0;
-    }
-}
-
-Socket::Address& Socket::Address::SetPort(uint16_t aPort) noexcept
-{
-    switch (Socket::Domain(mAddress.Unspecified.sa_family)) {
-        case Socket::Domain::Inet:
-            mAddress.Inet.sin_port = aPort;
-            break;
-        case Socket::Domain::Inet6:
-            mAddress.Inet6.sin6_port = aPort;
-            break;
-        default:
-            break;
-    }
-    return *this;
-}
-
-bool Socket::Address::IsEmpty() const
-{
-    return mAddress.Unspecified.sa_family == int(Domain::Unspecified);
-}
-
-Socket::Socket(Socket::Domain aDomain, Socket::Type aType, Socket::Protocol aProtocol)
+Socket::Socket(Domain aDomain, Type aType, Protocol aProtocol)
 {
     mHandle = socket(int(aDomain), int(aType), int(aProtocol));
     if (mHandle < 0) {
@@ -210,7 +30,7 @@ Socket::Socket(Socket::Domain aDomain, Socket::Type aType, Socket::Protocol aPro
     mProtocol = aProtocol;
 }
 
-Socket::Socket(const Socket &arServer, int aHandle, Socket::Address aLocalAddress, Socket::Address aPeerAddress)
+Socket::Socket(const Socket &arServer, int aHandle, SocketAddress aLocalAddress, SocketAddress aPeerAddress)
     : mHandle(aHandle),
       mLocalAddress(aLocalAddress),
       mPeerAddress(aPeerAddress),
@@ -333,7 +153,7 @@ Socket &Socket::SetSendTimeout(std::chrono::system_clock::duration aTimeout)
     return *this;
 }
 
-Socket::Address Socket::GetAddr()
+SocketAddress Socket::GetAddr()
 {
     if (mLocalAddress.IsEmpty()) {
         struct sockaddr sa{};
@@ -343,7 +163,7 @@ Socket::Address Socket::GetAddr()
         if (res < 0) {
             THROW_SYSTEM("getsockname() failed.");
         }
-        mLocalAddress = Address(sa, len);
+        mLocalAddress = SocketAddress(sa, len);
         mDomain = Domain(sa.sa_family);
     }
     return mLocalAddress;
@@ -359,16 +179,16 @@ Socket Socket::Accept() const
         THROW_SYSTEM("accept() failed. Handle: " + std::to_string(mHandle));
     }
 
-    return {*this, res, Address(sa, len), mLocalAddress};
+    return {*this, res, SocketAddress(sa, len), mLocalAddress};
 }
 
 Socket &Socket::Bind(const std::string &arAddr)
 {
-    Address sa(arAddr);
+    SocketAddress sa(arAddr);
     sa.SetDomain(mDomain);
 
     if (sa.GetDomain() == Domain::Unix) {
-        std::filesystem::remove(sa.AsString());
+        deleteOldSocketInode(sa);
     }
 
     int res = bind(mHandle, &sa.Get(), sa.Size());
@@ -381,7 +201,7 @@ Socket &Socket::Bind(const std::string &arAddr)
 
 Socket &Socket::Connect(const std::string &arAddr)
 {
-    Address sa(arAddr);
+    SocketAddress sa(arAddr);
     sa.SetDomain(mDomain);
     int res = connect(mHandle, &sa.Get(), sa.Size());
     if (res < 0) {
@@ -411,7 +231,7 @@ size_t Socket::Receive(std::uint8_t *apBuffer, size_t aBufLen, int aFlags) const
 
 size_t Socket::ReceiveFrom(Socket &arPeer, std::uint8_t *apBuffer, size_t aBufLen, int aFlags) const
 {
-    Address sa{};
+    SocketAddress sa{};
     socklen_t len = sizeof(sa);
 
     ssize_t res = recvfrom(mHandle, apBuffer, aBufLen, aFlags, &sa.Get(), &len);
@@ -457,7 +277,7 @@ int Socket::GetFd() const
     return mHandle;
 }
 
-int Socket::GetOptions(Socket::SockOptions aOption, int aLevel) const
+int Socket::GetOptions(SockOptions aOption, int aLevel) const
 {
     int result;
     socklen_t len = sizeof(result);
@@ -468,7 +288,7 @@ int Socket::GetOptions(Socket::SockOptions aOption, int aLevel) const
     return result;
 }
 
-Socket &Socket::SetOptions(Socket::SockOptions aOption, int aValue, int aLevel)
+Socket &Socket::SetOptions(SockOptions aOption, int aValue, int aLevel)
 {
     int res = setsockopt(mHandle, aLevel, int(aOption), &aValue, sizeof(aValue));
     if (res < 0) {
@@ -477,7 +297,7 @@ Socket &Socket::SetOptions(Socket::SockOptions aOption, int aValue, int aLevel)
     return *this;
 }
 
-std::chrono::system_clock::duration Socket::getTimeoutOption(Socket::SockOptions aOption) const
+std::chrono::system_clock::duration Socket::getTimeoutOption(SockOptions aOption) const
 {
     using namespace std::chrono;
     struct timeval tv{};
@@ -489,7 +309,7 @@ std::chrono::system_clock::duration Socket::getTimeoutOption(Socket::SockOptions
     return (seconds(tv.tv_sec + (tv.tv_usec / 1000000)) + microseconds(tv.tv_usec % 1000000));
 }
 
-void Socket::setTimeoutOption(Socket::SockOptions aOption, std::chrono::system_clock::duration aValue) const
+void Socket::setTimeoutOption(SockOptions aOption, std::chrono::system_clock::duration aValue) const
 {
     using namespace std::chrono;
     struct timeval tv{};
@@ -508,6 +328,11 @@ Socket& Socket::Shutdown(ShutdownFlags aFlag)
         THROW_SYSTEM("shutdown() failed.");
     }
     return *this;
+}
+
+void Socket::deleteOldSocketInode(const SocketAddress &arAddr)
+{
+    std::filesystem::remove(arAddr.AsString());
 }
 
 } // rsp::posix
