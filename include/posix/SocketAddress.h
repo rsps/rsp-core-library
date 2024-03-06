@@ -25,18 +25,17 @@ class SocketAddress
 {
 public:
     SocketAddress() = default;
-    explicit SocketAddress(const char *apAddr);
-    explicit SocketAddress(const std::string &arAddr);
-    explicit SocketAddress(std::string_view aAddr);
-    explicit SocketAddress(struct sockaddr &arSockAddr, socklen_t aLen);
-    explicit SocketAddress(uint32_t aIP, uint16_t aPort);
+    explicit SocketAddress(const struct sockaddr &arSockAddr, socklen_t aLen, Domain aDomain, Type aType,
+                           Protocol aProtocol);
+    explicit SocketAddress(std::string_view aUnixPath, Type aType, Protocol aProtocol = Protocol::Unspecified);
+    explicit SocketAddress(uint32_t aIP, uint16_t aPort, Type aType, Protocol aProtocol = Protocol::Unspecified);
 
     SocketAddress &operator=(const struct sockaddr &arSockAddr);
 
     [[nodiscard]] size_t Size() const;
     [[nodiscard]] bool IsEmpty() const;
     SocketAddress &SetDomain(Domain aDomain) noexcept;
-    [[nodiscard]] Domain GetDomain() const { return Domain(mAddress.Unspecified.sa_family); }
+
     [[nodiscard]] uint16_t GetPort() const;
     SocketAddress &SetPort(uint16_t aPort) noexcept;
 
@@ -46,6 +45,12 @@ public:
     [[nodiscard]] std::string AsString() const;
     [[nodiscard]] explicit operator std::string() const { return AsString(); }
 
+    [[nodiscard]] Domain GetDomain() const { return Domain(mAddress.Unspecified.sa_family); }
+    [[nodiscard]] Type GetType() const { return mType; }
+    [[nodiscard]] Protocol GetProtocol() const { return mProtocol; }
+    [[nodiscard]] const std::string& GetCanonicalName() const { return mCanonicalName; }
+    SocketAddress& SetCanonicalName(std::string_view aName);
+
 protected:
     union
     {
@@ -54,6 +59,11 @@ protected:
         struct sockaddr_in6 Inet6;
         struct sockaddr_un Unix;
     } mAddress{};
+    Type mType = Type::Unspecified;
+    Protocol mProtocol = Protocol::Unspecified;
+    std::string mCanonicalName{};
+
+    void makeCanonicalName();
 };
 } // rsp::posix
 

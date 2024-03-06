@@ -163,13 +163,13 @@ SocketAddress Socket::GetAddr()
         if (res < 0) {
             THROW_SYSTEM("getsockname() failed.");
         }
-        mLocalAddress = SocketAddress(sa, len);
+        mLocalAddress = SocketAddress(sa, len, mDomain, mType, mProtocol);
         mDomain = Domain(sa.sa_family);
     }
     return mLocalAddress;
 }
 
-Socket Socket::Accept() const
+Socket Socket::Accept()
 {
     struct sockaddr sa{};
     socklen_t len = sizeof(sa);
@@ -178,31 +178,44 @@ Socket Socket::Accept() const
     if (res < 0) {
         THROW_SYSTEM("accept() failed. Handle: " + std::to_string(mHandle));
     }
+    SocketAddress addr(sa, len, mDomain, mType, mProtocol);
+    mLogger.Info() << "Accepted connection from: " << addr.GetCanonicalName();
 
-    return {*this, res, SocketAddress(sa, len), mLocalAddress};
+    return {*this, res, addr, mLocalAddress};
 }
 
-Socket &Socket::Bind(const std::string &arAddr)
+Socket &Socket::Bind(const AddressInfo &arAddrInfo, bool aBindAll)
 {
-    SocketAddress sa(arAddr);
-    sa.SetDomain(mDomain);
-
-    if (sa.GetDomain() == Domain::Unix) {
-        deleteOldSocketInode(sa);
+    bool first = true;
+    int res = 0;
+    for (auto &sa : arAddrInfo.GetAddresses()) {
+        if (sa.GetDomain() == Domain::Unix) {
+            deleteOldSocketInode(sa);
+        }
+        res = bind(mHandle, &sa.Get(), sa.Size());
+        if (res == 0) {
+            if (first) {
+                mLocalAddress = sa;
+                first = false;
+            }
+            mLogger.Notice() << "Socket bound to: " << sa.GetCanonicalName();
+            if (!aBindAll) {
+                break;
+            }
+        }
+        else {
+            mLogger.Warning() << "Socket could not bind to " << sa.GetCanonicalName();
+        }
     }
-
-    int res = bind(mHandle, &sa.Get(), sa.Size());
     if (res < 0) {
         THROW_SYSTEM("bind() failed.");
     }
-    mLocalAddress = sa;
     return *this;
 }
 
-Socket &Socket::Connect(const std::string &arAddr)
+Socket &Socket::Connect(const AddressInfo &arAddrInfo)
 {
-    SocketAddress sa(arAddr);
-    sa.SetDomain(mDomain);
+    auto &sa = arAddrInfo[0];
     int res = connect(mHandle, &sa.Get(), sa.Size());
     if (res < 0) {
         THROW_SYSTEM("connect() failed.");

@@ -7,107 +7,45 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <netdb.h>
+#include <cstring>
 #include <arpa/inet.h>
 #include <posix/Socket.h>
 #include <exceptions/ExceptionHelper.h>
-#include <charconv>
 #include <cstring>
 #include <posix/SocketAddress.h>
 
 namespace rsp::posix {
 
-SocketAddress::SocketAddress(const char *apAddr)
-    : SocketAddress(std::string_view(apAddr))
+SocketAddress::SocketAddress(std::string_view aUnixPath, Type aType, Protocol aProtocol)
+    : mType(aType),
+      mProtocol(aProtocol)
 {
+    mAddress.Unix.sun_family = int(Domain::Unix);
+    if (aUnixPath.size() > sizeof(mAddress.Unix.sun_path)) {
+        THROW_WITH_BACKTRACE1(ESocketError, "Unix socket path is to long.");
+    }
+    std::memcpy(mAddress.Unix.sun_path, aUnixPath.data(), aUnixPath.size());
+    mCanonicalName = aUnixPath;
 }
 
-SocketAddress::SocketAddress(const std::string &arAddr)
-    : SocketAddress(std::string_view(arAddr))
+SocketAddress::SocketAddress(const sockaddr& arSockAddr, socklen_t aLen, Domain aDomain, Type aType, Protocol aProtocol)
+    : mType(aType),
+      mProtocol(aProtocol)
 {
+    mAddress.Unspecified.sa_family = int(aDomain);
+    std::memcpy(&mAddress.Unspecified.sa_data, &arSockAddr.sa_data, aLen);
 }
 
-SocketAddress::SocketAddress(std::string_view aAddr)
+SocketAddress::SocketAddress(uint32_t aIP, uint16_t aPort, Type aType, Protocol aProtocol)
+    : mType(aType),
+      mProtocol(aProtocol)
 {
-    size_t colon_pos;
-    struct addrinfo *p_addr_info = nullptr;
-    if (aAddr[0] == '/') {
-        if (aAddr.size() > sizeof(mAddress.Unix.sun_path)) {
-            THROW_WITH_BACKTRACE1(ESocketError, "Socket address is to long.");
-        }
-        mAddress.Unix.sun_family = int(Domain::Unix);
-        std::memcpy(mAddress.Unix.sun_path, aAddr.data(), aAddr.size());
-    }
-    else if ((colon_pos = aAddr.find(']')) != std::string::npos) { // IPv6 with service/port
-        struct addrinfo hints{};
-        hints.ai_family = AF_INET6;
-        auto name = std::string(aAddr.substr(0, colon_pos - 1));
-        auto port = std::string(aAddr.substr(colon_pos + 2));
-        auto res = getaddrinfo(name.c_str(), port.c_str(), &hints, &p_addr_info);
-        if (res) {
-            if (res == EAI_SYSTEM) {
-                THROW_SYSTEM("Failed to parse socket address.");
-            }
-            THROW_WITH_BACKTRACE2(ESocketError, "Failed to parse socket address: ", gai_strerror(res));
-        }
-    }
-    else if ((colon_pos = aAddr.find(':')) != std::string::npos) { // IPv4 with service/port
-        struct addrinfo hints{};
-        hints.ai_family = AF_INET;
-        auto name = std::string(aAddr.substr(0, colon_pos - 1));
-        auto port = std::string(aAddr.substr(colon_pos + 1));
-        auto res = getaddrinfo(name.c_str(), port.c_str(), &hints, &p_addr_info);
-        if (res) {
-            if (res == EAI_SYSTEM) {
-                THROW_SYSTEM("Failed to parse socket address.");
-            }
-            THROW_WITH_BACKTRACE2(ESocketError, "Failed to parse socket address: ", gai_strerror(res));
-        }
-    }
-    else {
-        auto name = std::string(aAddr.substr(0, colon_pos - 1));
-        auto res = getaddrinfo(name.c_str(), nullptr, nullptr, &p_addr_info);
-        if (res) {
-            if (res == EAI_SYSTEM) {
-                THROW_SYSTEM("Failed to parse socket address.");
-            }
-            THROW_WITH_BACKTRACE2(ESocketError, "Failed to parse socket address: ", gai_strerror(res));
-        }
-    }
-
-    struct addrinfo *p = p_addr_info;
-    while (p) {
-//            mAddress = *p;
-        p = p->ai_next;
-    }
-
-    if (p_addr_info) {
-        freeaddrinfo(p_addr_info);
-    }
+    mAddress.Inet.sin_family = int(Domain::Inet);
+    mAddress.Inet.sin_addr.s_addr = aIP;
+    mAddress.Inet.sin_port = aPort;
 }
 
-SocketAddress::SocketAddress(sockaddr &arSockAddr, socklen_t /*aLen*/)
-    : mAddress(arSockAddr)
-{
-//    if (aLen != (Size() + sizeof(mAddress.Unspecified.sa_family))) {
-//        THROW_WITH_BACKTRACE1(ESocketError, "Socket length is not same as Size().");
-//    }
-}
-
-SocketAddress::SocketAddress(uint32_t
-                             aIP,
-                             uint16_t aPort
-                            )
-{
-    mAddress.Inet.
-        sin_family = int(Domain::Inet);
-    mAddress.Inet.sin_addr.
-        s_addr = aIP;
-    mAddress.Inet.
-        sin_port = aPort;
-}
-
-struct sockaddr &SocketAddress::Get()
+struct sockaddr& SocketAddress::Get()
 {
     return mAddress.Unspecified;
 }
@@ -122,29 +60,24 @@ SocketAddress &SocketAddress::operator=(const sockaddr &arSockAddr)
 size_t SocketAddress::Size() const
 {
     if (mAddress.Unspecified.sa_family == int(Domain::Unix)) {
-//        for (size_t i = 0; i < sizeof(mAddress.Unix.sun_path); ++i) {
-//            if (mAddress.Unix.sun_path[i] == '\0') {
-//                return i;
-//            }
-//        }
         return SUN_LEN(&mAddress.Unix);
     }
     else if (mAddress.Inet.sin_family == int(Domain::Inet)) {
-        return sizeof(mAddress.Inet) - sizeof(mAddress.Unspecified.sa_family);
+        return sizeof(mAddress.Inet);
     }
     else if (mAddress.Inet6.sin6_family == int(Domain::Inet6)) {
-        return sizeof(mAddress.Inet6) - sizeof(mAddress.Unspecified.sa_family);
+        return sizeof(mAddress.Inet6);
     }
-    return sizeof(mAddress.Unspecified.sa_data);
+    return sizeof(mAddress.Unspecified);
 }
 
-SocketAddress &SocketAddress::SetDomain(Domain aDomain) noexcept
+SocketAddress& SocketAddress::SetDomain(Domain aDomain) noexcept
 {
     mAddress.Unspecified.sa_family = int(aDomain);
     return *this;
 }
 
-const struct sockaddr &SocketAddress::Get() const
+const struct sockaddr& SocketAddress::Get() const
 {
     return mAddress.Unspecified;
 }
@@ -183,7 +116,7 @@ uint16_t SocketAddress::GetPort() const
     }
 }
 
-SocketAddress &SocketAddress::SetPort(uint16_t aPort) noexcept
+SocketAddress& SocketAddress::SetPort(uint16_t aPort) noexcept
 {
     switch (Domain(mAddress.Unspecified.sa_family)) {
         case Domain::Inet:mAddress.Inet.sin_port = aPort;
@@ -198,6 +131,32 @@ SocketAddress &SocketAddress::SetPort(uint16_t aPort) noexcept
 bool SocketAddress::IsEmpty() const
 {
     return mAddress.Unspecified.sa_family == int(Domain::Unspecified);
+}
+
+SocketAddress& SocketAddress::SetCanonicalName(std::string_view aName)
+{
+    mCanonicalName = aName;
+    return *this;
+}
+
+void SocketAddress::makeCanonicalName()
+{
+    switch (Domain(mAddress.Unspecified.sa_family)) {
+        case Domain::Unix:
+//            mCanonicalName = ;
+            break;
+        case Domain::Inet:
+            break;
+        case Domain::Inet6:
+            break;
+        default:
+        case Domain::Unspecified:
+            mCanonicalName.resize(sizeof(mAddress.Unspecified.sa_data) + 1);
+            mCanonicalName.back() = '\0';
+            std::strncpy(mCanonicalName.data(), mAddress.Unspecified.sa_data, sizeof(mAddress.Unspecified.sa_data));
+            mCanonicalName.shrink_to_fit();
+            break;
+    }
 }
 
 } // namespace rsp::posix

@@ -17,6 +17,8 @@
 #include <exceptions/CoreException.h>
 #include "SocketAddress.h"
 #include "SocketTypes.h"
+#include "AddressInfo.h"
+#include <logging/LogChannel.h>
 
 namespace rsp::posix {
 
@@ -29,14 +31,14 @@ public:
     }
 };
 
-class Socket
+class Socket : public logging::NamedLogger<Socket>
 {
 public:
     Socket() = default;
     Socket(Domain aDomain, Type aType, Protocol aProtocol = Protocol::Unspecified);
     Socket(const Socket&) = delete;
     Socket(Socket&&) noexcept;
-    virtual ~Socket();
+    ~Socket() override;
 
     Socket& operator=(const Socket&) = delete;
     Socket& operator=(Socket&&) noexcept;
@@ -66,9 +68,9 @@ public:
     //---- Socket methods ----
     [[nodiscard]] SocketAddress GetAddr();
 
-    [[nodiscard]] Socket Accept() const;
-    Socket& Bind(const std::string &arAddr);
-    Socket& Connect(const std::string &arAddr);
+    [[nodiscard]] Socket Accept();
+    Socket& Bind(const AddressInfo &arAddrInfo, bool aBindAll = false);
+    Socket& Connect(const AddressInfo &arAddrInfo);
     [[nodiscard]] int GetOptions(SockOptions aOption, int aLevel = SOL_SOCKET) const;
     Socket& Listen(size_t aAcceptQueueSize = 0);
     size_t Receive(std::uint8_t *apBuffer, size_t aBufLen, int aFlags = 0) const;

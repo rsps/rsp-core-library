@@ -19,23 +19,24 @@ namespace rsp::posix {
 class AddressInfo
 {
 public:
-    AddressInfo() = default;
-    AddressInfo(std::string_view aUrn, Domain aFamily = Domain::Unspecified, Type aType = Type::Unspecified,
-                Protocol aProtocol = Protocol::Unspecified);
-    AddressInfo(const AddressInfo&) = delete;
-    AddressInfo(AddressInfo&&);
-    ~AddressInfo();
-
-    AddressInfo& operator=(const AddressInfo&) = delete;
-    AddressInfo& operator=(AddressInfo&&);
+    explicit AddressInfo(std::string_view aUrn, bool aServer = false, Domain aFamily = Domain::Unspecified,
+                         Type aType = Type::Unspecified, Protocol aProtocol = Protocol::Unspecified);
 
     size_t GetCount();
     [[nodiscard]] const SocketAddress &operator[](size_t aIndex) const;
+    [[nodiscard]] const std::vector<SocketAddress> &GetAddresses() const;
 
 protected:
-    struct addrinfo *mpAddrInfo = nullptr;
+    bool mServer;
+    Domain mFamilyHint;
+    Type mTypeHint;
+    Protocol mProtocolHint;
+    std::string mNode{};
+    std::string mService{};
+    std::vector<SocketAddress> mAddresses{};
 
-    static bool splitURN(std::string_view aUrn, std::string &arNode, std::string &arService);
+    bool splitURN(std::string_view aUrn);
+    void lookup();
 };
 } // rsp::posix
 

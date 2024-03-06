@@ -38,6 +38,7 @@ enum class Protocol {
     File        = PF_FILE,     ///< Another non-standard name for PF_LOCAL.
     Inet        = PF_INET,     ///< IP protocol family.
     Inet6       = PF_INET6,    ///< IP version 6.
+    Packet      = PF_PACKET,   ///< Packet family. (Datagram/UDP)
     BlueTooth   = PF_BLUETOOTH ///< Bluetooth sockets.
 };
 
