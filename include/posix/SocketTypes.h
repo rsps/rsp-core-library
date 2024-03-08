@@ -21,6 +21,7 @@ enum class Domain {
     File        = AF_FILE,     ///< Another non-standard name for PF_LOCAL.
     Inet        = AF_INET,     ///< IP protocol family.
     Inet6       = AF_INET6,    ///< IP version 6.
+    Packet      = AF_PACKET,   ///< Packet family.
     BlueTooth   = AF_BLUETOOTH ///< Bluetooth sockets.
 };
 
@@ -51,11 +52,11 @@ enum class SockOptions {
     KeepAlive = SO_KEEPALIVE,             ///< Non-zero requests periodic transmission of keepalive messages (protocol-specific).
 //        Linger = SO_LINGER, /*struct linger*/ ///< Specify actions to be taken for queued, unsent data on close(): linger on/off and linger time in seconds.
     OutOfBandInline = SO_OOBINLINE,       ///< Non-zero requests that out-of-band data be placed into normal data input queue as received.
-    ReceiveBufSize = SO_RCVBUF,           ///< Size of receive buffer (in bytes).
+    ReceiveBufSize = SO_RCVBUF,           ///< GetSize of receive buffer (in bytes).
     ReceiveLowAt = SO_RCVLOWAT,           ///< Minimum amount of data to return to application for input operations (in bytes).
     ReceiveTimeout = SO_RCVTIMEO, /*struct timeval*/ ///< Timeout value for a socket receive operation.
     ReUseAddress = SO_REUSEADDR,          ///< Non-zero requests reuse of local addresses in bind() (protocol-specific).
-    SendBufSize = SO_SNDBUF,              ///< Size of send buffer (in bytes).
+    SendBufSize = SO_SNDBUF,              ///< GetSize of send buffer (in bytes).
     SendLowAt = SO_SNDLOWAT,              ///< Minimum amount of data to send for output operations (in bytes).
     SendTimeout = SO_SNDTIMEO, /*struct timeval*/ ///< Timeout value for a socket send operation.
     GetSocketType = SO_TYPE,              ///< Identify socket type (getsockopt() only).

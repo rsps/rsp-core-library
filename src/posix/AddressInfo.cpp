@@ -50,18 +50,18 @@ bool AddressInfo::splitURN(std::string_view aUrn)
     }
 
     if ((colon_pos = aUrn.find(']')) != std::string::npos) { // IPv6 with service/port
-        if (mFamilyHint == Domain::Unspecified) {
-            mFamilyHint = Domain::Inet6;
-        }
+//        if (mFamilyHint == Domain::Unspecified) {
+//            mFamilyHint = Domain::Inet6;
+//        }
         mNode = aUrn.substr(0, colon_pos);
         mService = aUrn.substr(colon_pos + 2);
         return true;
     }
 
     if ((colon_pos = aUrn.find(':')) != std::string::npos) { // IPv4 with service/port
-        if (mFamilyHint == Domain::Unspecified) {
-            mFamilyHint = Domain::Inet;
-        }
+//        if (mFamilyHint == Domain::Unspecified) {
+//            mFamilyHint = Domain::Inet;
+//        }
         mNode = aUrn.substr(0, colon_pos);
         mService = aUrn.substr(colon_pos + 1);
         return true;
@@ -86,7 +86,7 @@ void AddressInfo::lookup()
         p_hints = &hints;
     }
     if (mServer) {
-        hints.ai_flags |= AI_PASSIVE | AI_CANONNAME;
+        hints.ai_flags |= AI_PASSIVE; // | AI_CANONNAME;
         p_hints = &hints;
     }
 
@@ -101,9 +101,7 @@ void AddressInfo::lookup()
 
     auto p = p_info;
     while (p) {
-        auto &sa = mAddresses.emplace_back(*(p->ai_addr), p->ai_addrlen, Domain(p->ai_family), Type(p->ai_socktype),
-                                           Protocol(p->ai_protocol));
-        sa.SetCanonicalName(p->ai_canonname);
+        mAddresses.emplace_back(*(p->ai_addr), p->ai_addrlen, Domain(p->ai_family), Type(p->ai_socktype), Protocol(p->ai_protocol));
         p = p->ai_next;
     }
 

@@ -32,7 +32,7 @@ public:
 
     SocketAddress &operator=(const struct sockaddr &arSockAddr);
 
-    [[nodiscard]] size_t Size() const;
+    [[nodiscard]] size_t GetSize() const;
     [[nodiscard]] bool IsEmpty() const;
     SocketAddress &SetDomain(Domain aDomain) noexcept;
 
@@ -48,8 +48,9 @@ public:
     [[nodiscard]] Domain GetDomain() const { return Domain(mAddress.Unspecified.sa_family); }
     [[nodiscard]] Type GetType() const { return mType; }
     [[nodiscard]] Protocol GetProtocol() const { return mProtocol; }
-    [[nodiscard]] const std::string& GetCanonicalName() const { return mCanonicalName; }
-    SocketAddress& SetCanonicalName(std::string_view aName);
+    [[nodiscard]] std::string GetCanonicalName() const;
+
+    void UpdateFromParent(const SocketAddress &arParent);
 
 protected:
     union
@@ -61,9 +62,6 @@ protected:
     } mAddress{};
     Type mType = Type::Unspecified;
     Protocol mProtocol = Protocol::Unspecified;
-    std::string mCanonicalName{};
-
-    void makeCanonicalName();
 };
 } // rsp::posix
 

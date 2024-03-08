@@ -171,28 +171,30 @@ SocketAddress Socket::GetAddr()
 
 Socket Socket::Accept()
 {
-    struct sockaddr sa{};
-    socklen_t len = sizeof(sa);
+    SocketAddress result;
+    socklen_t len = result.GetSize();
 
-    int res = accept(mHandle, &sa, &len);
+    int res = accept(mHandle, &result.Get(), &len);
     if (res < 0) {
         THROW_SYSTEM("accept() failed. Handle: " + std::to_string(mHandle));
     }
-    SocketAddress addr(sa, len, mDomain, mType, mProtocol);
-    mLogger.Info() << "Accepted connection from: " << addr.GetCanonicalName();
+    result.UpdateFromParent(mLocalAddress);
 
-    return {*this, res, addr, mLocalAddress};
+    mLogger.Info() << "Accepted connection from: " << result.GetCanonicalName();
+
+    return {*this, res, result, mLocalAddress};
 }
 
 Socket &Socket::Bind(const AddressInfo &arAddrInfo, bool aBindAll)
 {
     bool first = true;
     int res = 0;
+    int err = 0;
     for (auto &sa : arAddrInfo.GetAddresses()) {
         if (sa.GetDomain() == Domain::Unix) {
             deleteOldSocketInode(sa);
         }
-        res = bind(mHandle, &sa.Get(), sa.Size());
+        res = bind(mHandle, &sa.Get(), sa.GetSize());
         if (res == 0) {
             if (first) {
                 mLocalAddress = sa;
@@ -204,10 +206,12 @@ Socket &Socket::Bind(const AddressInfo &arAddrInfo, bool aBindAll)
             }
         }
         else {
-            mLogger.Warning() << "Socket could not bind to " << sa.GetCanonicalName();
+            err = errno;
+            mLogger.Warning() << "(" << err << ") Socket could not bind to " << sa.GetCanonicalName();
         }
     }
     if (res < 0) {
+        errno = err;
         THROW_SYSTEM("bind() failed.");
     }
     return *this;
@@ -216,7 +220,7 @@ Socket &Socket::Bind(const AddressInfo &arAddrInfo, bool aBindAll)
 Socket &Socket::Connect(const AddressInfo &arAddrInfo)
 {
     auto &sa = arAddrInfo[0];
-    int res = connect(mHandle, &sa.Get(), sa.Size());
+    int res = connect(mHandle, &sa.Get(), sa.GetSize());
     if (res < 0) {
         THROW_SYSTEM("connect() failed.");
     }

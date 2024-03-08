@@ -25,7 +25,6 @@ SocketAddress::SocketAddress(std::string_view aUnixPath, Type aType, Protocol aP
         THROW_WITH_BACKTRACE1(ESocketError, "Unix socket path is to long.");
     }
     std::memcpy(mAddress.Unix.sun_path, aUnixPath.data(), aUnixPath.size());
-    mCanonicalName = aUnixPath;
 }
 
 SocketAddress::SocketAddress(const sockaddr& arSockAddr, socklen_t aLen, Domain aDomain, Type aType, Protocol aProtocol)
@@ -53,11 +52,11 @@ struct sockaddr& SocketAddress::Get()
 SocketAddress &SocketAddress::operator=(const sockaddr &arSockAddr)
 {
     mAddress.Unspecified.sa_family = arSockAddr.sa_family;
-    std::memcpy(&mAddress.Unspecified.sa_data, &arSockAddr.sa_data, Size());
+    std::memcpy(&mAddress.Unspecified.sa_data, &arSockAddr.sa_data, GetSize());
     return *this;
 }
 
-size_t SocketAddress::Size() const
+size_t SocketAddress::GetSize() const
 {
     if (mAddress.Unspecified.sa_family == int(Domain::Unix)) {
         return SUN_LEN(&mAddress.Unix);
@@ -68,7 +67,7 @@ size_t SocketAddress::Size() const
     else if (mAddress.Inet6.sin6_family == int(Domain::Inet6)) {
         return sizeof(mAddress.Inet6);
     }
-    return sizeof(mAddress.Unspecified);
+    return sizeof(mAddress);
 }
 
 SocketAddress& SocketAddress::SetDomain(Domain aDomain) noexcept
@@ -88,7 +87,7 @@ std::string SocketAddress::AsString() const
     buffer[INET6_ADDRSTRLEN] = '\0';
 
     switch (Domain(mAddress.Unspecified.sa_family)) {
-        case Domain::Unix:return std::string{mAddress.Unix.sun_path, Size()};
+        case Domain::Unix:return std::string{mAddress.Unix.sun_path, GetSize()};
 
         case Domain::Inet:
             if (inet_ntop(AF_INET, &mAddress.Inet.sin_addr, buffer, sizeof(buffer))) {
@@ -133,30 +132,48 @@ bool SocketAddress::IsEmpty() const
     return mAddress.Unspecified.sa_family == int(Domain::Unspecified);
 }
 
-SocketAddress& SocketAddress::SetCanonicalName(std::string_view aName)
+std::string SocketAddress::GetCanonicalName() const
 {
-    mCanonicalName = aName;
-    return *this;
-}
+    std::string result;
+    char ip[INET6_ADDRSTRLEN + 1];
 
-void SocketAddress::makeCanonicalName()
-{
     switch (Domain(mAddress.Unspecified.sa_family)) {
         case Domain::Unix:
-//            mCanonicalName = ;
+            result = mAddress.Unix.sun_path;
             break;
+
         case Domain::Inet:
-            break;
+            if (inet_ntop(int(Domain::Inet), &mAddress.Inet.sin_addr.s_addr, ip, sizeof(ip))) {
+                result = std::string(ip) + ":" + std::to_string(int(ntohs(mAddress.Inet.sin_port)));
+                break;
+            }
+            THROW_SYSTEM("inet_ntop failed");
+
         case Domain::Inet6:
-            break;
+            if (inet_ntop(int(Domain::Inet6), &mAddress.Inet6.sin6_addr, ip, sizeof(ip))) {
+                result = std::string(ip) + ":" + std::to_string(int(ntohs(mAddress.Inet.sin_port)));
+                break;
+            }
+            THROW_SYSTEM("inet_ntop failed");
+
         default:
         case Domain::Unspecified:
-            mCanonicalName.resize(sizeof(mAddress.Unspecified.sa_data) + 1);
-            mCanonicalName.back() = '\0';
-            std::strncpy(mCanonicalName.data(), mAddress.Unspecified.sa_data, sizeof(mAddress.Unspecified.sa_data));
-            mCanonicalName.shrink_to_fit();
+            result.resize(sizeof(mAddress.Unspecified.sa_data) + 1);
+            result.back() = '\0';
+            std::strncpy(result.data(), mAddress.Unspecified.sa_data, _SS_SIZE - __SOCKADDR_COMMON_SIZE);
+            result.shrink_to_fit();
             break;
     }
+    return result;
+}
+
+void SocketAddress::UpdateFromParent(const SocketAddress &arParent)
+{
+    if (GetDomain() == Domain::Unix) {
+        mAddress.Unix = arParent.mAddress.Unix;
+    }
+    mProtocol = arParent.mProtocol;
+    mType = arParent.mType;
 }
 
 } // namespace rsp::posix
