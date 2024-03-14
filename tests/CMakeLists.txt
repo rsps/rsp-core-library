@@ -5,14 +5,14 @@ find_package(Git REQUIRED)
 FetchContent_Declare(
     DocTest
     GIT_REPOSITORY "https://github.com/onqtam/doctest"
-    GIT_TAG "v2.4.10"
+    GIT_TAG "v2.4.11"
 )
 FetchContent_MakeAvailable(DocTest)
 
 FetchContent_Declare(
     lighttpd_src
     GIT_REPOSITORY "https://github.com/lighttpd/lighttpd1.4"
-    GIT_TAG "lighttpd-1.4.66"
+    GIT_TAG "lighttpd-1.4.75"
 )
 
 FetchContent_GetProperties(lighttpd_src)
