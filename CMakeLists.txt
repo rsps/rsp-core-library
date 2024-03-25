@@ -13,6 +13,7 @@ OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
 OPTION(SDL2 "Use SDL2 for graphic accelleration." OFF)
 OPTION(ZLIB "Build with ZLib Inflate/Deflate compression." OFF)
 OPTION(NET_WPA_SUPPLICANT "Build with libwpa-client wpa_supplicant library." ON) # Enabled by default.
+OPTION(STD_THREAD "Thread architecture to use." ON) # C++ std::thread
 
 if(ARCH_ARM)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
@@ -39,10 +40,19 @@ configure_file (
     "${PROJECT_BINARY_DIR}/src/version-def.h"
 )
 
+# Declare empty lists
+set(BUILD_OPTIONS "")
+set(LIBRARIES "")
 
-set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set (THREADS_PREFER_PTHREAD_FLAG TRUE)
-find_package(Threads REQUIRED)
+message("THREAD_ARCH: " THREAD_ARCH)
+
+if (STD_THREAD)
+    set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
+    set (THREADS_PREFER_PTHREAD_FLAG TRUE)
+    find_package(Threads REQUIRED)
+    list(APPEND BUILD_OPTIONS -DUSE_STD_THREAD)
+    list(APPEND LIBRARIES Threads::Threads)
+endif ()
 
 set (CMAKE_CXX_STANDARD 20)
 
@@ -56,10 +66,10 @@ include(FetchContent)
 find_package(Git REQUIRED)
 
 if (SDL2)
-    set(SDL_BUILD_OPTIONS -DUSE_GFX_SDL)
-    set(SDL_LIB -lSDL2)
+    list(APPEND BUILD_OPTIONS -DUSE_GFX_SDL)
+    list(APPEND LIBRARIES -lSDL2)
 else()
-    set(SDL_BUILD_OPTIONS -DUSE_GFX_SW)
+    list(APPEND BUILD_OPTIONS -DUSE_GFX_SW)
 endif()
 
 # Include external projects Doctest from github.
@@ -74,44 +84,39 @@ add_library("rsp-core-lib" STATIC)
 
 if (FREETYPE_FONTS)
     find_package(Freetype REQUIRED)
-    set(FREETYPE_BUILD_OPTIONS -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
-    set(FONT_LIB Freetype::Freetype)
+    list(APPEND BUILD_OPTIONS -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+    list(APPEND LIBRARIES Freetype::Freetype)
 endif()
 
 if (NET_LIBCURL)
 #    set(CURL_LIBRARY "-lcurl")
     find_package(CURL 7.33 REQUIRED)
-    set(LIBCURL_BUILD_OPTIONS -DUSE_CURL)
-    set(NETWORK_LIB CURL::libcurl)
+    list(APPEND BUILD_OPTIONS -DUSE_CURL)
+    list(APPEND LIBRARIES CURL::libcurl)
 #    include_directories(${CURL_INCLUDE_DIR})
 endif()
 
 if (NET_WPA_SUPPLICANT)
     #sudo apt install libwpa-client-dev
     #find_package(WPA_SUPPLICANT REQUIRED)
-    set(LIBWPA_BUILD_OPTIONS -DUSE_WPA_SUPPLICANT)
-    set(LIBWPA wpa_client)
+    list(APPEND BUILD_OPTIONS -DUSE_WPA_SUPPLICANT)
+    list(APPEND LIBRARIES wpa_client)
 endif()
 
 if (OPENSSL_CRYPTO)
     find_package(OpenSSL REQUIRED)
-    set(OPENSSL_BUILD_OPTIONS -DUSE_OPENSSL)
-    set(CRYPTO_LIB OpenSSL::Crypto)
+    list(APPEND BUILD_OPTIONS -DUSE_OPENSSL)
+    list(APPEND LIBRARIES OpenSSL::Crypto)
 endif()
 
 if (ZLIB)
     find_package(ZLIB REQUIRED)
-    set(ZLIB_BUILD_OPTIONS -DUSE_ZLIB)
-    set(ZLIB_LIB ${ZLIB_LIBRARIES})
+    list(APPEND BUILD_OPTIONS -DUSE_ZLIB)
+    list(APPEND LIBRARIES ${ZLIB_LIBRARIES})
 endif()
 
 target_link_libraries ("rsp-core-lib"
-    ${FONT_LIB}
-    ${CRYPTO_LIB}
-    ${NETWORK_LIB}
-    ${SDL_LIB}
-    ${ZLIB_LIB}
-    ${LIBWPA}
+    ${LIBRARIES}
 )
 
 # Keep symbol information for exception stack traces
@@ -140,12 +145,7 @@ endif()
 
 target_compile_options(rsp-core-lib PUBLIC
     -Wshadow
-    ${FREETYPE_BUILD_OPTIONS}
-    ${OPENSSL_BUILD_OPTIONS}
-    ${LIBCURL_BUILD_OPTIONS}
-    ${SDL_BUILD_OPTIONS}
-    ${ZLIB_BUILD_OPTIONS}
-    ${LIBWPA_BUILD_OPTIONS}
+    ${BUILD_OPTIONS}
 )
 
 if (NOT RELEASE_BUILD)

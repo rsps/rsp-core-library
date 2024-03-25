@@ -49,7 +49,7 @@ public:
  * \param aLevel
  * \return o
  */
-std::ostream& operator<<(std::ostream &o, SetLevel aLevel);
+std::ostream& operator<<(std::ostream &o, const SetLevel &arLevel);
 
 } /* namespace rsp::logging */
 

@@ -44,7 +44,7 @@ public:
  * \param aLevel
  * \return o
  */
-std::ostream& operator<<(std::ostream &o, SetContext aContext);
+std::ostream& operator<<(std::ostream &o, const SetContext &arContext);
 
 } // rsp::logging
 

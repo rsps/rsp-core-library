@@ -14,8 +14,13 @@
 #include <logging/LogChannel.h>
 #include <string>
 #include <string_view>
-#include <thread>
 #include "ThreadInterface.h"
+
+#ifdef USE_STD_THREAD
+    #include <thread>
+    using thread_t = std::thread;
+#endif
+
 
 namespace rsp::utils {
 
@@ -74,7 +79,7 @@ public:
 
 protected:
     std::string mName{};
-    std::thread mThread{};
+    thread_t mThread{};
     ThreadCallback_t mWhenExecute{};
     bool mTerminated = false;
     std::exception_ptr mException = nullptr;

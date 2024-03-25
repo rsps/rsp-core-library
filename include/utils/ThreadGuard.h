@@ -11,15 +11,27 @@
 #ifndef RSP_CORE_LIB_UTILS_THREAD_GUARD_H
 #define RSP_CORE_LIB_UTILS_THREAD_GUARD_H
 
-#include <thread>
-#include <mutex>
+#ifdef USE_STD_THREAD
+    #include <thread>
+    #include <mutex>
+    using thread_id_t = std::thread::id;
+    using mutex_t = std::mutex;
+#else
+    using thread_id_t = int;
+    using mutex_t = int;
+#endif
+
 
 namespace rsp::utils {
 
 /**
  * \class ThreadGuard
  *
- * \brief Guard for restricting access to resources to a single class at a time.
+ * \brief Guard for restricting access to resources to a single thread at a time.
+ *
+ * ThreadGuard is a lock with owner, allowing multiple calls to Lock from the same thread, but blocking other threads.
+ * Unlock will unlock the guard if called from the owner thread.
+ * This is different from recursive_mutex, since multiple calls to Lock() only requires a single call to Unlock().
  */
 class ThreadGuard
 {
@@ -54,10 +66,9 @@ public:
     bool Unlock();
 
 protected:
-    std::thread::id mLockerId{};
-    std::mutex mMutex{};
-    std::mutex mLock{};
-
+    thread_id_t mLockerId{};
+    mutex_t mMutex{};
+    mutex_t mLock{};
 };
 
 } // rsp::utils
