@@ -79,6 +79,7 @@ public:
 
 
 #define THROW_SYSTEM(aMsg) THROW_WITH_BACKTRACE3(std::system_error, errno, std::generic_category(), aMsg)
+#define THROW_SYSTEM1(aMsg, aErrorNo) THROW_WITH_BACKTRACE3(std::system_error, aErrorNo, std::generic_category(), aMsg)
 
 #define THROW_RUNTIME(aMsg) THROW_WITH_BACKTRACE1(std::runtime_error, aMsg)
 #define RETHROW_RUNTIME(aMsg, aOriginalException) THROW_WITH_BACKTRACE1(std::runtime_error, std::string(aMsg) + " <- " + aOriginalException.what())
