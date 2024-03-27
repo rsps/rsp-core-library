@@ -44,8 +44,6 @@ configure_file (
 set(BUILD_OPTIONS "")
 set(LIBRARIES "")
 
-message("THREAD_ARCH: " THREAD_ARCH)
-
 if (STD_THREAD)
     set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
     set (THREADS_PREFER_PTHREAD_FLAG TRUE)
