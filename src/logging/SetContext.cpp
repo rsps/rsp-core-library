@@ -30,9 +30,9 @@ std::ostream& SetContext::operator ()(std::ostream &o) const
     return o;
 }
 
-std::ostream& operator<<(std::ostream &o, SetContext aContext)
+std::ostream& operator<<(std::ostream &o, const SetContext &arContext)
 {
-    return aContext(o);
+    return arContext(o);
 }
 
 } // rsp::logging

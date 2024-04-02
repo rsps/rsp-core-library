@@ -25,7 +25,7 @@ ThreadGuard& ThreadGuard::Lock()
         {
             std::lock_guard guard(mMutex);
 
-            if (mLockerId == std::thread::id()) {
+            if (mLockerId == std::thread::id()) { // if empty id
                 // Not set
                 mLock.lock();
                 mLockerId = std::this_thread::get_id();
@@ -45,7 +45,7 @@ bool ThreadGuard::Unlock()
     std::lock_guard guard(mMutex);
     if (mLockerId == std::this_thread::get_id()) {
         mLock.unlock();
-        mLockerId = std::thread::id();
+        mLockerId = std::thread::id(); // Set to empty id
         return true;
     }
 

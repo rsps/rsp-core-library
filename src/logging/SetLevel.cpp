@@ -32,9 +32,9 @@ std::ostream& SetLevel::operator ()(std::ostream &o) const
     return o;
 }
 
-std::ostream& operator<<(std::ostream &o, SetLevel aLevel)
+std::ostream& operator<<(std::ostream &o, const SetLevel &arLevel)
 {
-    return aLevel(o);
+    return arLevel(o);
 }
 
 } /* namespace rsp::logging */

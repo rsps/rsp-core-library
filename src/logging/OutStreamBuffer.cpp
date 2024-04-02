@@ -37,13 +37,13 @@ int OutStreamBuffer::sync()
         DEBUG("OutStreamBuffer mutex was not locked!!! " << std::this_thread::get_id())
     }
 
-    // Remove one ending newline, writeToLogger enforces a newline on every write
     std::string result = mBuffer.str();
-    if (result[result.length()-1] == '\n') {
+    // Remove one ending newline, writeToLogger enforces a newline on every write
+    if (!result.empty() && (result[result.length()-1] == '\n')) {
         result.pop_back();
     }
 
-    if (result.length() > 0) {
+    if (!result.empty()) {
         DEBUG("Message: (" << result.length() << ") " << result)
         writeToLogger(result);
     }
