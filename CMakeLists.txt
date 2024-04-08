@@ -159,6 +159,8 @@ target_compile_options(rsp-core-lib PRIVATE
 )
 endif()
 
+message("Compiler: " ${CMAKE_CXX_COMPILER})
+
 add_subdirectory(src)
 
 #--------------------------------------------------------
