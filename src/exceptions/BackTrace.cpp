@@ -8,14 +8,15 @@
  * \author      Steffen Brummer
  */
 
-#ifdef __GNUC__
-
-#include <execinfo.h>
-#include <cxxabi.h>
-#include <cstdlib>
-#include <ostream>
 #include <exceptions/BackTrace.h>
-#include <filesystem>
+#if defined(_GLIBCXX_HAVE_STACKTRACE)
+    #include <stacktrace>
+#elif defined(__x86_64__)
+    #include <execinfo.h>
+    #include <cxxabi.h>
+    #include <cstdlib>
+    #include <filesystem>
+#endif // _GLIBCXX_HAVE_STACKTRACE, __x86_64__
 
 #define MAX_DEPTH 32
 
@@ -39,6 +40,11 @@ std::ostream& operator <<(std::ostream &o, const BackTrace &arBackTrace)
 
 BackTrace::BackTrace(size_t aEntriesToDiscard)
 {
+#if defined(_GLIBCXX_HAVE_STACKTRACE)
+    for (auto &st : std::stacktrace::current()) {
+        mStackEntries.emplace_back(st.source_file(), st.description(), std::to_string(st.source_line()));
+    }
+#elif defined(__x86_64__)
     using namespace abi;
 
     void* trace[MAX_DEPTH]{};
@@ -73,8 +79,10 @@ BackTrace::BackTrace(size_t aEntriesToDiscard)
     }
 
     free(strings);
+#endif // _GLIBCXX_HAVE_STACKTRACE, __x86_64__
 }
 
+#if !defined(_GLIBCXX_HAVE_STACKTRACE) && defined(__x86_64__)
 std::string BackTrace::demangle(const std::string &arMangled)
 {
     std::string result;
@@ -91,8 +99,7 @@ std::string BackTrace::demangle(const std::string &arMangled)
     }
     return result;
 }
+#endif // !_GLIBCXX_HAVE_STACKTRACE, __x86_64__
 
 } /* namespace rsp::exceptions */
-
-#endif /* __GNUC__ */
 

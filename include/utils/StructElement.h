@@ -75,7 +75,7 @@ public:
      * \fn void Clear()
      * \brief Clears the content and set the type to null.
      */
-    void Clear() override        { mIsNull = true; mData = static_cast<T>(0); }
+    void Clear() override        { mIsNull = true; mData = {}; }
 
     /**
      * \fn T Get()const
