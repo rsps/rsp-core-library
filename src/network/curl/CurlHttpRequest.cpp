@@ -88,7 +88,7 @@ size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, Cu
     size_t separator = header.find_first_of(':');
     if (std::string::npos == separator) {
         StrUtils::Trim(header);
-        if (0 == header.length()) {
+        if (header.empty()) {
             return (size * nmemb); // blank line;
         }
         apResponse->addHeader(StrUtils::ToLower(header), "present");
@@ -172,7 +172,7 @@ IHttpResponse& CurlHttpRequest::Execute()
 
 void CurlHttpRequest::checkRequestOptions(const HttpRequestOptions &arOpts)
 {
-    if (arOpts.RequestType == HttpRequestType::NONE || arOpts.BaseUrl == "") {
+    if (arOpts.RequestType == HttpRequestType::NONE || arOpts.BaseUrl.empty()) {
         THROW_WITH_BACKTRACE1(ERequestOptions, "Insufficient request option settings");
     }
 }
@@ -237,7 +237,7 @@ void CurlHttpRequest::populateOptions()
 
         case HttpRequestType::PATCH:
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PATCH");
-            if (mRequestOptions.Body.size() > 0) {
+            if (!mRequestOptions.Body.empty()) {
                 readFromString(mRequestOptions.Body);
             }
             break;
@@ -245,7 +245,7 @@ void CurlHttpRequest::populateOptions()
         case HttpRequestType::PUT:
             // setCurlOption(CURLOPT_PUT, 1L); // Seems to put files only
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PUT");
-            if (mRequestOptions.Body.size() > 0) {
+            if (!mRequestOptions.Body.empty()) {
                 readFromString(mRequestOptions.Body);
             }
             break;
@@ -316,7 +316,7 @@ void CurlHttpRequest::populateOptions()
     }
 
     //Set basic auth
-    if (mRequestOptions.BasicAuthUsername.length() > 0) {
+    if (!mRequestOptions.BasicAuthUsername.empty()) {
         setCurlOption(CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         setCurlOption(CURLOPT_USERPWD,
             std::string(mRequestOptions.BasicAuthUsername + ":" + mRequestOptions.BasicAuthPassword).c_str());

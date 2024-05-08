@@ -73,7 +73,7 @@ private:
     static size_t headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse);
     static size_t progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
 
-    void checkRequestOptions(const HttpRequestOptions &arOpts);
+    static void checkRequestOptions(const HttpRequestOptions &arOpts);
     void populateOptions();
 
 };
