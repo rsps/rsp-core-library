@@ -20,7 +20,7 @@ enum LogLevel {
     +ToString(aLevel: LogLevel): std::string
 }
 
-enum LogType {
+enum LogFacility {
     Auth
     Cron
     Daemon
@@ -109,7 +109,7 @@ class ConsoleLogWriter {
 }
 
 class SysLogWriter {
-    +SysLogWriter(aIdent: std::string, aType: LogType)
+    +SysLogWriter(aIdent: std::string, aType: LogFacility)
     +Write(arMsg: const std::string&, aCurrentLevel: LogLevel)
 }
 
@@ -127,7 +127,7 @@ OutStreamBuf *-- LogStream
 LogWriterInterface <|-- ConsoleLogWriter
 LogWriterInterface <|-- SysLogWriter
 LogWriterInterface <|--- FileLogWriter
-LogType *--- SysLogWriter
+LogFacility *--- SysLogWriter
 LogLevel *-- LogWriterInterface
 
 ConsoleLogStreamsInterface *-- ConsoleLogWriter

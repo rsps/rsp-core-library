@@ -118,7 +118,7 @@ void ApplicationBase::installLogWriters()
     std::string s;
     if (mCmd.GetOptionValue("--log=", s)) {
         if (s == "syslog") {
-            mLogWriter = mLogger.MakeLogWriter<SysLogWriter>(GetAppName(), level, LogType::User);
+            mLogWriter = mLogger.MakeLogWriter<SysLogWriter>(GetAppName(), level, LogFacility::User);
         }
         else if (s == "console") {
             mLogWriter = mLogger.MakeLogWriter<ConsoleLogWriter>(level);
