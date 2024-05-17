@@ -53,6 +53,9 @@ public:
     static void Unregister(Signals aSignal);
 
 protected:
+#ifndef _NSIG
+    #define _NSIG 1
+#endif /* _NSIG */
     static SignalCallback_t mHandlers[_NSIG];
 
     static void signalHandler(int aSignalCode) noexcept;
