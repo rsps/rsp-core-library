@@ -6,11 +6,12 @@ cmake_minimum_required (VERSION 3.16)
 
 OPTION(RELEASE_BUILD "Set to turn off debug output" OFF) # Disabled by default.
 OPTION(ARCH_ARM "Set to cross-compile for ARM CPU" OFF) # Disabled by default.
+OPTION(GFX "Include graphic components." ON)
+OPTION(SDL2 "Use SDL2 for graphic accelleration." ON)
 OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
 OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
 OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
 OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
-OPTION(SDL2 "Use SDL2 for graphic accelleration." OFF)
 OPTION(ZLIB "Build with ZLib Inflate/Deflate compression." OFF)
 OPTION(NET_WPA_SUPPLICANT "Build with libwpa-client wpa_supplicant library." ON) # Enabled by default.
 OPTION(STD_THREAD "Thread architecture to use." ON) # C++ std::thread
@@ -63,11 +64,14 @@ include(GNUInstallDirs)
 include(FetchContent)
 find_package(Git REQUIRED)
 
-if (SDL2)
-    list(APPEND BUILD_OPTIONS -DUSE_GFX_SDL)
-    list(APPEND LIBRARIES -lSDL2)
-else()
-    list(APPEND BUILD_OPTIONS -DUSE_GFX_SW)
+if (GFX)
+    list(APPEND BUILD_OPTIONS -DUSE_GFX)
+    if (SDL2)
+        list(APPEND BUILD_OPTIONS -DUSE_GFX_SDL)
+        list(APPEND LIBRARIES -lSDL2)
+    else()
+        list(APPEND BUILD_OPTIONS -DUSE_GFX_SW)
+    endif()
 endif()
 
 # Include external projects Doctest from github.
