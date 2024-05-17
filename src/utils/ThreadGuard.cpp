@@ -14,8 +14,9 @@ namespace rsp::utils {
 ThreadGuard::~ThreadGuard()
 {
     std::lock_guard guard(mMutex);
-    mLock.try_lock();
-    mLock.unlock();
+    if (mLock.try_lock()) {
+        mLock.unlock();
+    }
 }
 
 ThreadGuard& ThreadGuard::Lock()
