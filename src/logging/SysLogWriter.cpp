@@ -8,6 +8,8 @@
  * \author      Steffen Brummer
  */
 
+#ifdef SYSLOG
+
 #include <syslog.h>
 #include <logging/SysLogWriter.h>
 
@@ -46,3 +48,5 @@ void SysLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, const
 
 
 } /* namespace logging */
+
+#endif /* SYSLOG */
