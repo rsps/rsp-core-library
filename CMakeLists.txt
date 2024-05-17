@@ -67,11 +67,18 @@ find_package(Git REQUIRED)
 
 if (GFX)
     list(APPEND BUILD_OPTIONS -DUSE_GFX)
+
     if (SDL2)
         list(APPEND BUILD_OPTIONS -DUSE_GFX_SDL)
         list(APPEND LIBRARIES -lSDL2)
     else()
         list(APPEND BUILD_OPTIONS -DUSE_GFX_SW)
+    endif()
+
+    if (FREETYPE_FONTS)
+        find_package(Freetype REQUIRED)
+        list(APPEND BUILD_OPTIONS -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+        list(APPEND LIBRARIES Freetype::Freetype)
     endif()
 endif()
 
@@ -88,12 +95,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(magic_enum)
 
 add_library("rsp-core-lib" STATIC)
-
-if (FREETYPE_FONTS)
-    find_package(Freetype REQUIRED)
-    list(APPEND BUILD_OPTIONS -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
-    list(APPEND LIBRARIES Freetype::Freetype)
-endif()
 
 if (NET_LIBCURL)
 #    set(CURL_LIBRARY "-lcurl")

@@ -9,16 +9,21 @@
  */
 
 #include <messaging/Event.h>
-#include <graphics/GfxEvents.h>
+#ifdef USE_GFX
+    #include <graphics/GfxEvents.h>
+#endif /* USE_GFX */
 
 namespace rsp::messaging {
 
 std::ostream& operator<<(std::ostream &os, const rsp::messaging::Event &arEvent)
 {
+#ifdef USE_GFX
     if (arEvent.IsType<rsp::graphics::TouchEvent>()) {
         os << arEvent.CastTo<rsp::graphics::TouchEvent>();
     }
-    else {
+    else
+#endif /* USE_GFX */
+    {
         os << "Event (" << arEvent.Type << ") " << arEvent.Name;
     }
     return os;
