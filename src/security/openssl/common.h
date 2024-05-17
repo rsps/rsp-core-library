@@ -10,8 +10,6 @@
 #ifndef RSP_CORE_LIB_SRC_SECURITY_OPENSSL_COMMON_H
 #define RSP_CORE_LIB_SRC_SECURITY_OPENSSL_COMMON_H
 
-#ifdef USE_OPENSSL
-
 #include <memory>
 #include <openssl/evp.h>
 #include <openssl/crypto.h>
@@ -95,7 +93,5 @@ protected:
 };
 
 } // namespace rsp::security
-
-#endif /* USE_OPENSSL */
 
 #endif // RSP_CORE_LIB_SRC_SECURITY_OPENSSL_COMMON_H

@@ -7,8 +7,6 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifdef USE_OPENSSL
-
 #include <security/Decrypt.h>
 
 #include "common.h"
@@ -66,5 +64,3 @@ std::unique_ptr<CryptBase> Decrypt::MakePimpl(CipherTypes aCipher)
 }
 
 }
-
-#endif /* USE_OPENSSL */

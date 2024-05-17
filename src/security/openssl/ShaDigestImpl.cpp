@@ -8,8 +8,6 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifdef USE_OPENSSL
-
 #include <security/Sha.h>
 #include <exceptions/CoreException.h>
 
@@ -228,6 +226,3 @@ DigestImpl* DigestImpl::Create(const SecureBuffer& arSecret, HashAlgorithms aAlg
 
 
 } // namespace rsp::security
-
-
-#endif /* USE_OPENSSL */

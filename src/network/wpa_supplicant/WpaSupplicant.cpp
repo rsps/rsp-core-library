@@ -7,8 +7,6 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifdef USE_WPA_SUPPLICANT
-
 #include <algorithm>
 #include <list>
 #include <string>
@@ -444,5 +442,3 @@ IWlanInterface* WLan::MakePimpl()
 }
 
 } /* namespace rsp::network */
-
-#endif /* USE_WPA_SUPPLICANT */
