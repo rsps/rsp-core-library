@@ -365,6 +365,6 @@ char TerminalIO::getChar()
 }
 
 #else /* __linux__ */
-#warning "This is a POSIX file, only cleared for building for Linux"
+// #warning "This is a POSIX file, only cleared for building for Linux"
 #endif /* __linux__ */
 } /* namespace hwtest */
