@@ -343,8 +343,8 @@ DateTime::Time DateTime::GetTime() const
 std::ostream& operator <<(std::ostream &os, const DateTime::Date &arDate)
 {
     os << std::setfill('0') << std::setw(4) << static_cast<int>(arDate.year()) << "-"
-        << std::setw(2) << static_cast<uint32_t>(arDate.month()) << "-"
-        << std::setw(2) << static_cast<uint32_t>(arDate.day());
+        << std::setw(2) << static_cast<unsigned>(arDate.month()) << "-"
+        << std::setw(2) << static_cast<unsigned>(arDate.day());
     return os;
 }
 
