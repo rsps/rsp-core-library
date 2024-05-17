@@ -20,7 +20,7 @@ CppObjectFile::CppObjectFile(const std::filesystem::path &arFileName)
     mVariableName.erase(std::remove(mVariableName.begin(), mVariableName.end(), '\"' ), mVariableName.end());
 }
 
-CppObjectFile& CppObjectFile::Hex(const std::uint8_t *apData, size_t aSize, size_t aIndent)
+CppObjectFile& CppObjectFile::Hex(const uint8_t *apData, size_t aSize, size_t aIndent)
 {
     std::string delim = ", ";
 

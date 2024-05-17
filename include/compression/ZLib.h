@@ -40,13 +40,13 @@ class ZLib
 public:
     ZLib(size_t aBufferSize = 8192);
 
-    void Inflate(const std::uint8_t *apData, size_t aSize);
+    void Inflate(const uint8_t *apData, size_t aSize);
 
     const std::ostream& GetResult();
 
 protected:
     z_stream mZStream{};
-    std::vector<std::uint8_t> mBuffer{};
+    std::vector<uint8_t> mBuffer{};
     std::stringstream mResult{};
 };
 

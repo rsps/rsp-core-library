@@ -80,7 +80,7 @@ ZLib::ZLib(size_t aBufferSize)
     }
 }
 
-void ZLib::Inflate(const std::uint8_t *apData, size_t aSize)
+void ZLib::Inflate(const uint8_t *apData, size_t aSize)
 {
     int ret;
 

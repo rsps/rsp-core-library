@@ -82,7 +82,7 @@ Framebuffer::Framebuffer()
     mScreenSurfaces[0].mpVirtualAddr = VideoSurface::PixelPtr_t(fb, [screensize](uint32_t *p) noexcept {
         munmap(p, screensize*2);
     });
-    mScreenSurfaces[1].mpVirtualAddr = VideoSurface::PixelPtr_t(fb + (screensize / sizeof(std::uint32_t)), [](uint32_t[]) noexcept {});
+    mScreenSurfaces[1].mpVirtualAddr = VideoSurface::PixelPtr_t(fb + (screensize / sizeof(uint32_t)), [](uint32_t[]) noexcept {});
 
     if (mVariableInfo.yoffset == 0) {
         mCurrentSurface = 1;

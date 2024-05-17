@@ -25,7 +25,7 @@ class BlockBuffer : public SecureBuffer
 {
 public:
 
-    std::uint8_t* current()
+    uint8_t* current()
     {
         return data() + mOffset;
     }

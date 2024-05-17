@@ -34,15 +34,15 @@ std::ostream& operator<<(std::ostream& os, const SecureBuffer &arBuffer);
 /**
  * \brief A secure buffer implementation that clears its memory after use.
  */
-class SecureBuffer : public std::vector<std::uint8_t, SecureAllocator<std::uint8_t>>
+class SecureBuffer : public std::vector<uint8_t, SecureAllocator<uint8_t>>
 {
 public:
-    using std::vector<std::uint8_t, SecureAllocator<std::uint8_t>>::vector;
+    using std::vector<uint8_t, SecureAllocator<uint8_t>>::vector;
 
     SecureBuffer(const char* apData) // NOLINT, conversion constructor
     {
-        auto b = reinterpret_cast<const std::uint8_t*>(apData);
-        auto e = reinterpret_cast<const std::uint8_t*>(apData + std::strlen(apData));
+        auto b = reinterpret_cast<const uint8_t*>(apData);
+        auto e = reinterpret_cast<const uint8_t*>(apData + std::strlen(apData));
         assign(b, e);
     }
 
@@ -53,8 +53,8 @@ public:
      */
     SecureBuffer(const char* apData, std::size_t aSize)
     {
-        auto b = reinterpret_cast<const std::uint8_t*>(apData);
-        auto e = reinterpret_cast<const std::uint8_t*>(apData + aSize);
+        auto b = reinterpret_cast<const uint8_t*>(apData);
+        auto e = reinterpret_cast<const uint8_t*>(apData + aSize);
         assign(b, e);
     }
 
@@ -63,7 +63,7 @@ public:
      * \param apData Pointer to unsigned char data
      * \param aSize Size of data to include
      */
-    SecureBuffer(const std::uint8_t* apData, std::size_t aSize)
+    SecureBuffer(const uint8_t* apData, std::size_t aSize)
     {
         auto b = apData;
         auto e = (apData + aSize);

@@ -15,7 +15,7 @@
 
 namespace rsp::graphics {
 
-typedef std::int32_t GuiUnit_t;
+typedef int32_t GuiUnit_t;
 
 } /* namespace rsp::graphics */
 

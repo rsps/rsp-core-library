@@ -50,7 +50,7 @@ PixelData::PixelData(const GfxResource &arResource)
 }
 
 
-PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData, size_t aDataSize, bool aCompressed)
+PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const uint8_t *apData, size_t aDataSize, bool aCompressed)
     : mColorDepth(aDepth),
       mRect(0, 0, aWidth, aHeight),
       mpData(apData)
@@ -125,7 +125,7 @@ void PixelData::move(PixelData &&arOther)
 }
 
 
-PixelData& PixelData::Init(uint32_t aId, GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData)
+PixelData& PixelData::Init(uint32_t aId, GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const uint8_t *apData)
 {
     mId = aId;
     mColorDepth = aDepth;
@@ -197,7 +197,7 @@ Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) co
 
         case ColorDepth::RGBA:
             offset = ((aY * GetWidth()) + aX) * 4;
-            result.FromRaw(*reinterpret_cast<const std::uint32_t*>(uintptr_t(mpData + offset)));
+            result.FromRaw(*reinterpret_cast<const uint32_t*>(uintptr_t(mpData + offset)));
             break;
 
         default:
@@ -223,7 +223,7 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
         }
         mpData = mData.data();
     }
-    std::uint8_t *p_data = mData.data();
+    uint8_t *p_data = mData.data();
 
 //    Color result;
     int offset;
@@ -253,12 +253,12 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
         case ColorDepth::RGBA:
             offset = ((aY * GetWidth()) + aX) * 4;
             if (!mBlend || aColor.GetAlpha() == 255) {
-                *reinterpret_cast<std::uint32_t*>(uintptr_t(p_data + offset)) = aColor.AsRaw();
+                *reinterpret_cast<uint32_t*>(uintptr_t(p_data + offset)) = aColor.AsRaw();
             }
             else {
                 Color bg;
-                bg.FromRaw(*reinterpret_cast<std::uint32_t*>(uintptr_t(p_data + offset)));
-                *reinterpret_cast<std::uint32_t*>(uintptr_t(p_data + offset)) = Color::Blend(bg, aColor).AsRaw();
+                bg.FromRaw(*reinterpret_cast<uint32_t*>(uintptr_t(p_data + offset)));
+                *reinterpret_cast<uint32_t*>(uintptr_t(p_data + offset)) = Color::Blend(bg, aColor).AsRaw();
             }
             break;
 
@@ -333,7 +333,7 @@ void PixelData::SaveToCFile(const std::filesystem::path &arFileName, bool aCompr
 
     auto result = Compress(aCompress);
 
-    fo << "static const std::uint8_t pixdata[" << result.mData.size() << "]{\n";
+    fo << "static const uint8_t pixdata[" << result.mData.size() << "]{\n";
     fo.Hex(result.mData.data(), result.mData.size());
     fo << "};\n\n";
 
@@ -392,8 +392,8 @@ void PixelData::Fill(Color aColor)
     }
     switch (mColorDepth) {
         case ColorDepth::RGBA: {
-            auto *p = reinterpret_cast<std::uint32_t*>(mData.data());
-            std::fill_n(p, mData.size() / sizeof(std::uint32_t), aColor.AsRaw());
+            auto *p = reinterpret_cast<uint32_t*>(mData.data());
+            std::fill_n(p, mData.size() / sizeof(uint32_t), aColor.AsRaw());
             break;
         }
 
@@ -428,13 +428,13 @@ PixelData& PixelData::Fade(int aAlphaInc, bool aFixed)
         }
         mpData = mData.data();
     }
-    std::uint8_t *p_data = mData.data();
+    uint8_t *p_data = mData.data();
 
     for (GuiUnit_t y = 0 ; y < GetHeight() ; y++) {
         for (GuiUnit_t x = 0 ; x < GetWidth() ; x++) {
             int offset = ((y * GetWidth()) + x) * 4;
             Color col;
-            col.FromRaw(*reinterpret_cast<const std::uint32_t*>(uintptr_t(p_data + offset)));
+            col.FromRaw(*reinterpret_cast<const uint32_t*>(uintptr_t(p_data + offset)));
             if (col == Color::None) {
                 continue;
             }
@@ -450,7 +450,7 @@ PixelData& PixelData::Fade(int aAlphaInc, bool aFixed)
                 alpha = std::max(alpha + aAlphaInc, 0);
             }
             col.SetAlpha(uint8_t(alpha));
-            *reinterpret_cast<std::uint32_t*>(uintptr_t(p_data + offset)) = col.AsRaw();
+            *reinterpret_cast<uint32_t*>(uintptr_t(p_data + offset)) = col.AsRaw();
         }
     }
     return *this;

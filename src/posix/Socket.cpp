@@ -237,7 +237,7 @@ Socket &Socket::Listen(size_t aAcceptQueueSize)
     return *this;
 }
 
-size_t Socket::Receive(std::uint8_t *apBuffer, size_t aBufLen, int aFlags) const
+size_t Socket::Receive(uint8_t *apBuffer, size_t aBufLen, int aFlags) const
 {
     ssize_t res = recv(mHandle, apBuffer, aBufLen, aFlags);
     if (res == -1) {
@@ -246,7 +246,7 @@ size_t Socket::Receive(std::uint8_t *apBuffer, size_t aBufLen, int aFlags) const
     return size_t(res);
 }
 
-size_t Socket::ReceiveFrom(Socket &arPeer, std::uint8_t *apBuffer, size_t aBufLen, int aFlags) const
+size_t Socket::ReceiveFrom(Socket &arPeer, uint8_t *apBuffer, size_t aBufLen, int aFlags) const
 {
     SocketAddress sa{};
     socklen_t len = sizeof(sa);
@@ -259,7 +259,7 @@ size_t Socket::ReceiveFrom(Socket &arPeer, std::uint8_t *apBuffer, size_t aBufLe
     return size_t(res);
 }
 
-size_t Socket::Send(const std::uint8_t *apBuffer, size_t aBufLen, int aFlags) const
+size_t Socket::Send(const uint8_t *apBuffer, size_t aBufLen, int aFlags) const
 {
     ssize_t res = send(mHandle, apBuffer, aBufLen, aFlags);
     if (res == -1) {

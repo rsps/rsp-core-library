@@ -35,7 +35,7 @@ public:
         return *this;
     }
 
-    [[nodiscard]] virtual std::string_view Translate(std::uint32_t aHash, std::string_view aDefault) const = 0;
+    [[nodiscard]] virtual std::string_view Translate(uint32_t aHash, std::string_view aDefault) const = 0;
 
     constexpr std::string_view operator()(const char *apText) const {
         return Translate(rsp::utils::crc32::HashConst(apText), apText);

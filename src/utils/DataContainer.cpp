@@ -26,13 +26,13 @@ void Crc32DataSignature::Init(std::string_view aSecret)
 void Crc32DataSignature::Calc(const rsp::utils::IDataContent &arContent)
 {
     mCRC = Crc32::Calc(arContent.GetData(), arContent.GetSize());
-    mCRC = Crc32::Calc(reinterpret_cast<const std::uint8_t*>(mSecret.data()), mSecret.size(), mCRC);
+    mCRC = Crc32::Calc(reinterpret_cast<const uint8_t*>(mSecret.data()), mSecret.size(), mCRC);
 }
 
 void Crc32DataSignature::Verify(const rsp::utils::IDataContent &arContent)
 {
-    std::uint32_t value = Crc32::Calc(arContent.GetData(), arContent.GetSize());
-    value = Crc32::Calc(reinterpret_cast<const std::uint8_t*>(mSecret.data()), mSecret.size(), value);
+    uint32_t value = Crc32::Calc(arContent.GetData(), arContent.GetSize());
+    value = Crc32::Calc(reinterpret_cast<const uint8_t*>(mSecret.data()), mSecret.size(), value);
 
     if (value != mCRC) {
         THROW_WITH_BACKTRACE(EInvalidSignature);

@@ -44,12 +44,12 @@ TEST_CASE("Socket")
         Socket sc;
         CHECK_NOTHROW(sc = server.Accept());
         CHECK_FALSE(client.IsDataReady());
-        CHECK_NOTHROW(sc.Send(reinterpret_cast<const std::uint8_t*>(msg.data()), msg.size()));
+        CHECK_NOTHROW(sc.Send(reinterpret_cast<const uint8_t*>(msg.data()), msg.size()));
         CHECK(client.IsDataReady());
 
         std::string result(20, 'A');
         size_t len;
-        CHECK_NOTHROW(len = client.Receive(reinterpret_cast<std::uint8_t*>(result.data()), result.size()));
+        CHECK_NOTHROW(len = client.Receive(reinterpret_cast<uint8_t*>(result.data()), result.size()));
         CHECK_NOTHROW(result.resize(len));
         MESSAGE(result);
         CHECK_EQ(result, msg);
@@ -73,22 +73,22 @@ TEST_CASE("Socket")
         Socket sc;
         CHECK_NOTHROW(sc = server.Accept());
         CHECK_FALSE(client.IsDataReady());
-        CHECK_NOTHROW(sc.Send(reinterpret_cast<const std::uint8_t*>(hello_client.data()), hello_client.size()));
+        CHECK_NOTHROW(sc.Send(reinterpret_cast<const uint8_t*>(hello_client.data()), hello_client.size()));
         CHECK(client.IsDataReady());
 
         std::string result(32, 'A');
         size_t len;
-        CHECK_NOTHROW(len = client.Receive(reinterpret_cast<std::uint8_t*>(result.data()), result.size()));
+        CHECK_NOTHROW(len = client.Receive(reinterpret_cast<uint8_t*>(result.data()), result.size()));
         CHECK_NOTHROW(result.resize(len));
         MESSAGE(result);
         CHECK_EQ(result, hello_client);
 
         CHECK_FALSE(sc.IsDataReady());
-        CHECK_NOTHROW(client.Send(reinterpret_cast<const std::uint8_t*>(hello_server.data()), hello_server.size()));
+        CHECK_NOTHROW(client.Send(reinterpret_cast<const uint8_t*>(hello_server.data()), hello_server.size()));
         CHECK(sc.IsDataReady());
         result.clear();
         result.resize(32);
-        CHECK_NOTHROW(len = sc.Receive(reinterpret_cast<std::uint8_t*>(result.data()), result.size()));
+        CHECK_NOTHROW(len = sc.Receive(reinterpret_cast<uint8_t*>(result.data()), result.size()));
         CHECK_NOTHROW(result.resize(len));
         MESSAGE(result);
         CHECK_EQ(result, hello_server);

@@ -37,7 +37,7 @@ class PixelData
 public:
     PixelData() = default;
     PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth = ColorDepth::RGBA);
-    PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *aData, size_t aDataSize, bool aCompressed = false);
+    PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const uint8_t *aData, size_t aDataSize, bool aCompressed = false);
     explicit PixelData(const GfxResource &arResource);
 
     PixelData(const PixelData& arOther);
@@ -49,7 +49,7 @@ public:
 
     [[nodiscard]] PixelData ChangeColorDepth(ColorDepth aDepth, Color aColor = Color::Black) const;
 
-    PixelData& Init(uint32_t aId, GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const std::uint8_t *apData);
+    PixelData& Init(uint32_t aId, GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const uint8_t *apData);
 
     void Fill(Color aColor);
 
@@ -63,10 +63,10 @@ public:
 
     [[nodiscard]] uint32_t GetId() const { return mId; }
 
-    [[nodiscard]] const std::uint8_t* GetData() const { return mpData; }
-    std::vector<std::uint8_t>& GetData() { return mData; }
+    [[nodiscard]] const uint8_t* GetData() const { return mpData; }
+    std::vector<uint8_t>& GetData() { return mData; }
 
-    PixelData& SetData(const std::uint8_t *apData) { mpData = const_cast<std::uint8_t*>(apData); return *this; }
+    PixelData& SetData(const uint8_t *apData) { mpData = const_cast<uint8_t*>(apData); return *this; }
 
     [[nodiscard]] size_t GetDataSize() const;
 
@@ -105,8 +105,8 @@ public:
 protected:
     ColorDepth mColorDepth = ColorDepth::RGB;
     Rect mRect{};
-    const std::uint8_t *mpData = nullptr;
-    std::vector<std::uint8_t> mData{};
+    const uint8_t *mpData = nullptr;
+    std::vector<uint8_t> mData{};
     bool mBlend = true;
     uint32_t mId = 0;
 

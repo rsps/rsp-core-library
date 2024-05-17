@@ -23,7 +23,7 @@ public:
      * \param apData Pointer to data
      * \param aSize Length of data
      */
-    HexStream(const std::uint8_t *apData, size_t aSize, size_t aElementSize)
+    HexStream(const uint8_t *apData, size_t aSize, size_t aElementSize)
         : mpData(apData),
           mDataSize(aSize / aElementSize),
           mSizeOf(aElementSize)
@@ -55,7 +55,7 @@ public:
 protected:
     friend std::ostream& operator<<(std::ostream &o, const HexStream &arHX);
 
-    const std::uint8_t *mpData;
+    const uint8_t *mpData;
     size_t mDataSize;
     size_t mSizeOf = 1;
     size_t mElementsPerLine = 16;

@@ -73,9 +73,9 @@ public:
     Socket& Connect(const AddressInfo &arAddrInfo);
     [[nodiscard]] int GetOptions(SockOptions aOption, int aLevel = SOL_SOCKET) const;
     Socket& Listen(size_t aAcceptQueueSize = 0);
-    size_t Receive(std::uint8_t *apBuffer, size_t aBufLen, int aFlags = 0) const;
-    size_t ReceiveFrom(Socket &arPeer, std::uint8_t *apBuffer, size_t aBufLen, int aFlags = 0) const;
-    size_t Send(const std::uint8_t *apBuffer, size_t aBufLen, int aFlags = 0) const;
+    size_t Receive(uint8_t *apBuffer, size_t aBufLen, int aFlags = 0) const;
+    size_t ReceiveFrom(Socket &arPeer, uint8_t *apBuffer, size_t aBufLen, int aFlags = 0) const;
+    size_t Send(const uint8_t *apBuffer, size_t aBufLen, int aFlags = 0) const;
     Socket& SetOptions(SockOptions aOption, int aValue, int aLevel = SOL_SOCKET);
     Socket& Shutdown(ShutdownFlags aFlag);
 

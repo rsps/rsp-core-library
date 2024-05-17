@@ -89,7 +89,7 @@ public:
      */
     operator SecureBuffer() const // NOLINT, conversion operator
     {
-        return {reinterpret_cast<const std::uint8_t*>(data()), size()};
+        return {reinterpret_cast<const uint8_t*>(data()), size()};
     }
 
     /**

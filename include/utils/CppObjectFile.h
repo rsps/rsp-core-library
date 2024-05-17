@@ -39,7 +39,7 @@ public:
         return *this;
     }
 
-    CppObjectFile& Hex(const std::uint8_t *apData, size_t aSize, size_t aIndent = 4);
+    CppObjectFile& Hex(const uint8_t *apData, size_t aSize, size_t aIndent = 4);
 protected:
     std::fstream mFile;
     std::string mVariableName;

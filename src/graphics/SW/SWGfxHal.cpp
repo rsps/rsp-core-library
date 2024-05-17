@@ -29,7 +29,7 @@ GfxHal& GfxHal::Get()
 
 namespace rsp::graphics::sw {
 
-std::uint64_t SWGfxHal::mAllocated = 0;
+uint64_t SWGfxHal::mAllocated = 0;
 
 struct VideoDeleter
 {
@@ -61,7 +61,7 @@ std::shared_ptr<VideoSurface> SWGfxHal::Alloc(int aWidth, int aHeight)
     return surface;
 }
 
-std::uint64_t SWGfxHal::GetVideoMemoryUsage() const
+uint64_t SWGfxHal::GetVideoMemoryUsage() const
 {
     return mAllocated;
 }

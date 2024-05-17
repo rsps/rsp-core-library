@@ -698,7 +698,7 @@ TEST_CASE("Framebuffer")
         Color green(Color::Green);
         Color red(Color::Red);
 
-        for (std::uint8_t a = 0; a < 250 ; a += 5) {
+        for (uint8_t a = 0; a < 250 ; a += 5) {
             blue.SetAlpha(a);
             green.SetAlpha(a);
             red.SetAlpha(a);

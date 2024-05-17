@@ -29,7 +29,7 @@ DateTime::DateTime(int aYear, unsigned aMonth, unsigned aDayOfMonth, int aHour, 
 {
     Date dt{year(aYear), month(aMonth), day(aDayOfMonth)};
     sys_days sd = dt;
-    std::int64_t t_sec = std::int64_t(aHour * 3600) + (std::int64_t(aMinute) * 60) + std::int64_t(aSecond);
+    int64_t t_sec = int64_t(aHour * 3600) + (int64_t(aMinute) * 60) + int64_t(aSecond);
     mTp = sd + seconds(t_sec) + milliseconds(aMilliSecond);
 }
 
@@ -336,7 +336,7 @@ DateTime::Date DateTime::GetDate() const
 DateTime::Time DateTime::GetTime() const
 {
     sys_days sd = time_point_cast<days>(mTp);
-    std::int64_t ms(duration_cast<milliseconds>(mTp - sd).count());
+    int64_t ms(duration_cast<milliseconds>(mTp - sd).count());
     return Time(milliseconds(ms));
 }
 

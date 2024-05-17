@@ -40,7 +40,7 @@ protected:
 
     void checkVersion();
 
-    static constexpr std::uint32_t minimumCurlVersion()
+    static constexpr uint32_t minimumCurlVersion()
     {
         return 0x072100;
     }

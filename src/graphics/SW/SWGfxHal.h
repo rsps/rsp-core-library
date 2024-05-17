@@ -22,7 +22,7 @@ class SWGfxHal: public GfxHal, public rsp::utils::Singleton<SWGfxHal>
 {
 public:
     std::shared_ptr<VideoSurface> Alloc(int aWidth, int aHeight) override;
-    [[nodiscard]] std::uint64_t GetVideoMemoryUsage() const override;
+    [[nodiscard]] uint64_t GetVideoMemoryUsage() const override;
     void Blit(VideoSurface &arDst, const VideoSurface &arSrc, OptionalRect aDstRect, OptionalRect aSrcRect) override;
     void CopyFrom(VideoSurface &arDst, const PixelData &arPixelData, uint32_t aColor, OptionalRect aDstRect, OptionalRect aSrcRect) override;
     void DrawRect(VideoSurface &arDst, uint32_t aColor, const Rect &arRect) override;
@@ -31,7 +31,7 @@ public:
     [[nodiscard]] uint32_t GetPixel(const VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY) const override;
     void SetPixel(VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, uint32_t aColor) override;
 
-    static std::uint64_t mAllocated;
+    static uint64_t mAllocated;
 };
 
 } /* namespace rsp::graphics */

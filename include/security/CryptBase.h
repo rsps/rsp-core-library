@@ -54,7 +54,7 @@ public:
      * \param apData Pointer to data to operate on.
      * \param aSize Size of data
      */
-    virtual void Update(const std::uint8_t *apData, size_t aSize) = 0;
+    virtual void Update(const uint8_t *apData, size_t aSize) = 0;
 
     /**
      * \brief End the current crypto operation.

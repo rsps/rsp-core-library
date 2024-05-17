@@ -67,11 +67,11 @@ public:
         };
     }
 
-    SceneCreator GetFactory(std::uint32_t aId);
+    SceneCreator GetFactory(uint32_t aId);
 
     bool HasActiveScene() { return (mpActiveScene != nullptr); }
 
-    void SetActiveScene(std::uint32_t aId);
+    void SetActiveScene(uint32_t aId);
     template <class T>
     void SetActiveScene() { SetActiveScene(rsp::utils::ID<T>()); }
 
@@ -84,7 +84,7 @@ public:
     SceneNotify& GetBeforeDestroy() { return mOnDestroy; }
 
 protected:
-    std::map<std::uint32_t, SceneCreator> mScenes{};
+    std::map<uint32_t, SceneCreator> mScenes{};
     std::unique_ptr<Scene> mpActiveScene = nullptr;
     SceneNotify mOnCreated{};
     SceneNotify mOnDestroy{};

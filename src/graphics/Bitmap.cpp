@@ -33,7 +33,7 @@ Bitmap::Bitmap(const std::string &arImgName)
 Bitmap::Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, ColorDepth aDepth)
     : Canvas(aWidth, aHeight, aDepth)
 {
-    Init(uint32_t(uintptr_t(this)), aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
+    Init(uint32_t(uintptr_t(this)), aWidth, aHeight, aDepth, reinterpret_cast<const uint8_t*>(apPixels));
 }
 
 Bitmap::Bitmap(const PixelData &arPixelData)
@@ -55,7 +55,7 @@ Bitmap& Bitmap::Load(const std::string &arImgName)
 
 Bitmap& Bitmap::Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, ColorDepth aDepth)
 {
-    Init(uint32_t(uintptr_t(this)), aWidth, aHeight, aDepth, reinterpret_cast<const std::uint8_t*>(apPixels));
+    Init(uint32_t(uintptr_t(this)), aWidth, aHeight, aDepth, reinterpret_cast<const uint8_t*>(apPixels));
 
     return *this;
 }

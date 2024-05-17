@@ -63,7 +63,7 @@ TEST_CASE("Json")
         CHECK_THROWS_AS(double a = v1.AsDouble(), EConversionError);
         CHECK_EQ("null", v1.AsString());
 
-//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v1)) << "\n" << TestHelpers::ToHex(reinterpret_cast<std::uint8_t*>(&v1), sizeof(Variant)));
+//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v1)) << "\n" << TestHelpers::ToHex(reinterpret_cast<uint8_t*>(&v1), sizeof(Variant)));
 }
 
 
@@ -80,7 +80,7 @@ TEST_CASE("Json")
         CHECK(IsEqual(456321.7651234, static_cast<double>(v1), 0.00000001));
         CHECK_EQ("456321.76512340002", Json::Encode(v1));
 
-//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v1)) << "\nInt: " << v1.RawAsInt() << "\n" << TestHelpers::ToHex(reinterpret_cast<std::uint8_t*>(&v1), sizeof(Variant)));
+//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v1)) << "\nInt: " << v1.RawAsInt() << "\n" << TestHelpers::ToHex(reinterpret_cast<uint8_t*>(&v1), sizeof(Variant)));
 
         auto v2 = Json::Decode("{\"Value\": 456321.7651234}");
         auto &v3 = v2["Value"];
@@ -89,7 +89,7 @@ TEST_CASE("Json")
         CHECK_EQ("456321.76512340002", Json::Encode(v3));
 
         // Explore output here: https://www.exploringbinary.com/floating-point-converter/
-//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v3)) << "\nInt: " << v3.RawAsInt() << "\n" << TestHelpers::ToHex(reinterpret_cast<std::uint8_t*>(&v3), sizeof(Variant)));
+//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v3)) << "\nInt: " << v3.RawAsInt() << "\n" << TestHelpers::ToHex(reinterpret_cast<uint8_t*>(&v3), sizeof(Variant)));
     }
 
     SUBCASE("Create String") {

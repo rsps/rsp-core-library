@@ -21,11 +21,11 @@ namespace rsp::utils {
 static const uint32_t cCRC32_XOR_MASK = 0xFFFFFFFF;
 
 
-const std::uint32_t* Crc32::getTable()
+const uint32_t* Crc32::getTable()
 {
     return crc32::detail::crc_table;
 /*
-    static std::uint32_t mTable[256] = { 0 };
+    static uint32_t mTable[256] = { 0 };
 
     int out = 0;
     if (mTable[0] == 0) {
@@ -53,9 +53,9 @@ const std::uint32_t* Crc32::getTable()
 }
 
 
-std::uint32_t Crc32::Calc(const void* aBuf, size_t aLen, std::uint32_t aInitial)
+uint32_t Crc32::Calc(const void* aBuf, size_t aLen, uint32_t aInitial)
 {
-    const std::uint32_t* table = getTable();
+    const uint32_t* table = getTable();
     uint32_t c = aInitial ^ cCRC32_XOR_MASK;
     const auto* u = static_cast<const uint8_t*>(aBuf);
 
@@ -70,9 +70,9 @@ Crc32::Crc32(uint32_t aInitial)
     mC = aInitial ^ cCRC32_XOR_MASK;
 }
 
-std::uint32_t Crc32::Add(uint8_t aU)
+uint32_t Crc32::Add(uint8_t aU)
 {
-    const std::uint32_t* table = getTable();
+    const uint32_t* table = getTable();
 
     mC = table[(mC ^ aU) & 0xFF] ^ (mC >> 8);
 

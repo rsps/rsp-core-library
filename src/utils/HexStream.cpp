@@ -19,7 +19,7 @@ std::ostream& operator <<(std::ostream &os, const HexStream &arHX)
     std::string_view delim = ", ";
     std::string line;
     size_t mod = arHX.mElementsPerLine / arHX.mSizeOf;
-    const std::uint8_t *data = arHX.mpData;
+    const uint8_t *data = arHX.mpData;
 
     for (size_t i = 0 ; i < arHX.mDataSize ; i++) {
         if ((i % mod) == 0) {
@@ -40,7 +40,7 @@ std::ostream& operator <<(std::ostream &os, const HexStream &arHX)
         uint32_t value = 0;
         for (uint32_t n=0 ; n < arHX.mSizeOf ; ++n) {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-            value = value + (std::uint32_t(*data++) << (8*n));
+            value = value + (uint32_t(*data++) << (8*n));
 #else
             value = (value << 8) + *data++;
 #endif

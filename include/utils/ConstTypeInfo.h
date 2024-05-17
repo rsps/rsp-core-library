@@ -84,7 +84,7 @@ constexpr uint32_t HashOf(const char *apName) noexcept
 
 
 template <class T>
-constexpr std::uint32_t ID()
+constexpr uint32_t ID()
 {
     return crc32::HashOf<T>();
 }
@@ -107,7 +107,7 @@ public:
     void SetName(const std::string &arName) { setName(arName); }
     void SetName(const char *apName) { setName(std::string(apName)); }
 
-    [[nodiscard]] std::uint32_t GetId() const { return mId; }
+    [[nodiscard]] uint32_t GetId() const { return mId; }
 
     void SetId(uint32_t aId) { setId(aId); }
     void SetId(int aId) { setId(static_cast<uint32_t>(aId)); }

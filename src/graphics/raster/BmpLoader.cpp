@@ -94,7 +94,7 @@ void BmpLoader::LoadImg(const std::string &aImgName)
     ReadData(file);
 }
 
-ColorDepth BmpLoader::bitsPerPixelToColorDepth(std::uint32_t aBpp)
+ColorDepth BmpLoader::bitsPerPixelToColorDepth(uint32_t aBpp)
 {
     switch (aBpp) {
         case 1:
@@ -148,7 +148,7 @@ void BmpLoader::ReadPalette(rsp::posix::FileIO &arFile)
     mPalette.resize((mBmpHeader.v4.coloursUsed > 0) ? mBmpHeader.v4.coloursUsed : 2^mBmpHeader.v1.bitsPerPixel);
     arFile.Seek(mBmpHeader.v1.size + 14);
 
-    std::uint8_t data[4];
+    uint8_t data[4];
     for (Color &color : mPalette) {
         arFile.ExactRead(data, 4);
         color.SetBlue(data[mBlueIndex]);
@@ -165,7 +165,7 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
     mLogger.Debug() << "Padded Row size: " << paddedRowSize;
 
     // Initialize container for reading
-    std::vector<std::uint8_t> pixelRows(paddedRowSize * static_cast<size_t>(std::abs(mBmpHeader.v1.heigth)));
+    std::vector<uint8_t> pixelRows(paddedRowSize * static_cast<size_t>(std::abs(mBmpHeader.v1.heigth)));
     mLogger.Debug() << "Container size: " << pixelRows.size();
 
     // Skip past the offset
@@ -176,18 +176,18 @@ void BmpLoader::ReadData(rsp::posix::FileIO &arFile)
     auto h = static_cast<size_t>(abs(mBmpHeader.v1.heigth));
     auto w = static_cast<size_t>(mBmpHeader.v1.width);
 
-    std::uint8_t *data = pixelRows.data();
+    uint8_t *data = pixelRows.data();
     if (mBmpHeader.v1.heigth < 0) { // If height is negative, then image is stored top to bottom.
-        for (std::uint32_t y = 0; y < h ; y++) {
-            for (std::uint32_t x = 0; x < w; x++) {
+        for (uint32_t y = 0; y < h ; y++) {
+            for (uint32_t x = 0; x < w; x++) {
                 Color color(ReadPixel(data, x, y, paddedRowSize));
                 mPixelData.SetPixelAt(GuiUnit_t(x), GuiUnit_t(y), color);
             }
         }
     }
     else { // Image is stored from bottom to top
-        for (std::uint32_t y = 0; y < h ; y++) {
-            for (std::uint32_t x = 0; x < w; x++) {
+        for (uint32_t y = 0; y < h ; y++) {
+            for (uint32_t x = 0; x < w; x++) {
                 Color color(ReadPixel(data, x, h-1-y, paddedRowSize));
                 mPixelData.SetPixelAt(GuiUnit_t(x), GuiUnit_t(y), color);
             }
@@ -217,7 +217,7 @@ int BmpLoader::maskToIndex(uint32_t aMask)
     return result;
 }
 
-Color BmpLoader::ReadPixel(const uint8_t* apPixelData, std::uint32_t aX, std::uint32_t aY, size_t aPaddedRowSize)
+Color BmpLoader::ReadPixel(const uint8_t* apPixelData, uint32_t aX, uint32_t aY, size_t aPaddedRowSize)
 {
     Color pixel = 0;
 

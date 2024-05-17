@@ -22,13 +22,13 @@ std::ostream& operator<<(std::ostream& os, ColorDepth aDepth);
 
 struct GfxResource
 {
-    std::uint32_t Id;
-    std::uint16_t Width;
-    std::uint16_t Height;
+    uint32_t Id;
+    uint16_t Width;
+    uint16_t Height;
     ColorDepth    Depth;
-    std::uint16_t Compressed;
-    std::uint32_t PixDataSize;
-    const std::uint8_t *PixData;
+    uint16_t Compressed;
+    uint32_t PixDataSize;
+    const uint8_t *PixData;
 };
 
 } // namespace rsp::graphics

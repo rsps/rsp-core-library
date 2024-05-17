@@ -116,7 +116,7 @@ void TouchParser::readBody(TouchEvent &arInput)
         readRawTouchEvent();
     }
 
-    std::uint64_t m = (mRawTouchEvent.stime * 1000) + static_cast<uint32_t>(mRawTouchEvent.mtime / 1000);
+    uint64_t m = (mRawTouchEvent.stime * 1000) + static_cast<uint32_t>(mRawTouchEvent.mtime / 1000);
     arInput.mTime = std::chrono::steady_clock::time_point(std::chrono::milliseconds{m});
 }
 

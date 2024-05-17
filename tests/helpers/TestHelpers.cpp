@@ -17,9 +17,9 @@
 #include <utils/HexStream.h>
 #include "TestHelpers.h"
 
-std::uint8_t TestHelpers::TamperWithFile(const std::string &arFileName, std::uint32_t aOffset, std::uint8_t aValue)
+uint8_t TestHelpers::TamperWithFile(const std::string &arFileName, uint32_t aOffset, uint8_t aValue)
 {
-    std::uint8_t result;
+    uint8_t result;
     rsp::posix::FileIO f(arFileName, std::ios_base::in | std::ios_base::out);
     f.Seek(aOffset);
     f.ExactRead(&result, sizeof(result));
@@ -42,15 +42,15 @@ void TestHelpers::ParseArguments(const char **apArgv)
 
 std::string TestHelpers::ToHex(const std::string &arString)
 {
-    return ToHex(reinterpret_cast<const std::uint8_t*>(arString.c_str()), arString.size(), 1);
+    return ToHex(reinterpret_cast<const uint8_t*>(arString.c_str()), arString.size(), 1);
 }
 
-std::string TestHelpers::ToHex(std::uint32_t aValue)
+std::string TestHelpers::ToHex(uint32_t aValue)
 {
-    return ToHex(reinterpret_cast<const std::uint8_t*>(&aValue), 4, 4);
+    return ToHex(reinterpret_cast<const uint8_t*>(&aValue), 4, 4);
 }
 
-std::string TestHelpers::ToHex(const uint8_t *apData, std::uint32_t aSize, std::uint32_t aSizeOf)
+std::string TestHelpers::ToHex(const uint8_t *apData, uint32_t aSize, uint32_t aSizeOf)
 {
     std::stringstream out;
     out << rsp::utils::HexStream(apData, aSize, aSizeOf);

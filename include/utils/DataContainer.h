@@ -60,13 +60,13 @@ struct IDataSignature
      * \brief Get start address of signature buffer
      * \return uint8_t*
      */
-    virtual std::uint8_t* GetData() = 0;
+    virtual uint8_t* GetData() = 0;
 
     /**
      * \brief Get const start address of signature buffer
      * \return const uint8_t*
      */
-    [[nodiscard]] virtual const std::uint8_t* GetData() const = 0;
+    [[nodiscard]] virtual const uint8_t* GetData() const = 0;
 
     /**
      * \brief Calculate the signature on the given data. Store the signature in internal buffer.
@@ -140,13 +140,13 @@ struct IDataContent
      * \brief Get a pointer to the start address of the content buffer
      * \return uint8_t*
      */
-    virtual std::uint8_t* GetData() = 0;
+    virtual uint8_t* GetData() = 0;
 
     /**
      * \brief Get a const pointer to the start address of the content buffer
      * \return const uint8_t*
      */
-    [[nodiscard]] virtual const std::uint8_t* GetData() const = 0;
+    [[nodiscard]] virtual const uint8_t* GetData() const = 0;
 };
 
 /**
@@ -179,14 +179,14 @@ public:
      */
     void Init(std::string_view aSecret);
 
-    std::uint8_t* GetData() override { return reinterpret_cast<std::uint8_t*>(&mCRC); }
-    [[nodiscard]] const std::uint8_t* GetData() const override { return reinterpret_cast<const std::uint8_t*>(&mCRC); }
-    [[nodiscard]] std::size_t GetSize() const override { return sizeof(std::uint32_t); }
+    uint8_t* GetData() override { return reinterpret_cast<uint8_t*>(&mCRC); }
+    [[nodiscard]] const uint8_t* GetData() const override { return reinterpret_cast<const uint8_t*>(&mCRC); }
+    [[nodiscard]] std::size_t GetSize() const override { return sizeof(uint32_t); }
     void Calc(const rsp::utils::IDataContent &arContent) override;
     void Verify(const rsp::utils::IDataContent &arContent) override;
 
 protected:
-    std::uint32_t mCRC{0};
+    uint32_t mCRC{0};
     std::string_view mSecret{};
 };
 
@@ -288,22 +288,22 @@ public:
             return sizeof(mData);
         }
     }
-    std::uint8_t* GetData() override
+    uint8_t* GetData() override
     {
         if constexpr (has_data) {
-            return reinterpret_cast<std::uint8_t*>(mData.data());
+            return reinterpret_cast<uint8_t*>(mData.data());
         }
         else {
-            return reinterpret_cast<std::uint8_t*>(&mData);
+            return reinterpret_cast<uint8_t*>(&mData);
         }
     }
-    [[nodiscard]] const std::uint8_t* GetData() const override
+    [[nodiscard]] const uint8_t* GetData() const override
     {
         if constexpr (has_data) {
-            return reinterpret_cast<const std::uint8_t*>(mData.data());
+            return reinterpret_cast<const uint8_t*>(mData.data());
         }
         else {
-            return reinterpret_cast<const std::uint8_t*>(&mData);
+            return reinterpret_cast<const uint8_t*>(&mData);
         }
     }
 

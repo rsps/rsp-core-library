@@ -32,7 +32,7 @@ public:
      * \param aId 32-bit id of scene
      * \return self
      */
-    GfxEngineBase& SetNextScene(std::uint32_t aId);
+    GfxEngineBase& SetNextScene(uint32_t aId);
 
     template <class E, typename = typename std::enable_if<std::is_enum<E>::value, E>::type>
     GfxEngineBase& SetNextScene(E e) { return SetNextScene(uint32_t(e)); }

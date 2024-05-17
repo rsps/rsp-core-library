@@ -27,7 +27,7 @@ public:
         None, Alpha, RGB, RGBA
     };
 
-    using data_type = std::uint8_t;
+    using data_type = uint8_t;
     using DecompressedData = std::vector<data_type>;
     using size_type = DecompressedData::size_type;
 

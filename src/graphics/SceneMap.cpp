@@ -16,7 +16,7 @@ using namespace rsp::logging;
 namespace rsp::graphics {
 
 
-SceneMap::SceneCreator SceneMap::GetFactory(std::uint32_t aId)
+SceneMap::SceneCreator SceneMap::GetFactory(uint32_t aId)
 {
     try {
         return mScenes.at(aId);
@@ -37,7 +37,7 @@ Scene& SceneMap::ActiveScene()
     return *mpActiveScene;
 }
 
-void SceneMap::SetActiveScene(std::uint32_t aId)
+void SceneMap::SetActiveScene(uint32_t aId)
 {
     if (mCurrentSceneId == aId) {
         return;

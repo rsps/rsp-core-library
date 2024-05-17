@@ -29,7 +29,7 @@ public:
     bool operator<=(const RunTime& arOther);
     bool operator<(const RunTime& arOther);
 
-    [[nodiscard]] std::int64_t Milliseconds() const;
+    [[nodiscard]] int64_t Milliseconds() const;
 
     explicit operator std::chrono::milliseconds() { return mValue; }
 

@@ -18,12 +18,12 @@
 
 namespace rsp::utils {
 
-constexpr std::uint32_t fourcc(char const p[5])
+constexpr uint32_t fourcc(char const p[5])
 {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    return (std::uint32_t(p[3]) << 24) | (std::uint32_t(p[2]) << 16) | (std::uint32_t(p[1]) << 8) | std::uint32_t(p[0]);
+    return (uint32_t(p[3]) << 24) | (uint32_t(p[2]) << 16) | (uint32_t(p[1]) << 8) | uint32_t(p[0]);
 #else
-    return (std::uint32_t(p[0]) << 24) | (std::uint32_t(p[1]) << 16) | (std::uint32_t(p[2]) << 8) | std::uint32_t(p[3]);
+    return (uint32_t(p[0]) << 24) | (uint32_t(p[1]) << 16) | (uint32_t(p[2]) << 8) | uint32_t(p[3]);
 #endif
 }
 
@@ -32,7 +32,7 @@ class FourCC
 {
 public:
     FourCC() noexcept {}
-    explicit FourCC(std::uint32_t aValue)
+    explicit FourCC(uint32_t aValue)
     {
         mValue = htobe32(aValue);
     }
@@ -44,7 +44,7 @@ public:
         }
     }
 
-    explicit operator std::uint32_t() const { return mValue; }
+    explicit operator uint32_t() const { return mValue; }
 
     bool operator==(const FourCC &arOther) const
     {
@@ -56,7 +56,7 @@ protected:
     friend std::ostream& operator<<(std::ostream& os, const FourCC &arChunk);
 
     union {
-        std::uint32_t mValue = 0;
+        uint32_t mValue = 0;
         char mAscii[4];
     };
 };

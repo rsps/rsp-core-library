@@ -19,7 +19,7 @@ using namespace rsp::security;
 
 struct MyData
 {
-    std::uint32_t Integer = 42;
+    uint32_t Integer = 42;
     FixedString<100> String{};
 };
 

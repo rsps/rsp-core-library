@@ -64,7 +64,7 @@ TEST_CASE("Crypt")
 
     Encrypt e(cipher);
     e.Init(siv, secure_key);
-    e.Update(reinterpret_cast<const std::uint8_t*>(cTestStr.data()), cTestStr.size());
+    e.Update(reinterpret_cast<const uint8_t*>(cTestStr.data()), cTestStr.size());
     SecureBuffer encrypted = e.Finalize();
 
     CHECK_EQ(encrypted, expected_result);

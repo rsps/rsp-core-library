@@ -12,7 +12,7 @@
 
 namespace rsp::utils {
 
-std::uint32_t Fnv1a::Hash32(const void *apData, std::uint32_t aLen)
+uint32_t Fnv1a::Hash32(const void *apData, uint32_t aLen)
 {
     uint32_t hash = fnv1a::cOffsetBasis32;
     uint32_t prime = fnv1a::cPrime32;
@@ -26,7 +26,7 @@ std::uint32_t Fnv1a::Hash32(const void *apData, std::uint32_t aLen)
     return hash;
 }
 
-std::uint64_t Fnv1a::Hash64(const void *apData, std::uint64_t aLen)
+uint64_t Fnv1a::Hash64(const void *apData, uint64_t aLen)
 {
     uint64_t hash = fnv1a::cOffsetBasis64;
     uint64_t prime = fnv1a::cPrime64;

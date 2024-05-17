@@ -83,7 +83,7 @@ public:
      *
      * \return AllocaStatus
      */
-    [[nodiscard]] virtual std::uint64_t GetVideoMemoryUsage() const = 0;
+    [[nodiscard]] virtual uint64_t GetVideoMemoryUsage() const = 0;
 
     /**
      * \brief Copy an area onto another

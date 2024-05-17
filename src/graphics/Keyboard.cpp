@@ -314,7 +314,7 @@ Keyboard& Keyboard::SetLayout(LayoutType aLayout)
 
 const PixelData& Keyboard::getPixelData(TextureId aId)
 {
-    return GfxCache::GetInstance().GetPixelData(std::uint32_t(aId));
+    return GfxCache::GetInstance().GetPixelData(uint32_t(aId));
 }
 
 Keyboard& Keyboard::AllowedButtons(utils::EnumFlags<Buttons> aMask)

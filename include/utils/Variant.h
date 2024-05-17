@@ -50,7 +50,7 @@ public:
      * \enum Types
      * \brief Type declaration used for each native type.
      */
-    enum class Types : std::uint32_t {Null, Bool, Int, Int64, Uint64, Uint32, Uint16, Float, Double, Pointer, String, Object, Array};
+    enum class Types : uint32_t {Null, Bool, Int, Int64, Uint64, Uint32, Uint16, Float, Double, Pointer, String, Object, Array};
 
     /**
      * \fn  Variant()
@@ -97,10 +97,10 @@ public:
     // NOLINTBEGIN, Conversion constructors.
     Variant(bool aValue);
     Variant(int aValue);
-    Variant(std::int64_t aValue);
-    Variant(std::uint64_t aValue);
-    Variant(std::uint32_t aValue);
-    Variant(std::uint16_t aValue);
+    Variant(int64_t aValue);
+    Variant(uint64_t aValue);
+    Variant(uint32_t aValue);
+    Variant(uint16_t aValue);
     Variant(float aValue);
     Variant(double aValue);
     Variant(void* apValue);
@@ -142,10 +142,10 @@ public:
     // NOLINTBEGIN, Conversion operators.
     operator bool() const              { return AsBool(); }
     operator int() const               { return static_cast<int>(AsInt()); }
-    operator std::int64_t() const      { return AsInt(); }
-    operator std::uint64_t() const     { return static_cast<std::uint64_t>(AsInt()); }
-    operator std::uint32_t() const     { return static_cast<std::uint32_t>(AsInt()); }
-    operator std::uint16_t() const     { return static_cast<std::uint16_t>(AsInt()); }
+    operator int64_t() const      { return AsInt(); }
+    operator uint64_t() const     { return static_cast<uint64_t>(AsInt()); }
+    operator uint32_t() const     { return static_cast<uint32_t>(AsInt()); }
+    operator uint16_t() const     { return static_cast<uint16_t>(AsInt()); }
     operator float() const             { return static_cast<float>(AsDouble()); }
     operator double() const            { return AsDouble(); }
     operator void*() const             { return AsPointer(); }
@@ -161,10 +161,10 @@ public:
      */
     Variant& operator =(bool aValue);
     Variant& operator =(int aValue);
-    Variant& operator =(std::int64_t aValue);
-    Variant& operator =(std::uint64_t aValue);
-    Variant& operator =(std::uint32_t aValue);
-    Variant& operator =(std::uint16_t aValue);
+    Variant& operator =(int64_t aValue);
+    Variant& operator =(uint64_t aValue);
+    Variant& operator =(uint32_t aValue);
+    Variant& operator =(uint16_t aValue);
     Variant& operator =(float aValue);
     Variant& operator =(double aValue);
     Variant& operator =(void* apValue);
@@ -178,19 +178,19 @@ public:
      * \return T
      */
     [[nodiscard]] bool AsBool() const;
-    [[nodiscard]] std::int64_t AsInt() const;
+    [[nodiscard]] int64_t AsInt() const;
     [[nodiscard]] double AsDouble() const;
     [[nodiscard]] float AsFloat() const { return static_cast<float>(AsDouble()); }
     [[nodiscard]] std::string AsString() const;
     [[nodiscard]] void* AsPointer() const;
 
-    [[nodiscard]] std::int64_t RawAsInt() const { return mInt; }
+    [[nodiscard]] int64_t RawAsInt() const { return mInt; }
 
 protected:
     Types mType = Types::Null;
     union {
         bool mBool;
-        std::int64_t mInt{0};
+        int64_t mInt{0};
         float mFloat;
         double mDouble;
         uintptr_t mPointer;

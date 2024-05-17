@@ -81,28 +81,28 @@ Variant::Variant(int aValue)
     JLOG("Variant int constructor")
 }
 
-Variant::Variant(std::int64_t aValue)
+Variant::Variant(int64_t aValue)
     : mType(Types::Int64),
       mInt(aValue)
 {
     JLOG("Variant int64 constructor")
 }
 
-Variant::Variant(std::uint64_t aValue)
+Variant::Variant(uint64_t aValue)
     : mType(Types::Uint64),
-      mInt(static_cast<std::int64_t>(aValue))
+      mInt(static_cast<int64_t>(aValue))
 {
     JLOG("Variant uint64 constructor")
 }
 
-Variant::Variant(std::uint32_t aValue)
+Variant::Variant(uint32_t aValue)
     : mType(Types::Uint32),
       mInt(aValue)
 {
     JLOG("Variant uint32 constructor")
 }
 
-Variant::Variant(std::uint16_t aValue)
+Variant::Variant(uint16_t aValue)
     : mType(Types::Uint16),
       mInt(aValue)
 {
@@ -162,28 +162,28 @@ Variant& Variant::operator =(int aValue)
     return *this;
 }
 
-Variant& Variant::operator =(std::int64_t aValue)
+Variant& Variant::operator =(int64_t aValue)
 {
     mType = Types::Int64;
     mInt = aValue;
     return *this;
 }
 
-Variant& Variant::operator =(std::uint64_t aValue)
+Variant& Variant::operator =(uint64_t aValue)
 {
     mType = Types::Uint64;
-    mInt = static_cast<std::int64_t>(aValue);
+    mInt = static_cast<int64_t>(aValue);
     return *this;
 }
 
-Variant& Variant::operator =(std::uint32_t aValue)
+Variant& Variant::operator =(uint32_t aValue)
 {
     mType = Types::Uint32;
     mInt = aValue;
     return *this;
 }
 
-Variant& Variant::operator =(std::uint16_t aValue)
+Variant& Variant::operator =(uint16_t aValue)
 {
     mType = Types::Uint16;
     mInt = aValue;
@@ -264,11 +264,11 @@ bool Variant::AsBool() const
     }
 }
 
-std::int64_t Variant::AsInt() const
+int64_t Variant::AsInt() const
 {
     switch (mType) {
         case Types::Bool:
-            return static_cast<std::int64_t>(mBool);
+            return static_cast<int64_t>(mBool);
 
         case Types::Int:
         case Types::Int64:
@@ -278,15 +278,15 @@ std::int64_t Variant::AsInt() const
             return mInt;
 
         case Types::Float:
-            return static_cast<std::int64_t>(mFloat);
+            return static_cast<int64_t>(mFloat);
         case Types::Double:
-            return static_cast<std::int64_t>(mDouble);
+            return static_cast<int64_t>(mDouble);
 
         case Types::Pointer:
-            return static_cast<std::int64_t>(mPointer);
+            return static_cast<int64_t>(mPointer);
 
         case Types::String:
-            return static_cast<std::int64_t>(std::strtol(mString.c_str(), nullptr, 0));
+            return static_cast<int64_t>(std::strtol(mString.c_str(), nullptr, 0));
 
         default:
             THROW_WITH_BACKTRACE2(EConversionError, TypeToText(), "int");

@@ -41,7 +41,7 @@ public:
     explicit Crc32(uint32_t aInitial = 0);
 
     /**
-     * \fn std::uint32_t Calc(const void*, std::size_t, std::uint32_t=0)
+     * \fn uint32_t Calc(const void*, std::size_t, uint32_t=0)
      * \brief A standalone method to calculate the CRC32 of any buffer.
      *
      * \param aBuf
@@ -49,16 +49,16 @@ public:
      * \param aInitial
      * \return
      */
-    static std::uint32_t Calc(const void* aBuf, size_t aLen, std::uint32_t aInitial = 0);
+    static uint32_t Calc(const void* aBuf, size_t aLen, uint32_t aInitial = 0);
 
     /**
-     * \fn std::uint32_t Add(uint8_t)
+     * \fn uint32_t Add(uint8_t)
      * \brief An object method for incremental calculation of a CRC32 value.
      *
      * \param aByte
      * \return
      */
-    std::uint32_t Add(uint8_t aByte);
+    uint32_t Add(uint8_t aByte);
 
     /**
      * \fn bool Verify(uint32_t, bool=false)
@@ -72,7 +72,7 @@ public:
     [[nodiscard]] bool Verify(uint32_t aResult, bool aThrowOnMismatch = false) const;
 
 protected:
-    static const std::uint32_t* getTable();
+    static const uint32_t* getTable();
     uint32_t mC{0};
 };
 

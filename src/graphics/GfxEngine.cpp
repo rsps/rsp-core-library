@@ -24,7 +24,7 @@ GfxEngineBase::GfxEngineBase(int aMaxFPS)
 {
 }
 
-GfxEngineBase& GfxEngineBase::SetNextScene(std::uint32_t aId)
+GfxEngineBase& GfxEngineBase::SetNextScene(uint32_t aId)
 {
     if (!GetSceneMap().HasActiveScene() || (GetSceneMap().ActiveScene().GetId() != aId)) {
         GfxInputEvents::GetInstance().Flush();
