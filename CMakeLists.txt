@@ -29,32 +29,17 @@ execute_process(COMMAND ${GCC_TOOL} --version OUTPUT_VARIABLE GCC_TOOL_VERSION E
 string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" GCC_TOOL_VERSION "${GCC_TOOL_VERSION}")
 message(STATUS "🔖 GCC ${GCC_TOOL_VERSION} (${GCC_TOOL})")
 
-project (rsp-core-lib)
-
 set (LIB_VERSION_MAJOR 0)
 set (LIB_VERSION_MINOR 1)
 set (LIB_VERSION_PATCH 0)
 
-# configure a header file to pass some of the CMake settings
-# to the source code
-configure_file (
-    "${PROJECT_SOURCE_DIR}/version-def.h.in"
-    "${PROJECT_BINARY_DIR}/src/version-def.h"
-)
 
 # Declare empty lists
 set(BUILD_OPTIONS "")
 set(LIBRARIES "")
 
-if (STD_THREAD)
-    set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
-    set (THREADS_PREFER_PTHREAD_FLAG TRUE)
-    find_package(Threads REQUIRED)
-    list(APPEND BUILD_OPTIONS -DUSE_STD_THREAD)
-    list(APPEND LIBRARIES Threads::Threads)
-endif ()
-
 set (CMAKE_CXX_STANDARD 20)
+
 
 # Must use GNUInstallDirs to install libraries into correct
 # locations on all platforms.
@@ -94,8 +79,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(magic_enum)
 
-add_library("rsp-core-lib" STATIC)
-
 if (NET_LIBCURL)
 #    set(CURL_LIBRARY "-lcurl")
     find_package(CURL 7.33 REQUIRED)
@@ -120,9 +103,33 @@ if (ZLIB)
     list(APPEND LIBRARIES ${ZLIB_LIBRARIES})
 endif()
 
+project (rsp-core-lib)
+
+if (STD_THREAD)
+    set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
+    set (THREADS_PREFER_PTHREAD_FLAG TRUE)
+    find_package(Threads REQUIRED)
+    list(APPEND BUILD_OPTIONS -DUSE_STD_THREAD)
+    list(APPEND LIBRARIES Threads::Threads)
+endif ()
+
+add_library("rsp-core-lib" STATIC)
+
 target_link_libraries ("rsp-core-lib"
     ${LIBRARIES}
 )
+
+# configure a header file to pass some of the CMake settings
+# to the source code
+configure_file (
+        "${PROJECT_SOURCE_DIR}/version-def.h.in"
+        "${PROJECT_BINARY_DIR}/src/version-def.h"
+)
+
+if(ESP_PLATFORM)
+    # On ESP-IDF, bar.c needs to include esp_flash.h from the spi_flash component
+    target_link_libraries(rsp-core-lib PRIVATE idf::lwip idf::newlib)
+endif()
 
 # Keep symbol information for exception stack traces
 SET (CMAKE_ENABLE_EXPORTS TRUE)
