@@ -10,7 +10,9 @@
 
 #include <messaging/EventBroker.h>
 #include <logging/Logger.h>
-#include <graphics/Control.h>
+#ifdef USE_GFX
+    #include <graphics/Control.h>
+#endif
 
 using namespace std::ranges;
 using namespace rsp::logging;
@@ -34,8 +36,10 @@ size_t EventBroker::ProcessEvents()
     }
     for (auto &event : q) {
         for (SubscriberInterface* &sub : mSubscribers) {
+#ifdef USE_GFX
             auto *ctrl = dynamic_cast<rsp::graphics::Control*>(sub);
             mLogger.Debug() << "Propagating " << *event << " to " << (ctrl ? ctrl->GetName() : "Unknown");
+#endif
             if (sub->ProcessEvent(*event)) {
                 break;
             }

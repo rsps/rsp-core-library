@@ -8,7 +8,14 @@
  * \author      Steffen Brummer
  */
 
-#include <netdb.h>
+#ifdef __linux__
+    #include <netdb.h>
+#else
+#ifdef ESP_PLATFORM
+    #include <lwip/netdb.h>
+#endif
+#endif
+
 #include "posix/AddressInfo.h"
 #include <posix/Socket.h>
 
