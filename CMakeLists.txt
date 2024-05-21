@@ -40,13 +40,6 @@ set(LIBRARIES "")
 
 set (CMAKE_CXX_STANDARD 20)
 
-
-# Must use GNUInstallDirs to install libraries into correct
-# locations on all platforms.
-include(GNUInstallDirs)
-
-#message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
-
 include(FetchContent)
 find_package(Git REQUIRED)
 
@@ -105,6 +98,8 @@ endif()
 
 project (rsp-core-lib)
 
+#message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
+
 if (STD_THREAD)
     set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
     set (THREADS_PREFER_PTHREAD_FLAG TRUE)
@@ -129,6 +124,10 @@ configure_file (
 if(ESP_PLATFORM)
     # On ESP-IDF, bar.c needs to include esp_flash.h from the spi_flash component
     target_link_libraries(rsp-core-lib PRIVATE idf::lwip idf::newlib)
+else()
+    # Must use GNUInstallDirs to install libraries into correct
+    # locations on all platforms.
+    include(GNUInstallDirs)
 endif()
 
 # Keep symbol information for exception stack traces
