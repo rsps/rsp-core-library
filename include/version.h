@@ -12,6 +12,8 @@
 
 #include <string>
 
+#define LIB_VERSION "0.1.0"
+
 namespace rsp {
 
 std::string get_library_version();

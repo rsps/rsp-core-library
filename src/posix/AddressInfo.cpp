@@ -10,10 +10,8 @@
 
 #ifdef __linux__
     #include <netdb.h>
-#else
-#ifdef ESP_PLATFORM
+#elif defined(ESP_PLATFORM)
     #include <lwip/netdb.h>
-#endif
 #endif
 
 #include "posix/AddressInfo.h"

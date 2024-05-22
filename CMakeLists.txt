@@ -29,10 +29,6 @@ execute_process(COMMAND ${GCC_TOOL} --version OUTPUT_VARIABLE GCC_TOOL_VERSION E
 string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" GCC_TOOL_VERSION "${GCC_TOOL_VERSION}")
 message(STATUS "🔖 GCC ${GCC_TOOL_VERSION} (${GCC_TOOL})")
 
-set (LIB_VERSION_MAJOR 0)
-set (LIB_VERSION_MINOR 1)
-set (LIB_VERSION_PATCH 0)
-
 
 # Declare empty lists
 set(BUILD_OPTIONS "")
@@ -110,25 +106,14 @@ endif ()
 
 add_library("rsp-core-lib" STATIC)
 
+
+# Must use GNUInstallDirs to install libraries into correct
+# locations on all platforms.
+include(GNUInstallDirs)
+
 target_link_libraries ("rsp-core-lib"
-    ${LIBRARIES}
+        ${LIBRARIES}
 )
-
-# configure a header file to pass some of the CMake settings
-# to the source code
-configure_file (
-        "${PROJECT_SOURCE_DIR}/version-def.h.in"
-        "${PROJECT_BINARY_DIR}/src/version-def.h"
-)
-
-if(ESP_PLATFORM)
-    # On ESP-IDF, bar.c needs to include esp_flash.h from the spi_flash component
-    target_link_libraries(rsp-core-lib PRIVATE idf::lwip idf::newlib)
-else()
-    # Must use GNUInstallDirs to install libraries into correct
-    # locations on all platforms.
-    include(GNUInstallDirs)
-endif()
 
 # Keep symbol information for exception stack traces
 SET (CMAKE_ENABLE_EXPORTS TRUE)
