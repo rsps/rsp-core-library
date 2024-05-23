@@ -21,8 +21,8 @@ namespace rsp::utils {
 class ThreadException : public exceptions::CoreException
 {
 public:
-    ThreadException(std::string_view aName, const char *aMsg)
-            : CoreException(std::string("Exception thrown in thread '" + std::string(aName) + "': " + aMsg))
+    ThreadException(const std::string &arName, const char *apMsg)
+            : CoreException(std::string("Exception thrown in thread '") + arName + "': " + apMsg)
     {
     }
 };

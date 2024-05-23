@@ -10,13 +10,16 @@
 
 #include <utils/Thread.h>
 #include <utils/ThreadList.h>
+#ifdef ESP_PLATFORM
+    #include <esp_pthread.h>
+#endif
 
 using namespace rsp::logging;
 
 namespace rsp::utils {
 
 Thread::Thread(std::string_view aName)
-        : mName(aName)
+      : mName(aName)
 {
     if (mName.empty()) {
         THROW_WITH_BACKTRACE2(ThreadException, "<empty>>", "A Thread name must not be empty.");
@@ -105,4 +108,22 @@ void Thread::execute()
     }
 }
 
+#define UNUSED(macro_arg_parameter) {(void)macro_arg_parameter;}
+
+Thread& Thread::SetAttributes(size_t aStackSize, size_t aPriority, int aCoreId)
+{
+#ifdef ESP_PLATFORM
+    auto cfg = esp_pthread_get_default_config();
+    cfg.thread_name = GetName().c_str();
+    cfg.pin_to_core = aCoreId;
+    cfg.stack_size = aStackSize;
+    cfg.prio = aPriority;
+    esp_pthread_set_cfg(&cfg);
+#else
+    UNUSED(aStackSize)
+    UNUSED(aPriority)
+    UNUSED(aCoreId)
+#endif /* ESP_PLATFORM */
+    return *this;
+}
 } /* namespace rsp::utils */

@@ -88,7 +88,8 @@ std::string SocketAddress::AsString() const
     buffer[INET6_ADDRSTRLEN] = '\0';
 
     switch (Domain(mAddress.Unspecified.sa_family)) {
-        case Domain::Unix:return std::string{mAddress.Unix.sun_path, GetSize()};
+        case Domain::Unix:
+            return std::string{mAddress.Unix.sun_path, GetSize()};
 
         case Domain::Inet:
             if (inet_ntop(AF_INET, &mAddress.Inet.sin_addr, buffer, sizeof(buffer))) {

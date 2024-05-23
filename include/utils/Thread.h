@@ -30,6 +30,10 @@ class Thread : public ThreadInterface, public logging::NamedLogger<Thread>
 public:
     using ThreadCallback_t = std::function<void(void)>;
 
+    /**
+     * Thread constructor that requires a thread name
+     * \param aName
+     */
     explicit Thread(std::string_view aName);
     ~Thread() override;
 
@@ -41,6 +45,17 @@ public:
      * \return string
      */
     [[nodiscard]] const std::string& GetName() const override;
+
+    /**
+     * \brief
+     *  Set thread attributes to use on this thread, if the OS supports it.
+     *  Call this before calling Start().
+     * \param aStackSize
+     * \param aPriority
+     * \param aCoreId
+     * \return self
+     */
+    Thread& SetAttributes(size_t aStackSize, size_t aPriority, int aCoreId = -1);
 
     /**
      * \brief Starts the thread
