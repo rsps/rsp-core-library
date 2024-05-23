@@ -11,15 +11,17 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#ifdef __linux__
+    #include <linux/limits.h>
+    #include <fts.h>
+    #include <sys/sysmacros.h>
+    #include <arpa/inet.h>
+    #include <pthread.h>
+    #include <sys/resource.h>
+#endif
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <exceptions/ExceptionHelper.h>
-#include <linux/limits.h>
-#include <fts.h>
-#include <sys/sysmacros.h>
 #include <posix/FileSystem.h>
-#include <pthread.h>
-#include <sys/resource.h>
 #include <system_error>
 #include <cstdio>
 #include <cstdlib>
@@ -84,6 +86,7 @@ void DeleteFile(const std::string &arFileName)
 
 void RecursiveDeleteDir(const std::string& arDir)
 {
+#ifdef __linux__
     FTSENT *curr;
 
     // Cast needed (in C) because fts_open() takes a "char * const *", instead
@@ -138,6 +141,7 @@ void RecursiveDeleteDir(const std::string& arDir)
     }
 
     fts_close(fts_ptr);
+#endif /* __linux__ */
 }
 
 void MakeDirectory(const std::string& arDir)
@@ -304,6 +308,7 @@ std::string GetLastResumeId()
 
 void SetThreadPriority(std::thread &arThread, unsigned int aPriority)
 {
+#ifdef __linux__
     sched_param sch{};
     int policy;
     struct rlimit limit{};
@@ -341,6 +346,7 @@ void SetThreadPriority(std::thread &arThread, unsigned int aPriority)
         ss << "FileSystem - Could not set thread priority. Expected: " << aPriority << ", Current: " << sch.sched_priority;
         THROW_WITH_BACKTRACE1(std::runtime_error, ss.str());
     }
+#endif /* __linux__ */
 }
 
 std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, bool aRecursive, bool aDirOnly)
@@ -377,6 +383,13 @@ std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, boo
     return result;
 }
 
+#ifndef major
+    #define major(a) ((a >> 12) & 0x000fu)
+#endif
+#ifndef minor
+    #define minor(a) (a  & 0x0fffu)
+#endif
+
 std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriverName, const std::filesystem::path &arPath)
 {
     struct stat stat_buf{};
@@ -388,10 +401,10 @@ std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriver
             THROW_SYSTEM("stat ERROR");
         }
 
-        unsigned int major = major(stat_buf.st_rdev);
-        unsigned int minor = minor(stat_buf.st_rdev);
+        unsigned int maj = major(stat_buf.st_rdev);
+        unsigned int min = minor(stat_buf.st_rdev);
 
-        std::filesystem::path sys_path(StrUtils::Format("/sys/dev/char/%d:%d/device/driver", major, minor).c_str());
+        std::filesystem::path sys_path(StrUtils::Format("/sys/dev/char/%d:%d/device/driver", maj, min).c_str());
 
         if (!std::filesystem::directory_entry(sys_path).exists()) {
             continue;

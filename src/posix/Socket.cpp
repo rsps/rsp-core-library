@@ -11,7 +11,7 @@
 #include <charconv>
 #include <exceptions/ExceptionHelper.h>
 #include <posix/Socket.h>
-#include <poll.h>
+#include <sys/poll.h>
 #include <unistd.h>
 #include <filesystem>
 #include <arpa/inet.h>
@@ -330,8 +330,8 @@ void Socket::setTimeoutOption(SockOptions aOption, std::chrono::system_clock::du
 {
     using namespace std::chrono;
     struct timeval tv{};
-    tv.tv_sec = duration_cast<seconds>(aValue).count();
-    tv.tv_usec = duration_cast<microseconds>(aValue).count() % 1000000;
+    tv.tv_sec = time_t(duration_cast<seconds>(aValue).count());
+    tv.tv_usec = suseconds_t(duration_cast<microseconds>(aValue).count() % 1000000);
     int res = setsockopt(mHandle, SOL_SOCKET, int(aOption), &tv, sizeof(tv));
     if (res < 0) {
         THROW_SYSTEM("setsockopt() failed.");

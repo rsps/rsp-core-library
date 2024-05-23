@@ -11,7 +11,6 @@
 #include <arpa/inet.h>
 #include <posix/Socket.h>
 #include <exceptions/ExceptionHelper.h>
-#include <cstring>
 #include <posix/SocketAddress.h>
 
 namespace rsp::posix {
@@ -58,13 +57,15 @@ SocketAddress &SocketAddress::operator=(const sockaddr &arSockAddr)
 
 size_t SocketAddress::GetSize() const
 {
+#ifdef SUN_LEN
     if (mAddress.Unspecified.sa_family == int(Domain::Unix)) {
         return SUN_LEN(&mAddress.Unix);
     }
-    else if (mAddress.Inet.sin_family == int(Domain::Inet)) {
+#endif
+    if (mAddress.Inet.sin_family == int(Domain::Inet)) {
         return sizeof(mAddress.Inet);
     }
-    else if (mAddress.Inet6.sin6_family == int(Domain::Inet6)) {
+    if (mAddress.Inet6.sin6_family == int(Domain::Inet6)) {
         return sizeof(mAddress.Inet6);
     }
     return sizeof(mAddress);
@@ -160,7 +161,7 @@ std::string SocketAddress::GetCanonicalName() const
         case Domain::Unspecified:
             result.resize(sizeof(mAddress.Unspecified.sa_data) + 1);
             result.back() = '\0';
-            std::strncpy(result.data(), mAddress.Unspecified.sa_data, _SS_SIZE - __SOCKADDR_COMMON_SIZE);
+            std::strncpy(result.data(), mAddress.Unspecified.sa_data, sizeof(mAddress) - sizeof(uint16_t));
             result.shrink_to_fit();
             break;
     }

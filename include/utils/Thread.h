@@ -15,12 +15,7 @@
 #include <string>
 #include <string_view>
 #include "ThreadInterface.h"
-
-#ifdef USE_STD_THREAD
-    #include <thread>
-    using thread_t = std::thread;
-#endif
-
+#include <thread>
 
 namespace rsp::utils {
 
@@ -79,7 +74,7 @@ public:
 
 protected:
     std::string mName{};
-    thread_t mThread{};
+    std::thread mThread{};
     ThreadCallback_t mWhenExecute{};
     bool mTerminated = false;
     std::exception_ptr mException = nullptr;

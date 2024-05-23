@@ -10,18 +10,28 @@
 
 #include <posix/NetworkInterfaces.h>
 #include <exceptions/CoreException.h>
-#include <cstring>
-#include <unistd.h>
-#include <ifaddrs.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <linux/wireless.h>
+#ifdef __linux__
+    #include <cstring>
+    #include <unistd.h>
+    #include <ifaddrs.h>
+    #include <linux/wireless.h>
+    #include <sys/ioctl.h>
+    #include <sys/socket.h>
+#elif defined(ESP_PLATFORM)
+    #include <esp_netif.h>
+#endif
 
 namespace rsp::posix {
+
+#ifdef __linux__
+static bool isWireless(const std::string &arInterfaceName);
+#endif /* __linux__ */
+
 
 NetworkInterfaces::NetworkInterfaces()
     : mLogger("posix")
 {
+#ifdef __linux__
     struct ifaddrs *interface_addresses;
 
     if (getifaddrs(&interface_addresses) == -1) {
@@ -47,6 +57,14 @@ NetworkInterfaces::NetworkInterfaces()
     }
 
     freeifaddrs(interface_addresses);
+#elif defined(ESP_PLATFORM)
+    esp_netif_obj *net = esp_netif_next_unsafe(nullptr);
+    int index = 0;
+    while (net) {
+        mWireless.emplace_back(std::to_string(index++));
+        net = esp_netif_next_unsafe(net);
+    }
+#endif
 }
 
 const std::vector<std::string>& NetworkInterfaces::GetWireless() const
@@ -59,7 +77,8 @@ const std::vector<std::string>& NetworkInterfaces::GetCabled() const
     return mCabled;
 }
 
-bool NetworkInterfaces::isWireless(const std::string &arInterfaceName)
+#ifdef __linux__
+bool isWireless(const std::string &arInterfaceName)
 {
     bool result = false;
     int sock;
@@ -81,5 +100,6 @@ bool NetworkInterfaces::isWireless(const std::string &arInterfaceName)
     close(sock);
     return result;
 }
+#endif
 
 } /* namespace rsp::posix */

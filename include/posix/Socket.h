@@ -29,6 +29,10 @@ public:
             : CoreException(((apSystemMsg == nullptr) ? arMsg : arMsg + std::string(apSystemMsg)))
     {
     }
+    explicit ESocketError(const std::string &arMsg, const std::string &arSystemMsg)
+          : CoreException(arMsg + arSystemMsg)
+    {
+    }
 };
 
 class Socket : public logging::NamedLogger<Socket>

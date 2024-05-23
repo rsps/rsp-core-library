@@ -22,8 +22,6 @@ using namespace rsp::application;
 
 namespace rsp::posix {
 
-#ifdef __linux__
-
 TerminalIO::TerminalIO()
 {
     tcgetattr(0, &mOldTermios);             // grab old terminal i/o settings
@@ -258,7 +256,7 @@ std::string TerminalIO::GetLine()
     }
 
     StrUtils::Trim(line);
-    if (line.length() > 0) {
+    if (!line.empty()) {
         if (!mHistory.empty()) {
             if (mHistory.back() != line) {
                 mHistory.push_back(line);
@@ -364,7 +362,4 @@ char TerminalIO::getChar()
     return char(std::getchar());
 }
 
-#else /* __linux__ */
-// #warning "This is a POSIX file, only cleared for building for Linux"
-#endif /* __linux__ */
 } /* namespace hwtest */

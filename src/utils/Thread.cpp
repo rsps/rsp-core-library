@@ -38,7 +38,7 @@ const std::string& Thread::GetName() const
 ThreadInterface& Thread::Start()
 {
     mTerminated = false;
-    thread_t thread(&Thread::run, this);
+    std::thread thread(&Thread::run, this);
     mThread.swap(thread);
 
     return *this;

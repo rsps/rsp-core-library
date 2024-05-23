@@ -8,6 +8,8 @@
  * \author      Steffen Brummer
  */
 
+#ifdef __linux__
+
 #include <exceptions/ExceptionHelper.h>
 #include <new>
 #include <typeinfo>
@@ -152,3 +154,4 @@ __throw_bad_function_call()
 
 } /* namespace std */
 
+#endif /* __linux__ */

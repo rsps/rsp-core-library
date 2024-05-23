@@ -16,13 +16,21 @@ namespace rsp::posix {
 
 enum class Domain {
     Unspecified = AF_UNSPEC,   ///< Unspecified
+#ifdef AF_LOCAL
     Local       = AF_LOCAL,    ///< Local to host (pipes and file-domain).
-    Unix        = AF_UNIX,     ///< POSIX name for PF_LOCAL.
-    File        = AF_FILE,     ///< Another non-standard name for PF_LOCAL.
+    Unix        = AF_LOCAL,    ///< POSIX name for AF_LOCAL.
+    File        = AF_LOCAL,    ///< Another non-standard name for PF_LOCAL.
+#else
+    Unix        = 1,           ///< POSIX name for AF_LOCAL.
+#endif
     Inet        = AF_INET,     ///< IP protocol family.
     Inet6       = AF_INET6,    ///< IP version 6.
+#ifdef AF_PACKET
     Packet      = AF_PACKET,   ///< Packet family.
+#endif
+#ifdef AF_BLUETOOTH
     BlueTooth   = AF_BLUETOOTH ///< Bluetooth sockets.
+#endif
 };
 
 enum class Type {
@@ -34,13 +42,21 @@ enum class Type {
 
 enum class Protocol {
     Unspecified = PF_UNSPEC,   ///< Unspecified
+#ifdef PF_LOCAL
     Local       = PF_LOCAL,    ///< Local to host (pipes and file-domain).
-    Unix        = PF_UNIX,     ///< POSIX name for PF_LOCAL.
-    File        = PF_FILE,     ///< Another non-standard name for PF_LOCAL.
+    Unix        = PF_LOCAL,    ///< POSIX name for PF_LOCAL.
+    File        = PF_LOCAL,    ///< Another non-standard name for PF_LOCAL.
+#else
+    Unix        = 1,           ///< POSIX name for PF_LOCAL.
+#endif
     Inet        = PF_INET,     ///< IP protocol family.
     Inet6       = PF_INET6,    ///< IP version 6.
+#ifdef PF_PACKET
     Packet      = PF_PACKET,   ///< Packet family. (Datagram/UDP)
+#endif
+#ifdef PF_BLUETOOTH
     BlueTooth   = PF_BLUETOOTH ///< Bluetooth sockets.
+#endif
 };
 
 enum class SockOptions {

@@ -12,12 +12,10 @@
 #include <iostream>
 
 #include <fcntl.h>
+#include <sys/poll.h>
 #include <posix/FileIO.h>
 #include <unistd.h>
-#ifdef __linux__
-    #include <poll.h>
-#elif defined(ESP_PLATFORM)
-#endif
+
 
 namespace rsp::posix
 {
@@ -205,10 +203,9 @@ void FileIO::SetSize(size_t aSize)
 
 bool FileIO::WaitForDataReady(int aTimeoutMs) const
 {
-    bool result = false;
-#ifdef __linux__
     struct pollfd fd{};
     int ret;
+    bool result = false;
 
     fd.fd = mHandle;
     fd.events = POLLIN;
@@ -220,7 +217,7 @@ bool FileIO::WaitForDataReady(int aTimeoutMs) const
             result = true;
         }
     }
-#endif
+
     return result;
 }
 

@@ -8,12 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#ifdef __linux__
-    #include <netdb.h>
-#elif defined(ESP_PLATFORM)
-    #include <lwip/netdb.h>
-#endif
-
+#include <netdb.h>
 #include "posix/AddressInfo.h"
 #include <posix/Socket.h>
 
@@ -98,10 +93,18 @@ void AddressInfo::lookup()
     auto res = getaddrinfo(mNode.empty() ? nullptr : mNode.c_str(), mService.empty() ? nullptr : mService.c_str(),
                            p_hints, &p_info);
     if (res) {
+#ifdef EAI_SYSTEM
         if (res == EAI_SYSTEM) {
             THROW_SYSTEM("Failed to parse socket address.");
         }
-        THROW_WITH_BACKTRACE2(ESocketError, "getaddrinfo failed to parse socket address: ", gai_strerror(res));
+#endif
+        std::string err_code =
+#ifdef __linux__
+            gai_strerror(res);
+#else
+            std::to_string(res);
+#endif
+        THROW_WITH_BACKTRACE2(ESocketError, "getaddrinfo failed to parse socket address: ", err_code);
     }
 
     auto p = p_info;

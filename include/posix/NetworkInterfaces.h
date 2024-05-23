@@ -33,8 +33,6 @@ protected:
     std::vector<std::string> mWireless{};
     std::vector<std::string> mCabled{};
     rsp::logging::LogChannel mLogger;
-
-    static bool isWireless(const std::string &arInterfaceName);
 };
 
 } /* namespace rsp::posix */

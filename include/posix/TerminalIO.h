@@ -13,11 +13,7 @@
 
 #include <string>
 #include <vector>
-#ifdef __linux__
-extern "C" {
-    #include <termios.h>
-}
-#endif
+#include <sys/termios.h>
 
 namespace rsp::posix {
 
@@ -130,14 +126,12 @@ protected:
     std::vector<std::string> mDictionary{};
     std::string mPreset{};
     std::string mPrompt{};
-#ifdef __linux__
     struct termios mOldTermios{};
     struct termios mCurrentTermios{};
 
     static char getChar();
     static EscapeCodes escString2Code(const char *apEscStr);
     void handleTabulator(int &tab_count, std::string &line, unsigned int &cursor);
-#endif
 };
 
 } /* namespace rsp::posix */
