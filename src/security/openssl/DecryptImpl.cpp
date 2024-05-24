@@ -20,7 +20,7 @@ struct OpenSSLDecrypt : public OpenSSLCryptBase
 
     void Init(const SecureBuffer& arIvSeed, const SecureBuffer& arSecret) override
     {
-        int rc = EVP_DecryptInit_ex(mCtx.get(), getCipher(), nullptr, arSecret.data(), arIvSeed.data());
+        int rc = EVP_DecryptInit_ex(mCipherCtx.get(), getCipher(), nullptr, arSecret.data(), arIvSeed.data());
         if (rc != 1) {
             THROW_WITH_BACKTRACE2(CryptException, "EVP_DecryptInit_ex failed", ERR_error_string(static_cast<unsigned int>(rc), nullptr));
         }
@@ -31,7 +31,7 @@ struct OpenSSLDecrypt : public OpenSSLCryptBase
         mData.grow(aSize);
         int out_len = 0;
 
-        int rc = EVP_DecryptUpdate(mCtx.get(), mData.current(), &out_len, apData, static_cast<int>(aSize));
+        int rc = EVP_DecryptUpdate(mCipherCtx.get(), mData.current(), &out_len, apData, static_cast<int>(aSize));
         if (rc != 1) {
             THROW_WITH_BACKTRACE2(CryptException, "EVP_DecryptUpdate failed", ERR_error_string(static_cast<unsigned int>(rc), nullptr));
         }
@@ -44,7 +44,7 @@ struct OpenSSLDecrypt : public OpenSSLCryptBase
         mData.grow(0);
         int out_len = 0;
 
-        int rc = EVP_DecryptFinal_ex(mCtx.get(), mData.current(), &out_len);
+        int rc = EVP_DecryptFinal_ex(mCipherCtx.get(), mData.current(), &out_len);
         if (rc != 1) {
             THROW_WITH_BACKTRACE2(CryptException, "EVP_DecryptFinal_ex failed", ERR_error_string(static_cast<unsigned int>(rc), nullptr));
         }

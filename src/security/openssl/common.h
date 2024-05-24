@@ -61,14 +61,14 @@ public:
 
     explicit OpenSSLCryptBase(CipherTypes aCipher)
         : CryptBase(aCipher),
-          mCtx(EVP_CIPHER_CTX_new(), ::EVP_CIPHER_CTX_free)
+          mCipherCtx(EVP_CIPHER_CTX_new(), ::EVP_CIPHER_CTX_free)
     {
     }
 
 protected:
     [[nodiscard]] static constexpr std::size_t getKeySize() { return EVP_MAX_IV_LENGTH; }
     BlockBuffer mData{};
-    EvpCipherCtxPtr mCtx;
+    EvpCipherCtxPtr mCipherCtx;
 
     const EVP_CIPHER* getCipher()
     {

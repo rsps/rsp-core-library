@@ -82,8 +82,16 @@ protected:
 class CryptException: public exceptions::CoreException
 {
 public:
-    explicit CryptException(const char *aMsg, const char *aErr)
-        : CoreException(std::string(aMsg) + ": " + std::string(aErr))
+    explicit CryptException(const char *apMsg)
+            : CoreException(std::string(apMsg))
+    {
+    }
+    explicit CryptException(const char *apMsg, const char *apErr)
+        : CoreException(std::string(apMsg) + ": " + std::string(apErr))
+    {
+    }
+    explicit CryptException(const char *aMsg, int aErrCode)
+            : CoreException(std::string(aMsg) + ": " + std::to_string(aErrCode))
     {
     }
 };

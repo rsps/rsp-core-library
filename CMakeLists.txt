@@ -9,7 +9,8 @@ OPTION(ARCH_ARM "Set to cross-compile for ARM CPU" OFF) # Disabled by default.
 OPTION(GFX "Include graphic components." ON)
 OPTION(SDL2 "Use SDL2 for graphic acceleration." ON)
 OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
-OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
+OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." OFF) # Enabled by default.
+OPTION(MBEDTLS_CRYPTO "Build with Mbed TLS encryption engine." ON) # Disabled by default.
 OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
 OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
 OPTION(ZLIB "Build with ZLib Inflate/Deflate compression." OFF)
@@ -29,6 +30,7 @@ execute_process(COMMAND ${GCC_TOOL} --version OUTPUT_VARIABLE GCC_TOOL_VERSION E
 string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" GCC_TOOL_VERSION "${GCC_TOOL_VERSION}")
 message(STATUS "🔖 GCC ${GCC_TOOL_VERSION} (${GCC_TOOL})")
 
+project (rsp-core-lib)
 
 # Declare empty lists
 set(BUILD_OPTIONS "")
@@ -60,7 +62,7 @@ if (SYSLOG)
     list(APPEND BUILD_OPTIONS -DSYSLOG)
 endif ()
 
-# Include external projects Doctest from github.
+# Include external project magic_enum from github.
 FetchContent_Declare(
     magic_enum
     GIT_REPOSITORY "https://github.com/Neargye/magic_enum"
@@ -84,6 +86,18 @@ endif()
 if (OPENSSL_CRYPTO)
     find_package(OpenSSL REQUIRED)
     list(APPEND LIBRARIES OpenSSL::Crypto)
+endif ()
+
+if (MBEDTLS_CRYPTO)
+    FetchContent_Declare(
+            mbedtls
+            GIT_REPOSITORY "https://github.com/Mbed-TLS/mbedtls.git"
+            GIT_TAG "v3.6.0"
+            GIT_PROGRESS ON
+            USES_TERMINAL_DOWNLOAD ON
+    )
+    FetchContent_MakeAvailable(mbedtls)
+    list(APPEND LIBRARIES MbedTLS::mbedcrypto)
 endif()
 
 if (ZLIB)
@@ -91,8 +105,6 @@ if (ZLIB)
     list(APPEND BUILD_OPTIONS -DUSE_ZLIB)
     list(APPEND LIBRARIES ${ZLIB_LIBRARIES})
 endif()
-
-project (rsp-core-lib)
 
 #message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 

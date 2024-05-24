@@ -24,8 +24,11 @@ if (GFX)
 endif ()
 
 if (OPENSSL_CRYPTO)
-    file(GLOB OPENSSL_FILES ${CMAKE_CURRENT_LIST_DIR}/security/openssl/*.cpp)
-    list(APPEND SECURITY_FILES ${OPENSSL_FILES})
+    file(GLOB CRYPTO_FILES ${CMAKE_CURRENT_LIST_DIR}/security/openssl/*.cpp)
+    list(APPEND SECURITY_FILES ${CRYPTO_FILES})
+elseif (MBEDTLS_CRYPTO)
+    file(GLOB CRYPTO_FILES ${CMAKE_CURRENT_LIST_DIR}/security/mbedtls/*.cpp)
+    list(APPEND SECURITY_FILES ${CRYPTO_FILES})
 endif ()
 
 set(LIBRARY_SOURCES

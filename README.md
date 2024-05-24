@@ -35,7 +35,7 @@ To install those libraries on on Debian based systems, execute the following in 
 sudo apt install libssl-dev libcurl4 libcurl4-openssl-dev libwpa-client-dev libfreetype-dev zlib1g-dev
 ```
 
-To execute the unit tests a ffew other libraries are needed:
+To execute the unit tests a few other libraries are needed:
 ```
 sudo apt install libpcre2-dev pkg-config
 ``` 
