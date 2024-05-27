@@ -9,8 +9,8 @@ OPTION(ARCH_ARM "Set to cross-compile for ARM CPU" OFF) # Disabled by default.
 OPTION(GFX "Include graphic components." ON)
 OPTION(SDL2 "Use SDL2 for graphic acceleration." ON)
 OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
-OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." OFF) # Enabled by default.
-OPTION(MBEDTLS_CRYPTO "Build with Mbed TLS encryption engine." ON) # Disabled by default.
+OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
+OPTION(MBEDTLS_CRYPTO "Build with Mbed TLS encryption engine." OFF) # Disabled by default.
 OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
 OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
 OPTION(ZLIB "Build with ZLib Inflate/Deflate compression." OFF)
@@ -37,6 +37,8 @@ set(BUILD_OPTIONS "")
 set(LIBRARIES "")
 
 set (CMAKE_CXX_STANDARD 20)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(FetchContent)
 find_package(Git REQUIRED)
@@ -90,15 +92,10 @@ if (OPENSSL_CRYPTO)
 endif ()
 
 if (MBEDTLS_CRYPTO)
-    FetchContent_Declare(
-            mbedtls
-            GIT_REPOSITORY "https://github.com/Mbed-TLS/mbedtls.git"
-            GIT_TAG "v3.6.0"
-            GIT_PROGRESS ON
-            USES_TERMINAL_DOWNLOAD ON
-    )
-    FetchContent_MakeAvailable(mbedtls)
-    list(APPEND LIBRARIES MbedTLS::mbedcrypto)
+    if (NOT ESP_PLATFORM)
+        find_package(MbedTLS REQUIRED)
+        list(APPEND LIBRARIES MbedTLS::mbedcrypto)
+    endif()
     list(APPEND BUILD_OPTIONS -DUSE_MBEDTLS)
 endif()
 
