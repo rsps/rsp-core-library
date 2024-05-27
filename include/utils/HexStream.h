@@ -63,6 +63,14 @@ protected:
 
 std::ostream& operator<<(std::ostream &os, const HexStream &arHX);
 
+std::string ToHex(const std::string &arString);
+std::string ToHex(uint8_t aValue);
+std::string ToHex(uint16_t aValue);
+std::string ToHex(uint32_t aValue);
+std::string ToHex(uint64_t aValue);
+std::string ToHex(const uint8_t *apData, uint32_t aSize, uint32_t aSizeOf);
+
+
 } /* namespace rsp::utils */
 
 #endif // RSP_CORE_LIB_UTILS_HEX_STREAM_H

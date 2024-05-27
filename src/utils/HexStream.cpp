@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <string>
 #include <utils/HexStream.h>
+#include <utils/StrUtils.h>
 
 namespace rsp::utils {
 
@@ -46,8 +47,8 @@ std::ostream& operator <<(std::ostream &os, const HexStream &arHX)
 #endif
         }
 
-        os << "0x" << std::setw(int(2 * arHX.mSizeOf)) << std::setfill('0') << std::hex << value << delim;
-
+        os << "0x" << std::setw(int(2 * arHX.mSizeOf)) << std::setfill('0') << std::hex << value;
+        os << delim;
         if ((i % mod) == (mod - 1)) {
             os << "  " << line << "\n";
             line.clear();
@@ -59,6 +60,48 @@ std::ostream& operator <<(std::ostream &os, const HexStream &arHX)
     os << std::dec;
 
     return os;
+}
+
+std::string ToHex(const std::string &arString)
+{
+    return ToHex(reinterpret_cast<const uint8_t*>(arString.c_str()), arString.size(), 1);
+}
+
+std::string ToHex(uint8_t aValue)
+{
+    std::stringstream ss;
+    ss << "0x" << std::setw(2) << std::setfill('0') << std::hex << uint32_t(aValue);
+    return ss.str();
+}
+
+std::string ToHex(uint16_t aValue)
+{
+    std::stringstream ss;
+    ss << "0x" << std::setw(4) << std::setfill('0') << std::hex << aValue;
+    return ss.str();
+}
+
+std::string ToHex(uint32_t aValue)
+{
+    std::stringstream ss;
+    ss << "0x" << std::setw(8) << std::setfill('0') << std::hex << aValue;
+    return ss.str();
+}
+
+std::string ToHex(uint64_t aValue)
+{
+    std::stringstream ss;
+    ss << "0x" << std::setw(16) << std::setfill('0') << std::hex << aValue;
+    return ss.str();
+}
+
+std::string ToHex(const uint8_t *apData, uint32_t aSize, uint32_t aSizeOf)
+{
+    std::stringstream out;
+    out << rsp::utils::HexStream(apData, aSize, aSizeOf);
+    std::string result(out.str());
+    StrUtils::Trim(result);
+    return result;
 }
 
 } /* namespace utils */
