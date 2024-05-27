@@ -36,12 +36,12 @@ public:
          * \see https://mbed-tls.readthedocs.io/en/latest/kb/how-to/encrypt-with-aes-cbc/
          * Quote: "The CBC mode for AES assumes that you provide data in blocks of 16 bytes"
          */
-        resize(size() + aSize + (16 - ((size() + aSize) % 16)));
+        resize(size() + aSize + 16);
     }
 
     void moveOffset(int aLength)
     {
-        mOffset += static_cast<size_t>(aLength);
+        mOffset += size_t(aLength);
     }
 
     void shrinkToOffset()

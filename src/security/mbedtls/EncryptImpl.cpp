@@ -38,12 +38,14 @@ struct MbedTLSEncrypt : public MbedTLSCryptBase
         if (rc) {
             THROW_WITH_BACKTRACE2(CryptException, "mbedtls_cipher_setkey failed", rc);
         }
-
         rc = mbedtls_cipher_set_iv(&mCipherCtx, arIvSeed.data(), 16);
         if (rc) {
             THROW_WITH_BACKTRACE2(CryptException, "mbedtls_cipher_set_iv failed", rc);
         }
-
+        rc = mbedtls_cipher_set_padding_mode(&mCipherCtx, MBEDTLS_PADDING_PKCS7);
+        if (rc) {
+            THROW_WITH_BACKTRACE2(CryptException, "mbedtls_cipher_set_padding_mode failed", rc);
+        }
         rc = mbedtls_cipher_reset(&mCipherCtx);
         if (rc) {
             THROW_WITH_BACKTRACE2(CryptException, "mbedtls_cipher_reset failed", rc);
@@ -64,12 +66,12 @@ struct MbedTLSEncrypt : public MbedTLSCryptBase
 
     SecureBuffer Finalize() override
     {
-        mData.grow(1);
+        mData.grow(0);
         size_t out_len = 0;
 
 //        MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA
         int rc = mbedtls_cipher_finish(&mCipherCtx, mData.current(), &out_len);
-        if (rc) {
+        if (rc && (rc != MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA)) {
             THROW_WITH_BACKTRACE2(CryptException, "mbedtls_cipher_finish failed", rc);
         }
 

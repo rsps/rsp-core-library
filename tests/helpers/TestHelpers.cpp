@@ -10,8 +10,6 @@
 
 #include <cstring>
 #include <string>
-#include <sstream>
-#include <iomanip>
 #include <posix/FileIO.h>
 #include <posix/FileSystem.h>
 #include <utils/HexStream.h>
@@ -42,19 +40,17 @@ void TestHelpers::ParseArguments(const char **apArgv)
 
 std::string TestHelpers::ToHex(const std::string &arString)
 {
-    return ToHex(reinterpret_cast<const uint8_t*>(arString.c_str()), arString.size(), 1);
+    return rsp::utils::ToHex(arString);
 }
 
 std::string TestHelpers::ToHex(uint32_t aValue)
 {
-    return ToHex(reinterpret_cast<const uint8_t*>(&aValue), 4, 4);
+    return rsp::utils::ToHex(aValue);
 }
 
 std::string TestHelpers::ToHex(const uint8_t *apData, uint32_t aSize, uint32_t aSizeOf)
 {
-    std::stringstream out;
-    out << rsp::utils::HexStream(apData, aSize, aSizeOf);
-    return out.str();
+    return rsp::utils::ToHex(apData, aSize, aSizeOf);
 }
 
 bool TestHelpers::ValidateJson(const std::string &arJson)

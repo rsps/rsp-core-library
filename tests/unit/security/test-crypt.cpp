@@ -74,7 +74,8 @@ TEST_CASE("Crypt")
     d.Update(encrypted.data(), encrypted.size());
     SecureString plain = d.Finalize();
 
-    CHECK(bool(cTestStr == plain));
+    CHECK_EQ(std::string(plain), cTestStr);
+//    MESSAGE("Sizes: " << plain.size() << " vs " << cTestStr.size());
 }
 
 

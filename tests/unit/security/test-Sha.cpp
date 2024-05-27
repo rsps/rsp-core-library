@@ -28,8 +28,13 @@ TEST_CASE("SHA")
     SUBCASE("Library Version")
     {
         Sha sha(HashAlgorithms::Sha3);
+#ifdef USE_OPENSSL
         CHECK_EQ(sha.GetLibraryName(), std::string("openssl"));
         CHECK_EQ(sha.GetLibraryVersion(), std::string("3.0.2"));
+#elif defined(USE_MBEDTLS)
+        CHECK_EQ(sha.GetLibraryName(), std::string("MbedTLS"));
+        CHECK_EQ(sha.GetLibraryVersion(), std::string("3.6.0"));
+#endif
     }
 
     SUBCASE("SHA1-HMAC")

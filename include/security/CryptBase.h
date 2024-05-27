@@ -11,6 +11,7 @@
 #define RSP_CORE_LIB_SECURITY_CRYPT_BASE_H
 
 #include <exceptions/CoreException.h>
+#include <utils/HexStream.h>
 #include <string_view>
 #include <vector>
 #include "SecureBuffer.h"
@@ -91,7 +92,7 @@ public:
     {
     }
     explicit CryptException(const char *aMsg, int aErrCode)
-            : CoreException(std::string(aMsg) + ": " + std::to_string(aErrCode))
+            : CoreException(std::string(aMsg) + ((aErrCode < 0) ? ": -" + utils::ToHex(uint16_t(-aErrCode)) : ": " + std::to_string(aErrCode)))
     {
     }
 };
