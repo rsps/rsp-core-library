@@ -13,7 +13,7 @@
 #include <posix/Socket.h>
 #include <sys/poll.h>
 #include <unistd.h>
-#include <filesystem>
+#include <posix/FileSystem.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 
@@ -349,7 +349,7 @@ Socket& Socket::Shutdown(ShutdownFlags aFlag)
 
 void Socket::deleteOldSocketInode(const SocketAddress &arAddr)
 {
-    std::filesystem::remove(arAddr.AsString());
+    FileSystem::DeleteFile(arAddr.AsString());
 }
 
 } // rsp::posix
