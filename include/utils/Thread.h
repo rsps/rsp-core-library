@@ -95,6 +95,8 @@ protected:
     std::exception_ptr mException = nullptr;
 
     void run();
+    void start();
+    void stop();
 
     /**
      * \brief Override this for specialized threaded object.

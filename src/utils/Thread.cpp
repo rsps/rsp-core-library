@@ -31,6 +31,7 @@ Thread::Thread(std::string_view aName)
 Thread::~Thread()
 {
     ThreadList::GetInstance().RemoveThread(*this);
+    stop();
 }
 
 const std::string& Thread::GetName() const
@@ -40,20 +41,13 @@ const std::string& Thread::GetName() const
 
 ThreadInterface& Thread::Start()
 {
-    mTerminated = false;
-    std::thread thread(&Thread::run, this);
-    mThread.swap(thread);
-
+    start();
     return *this;
 }
 
 ThreadInterface& Thread::Stop()
 {
-    mTerminated = true;
-
-    if (mThread.joinable()) {
-        mThread.join();
-    }
+    stop();
 
     if (mException) {
         std::rethrow_exception(mException);
@@ -126,4 +120,20 @@ Thread& Thread::SetAttributes(size_t aStackSize, size_t aPriority, int aCoreId)
 #endif /* ESP_PLATFORM */
     return *this;
 }
+
+void Thread::start()
+{
+    mTerminated = false;
+    std::thread thread(&Thread::run, this);
+    mThread.swap(thread);
+}
+
+void Thread::stop()
+{
+    mTerminated = true;
+    if (mThread.joinable()) {
+        mThread.join();
+    }
+}
+
 } /* namespace rsp::utils */
