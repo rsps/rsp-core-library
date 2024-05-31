@@ -74,13 +74,6 @@ Variant::Variant(bool aValue)
     JLOG("Variant bool constructor")
 }
 
-Variant::Variant(int aValue)
-    : mType(Types::Int),
-      mInt(aValue)
-{
-    JLOG("Variant int constructor")
-}
-
 Variant::Variant(int64_t aValue)
     : mType(Types::Int64),
       mInt(aValue)
@@ -95,11 +88,25 @@ Variant::Variant(uint64_t aValue)
     JLOG("Variant uint64 constructor")
 }
 
+Variant::Variant(int32_t aValue)
+        : mType(Types::Int),
+          mInt(aValue)
+{
+    JLOG("Variant int32 constructor")
+}
+
 Variant::Variant(uint32_t aValue)
     : mType(Types::Uint32),
       mInt(aValue)
 {
     JLOG("Variant uint32 constructor")
+}
+
+Variant::Variant(int16_t aValue)
+        : mType(Types::Int),
+          mInt(aValue)
+{
+    JLOG("Variant int32 constructor")
 }
 
 Variant::Variant(uint16_t aValue)

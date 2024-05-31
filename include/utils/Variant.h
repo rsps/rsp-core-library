@@ -96,10 +96,11 @@ public:
      */
     // NOLINTBEGIN, Conversion constructors.
     Variant(bool aValue);
-    Variant(int aValue);
     Variant(int64_t aValue);
     Variant(uint64_t aValue);
+    Variant(int32_t aValue);
     Variant(uint32_t aValue);
+    Variant(int16_t aValue);
     Variant(uint16_t aValue);
     Variant(float aValue);
     Variant(double aValue);
@@ -141,10 +142,11 @@ public:
      */
     // NOLINTBEGIN, Conversion operators.
     operator bool() const              { return AsBool(); }
-    operator int() const               { return static_cast<int>(AsInt()); }
     operator int64_t() const      { return AsInt(); }
     operator uint64_t() const     { return static_cast<uint64_t>(AsInt()); }
+    operator int32_t() const      { return static_cast<int32_t>(AsInt()); }
     operator uint32_t() const     { return static_cast<uint32_t>(AsInt()); }
+    operator int16_t() const      { return static_cast<int16_t>(AsInt()); }
     operator uint16_t() const     { return static_cast<uint16_t>(AsInt()); }
     operator float() const             { return static_cast<float>(AsDouble()); }
     operator double() const            { return AsDouble(); }
