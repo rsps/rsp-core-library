@@ -25,7 +25,7 @@ namespace rsp::utils {
  * The object catches an holds an eventual exception terminating the thread.
  *
  */
-class Thread : public ThreadInterface, public logging::NamedLogger<Thread>
+class Thread : public ThreadInterface
 {
 public:
     using ThreadCallback_t = std::function<void(void)>;
@@ -88,7 +88,8 @@ public:
     ThreadInterface& SetExecute(ThreadCallback_t aCb) override;
 
 protected:
-    std::string mName{};
+    std::string mName;
+    rsp::logging::LogChannel mLogger;
     std::thread mThread{};
     ThreadCallback_t mWhenExecute{};
     bool mTerminated = false;

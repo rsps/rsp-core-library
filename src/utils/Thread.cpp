@@ -19,7 +19,8 @@ using namespace rsp::logging;
 namespace rsp::utils {
 
 Thread::Thread(std::string_view aName)
-      : mName(aName)
+      : mName(aName),
+        mLogger(aName)
 {
     if (mName.empty()) {
         THROW_WITH_BACKTRACE2(ThreadException, "<empty>>", "A Thread name must not be empty.");
