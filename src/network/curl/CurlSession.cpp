@@ -42,18 +42,18 @@ IHttpRequest& CurlSession::Request(HttpRequestType aType, std::string_view aUri,
     opt.RequestType = aType;
     opt.Uri = aUri;
 
-    auto req = mPool.Get();
-    req->mpSession = this;
-    req->SetOptions(opt);
-    req->mResponseHandler = aCallback;
-    mPending.push_back(req);
+    auto &req = mPool.Get();
+    req.mpSession = this;
+    req.SetOptions(opt);
+    req.mResponseHandler = aCallback;
+    mPending.push_back(&req);
 
-    return *req;
+    return req;
 }
 
-void CurlSession::requestCompleted(CurlSessionHttpRequest *apRequest)
+void CurlSession::requestCompleted(CurlSessionHttpRequest& arRequest)
 {
-    mPool.Put(&apRequest);
+    mPool.Put(arRequest);
 }
 
 
@@ -64,7 +64,7 @@ void CurlSessionHttpRequest::requestDone()
     if (mResponseHandler) {
         mResponseHandler(mResponse);
     }
-    mpSession->requestCompleted(this);
+    mpSession->requestCompleted(*this);
 }
 
 

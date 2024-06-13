@@ -27,7 +27,7 @@ public:
     void ProcessRequests() override;
     IHttpSession& SetDefaultOptions(const HttpRequestOptions &arOptions) override;
     HttpRequestOptions& GetDefaultOptions() override { return mDefaultOptions; }
-    const HttpRequestOptions& GetDefaultOptions() const override { return mDefaultOptions; }
+    [[nodiscard]] const HttpRequestOptions& GetDefaultOptions() const override { return mDefaultOptions; }
 
     IHttpRequest& Request(HttpRequestType aType, std::string_view aUri, ResponseCallback_t aCallback) override;
 
@@ -39,7 +39,7 @@ protected:
 
 private:
     friend class CurlSessionHttpRequest;
-    void requestCompleted(CurlSessionHttpRequest* apRequest);
+    void requestCompleted(CurlSessionHttpRequest& arRequest);
 };
 
 } /* namespace rsp::network::curl */
