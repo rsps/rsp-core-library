@@ -70,6 +70,19 @@ LogChannel& LogChannel::operator =(const LogChannel &arOther)
     return *this;
 }
 
+LogChannel::LogChannel(LogChannel&& arOther) noexcept
+    : mChannel(std::move(arOther.mChannel))
+{
+}
+
+LogChannel& LogChannel::operator=(LogChannel&& arOther) noexcept
+{
+    if (this != &arOther) {
+        mChannel = std::move(arOther.mChannel);
+    }
+    return *this;
+}
+
 size_t LogChannel::GetWritersCount() const
 {
     return LoggerInterface::GetDefault()->GetWritersCount();

@@ -24,7 +24,9 @@ public:
     explicit LogChannel(std::string_view aChannel);
 
     LogChannel(const LogChannel &arOther);
+    LogChannel(LogChannel &&arOther) noexcept;
     LogChannel& operator=(const LogChannel &arOther);
+    LogChannel& operator=(LogChannel &&arOther) noexcept;
 
     rsp::logging::LogStream Warning() override;
     rsp::logging::LogStream Notice() override;
@@ -45,19 +47,21 @@ protected:
     std::string mChannel;
 };
 
-template <class T>
-class NamedLogger
+class NamedLogChannel
 {
 public:
-    NamedLogger() : NamedLogger(rsp::utils::NameOf<T>()) {}
-    explicit NamedLogger(std::string_view aName) : mLogger(aName) {}
-    virtual ~NamedLogger() = default;
-
-    NamedLogger(const NamedLogger<T>& arOther) : mLogger(arOther.mLogger) {}
-    NamedLogger(NamedLogger<T>&& arOther) noexcept : mLogger(std::move(arOther.mLogger)) {}
+    explicit NamedLogChannel(std::string_view aName) : mLogger(aName) {}
+    virtual ~NamedLogChannel() = default;
 
 protected:
     LogChannel mLogger;
+};
+
+template <class T>
+class NamedLogger : public NamedLogChannel
+{
+public:
+    NamedLogger() : NamedLogChannel(rsp::utils::NameOf<T>()) {}
 };
 
 } /* namespace rsp::logging */
