@@ -49,8 +49,12 @@ template <class T>
 class NamedLogger
 {
 public:
-    NamedLogger() : mLogger(rsp::utils::NameOf<T>()) {}
+    NamedLogger() : NamedLogger(rsp::utils::NameOf<T>()) {}
+    explicit NamedLogger(std::string_view aName) : mLogger(aName) {}
     virtual ~NamedLogger() = default;
+
+    NamedLogger(const NamedLogger<T>& arOther) : mLogger(arOther.mLogger) {}
+    NamedLogger(NamedLogger<T>&& arOther) noexcept : mLogger(std::move(arOther.mLogger)) {}
 
 protected:
     LogChannel mLogger;

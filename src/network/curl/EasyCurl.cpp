@@ -35,6 +35,7 @@ EasyCurl::~EasyCurl()
 }
 
 EasyCurl::EasyCurl(const EasyCurl &arOther)
+    : NamedLogger<EasyCurl>(arOther)
 {
     DLOG("EasyCurl Copy Construct")
     *this = arOther;

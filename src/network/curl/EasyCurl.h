@@ -31,7 +31,7 @@ public:
     EasyCurl();
     EasyCurl(const EasyCurl& arOther);
     EasyCurl(EasyCurl&& arOther) noexcept;
-    virtual ~EasyCurl();
+    ~EasyCurl() override;
 
     static EasyCurl* GetFromHandle(CURL* apHandle);
 
