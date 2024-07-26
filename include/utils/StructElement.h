@@ -171,26 +171,15 @@ protected:
     T mMargin;
 
     /*
-     * Simple overloaded functions for difference check
+     * Template function for difference check
      */
-    [[nodiscard]] bool differs(double aVal1, double aVal2, double aMargin) const {
-        return std::fabs(aVal1 - aVal2) > aMargin;
-    }
-
-    [[nodiscard]] bool differs(float aVal1, float aVal2, float aMargin) const {
-        return std::fabs(aVal1 - aVal2) > aMargin;
-    }
-
-    [[nodiscard]] bool differs(int aVal1, int aVal2, int aMargin) const {
-        return std::abs(aVal1 - aVal2) > aMargin;
-    }
-
-    [[nodiscard]] bool differs(unsigned int aVal1, unsigned int aVal2, unsigned int aMargin) const {
-        return uint(std::abs(static_cast<int>(aVal1 - aVal2))) > aMargin;
-    }
-
-    [[nodiscard]] bool differs(bool aVal1, bool aVal2, bool) const {
-        return (aVal1 != aVal2);
+    [[nodiscard]] bool differs(T aVal1, T aVal2, T aMargin) const {
+        static_assert(std::is_floating_point<T>::value || std::is_integral<T>::value, "Only defined for float or integral types");
+        if constexpr(std::is_floating_point<T>::value) {
+            return std::fabs(aVal1 - aVal2) > aMargin;
+        } else if constexpr(std::is_integral<T>::value) {
+            return ((aVal1 > aVal2) ? aVal1 - aVal2 : aVal2 - aVal1) > aMargin;
+        }
     }
 };
 
