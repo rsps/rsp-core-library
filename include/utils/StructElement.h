@@ -9,6 +9,8 @@
  */
 
 #include "Nullable.h"
+#include "ConstTypeInfo.h"
+#include <cmath>
 
 #ifndef RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
 #define RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
@@ -78,14 +80,14 @@ public:
     void Clear() override        { mIsNull = true; mData = {}; }
 
     /**
-     * \fn T Get()const
+     * \fn T Get() const
      * \brief Getter that throws if content is null.
      *
      * \return T
      */
     T Get() const {
         if (mIsNull) {
-            THROW_WITH_BACKTRACE(ENullValueError);
+            THROW_WITH_BACKTRACE1(ENullValueError, NameOf<T>());
         }
         return mData;
     }

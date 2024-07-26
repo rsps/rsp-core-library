@@ -12,11 +12,6 @@
 #define RSP_CORE_LIB_UTILS_NULLABLE_H
 
 #include <exceptions/CoreException.h>
-#include <type_traits>
-#include <string>
-#include <stdexcept>
-#include <cmath>
-#include <cstdlib>
 
 namespace rsp::utils {
 
@@ -26,16 +21,16 @@ namespace rsp::utils {
  */
 class ENullableException : public exceptions::CoreException {
 public:
-    explicit ENullableException(const char *aMsg) : CoreException(aMsg) {}
+    using exceptions::CoreException::CoreException;
 };
 
 /**
  * \class ENullValueError
- * \brief Exception thrown on attempt to use a nulled value.
+ * \brief Exception thrown on attempt to use a null value.
  */
 class ENullValueError : public ENullableException {
 public:
-    explicit ENullValueError() : ENullableException("Value is null") {}
+    explicit ENullValueError(const std::string_view &arOrigin) : ENullableException(std::string("Value is null in ") + std::string(arOrigin)) {}
 };
 
 /**
