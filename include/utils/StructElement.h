@@ -173,12 +173,16 @@ protected:
     /*
      * Template function for difference check
      */
-    [[nodiscard]] bool differs(T aVal1, T aVal2, T aMargin) const {
-        static_assert(std::is_floating_point<T>::value || std::is_integral<T>::value, "Only defined for float or integral types");
+    [[nodiscard]] bool differs(T aVal1, T aVal2, T aMargin) const
+    {
+//        static_assert(std::is_floating_point<T>::value || std::is_integral<T>::value, "Only defined for float or integral types");
         if constexpr(std::is_floating_point<T>::value) {
             return std::fabs(aVal1 - aVal2) > aMargin;
         } else if constexpr(std::is_integral<T>::value) {
             return ((aVal1 > aVal2) ? aVal1 - aVal2 : aVal2 - aVal1) > aMargin;
+        }
+        else {
+            return (aVal1 != aVal2);
         }
     }
 };
