@@ -14,17 +14,21 @@
 #include <cstddef>
 #include <cstdint>
 
+namespace rsp::utils {
+
 template<class T, size_t N>
 class Average
 {
 public:
-    void Clear() {
+    void Clear()
+    {
         mBuffer.fill(T{});
         mIndex = 0;
         mCount = 0;
     }
 
-    T Add(T aValue) {
+    T Add(T aValue)
+    {
         mBuffer[mIndex++] = aValue;
         if (mIndex >= N) {
             mIndex = 0;
@@ -35,15 +39,17 @@ public:
         return (Sum() / T(mCount));
     }
 
-    T Sum() {
+    T Sum()
+    {
         T result{};
-        for (size_t i = 0; i < mCount ; i++) {
+        for (size_t i = 0; i < mCount; i++) {
             result += mBuffer[i];
         }
         return result;
     }
 
-    size_t Count() {
+    size_t Count()
+    {
         return mCount;
     }
 
@@ -52,5 +58,7 @@ protected:
     size_t mCount = 0;
     std::array<T, N> mBuffer{};
 };
+
+} // namespace rsp::utils
 
 #endif //RSP_CORE_LIB_INCLUDE_UTILS_AVERAGE_H

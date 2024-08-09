@@ -12,6 +12,8 @@
 #include <utils/Average.h>
 
 TEST_CASE("Average") {
+    using namespace rsp::utils;
+
     SUBCASE("Uint32") {
         Average<uint32_t, 10> avr;
 
