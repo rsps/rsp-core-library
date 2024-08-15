@@ -84,7 +84,7 @@ TEST_CASE("StructElement") {
         CHECK_FALSE(data.mFloat.Compare(1.2359f));
         CHECK_FALSE(data.mFloat.Compare(1.2365f));
 
-        CHECK_THROWS_AS(data.mInteger == data.mFloat, const ETypeMismatchError&);
+//        CHECK_THROWS_AS(data.mInteger == data.mFloat, const ETypeMismatchError&); // Now static assert during compile
     }
 
     SUBCASE("Presentation") {

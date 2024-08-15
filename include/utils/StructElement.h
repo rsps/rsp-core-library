@@ -177,7 +177,6 @@ protected:
      */
     [[nodiscard]] bool differs(T aVal1, T aVal2, T aMargin) const
     {
-//        static_assert(std::is_floating_point<T>::value || std::is_integral<T>::value, "Only defined for float or integral types");
         if constexpr(std::is_floating_point<T>::value) {
             return std::fabs(aVal1 - aVal2) > aMargin;
         } else if constexpr(std::is_integral<T>::value) {
@@ -256,7 +255,8 @@ bool operator==(const StructElementBase<T>& aEl1, const StructElementBase<T>& aE
  */
 template <class T, class E>
 bool operator!=(const StructElementBase<T>& /*aEl1*/, const StructElementBase<E>& /*aEl2*/ ) {
-    THROW_WITH_BACKTRACE(ETypeMismatchError);
+    static_assert(std::is_same_v<T, E>, "Value types must be same");
+    return false;
 }
 
 /**
@@ -271,7 +271,8 @@ bool operator!=(const StructElementBase<T>& /*aEl1*/, const StructElementBase<E>
  */
 template <class T, class E>
 bool operator==(const StructElement<T>& /*aEl1*/, const StructElement<E>& /*aEl2*/ ) {
-    THROW_WITH_BACKTRACE(ETypeMismatchError);
+    static_assert(std::is_same_v<T, E>, "Value types must be same");
+    return false;
 }
 
 
