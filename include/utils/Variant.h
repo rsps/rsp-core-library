@@ -63,7 +63,7 @@ public:
 
     template<class T>
     explicit Variant(const rsp::utils::StructElement<T>& arOther)
-        : Variant(ToVariant(arOther))
+        : Variant(ToVariant<T>(arOther))
     {
     }
 
@@ -72,7 +72,7 @@ public:
 
     template<class T>
     Variant& operator=(const rsp::utils::StructElement<T>& arOther) {
-        *this = ToVariant(arOther);
+        *this = ToVariant<T>(arOther);
         return *this;
     }
 
@@ -85,7 +85,11 @@ public:
         if (arOther.IsNull()) {
             return {};
         }
-        return Variant(arOther.Get());
+        Variant result(arOther.Get());
+        if constexpr (std::is_floating_point_v<T>) {
+            result.mPrecision = arOther.mPrecision;
+        }
+        return result;
     }
 
     /**
@@ -135,6 +139,12 @@ public:
      * \return string
      */
     [[nodiscard]] std::string TypeToText() const;
+
+    /**
+     * \brief Number of digits on string presentation of floating point types
+     * \param aDigits Set to -1 for max for specific type.
+     */
+    void SetPrecision(int aPrecision) { mPrecision = aPrecision; }
 
     /**
      * \fn  operator <T>()const
@@ -198,6 +208,7 @@ protected:
         uintptr_t mPointer;
     };
     std::string mString{};
+    int mPrecision = -1;
 };
 
 std::ostream& operator<< (std::ostream& os, const Variant& arValue);

@@ -126,6 +126,13 @@ TEST_CASE("Variant")
         CHECK_EQ(v.AsString(), "1.7976931348623157e+308");
         r = v.AsString();
         CHECK_EQ(r.AsDouble(), 1.7976931348623157e+308);
+
+        v = 1.234567;
+        v.SetPrecision(3);
+        CHECK_EQ(v.AsString(), "1.235");
+        r = v.AsString(); // Example of "lost in translation" / rounding effects
+        CHECK_EQ(r.AsDouble(), 1.235);
+        CHECK_EQ(v.AsDouble(), 1.234567);
     }
 
 }

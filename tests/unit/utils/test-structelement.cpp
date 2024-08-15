@@ -74,13 +74,26 @@ TEST_CASE("StructElement") {
 
         data.mFloat.SetMargin(0.002f);
         data.mFloat = 1.2345f;
-
         CHECK(data.mFloat.Compare(1.2345f));
         CHECK(data.mFloat.Compare(1.2359f));
         CHECK(data.mFloat.Compare(1.2365f));
         CHECK_FALSE(data.mFloat.Compare(1.2366f));
 
+        data.mFloat = StructElement<float>(1.2345f); // This copies margin from temporary object.
+        CHECK(data.mFloat.Compare(1.2345f));
+        CHECK_FALSE(data.mFloat.Compare(1.2359f));
+        CHECK_FALSE(data.mFloat.Compare(1.2365f));
+
         CHECK_THROWS_AS(data.mInteger == data.mFloat, const ETypeMismatchError&);
+    }
+
+    SUBCASE("Presentation") {
+        data.mDouble = 1.23456789;
+        data.mDouble.SetPrecision(3);
+        CHECK_EQ(data.mDouble, 1.23456789);
+        Variant v(data.mDouble);
+        CHECK_EQ(v.AsDouble(), 1.23456789);
+        CHECK_EQ(v.AsString(), "1.235");
     }
 }
 

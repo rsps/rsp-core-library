@@ -29,7 +29,8 @@ Variant::Variant()
 Variant::Variant(const Variant &arOther)
     : mType(arOther.mType),
       mInt(arOther.mInt),
-      mString(arOther.mString)
+      mString(arOther.mString),
+      mPrecision(arOther.mPrecision)
 {
     JLOG("Variant copy constructor")
 }
@@ -37,10 +38,12 @@ Variant::Variant(const Variant &arOther)
 Variant::Variant(Variant &&arOther) noexcept
     : mType(arOther.mType),
       mInt(arOther.mInt),
-      mString(std::move(arOther.mString))
+      mString(std::move(arOther.mString)),
+      mPrecision(arOther.mPrecision)
 {
     JLOG("Variant move constructor")
     arOther.mType = Types::Null;
+    arOther.mPrecision = -1;
 }
 
 Variant& Variant::operator=(const Variant &arOther)
@@ -50,6 +53,7 @@ Variant& Variant::operator=(const Variant &arOther)
         mType = arOther.mType;
         mInt = arOther.mInt,
         mString = arOther.mString;
+        mPrecision = arOther.mPrecision;
     }
     return *this;
 }
@@ -61,11 +65,12 @@ Variant& Variant::operator=(Variant &&arOther) noexcept
         mType = arOther.mType;
         mInt = arOther.mInt;
         mString = std::move(arOther.mString);
+        mPrecision = arOther.mPrecision;
         arOther.mType = Types::Null;
+        arOther.mPrecision = -1;
     }
     return *this;
 }
-
 
 Variant::Variant(bool aValue)
     : mType(Types::Bool),
@@ -348,9 +353,9 @@ std::string Variant::AsString() const
             return std::to_string(static_cast<uint64_t>(mInt));
 
         case Types::Float:
-            return StrUtils::ToString(mFloat);
+            return StrUtils::ToString(mFloat, mPrecision, (mPrecision != -1));
         case Types::Double:
-            return StrUtils::ToString(mDouble);
+            return StrUtils::ToString(mDouble, mPrecision, (mPrecision != -1));
 
         case Types::Pointer:
         case Types::Object:

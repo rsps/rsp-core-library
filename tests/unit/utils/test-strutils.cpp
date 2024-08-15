@@ -50,6 +50,8 @@ TEST_CASE("StrUtils") {
     CHECK_EQ(StrUtils::ToString(123.12345678, 5), "123.12");
     CHECK_EQ(StrUtils::ToString(123.12345678f), "123.123459");
     CHECK_EQ(StrUtils::ToString(123.12345678f, 5), "123.12");
+    CHECK_EQ(StrUtils::ToString(123.12345678f, 5, true), "123.12346");
+    CHECK_EQ(StrUtils::ToString(123.123f, 5, true), "123.12300");
 
     CHECK_EQ(StrUtils::ToString(4.4783619199999997e-06, 12), "4.47836192e-06");
 
