@@ -253,7 +253,7 @@ bool operator==(const StructElementBase<T>& aEl1, const StructElementBase<T>& aE
  * \param aEl2
  * \return
  */
-template <class T, class E>
+template <class T, class E> requires (!std::is_same_v<T, E>)
 bool operator!=(const StructElementBase<T>& /*aEl1*/, const StructElementBase<E>& /*aEl2*/ ) {
     static_assert(std::is_same_v<T, E>, "Value types must be same");
     return false;
@@ -269,7 +269,7 @@ bool operator!=(const StructElementBase<T>& /*aEl1*/, const StructElementBase<E>
  * \param aEl2
  * \return
  */
-template <class T, class E>
+template <class T, class E> requires (!std::is_same_v<T, E>)
 bool operator==(const StructElement<T>& /*aEl1*/, const StructElement<E>& /*aEl2*/ ) {
     static_assert(std::is_same_v<T, E>, "Value types must be same");
     return false;
