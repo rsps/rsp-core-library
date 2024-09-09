@@ -205,10 +205,18 @@ public:
 
     StructElement(const T& aValue) : StructElementBase<T>(aValue) {} // NOLINT, Conversion constructor
 
-    StructElement(const StructElement<T> &arOther) = default;
-    StructElement(StructElement<T> &&arOther) = default;
-    StructElement& operator=(const StructElement<T> &arOther) = default;
-    StructElement& operator=(StructElement<T> &&arOther) = default;
+    StructElement(const StructElement<T> &arOther) : StructElementBase<T>(arOther), mPrecision(arOther.mPrecision) {}
+    StructElement(StructElement<T> &&arOther) noexcept : StructElementBase<T>(arOther), mPrecision(std::move(arOther.mPrecision)) {}
+    StructElement& operator=(const StructElement<T> &arOther) {
+        StructElementBase<T>::operator=(arOther);
+        mPrecision = arOther.mPrecision;
+        return *this;
+    }
+    StructElement& operator=(StructElement<T> &&arOther) {
+        mPrecision = std::move(arOther.mPrecision);
+        StructElementBase<T>::operator=(std::move(arOther));
+        return *this;
+    }
     StructElement& operator=(const T& aValue) override { StructElementBase<T>::Set(aValue); return *this; } // Without this, constructor + copy is called
 
     StructElement& SetPrecision(int aPrecision) { mPrecision = aPrecision; return *this; }
