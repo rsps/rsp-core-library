@@ -12,7 +12,9 @@
 #define RSP_CORE_LIB_NETWORK_HTTP_REQUEST_OPTIONS_H
 
 #include <network/ConnectionOptions.h>
+#include <network/IHttpBodyStream.h>
 #include <memory>
+#include <optional>
 #include <string>
 #include <map>
 #include <posix/FileIO.h>
@@ -48,7 +50,7 @@ class HttpRequestOptions: public ConnectionOptions
 public:
     std::map<std::string, std::string> Headers{};
     std::string Uri{};
-    std::string Body{};
+    std::optional<IHttpBodyStream*> Body{};
     HttpRequestType RequestType = HttpRequestType::GET;
     std::string BasicAuthUsername{};
     std::string BasicAuthPassword{};
@@ -58,7 +60,7 @@ public:
     void Clear() {
         Headers.clear();
         Uri.clear();
-        Body.clear();
+        Body.reset();
         WriteFile.Clear();
         ReadFile.Clear();
     }
