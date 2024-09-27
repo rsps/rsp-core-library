@@ -35,8 +35,9 @@ std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)
         o << "  " << tuple.first << ": " << tuple.second << "\n";
     }
 
-    o <<
-        "Body:\n" << arOptions.Body;
+    if (arOptions.Body) {
+        o << "Body:\n" << arOptions.Body->GetString(100);
+    }
 
     return o;
 }

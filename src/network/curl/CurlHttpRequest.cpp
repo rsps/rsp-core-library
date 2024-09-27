@@ -47,10 +47,24 @@ void CurlHttpRequest::readFromString(const std::string &arString)
 {
     setCurlOption(CURLOPT_UPLOAD, 1L);
     setCurlOption(CURLOPT_READFUNCTION, stringReadFunction);
-    mUploadBuffer.Remaining = arString.size();
-    mUploadBuffer.Data = arString.c_str();
+    mUploadBuffer.String = { arString.size(), arString.c_str() };
     setCurlOption(CURLOPT_READDATA, &mUploadBuffer);
     setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(arString.size()));
+}
+
+void CurlHttpRequest::readFromStream(const std::shared_ptr<IHttpBodyStream>& arBody)
+{
+    if (!arBody) {
+        return;
+    }
+    if (arBody->GetSize() == 0) {
+        return;
+    }
+    setCurlOption(CURLOPT_UPLOAD, 1L);
+    setCurlOption(CURLOPT_READFUNCTION, streamReadFunction);
+    mUploadBuffer.Stream = { 0, arBody.get() };
+    setCurlOption(CURLOPT_READDATA, &mUploadBuffer);
+    setCurlOption(CURLOPT_INFILESIZE_LARGE, arBody->GetSize());
 }
 
 size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
@@ -72,14 +86,21 @@ size_t CurlHttpRequest::fileReadFunction(void *ptr, size_t size, size_t nmemb, r
 size_t CurlHttpRequest::stringReadFunction(void *ptr, size_t size, size_t nmemb, UploadBuffer *apBuf)
 {
     size_t sz = size * nmemb;
-    if (sz > apBuf->Remaining) {
-        sz = apBuf->Remaining;
+    if (sz > apBuf->String.Remaining) {
+        sz = apBuf->String.Remaining;
     }
 //    mLogger.Debug() << "Copying " << sz << " characters to network buffer";
-    std::memcpy(ptr, apBuf->Data, sz);
-    apBuf->Data += sz;
-    apBuf->Remaining -= sz;
+    std::memcpy(ptr, apBuf->String.Data, sz);
+    apBuf->String.Data += sz;
+    apBuf->String.Remaining -= sz;
     return sz;
+}
+
+size_t CurlHttpRequest::streamReadFunction(void *ptr, size_t size, size_t nmemb, CurlHttpRequest::UploadBuffer *apBuf)
+{
+    size_t written;
+    (void) apBuf->Stream.Body->GetChunk(static_cast<char*>(ptr), size * nmemb, written, apBuf->Stream.ChunkIndex);
+    return written;
 }
 
 size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
@@ -121,15 +142,15 @@ const HttpRequestOptions& CurlHttpRequest::GetOptions() const
     return mRequestOptions;
 }
 
-IHttpRequest& CurlHttpRequest::SetBody(const std::string &arBody)
+IHttpRequest& CurlHttpRequest::SetBody(std::shared_ptr<IHttpBodyStream> apBody)
 {
-    mRequestOptions.Body = arBody;
+    mRequestOptions.Body = apBody;
     return *this;
 }
 
-const std::string& CurlHttpRequest::GetBody() const
+const IHttpBodyStream& CurlHttpRequest::GetBody() const
 {
-    return mRequestOptions.Body;
+    return *mRequestOptions.Body;
 }
 
 
@@ -227,7 +248,7 @@ void CurlHttpRequest::populateOptions()
             }
             else {
                 setCurlOption(CURLOPT_CUSTOMREQUEST, "POST");
-                readFromString(mRequestOptions.Body);
+                readFromStream(mRequestOptions.Body);
             }
             break;
 
@@ -237,17 +258,13 @@ void CurlHttpRequest::populateOptions()
 
         case HttpRequestType::PATCH:
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PATCH");
-            if (!mRequestOptions.Body.empty()) {
-                readFromString(mRequestOptions.Body);
-            }
+            readFromStream(mRequestOptions.Body);
             break;
 
         case HttpRequestType::PUT:
             // setCurlOption(CURLOPT_PUT, 1L); // Seems to put files only
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PUT");
-            if (!mRequestOptions.Body.empty()) {
-                readFromString(mRequestOptions.Body);
-            }
+            readFromStream(mRequestOptions.Body);
             break;
 
         case HttpRequestType::DELETE:

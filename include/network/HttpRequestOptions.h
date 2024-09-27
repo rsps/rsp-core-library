@@ -14,7 +14,6 @@
 #include <network/ConnectionOptions.h>
 #include <network/IHttpBodyStream.h>
 #include <memory>
-#include <optional>
 #include <string>
 #include <map>
 #include <posix/FileIO.h>
@@ -50,7 +49,7 @@ class HttpRequestOptions: public ConnectionOptions
 public:
     std::map<std::string, std::string> Headers{};
     std::string Uri{};
-    std::optional<IHttpBodyStream*> Body{};
+    std::shared_ptr<IHttpBodyStream> Body{};
     HttpRequestType RequestType = HttpRequestType::GET;
     std::string BasicAuthUsername{};
     std::string BasicAuthPassword{};

@@ -27,19 +27,19 @@ public:
         return mPimpl->GetOptions();
     }
 
-    IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override
+    HttpRequest& SetOptions(const HttpRequestOptions &arOptions) override
     {
         mPimpl->SetOptions(arOptions);
         return *this;
     }
 
-    IHttpRequest& SetBody(std::string const &body) override
+    HttpRequest& SetBody(std::shared_ptr<IHttpBodyStream> apBody) override
     {
-        mPimpl->SetBody(body);
+        mPimpl->SetBody(apBody);
         return *this;
     }
 
-    [[nodiscard]] const std::string& GetBody() const override
+    [[nodiscard]] const IHttpBodyStream& GetBody() const override
     {
         return mPimpl->GetBody();
     }

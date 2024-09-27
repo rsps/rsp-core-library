@@ -61,30 +61,24 @@ const std::string& HttpStringBody::Get() const
 HttpStringBody& HttpStringBody::operator=(const std::string &arContent)
 {
     mContent = arContent;
-    mChunkReadIndex = 0;
     return *this;
 }
 
-size_t HttpStringBody::GetChunk(char *apBuffer, size_t aBufferSize)
+bool HttpStringBody::GetChunk(char *apBuffer, size_t aBufferSize, size_t &arWritten, size_t &arChunkIndex) const
 {
-    size_t len = mContent.size() - mChunkReadIndex;
+    size_t len = mContent.size() - arChunkIndex;
     if (len > aBufferSize) {
         len = aBufferSize;
     }
-    std::memcpy(apBuffer, mContent.data() + mChunkReadIndex, len);
-    mChunkReadIndex += len;
-    return len;
+    std::memcpy(apBuffer, mContent.data() + arChunkIndex, len);
+    arChunkIndex += len;
+    arWritten = len;
+    return (arChunkIndex == mContent.size());
 }
 
 size_t HttpStringBody::GetSize() const
 {
     return mContent.size();
-}
-
-HttpStringBody& HttpStringBody::Reset()
-{
-    mChunkReadIndex = 0;
-    return *this;
 }
 
 } // rsp::network

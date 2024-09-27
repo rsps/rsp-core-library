@@ -29,9 +29,8 @@ public:
     HttpStringBody& Set(const std::string &arContent);
     [[nodiscard]] const std::string& Get() const;
     HttpStringBody& operator=(const std::string &arContent);
-    [[nodiscard]] size_t GetChunk(char *apBuffer, size_t aBufferSize) override;
+    [[nodiscard]] bool GetChunk(char *apBuffer, size_t aBufferSize, size_t &arWritten, size_t &arChunkIndex) const override;
     [[nodiscard]] size_t GetSize() const override;
-    HttpStringBody& Reset() override;
 protected:
     std::string mContent{};
     size_t mChunkReadIndex = 0;

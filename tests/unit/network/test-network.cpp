@@ -12,11 +12,13 @@
 #include <cstring>
 #include <iostream>
 #include <chrono>
+#include <filesystem>
 #include <network/IHttpRequest.h>
 #include <network/HttpRequest.h>
 #include <network/HttpDownload.h>
 #include <network/NetworkLibrary.h>
 #include <network/HttpSession.h>
+#include <network/HttpStringBody.h>
 #include <network/NetworkException.h>
 #include <posix/FileSystem.h>
 #include <posix/FileIO.h>
@@ -28,7 +30,6 @@
 using namespace rsp::logging;
 using namespace rsp::network;
 using namespace rsp::utils;
-//using namespace rsp::utils::AnsiEscapeCodes;
 using namespace rsp::posix;
 
 TEST_CASE("Network")
@@ -36,12 +37,15 @@ TEST_CASE("Network")
     TestLogger logger;
 
     HttpRequestOptions opt;
+//    opt.Body = std::make_shared<HttpStringBody>();
     opt.CertCaPath = "webserver/ssl/ca/ca.crt";
     opt.CertPath = "webserver/ssl/certs/SN1234.crt";
     opt.KeyPath = "webserver/ssl/private/SN1234.key";
 
     // Run lighttpd directly from build directory, no need to install it.
-    CHECK_EQ(0, std::system("_deps/lighttpd_src-build/build/lighttpd -f webserver/lighttpd.conf -m _deps/lighttpd_src-build/build"));
+    std::string cwd = std::filesystem::current_path();
+    std::string command = cwd + "/_deps/lighttpd_src-build/build/lighttpd -f " + cwd + "/webserver/lighttpd.conf -m " + cwd + "/_deps/lighttpd_src-build/build";
+    CHECK_EQ(0, std::system(command.c_str()));
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     SUBCASE("Library Version"){
@@ -74,7 +78,7 @@ TEST_CASE("Network")
 
         logger.Info() << "Request:\n" << request << std::endl;
 
-        IHttpResponse *resp = nullptr;
+        IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
         logger.Info() << "Response:\n" << *resp << std::endl;
@@ -112,7 +116,7 @@ TEST_CASE("Network")
 
         request.SetOptions(opt);
 
-        IHttpResponse *resp = nullptr;
+        IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
 //        MESSAGE("Request:\n" << resp->GetRequest());
@@ -139,7 +143,7 @@ TEST_CASE("Network")
         IHttpResponse *resp = nullptr;
 
         SUBCASE("To Memory") {
-            FileSystem::DeleteFile(std::string(cFile));
+            FileSystem::DeleteFile(cFile);
             request.SetFileName("");
 
             CHECK_NOTHROW(resp = &request.Execute());
@@ -150,7 +154,7 @@ TEST_CASE("Network")
         }
 
         SUBCASE("To File") {
-            FileSystem::DeleteFile(std::string(cFile));
+            FileSystem::DeleteFile(cFile);
 
             CHECK_NOTHROW(resp = &request.Execute());
 
@@ -230,7 +234,7 @@ TEST_CASE("Network")
         HttpRequest request;
         request.SetOptions(opt);
 
-        IHttpResponse *resp = nullptr;
+        IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
 //        MESSAGE(resp->GetBody());
@@ -264,7 +268,7 @@ TEST_CASE("Network")
         request.AddField("filename", "uploaded.png");
         request.AddFile("filedata", file);
 
-        IHttpResponse *resp = nullptr;
+        IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
         auto body = resp->GetBody();
@@ -291,6 +295,57 @@ TEST_CASE("Network")
         CHECK_EQ(std::memcmp(source.data(), s2.data(), source.size()), 0);
 
         FileSystem::DeleteFile(std::string(cUploadedFile));
+    }
+
+    SUBCASE("Body Stream") {
+        HttpStringBody body(R"(
+              O freddled gruntbuggly thy micturations are to me
+                 As plured gabbleblochits on a lurgid bee.
+              Groop, I implore thee my foonting turlingdromes.
+           And hooptiously drangle me with crinkly bindlewurdles,
+Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
+)");
+
+//        MESSAGE(body.GetString(100));
+        CHECK_EQ(body.GetString(100), body.Get().substr(0, 97) + "...");
+
+        char buffer[51];
+        size_t written;
+        size_t chunk_index = 0;
+        bool eof = false;
+        while (!eof) {
+            eof = body.GetChunk(buffer, sizeof(buffer) - 1, written, chunk_index);
+            buffer[written] = '\0';
+//            MESSAGE("\nChunk:   " << buffer << "\nwritten: " << written << "\nindex:   " << chunk_index);
+        }
+        CHECK_EQ(written, 33);
+        CHECK_EQ(chunk_index, 333);
+        CHECK_EQ("blurlecruncheon, see if I don't.\n", std::string(buffer));
+    }
+
+    SUBCASE("Post JSON") {
+        opt.BaseUrl = "https://server.localhost:44300/cgi/post.sh";
+        opt.RequestType = HttpRequestType::POST;
+//        opt.Verbose = 1;
+
+        const std::string json(R"({ "name": "temperature", "value": 24.03 })");
+
+        HttpRequest request;
+        request.SetOptions(opt);
+        request.SetBody(std::make_shared<HttpStringBody>(json));
+
+        IHttpResponse *resp;
+        CHECK_NOTHROW(resp = &request.Execute());
+
+        auto body = resp->GetBody();
+//        MESSAGE(body);
+
+        std::string expected = R"(
+Content length: 41
+Request Method: POST
+Body: )" + json + "\n";
+
+        CHECK_EQ(body, expected);
     }
 
     SUBCASE("Http Session") {
