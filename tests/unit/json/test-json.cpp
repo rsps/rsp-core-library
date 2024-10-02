@@ -364,12 +364,13 @@ null }
         CHECK_EQ(ss.str(), "Number");
 
         JsonStream js(pretty);
-        js << Indent(1) << OBegin()
+        js << OBegin()
             << Key("Member1") << 1234 << Comma()
-            << Key("Member2") << Indent(2) << OBegin()
+            << Key("Member2") << OBegin()
                 << Key("NestedMember") << "NestedValue"
-                << Indent(1) << OEnd()
-            << Indent(0) << OEnd();
+                << OEnd()
+            << OEnd();
+        CHECK_EQ(js.Getsize(), (pretty ? 85 : 57));
         CHECK_EQ(js.str(), raw);
     }
 

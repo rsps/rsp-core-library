@@ -18,11 +18,6 @@ namespace rsp::json {
 
 #define QUOTED(a) "\"" #a "\""
 
-struct Indent
-{
-    unsigned mValue;
-    explicit Indent(unsigned aValue) : mValue(aValue) {}
-};
 struct Comma {
     char mValue = ',';
     explicit Comma(char aValue = ',') : mValue(aValue) {}
@@ -53,6 +48,8 @@ public:
      */
     explicit JsonStream(bool aPrettyPrint = false, unsigned aLevel = 0);
 
+    [[nodiscard]] size_t Getsize() const;
+
     bool mPrettyPrint;
     unsigned mRootLevel;
     std::string indentation{};
@@ -60,7 +57,6 @@ public:
     std::string newLine{};
 };
 
-JsonStream& operator<<(JsonStream& o, const Indent &arIndent);
 JsonStream& operator<<(JsonStream& o, const Comma &arComma);
 JsonStream& operator<<(JsonStream& o, const Key &arKey);
 JsonStream& operator<<(JsonStream& o, const OBegin &arObjectBegin);

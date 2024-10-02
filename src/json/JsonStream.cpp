@@ -13,23 +13,22 @@
 
 namespace rsp::json {
 
+const int cIndentSize = 4;
+
 JsonStream::JsonStream(bool aPrettyPrint, unsigned aLevel)
     : mPrettyPrint(aPrettyPrint),
       mRootLevel(aLevel)
 {
     if (mPrettyPrint) {
-        indentation = std::string( (mRootLevel) * 4, ' ');
+        indentation = std::string( (mRootLevel) * cIndentSize, ' ');
         space = " ";
         newLine = "\n";
     }
 }
 
-JsonStream& operator <<(JsonStream &o, const Indent &arIndent)
+size_t JsonStream::Getsize() const
 {
-    if (o.mPrettyPrint) {
-        o.indentation = std::string( (o.mRootLevel + arIndent.mValue) * 4, ' ');
-    }
-    return o;
+    return size_t(view().size());;
 }
 
 JsonStream& operator <<(JsonStream &o, const Comma &arComma)
@@ -46,24 +45,36 @@ JsonStream& operator <<(JsonStream &o, const Key &arKey)
 
 JsonStream& operator <<(JsonStream &o, const OBegin &)
 {
+    if (o.mPrettyPrint) {
+        o.indentation += std::string( cIndentSize, ' ');
+    }
     static_cast<std::ostringstream&>(o) << "{" << o.newLine << o.indentation;
     return o;
 }
 
 JsonStream& operator <<(JsonStream &o, const OEnd &)
 {
+    if (o.mPrettyPrint) {
+        o.indentation.resize(o.indentation.size() - cIndentSize);
+    }
     static_cast<std::ostringstream&>(o) << o.newLine << o.indentation << "}";
     return o;
 }
 
 JsonStream& operator <<(JsonStream &o, const ABegin &)
 {
+    if (o.mPrettyPrint) {
+        o.indentation += std::string( cIndentSize, ' ');
+    }
     static_cast<std::ostringstream&>(o) << "[" << o.newLine << o.indentation;
     return o;
 }
 
 JsonStream& operator <<(JsonStream &o, const AEnd &)
 {
+    if (o.mPrettyPrint) {
+        o.indentation.resize(o.indentation.size() - cIndentSize);
+    }
     static_cast<std::ostringstream&>(o) << o.newLine << o.indentation << "]";
     return o;
 }
