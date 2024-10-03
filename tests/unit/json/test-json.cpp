@@ -340,7 +340,7 @@ null }
 
     SUBCASE("Streaming") {
         bool pretty = false;
-        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"}})";
+        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"},"NullValue":null})";
 
         SUBCASE("Ugly") {
         }
@@ -349,7 +349,8 @@ null }
     "Member1": 1234,
     "Member2": {
         "NestedMember": "NestedValue"
-    }
+    },
+    "NullValue": null
 })";
             pretty = true;
         }
@@ -368,9 +369,10 @@ null }
             << Key("Member1") << 1234 << Comma()
             << Key("Member2") << OBegin()
                 << Key("NestedMember") << "NestedValue"
-                << OEnd()
+            << OEnd() << Comma()
+            << Key("NullValue") << Null()
             << OEnd();
-        CHECK_EQ(js.Getsize(), (pretty ? 85 : 57));
+        CHECK_EQ(js.Getsize(), (pretty ? 108 : 74));
         CHECK_EQ(js.str(), raw);
     }
 

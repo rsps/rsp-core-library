@@ -32,6 +32,7 @@ struct OBegin {};
 struct OEnd {};
 struct ABegin {};
 struct AEnd {};
+struct Null {};
 
 /**
  * \class JsonStream
@@ -65,6 +66,7 @@ JsonStream& operator<<(JsonStream& o, const ABegin &arArrayBegin);
 JsonStream& operator<<(JsonStream& o, const AEnd &arArrayEnd);
 JsonStream& operator<<(JsonStream& o, const std::string &arStr);
 JsonStream& operator<<(JsonStream& o, const char *apStr);
+JsonStream& operator<<(JsonStream& o, const Null &arNull);
 
 template <class T>
 JsonStream& operator<<(JsonStream& o, T v) {

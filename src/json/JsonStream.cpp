@@ -91,6 +91,11 @@ JsonStream& operator<<(JsonStream& o, const char *apStr)
     return o;
 }
 
+JsonStream& operator<<(JsonStream &o, const Null&)
+{
+    static_cast<std::ostringstream&>(o) << "null";
+    return o;
+}
 }
 
  // namespace rsp::json
