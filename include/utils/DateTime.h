@@ -67,6 +67,7 @@ public:
      * \return DateTime object initialized to current time and date.
      */
     static DateTime Now() { return {}; }
+    static DateTime Null() { return DateTime(0); }
 
     /**
      * \brief Default constructor, initializes to current time
