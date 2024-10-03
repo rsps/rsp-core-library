@@ -34,6 +34,19 @@ struct ABegin {};
 struct AEnd {};
 struct Null {};
 
+template <typename T>
+concept HasFuncEmpty =
+      requires(T t) {
+          { t.empty() } -> std::same_as<bool>;
+      };
+
+template <class T> requires HasFuncEmpty<T>
+struct Value
+{
+    T& mrValue;
+    explicit Value(T& arValue) : mrValue(arValue) {}
+};
+
 /**
  * \class JsonStream
  * \brief std::ostringstream derivative to help with formatting data in human readable JSON format

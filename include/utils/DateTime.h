@@ -247,6 +247,11 @@ public:
      */
     [[nodiscard]] Time GetTime() const;
 
+    /**
+     * \brief Check if this deviates from epoch start.
+     * \return True if value is epoch (Null)
+     */
+    [[nodiscard]] bool empty() const { return mTp.time_since_epoch().count() == 0; }
 protected:
     std::chrono::system_clock::time_point mTp{};
 

@@ -32,6 +32,8 @@ TEST_CASE("DateTime")
     SUBCASE("Zero") {
         DateTime dt(0);
         DMESG("DateTime(0) = " << dt)
+        CHECK_EQ(DateTime::Null(), dt);
+        CHECK(dt.empty());
         CHECK_EQ(dt.ToRFC3339Milli(), "1970-01-01T00:00:00.000Z");
 
         std::tm tm = dt;
@@ -48,7 +50,14 @@ TEST_CASE("DateTime")
         SUBCASE("Now") {
             DateTime dt1;
             DateTime dt2(std::chrono::system_clock::now());
+            CHECK_FALSE(dt1.empty());
+            CHECK_FALSE(dt2.empty());
             CHECK_EQ(dt1.MilliSecondsBetween(dt2), 0); // Test shows difference is way less than 1 microsecond on workstation
+        }
+        SUBCASE("Null") {
+            DateTime dt1(0);
+            DateTime dt2 = DateTime::Null();
+            CHECK_EQ(dt1.MicroSecondsBetween(dt2), 0);
         }
         SUBCASE("From values") {
             DateTime dt(2022, 11, 8, 15, 43, 23, 813);
