@@ -11,8 +11,9 @@
 #ifndef RSP_CORE_LIB_JSON_JSON_STREAM_H
 #define RSP_CORE_LIB_JSON_JSON_STREAM_H
 
-#include <string>
 #include <sstream>
+#include <string>
+#include <string_view>
 #include <utils/Variant.h>
 
 namespace rsp::json {
@@ -34,6 +35,13 @@ struct OEnd {};
 struct ABegin {};
 struct AEnd {};
 struct Null {};
+
+struct Raw
+{
+    std::string_view mJson;
+    explicit Raw(const std::string &arJson) : mJson(arJson) {}
+    explicit Raw(std::string_view aJson) : mJson(aJson) {}
+};
 
 template <class T>
 struct Value
@@ -73,9 +81,11 @@ JsonStream& operator<<(JsonStream& o, const OEnd &arObjectEnd);
 JsonStream& operator<<(JsonStream& o, const ABegin &arArrayBegin);
 JsonStream& operator<<(JsonStream& o, const AEnd &arArrayEnd);
 JsonStream& operator<<(JsonStream& o, const std::string &arStr);
+JsonStream& operator<<(JsonStream& o, const std::string_view &arStr);
 JsonStream& operator<<(JsonStream& o, const char *apStr);
 JsonStream& operator<<(JsonStream& o, const Null &arNull);
 JsonStream& operator<<(JsonStream& o, const rsp::utils::Variant &arValue);
+JsonStream& operator<<(JsonStream& o, const Raw &arJson);
 
 template <class T>
 JsonStream& operator<<(JsonStream& o, const Value<T>& v) {

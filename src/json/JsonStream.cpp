@@ -85,6 +85,12 @@ JsonStream& operator <<(JsonStream &o, const std::string &arStr)
     return o;
 }
 
+JsonStream& operator<<(JsonStream& o, const std::string_view& arStr)
+{
+    static_cast<std::ostringstream&>(o) << "\"" << arStr << "\"";
+    return o;
+}
+
 JsonStream& operator<<(JsonStream& o, const char *apStr)
 {
     static_cast<std::ostringstream&>(o) << "\"" << apStr << "\"";
@@ -94,6 +100,12 @@ JsonStream& operator<<(JsonStream& o, const char *apStr)
 JsonStream& operator<<(JsonStream &o, const Null&)
 {
     static_cast<std::ostringstream&>(o) << "null";
+    return o;
+}
+
+JsonStream& operator<<(JsonStream& o, const Raw& arJson)
+{
+    static_cast<std::ostringstream&>(o) << arJson.mJson;
     return o;
 }
 
