@@ -28,7 +28,7 @@ JsonStream::JsonStream(bool aPrettyPrint, unsigned aLevel)
 
 size_t JsonStream::Getsize() const
 {
-    return size_t(view().size());;
+    return size_t(view().size());
 }
 
 JsonStream& operator <<(JsonStream &o, const Comma &arComma)
@@ -96,6 +96,42 @@ JsonStream& operator<<(JsonStream &o, const Null&)
     static_cast<std::ostringstream&>(o) << "null";
     return o;
 }
+
+JsonStream& operator<<(JsonStream& o, const utils::Variant& arValue)
+{
+    using namespace rsp::utils;
+    switch (arValue.GetType()) {
+        case Variant::Types::Null:
+            o << Null();
+            break;
+        case Variant::Types::Bool:
+            o << arValue.AsBool();
+            break;
+        case Variant::Types::Int:
+        case Variant::Types::Int64:
+            o << arValue.AsInt();
+            break;
+        case Variant::Types::Uint64:
+        case Variant::Types::Uint32:
+        case Variant::Types::Uint16:
+            o << uint64_t(arValue);
+            break;
+        case Variant::Types::Float:
+            o << arValue.AsFloat();
+            break;
+        case Variant::Types::Double:
+            o << arValue.AsDouble();
+            break;
+        case Variant::Types::Pointer:
+            o << static_cast<void*>(arValue);
+            break;
+        case Variant::Types::String:
+        case Variant::Types::Object:
+        case Variant::Types::Array:
+            o << arValue.AsString();
+            break;
+    }
+    return o;
 }
 
- // namespace rsp::json
+} // namespace rsp::json

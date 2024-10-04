@@ -10,12 +10,12 @@
 
 #include <json/Json.h>
 #include <json/JsonDecoder.h>
-
 #include "doctest.h"
 #include <iostream>
 #include <utils/StrUtils.h>
 #include <utils/InRange.h>
 #include <TestHelpers.h>
+#include <optional>
 
 using namespace rsp::utils;
 using namespace rsp::json;
@@ -340,7 +340,7 @@ null }
 
     SUBCASE("Streaming") {
         bool pretty = false;
-        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"},"NullValue":null})";
+        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"},"NullValue":null,"Optional":null})";
 
         SUBCASE("Ugly") {
         }
@@ -350,7 +350,8 @@ null }
     "Member2": {
         "NestedMember": "NestedValue"
     },
-    "NullValue": null
+    "NullValue": null,
+    "Optional": null
 })";
             pretty = true;
         }
@@ -364,15 +365,21 @@ null }
         ss << Json::Types::Number;
         CHECK_EQ(ss.str(), "Number");
 
+        std::string empty_string; // = "not empty";
+        Variant number(1234);
+        std::string not_empty_string("NestedValue");
+        std::optional<double> opt;
+
         JsonStream js(pretty);
         js << OBegin()
-            << Key("Member1") << 1234 << Comma()
+            << Key("Member1") << number << Comma()
             << Key("Member2") << OBegin()
-                << Key("NestedMember") << "NestedValue"
+                << Key("NestedMember") << Value(not_empty_string)
             << OEnd() << Comma()
-            << Key("NullValue") << Null()
+            << Key("NullValue") << Value(empty_string) << Comma()
+            << Key("Optional") << Value(opt)
             << OEnd();
-        CHECK_EQ(js.Getsize(), (pretty ? 108 : 74));
+        CHECK_EQ(js.Getsize(), raw.size());
         CHECK_EQ(js.str(), raw);
     }
 

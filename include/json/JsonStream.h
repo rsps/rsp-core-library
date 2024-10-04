@@ -13,6 +13,7 @@
 
 #include <string>
 #include <sstream>
+#include <utils/Variant.h>
 
 namespace rsp::json {
 
@@ -34,13 +35,7 @@ struct ABegin {};
 struct AEnd {};
 struct Null {};
 
-template <typename T>
-concept HasFuncEmpty =
-      requires(T t) {
-          { t.empty() } -> std::same_as<bool>;
-      };
-
-template <class T> requires HasFuncEmpty<T>
+template <class T>
 struct Value
 {
     T& mrValue;
@@ -80,9 +75,32 @@ JsonStream& operator<<(JsonStream& o, const AEnd &arArrayEnd);
 JsonStream& operator<<(JsonStream& o, const std::string &arStr);
 JsonStream& operator<<(JsonStream& o, const char *apStr);
 JsonStream& operator<<(JsonStream& o, const Null &arNull);
+JsonStream& operator<<(JsonStream& o, const rsp::utils::Variant &arValue);
 
 template <class T>
-JsonStream& operator<<(JsonStream& o, T v) {
+JsonStream& operator<<(JsonStream& o, const Value<T>& v) {
+    if constexpr (requires { v.mrValue.empty(); }) {
+        if (v.mrValue.empty()) {
+            o << Null();
+        }
+        else {
+            o << v.mrValue;
+        }
+    }
+    else if constexpr (requires { v.mrValue.has_value(); }) {
+        if (v.mrValue.has_value()) {
+            o << v.mrValue.value();
+        }
+        else {
+            o << Null();
+        }
+    }
+
+    return o;
+}
+
+template <class T>
+JsonStream& operator<<(JsonStream& o, const T& v) {
     static_cast<std::ostringstream&>(o) << v;
     return o;
 }
