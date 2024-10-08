@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 namespace rsp::utils {
 
@@ -37,6 +38,14 @@ public:
         return *this;
     }
 
+    template <class T>
+    StreamStorage& operator<<(const std::vector<T>& arValue) {
+        auto sz = uint32_t(arValue.size());
+        mpOut->write( reinterpret_cast<char*>(&sz), sizeof(sz));
+        mpOut->write(arValue.data(), sz * sizeof(T));
+        return *this;
+    }
+
 
     template< class T>
     StreamStorage& operator>>(T& arValue) {
@@ -49,6 +58,15 @@ public:
         mpIn->read(reinterpret_cast<char*>(&sz), sizeof(sz));
         arValue.resize(size_t(sz));
         mpIn->read(arValue.data(), sz);
+        return *this;
+    }
+
+    template <class T>
+    StreamStorage& operator>>(const std::vector<T>& arValue) {
+        uint32_t sz;
+        mpIn->read(reinterpret_cast<char*>(&sz), sizeof(sz));
+        arValue.resize(size_t(sz));
+        mpIn->read(arValue.data(), sz * sizeof(T));
         return *this;
     }
 
