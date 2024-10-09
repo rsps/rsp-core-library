@@ -28,7 +28,7 @@ struct BinaryStorage
 /**
  * \brief Streaming operators for store/retrieve binary data to/from streams
  */
-template< class T> requires(std::is_arithmetic_v<T> || std::is_enum_v<T>)
+template< class T> // requires(std::is_arithmetic_v<T> || std::is_enum_v<T>)
 BinaryStorage& operator>>(BinaryStorage &i, T& arValue) {
     i.mpIn->read(reinterpret_cast<char*>(&arValue), sizeof(T));
     return i;
@@ -75,7 +75,7 @@ BinaryStorage& operator>>(BinaryStorage &i, ContainerT<ValueT, TraitsT, Allocato
 
 
 
-template<class T> requires(std::is_arithmetic_v<T> || std::is_enum_v<T>)
+template<class T>//requires(std::is_arithmetic_v<T> || std::is_enum_v<T>)
 BinaryStorage& operator<<(BinaryStorage &o, const T& arValue)
 {
     o.mpOut->write(reinterpret_cast<const char *>(&arValue), sizeof(T));

@@ -12,8 +12,16 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <utils/DateTime.h>
 
 using namespace rsp::utils;
+
+enum class EType : uint8_t {
+    NONE,
+    ONE,
+    TWO
+};
+
 
 TEST_CASE("BinaryStorage") {
 
@@ -41,19 +49,24 @@ TEST_CASE("BinaryStorage") {
 
     SUBCASE("IO") {
         std::vector<int> v{13, 423, 42, 76, -90};
+        auto now = DateTime::Now();
         std::stringstream ss;
         BinaryStorage bs(ss);
-        bs << v;
+        bs << v << EType::ONE << now;
 
         ss.seekg(0);
 
         std::vector<int> r;
-        bs >> r;
+        DateTime dt;
+        EType e;
+        bs >> r >> e >> dt;
 
         CHECK_EQ(v.size(), r.size());
         size_t index = 0;
         for (auto &i : v) {
             CHECK_EQ(i, r.at(index++));
         }
+        CHECK_EQ(e, EType::ONE);
+        CHECK_EQ(dt, now);
     }
 }
