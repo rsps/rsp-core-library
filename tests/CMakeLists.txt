@@ -9,17 +9,18 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(DocTest)
 
-FetchContent_Declare(
-    lighttpd_src
+# Include external project lighttpd from github.
+# Uses verbose FetchContent_Populate mode to avoid deprecation warning.
+# This is build using custom target for use during local unit tests
+FetchContent_Populate(lighttpd_src
+    QUIET
     GIT_REPOSITORY "https://github.com/lighttpd/lighttpd1.4"
     GIT_TAG "lighttpd-1.4.75"
+    BUILD_COMMAND ""
+    SOURCE_DIR ${FETCHCONTENT_BASE_DIR}/lighttpd_src-src
+    BINARY_DIR ${FETCHCONTENT_BASE_DIR}/lighttpd_src-build
+    SUBBUILD_DIR ${FETCHCONTENT_BASE_DIR}/lighttpd_src-subbuild
 )
-
-FetchContent_GetProperties(lighttpd_src)
-if(NOT lighttpd_POPULATED)
-    FetchContent_Populate(lighttpd_src)
-endif()
-
 add_custom_target(lighttpd
     COMMENT "Building lighttpd..."
     BYPRODUCTS ${lighttpd_src_BINARY_DIR}/build/lighttpd
