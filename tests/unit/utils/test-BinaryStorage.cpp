@@ -8,34 +8,52 @@
 * \author      steffen
 */
 #include <doctest.h>
-#include <utils/StreamStorage.h>
+#include <utils/BinaryStorage.h>
 #include <fstream>
+#include <sstream>
+#include <vector>
 
 using namespace rsp::utils;
 
-TEST_CASE("StreamStorage") {
+TEST_CASE("BinaryStorage") {
 
     const std::string cFileName("storage-file.dat");
 
     SUBCASE("Write") {
         std::ofstream o_file(cFileName, std::ios::binary);
-        StreamStorage ss(o_file);
-        ss << std::string("This is a string.") << uint16_t(46222) << true << false;
+        BinaryStorage ss(o_file);
+        CHECK_NOTHROW(ss << std::string("This is a string.") << uint16_t(46222) << true << false);
     }
 
     SUBCASE("Read") {
         std::ifstream i_file(cFileName, std::ios::binary);
-        StreamStorage ss(i_file);
+        BinaryStorage ss(i_file);
         std::string s1;
         uint16_t u32;
         bool b1;
         bool b2;
-        ss >> s1 >> u32 >> b1 >> b2;
+        CHECK_NOTHROW(ss >> s1 >> u32 >> b1 >> b2);
         CHECK_EQ(s1, std::string("This is a string."));
         CHECK_EQ(u32, uint16_t(46222));
         CHECK(b1);
         CHECK_FALSE(b2);
     }
 
+    SUBCASE("IO") {
+        std::vector<int> v{13, 423, 42, 76, -90};
+        std::stringstream ss;
+        BinaryStorage bs(ss);
+        bs << v;
 
+        ss.seekg(0);
+
+        std::vector<int> r;
+        bs >> r;
+
+        CHECK_EQ(v.size(), r.size());
+        size_t index = 0;
+        for (auto &i : v) {
+            CHECK_EQ(i, r.at(index++));
+        }
+    }
 }
