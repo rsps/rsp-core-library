@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <type_traits>
+#include <cassert>
 
 namespace rsp::utils {
 
@@ -25,85 +26,62 @@ struct BinaryStorage
     std::ostream *mpOut = nullptr;
 };
 
+template <typename T>
+concept HasSize =
+requires(T t) {
+    { t.size() } -> std::same_as<size_t>;
+};
+
+template<typename T>
+concept HasResize = requires {
+    typename T::size_type;
+    { std::declval<T>().resize(std::declval<typename T::size_type>()) } -> std::same_as<void>;
+};
+
+
 /**
  * \brief Streaming operators for store/retrieve binary data to/from streams
  */
-template< class T> // requires(std::is_arithmetic_v<T> || std::is_enum_v<T>)
+template< class T> requires (!HasResize<T>) // For integrals without resize() function
 BinaryStorage& operator>>(BinaryStorage &i, T& arValue) {
-    i.mpIn->read(reinterpret_cast<char*>(&arValue), sizeof(T));
+    if (i.mpIn) {
+        i.mpIn->read(reinterpret_cast<char *>(&arValue), sizeof(T));
+    }
     return i;
 }
 
-// For string like types
 template <template <typename> class ContainerT,
-        typename ValueT>
+        typename ValueT> requires (HasResize<ContainerT<ValueT> >) // For containers with resize() function
 BinaryStorage& operator>>(BinaryStorage &i, ContainerT<ValueT>& arContainer)
 {
-    uint32_t sz;
-    i.mpIn->read(reinterpret_cast<char *>(&sz), sizeof(sz));
-    arContainer.resize(size_t(sz));
-    i.mpIn->read(reinterpret_cast<char *>(arContainer.data()), sz * sizeof(ValueT));
-    return i;
-}
-
-// For vector like types
-template <template <typename, typename> class ContainerT,
-        typename ValueT,
-        typename AllocatorT>
-BinaryStorage& operator>>(BinaryStorage &i, ContainerT<ValueT, AllocatorT>& arContainer)
-{
-    uint32_t sz;
-    i.mpIn->read(reinterpret_cast<char *>(&sz), sizeof(sz));
-    arContainer.resize(size_t(sz));
-    i.mpIn->read(reinterpret_cast<char *>(arContainer.data()), sz * sizeof(ValueT));
-    return i;
-}
-
-// For basic_string like types
-template <template <typename, typename, typename> class ContainerT,
-        typename ValueT,
-        typename TraitsT,
-        typename AllocatorT>
-BinaryStorage& operator>>(BinaryStorage &i, ContainerT<ValueT, TraitsT, AllocatorT>& arContainer)
-{
-    uint32_t sz;
-    i.mpIn->read(reinterpret_cast<char *>(&sz), sizeof(sz));
-    arContainer.resize(size_t(sz));
-    i.mpIn->read(reinterpret_cast<char *>(arContainer.data()), sz * sizeof(ValueT));
+    if (i.mpIn) {
+        uint32_t sz;
+        i.mpIn->read(reinterpret_cast<char *>(&sz), sizeof(sz));
+        arContainer.resize(size_t(sz));
+        i.mpIn->read(reinterpret_cast<char *>(arContainer.data()), sz * sizeof(ValueT));
+    }
     return i;
 }
 
 
-
-template<class T>//requires(std::is_arithmetic_v<T> || std::is_enum_v<T>)
+template<class T> requires (!HasSize<T>) // For integrals without size() function
 BinaryStorage& operator<<(BinaryStorage &o, const T& arValue)
 {
-    o.mpOut->write(reinterpret_cast<const char *>(&arValue), sizeof(T));
+    if (o.mpOut) {
+        o.mpOut->write(reinterpret_cast<const char *>(&arValue), sizeof(T));
+    }
     return o;
 }
 
-// For vector like types
-template <template <typename, typename> class ContainerT,
-          typename ValueT,
-          typename AllocatorT>
-BinaryStorage& operator<<(BinaryStorage &o, const ContainerT<ValueT, AllocatorT>& arContainer)
+template <template <typename> class ContainerT,
+      typename ValueT> requires (HasSize<ContainerT<ValueT> >) // For containers with size() function
+BinaryStorage& operator<<(BinaryStorage &o, const ContainerT<ValueT>& arContainer)
 {
-    auto sz = uint32_t(arContainer.size());
-    o.mpOut->write(reinterpret_cast<const char *>(&sz), sizeof(sz));
-    o.mpOut->write(reinterpret_cast<const char *>(arContainer.data()), sz * sizeof(ValueT));
-    return o;
-}
-
-// For string like types
-template <template <typename, typename, typename> class ContainerT,
-        typename ValueT,
-        typename TraitsT,
-        typename AllocatorT>
-BinaryStorage& operator<<(BinaryStorage &o, const ContainerT<ValueT, TraitsT, AllocatorT>& arContainer)
-{
-    auto sz = uint32_t(arContainer.size());
-    o.mpOut->write(reinterpret_cast<const char *>(&sz), sizeof(sz));
-    o.mpOut->write(reinterpret_cast<const char *>(arContainer.data()), sz * sizeof(ValueT));
+    if (o.mpOut) {
+        auto sz = uint32_t(arContainer.size());
+        o.mpOut->write(reinterpret_cast<const char *>(&sz), sizeof(sz));
+        o.mpOut->write(reinterpret_cast<const char *>(arContainer.data()), sz * sizeof(ValueT));
+    }
     return o;
 }
 

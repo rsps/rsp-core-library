@@ -30,19 +30,20 @@ TEST_CASE("BinaryStorage") {
     SUBCASE("Write") {
         std::ofstream o_file(cFileName, std::ios::binary);
         BinaryStorage ss(o_file);
-        CHECK_NOTHROW(ss << std::string("This is a string.") << uint16_t(46222) << true << false);
+        std::string s1("This is a string.");
+        CHECK_NOTHROW(ss << s1 << uint16_t(46222) << true << false);
     }
 
     SUBCASE("Read") {
         std::ifstream i_file(cFileName, std::ios::binary);
         BinaryStorage ss(i_file);
         std::string s1;
-        uint16_t u32;
+        uint16_t u16;
         bool b1;
         bool b2;
-        CHECK_NOTHROW(ss >> s1 >> u32 >> b1 >> b2);
+        CHECK_NOTHROW(ss >> s1 >> u16 >> b1 >> b2);
         CHECK_EQ(s1, std::string("This is a string."));
-        CHECK_EQ(u32, uint16_t(46222));
+        CHECK_EQ(u16, uint16_t(46222));
         CHECK(b1);
         CHECK_FALSE(b2);
     }
@@ -50,16 +51,18 @@ TEST_CASE("BinaryStorage") {
     SUBCASE("IO") {
         std::vector<int> v{13, 423, 42, 76, -90};
         auto now = DateTime::Now();
+        auto duration = std::chrono::milliseconds(113);
         std::stringstream ss;
         BinaryStorage bs(ss);
-        bs << v << EType::ONE << now;
+        bs << v << EType::ONE << now << duration;
 
         ss.seekg(0);
 
         std::vector<int> r;
         DateTime dt;
         EType e;
-        bs >> r >> e >> dt;
+        std::chrono::milliseconds ms;
+        bs >> r >> e >> dt >> ms;
 
         CHECK_EQ(v.size(), r.size());
         size_t index = 0;
@@ -68,5 +71,6 @@ TEST_CASE("BinaryStorage") {
         }
         CHECK_EQ(e, EType::ONE);
         CHECK_EQ(dt, now);
+        CHECK_EQ(ms.count(), 113);
     }
 }
