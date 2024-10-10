@@ -8,11 +8,12 @@
 * \author      steffen
 */
 #include <doctest.h>
-#include <utils/BinaryStorage.h>
+#include <utils/BinaryStream.h>
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <utils/DateTime.h>
+#include <utils/HexStream.h>
 
 using namespace rsp::utils;
 
@@ -23,46 +24,49 @@ enum class EType : uint8_t {
 };
 
 
-TEST_CASE("BinaryStorage") {
+TEST_CASE("BinaryStream") {
 
     const std::string cFileName("storage-file.dat");
 
     SUBCASE("Write") {
         std::ofstream o_file(cFileName, std::ios::binary);
-        BinaryStorage ss(o_file);
+        BinaryStream ss(o_file);
         std::string s1("This is a string.");
-        CHECK_NOTHROW(ss << s1 << uint16_t(46222) << true << false);
+        std::string s2(128, 'A');
+        CHECK_NOTHROW(ss << s1 << uint16_t(46222) << true << false << s2);
     }
 
     SUBCASE("Read") {
-        std::ifstream i_file(cFileName, std::ios::binary);
-        BinaryStorage ss(i_file);
+        BinaryFileStream ss(cFileName, std::ios::in);
         std::string s1;
+        std::string s2;
         uint16_t u16;
         bool b1;
         bool b2;
-        CHECK_NOTHROW(ss >> s1 >> u16 >> b1 >> b2);
+        CHECK_NOTHROW(ss >> s1 >> u16 >> b1 >> b2 >> s2);
         CHECK_EQ(s1, std::string("This is a string."));
         CHECK_EQ(u16, uint16_t(46222));
         CHECK(b1);
         CHECK_FALSE(b2);
+        CHECK_EQ(s2.size(), 128);
     }
 
     SUBCASE("IO") {
         std::vector<int> v{13, 423, 42, 76, -90};
         auto now = DateTime::Now();
         auto duration = std::chrono::milliseconds(113);
-        std::stringstream ss;
-        BinaryStorage bs(ss);
-        bs << v << EType::ONE << now << duration;
+        std::string s1(256, 'A');
+        BinaryStringStream bs;
+        bs << v << EType::ONE << now << duration << s1;
 
-        ss.seekg(0);
+        bs.Reset();
 
         std::vector<int> r;
         DateTime dt;
         EType e;
         std::chrono::milliseconds ms;
-        bs >> r >> e >> dt >> ms;
+        std::string s2;
+        bs >> r >> e >> dt >> ms >> s2;
 
         CHECK_EQ(v.size(), r.size());
         size_t index = 0;
@@ -72,5 +76,7 @@ TEST_CASE("BinaryStorage") {
         CHECK_EQ(e, EType::ONE);
         CHECK_EQ(dt, now);
         CHECK_EQ(ms.count(), 113);
+        CHECK_EQ(s1, s2);
+        CHECK_EQ(bs.Get().str().size(), 304);
     }
 }
