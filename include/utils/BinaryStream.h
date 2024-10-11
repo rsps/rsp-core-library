@@ -95,7 +95,7 @@ BinaryStream& operator>>(BinaryStream &i, T& arValue)
 }
 
 template<>
-BinaryStream& operator>>(BinaryStream &i, size_t& arValue)
+inline BinaryStream& operator>><size_t>(BinaryStream &i, size_t& arValue)
 {
     arValue = i.ReadSize<size_t>();
     return i;
@@ -130,7 +130,7 @@ BinaryStream& operator<<(BinaryStream &o, const T& arValue)
 }
 
 template<>
-BinaryStream& operator<<(BinaryStream &o, const size_t& arValue)
+inline BinaryStream& operator<<<size_t>(BinaryStream &o, const size_t& arValue)
 {
     o.WriteSize(arValue);
     return o;
