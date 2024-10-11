@@ -32,7 +32,8 @@ TEST_CASE("BinaryStream") {
         BinaryStream ss(o_file);
         std::string s1("This is a string.");
         std::string s2(128, 'A');
-        CHECK_NOTHROW(ss << s1 << uint16_t(46222) << true << false << s2);
+        size_t sz = 46922;
+        CHECK_NOTHROW(ss << s1 << uint16_t(46222) << true << false << s2 << sz);
     }
 
     SUBCASE("Read") {
@@ -42,12 +43,14 @@ TEST_CASE("BinaryStream") {
         uint16_t u16;
         bool b1;
         bool b2;
-        CHECK_NOTHROW(ss >> s1 >> u16 >> b1 >> b2 >> s2);
+        size_t sz;
+        CHECK_NOTHROW(ss >> s1 >> u16 >> b1 >> b2 >> s2 >> sz);
         CHECK_EQ(s1, std::string("This is a string."));
         CHECK_EQ(u16, uint16_t(46222));
         CHECK(b1);
         CHECK_FALSE(b2);
         CHECK_EQ(s2.size(), 128);
+        CHECK_EQ(sz, 46922);
     }
 
     SUBCASE("IO") {

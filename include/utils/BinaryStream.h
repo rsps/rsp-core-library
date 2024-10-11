@@ -32,6 +32,41 @@ struct BinaryStream
 
     std::streambuf *mpStreamBuf = nullptr;
 
+    template <class T>
+    void WriteSize(T sz)
+    {
+        uint8_t bytes[10];
+        std::streamsize index = 0;
+        if (sz) {
+            while (sz) {
+                bytes[index++] = (sz & 0x7F) | (sz > 0x7F ? 0x80 : 0);
+                sz >>= 7;
+            }
+        }
+        else {
+            bytes[0] = 0;
+            index = 1;
+        }
+        mpStreamBuf->sputn(reinterpret_cast<const char *>(bytes), index);
+    }
+
+    template <class T>
+    T ReadSize()
+    {
+        T sz = 0;
+        uint8_t byte;
+        size_t index = 0;
+        size_t bits = 0;
+        do {
+            mpStreamBuf->sgetn(reinterpret_cast<char *>(&byte), 1);
+            sz += static_cast<T>((byte & 0x7F) << bits);
+            bits += 7;
+            index++;
+        }
+        while((byte & 0x80) && (index < sizeof(sz)));
+        return sz;
+    }
+
 protected:
     BinaryStream() = default;
 };
@@ -53,8 +88,16 @@ concept HasResize = requires {
  * \brief Streaming operators for store/retrieve binary data to/from streams
  */
 template< class T> requires (!HasResize<T>) // && !std::is_integral_v<T>) // For values without resize() function
-BinaryStream& operator>>(BinaryStream &i, T& arValue) {
+BinaryStream& operator>>(BinaryStream &i, T& arValue)
+{
     i.mpStreamBuf->sgetn(reinterpret_cast<char *>(&arValue), sizeof(T));
+    return i;
+}
+
+template<>
+BinaryStream& operator>>(BinaryStream &i, size_t& arValue)
+{
+    arValue = i.ReadSize<size_t>();
     return i;
 }
 
@@ -62,17 +105,18 @@ template <template <typename> class ContainerT,
         typename ValueT> requires (HasResize<ContainerT<ValueT> >) // For containers with resize() function
 BinaryStream& operator>>(BinaryStream &i, ContainerT<ValueT>& arContainer)
 {
-    decltype(arContainer.size()) sz = 0;
-    uint8_t byte;
-    size_t index = 0;
-    size_t bits = 0;
-    do {
-        i.mpStreamBuf->sgetn(reinterpret_cast<char *>(&byte), 1);
-        sz += static_cast<decltype(arContainer.size())>((byte & 0x7F) << bits);
-        bits += 7;
-        index++;
-    }
-    while((byte & 0x80) && (index < sizeof(sz)));
+    using size_type = decltype(arContainer.size());
+    auto sz = i.ReadSize<size_type>();
+//    uint8_t byte;
+//    size_t index = 0;
+//    size_t bits = 0;
+//    do {
+//        i.mpStreamBuf->sgetn(reinterpret_cast<char *>(&byte), 1);
+//        sz += static_cast<decltype(arContainer.size())>((byte & 0x7F) << bits);
+//        bits += 7;
+//        index++;
+//    }
+//    while((byte & 0x80) && (index < sizeof(sz)));
     arContainer.resize(size_t(sz));
     i.mpStreamBuf->sgetn(reinterpret_cast<char *>(arContainer.data()), std::streamsize(sz * sizeof(ValueT)));
     return i;
@@ -85,24 +129,32 @@ BinaryStream& operator<<(BinaryStream &o, const T& arValue)
     return o;
 }
 
+template<>
+BinaryStream& operator<<(BinaryStream &o, const size_t& arValue)
+{
+    o.WriteSize(arValue);
+    return o;
+}
+
 template <template <typename> class ContainerT,
       typename ValueT> requires (HasSize<ContainerT<ValueT> >) // For containers with size() function
 BinaryStream& operator<<(BinaryStream &o, const ContainerT<ValueT>& arContainer)
 {
-    auto sz = arContainer.size();
-    uint8_t bytes[10];
-    std::streamsize index = 0;
-    if (sz) {
-        while (sz) {
-            bytes[index++] = (sz & 0x7F) | (sz > 0x7F ? 0x80 : 0);
-            sz >>= 7;
-        }
-    }
-    else {
-        bytes[0] = 0;
-        index = 1;
-    }
-    o.mpStreamBuf->sputn(reinterpret_cast<const char *>(bytes), index);
+    o.WriteSize(arContainer.size());
+//    auto sz = arContainer.size();
+//    uint8_t bytes[10];
+//    std::streamsize index = 0;
+//    if (sz) {
+//        while (sz) {
+//            bytes[index++] = (sz & 0x7F) | (sz > 0x7F ? 0x80 : 0);
+//            sz >>= 7;
+//        }
+//    }
+//    else {
+//        bytes[0] = 0;
+//        index = 1;
+//    }
+//    o.mpStreamBuf->sputn(reinterpret_cast<const char *>(bytes), index);
     o.mpStreamBuf->sputn(reinterpret_cast<const char *>(arContainer.data()), std::streamsize(arContainer.size() * sizeof(ValueT)));
     return o;
 }
