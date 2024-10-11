@@ -10,7 +10,6 @@
 #include <doctest.h>
 #include <utils/BinaryStream.h>
 #include <fstream>
-#include <sstream>
 #include <vector>
 #include <utils/DateTime.h>
 #include <utils/HexStream.h>
@@ -56,8 +55,9 @@ TEST_CASE("BinaryStream") {
         auto now = DateTime::Now();
         auto duration = std::chrono::milliseconds(113);
         std::string s1(256, 'A');
+        std::string empty;
         BinaryStringStream bs;
-        bs << v << EType::ONE << now << duration << s1;
+        bs << v << EType::ONE << now << duration << empty << s1;
 
         bs.Reset();
 
@@ -65,8 +65,8 @@ TEST_CASE("BinaryStream") {
         DateTime dt;
         EType e;
         std::chrono::milliseconds ms;
-        std::string s2;
-        bs >> r >> e >> dt >> ms >> s2;
+        std::string s2, empty2;
+        bs >> r >> e >> dt >> ms >> empty2 >> s2;
 
         CHECK_EQ(v.size(), r.size());
         size_t index = 0;
@@ -77,6 +77,6 @@ TEST_CASE("BinaryStream") {
         CHECK_EQ(dt, now);
         CHECK_EQ(ms.count(), 113);
         CHECK_EQ(s1, s2);
-        CHECK_EQ(bs.Get().str().size(), 304);
+        CHECK_EQ(bs.Get().str().size(), 305);
     }
 }

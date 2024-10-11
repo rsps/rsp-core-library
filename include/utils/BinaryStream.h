@@ -92,9 +92,15 @@ BinaryStream& operator<<(BinaryStream &o, const ContainerT<ValueT>& arContainer)
     auto sz = arContainer.size();
     uint8_t bytes[10];
     std::streamsize index = 0;
-    while (sz) {
-        bytes[index++] = (sz & 0x7F) | (sz > 0x7F ? 0x80 : 0);
-        sz >>= 7;
+    if (sz) {
+        while (sz) {
+            bytes[index++] = (sz & 0x7F) | (sz > 0x7F ? 0x80 : 0);
+            sz >>= 7;
+        }
+    }
+    else {
+        bytes[0] = 0;
+        index = 1;
     }
     o.mpStreamBuf->sputn(reinterpret_cast<const char *>(bytes), index);
     o.mpStreamBuf->sputn(reinterpret_cast<const char *>(arContainer.data()), std::streamsize(arContainer.size() * sizeof(ValueT)));
