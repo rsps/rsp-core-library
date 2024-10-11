@@ -14,6 +14,7 @@
 #include <sstream>
 #include <type_traits>
 #include <bit>
+#include <cstdint>
 
 namespace rsp::utils {
 
@@ -105,6 +106,7 @@ class BinaryFileStream : public BinaryStream
 public:
     explicit BinaryFileStream(const std::string &arFilename, std::ios::openmode aMode)
     {
+        mFile.exceptions(std::fstream::failbit | std::fstream::badbit | std::fstream::eofbit);
         mFile.open(arFilename, std::ios::binary | aMode);
         mpStreamBuf = mFile.rdbuf();
     }
