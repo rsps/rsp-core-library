@@ -12,6 +12,7 @@
 #define RSP_CORE_LIB_UTILS_HEX_STREAM_H
 
 #include <ostream>
+#include <cstdint>
 
 namespace rsp::utils {
 

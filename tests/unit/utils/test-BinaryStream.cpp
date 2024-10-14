@@ -13,6 +13,7 @@
 #include <vector>
 #include <utils/DateTime.h>
 #include <utils/HexStream.h>
+#include <utils/StructElement.h>
 
 using namespace rsp::utils;
 
@@ -33,7 +34,12 @@ TEST_CASE("BinaryStream") {
         std::string s1("This is a string.");
         std::string s2(128, 'A');
         size_t sz = 46922;
-        CHECK_NOTHROW(ss << s1 << uint16_t(46222) << true << false << s2 << sz);
+        auto now = DateTime::Now();
+        StructElement<std::string> se_str(now.ToRFC3339Milli());
+        StructElement<DateTime> se_dt(now);
+        StructElement<int> se_null;
+        StructElement<float> f1 = 1.234567f;
+        CHECK_NOTHROW(ss << s1 << uint16_t(46222) << true << false << s2 << sz << se_str << se_dt << se_null << f1);
     }
 
     SUBCASE("Read") {
@@ -44,13 +50,22 @@ TEST_CASE("BinaryStream") {
         bool b1;
         bool b2;
         size_t sz;
-        CHECK_NOTHROW(ss >> s1 >> u16 >> b1 >> b2 >> s2 >> sz);
+        StructElement<std::string> se_str;
+        StructElement<DateTime> se_dt;
+        StructElement<int> se_null;
+        StructElement<float> f1;
+        CHECK_NOTHROW(ss >> s1 >> u16 >> b1 >> b2 >> s2 >> sz >> se_str >> se_dt >> se_null >> f1);
         CHECK_EQ(s1, std::string("This is a string."));
         CHECK_EQ(u16, uint16_t(46222));
         CHECK(b1);
         CHECK_FALSE(b2);
         CHECK_EQ(s2.size(), 128);
         CHECK_EQ(sz, 46922);
+        CHECK_FALSE(se_str.IsNull());
+        CHECK_FALSE(se_dt.IsNull());
+        CHECK(se_null.IsNull());
+        CHECK_EQ(se_str.Get(), se_dt.Get().ToRFC3339Milli());
+        CHECK_EQ(f1.Get(), 1.234567f);
     }
 
     SUBCASE("IO") {

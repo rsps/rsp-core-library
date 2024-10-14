@@ -14,6 +14,7 @@
 #include <curl/curl.h>
 #include <string_view>
 #include <network/NetworkLibrary.h>
+#include <cstdint>
 
 namespace rsp::network::curl {
 

@@ -12,6 +12,7 @@
 #include <concepts>
 #include "ConstTypeInfo.h"
 #include "Nullable.h"
+#include "BinaryStream.h"
 
 #ifndef RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
 #define RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
@@ -44,7 +45,7 @@ public:
  * The class also supports comparison with margins (epsilon).
  */
 template <class T>
-class StructElementBase : public Nullable
+class StructElementBase : public Nullable, public BinaryStreamable
 {
 public:
     /**
@@ -157,6 +158,30 @@ public:
      */
     StructElementBase<T>& SetMargin(T aValue) { mMargin = aValue; return *this; }
 
+    BinaryStream& SaveTo(BinaryStream &o) const override
+    {
+        o << mIsNull;
+        if (!mIsNull) {
+            o << mData;
+            if constexpr (std::is_arithmetic_v<T>) {
+                o << mMargin;
+            }
+        }
+        return o;
+    }
+
+    BinaryStream& LoadFrom(BinaryStream &i) override
+    {
+        i >> mIsNull;
+        if (!mIsNull) {
+            i >> mData;
+            if constexpr (std::is_arithmetic_v<T>) {
+                i >> mMargin;
+            }
+        }
+        return i;
+    }
+
 protected:
     template <class E>
     friend std::ostream & operator<< (std::ostream &out, StructElementBase<E> const &t);
@@ -220,6 +245,25 @@ public:
     StructElement& operator=(const T& aValue) override { StructElementBase<T>::Set(aValue); return *this; } // Without this, constructor + copy is called
 
     StructElement& SetPrecision(int aPrecision) { mPrecision = aPrecision; return *this; }
+
+    BinaryStream& SaveTo(BinaryStream &o) const override
+    {
+        StructElementBase<T>::SaveTo(o);
+        if (!StructElementBase<T>::IsNull()) {
+            o << mPrecision;
+        }
+        return o;
+    }
+
+    BinaryStream& LoadFrom(BinaryStream &i) override
+    {
+        StructElementBase<T>::LoadFrom(i);
+        if (!StructElementBase<T>::IsNull()) {
+            i >> mPrecision;
+        }
+        return i;
+    }
+
 protected:
     friend class Variant;
     int mPrecision = -1;

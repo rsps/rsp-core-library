@@ -16,6 +16,7 @@
 #include <ostream>
 #include <filesystem>
 #include <ctime>
+#include <utils/StructElement.h>
 
 namespace rsp::utils {
 
@@ -271,6 +272,16 @@ private:
 std::ostream& operator<< (std::ostream& os, const DateTime::Date &arDate);
 std::ostream& operator<< (std::ostream& os, const DateTime::Time &arTime);
 std::ostream& operator<< (std::ostream& os, const DateTime &arDateTime);
+
+/**
+ * Specialized default value for DateTime types.
+ */
+template<>
+class defaultItem<DateTime>
+{
+public:
+    static DateTime default_value() { return {}; }
+};
 
 } /* namespace rsp::utils */
 
