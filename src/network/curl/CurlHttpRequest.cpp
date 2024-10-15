@@ -62,7 +62,7 @@ void CurlHttpRequest::readFromStream(const std::shared_ptr<IHttpBodyStream>& arB
     }
     setCurlOption(CURLOPT_UPLOAD, 1L);
     setCurlOption(CURLOPT_READFUNCTION, streamReadFunction);
-    mUploadBuffer.Stream = { 0, arBody.get() };
+    mUploadBuffer.Stream = { 0, 0, arBody.get() };
     setCurlOption(CURLOPT_READDATA, &mUploadBuffer);
     setCurlOption(CURLOPT_INFILESIZE_LARGE, arBody->GetSize());
 }
@@ -99,7 +99,7 @@ size_t CurlHttpRequest::stringReadFunction(void *ptr, size_t size, size_t nmemb,
 size_t CurlHttpRequest::streamReadFunction(void *ptr, size_t size, size_t nmemb, CurlHttpRequest::UploadBuffer *apBuf)
 {
     size_t written;
-    (void) apBuf->Stream.Body->GetChunk(static_cast<char*>(ptr), size * nmemb, written, apBuf->Stream.ChunkIndex);
+    (void) apBuf->Stream.Body->GetChunk(static_cast<char*>(ptr), size * nmemb, written, apBuf->Stream.ChunkIndex, apBuf->Stream.PayloadIndex);
     return written;
 }
 

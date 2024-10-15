@@ -64,7 +64,7 @@ HttpStringBody& HttpStringBody::operator=(const std::string &arContent)
     return *this;
 }
 
-bool HttpStringBody::GetChunk(char *apBuffer, size_t aBufferSize, size_t &arWritten, size_t &arChunkIndex) const
+bool HttpStringBody::GetChunk(char *apBuffer, size_t aBufferSize, size_t &arWritten, size_t &arChunkIndex, size_t &) const
 {
     size_t len = mContent.size() - arChunkIndex;
     if (len > aBufferSize) {

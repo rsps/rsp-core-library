@@ -312,9 +312,10 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
         char buffer[51];
         size_t written;
         size_t chunk_index = 0;
+        size_t payload_index = 0;
         bool eof = false;
         while (!eof) {
-            eof = body.GetChunk(buffer, sizeof(buffer) - 1, written, chunk_index);
+            eof = body.GetChunk(buffer, sizeof(buffer) - 1, written, chunk_index, payload_index);
             buffer[written] = '\0';
 //            MESSAGE("\nChunk:   " << buffer << "\nwritten: " << written << "\nindex:   " << chunk_index);
         }

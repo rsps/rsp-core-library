@@ -29,7 +29,7 @@ public:
     HttpStringBody& Set(const std::string &arContent);
     [[nodiscard]] const std::string& Get() const;
     HttpStringBody& operator=(const std::string &arContent);
-    [[nodiscard]] bool GetChunk(char *apBuffer, size_t aBufferSize, size_t &arWritten, size_t &arChunkIndex) const override;
+    [[nodiscard]] bool GetChunk(char *apBuffer, size_t aBufferSize, size_t &arWritten, size_t &arChunkIndex, size_t &arPayloadIndex) const override;
     [[nodiscard]] size_t GetSize() const override;
 protected:
     std::string mContent{};

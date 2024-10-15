@@ -30,9 +30,10 @@ public:
      * \param aBufferSize Size of buffer
      * \param arBytesWritten Size of chunk written to buffer
      * \param arChunkIndex Zero initialized index to delivered chunks, entirely controlled by implementation to keep function const.
+     * \param arPayloadIndex Zero initialized sub index to delivered chunk, entirely controlled by implementation to keep function const.
      * \return True if entire body has been written
      */
-    [[nodiscard]] virtual bool GetChunk(char *apBuffer, size_t aBufferSize, size_t &arBytesWritten, size_t &arChunkIndex) const = 0;
+    [[nodiscard]] virtual bool GetChunk(char *apBuffer, size_t aBufferSize, size_t &arBytesWritten, size_t &arChunkIndex, size_t &arPayloadIndex) const = 0;
     /**
      * \brief Get the total size of the encoded body data
      * \return Size of encoded body
@@ -50,7 +51,8 @@ public:
         result.resize(aMaxLen);
         size_t written;
         size_t chunk_index = 0;
-        auto eof = GetChunk(result.data(), aMaxLen, written, chunk_index);
+        size_t payload_index = 0;
+        auto eof = GetChunk(result.data(), aMaxLen, written, chunk_index, payload_index);
         if (!eof) {
             result.resize(written - 3);
             result += "...";
