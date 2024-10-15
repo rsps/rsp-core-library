@@ -26,9 +26,9 @@ JsonStream::JsonStream(bool aPrettyPrint, unsigned aLevel)
     }
 }
 
-size_t JsonStream::Getsize() const
+size_t JsonStream::Getsize()
 {
-    return size_t(view().size());
+    return size_t(tellp());
 }
 
 JsonStream& operator <<(JsonStream &o, const Comma &arComma)

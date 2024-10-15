@@ -65,7 +65,7 @@ public:
      */
     explicit JsonStream(bool aPrettyPrint = false, unsigned aLevel = 0);
 
-    [[nodiscard]] size_t Getsize() const;
+    [[nodiscard]] size_t Getsize();
 
     bool mPrettyPrint;
     unsigned mRootLevel;
