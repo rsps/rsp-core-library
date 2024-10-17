@@ -66,22 +66,22 @@ public:
 
     Iterator begin() override
     {
-        return { &mVector.front(), &mVector.back() + 1, sizeof(Element) };
+        return {mVector, true};
     }
 
     Iterator end() override
     {
-        return Iterator(&mVector.front(), &mVector.back() + 1, sizeof(Element)).end();
+        return {mVector, false};
     }
 
     ConstIterator cbegin() override
     {
-        return { &mVector.front(), &mVector.back() + 1, sizeof(Element) };
+        return {mVector, true};
     }
 
     ConstIterator cend() override
     {
-        return ConstIterator(&mVector.front(), &mVector.back() + 1, sizeof(Element)).end();
+        return {mVector, false};
     }
 
     size_t size() override
@@ -99,12 +99,13 @@ TEST_CASE("AbstractIterator")
     CHECK_NOTHROW(Container dummy);
 
     Container container;
+    IContainer &ref_container = container;
 
     SUBCASE("for-loop") {
         int expected = 0;
         size_t count = 0;
 
-        for (auto &e: container) {
+        for (auto &e: ref_container) {
             CHECK_EQ(e.GetValue(), expected++);
             count++;
         }

@@ -52,6 +52,13 @@ public:
     AbstractIterator(pointer aPtr, pointer aStart, pointer aSentinel, size_type aDerivedElementSize)
         : mPtr(aPtr), mStart(aStart), mSentinel(aSentinel), mElementSize(aDerivedElementSize) {}
 
+    // Construct begin from vector
+    template <class C>
+    AbstractIterator(C &arContainer, bool aBegin)
+        : AbstractIterator{ (aBegin ? &arContainer.front() : &arContainer.back() + 1), &arContainer.front(), &arContainer.back() + 1, sizeof(typename C::value_type) }
+    {
+    }
+
     reference operator*() const { return *mPtr; }
     pointer operator->() { return mPtr; }
 
@@ -68,8 +75,8 @@ public:
     // Postfix increment
     AbstractIterator operator++(int) { auto tmp = *this; ++(*this); return tmp; }
 
-    friend bool operator==(const AbstractIterator& a, const AbstractIterator& b) { return a.mPtr == b.mPtr; };
-    friend bool operator!=(const AbstractIterator& a, const AbstractIterator& b) { return a.mPtr != b.mPtr; };
+    friend bool operator==(const AbstractIterator& a, const AbstractIterator& b) { return a.mPtr == b.mPtr; }
+    friend bool operator!=(const AbstractIterator& a, const AbstractIterator& b) { return a.mPtr != b.mPtr; }
     auto operator<=>(const AbstractIterator &) const = default; // three-way comparison C++20
 
     auto begin() const { return AbstractIterator(mStart, mSentinel, mElementSize); }
