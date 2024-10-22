@@ -2,6 +2,8 @@ var.basedir = "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@/webserver"
 
 server.modules += (
     "mod_openssl",
+    "mod_authn_file",
+    "mod_auth",
     "mod_cgi",
     "mod_alias"
 )
@@ -52,6 +54,16 @@ $HTTP["url"] =~ "^/cgi/" {
             ".sh"  => "/bin/bash",
         )
 }
+
+auth.backend = "plain"
+auth.backend.plain.userfile = basedir + "/users.plain"
+auth.require = ( "/authenticated/" =>
+    (
+        "method" => "basic",
+        "realm" => "login",
+        "require" => "valid-user"
+    )
+)
 
 
 $SERVER["socket"] == ":44300" {

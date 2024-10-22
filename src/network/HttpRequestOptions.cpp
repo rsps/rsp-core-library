@@ -26,13 +26,18 @@ std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)
         arOptions.RequestType << " " << arOptions.Uri << "\n";
     if (!arOptions.BasicAuthUsername.empty()) {
         o <<
-            "Basic Auth User: " << arOptions.BasicAuthUsername << "\n"
-            "Basic Auth Pw: " << arOptions.BasicAuthPassword << "\n";
+            "Basic Auth User: " << std::string(arOptions.BasicAuthUsername.size(), 'X') << "\n"
+            "Basic Auth Pw: " << std::string(arOptions.BasicAuthPassword.size(), 'X') << "\n";
     }
     o << "Headers:\n";
 
     for(auto &tuple : arOptions.Headers) {
-        o << "  " << tuple.first << ": " << tuple.second << "\n";
+        if (rsp::utils::StrUtils::ToLower(tuple.first) == std::string("authorization")) {
+            o << "  " << tuple.first << ": " << std::string(tuple.second.size(), 'X') << "\n";
+        }
+        else {
+            o << "  " << tuple.first << ": " << tuple.second << "\n";
+        }
     }
 
     if (arOptions.Body) {

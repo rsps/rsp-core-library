@@ -399,5 +399,99 @@ Body: )" + json + "\n";
         CHECK(resp2);
     }
 
+    SUBCASE("Authenticated") {
+        CHECK_NOTHROW(HttpSession session1(1));
+        bool respHead = false;
+        bool respHead2 = false;
+        bool respErrHead = false;
+        bool resp1 = false;
+        HttpSession session(5);
+
+        opt.BaseUrl = "https://server.localhost:44300/";
+//        opt.Verbose = 1;
+        session.SetDefaultOptions(opt);
+
+        session.Head("/authenticated/index.html",
+                                 [&respErrHead](IHttpResponse& resp) {
+//                                     MESSAGE("Request Head:\n" << resp.GetRequest());
+//                                     MESSAGE("Response Head:\n" << resp);
+                                     CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
+                                     CHECK_EQ(resp.GetHeaders().at("content-length"), "164");
+                                     CHECK_EQ(resp.GetHeaders().at("http/2 401"), "present");
+                                     CHECK_EQ(resp.GetBody().size(), 0);
+                                     CHECK_EQ(resp.GetStatusCode(), 401);
+                                     respErrHead = true;
+                                 });
+        CHECK_NOTHROW(session.ProcessRequests());
+
+        opt.BasicAuthUsername = "jb";
+        opt.BasicAuthPassword = "agent007";
+        session.SetDefaultOptions(opt);
+
+        session.Head("/authenticated/index.html",
+                                 [&respHead](IHttpResponse& resp) {
+//                                     MESSAGE("Request Head:\n" << resp.GetRequest());
+//                                     MESSAGE("Response Head:\n" << resp);
+                                     CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
+                                     CHECK_EQ(resp.GetHeaders().at("content-length"), "131");
+                                     CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
+                                     CHECK_EQ(resp.GetBody().size(), 0);
+                                     CHECK_EQ(resp.GetStatusCode(), 200);
+
+                                     CHECK_EQ(resp.GetRequest().GetOptions().BasicAuthUsername, "jb");
+                                     CHECK_EQ(resp.GetRequest().GetOptions().BasicAuthPassword, "agent007");
+                                     std::stringstream ss;
+                                     ss << resp.GetRequest();
+                                     CHECK_FALSE(StrUtils::Contains(ss.str(), "jb"));
+                                     CHECK_FALSE(StrUtils::Contains(ss.str(), "agent007"));
+                                     respHead = true;
+                                 });
+        CHECK_NOTHROW(session.ProcessRequests());
+
+        opt.BasicAuthUsername = "";
+        opt.BasicAuthPassword = "";
+        opt.Headers["Authorization"] = "Basic amI6YWdlbnQwMDc="; // Found in lighttpd error.log. Curl adds this from above used BasicAuthXXX credentials
+        session.SetDefaultOptions(opt);
+
+        session.Head("/authenticated/index.html",
+                     [&respHead2](IHttpResponse& resp) {
+//                         MESSAGE("Request Head:\n" << resp.GetRequest());
+//                         MESSAGE("Response Head:\n" << resp);
+                         CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
+                         CHECK_EQ(resp.GetHeaders().at("content-length"), "131");
+                         CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
+                         CHECK_EQ(resp.GetBody().size(), 0);
+                         CHECK_EQ(resp.GetStatusCode(), 200);
+                         CHECK_EQ(resp.GetRequest().GetOptions().Headers.at("Authorization"), "Basic amI6YWdlbnQwMDc=");
+                         std::stringstream ss;
+                         ss << resp.GetRequest();
+                         CHECK(StrUtils::Contains(ss.str(), "Authorization"));
+                         CHECK_FALSE(StrUtils::Contains(ss.str(), "Basic amI6YWdlbnQwMDc="));
+                         respHead2 = true;
+                     });
+        CHECK_NOTHROW(session.ProcessRequests());
+
+        session.Get("/authenticated/index.html",
+                    [&resp1](IHttpResponse& resp) {
+//                        MESSAGE("Response 1:\n" << resp);
+                        CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
+                        CHECK_EQ(resp.GetHeaders().at("content-length"), "131");
+                        CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
+                        CHECK_EQ(resp.GetBody().size(), 131);
+                        CHECK_EQ(200, resp.GetStatusCode());
+                        std::stringstream ss;
+                        ss << resp.GetRequest();
+                        CHECK(StrUtils::Contains(ss.str(), "Authorization"));
+                        CHECK_FALSE(StrUtils::Contains(ss.str(), "Basic amI6YWdlbnQwMDc="));
+                        resp1 = true;
+                    });
+        CHECK_NOTHROW(session.ProcessRequests());
+
+        CHECK(respErrHead);
+        CHECK(respHead);
+        CHECK(respHead2);
+        CHECK(resp1);
+    }
+
     CHECK_EQ(0, std::system("killall lighttpd"));
 }

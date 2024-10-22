@@ -69,26 +69,28 @@ std::string& ToUpper(std::string &arStr)
 std::string ToLower(const std::string &arStr)
 {
     std::string result = arStr;
-    return ToLower(result);
+    ToLower(result);
+    return result;
 }
 
 std::string ToUpper(const std::string &arStr)
 {
     std::string result = arStr;
-    return ToUpper(result);
+    ToUpper(result);
+    return result;
 }
 
 
 std::string GetHomeDir()
 {
-    const char *homedir;
+    const char *home_dir;
 
-    if ((homedir = getenv("HOME")) == nullptr) {
+    if ((home_dir = getenv("HOME")) == nullptr) {
         struct passwd *pwd = getpwuid(getuid());
-        homedir = pwd->pw_dir;
+        home_dir = pwd->pw_dir;
     }
 
-    return homedir;
+    return home_dir;
 }
 
 std::string GetConfigDir()
