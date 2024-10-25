@@ -13,12 +13,19 @@
 #include "doctest.h"
 #include <iostream>
 #include <utils/StrUtils.h>
+#include <utils/StructElement.h>
 #include <utils/InRange.h>
 #include <TestHelpers.h>
 #include <optional>
 
 using namespace rsp::utils;
 using namespace rsp::json;
+
+enum class EType : uint8_t {
+    ONE,
+    TWO,
+    THREE
+};
 
 TEST_CASE("Json")
 {
@@ -340,7 +347,7 @@ null }
 
     SUBCASE("Streaming") {
         bool pretty = false;
-        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"},"NullValue":null,"Optional":null})";
+        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"},"NullValue":null,"Optional":null,"Enum":"TWO"})";
 
         SUBCASE("Ugly") {
         }
@@ -351,7 +358,8 @@ null }
         "NestedMember": "NestedValue"
     },
     "NullValue": null,
-    "Optional": null
+    "Optional": null,
+    "Enum": "TWO"
 })";
             pretty = true;
         }
@@ -369,6 +377,7 @@ null }
         Variant number(1234);
         std::string not_empty_string("NestedValue");
         std::optional<double> opt;
+        rsp::utils::StructElement<EType> enum_value(EType::TWO);
 
         JsonStream js(pretty);
         js << OBegin()
@@ -377,7 +386,8 @@ null }
                 << Key("NestedMember") << Value(not_empty_string)
             << OEnd() << Comma()
             << Key("NullValue") << Value(empty_string) << Comma()
-            << Key("Optional") << Value(opt)
+            << Key("Optional") << Value(opt) << Comma()
+            << Key("Enum") << enum_value
             << OEnd();
         CHECK_EQ(js.Getsize(), raw.size());
         CHECK_EQ(js.str(), raw);

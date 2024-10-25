@@ -15,6 +15,7 @@
 #include <string>
 #include <string_view>
 #include <utils/Variant.h>
+#include <utils/StructElement.h>
 
 namespace rsp::json {
 
@@ -109,9 +110,26 @@ JsonStream& operator<<(JsonStream& o, const Value<T>& v) {
     return o;
 }
 
-template <class T>
+// Default enum streaming
+template <class E> requires std::is_enum_v<E>
+JsonStream& operator<< (JsonStream &o, E value) {
+    return o << magic_enum::enum_name(value);
+}
+
+template <class T> requires (!std::is_enum_v<T>)
 JsonStream& operator<<(JsonStream& o, const T& v) {
     static_cast<std::ostringstream&>(o) << v;
+    return o;
+}
+
+template <class T>
+JsonStream& operator<< (JsonStream &o, utils::StructElement<T> const &t) {
+    if (t.IsNull()) {
+        o << Null();
+    }
+    else {
+        o << t.Get();
+    }
     return o;
 }
 

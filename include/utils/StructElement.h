@@ -13,6 +13,7 @@
 #include "ConstTypeInfo.h"
 #include "Nullable.h"
 #include "BinaryStream.h"
+#include <magic_enum.hpp>
 
 #ifndef RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
 #define RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
@@ -26,7 +27,7 @@ namespace rsp::utils {
  */
 template<class T> class defaultItem {
 public:
-    static constexpr T default_value() { return 0; }
+    static constexpr T default_value() { return T(0); }
 };
 
 /**
@@ -52,7 +53,7 @@ public:
      * \fn  StructElement()
      * \brief Constructor of empty (Null) StructElement
      */
-    StructElementBase() : mIsNull(true), mData(defaultItem<T>::default_value()), mMargin(defaultItem<T>::default_value())  {}
+    StructElementBase() : mIsNull(true), mData(T(defaultItem<T>::default_value())), mMargin(T(defaultItem<T>::default_value()))  {}
     /**
      * \fn  StructElement(const T&)
      * \brief Constructor of StructElement with type T and value.
@@ -82,35 +83,9 @@ public:
     void Clear() override        { mIsNull = true; mData = {}; }
 
     /**
-     * \fn T Get() const
-     * \brief Getter that throws if content is null.
-     *
-     * \return T
-     */
-    [[nodiscard]] T Get() const {
-        if (mIsNull) {
-            THROW_WITH_BACKTRACE1(ENullValueError, NameOf<T>());
-        }
-        return mData;
-    }
-    /**
-     * \fn T Get(const T&)const
-     * \brief Getter that returns the given default in case content is null.
-     *
-     * \param arDefault
-     * \return T
-     */
-    [[nodiscard]] T Get(const T &arDefault) const {
-        if (mIsNull) {
-            return arDefault;
-        }
-        return mData;
-    }
-
-    /**
      * \brief Conversion operator overload.
      */
-    operator T() const { return Get(); } // NOLINT, Conversion operator
+    operator T() const { return get(); } // NOLINT, Conversion operator
 
     /**
      * \fn void Set(T)
@@ -196,6 +171,21 @@ protected:
     T mData;
     T mMargin;
 
+    [[nodiscard]] T get() const
+    {
+        if (mIsNull) {
+            THROW_WITH_BACKTRACE1(ENullValueError, NameOf<T>());
+        }
+        return mData;
+    }
+
+    [[nodiscard]] T get(const T &arDefault) const
+    {
+        if (mIsNull) {
+            return arDefault;
+        }
+        return mData;
+    }
 
     /*
      * Template function for difference check
@@ -220,6 +210,25 @@ public:
     using StructElementBase<T>::StructElementBase;
 
     StructElement& operator=(const T& aValue) override { StructElementBase<T>::Set(aValue); return *this; }
+
+    [[nodiscard]] T Get() const { return StructElementBase<T>::get(); }
+    [[nodiscard]] T Get(const T &arDefault) const { return StructElementBase<T>::get(arDefault); }
+};
+
+template <class E> requires (std::is_enum_v<E>)
+class StructElement<E> : public StructElementBase<typename std::underlying_type<E>::type>
+{
+public:
+    using T = std::underlying_type<E>::type;
+    using StructElementBase<T>::StructElementBase;
+
+    explicit StructElement(E aValue) : StructElementBase<T>(T(aValue)) {}
+
+    StructElement& operator=(const T& aValue) override { StructElementBase<T>::Set(aValue); return *this; }
+    StructElement& operator=(E aValue) { StructElementBase<T>::Set(T(aValue)); return *this; }
+
+    [[nodiscard]] E Get() const { return E(StructElementBase<T>::get()); }
+    [[nodiscard]] E Get(const E&arDefault) const { return E(StructElementBase<T>::get(T(arDefault))); }
 };
 
 template <class T> requires std::is_floating_point_v<T>
@@ -237,7 +246,7 @@ public:
         mPrecision = arOther.mPrecision;
         return *this;
     }
-    StructElement& operator=(StructElement<T> &&arOther) {
+    StructElement& operator=(StructElement<T> &&arOther) noexcept {
         mPrecision = std::move(arOther.mPrecision);
         StructElementBase<T>::operator=(std::move(arOther));
         return *this;
@@ -263,6 +272,9 @@ public:
         }
         return i;
     }
+
+    [[nodiscard]] T Get() const { return StructElementBase<T>::get(); }
+    [[nodiscard]] T Get(const T &arDefault) const { return StructElementBase<T>::get(arDefault); }
 
 protected:
     friend class Variant;
@@ -328,6 +340,13 @@ bool operator==(const StructElement<T>& /*aEl1*/, const StructElement<E>& /*aEl2
 }
 
 
+// Default enum streaming
+template <class E> requires std::is_enum_v<E>
+std::ostream & operator<< (std::ostream &o, E value) {
+    o << magic_enum::enum_name(value);
+    return o;
+}
+
 /**
  * \fn std::ostream operator <<&(std::ostream&, const StructElement<T>&)
  * \brief Streaming operator for debugging Variant content
@@ -338,12 +357,12 @@ bool operator==(const StructElement<T>& /*aEl1*/, const StructElement<E>& /*aEl2
  * \return out
  */
 template <class T>
-std::ostream & operator<< (std::ostream &out, StructElementBase<T> const &t) {
-    if (t.mIsNull) {
+std::ostream & operator<< (std::ostream &out, StructElement<T> const &t) {
+    if (t.IsNull()) {
         out << "null";
     }
     else {
-        out << t.mData;
+        out << t.Get();
     }
     return out;
 }
