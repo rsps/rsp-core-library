@@ -85,6 +85,7 @@ JsonStream& operator<<(JsonStream& o, const std::string &arStr);
 JsonStream& operator<<(JsonStream& o, const std::string_view &arStr);
 JsonStream& operator<<(JsonStream& o, const char *apStr);
 JsonStream& operator<<(JsonStream& o, const Null &arNull);
+JsonStream& operator<<(JsonStream& o, const bool &arBool);
 JsonStream& operator<<(JsonStream& o, const rsp::utils::Variant &arValue);
 JsonStream& operator<<(JsonStream& o, const Raw &arJson);
 

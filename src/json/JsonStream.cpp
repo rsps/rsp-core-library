@@ -103,6 +103,12 @@ JsonStream& operator<<(JsonStream &o, const Null&)
     return o;
 }
 
+JsonStream& operator<<(JsonStream& o, const bool& arBool)
+{
+    static_cast<std::ostringstream&>(o) << (arBool ? "true" : "false");
+    return o;
+}
+
 JsonStream& operator<<(JsonStream& o, const Raw& arJson)
 {
     static_cast<std::ostringstream&>(o) << arJson.mJson;

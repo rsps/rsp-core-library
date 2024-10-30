@@ -347,7 +347,7 @@ null }
 
     SUBCASE("Streaming") {
         bool pretty = false;
-        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"},"NullValue":null,"Optional":null,"Enum":"TWO"})";
+        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"},"NullValue":null,"Optional":null,"Enum":"TWO","Boolean":true})";
 
         SUBCASE("Ugly") {
         }
@@ -359,7 +359,8 @@ null }
     },
     "NullValue": null,
     "Optional": null,
-    "Enum": "TWO"
+    "Enum": "TWO",
+    "Boolean": true
 })";
             pretty = true;
         }
@@ -378,6 +379,7 @@ null }
         std::string not_empty_string("NestedValue");
         std::optional<double> opt;
         rsp::utils::StructElement<EType> enum_value(EType::TWO);
+        rsp::utils::StructElement<bool> bool_value(true);
 
         JsonStream js(pretty);
         js << OBegin()
@@ -387,7 +389,8 @@ null }
             << OEnd() << Comma()
             << Key("NullValue") << Value(empty_string) << Comma()
             << Key("Optional") << Value(opt) << Comma()
-            << Key("Enum") << enum_value
+            << Key("Enum") << enum_value << Comma()
+            << Key("Boolean") << bool_value
             << OEnd();
         CHECK_EQ(js.Getsize(), raw.size());
         CHECK_EQ(js.str(), raw);
