@@ -5,6 +5,7 @@
 
 #include <iomanip>
 #include <json/JsonEncoder.h>
+#include <json/JsonStream.h>
 #include <logging/Logger.h>
 
 using namespace rsp::utils;
@@ -39,68 +40,7 @@ std::string JsonEncoder::Encode(const rsp::utils::DynamicData &arData)
 
 void JsonEncoder::stringToStringStream(const DynamicData &arData, unsigned int /*aLevel*/)
 {
-    std::string s = arData.AsString();
-    std::size_t i = 0;
-    mResult << "\"";
-
-    while (i < s.length()) {
-        auto c = s[i];
-        switch (c) {
-            case '\"':
-                mResult << "\\\"";
-                break;
-            case '\\':
-                mResult << "\\\\";
-                break;
-            case '\b':
-                mResult << "\\b";
-                break;
-            case '\f':
-                mResult << "\\f";
-                break;
-            case '\n':
-                mResult << "\\n";
-                break;
-            case '\r':
-                mResult << "\\r";
-                break;
-            case '\t':
-                mResult << "\\t";
-                break;
-            default:
-                if (mPf.ForceToUCS2 && static_cast<uint8_t>(c) > 127) {
-                    int v;
-                    char buf[12];
-                    switch (static_cast<uint8_t>(c) & 0xE0) {
-                        case 0xE0:
-                            v =   ((static_cast<int>(s[i]) & 0x0F) << 12)
-                                + ((static_cast<int>(s[i+1]) & 0x3F) << 6)
-                                + (static_cast<int>(s[i+2]) & 0x3F);
-                            sprintf(buf, "\\u%04x", v);
-                            mResult << buf;
-                            i += 4;
-                            break;
-
-                        case 0xC0:
-                            v =   ((static_cast<int>(s[i]) & 0x1F) << 6)
-                                + (static_cast<int>(s[i+1]) & 0x3F);
-                            sprintf(buf, "\\u%04x", v);
-                            mResult << buf;
-                            i += 4;
-                            break;
-
-                        default:
-                            THROW_WITH_BACKTRACE1(EJsonParseError, std::string("DynamicData of type string has illegal JSON character: ") + c);
-                    }
-                }
-                else {
-                    mResult << c;
-                }
-                break;
-        }
-        i++;
-    }
-    mResult << "\"";
+    JsonStream::StringToStream(arData.AsString(), mResult ,mPf.ForceToUCS2);
 }
 
 void JsonEncoder::arrayToStringStream(const DynamicData &arData, unsigned int aLevel) // NOLINT
