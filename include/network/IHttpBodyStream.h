@@ -55,7 +55,7 @@ public:
         size_t total = 0;
         bool eof = false;
         while (!eof && aMaxLen > 0) {
-            eof = GetChunk(result.data(), aMaxLen, written, chunk_index, payload_index);
+            eof = GetChunk(&result[total], aMaxLen, written, chunk_index, payload_index);
             aMaxLen -= written;
             total += written;
         }
