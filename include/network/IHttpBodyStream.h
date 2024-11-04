@@ -54,9 +54,8 @@ public:
         size_t payload_index = 0;
         size_t total = 0;
         bool eof = false;
-        while (!eof && aMaxLen > 0) {
+        while (!eof && (total < (aMaxLen / 2))) {
             eof = GetChunk(&result[total], aMaxLen, written, chunk_index, payload_index);
-            aMaxLen -= written;
             total += written;
         }
         if (!eof) {
