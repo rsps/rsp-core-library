@@ -347,7 +347,7 @@ null }
 
     SUBCASE("Streaming") {
         bool pretty = false;
-        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"},"NullValue":null,"Optional":null,"Enum":"TWO","Boolean":true})";
+        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"Nested\nValue"},"NullValue":null,"Optional":null,"Enum":"TWO","Boolean":true})";
 
         SUBCASE("Ugly") {
         }
@@ -355,7 +355,7 @@ null }
             raw = R"({
     "Member1": 1234,
     "Member2": {
-        "NestedMember": "NestedValue"
+        "NestedMember": "Nested\nValue"
     },
     "NullValue": null,
     "Optional": null,
@@ -376,7 +376,8 @@ null }
 
         std::string empty_string; // = "not empty";
         Variant number(1234);
-        std::string not_empty_string("NestedValue");
+        std::string not_empty_string(R"(Nested
+Value)");
         std::optional<double> opt;
         rsp::utils::StructElement<EType> enum_value(EType::TWO);
         rsp::utils::StructElement<bool> bool_value(true);

@@ -8,7 +8,9 @@
  * \author      Steffen Brummer
  */
 
+#include <cstring>
 #include <string>
+#include <json/JsonExceptions.h>
 #include <json/JsonStream.h>
 
 namespace rsp::json {
@@ -29,6 +31,81 @@ JsonStream::JsonStream(bool aPrettyPrint, unsigned aLevel)
 size_t JsonStream::Getsize()
 {
     return size_t(tellp());
+}
+
+void JsonStream::StringToStream(const std::string& arString, std::ostream& o, bool aForceToUCS2)
+{
+    StringToStream(arString.data(), arString.size(), o, aForceToUCS2);
+}
+
+void JsonStream::StringToStream(std::string_view aString, std::ostream& o, bool aForceToUCS2)
+{
+    StringToStream(aString.data(), aString.size(), o, aForceToUCS2);
+}
+
+void JsonStream::StringToStream(const char *apString, size_t aSize, std::ostream& o, bool aForceToUCS2)
+{
+    auto s = apString;
+    std::size_t i = 0;
+    o << "\"";
+    while (i < aSize) {
+        auto c = *apString++;
+        switch (c) {
+            case '\"':
+                o << "\\\"";
+                break;
+            case '\\':
+                o << "\\\\";
+                break;
+            case '\b':
+                o << "\\b";
+                break;
+            case '\f':
+                o << "\\f";
+                break;
+            case '\n':
+                o << "\\n";
+                break;
+            case '\r':
+                o << "\\r";
+                break;
+            case '\t':
+                o << "\\t";
+                break;
+            default:
+                if (aForceToUCS2 && static_cast<uint8_t>(c) > 127) {
+                    int v;
+                    char buf[12];
+                    switch (static_cast<uint8_t>(c) & 0xE0) {
+                        case 0xE0:
+                            v =   ((static_cast<int>(s[i]) & 0x0F) << 12)
+                                  + ((static_cast<int>(s[i+1]) & 0x3F) << 6)
+                                  + (static_cast<int>(s[i+2]) & 0x3F);
+                            sprintf(buf, "\\u%04x", v);
+                            o << buf;
+                            i += 4;
+                            break;
+
+                        case 0xC0:
+                            v =   ((static_cast<int>(s[i]) & 0x1F) << 6)
+                                  + (static_cast<int>(s[i+1]) & 0x3F);
+                            sprintf(buf, "\\u%04x", v);
+                            o << buf;
+                            i += 4;
+                            break;
+
+                        default:
+                            THROW_WITH_BACKTRACE1(EJsonParseError, std::string("String has illegal JSON character: ") + c + " (" + std::to_string(int(c)) + ")");
+                    }
+                }
+                else {
+                    o << c;
+                }
+                break;
+        }
+        i++;
+    }
+    o << "\"";
 }
 
 JsonStream& operator <<(JsonStream &o, const Comma &arComma)
@@ -81,19 +158,19 @@ JsonStream& operator <<(JsonStream &o, const AEnd &)
 
 JsonStream& operator <<(JsonStream &o, const std::string &arStr)
 {
-    static_cast<std::ostringstream&>(o) << "\"" << arStr << "\"";
+    JsonStream::StringToStream(arStr, o);
     return o;
 }
 
 JsonStream& operator<<(JsonStream& o, const std::string_view& arStr)
 {
-    static_cast<std::ostringstream&>(o) << "\"" << arStr << "\"";
+    JsonStream::StringToStream(arStr, o);
     return o;
 }
 
 JsonStream& operator<<(JsonStream& o, const char *apStr)
 {
-    static_cast<std::ostringstream&>(o) << "\"" << apStr << "\"";
+    JsonStream::StringToStream(apStr, std::strlen(apStr), o);
     return o;
 }
 

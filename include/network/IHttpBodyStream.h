@@ -48,17 +48,22 @@ public:
     [[nodiscard]] std::string GetString(size_t aMaxLen = 100) const
     {
         std::string result;
-        result.resize(aMaxLen);
+        result.resize(aMaxLen + 256ul);
         size_t written;
         size_t chunk_index = 0;
         size_t payload_index = 0;
-        auto eof = GetChunk(result.data(), aMaxLen, written, chunk_index, payload_index);
+        size_t total = 0;
+        bool eof = false;
+        while (!eof && (total < aMaxLen)) {
+            eof = GetChunk(&result[total], aMaxLen, written, chunk_index, payload_index);
+            total += written;
+        }
         if (!eof) {
-            result.resize(written - 3);
+            result.resize(total - 3);
             result += "...";
         }
         else {
-            result.resize(written);
+            result.resize(total);
         }
         return result;
     }

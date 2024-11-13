@@ -68,6 +68,10 @@ public:
 
     [[nodiscard]] size_t Getsize();
 
+    static void StringToStream(const std::string &arString, std::ostream &o, bool aForceToUCS2 = false);
+    static void StringToStream(std::string_view aString, std::ostream &o, bool aForceToUCS2 = false);
+    static void StringToStream(const char *apString, size_t aSize, std::ostream &o, bool aForceToUCS2 = false);
+
     bool mPrettyPrint;
     unsigned mRootLevel;
     std::string indentation{};
