@@ -41,7 +41,7 @@ std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)
     }
 
     if (arOptions.Body) {
-        o << "Body:\n" << arOptions.Body->GetString(100);
+        o << "Body:\n" << arOptions.Body->GetString(300);
     }
 
     return o;
