@@ -347,7 +347,7 @@ null }
 
     SUBCASE("Streaming") {
         bool pretty = false;
-        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"Nested\nValue"},"NullValue":null,"Optional":null,"Enum":"TWO","Boolean":true})";
+        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"Nested\nValue"},"NullValue":null,"Optional":null,"Enum":"TWO","Boolean":true,"Date":null})";
 
         SUBCASE("Ugly") {
         }
@@ -360,7 +360,8 @@ null }
     "NullValue": null,
     "Optional": null,
     "Enum": "TWO",
-    "Boolean": true
+    "Boolean": true,
+    "Date": null
 })";
             pretty = true;
         }
@@ -391,7 +392,8 @@ Value)");
             << Key("NullValue") << Value(empty_string) << Comma()
             << Key("Optional") << Value(opt) << Comma()
             << Key("Enum") << enum_value << Comma()
-            << Key("Boolean") << bool_value
+            << Key("Boolean") << bool_value << Comma()
+            << Key("Date") << rsp::utils::DateTime::Null()
             << OEnd();
         CHECK_EQ(js.Getsize(), raw.size());
         CHECK_EQ(js.str(), raw);

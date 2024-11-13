@@ -192,6 +192,17 @@ JsonStream& operator<<(JsonStream& o, const Raw& arJson)
     return o;
 }
 
+JsonStream& operator<<(JsonStream &o, const utils::DateTime &arDt)
+{
+    if (arDt.empty()) {
+        o << Null();
+    }
+    else {
+        o << arDt.ToRFC3339Milli();
+    }
+    return o;
+}
+
 JsonStream& operator<<(JsonStream& o, const utils::Variant& arValue)
 {
     using namespace rsp::utils;

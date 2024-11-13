@@ -14,6 +14,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <utils/DateTime.h>
 #include <utils/Variant.h>
 #include <utils/StructElement.h>
 
@@ -92,6 +93,7 @@ JsonStream& operator<<(JsonStream& o, const Null &arNull);
 JsonStream& operator<<(JsonStream& o, const bool &arBool);
 JsonStream& operator<<(JsonStream& o, const rsp::utils::Variant &arValue);
 JsonStream& operator<<(JsonStream& o, const Raw &arJson);
+JsonStream& operator<<(JsonStream& o, const rsp::utils::DateTime &arDt);
 
 template <class T>
 JsonStream& operator<<(JsonStream& o, const Value<T>& v) {
@@ -110,6 +112,9 @@ JsonStream& operator<<(JsonStream& o, const Value<T>& v) {
         else {
             o << Null();
         }
+    }
+    else {
+        static_assert(false, "Value type not supported");
     }
 
     return o;
