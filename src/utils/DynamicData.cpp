@@ -19,6 +19,44 @@ std::ostream& operator<< (std::ostream& os, const DynamicData& arValue)
     return os;
 }
 
+//DynamicData::DynamicData(const DynamicData& arOther)
+//    : Variant(arOther),
+//      mName(arOther.mName),
+//      mItems(arOther.mItems)
+//{
+//}
+//
+//DynamicData::DynamicData(DynamicData&& arOther) noexcept
+//    : Variant(std::move(arOther)),
+//      mName(std::move(arOther.mName)),
+//      mItems(std::move(arOther.mItems))
+//{
+//}
+
+DynamicData& DynamicData::operator=(const DynamicData& arOther)
+{
+    if (&arOther != this) {
+        Variant::operator=(arOther);
+//        if (mName.empty() && !arOther.mName.empty()) {
+//            mName = arOther.mName;
+//        }
+        mItems = arOther.mItems;
+    }
+    return *this;
+}
+
+DynamicData& DynamicData::operator=(DynamicData&& arOther) noexcept
+{
+    if (&arOther != this) {
+        mItems = std::move(arOther.mItems);
+        Variant::operator=(std::move(arOther));
+//        if (mName.empty() && !arOther.mName.empty()) {
+//            mName = std::move(arOther.mName);
+//        }
+    }
+    return *this;
+}
+
 DynamicData& DynamicData::operator [](std::string_view aKey)
 {
     DDLOG("DynamicData - Access member " << aKey)

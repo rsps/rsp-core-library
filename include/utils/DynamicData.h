@@ -101,16 +101,10 @@ public:
     template <class T, std::enable_if_t<!std::is_base_of_v<DynamicData, T>, bool> = true>
     DynamicData(T aValue) : Variant(aValue) {} // NOLINT
 
-    DynamicData& operator=(const DynamicData&) = default;
-    DynamicData& operator=(DynamicData&&) noexcept = default;
+    DynamicData& operator=(const DynamicData&);
+    DynamicData& operator=(DynamicData&&) noexcept;
 
-    /**
-     * \brief Assign all types supported by Variant class
-     *
-     * Use template to declare inherited assignment operators
-     */
-    template<class T>
-    DynamicData& operator=(T aValue) { rsp::utils::Variant::operator=(aValue); return *this; }
+    using rsp::utils::Variant::operator=;
 
     /**
      * \brief Try to assign member value to lvalue.
