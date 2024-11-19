@@ -24,10 +24,15 @@ public:
     enum class Types : unsigned int { Null, Bool, Number, String, Object, Array };
 
     Json() : DynamicData() {}
+    Json(const Json &arOther) = default;
+    Json(Json &&arOther) = default;
     explicit Json(std::string_view aJson);
     explicit Json(const std::string &arJson) : Json(std::string_view(arJson)) {}
     explicit Json(const rsp::utils::DynamicData &arData);
     explicit Json(rsp::utils::DynamicData&& arData);
+
+    Json& operator=(const Json&) = default;
+    Json& operator=(Json&&) noexcept = default;
 
     /**
      * \brief Encode a DynamicData object to a JSON formatted string

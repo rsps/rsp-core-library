@@ -271,6 +271,20 @@ null }
         CHECK_EQ(orig, result);
     }
 
+    SUBCASE("Copy Self") {
+        std::string orig(R"({"key":"[10,20,30]"})");
+        Json js;
+        js = Json::Decode(orig);
+
+        CHECK(js.IsObject());
+        CHECK_EQ(js["key"].GetType(), Variant::Types::String);
+
+        js["key"] = Json::Decode(js["key"].AsString());
+
+        CHECK(js["key"].IsArray());
+        CHECK_EQ(js["key"][2].AsInt(), 30);
+    }
+
     SUBCASE("Move") {
         std::string orig(json_object);
         StrUtils::Trim(orig);
