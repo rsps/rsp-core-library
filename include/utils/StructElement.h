@@ -132,6 +132,7 @@ public:
      * \param aValue
      */
     StructElementBase<T>& SetMargin(T aValue) { mMargin = aValue; return *this; }
+    [[nodiscard]] T GetMargin() const { return mMargin; }
 
     BinaryStream& SaveTo(BinaryStream &o) const override
     {
@@ -254,6 +255,7 @@ public:
     StructElement& operator=(const T& aValue) override { StructElementBase<T>::Set(aValue); return *this; } // Without this, constructor + copy is called
 
     StructElement& SetPrecision(int aPrecision) { mPrecision = aPrecision; return *this; }
+    [[nodiscard]] int GetPrecision() const { return mPrecision; }
 
     BinaryStream& SaveTo(BinaryStream &o) const override
     {

@@ -347,7 +347,7 @@ null }
 
     SUBCASE("Streaming") {
         bool pretty = false;
-        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"Nested\nValue"},"NullValue":null,"Optional":null,"Enum":"TWO","Boolean":true,"Date":null})";
+        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"Nested\nValue"},"NullValue":null,"Optional":null,"Enum":"TWO","Boolean":true,"Date":null,"Float":1.23})";
 
         SUBCASE("Ugly") {
         }
@@ -361,7 +361,8 @@ null }
     "Optional": null,
     "Enum": "TWO",
     "Boolean": true,
-    "Date": null
+    "Date": null,
+    "Float": 1.23
 })";
             pretty = true;
         }
@@ -382,6 +383,8 @@ Value)");
         std::optional<double> opt;
         rsp::utils::StructElement<EType> enum_value(EType::TWO);
         rsp::utils::StructElement<bool> bool_value(true);
+        rsp::utils::StructElement<float> float_value(1.23456789f);
+        float_value.SetPrecision(2);
 
         JsonStream js(pretty);
         js << OBegin()
@@ -393,7 +396,8 @@ Value)");
             << Key("Optional") << Value(opt) << Comma()
             << Key("Enum") << enum_value << Comma()
             << Key("Boolean") << bool_value << Comma()
-            << Key("Date") << rsp::utils::DateTime::Null()
+            << Key("Date") << rsp::utils::DateTime::Null() << Comma()
+            << Key("Float") << float_value
             << OEnd();
         CHECK_EQ(js.Getsize(), raw.size());
         CHECK_EQ(js.str(), raw);

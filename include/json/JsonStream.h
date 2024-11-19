@@ -138,6 +138,17 @@ JsonStream& operator<< (JsonStream &o, utils::StructElement<T> const &t) {
         o << Null();
     }
     else {
+        if constexpr(std::is_floating_point<T>::value) {
+            std::streamsize digits = t.GetPrecision();
+            if (digits == -1) {
+                digits = std::numeric_limits<double>::max_digits10;
+            }
+            o.imbue(std::locale::classic());
+            if (digits >= 0) {
+                o.precision(digits);
+                o << std::fixed;
+            }
+        }
         o << t.Get();
     }
     return o;
