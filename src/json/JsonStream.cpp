@@ -28,7 +28,7 @@ JsonStream::JsonStream(bool aPrettyPrint, unsigned aLevel)
     }
 }
 
-size_t JsonStream::Getsize()
+size_t JsonStream::GetSize()
 {
     return size_t(tellp());
 }

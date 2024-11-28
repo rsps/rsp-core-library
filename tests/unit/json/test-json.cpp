@@ -413,7 +413,7 @@ Value)");
             << Key("Date") << rsp::utils::DateTime::Null() << Comma()
             << Key("Float") << float_value
             << OEnd();
-        CHECK_EQ(js.Getsize(), raw.size());
+        CHECK_EQ(js.GetSize(), raw.size());
         CHECK_EQ(js.str(), raw);
     }
 
