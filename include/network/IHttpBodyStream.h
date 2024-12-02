@@ -38,7 +38,7 @@ public:
      * \brief Get the total size of the encoded body data
      * \return Size of encoded body
      */
-    [[nodiscard]] virtual size_t GetSize() const = 0;
+    [[nodiscard]] virtual size_t GetSize() = 0;
 
     /**
      * \brief Get up to aMaxLen characters from the body content.

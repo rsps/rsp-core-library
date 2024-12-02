@@ -76,7 +76,7 @@ bool HttpStringBody::GetChunk(char *apBuffer, size_t aBufferSize, size_t &arWrit
     return (arChunkIndex == mContent.size());
 }
 
-size_t HttpStringBody::GetSize() const
+size_t HttpStringBody::GetSize()
 {
     return mContent.size();
 }
