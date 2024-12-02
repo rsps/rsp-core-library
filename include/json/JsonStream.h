@@ -67,7 +67,7 @@ public:
      */
     explicit JsonStream(bool aPrettyPrint = false, unsigned aLevel = 0);
 
-    [[nodiscard]] size_t Getsize();
+    [[nodiscard]] size_t GetSize();
 
     static void StringToStream(const std::string &arString, std::ostream &o, bool aForceToUCS2 = false);
     static void StringToStream(std::string_view aString, std::ostream &o, bool aForceToUCS2 = false);
