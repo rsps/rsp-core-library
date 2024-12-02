@@ -60,7 +60,7 @@ protected:
     {
         size_t ChunkIndex = 0;
         size_t PayloadIndex = 0;
-        const IHttpBodyStream* Body;
+        IHttpBodyStream* Body;
     };
     union UploadBuffer
     {

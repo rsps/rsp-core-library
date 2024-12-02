@@ -33,7 +33,7 @@ public:
      * \param arPayloadIndex Zero initialized sub index to delivered chunk, entirely controlled by implementation to keep function const.
      * \return True if entire body has been written
      */
-    [[nodiscard]] virtual bool GetChunk(char *apBuffer, size_t aBufferSize, size_t &arBytesWritten, size_t &arChunkIndex, size_t &arPayloadIndex) const = 0;
+    [[nodiscard]] virtual bool GetChunk(char *apBuffer, size_t aBufferSize, size_t &arBytesWritten, size_t &arChunkIndex, size_t &arPayloadIndex) = 0;
     /**
      * \brief Get the total size of the encoded body data
      * \return Size of encoded body
@@ -45,7 +45,7 @@ public:
      * \param aMaxLen Maximum length of returned string. If entire content does not fit, the result will be appended with 3 dots e.g. "This is content..."
      * \return string
      */
-    [[nodiscard]] std::string GetString(size_t aMaxLen = 100) const
+    [[nodiscard]] std::string GetString(size_t aMaxLen = 100)
     {
         std::string result;
         result.resize(aMaxLen + 256ul);
