@@ -50,8 +50,8 @@ ThreadInterface& Thread::Stop()
 {
     stop();
 
-    if (mException) {
-        std::rethrow_exception(mException);
+    if (mpException) {
+        std::rethrow_exception(mpException);
     }
 
     return *this;
@@ -89,7 +89,7 @@ void Thread::run()
         }
     }
     catch(...) {
-        mException = std::current_exception();
+        mpException = std::current_exception();
     }
 }
 

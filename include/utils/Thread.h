@@ -87,13 +87,20 @@ public:
      */
     ThreadInterface& SetExecute(ThreadCallback_t aCb) override;
 
+    /**
+     * \brief Check if this thread has stopped execution, due to an unhandled exception.
+     *        The exception is pending and will be rethrown by invoking Stop()
+     * \return True if an exception is pending
+     */
+    [[nodiscard]] bool HasException() const { return bool(mpException); }
+
 protected:
     std::string mName;
     rsp::logging::LogChannel mLogger;
     std::thread mThread{};
     ThreadCallback_t mWhenExecute{};
     bool mTerminated = false;
-    std::exception_ptr mException = nullptr;
+    std::exception_ptr mpException = nullptr;
 
     void run();
     void start();
