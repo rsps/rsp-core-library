@@ -124,6 +124,7 @@ Thread& Thread::SetAttributes(size_t aStackSize, size_t aPriority, int aCoreId)
 
 void Thread::start()
 {
+    mpException = nullptr;
     mTerminated = false;
     std::thread thread(&Thread::run, this);
     mThread.swap(thread);
