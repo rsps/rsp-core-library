@@ -51,7 +51,9 @@ ThreadInterface& Thread::Stop()
     stop();
 
     if (mpException) {
-        std::rethrow_exception(mpException);
+        auto exc = mpException;
+        mpException = nullptr;
+        std::rethrow_exception(exc);
     }
 
     return *this;
