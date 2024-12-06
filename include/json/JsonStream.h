@@ -43,6 +43,7 @@ struct Raw
     std::string_view mJson;
     explicit Raw(const std::string &arJson) : mJson(arJson) {}
     explicit Raw(std::string_view aJson) : mJson(aJson) {}
+    explicit Raw(const char* apJson) : mJson(std::string_view(apJson)) {}
 };
 
 template <class T>
