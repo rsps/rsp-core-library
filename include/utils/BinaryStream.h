@@ -63,8 +63,18 @@ struct BinaryStream
             bits += 7;
             index++;
         }
-        while((byte & 0x80) && (index < sizeof(sz)));
+        while((byte & 0x80) && (index < sizeof(T)));
         return sz;
+    }
+
+    std::streamsize GetN(void* apBuffer, std::streamsize aSize) const
+    {
+        return mpStreamBuf->sgetn(reinterpret_cast<char *>(apBuffer), aSize);
+    }
+
+    std::streamsize PutN(const void* apBuffer, std::streamsize aSize) const
+    {
+        return mpStreamBuf->sputn(reinterpret_cast<const char *>(apBuffer), aSize);
     }
 
 protected:
@@ -108,7 +118,7 @@ BinaryStream& operator>>(BinaryStream &i, T& arValue)
         arValue.LoadFrom(i);
     }
     else {
-        i.mpStreamBuf->sgetn(reinterpret_cast<char *>(&arValue), sizeof(T));
+        i.GetN(&arValue, sizeof(T));
     }
     return i;
 }
@@ -127,7 +137,7 @@ BinaryStream& operator>>(BinaryStream &i, ContainerT<ValueT>& arContainer)
     using size_type = decltype(arContainer.size());
     auto sz = i.ReadSize<size_type>();
     arContainer.resize(size_t(sz));
-    i.mpStreamBuf->sgetn(reinterpret_cast<char *>(arContainer.data()), std::streamsize(sz * sizeof(ValueT)));
+    i.GetN(arContainer.data(), std::streamsize(sz * sizeof(ValueT)));
     return i;
 }
 
@@ -138,7 +148,7 @@ BinaryStream& operator<<(BinaryStream &o, const T& arValue)
         arValue.SaveTo(o);
     }
     else {
-        o.mpStreamBuf->sputn(reinterpret_cast<const char *>(&arValue), sizeof(T));
+        o.PutN(&arValue, sizeof(T));
     }
     return o;
 }
@@ -155,7 +165,7 @@ template <template <typename> class ContainerT,
 BinaryStream& operator<<(BinaryStream &o, const ContainerT<ValueT>& arContainer)
 {
     o.WriteSize(arContainer.size());
-    o.mpStreamBuf->sputn(reinterpret_cast<const char *>(arContainer.data()), std::streamsize(arContainer.size() * sizeof(ValueT)));
+    o.PutN(arContainer.data(), std::streamsize(arContainer.size() * sizeof(ValueT)));
     return o;
 }
 
@@ -184,6 +194,12 @@ public:
     BinaryStringStream()
     {
         mpStreamBuf = mStringStream.rdbuf();
+    }
+
+    BinaryStringStream(char *apBuffer, std::streamsize aSize)
+    {
+        mpStreamBuf = mStringStream.rdbuf();
+        mpStreamBuf->pubsetbuf(apBuffer, aSize);
     }
 
     std::stringstream& Get()
