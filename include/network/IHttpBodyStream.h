@@ -59,12 +59,9 @@ public:
             total += written;
         }
         if (!eof) {
-            result.resize(total - 3);
-            result += "...";
+            result.replace(total - 3, 3, 3, '.');
         }
-        else {
-            result.resize(total);
-        }
+        result.resize(total);
         return result;
     }
 };
