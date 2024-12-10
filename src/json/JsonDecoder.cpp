@@ -68,7 +68,8 @@ void JsonDecoder::findSubString(char aToken1, char aToken2)
         else if (!in_quotes && (*it == aToken1)) {
             indent++;
         }
-        else if (!in_quotes && (*it == '\\')) {
+//        else if (!in_quotes && (*it == '\\')) {
+        else if (*it == '\\') {
             it++;
             if (*it == 'u') {
                 it += 4; // Advance u + 4 hex digits

@@ -455,6 +455,20 @@ Value)");
         CHECK(o["Queue"].IsArray());
         CHECK_EQ(o["Queue"][0][0].AsInt(), 3);
     }
+
+    SUBCASE("Escapes") {
+        std::string raw = R"(
+[
+            "String \"with\" escape characters",
+            "String \"with\" \u0000\u0001\u0002 binary data"
+])";
+        Json v;
+        CHECK_NOTHROW(v = Json::Decode(raw));
+        CHECK(v.IsArray());
+        CHECK_EQ(v.GetCount(), 2);
+        CHECK_EQ(v[0].AsString().size(), 31);
+        CHECK_EQ(v[1].AsString().size(), 29);
+    }
 }
 
 template <typename E, E V, int I> void func_print() {
