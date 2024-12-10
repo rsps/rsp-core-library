@@ -41,9 +41,32 @@ std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)
     }
 
     if (arOptions.Body) {
-        o << "Body:\n" << arOptions.Body->GetString(300);
+        o << "Body:\n" << *(arOptions.Body);
     }
 
+    return o;
+}
+
+
+/**
+ * \brief Get up to aMaxLen characters from the body content.
+ * \param aMaxLen Maximum length of returned string. If entire content does not fit, the result will be appended with 3 dots e.g. "This is content..."
+ * \return string
+ */
+std::ostream& operator<<(std::ostream &o, IHttpBodyStream &s)
+{
+    char buffer[257];
+    size_t written;
+    size_t chunk_index = 0;
+    size_t payload_index = 0;
+    size_t total = 0;
+    bool eof = false;
+    while (!eof) {
+        eof = s.GetChunk(buffer, 256, written, chunk_index, payload_index);
+        total += written;
+        buffer[written] = '\0';
+        o << buffer;
+    }
     return o;
 }
 

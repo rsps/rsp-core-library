@@ -307,7 +307,9 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
 )");
 
 //        MESSAGE(body.GetString(100));
-        CHECK_EQ(body.GetString(100), body.Get().substr(0, 97) + "...");
+        std::stringstream ss;
+        ss << body;
+        CHECK_EQ(ss.str(), body.Get());
 
         char buffer[51];
         size_t written;

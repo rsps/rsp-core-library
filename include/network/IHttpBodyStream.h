@@ -39,32 +39,9 @@ public:
      * \return Size of encoded body
      */
     [[nodiscard]] virtual size_t GetSize() = 0;
-
-    /**
-     * \brief Get up to aMaxLen characters from the body content.
-     * \param aMaxLen Maximum length of returned string. If entire content does not fit, the result will be appended with 3 dots e.g. "This is content..."
-     * \return string
-     */
-    [[nodiscard]] std::string GetString(size_t aMaxLen = 100)
-    {
-        std::string result;
-        result.resize(aMaxLen + 256ul);
-        size_t written;
-        size_t chunk_index = 0;
-        size_t payload_index = 0;
-        size_t total = 0;
-        bool eof = false;
-        while (!eof && (total < aMaxLen)) {
-            eof = GetChunk(&result[total], aMaxLen, written, chunk_index, payload_index);
-            total += written;
-        }
-        if (!eof) {
-            result.replace(total - 3, 3, 3, '.');
-        }
-        result.resize(total);
-        return result;
-    }
 };
+
+std::ostream& operator<<(std::ostream &o, IHttpBodyStream &s);
 
 } // rsp::network
 
