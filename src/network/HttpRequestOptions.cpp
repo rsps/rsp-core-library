@@ -55,17 +55,24 @@ std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)
  */
 std::ostream& operator<<(std::ostream &o, IHttpBodyStream &s)
 {
-    char buffer[257];
+    char buffer[200];
     size_t written;
     size_t chunk_index = 0;
     size_t payload_index = 0;
     size_t total = 0;
     bool eof = false;
     while (!eof) {
-        eof = s.GetChunk(buffer, 256, written, chunk_index, payload_index);
+        eof = s.GetChunk(buffer, sizeof(buffer), written, chunk_index, payload_index);
         total += written;
-        buffer[written] = '\0';
-        o << buffer;
+        for (size_t i = 0 ; i < written ; ++i) {
+            auto c = buffer[i];
+            if (std::isprint(static_cast<unsigned char>(c)) || c == '\n' || c == '\r') {
+                o << c;
+            }
+            else {
+                o << '.';
+            }
+        }
     }
     return o;
 }
