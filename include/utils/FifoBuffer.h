@@ -20,6 +20,11 @@ template<class T, size_t N>
 class FifoBuffer
 {
 public:
+    void Clear()
+    {
+        mHead = mTail = 0;
+    }
+
     [[nodiscard]] bool IsEmpty() const
     {
         return mHead == mTail;
@@ -61,7 +66,7 @@ public:
         if (!IsEmpty()) {
             if (mHead == N) {
                 std::memcpy(apBuffer, &mBuffer.at(mTail), size);
-                mHead = mTail = 0;
+                Clear();
             }
             else if (mHead > mTail) {
                 std::memcpy(apBuffer, &mBuffer.at(mTail), size);
