@@ -30,8 +30,6 @@ struct BinaryStream
         mpStreamBuf->pubseekpos(0);
     }
 
-    std::streambuf *mpStreamBuf = nullptr;
-
     template <class T>
     void WriteSize(T sz)
     {
@@ -79,6 +77,7 @@ struct BinaryStream
 
 protected:
     BinaryStream() = default;
+    std::streambuf *mpStreamBuf = nullptr;
 };
 
 class BinaryStreamable
