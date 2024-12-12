@@ -25,7 +25,8 @@ public:
     virtual ~IHttpBodyStream() = default;
 
     /**
-     * \brief Fill the given buffer with the next chunk of body data
+     * \brief Fill the given buffer with the next chunk of body data.
+     *        This function must be able to correctly handle a buffer size as small as 1 byte.
      * \param apBuffer Pointer to buffer to fill
      * \param aBufferSize Size of buffer
      * \param arBytesWritten Size of chunk written to buffer

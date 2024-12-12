@@ -12,6 +12,11 @@
 
 using namespace rsp::utils;
 
+static bool Compare(char *apData, std::initializer_list<char> aList)
+{
+    return (std::memcmp(apData, std::data(aList), aList.size()) == 0);
+}
+
 TEST_CASE("FifoBuffer")
 {
     FifoBuffer<char, 10> mFifo;
@@ -37,26 +42,32 @@ TEST_CASE("FifoBuffer")
     CHECK_EQ(mFifo.Write(data, sizeof(data)), 0);
 
     char out[4]{};
-    char expected[4] = {1, 2, 3, 4};
     CHECK_EQ(mFifo.Read(out, sizeof(out)), sizeof(out));
-
     CHECK_FALSE(mFifo.IsEmpty());
     CHECK_EQ(mFifo.Used(), 6);
     CHECK_EQ(mFifo.Free(), 4);
-    CHECK_EQ(std::memcmp(out, expected, sizeof(out)), 0);
+    CHECK(Compare(out, {1, 2, 3, 4}));
+
+    CHECK_EQ(mFifo.Write(data, sizeof(data)), 4);
+    CHECK_FALSE(mFifo.IsEmpty());
+    CHECK_EQ(mFifo.Used(), 10);
+    CHECK_EQ(mFifo.Free(), 0);
 
     CHECK_EQ(mFifo.Read(out, sizeof(out)), sizeof(out));
+    CHECK_FALSE(mFifo.IsEmpty());
+    CHECK_EQ(mFifo.Used(), 6);
+    CHECK_EQ(mFifo.Free(), 4);
+    CHECK(Compare(out, {5, 1, 2, 3}));
 
+    CHECK_EQ(mFifo.Read(out, 4), 4);
     CHECK_FALSE(mFifo.IsEmpty());
     CHECK_EQ(mFifo.Used(), 2);
     CHECK_EQ(mFifo.Free(), 8);
-
-    char expected2[4] = {5, 1, 2, 3};
-    CHECK_EQ(std::memcmp(out, expected2, 4), 0);
+    CHECK(Compare(out, {4, 5, 1, 2}));
 
     std::memset(out, 0, sizeof(out));
     CHECK_EQ(mFifo.Read(out, sizeof(out)), 2);
-
+    CHECK(Compare(out, {3, 4, 0, 0}));
     CHECK(mFifo.IsEmpty());
     CHECK_EQ(mFifo.Used(), 0);
     CHECK_EQ(mFifo.Free(), 10);
@@ -71,9 +82,6 @@ TEST_CASE("FifoBuffer")
     CHECK_EQ(mFifo.Used(), 0);
     CHECK_EQ(mFifo.Free(), 10);
 
-    char expected3[4] = {4, 5, 0, 0};
-    CHECK_EQ(std::memcmp(out, expected3, 4), 0);
-
     CHECK_EQ(mFifo.Write(&data[1], 4), 4);
 
     CHECK_FALSE(mFifo.IsEmpty());
@@ -83,6 +91,5 @@ TEST_CASE("FifoBuffer")
     std::memset(out, 0, sizeof(out));
     CHECK_EQ(mFifo.Read(out, sizeof(out)), 4);
 
-    char expected4[4] = {2, 3, 4, 5};
-    CHECK_EQ(std::memcmp(out, expected4, 4), 0);
+    CHECK(Compare(out, {2, 3, 4, 5}));
 }
