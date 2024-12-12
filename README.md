@@ -32,7 +32,7 @@ The libraries should be available for the linker to build the program.
 To install those libraries on on Debian based systems, execute the following in a terminal:
 
 ```
-sudo apt install libssl-dev libcurl4 libcurl4-openssl-dev libwpa-client-dev libfreetype-dev zlib1g-dev
+sudo apt install libssl-dev libcurl4 libcurl4-openssl-dev libwpa-client-dev libfreetype-dev zlib1g-dev libsdl2-dev
 ```
 
 To execute the unit tests a few other libraries are needed:
