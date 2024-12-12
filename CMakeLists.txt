@@ -52,6 +52,7 @@ if (GFX)
     list(APPEND BUILD_OPTIONS -DUSE_GFX)
 
     if (SDL2)
+        find_package(SDL2 REQUIRED)
         list(APPEND BUILD_OPTIONS -DUSE_GFX_SDL)
         list(APPEND LIBRARIES -lSDL2)
     else()
