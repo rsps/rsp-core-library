@@ -47,6 +47,7 @@ public:
     FifoBuffer& SetHead(size_t aHead)
     {
         ASSERT(mHead == 0)
+        ASSERT(mHead <= N)
         ASSERT(mTail == 0)
         if (aHead > 0) {
             mHead = aHead % N;
