@@ -25,7 +25,7 @@ bool RequestData::GetData(char *apBuffer, size_t aLen, IHttpBodyStream &arBody)
             done = arBody.GetChunk(mFiFo.GetData(), mFiFo.Free(), sz, mChunkIndex, mPayloadIndex);
             mFiFo.SetHead(sz);
         }
-        mWritten += mFiFo.Read(apBuffer, aLen);
+        mWritten += mFiFo.Read(&apBuffer[mWritten], aLen - mWritten);
     }
     return false;
 }

@@ -320,9 +320,9 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
 //            MESSAGE("\nChunk:   " << buffer << "\nwritten: " << written << "\nindex:   " << chunk_index);
         }
         buffer[rd.GetWritten()] = '\0';
-        CHECK_EQ(rd.GetWritten(), 26);
+        CHECK_EQ(rd.GetWritten(), 27);
         CHECK_EQ(rd.GetChunkIndex(), 333);
-        CHECK_EQ("runcheon, see if I don't.\n", std::string(buffer));
+        CHECK_EQ("cruncheon, see if I don't.\n", std::string(buffer));
     }
 
     SUBCASE("Post JSON") {
