@@ -20,6 +20,7 @@
 #include <network/HttpSession.h>
 #include <network/HttpStringBody.h>
 #include <network/NetworkException.h>
+#include <network/RequestData.h>
 #include <posix/FileSystem.h>
 #include <posix/FileIO.h>
 #include <utils/StrUtils.h>
@@ -311,19 +312,17 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
         ss << body;
         CHECK_EQ(ss.str(), body.Get());
 
-        char buffer[51];
-        size_t written;
-        size_t chunk_index = 0;
-        size_t payload_index = 0;
-        bool eof = false;
-        while (!eof) {
-            eof = body.GetChunk(buffer, sizeof(buffer) - 1, written, chunk_index, payload_index);
-            buffer[written] = '\0';
+        char buffer[52];
+        RequestData rd;
+
+        while (!rd.GetData(buffer, sizeof(buffer) - 1, body)) {
+            buffer[rd.GetWritten()] = '\0';
 //            MESSAGE("\nChunk:   " << buffer << "\nwritten: " << written << "\nindex:   " << chunk_index);
         }
-        CHECK_EQ(written, 33);
-        CHECK_EQ(chunk_index, 333);
-        CHECK_EQ("blurlecruncheon, see if I don't.\n", std::string(buffer));
+        buffer[rd.GetWritten()] = '\0';
+        CHECK_EQ(rd.GetWritten(), 26);
+        CHECK_EQ(rd.GetChunkIndex(), 333);
+        CHECK_EQ("runcheon, see if I don't.\n", std::string(buffer));
     }
 
     SUBCASE("Post JSON") {

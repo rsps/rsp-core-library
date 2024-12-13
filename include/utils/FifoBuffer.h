@@ -48,7 +48,10 @@ public:
     {
         ASSERT(mHead == 0)
         ASSERT(mTail == 0)
-        mHead = aHead;
+        if (aHead > 0) {
+            mHead = aHead % N;
+            mFull = (mHead == mTail);
+        }
         return *this;
     }
 
