@@ -36,7 +36,9 @@ void BufferToStream::Print(std::ostream& o) const
             if (mShowNewLines) {
                 o << "\\r";
             }
-            o << c;
+            else {
+                o << '.';
+            }
         }
         else {
             o << '.';

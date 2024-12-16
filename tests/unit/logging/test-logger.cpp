@@ -126,7 +126,8 @@ TEST_CASE("Logging") {
     t.join();
 
     std::vector<uint8_t> vec = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    CHECK_NOTHROW(log.Info() << "Binary: " << BufferToStream(reinterpret_cast<char*>(vec.data()), vec.size(), true));
+    CHECK_NOTHROW(log.Info() << "Binary1: " << BufferToStream(reinterpret_cast<char*>(vec.data()), vec.size(), true));
+    CHECK_NOTHROW(log.Info() << "Binary2: " << BufferToStream(reinterpret_cast<char*>(vec.data()), vec.size()));
 
     std::ifstream fin;
     fin.open(cFileName);
@@ -177,9 +178,14 @@ TEST_CASE("Logging") {
     CHECK_MESSAGE(StrUtils::Contains(line, "] Main.INFO: Wakeup..."), line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "] Test Channel.INFO: Binary: .........\\n"), line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "] Test Channel.INFO: Binary1: .........\\n"), line);
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "..\\r\r..."), line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "..\\r..."), line);
+
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "] Test Channel.INFO: Binary2: ........."), line);
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "......"), line);
 
     std::getline(fin, line);
     CHECK_MESSAGE(fin.eof(), line);
