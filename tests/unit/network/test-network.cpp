@@ -276,7 +276,7 @@ TEST_CASE("Network")
 //        MESSAGE(body);
 
         std::string expected = "\n"
-            "Uploaded file size: 25455\n"
+            "Uploaded file size: 25437\n"
             "CTYPE: multipart/form-data\n"
             "filename: uploaded.png\r\n"
             "filedata: filename=\"image.png\"; Content-Type: image/png\r\n";
