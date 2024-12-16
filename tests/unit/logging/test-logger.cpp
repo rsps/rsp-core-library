@@ -14,6 +14,7 @@
 #include <iostream>
 #include <doctest.h>
 #include <exceptions/CoreException.h>
+#include <logging/BufferToStream.h>
 #include <logging/Logger.h>
 #include <logging/LogChannel.h>
 #include <logging/ConsoleLogWriter.h>
@@ -124,6 +125,9 @@ TEST_CASE("Logging") {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     t.join();
 
+    std::vector<uint8_t> vec = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    CHECK_NOTHROW(log.Info() << "Binary: " << BufferToStream(reinterpret_cast<char*>(vec.data()), vec.size(), true));
+
     std::ifstream fin;
     fin.open(cFileName);
 
@@ -171,6 +175,11 @@ TEST_CASE("Logging") {
 
     std::getline(fin, line);
     CHECK_MESSAGE(StrUtils::Contains(line, "] Main.INFO: Wakeup..."), line);
+
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "] Test Channel.INFO: Binary: .........\\n"), line);
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "..\\r\r..."), line);
 
     std::getline(fin, line);
     CHECK_MESSAGE(fin.eof(), line);
