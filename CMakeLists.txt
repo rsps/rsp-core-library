@@ -35,9 +35,9 @@ project (rsp-core-lib)
 # Declare empty lists
 set(BUILD_OPTIONS "")
 set(LIBRARIES "")
-if ("${GCC_TOOL}" MATCHES "\/g\\+\\+-14$")
+if ("${GCC_TOOL}" MATCHES "\/g\\+\\+-1[3-9]+$")
     list(APPEND LIBRARIES "-lstdc++exp")
-else()
+elseif ("${GCC_TOOL}" MATCHES "\/g\\+\\+-12$")
     list(APPEND LIBRARIES "-lstdc++_libbacktrace")
 endif()
 
