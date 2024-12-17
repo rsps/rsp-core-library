@@ -9,6 +9,7 @@
  */
 
 #include <doctest.h>
+#include <cctype>
 #include <cstring>
 #include <iostream>
 #include <chrono>
@@ -19,6 +20,7 @@
 #include <network/NetworkLibrary.h>
 #include <network/HttpSession.h>
 #include <network/HttpStringBody.h>
+#include <network/MultipartBoundary.h>
 #include <network/NetworkException.h>
 #include <network/RequestData.h>
 #include <posix/FileSystem.h>
@@ -492,6 +494,27 @@ Body: )" + json + "\n";
         CHECK(respHead);
         CHECK(respHead2);
         CHECK(resp1);
+    }
+
+    SUBCASE("MultipartBoundary") {
+        MultipartBoundary mb1;
+        CHECK_EQ(mb1.GetBoundary().size(), 32);
+        MESSAGE("Random boundary: " << mb1.GetBoundary());
+        for (auto c : mb1.GetBoundary()) {
+            CHECK(std::isprint(c));
+        }
+
+        MultipartBoundary mb("ABC");
+        CHECK_EQ(mb.GetBoundary(), "ABC");
+
+        CHECK_EQ(mb.GetContentTypeHeader(), std::string("multipart/form-data; boundary=ABC"));
+
+        CHECK_EQ(mb.MakeContentDisposition(""), std::string("--ABC\r\n\r\n"));
+        CHECK_EQ(mb.MakeContentDisposition("Field1"), std::string("--ABC\r\nContent-Disposition: form-data; name=\"Field1\"\r\n\r\n"));
+        CHECK_EQ(mb.MakeContentDisposition("File", "my-file.bin"), std::string("--ABC\r\nContent-Disposition: form-data; name=\"File\"; filename=\"my-file.bin\"\r\n\r\n"));
+        CHECK_EQ(mb.MakeContentDisposition("File", "my-file.bin", "application/octet-stream"), std::string("--ABC\r\nContent-Disposition: form-data; name=\"File\"; filename=\"my-file.bin\"\r\nContent-Type: application/octet-stream\r\n\r\n"));
+
+        CHECK_EQ(mb.GetEndBoundary(), std::string("\r\n--ABC--"));
     }
 
     CHECK_EQ(0, std::system("killall lighttpd"));
