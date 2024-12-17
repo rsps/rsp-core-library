@@ -16,7 +16,7 @@
 
 namespace rsp::network {
 
-constexpr std::string CRLF("\r\n");
+constexpr const char* CRLF = "\r\n";
 
 class MultipartBoundary
 {
