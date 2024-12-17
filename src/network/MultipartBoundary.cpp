@@ -54,7 +54,8 @@ std::string MultipartBoundary::MakeContentDisposition(const std::string& arName,
 
 std::ostream& MultipartBoundary::StreamContentDisposition(std::ostream& o, const std::string& arName, const std::string& arFileName, const std::string& arContentType) const
 {
-    o << "--" << mBoundary;
+    /** \see https://datatracker.ietf.org/doc/html/rfc7578#section-4.1 */
+    o << CRLF << "--" << mBoundary;
     if (!arName.empty()) {
         o << CRLF << "Content-Disposition: form-data; name=\"" << arName << "\"";
     }
