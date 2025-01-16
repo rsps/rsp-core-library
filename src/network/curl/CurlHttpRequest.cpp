@@ -17,6 +17,11 @@
 #include "CurlSession.h"
 #include "Exceptions.h"
 
+//#define LOG_OUTPUT 1
+#ifdef LOG_OUTPUT
+    #include <logging/BufferToStream.h>
+#endif
+
 using namespace rsp::logging;
 using namespace rsp::network;
 using namespace rsp::utils;
@@ -91,6 +96,10 @@ size_t CurlHttpRequest::stringReadFunction(void *ptr, size_t size, size_t nmemb,
     }
 //    mLogger.Debug() << "Copying " << sz << " characters to network buffer";
     std::memcpy(ptr, apBuf->String.Data, sz);
+#ifdef LOG_OUTPUT
+    auto o = rsp::logging::LoggerInterface::GetDefault()->Info();
+    o << "Request chunk (" << sz << ") " << BufferToStream(static_cast<char*>(ptr), sz, true);
+#endif
     apBuf->String.Data += sz;
     apBuf->String.Remaining -= sz;
     return sz;
@@ -99,7 +108,12 @@ size_t CurlHttpRequest::stringReadFunction(void *ptr, size_t size, size_t nmemb,
 size_t CurlHttpRequest::streamReadFunction(void *ptr, size_t size, size_t nmemb, CurlHttpRequest::UploadBuffer *apBuf)
 {
     apBuf->Stream.rd.GetData(static_cast<char*>(ptr), size * nmemb, *(apBuf->Stream.Body));
-    return apBuf->Stream.rd.GetWritten();
+    size_t written = apBuf->Stream.rd.GetWritten();
+#ifdef LOG_OUTPUT
+    auto o = rsp::logging::LoggerInterface::GetDefault()->Info();
+    o << "Request chunk (" << written << ") " << BufferToStream(static_cast<char*>(ptr), written, true);
+#endif
+    return written;
 }
 
 size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse)

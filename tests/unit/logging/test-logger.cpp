@@ -14,6 +14,7 @@
 #include <iostream>
 #include <doctest.h>
 #include <exceptions/CoreException.h>
+#include <logging/BufferToStream.h>
 #include <logging/Logger.h>
 #include <logging/LogChannel.h>
 #include <logging/ConsoleLogWriter.h>
@@ -124,6 +125,10 @@ TEST_CASE("Logging") {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     t.join();
 
+    std::vector<uint8_t> vec = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    CHECK_NOTHROW(log.Info() << "Binary1: " << BufferToStream(reinterpret_cast<char*>(vec.data()), vec.size(), true));
+    CHECK_NOTHROW(log.Info() << "Binary2: " << BufferToStream(reinterpret_cast<char*>(vec.data()), vec.size()));
+
     std::ifstream fin;
     fin.open(cFileName);
 
@@ -171,6 +176,16 @@ TEST_CASE("Logging") {
 
     std::getline(fin, line);
     CHECK_MESSAGE(StrUtils::Contains(line, "] Main.INFO: Wakeup..."), line);
+
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "] Test Channel.INFO: Binary1: .........\\n"), line);
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "..\\r..."), line);
+
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "] Test Channel.INFO: Binary2: ........."), line);
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "......"), line);
 
     std::getline(fin, line);
     CHECK_MESSAGE(fin.eof(), line);
