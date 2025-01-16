@@ -121,14 +121,14 @@ if (STD_THREAD)
     list(APPEND LIBRARIES Threads::Threads)
 endif ()
 
-add_library("rsp-core-lib" STATIC)
+add_library("${PROJECT_NAME}" STATIC)
 
 
 # Must use GNUInstallDirs to install libraries into correct
 # locations on all platforms.
 include(GNUInstallDirs)
 
-target_link_libraries ("rsp-core-lib"
+target_link_libraries ("${PROJECT_NAME}"
         ${LIBRARIES}
 )
 
@@ -138,7 +138,7 @@ SET (CMAKE_ENABLE_EXPORTS TRUE)
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
 # paths.
-target_include_directories(rsp-core-lib
+target_include_directories("${PROJECT_NAME}"
     PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
@@ -156,20 +156,20 @@ if (NOT RELEASE_BUILD)
     add_compile_options(${STRICT_COMPILE_OPTIONS})
 endif()
 
-target_compile_options(rsp-core-lib PUBLIC
+target_compile_options("${PROJECT_NAME}" PUBLIC
     -Wshadow
     ${BUILD_OPTIONS}
 )
 
 if (NOT RELEASE_BUILD)
-target_compile_options(rsp-core-lib PRIVATE
+target_compile_options("${PROJECT_NAME}" PRIVATE
     ${STRICT_COMPILE_OPTIONS}
     -DDEBUG_LOG
     -g
     -O0
 )
 else()
-target_compile_options(rsp-core-lib PRIVATE
+target_compile_options("${PROJECT_NAME}" PRIVATE
     -O3
 )
 endif()
