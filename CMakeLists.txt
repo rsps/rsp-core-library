@@ -37,7 +37,7 @@ if ("${GCC_TOOL}" MATCHES "\/g\\+\\+-1[3-9]+$")
 elseif ("${GCC_TOOL}" MATCHES "\/g\\+\\+-12$")
     list(APPEND LIBRARIES "-lstdc++_libbacktrace")
 endif()
-c
+
 set (CMAKE_CXX_STANDARD 23)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
