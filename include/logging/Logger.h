@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_LOGGING_LOGGER_H_
-#define SRC_LOGGING_LOGGER_H_
+#ifndef RSP_CORE_LIB_LOGGING_LOGGER_H
+#define RSP_CORE_LIB_LOGGING_LOGGER_H
 
 #include <string>
 #include <vector>
@@ -56,9 +56,11 @@ constexpr const char* stem(std::string_view path)
 class Logger : public LoggerInterface
 {
 public:
-    Logger(bool aCaptureClog = false);
-    Logger(const Logger&) = delete;
+    explicit Logger(bool aCaptureClog = false);
     ~Logger() override;
+
+    Logger(const Logger&) = delete;
+    Logger& operator= (const Logger&) = delete;
 
     LogStream Emergency() override;
     LogStream Alert() override;
@@ -69,16 +71,24 @@ public:
     LogStream Info() override;
     LogStream Debug() override;
 
-    Logger& operator= (const Logger&) = delete;
+
+    [[nodiscard]] size_t GetWritersCount() const override;
 
 protected:
     // Use shared_ptr to use compilers default move operations.
-    // It is instantiated with "do nothing" deallocator in Logger constructor initialization.
+    // It is instantiated with "do nothing" de-allocator in Logger constructor initialization.
     std::shared_ptr<std::streambuf> mpClogBackup;
 
+    std::recursive_mutex mMutex{};
+    std::vector<std::weak_ptr<LogWriterInterface>> mWriters{};
+
     std::shared_ptr<std::streambuf> makeCLogStream(bool aCaptureLog);
+
+    Handle_t addLogWriter(std::shared_ptr<LogWriterInterface> aWriter) override;
+    void write(const LogStream &arStream, const std::string &arMsg,
+                       const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
 };
 
 } /* namespace logging */
 
-#endif /* SRC_LOGGING_LOGGER_H_ */
+#endif // RSP_CORE_LIB_LOGGING_LOGGER_H

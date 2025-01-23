@@ -9,11 +9,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDE_NETWORK_IHTTPSESSION_H
-#define INCLUDE_NETWORK_IHTTPSESSION_H
+#ifndef RSP_CORE_LIB_NETWORK_I_HTTP_SESSION_H
+#define RSP_CORE_LIB_NETWORK_I_HTTP_SESSION_H
 
 #include <network/IHttpRequest.h>
 #include <network/HttpRequestOptions.h>
+
+#include <utility>
 
 namespace rsp::network {
 
@@ -28,7 +30,7 @@ class IHttpSession
 public:
     typedef std::function<void(IHttpResponse&)> ResponseCallback_t;
 
-    virtual ~IHttpSession() {}
+    virtual ~IHttpSession() = default;
 
     /**
      * \brief Process all requests currently queued in the session.
@@ -49,7 +51,7 @@ public:
      * \return Reference to HttpRequestOptions
      */
     virtual HttpRequestOptions& GetDefaultOptions() = 0;
-    virtual const HttpRequestOptions& GetDefaultOptions() const = 0;
+    [[nodiscard]] virtual const HttpRequestOptions& GetDefaultOptions() const = 0;
 
     /**
      * \brief Queue a new request of the given type and destination.
@@ -68,14 +70,14 @@ public:
      * \param aCallback Response handler
      * \return self
      */
-    IHttpRequest& Get(std::string_view aUri, ResponseCallback_t aCallback)   { return Request(HttpRequestType::GET, aUri, aCallback); }
-    IHttpRequest& Post(std::string_view aUri, ResponseCallback_t aCallback)  { return Request(HttpRequestType::POST, aUri, aCallback); }
-    IHttpRequest& Put(std::string_view aUri, ResponseCallback_t aCallback)   { return Request(HttpRequestType::PUT, aUri, aCallback); }
-    IHttpRequest& Head(std::string_view aUri, ResponseCallback_t aCallback)  { return Request(HttpRequestType::HEAD, aUri, aCallback); }
-    IHttpRequest& Patch(std::string_view aUri, ResponseCallback_t aCallback) { return Request(HttpRequestType::PATCH, aUri, aCallback); }
-    IHttpRequest& Delete(std::string_view aUri, ResponseCallback_t aCallback){ return Request(HttpRequestType::DELETE, aUri, aCallback); }
+    IHttpRequest& Get(std::string_view aUri, ResponseCallback_t aCallback)   { return Request(HttpRequestType::GET, aUri, std::move(aCallback)); }
+    IHttpRequest& Post(std::string_view aUri, ResponseCallback_t aCallback)  { return Request(HttpRequestType::POST, aUri, std::move(aCallback)); }
+    IHttpRequest& Put(std::string_view aUri, ResponseCallback_t aCallback)   { return Request(HttpRequestType::PUT, aUri, std::move(aCallback)); }
+    IHttpRequest& Head(std::string_view aUri, ResponseCallback_t aCallback)  { return Request(HttpRequestType::HEAD, aUri, std::move(aCallback)); }
+    IHttpRequest& Patch(std::string_view aUri, ResponseCallback_t aCallback) { return Request(HttpRequestType::PATCH, aUri, std::move(aCallback)); }
+    IHttpRequest& Delete(std::string_view aUri, ResponseCallback_t aCallback){ return Request(HttpRequestType::DELETE, aUri, std::move(aCallback)); }
 };
 
 } // namespace rsp::network
 
-#endif
+#endif // RSP_CORE_LIB_NETWORK_I_HTTP_SESSION_H

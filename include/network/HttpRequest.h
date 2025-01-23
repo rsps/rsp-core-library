@@ -8,8 +8,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef HTTPREQUEST_H
-#define HTTPREQUEST_H
+#ifndef RSP_CORE_LIB_NETWORK_HTTP_REQUEST_H
+#define RSP_CORE_LIB_NETWORK_HTTP_REQUEST_H
 
 #include <network/IHttpRequest.h>
 #include <network/HttpResponse.h>
@@ -20,26 +20,26 @@ class HttpRequest: public IHttpRequest
 {
 public:
     HttpRequest();
-    HttpRequest(const HttpRequestOptions& arOptions);
+    explicit HttpRequest(const HttpRequestOptions& arOptions);
 
-    const HttpRequestOptions& GetOptions() const override
+    [[nodiscard]] const HttpRequestOptions& GetOptions() const override
     {
         return mPimpl->GetOptions();
     }
 
-    IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override
+    HttpRequest& SetOptions(const HttpRequestOptions &arOptions) override
     {
         mPimpl->SetOptions(arOptions);
         return *this;
     }
 
-    IHttpRequest& SetBody(std::string const &body) override
+    HttpRequest& SetBody(std::shared_ptr<IHttpBodyStream> apBody) override
     {
-        mPimpl->SetBody(body);
+        mPimpl->SetBody(apBody);
         return *this;
     }
 
-    const std::string& GetBody() const override
+    [[nodiscard]] const IHttpBodyStream& GetBody() const override
     {
         return mPimpl->GetBody();
     }
@@ -54,7 +54,7 @@ public:
         return mPimpl->AddFile(arFieldName, arFile);
     }
 
-    IHttpResponse& Execute() override
+    [[nodiscard]] IHttpResponse& Execute() override
     {
         return mPimpl->Execute();
     }
@@ -71,4 +71,4 @@ protected:
 
 } // rsp::network
 
-#endif
+#endif // RSP_CORE_LIB_NETWORK_HTTP_REQUEST_H

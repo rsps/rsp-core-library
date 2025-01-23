@@ -12,7 +12,7 @@
 
 namespace rsp::network {
 
-HttpSession::HttpSession(std::size_t aSize)
+HttpSession::HttpSession(size_t aSize)
     : mPimpl(MakePimpl(aSize))
 {
 }

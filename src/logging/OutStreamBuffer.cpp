@@ -8,15 +8,13 @@
  * \author      Steffen Brummer
  */
 
-#include <thread>
 #include <logging/OutStreamBuffer.h>
-#include <logging/Logger.h>
 
 namespace rsp::logging {
 
-OutStreamBuffer::OutStreamBuffer(LoggerInterface *apLogger, LogLevel aLevel)
+OutStreamBuffer::OutStreamBuffer(LoggerInterface& arLogger, LogLevel aLevel)
     : std::streambuf(),
-      LogStream(apLogger, aLevel, std::string(), rsp::utils::DynamicData())
+      LogStream(arLogger, aLevel)
 {
 }
 
@@ -35,27 +33,25 @@ int OutStreamBuffer::overflow(int c)
 
 int OutStreamBuffer::sync()
 {
-    if (mMutex.try_lock()) {
-        DEBUG("mutex was not locked!!! " << std::this_thread::get_id());
+    if (mLock.IsLocked()) {
+        DEBUG("OutStreamBuffer mutex was not locked!!! " << std::this_thread::get_id())
     }
 
-    // Remove one ending newline, writeToLogger enforces a newline on every write
     std::string result = mBuffer.str();
-    if (result[result.length()-1] == '\n') {
+    // Remove one ending newline, writeToLogger enforces a newline on every write
+    if (!result.empty() && (result[result.length()-1] == '\n')) {
         result.pop_back();
     }
 
-    if (result.length() > 0) {
-        DEBUG("Message: (" << result.length() << ") " << result);
+    if (!result.empty()) {
+        DEBUG("Message: (" << result.length() << ") " << result)
         writeToLogger(result);
     }
     mBuffer.str(std::string());
 
-    mMutex.unlock();
-    DEBUG("Unlocked by " << std::this_thread::get_id());
+    mLock.Unlock();
+    DEBUG("Unlocked by " << std::this_thread::get_id())
     return 0;
 }
 
-
 } /* namespace rsp::logging */
-

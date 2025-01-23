@@ -19,18 +19,13 @@ using namespace rsp::logging;
 TestApplication::TestApplication(int argc, const char **argv)
     : ApplicationBase(argc, argv)
 {
-    mLogHandle = mLogger.AddLogWriter(std::make_shared<FileLogWriter>(mCmd.GetAppName() + ".log", LogLevel::Info));
-}
-
-TestApplication::~TestApplication()
-{
-    mLogger.RemoveLogWriter(mLogHandle);
+    mLogHandle = mLogger.MakeLogWriter<FileLogWriter>(GetAppName() + ".log", LogLevel::Info);
 }
 
 void TestApplication::execute()
 {
     if (!mCallback) {
-        GetLog().Info() <<  mCmd.GetAppName() << " says \"Hello World.\"";
+        GetLog().Info() <<  GetAppName() << " says \"Hello World.\"";
         Terminate(true);
     }
     else if (mCallback(*this)) {

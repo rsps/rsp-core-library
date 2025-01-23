@@ -5,21 +5,22 @@ find_package(Git REQUIRED)
 FetchContent_Declare(
     DocTest
     GIT_REPOSITORY "https://github.com/onqtam/doctest"
-    GIT_TAG "v2.4.9"
+    GIT_TAG "v2.4.11"
 )
 FetchContent_MakeAvailable(DocTest)
 
-FetchContent_Declare(
-    lighttpd_src
+# Include external project lighttpd from github.
+# Uses verbose FetchContent_Populate mode to avoid deprecation warning.
+# This is build using custom target for use during local unit tests
+FetchContent_Populate(lighttpd_src
+    QUIET
     GIT_REPOSITORY "https://github.com/lighttpd/lighttpd1.4"
-    GIT_TAG "lighttpd-1.4.66"
+    GIT_TAG "lighttpd-1.4.75"
+    BUILD_COMMAND ""
+    SOURCE_DIR ${FETCHCONTENT_BASE_DIR}/lighttpd_src-src
+    BINARY_DIR ${FETCHCONTENT_BASE_DIR}/lighttpd_src-build
+    SUBBUILD_DIR ${FETCHCONTENT_BASE_DIR}/lighttpd_src-subbuild
 )
-
-FetchContent_GetProperties(lighttpd_src)
-if(NOT lighttpd_POPULATED)
-    FetchContent_Populate(lighttpd_src)
-endif()
-
 add_custom_target(lighttpd
     COMMENT "Building lighttpd..."
     BYPRODUCTS ${lighttpd_src_BINARY_DIR}/build/lighttpd
@@ -51,8 +52,9 @@ target_include_directories(${TEST_BINARY}
 )
 
 if (NOT RELEASE_BUILD)
-target_compile_options(${TEST_BINARY} PRIVATE 
+target_compile_options(${TEST_BINARY} PRIVATE
     -DGFX_FPS=20
+    -DDEBUG_LOG
     -g
     -O0
     )
@@ -75,10 +77,13 @@ target_sources(${TEST_BINARY} PRIVATE
     ${SRC_FILES}
 )
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/testImages 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/testImages
     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/fonts 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/fonts
+    DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/helpers/scripts
     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/webserver/public
@@ -87,6 +92,8 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/webserver/ssl
     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/webserver/cgi
     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/webserver/users.plain
+        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/)
 
-    
+
 install(TARGETS ${TEST_BINARY} DESTINATION tgm/)

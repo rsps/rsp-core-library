@@ -8,18 +8,13 @@
  * \author      Steffen Brummer
  */
 
-#include <ctime>
 #include <chrono>
 #include <algorithm>
-#include <locale>
 #include <sstream>
-#include <iomanip>
 #include <iostream>
 #include <cstdarg>
 #include <unistd.h>
-#include <sys/types.h>
 #include <pwd.h>
-#include <time.h>
 #include <utils/ClockCast.h>
 #include <utils/StrUtils.h>
 
@@ -74,34 +69,36 @@ std::string& ToUpper(std::string &arStr)
 std::string ToLower(const std::string &arStr)
 {
     std::string result = arStr;
-    return ToLower(result);
+    ToLower(result);
+    return result;
 }
 
 std::string ToUpper(const std::string &arStr)
 {
     std::string result = arStr;
-    return ToUpper(result);
+    ToUpper(result);
+    return result;
 }
 
 
 std::string GetHomeDir()
 {
-    const char *homedir;
+    const char *home_dir;
 
-    if ((homedir = getenv("HOME")) == nullptr) {
+    if ((home_dir = getenv("HOME")) == nullptr) {
         struct passwd *pwd = getpwuid(getuid());
-        homedir = pwd->pw_dir;
+        home_dir = pwd->pw_dir;
     }
 
-    return homedir;
+    return home_dir;
 }
 
 std::string GetConfigDir()
 {
-    const char *configdir;
+    const char *config_dir;
 
-    if ((configdir = getenv("XDG_CONFIG_HOME")) != nullptr) {
-        return configdir;
+    if ((config_dir = getenv("XDG_CONFIG_HOME")) != nullptr) {
+        return config_dir;
     }
 
     return GetHomeDir();
@@ -109,7 +106,7 @@ std::string GetConfigDir()
 
 bool StartsWith(const std::string &aText, const std::string &aPrefix)
 {
-    return (aPrefix == aText.substr(0, aPrefix.length()));
+    return (aText.compare(0, aPrefix.length(), aPrefix) == 0);
 }
 
 bool EndsWith(const std::string &aText, const std::string &aAffix)
@@ -119,15 +116,15 @@ bool EndsWith(const std::string &aText, const std::string &aAffix)
 
 bool Contains(const std::string &aText, const std::string &aMatch)
 {
-    return (aText.find(aMatch, 0) != aText.npos);
+    return (aText.find(aMatch, 0) != std::string::npos);
 }
 
 
-std::vector<std::string> FindMatches(std::string aText, std::vector<std::string> &arList)
+std::vector<std::string> FindMatches(const std::string& arText, std::vector<std::string> &arList)
 {
     std::vector<std::string> found;
     for (std::string &s : arList) {
-        if(aText == s.substr(0, aText.length())) {
+        if(arText == s.substr(0, arText.length())) {
             found.push_back(s);
         }
     }
@@ -204,7 +201,7 @@ double ToDouble(const std::string &arString)
     // maybe use some manipulators
     stream >> d;
     if(!stream) {
-        THROW_WITH_BACKTRACE1(DecimalConversionError, std::string("StrUtils::ToDouble conversion error. From " + arString + " to double"));
+        THROW_WITH_BACKTRACE1(exceptions::DecimalConversionError, std::string("StrUtils::ToDouble conversion error. From " + arString + " to double"));
     }
     return d;
 }

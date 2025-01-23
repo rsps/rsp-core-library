@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SHA256DATASIGNATURE_H_
-#define INCLUDE_SECURITY_SHA256DATASIGNATURE_H_
+#ifndef RSP_CORE_LIB_SECURITY_SHA256_DATA_SIGNATURE_H
+#define RSP_CORE_LIB_SECURITY_SHA256_DATA_SIGNATURE_H
 
 #include "SecureBuffer.h"
 #include <utils/DataContainer.h>
@@ -28,9 +28,9 @@ public:
      */
     void Init(const SecureBuffer& arSecret);
 
-    std::size_t GetSize() const override { return 32; }
-    std::uint8_t* GetData() override { return mSignature.data(); }
-    const std::uint8_t* GetData() const override { return mSignature.data(); }
+    [[nodiscard]] std::size_t GetSize() const override { return 32; }
+    uint8_t* GetData() override { return mSignature.data(); }
+    [[nodiscard]] const uint8_t* GetData() const override { return mSignature.data(); }
     void Calc(const rsp::utils::IDataContent &arContent) override;
     void Verify(const rsp::utils::IDataContent &arContent) override;
 
@@ -41,4 +41,4 @@ protected:
 
 } /* namespace rsp::security */
 
-#endif /* INCLUDE_SECURITY_SHA256DATASIGNATURE_H_ */
+#endif // RSP_CORE_LIB_SECURITY_SHA256_DATA_SIGNATURE_H

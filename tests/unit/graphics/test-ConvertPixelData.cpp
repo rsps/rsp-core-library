@@ -9,9 +9,10 @@
  */
 
 #include <doctest.h>
-#include <graphics/primitives/Bitmap.h>
-#include <graphics/primitives/Color.h>
+#include <graphics/Bitmap.h>
+#include <graphics/Color.h>
 #include <posix/FileSystem.h>
+#include <utils/StrUtils.h>
 #include <TestHelpers.h>
 
 using namespace rsp::utils;
@@ -20,69 +21,74 @@ using namespace rsp::posix;
 
 TEST_SUITE_BEGIN("Graphics");
 
+static ColorDepth getDepth(const std::string& arPath)
+{
+    if (StrUtils::Contains(arPath, "/alpha/")) {
+        return ColorDepth::Alpha;
+    }
+    if (StrUtils::Contains(arPath, "/monochrome/")) {
+        return ColorDepth::Monochrome;
+    }
+    if (StrUtils::Contains(arPath, "/rgb/")) {
+        return ColorDepth::RGB;
+    }
+    return ColorDepth::RGBA;
+}
+
+static bool stemCompare(const std::filesystem::path& a1, const std::filesystem::path& a2)
+{
+    return  a1.stem().compare(a2.stem()) < 0;
+}
+
+
 TEST_CASE("Bitmap to C")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     std::string root = FileSystem::GetCurrentWorkingDirectory() + "testImages";
+    std::vector<std::filesystem::path> list;
 
-    SUBCASE("Alpha") {
-        MESSAGE("Converting alphas");
-        if (!FileSystem::DirectoryExists(root + "/alpha")) {
-            return;
-        }
-        std::vector<std::filesystem::path> list = FileSystem::Glob(root + "/alpha/*.bmp");
+    FileSystem::MakeDirectory(root + "/gfx");
+    FileSystem::DeleteFile(root + "/gfx/GfxResources.h");
 
-        for(std::filesystem::path &path : list) {
-            MESSAGE("Converting " << path << " to C++ file");
-            Bitmap bmp(path);
-            PixelData alpha = bmp.GetPixelData().ChangeColorDepth(PixelData::ColorDepth::Alpha);
-            alpha.SaveToCFile(path.replace_extension("cpp"));
-        }
+    if (FileSystem::DirectoryExists(root + "/alpha")) {
+        MESSAGE("List alpha");
+        auto l = FileSystem::Glob(root + "/alpha/*.bmp");
+        list.insert(list.end(), l.begin(), l.end());
     }
 
-    SUBCASE("Monochrome") {
-        if (!FileSystem::DirectoryExists(root + "/monochrome")) {
-            return;
-        }
-        std::vector<std::filesystem::path> list = FileSystem::Glob(root + "/monochrome/*.bmp");
-
-        for(std::filesystem::path &path : list) {
-            Bitmap bmp(path);
-            PixelData mono = bmp.GetPixelData().ChangeColorDepth(PixelData::ColorDepth::Monochrome);
-            mono.SaveToCFile(path.replace_extension("cpp"));
-        }
+    if (FileSystem::DirectoryExists(root + "/monochrome")) {
+        MESSAGE("List Monochrome");
+        auto l = FileSystem::Glob(root + "/monochrome/*.bmp");
+        list.insert(list.end(), l.begin(), l.end());
     }
 
-    SUBCASE("RGB") {
-        if (!FileSystem::DirectoryExists(root + "/rgb")) {
-            return;
-        }
-        MESSAGE("Found directory " << root + "/rgb");
-        std::vector<std::filesystem::path> list = FileSystem::Glob(root+ "/rgb/*.bmp");
-
-        for(std::filesystem::path &path : list) {
-            MESSAGE("Convert file " << path);
-            Bitmap bmp(path);
-            PixelData rgb = bmp.GetPixelData().ChangeColorDepth(PixelData::ColorDepth::RGB);
-            rgb.SaveToCFile(path.replace_extension("cpp"));
-        }
+    if (FileSystem::DirectoryExists(root + "/rgb")) {
+        MESSAGE("List RGB");
+        auto l = FileSystem::Glob(root + "/rgb/*.bmp");
+        list.insert(list.end(), l.begin(), l.end());
     }
 
-    SUBCASE("RGBA") {
-        if (!FileSystem::DirectoryExists(root + "/rgba")) {
-            return;
-        }
-        std::vector<std::filesystem::path> list = FileSystem::Glob(root + "/rgba/*.bmp");
-
-        for(std::filesystem::path &path : list) {
-            Bitmap bmp(path);
-            PixelData rgba = bmp.GetPixelData().ChangeColorDepth(PixelData::ColorDepth::RGBA);
-            rgba.SaveToCFile(path.replace_extension("cpp"));
-        }
+    if (FileSystem::DirectoryExists(root + "/rgba")) {
+        MESSAGE("List RGBA");
+        auto l = FileSystem::Glob(root + "/rgba/*.bmp");
+        list.insert(list.end(), l.begin(), l.end());
     }
 
+    std::sort(list.begin(), list.end(), stemCompare);
+
+    for(std::filesystem::path &path : list) {
+        MESSAGE(path.stem());
+    }
+
+    for(std::filesystem::path &path : list) {
+        MESSAGE("Converting " << path.filename() << " to C++ file");
+        Bitmap bmp(path);
+        PixelData pd = bmp.GetPixelData().ChangeColorDepth(getDepth(path));
+
+        std::string dest = root + "/gfx/" + std::string(path.stem()) + ".cpp";
+        pd.SaveToCFile(dest, true, "GfxResources.h");
+    }
 }
 
 

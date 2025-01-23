@@ -9,52 +9,76 @@
  */
 
 #include <utils/Thread.h>
-#include <logging/Logger.h>
+#include <utils/ThreadList.h>
+#ifdef ESP_PLATFORM
+    #include <esp_pthread.h>
+#endif
 
 using namespace rsp::logging;
 
 namespace rsp::utils {
 
-
-std::string Thread::GetName()
+Thread::Thread(std::string_view aName)
+      : mName(aName),
+        mLogger(aName)
 {
-    if (!mName.empty()) {
-        return mName;
+    if (mName.empty()) {
+        THROW_WITH_BACKTRACE2(ThreadException, "<empty>>", "A Thread name must not be empty.");
     }
 
-    std::stringstream ss;
-    ss << mThread.get_id();
-
-    return ss.str();
+    ThreadList::GetInstance().AddThread(*this);
 }
 
-Thread& Thread::Start()
+Thread::~Thread()
 {
-    mTerminated = false;
-    std::thread thread(&Thread::run, this);
-    mThread.swap(thread);
+    ThreadList::GetInstance().RemoveThread(*this);
+    stop();
+}
+
+const std::string& Thread::GetName() const
+{
+    return mName;
+}
+
+ThreadInterface& Thread::Start()
+{
+    start();
+    return *this;
+}
+
+ThreadInterface& Thread::Stop()
+{
+    stop();
+
+    if (mpException) {
+        auto exc = mpException;
+        mpException = nullptr;
+        std::rethrow_exception(exc);
+    }
 
     return *this;
 }
 
-Thread& Thread::Stop()
+ThreadInterface& Thread::Terminate()
 {
     mTerminated = true;
+    return *this;
+}
 
-    if (mThread.joinable()) {
-        mThread.join();
-    }
+bool Thread::IsTerminated() const
+{
+    return mTerminated;
+}
 
-    if (mException) {
-        std::rethrow_exception(mException);
-    }
-
+ThreadInterface& Thread::SetExecute(Thread::ThreadCallback_t aCb)
+{
+    mWhenExecute = aCb;
     return *this;
 }
 
 void Thread::run()
 {
-    Logger::GetDefault().Info() << "Running thread '" << mName << "'";
+    mLogger.Debug() << "Running thread '" << mName << "'";
     try {
         try {
             while (!mTerminated) {
@@ -62,12 +86,12 @@ void Thread::run()
             }
         }
         catch (const std::exception &e) {
-            Logger::GetDefault().Error() << "Thread '" << GetName() << "'" << " excepted with: " << e.what();
+            mLogger.Error() << "Thread '" << GetName() << "'" << " excepted with: " << e.what();
             throw ThreadException(GetName(), e.what());
         }
     }
     catch(...) {
-        mException = std::current_exception();
+        mpException = std::current_exception();
     }
 }
 
@@ -78,6 +102,41 @@ void Thread::execute()
     }
     else {
         mTerminated = true;
+    }
+}
+
+#define UNUSED(macro_arg_parameter) {(void)macro_arg_parameter;}
+
+Thread& Thread::SetAttributes(size_t aStackSize, size_t aPriority, int aCoreId)
+{
+#ifdef ESP_PLATFORM
+    auto cfg = esp_pthread_get_default_config();
+    cfg.thread_name = GetName().c_str();
+    cfg.pin_to_core = aCoreId;
+    cfg.stack_size = aStackSize;
+    cfg.prio = aPriority;
+    esp_pthread_set_cfg(&cfg);
+#else
+    UNUSED(aStackSize)
+    UNUSED(aPriority)
+    UNUSED(aCoreId)
+#endif /* ESP_PLATFORM */
+    return *this;
+}
+
+void Thread::start()
+{
+    mpException = nullptr;
+    mTerminated = false;
+    std::thread thread(&Thread::run, this);
+    mThread.swap(thread);
+}
+
+void Thread::stop()
+{
+    mTerminated = true;
+    if (mThread.joinable()) {
+        mThread.join();
     }
 }
 

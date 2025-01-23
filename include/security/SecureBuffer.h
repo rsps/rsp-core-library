@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SECUREBUFFER_H_
-#define INCLUDE_SECURITY_SECUREBUFFER_H_
+#ifndef RSP_CORE_LIB_SECURITY_SECURE_BUFFER_H
+#define RSP_CORE_LIB_SECURITY_SECURE_BUFFER_H
 
 #include <vector>
 #include <string>
@@ -20,6 +20,7 @@
 namespace rsp::security {
 
 class SecureBuffer;
+class SecureString;
 
 /**
  * \brief Output streaming operator for SecureBuffer
@@ -33,15 +34,15 @@ std::ostream& operator<<(std::ostream& os, const SecureBuffer &arBuffer);
 /**
  * \brief A secure buffer implementation that clears its memory after use.
  */
-class SecureBuffer : public std::vector<std::uint8_t, SecureAllocator<std::uint8_t>>
+class SecureBuffer : public std::vector<uint8_t, SecureAllocator<uint8_t>>
 {
 public:
-    using std::vector<std::uint8_t, SecureAllocator<std::uint8_t>>::vector;
+    using std::vector<uint8_t, SecureAllocator<uint8_t>>::vector;
 
-    SecureBuffer(const char* apData)
+    SecureBuffer(const char* apData) // NOLINT, conversion constructor
     {
-        auto b = reinterpret_cast<const std::uint8_t*>(apData);
-        auto e = reinterpret_cast<const std::uint8_t*>(apData + std::strlen(apData));
+        auto b = reinterpret_cast<const uint8_t*>(apData);
+        auto e = reinterpret_cast<const uint8_t*>(apData + std::strlen(apData));
         assign(b, e);
     }
 
@@ -52,8 +53,8 @@ public:
      */
     SecureBuffer(const char* apData, std::size_t aSize)
     {
-        auto b = reinterpret_cast<const std::uint8_t*>(apData);
-        auto e = reinterpret_cast<const std::uint8_t*>(apData + aSize);
+        auto b = reinterpret_cast<const uint8_t*>(apData);
+        auto e = reinterpret_cast<const uint8_t*>(apData + aSize);
         assign(b, e);
     }
 
@@ -62,7 +63,7 @@ public:
      * \param apData Pointer to unsigned char data
      * \param aSize Size of data to include
      */
-    SecureBuffer(const std::uint8_t* apData, std::size_t aSize)
+    SecureBuffer(const uint8_t* apData, std::size_t aSize)
     {
         auto b = apData;
         auto e = (apData + aSize);
@@ -97,14 +98,9 @@ public:
      * \brief Format this content to ASCII hex.
      * \return String with ASCII hex.
      */
-    std::string GetHex() const
-    {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
+    [[nodiscard]] SecureString GetHex() const;
 };
 
 } // namespace rsp::security
 
-#endif /* INCLUDE_SECURITY_SECUREBUFFER_H_ */
+#endif // RSP_CORE_LIB_SECURITY_SECURE_BUFFER_H

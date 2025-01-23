@@ -8,23 +8,24 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_NETWORK_CURL_MULTICURL_H_
-#define SRC_NETWORK_CURL_MULTICURL_H_
+#ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_MULTI_CURL_H
+#define RSP_CORE_LIB_SRC_NETWORK_CURL_MULTI_CURL_H
 
 #include <map>
 #include <curl/curl.h>
 #include "Exceptions.h"
 #include "CurlSessionHttpRequest.h"
+#include <logging/LogChannel.h>
 
 namespace rsp::network::curl {
 
 /**
  * \class MultiCurl
- * \brief Reduced wrapper for libcurls multi interface.
- * This implementation is intended for queing multiple requests and let libcurl execute them all.
+ * \brief Reduced wrapper for libcurl's multi interface.
+ * This implementation is intended for queueing multiple requests and let libcurl execute them all.
  * This allows for utilizing HTTP 1.1 keepalive and http2 transport optimizations.
  */
-class MultiCurl
+class MultiCurl : public logging::NamedLogger<MultiCurl>
 {
 public:
     MultiCurl();
@@ -59,4 +60,4 @@ protected:
 
 } /* namespace rsp::network::curl */
 
-#endif /* SRC_NETWORK_CURL_MULTICURL_H_ */
+#endif // RSP_CORE_LIB_SRC_NETWORK_CURL_MULTI_CURL_H

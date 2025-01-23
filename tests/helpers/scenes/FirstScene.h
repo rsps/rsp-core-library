@@ -10,8 +10,8 @@
 #ifndef FIRSTSCENE_H
 #define FIRSTSCENE_H
 
-#include <graphics/controls/Button.h>
-#include <graphics/controls/Scene.h>
+#include <graphics/Button.h>
+#include <graphics/Scene.h>
 
 namespace rsp::graphics {
 
@@ -24,13 +24,13 @@ public:
     {
         Rect topRect(100, 400, 200, 100);
         mTopBtnImg.SetArea(topRect);
-        mTopBtnImg.GetStyle(Control::States::normal).mBackground.SetPixelData(mNormal);
-        mTopBtnImg.GetStyle(Control::States::pressed).mBackground.SetPixelData(mPressed);
+        mTopBtnImg.GetStyle(Control::States::Normal).mTextures.push_back(Texture::Create(mNormal, Color::None));
+        mTopBtnImg.GetStyle(Control::States::Pressed).mTextures.push_back(Texture::Create(mPressed, Color::None));
 
         Rect botRect(100, 600, 200, 100);
         mBotBtnImg.SetArea(botRect);
-        mBotBtnImg.GetStyle(Control::States::normal).mBackground.SetPixelData(mNormal);
-        mBotBtnImg.GetStyle(Control::States::pressed).mBackground.SetPixelData(mPressed);
+        mBotBtnImg.GetStyle(Control::States::Normal).mTextures.push_back(Texture::Create(mNormal, Color::None));
+        mBotBtnImg.GetStyle(Control::States::Pressed).mTextures.push_back(Texture::Create(mPressed, Color::None));
 
         // Add them to the lists?
         AddChild(&mTopBtnImg);

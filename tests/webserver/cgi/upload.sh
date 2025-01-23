@@ -6,4 +6,3 @@ echo "Request Method: $REQUEST_METHOD"
 #env
 
 cp -b /dev/stdin ../upload.png
-

@@ -8,13 +8,15 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_LOGGING_OUTSTREAMBUFFER_H_
-#define INCLUDE_LOGGING_OUTSTREAMBUFFER_H_
+#ifndef RSP_CORE_LIB_LOGGING_OUT_STREAM_BUFFER_H
+#define RSP_CORE_LIB_LOGGING_OUT_STREAM_BUFFER_H
 
 #include <iostream>
 #include <mutex>
+#include <thread>
 #include "LoggerInterface.h"
 #include "LogStream.h"
+#include <utils/ThreadGuard.h>
 
 namespace rsp::logging {
 
@@ -24,19 +26,19 @@ namespace rsp::logging {
 /**
  * \class OutStreamBuf
  *
- * \brief A streambuf implementation of LogStream can be used to replace std::cout/cerr/clog streambuf's.
+ * \brief A std::streambuf implementation of LogStream can be used to replace std::cout/cerr/clog streambuf's.
  *
  * This is not intended to be used directly, instead simply instantiate a Logger with the aCaptureClog argument.
  */
 class OutStreamBuffer : public std::streambuf, public LogStream
 {
 public:
-    OutStreamBuffer(LoggerInterface *apOwner, LogLevel aLevel);
+    OutStreamBuffer(LoggerInterface &arOwner, LogLevel aLevel);
 
-    void Lock() { mMutex.lock(); }
+    void Lock() { mLock.Lock(); }
 
 protected:
-    std::mutex mMutex{};
+    rsp::utils::ThreadGuard mLock{};
 
     int overflow(int c) override;
     int sync() override;
@@ -45,4 +47,4 @@ protected:
 
 } /* namespace rsp::logging */
 
-#endif /* INCLUDE_LOGGING_OUTSTREAMBUFFER_H_ */
+#endif // RSP_CORE_LIB_LOGGING_OUT_STREAM_BUFFER_H

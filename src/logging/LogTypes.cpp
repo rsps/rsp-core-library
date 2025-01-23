@@ -31,9 +31,9 @@ namespace rsp::logging {
 //    { LogLevel::Debug, "debug" }
 //};
 
-LogLevel ToLogLevel(std::string aLevelString)
+LogLevel ToLogLevel(const std::string& arLevelString)
 {
-    return magic_enum::enum_cast<LogLevel>(aLevelString).value();
+    return magic_enum::enum_cast<LogLevel>(arLevelString).value();
 }
 
 std::string ToString(LogLevel aLevel)
@@ -49,4 +49,3 @@ std::ostream& operator<<(std::ostream &o, LogLevel aLevel)
 
 
 } /* namespace rsp::logging */
-

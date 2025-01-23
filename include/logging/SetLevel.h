@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_LOGGING_SETLEVEL_H_
-#define INCLUDE_LOGGING_SETLEVEL_H_
+#ifndef RSP_CORE_LIB_LOGGING_SET_LEVEL_H
+#define RSP_CORE_LIB_LOGGING_SET_LEVEL_H
 
 #include <ostream>
 #include "LogTypes.h"
@@ -29,13 +29,13 @@ public:
      *
      * \param aLevel
      */
-    SetLevel(LogLevel aLevel) : mValue(aLevel) {}
+    explicit SetLevel(LogLevel aLevel) : mValue(aLevel) {}
 
     /**
      * \brief Callable operator used by streaming operators
      *
      * \param o
-     * \return
+     * \return o
      */
     std::ostream& operator()(std::ostream& o) const;
 
@@ -47,10 +47,10 @@ public:
  *
  * \param o
  * \param aLevel
- * \return
+ * \return o
  */
-std::ostream& operator<<(std::ostream &o, SetLevel aLevel);
+std::ostream& operator<<(std::ostream &o, const SetLevel &arLevel);
 
 } /* namespace rsp::logging */
 
-#endif /* INCLUDE_LOGGING_SETLEVEL_H_ */
+#endif // RSP_CORE_LIB_LOGGING_SET_LEVEL_H

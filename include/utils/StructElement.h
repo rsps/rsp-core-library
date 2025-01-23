@@ -8,10 +8,15 @@
  * \author      Steffen Brummer
  */
 
+#include <cmath>
+#include <concepts>
+#include "ConstTypeInfo.h"
 #include "Nullable.h"
+#include "BinaryStream.h"
+#include <magic_enum.hpp>
 
-#ifndef INCLUDE_UTILS_STRUCTELEMENT_H_
-#define INCLUDE_UTILS_STRUCTELEMENT_H_
+#ifndef RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
+#define RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
 
 namespace rsp::utils {
 
@@ -22,7 +27,7 @@ namespace rsp::utils {
  */
 template<class T> class defaultItem {
 public:
-    static constexpr T default_value() { return 0; }
+    static constexpr T default_value() { return T(0); }
 };
 
 /**
@@ -41,27 +46,27 @@ public:
  * The class also supports comparison with margins (epsilon).
  */
 template <class T>
-class StructElement : public Nullable
+class StructElementBase : public Nullable, public BinaryStreamable
 {
 public:
     /**
      * \fn  StructElement()
      * \brief Constructor of empty (Null) StructElement
      */
-    StructElement() : mIsNull(true), mData(defaultItem<T>::default_value()), mMargin(defaultItem<T>::default_value())  {}
+    StructElementBase() : mIsNull(true), mData(T(defaultItem<T>::default_value())), mMargin(T(defaultItem<T>::default_value()))  {}
     /**
      * \fn  StructElement(const T&)
      * \brief Constructor of StructElement with type T and value.
      *
      * \param aValue
      */
-    StructElement(const T& aValue) : mIsNull(false), mData(aValue), mMargin(defaultItem<T>::default_value()) {}
+    StructElementBase(const T& aValue) : mIsNull(false), mData(aValue), mMargin(defaultItem<T>::default_value()) {} // NOLINT, Conversion constructor
 
-    StructElement(const StructElement<T> &arOther) = default;
-    StructElement(StructElement<T> &&arOther) = default;
+    StructElementBase(const StructElementBase<T> &arOther) = default;
+    StructElementBase(StructElementBase<T> &&arOther) = default;
 
-    StructElement& operator=(const StructElement<T> &arOther) = default;
-    StructElement& operator=(StructElement<T> &&arOther) = default;
+    StructElementBase& operator=(const StructElementBase<T> &arOther) = default;
+    StructElementBase& operator=(StructElementBase<T> &&arOther) = default;
 
     /**
      * \fn bool IsNull()const
@@ -69,45 +74,18 @@ public:
      *
      * \return bool
      */
-    bool IsNull() const override { return mIsNull; }
+    [[nodiscard]] bool IsNull() const override { return mIsNull; }
 
     /**
      * \fn void Clear()
      * \brief Clears the content and set the type to null.
      */
-    void Clear() override        { mIsNull = true; mData = static_cast<T>(0); }
+    void Clear() override        { mIsNull = true; mData = {}; }
 
     /**
-     * \fn T Get()const
-     * \brief Getter that throws if content is null.
-     *
-     * \return T
+     * \brief Conversion operator overload.
      */
-    T Get() const {
-        if (mIsNull) {
-            THROW_WITH_BACKTRACE(ENullValueError);
-        }
-        return mData;
-    }
-    /**
-     * \fn T Get(const T&)const
-     * \brief Getter that returns the given default in case content is null.
-     *
-     * \param arDefault
-     * \return T
-     */
-    T Get(const T &arDefault) const {
-        if (mIsNull) {
-            return arDefault;
-        }
-        return mData;
-    }
-
-    /**
-     * \fn  operator #0()const
-     * \brief Operator overload.
-     */
-    operator T() const { return Get(); }
+    operator T() const { return get(); } // NOLINT, Conversion operator
 
     /**
      * \fn void Set(T)
@@ -115,7 +93,7 @@ public:
      *
      * \param aValue
      */
-    void Set(T aValue) { mData = aValue; mIsNull = false; }
+    void Set(const T& aValue) { mData = aValue; mIsNull = false; }
     /**
      * \fn StructElement<T> operator =&(const T&)
      * \brief Assignment operator that changes the content and the type.
@@ -123,7 +101,7 @@ public:
      * \param aValue
      * \return Reference to this.
      */
-    StructElement<T>& operator =(const T& aValue) { Set(aValue); return *this; }
+    virtual StructElementBase<T>& operator=(const T& aValue) { Set(aValue); return *this; }
 
     /**
      * \fn bool Compare(const T&)const
@@ -132,8 +110,8 @@ public:
      * \param aValue
      * \return bool
      */
-    bool Compare(const T& aValue) const {
-        return (mIsNull) ? false : !differs(mData, aValue, mMargin);
+    [[nodiscard]] bool Compare(const T& aValue) const {
+        return !(mIsNull) && !differs(mData, aValue, mMargin);
     }
 
     /**
@@ -153,49 +131,160 @@ public:
      *
      * \param aValue
      */
-    void SetMargin(T aValue) { mMargin = aValue; }
+    StructElementBase<T>& SetMargin(T aValue) { mMargin = aValue; return *this; }
+    [[nodiscard]] T GetMargin() const { return mMargin; }
+
+    BinaryStream& SaveTo(BinaryStream &o) const override
+    {
+        o << mIsNull;
+        if (!mIsNull) {
+            o << mData;
+            if constexpr (std::is_arithmetic_v<T>) {
+                o << mMargin;
+            }
+        }
+        return o;
+    }
+
+    BinaryStream& LoadFrom(BinaryStream &i) override
+    {
+        i >> mIsNull;
+        if (!mIsNull) {
+            i >> mData;
+            if constexpr (std::is_arithmetic_v<T>) {
+                i >> mMargin;
+            }
+        }
+        return i;
+    }
 
 protected:
     template <class E>
-    friend std::ostream & operator<< (std::ostream &out, StructElement<E> const &t);
+    friend std::ostream & operator<< (std::ostream &out, StructElementBase<E> const &t);
 
     template <class E>
-    friend bool operator!=(const StructElement<E>& aEl1, const StructElement<E>& aEl2 );
+    friend bool operator!=(const StructElementBase<E>& aEl1, const StructElementBase<E>& aEl2 );
 
     template <class E>
-    friend bool operator==(const StructElement<E>& aEl1, const StructElement<E>& aEl2 );
+    friend bool operator==(const StructElementBase<E>& aEl1, const StructElementBase<E>& aEl2 );
 
     bool mIsNull;
     T mData;
     T mMargin;
 
+    [[nodiscard]] T get() const
+    {
+        if (mIsNull) {
+            THROW_WITH_BACKTRACE1(ENullValueError, NameOf<T>());
+        }
+        return mData;
+    }
+
+    [[nodiscard]] T get(const T &arDefault) const
+    {
+        if (mIsNull) {
+            return arDefault;
+        }
+        return mData;
+    }
+
     /*
-     * Simple overloaded functions for difference check
+     * Template function for difference check
      */
-    bool differs(double aVal1, double aVal2, double aMargin) const {
-        return std::fabs(aVal1 - aVal2) > aMargin;
-    }
-
-    bool differs(float aVal1, float aVal2, float aMargin) const {
-        return std::fabs(aVal1 - aVal2) > aMargin;
-    }
-
-    bool differs(int aVal1, int aVal2, int aMargin) const {
-        return std::abs(aVal1 - aVal2) > aMargin;
-    }
-
-    bool differs(unsigned int aVal1, unsigned int aVal2, unsigned int aMargin) const {
-        return std::abs(static_cast<int>(aVal1 - aVal2)) > aMargin;
-    }
-
-    bool differs(bool aVal1, bool aVal2, bool) const {
-        return (aVal1 != aVal2);
+    [[nodiscard]] bool differs(T aVal1, T aVal2, T aMargin) const
+    {
+        if constexpr(std::is_floating_point<T>::value) {
+            return std::fabs(aVal1 - aVal2) > aMargin;
+        } else if constexpr(std::is_integral<T>::value) {
+            return ((aVal1 > aVal2) ? aVal1 - aVal2 : aVal2 - aVal1) > aMargin;
+        }
+        else {
+            return (aVal1 != aVal2);
+        }
     }
 };
 
+template <class T>
+class StructElement : public StructElementBase<T>
+{
+public:
+    using StructElementBase<T>::StructElementBase;
+
+    StructElement& operator=(const T& aValue) override { StructElementBase<T>::Set(aValue); return *this; }
+
+    [[nodiscard]] T Get() const { return StructElementBase<T>::get(); }
+    [[nodiscard]] T Get(const T &arDefault) const { return StructElementBase<T>::get(arDefault); }
+};
+
+template <class E> requires (std::is_enum_v<E>)
+class StructElement<E> : public StructElementBase<typename std::underlying_type<E>::type>
+{
+public:
+    using T = std::underlying_type<E>::type;
+    using StructElementBase<T>::StructElementBase;
+
+    explicit StructElement(E aValue) : StructElementBase<T>(T(aValue)) {}
+
+    StructElement& operator=(const T& aValue) override { StructElementBase<T>::Set(aValue); return *this; }
+    StructElement& operator=(E aValue) { StructElementBase<T>::Set(T(aValue)); return *this; }
+
+    [[nodiscard]] E Get() const { return E(StructElementBase<T>::get()); }
+    [[nodiscard]] E Get(const E&arDefault) const { return E(StructElementBase<T>::get(T(arDefault))); }
+};
+
+template <class T> requires std::is_floating_point_v<T>
+class StructElement<T> : public StructElementBase<T>
+{
+public:
+    using StructElementBase<T>::StructElementBase;
+
+    StructElement(const T& aValue) : StructElementBase<T>(aValue) {} // NOLINT, Conversion constructor
+
+    StructElement(const StructElement<T> &arOther) : StructElementBase<T>(arOther), mPrecision(arOther.mPrecision) {}
+    StructElement(StructElement<T> &&arOther) noexcept : StructElementBase<T>(arOther), mPrecision(std::move(arOther.mPrecision)) {}
+    StructElement& operator=(const StructElement<T> &arOther) {
+        StructElementBase<T>::operator=(arOther);
+        mPrecision = arOther.mPrecision;
+        return *this;
+    }
+    StructElement& operator=(StructElement<T> &&arOther) noexcept {
+        mPrecision = std::move(arOther.mPrecision);
+        StructElementBase<T>::operator=(std::move(arOther));
+        return *this;
+    }
+    StructElement& operator=(const T& aValue) override { StructElementBase<T>::Set(aValue); return *this; } // Without this, constructor + copy is called
+
+    StructElement& SetPrecision(int aPrecision) { mPrecision = aPrecision; return *this; }
+    [[nodiscard]] int GetPrecision() const { return mPrecision; }
+
+    BinaryStream& SaveTo(BinaryStream &o) const override
+    {
+        StructElementBase<T>::SaveTo(o);
+        if (!StructElementBase<T>::IsNull()) {
+            o << mPrecision;
+        }
+        return o;
+    }
+
+    BinaryStream& LoadFrom(BinaryStream &i) override
+    {
+        StructElementBase<T>::LoadFrom(i);
+        if (!StructElementBase<T>::IsNull()) {
+            i >> mPrecision;
+        }
+        return i;
+    }
+
+    [[nodiscard]] T Get() const { return StructElementBase<T>::get(); }
+    [[nodiscard]] T Get(const T &arDefault) const { return StructElementBase<T>::get(arDefault); }
+
+protected:
+    friend class Variant;
+    int mPrecision = -1;
+};
 
 template <class T>
-bool operator!=(const StructElement<T>& aEl1, const StructElement<T>& aEl2 ) {
+bool operator!=(const StructElementBase<T>& aEl1, const StructElementBase<T>& aEl2 ) {
     if (aEl1.mIsNull) {
         return !aEl2.mIsNull;
     }
@@ -216,13 +305,13 @@ bool operator!=(const StructElement<T>& aEl1, const StructElement<T>& aEl2 ) {
  * \return bool
  */
 template <class T>
-bool operator==(const StructElement<T>& aEl1, const StructElement<T>& aEl2 ) {
+bool operator==(const StructElementBase<T>& aEl1, const StructElementBase<T>& aEl2 ) {
     return !(aEl1 != aEl2);
 }
 
 /**
  * \fn bool operator !=(const StructElement<T>&, const StructElement<E>&)
- * \brief In-eaquality operator for StructElements of different types. Always throws.
+ * \brief In-equality operator for StructElements of different types. Always throws.
  *
  * \tparam T
  * \tparam E
@@ -230,14 +319,15 @@ bool operator==(const StructElement<T>& aEl1, const StructElement<T>& aEl2 ) {
  * \param aEl2
  * \return
  */
-template <class T, class E>
-bool operator!=(const StructElement<T>& aEl1, const StructElement<E>& aEl2 ) {
-    THROW_WITH_BACKTRACE(ETypeMismatchError);
+template <class T, class E> requires (!std::is_same_v<T, E>)
+bool operator!=(const StructElementBase<T>& /*aEl1*/, const StructElementBase<E>& /*aEl2*/ ) {
+    static_assert(std::is_same_v<T, E>, "Value types must be same");
+    return false;
 }
 
 /**
  * \fn bool operator !=(const StructElement<T>&, const StructElement<E>&)
- * \brief Eaquality operator for StructElements of different types. Always throws.
+ * \brief Equality operator for StructElements of different types. Always throws.
  *
  * \tparam T
  * \tparam E
@@ -245,11 +335,19 @@ bool operator!=(const StructElement<T>& aEl1, const StructElement<E>& aEl2 ) {
  * \param aEl2
  * \return
  */
-template <class T, class E>
-bool operator==(const StructElement<T>& aEl1, const StructElement<E>& aEl2 ) {
-    THROW_WITH_BACKTRACE(ETypeMismatchError);
+template <class T, class E> requires (!std::is_same_v<T, E>)
+bool operator==(const StructElement<T>& /*aEl1*/, const StructElement<E>& /*aEl2*/ ) {
+    static_assert(std::is_same_v<T, E>, "Value types must be same");
+    return false;
 }
 
+
+// Default enum streaming
+template <class E> requires std::is_enum_v<E>
+std::ostream & operator<< (std::ostream &o, E value) {
+    o << magic_enum::enum_name(value);
+    return o;
+}
 
 /**
  * \fn std::ostream operator <<&(std::ostream&, const StructElement<T>&)
@@ -262,15 +360,15 @@ bool operator==(const StructElement<T>& aEl1, const StructElement<E>& aEl2 ) {
  */
 template <class T>
 std::ostream & operator<< (std::ostream &out, StructElement<T> const &t) {
-    if (t.mIsNull) {
+    if (t.IsNull()) {
         out << "null";
     }
     else {
-        out << t.mData;
+        out << t.Get();
     }
     return out;
 }
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_STRUCTELEMENT_H_ */
+#endif // RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H

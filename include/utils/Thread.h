@@ -8,30 +8,16 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_THREAD_H_
-#define INCLUDE_UTILS_THREAD_H_
+#ifndef RSP_CORE_LIB_UTILS_THREAD_H
+#define RSP_CORE_LIB_UTILS_THREAD_H
 
-#include <exception>
+#include <logging/LogChannel.h>
 #include <string>
 #include <string_view>
+#include "ThreadInterface.h"
 #include <thread>
-#include "Function.h"
-#include "CoreException.h"
 
 namespace rsp::utils {
-
-/**
- * \brief Base class for thread exceptions.
- */
-class ThreadException : public CoreException
-{
-public:
-    ThreadException(std::string_view aName, const char *aMsg)
-        : CoreException("")
-    {
-        mMsg = std::string("Exception thrown in thread '" + std::string(aName) + "': " + aMsg);
-    }
-};
 
 /**
  * \brief Thread object encapsulates a std::thread with an optional name.
@@ -39,14 +25,17 @@ public:
  * The object catches an holds an eventual exception terminating the thread.
  *
  */
-class Thread
+class Thread : public ThreadInterface
 {
 public:
-    using ThreadCallback_t = Function<void(void)>;
+    using ThreadCallback_t = std::function<void(void)>;
 
-    Thread() {}
-    Thread(std::string_view aName) : mName(aName) {}
-    virtual ~Thread() {}
+    /**
+     * Thread constructor that requires a thread name
+     * \param aName
+     */
+    explicit Thread(std::string_view aName);
+    ~Thread() override;
 
     Thread(const Thread &) = delete;
     Thread& operator=(const Thread &) = delete;
@@ -55,41 +44,67 @@ public:
      * \brief Get the name of this thread. If no name have been assigned the thread id is returned.
      * \return string
      */
-    std::string GetName();
+    [[nodiscard]] const std::string& GetName() const override;
 
     /**
-     * \brief Set the thread name.
-     * \param aName Name of this thread
+     * \brief
+     *  Set thread attributes to use on this thread, if the OS supports it.
+     *  Call this before calling Start().
+     * \param aStackSize
+     * \param aPriority
+     * \param aCoreId
      * \return self
      */
-    Thread& SetName(std::string_view aName) { mName = aName; return *this; }
+    Thread& SetAttributes(size_t aStackSize, size_t aPriority, int aCoreId = -1);
 
     /**
      * \brief Starts the thread
      * \return self
      */
-    Thread& Start();
+    ThreadInterface& Start() override;
 
     /**
-     * \brief Stops the thread. If the thread have thrown any exceptions, this method will also throw.
+     * \brief Stops the thread and sync result. If the thread have thrown any exceptions, this method will also throw.
      * \return self
      */
-    Thread& Stop();
+    ThreadInterface& Stop() override;
+
+    /**
+     * \brief Flag the thread for termination. This will stop the execution after the current iteration.
+     * \return self
+     */
+    ThreadInterface& Terminate() override;
+
+    /**
+     * \brief Check if the thread is terminating
+     * \return True if the thread is stopping or stopped.
+     */
+    [[nodiscard]] bool IsTerminated() const override;
 
     /**
      * \brief Callback for running simple method in own thread
      * \return ThreadCallback_t
      */
-    ThreadCallback_t& GetExecute() { return mWhenExecute; }
+    ThreadInterface& SetExecute(ThreadCallback_t aCb) override;
+
+    /**
+     * \brief Check if this thread has stopped execution, due to an unhandled exception.
+     *        The exception is pending and will be rethrown by invoking Stop()
+     * \return True if an exception is pending
+     */
+    [[nodiscard]] bool HasException() const { return bool(mpException); }
 
 protected:
-    std::string mName{};
+    std::string mName;
+    rsp::logging::LogChannel mLogger;
     std::thread mThread{};
     ThreadCallback_t mWhenExecute{};
     bool mTerminated = false;
-    std::exception_ptr mException = nullptr;
+    std::exception_ptr mpException = nullptr;
 
     void run();
+    void start();
+    void stop();
 
     /**
      * \brief Override this for specialized threaded object.
@@ -99,4 +114,4 @@ protected:
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_THREAD_H_ */
+#endif // RSP_CORE_LIB_UTILS_THREAD_H

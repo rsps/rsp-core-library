@@ -9,8 +9,8 @@
  */
 
 #include <doctest.h>
+#include <exceptions/CoreException.h>
 #include <utils/StrUtils.h>
-#include <utils/CoreException.h>
 
 using namespace rsp::utils;
 
@@ -28,7 +28,7 @@ TEST_CASE("StrUtils") {
     std::string s("Hello World");
 
     StrUtils::ReplaceAll(s, "llo", "ll of a");
-    CHECK(s == "Hell of a World");
+    CHECK_EQ(s, "Hell of a World");
 
 //    std::chrono::system_clock::time_point tp;
 //    CHECK(StrUtils::TimeStamp(tp) == "1970-01-01 00:00:00.000");
@@ -44,12 +44,14 @@ TEST_CASE("StrUtils") {
     CHECK(StrUtils::Format("%02d-%8.8s", 10, str.c_str()) == "10-From Str");
 
     CHECK_EQ(StrUtils::ToDouble("123.123456789"), 123.123456789);
-    CHECK_THROWS_AS(StrUtils::ToDouble("banana123.123456789"), const DecimalConversionError&);
+    CHECK_THROWS_AS(StrUtils::ToDouble("banana123.123456789"), const rsp::exceptions::DecimalConversionError&);
 
     CHECK_EQ(StrUtils::ToString(123.12345678), "123.12345678");
     CHECK_EQ(StrUtils::ToString(123.12345678, 5), "123.12");
     CHECK_EQ(StrUtils::ToString(123.12345678f), "123.123459");
     CHECK_EQ(StrUtils::ToString(123.12345678f, 5), "123.12");
+    CHECK_EQ(StrUtils::ToString(123.12345678f, 5, true), "123.12346");
+    CHECK_EQ(StrUtils::ToString(123.123f, 5, true), "123.12300");
 
     CHECK_EQ(StrUtils::ToString(4.4783619199999997e-06, 12), "4.47836192e-06");
 

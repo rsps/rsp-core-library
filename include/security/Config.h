@@ -8,10 +8,10 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_CONFIG_H_
-#define INCLUDE_SECURITY_CONFIG_H_
+#ifndef RSP_CORE_LIB_SECURITY_CONFIG_H
+#define RSP_CORE_LIB_SECURITY_CONFIG_H
 
-#include <json/Jsonable.h>
+#include <utils/DynamicData.h>
 #include <security/SignedContainer.h>
 #include <utils/Validator.h>
 
@@ -28,7 +28,7 @@ namespace rsp::security {
  * json network data.
  */
 template <typename T>
-class Config : public SignedContainer<T>, public rsp::json::Jsonable
+class Config : public SignedContainer<T>, public rsp::utils::DynamicData::Serializable
 {
 public:
     using SignedContainer<T>::SignedContainer;
@@ -43,4 +43,4 @@ public:
 } // namespace rsp::security
 
 
-#endif /* INCLUDE_SECURITY_CONFIG_H_ */
+#endif // RSP_CORE_LIB_SECURITY_CONFIG_H

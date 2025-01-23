@@ -8,15 +8,15 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_UTILS_STRUTILS_H_
-#define SRC_UTILS_STRUTILS_H_
+#ifndef RSP_CORE_LIB_UTILS_STR_UTILS_H
+#define RSP_CORE_LIB_UTILS_STR_UTILS_H
 
+#include <algorithm>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include <chrono>
-#include <filesystem>
 
 namespace rsp::utils::StrUtils {
 
@@ -146,13 +146,13 @@ bool EndsWith(const std::string &aText, const std::string &aAffix);
 bool Contains(const std::string &aText, const std::string &aMatch);
 
 /**
- * Get a list of strings in arList that starts with aText.
+ * Get a list of strings in arList that starts with arText.
  *
- * @param aText String to find in list
+ * @param arText String to find in list
  * @param Reference to list of strings to search in.
  * @return List with matching strings
  */
-std::vector<std::string> FindMatches(std::string aText, std::vector<std::string> &arList);
+std::vector<std::string> FindMatches(const std::string& arText, std::vector<std::string> &arList);
 
 /**
  * Find all characters common from start of all strings in a list.
@@ -212,4 +212,4 @@ std::string ToString(float aValue, int aDigits = -1, bool aFixed = false);
 
 }
 
-#endif /* SRC_UTILS_STRUTILS_H_ */
+#endif // RSP_CORE_LIB_UTILS_STR_UTILS_H

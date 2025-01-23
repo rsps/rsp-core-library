@@ -9,13 +9,13 @@
  */
 
 
-#ifndef INCLUDE_JSON_JSONDECODER_H_
-#define INCLUDE_JSON_JSONDECODER_H_
+#ifndef RSP_CORE_LIB_JSON_JSON_DECODER_H
+#define RSP_CORE_LIB_JSON_JSON_DECODER_H
 
-#include <json/JsonValue.h>
 #include <string>
 #include <string_view>
 #include <vector>
+#include <utils/DynamicData.h>
 
 namespace rsp::json {
 
@@ -31,30 +31,27 @@ public:
      *
      * \param std::string
      */
-    JsonDecoder(std::string_view aJson);
-    JsonDecoder(const JsonDecoder &arJson);
-
-    JsonDecoder& operator=(const JsonDecoder &arJson);
+    explicit JsonDecoder(std::string_view aJson);
 
     /**
      * Decode a value object from the content. The result can be a complex hierarchy of value objects.
      * \return JsonValue*
      */
-    JsonValue GetValue();
+    rsp::utils::DynamicData Decode();
 
 protected:
     std::string::iterator mIt; // Current index iterator, this is always moving forward.
     std::string::iterator mEnd; // Current end iterator, to limit the end of the current extraction.
     std::vector<std::string::iterator> mStack{}; // Used to stack end iterators when parsing sub-strings.
 
-    void findSubString(const char aToken1, const char aToken2);
+    void findSubString(char aToken1, char aToken2);
     void push();
     void pop();
     void skipWhiteSpace();
     std::string getString();
-    JsonValue getObject();
-    JsonValue getArray();
-    JsonValue getNumber();
+    rsp::utils::DynamicData getObject();
+    rsp::utils::DynamicData getArray();
+    rsp::utils::DynamicData getNumber();
 
     unsigned int getOffset() { return static_cast<unsigned int>(mIt - begin()); };
     unsigned int getLength() { return static_cast<unsigned int>(mEnd - mIt); };
@@ -64,4 +61,4 @@ protected:
 
 } /* rsp::json */
 
-#endif /* INCLUDE_JSON_JSONDECODER_H_ */
+#endif // RSP_CORE_LIB_JSON_JSON_DECODER_H

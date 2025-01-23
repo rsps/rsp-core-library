@@ -1,3 +1,4 @@
+
 /*!
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,18 +8,17 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifdef USE_OPENSSL
-
 #include <security/Sha.h>
-#include <utils/CoreException.h>
+#include <exceptions/CoreException.h>
 
 #include <openssl/evp.h>
 #include <openssl/sha.h>
-#include <openssl/hmac.h>
 
 namespace rsp::security {
 
 #if OPENSSL_VERSION_NUMBER < 0x30000000L
+
+#include <openssl/hmac.h>
 
 /**
  * \class OpenSSLSha
@@ -110,7 +110,7 @@ public:
         EVP_MAC_init(mpCtx, arSecret.data(), static_cast<unsigned long int>(arSecret.size()), params);
     }
 
-    ~OpenSSLHMac()
+    ~OpenSSLHMac() override
     {
         EVP_MAC_free(mpMac);
         EVP_MAC_CTX_free(mpCtx);
@@ -132,9 +132,19 @@ public:
         EVP_MAC_final(mpCtx, nullptr, &len, 0);
         result.resize(len);
         EVP_MAC_final(mpCtx, result.data(), &len, len);
-        ASSERT(len == result.size());
+        ASSERT(len == result.size())
 
         return result;
+    }
+
+    [[nodiscard]] std::string GetLibraryVersion() const override
+    {
+        return OPENSSL_FULL_VERSION_STR;
+    }
+
+    [[nodiscard]] std::string GetLibraryName() const override
+    {
+        return "openssl";
     }
 
 protected:
@@ -147,10 +157,10 @@ protected:
 class OpenSSLSha: public DigestImpl
 {
 public:
-    OpenSSLSha(HashAlgorithms aAlgorithm)
+    explicit OpenSSLSha(HashAlgorithms aAlgorithm)
         : mpMdctx(EVP_MD_CTX_create())
     {
-        const EVP_MD* md = nullptr;
+        const EVP_MD* md;
 
         switch (aAlgorithm) {
             case HashAlgorithms::Sha1:
@@ -188,6 +198,16 @@ public:
         return result;
     }
 
+    [[nodiscard]] std::string GetLibraryVersion() const override
+    {
+        return OPENSSL_FULL_VERSION_STR;
+    }
+
+    [[nodiscard]] std::string GetLibraryName() const override
+    {
+        return "openssl";
+    }
+
     OpenSSLSha(const OpenSSLSha&) = delete;
     OpenSSLSha& operator=(const OpenSSLSha&) = delete;
 
@@ -198,7 +218,7 @@ protected:
 // SHA interface factory for OpenSSL
 DigestImpl* DigestImpl::Create(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
 {
-    if (arSecret.size() > 0) {
+    if (!arSecret.empty()) {
         return new OpenSSLHMac(arSecret, aAlgorithm);
     }
     return new OpenSSLSha(aAlgorithm);
@@ -206,6 +226,3 @@ DigestImpl* DigestImpl::Create(const SecureBuffer& arSecret, HashAlgorithms aAlg
 
 
 } // namespace rsp::security
-
-
-#endif /* USE_OPENSSL */

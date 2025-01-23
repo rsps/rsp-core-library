@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_NETWORK_CURL_CURLSESSION_H_
-#define SRC_NETWORK_CURL_CURLSESSION_H_
+#ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_SESSION_H
+#define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_SESSION_H
 
 #include <vector>
 #include <network/IHttpSession.h>
@@ -23,11 +23,11 @@ namespace rsp::network::curl {
 class CurlSession: public IHttpSession
 {
 public:
-    CurlSession(std::size_t aSize) : mPool(aSize) {}
+    explicit CurlSession(size_t aSize) : mPool(aSize) {}
     void ProcessRequests() override;
     IHttpSession& SetDefaultOptions(const HttpRequestOptions &arOptions) override;
     HttpRequestOptions& GetDefaultOptions() override { return mDefaultOptions; }
-    const HttpRequestOptions& GetDefaultOptions() const override { return mDefaultOptions; }
+    [[nodiscard]] const HttpRequestOptions& GetDefaultOptions() const override { return mDefaultOptions; }
 
     IHttpRequest& Request(HttpRequestType aType, std::string_view aUri, ResponseCallback_t aCallback) override;
 
@@ -39,9 +39,9 @@ protected:
 
 private:
     friend class CurlSessionHttpRequest;
-    void requestCompleted(CurlSessionHttpRequest* apRequest);
+    void requestCompleted(CurlSessionHttpRequest& arRequest);
 };
 
 } /* namespace rsp::network::curl */
 
-#endif /* SRC_NETWORK_CURL_CURLSESSION_H_ */
+#endif // RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_SESSION_H

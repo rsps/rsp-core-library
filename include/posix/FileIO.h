@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_POSIX_FILEIO_H_
-#define SRC_POSIX_FILEIO_H_
+#ifndef RSP_CORE_LIB_POSIX_FILE_IO_H
+#define RSP_CORE_LIB_POSIX_FILE_IO_H
 
 #include <chrono>
 #include <fstream>
@@ -45,7 +45,7 @@ public:
     const std::string& GetFileName() { return mFileName; }
 
     /**
-     * Opens the given file or create it if aPersmissions are given.
+     * Opens the given file or create it if aPermissions are given.
      * Open modes can be in, out and inout.
      *
      * \param aFileName
@@ -64,7 +64,7 @@ public:
      *
      * \return True if file is open.
      */
-    bool IsOpen()
+    [[nodiscard]] bool IsOpen() const
     {
         return (mHandle >= 0);
     }
@@ -76,7 +76,7 @@ public:
      * \param aSeekDir
      * \return
      */
-    std::size_t Seek(std::size_t aOffset, std::ios_base::seekdir aSeekDir = std::ios_base::beg);
+    size_t Seek(size_t aOffset, std::ios_base::seekdir aSeekDir = std::ios_base::beg);
 
     /**
      * Read an amount of bytes into the buffer.
@@ -85,14 +85,14 @@ public:
      * \param aNumberOfBytesToRead
      * \return Number of bytes read. Can be zero if no more bytes are currently available
      */
-    std::size_t Read(void *apBuffer, std::size_t aNumberOfBytesToRead);
+    size_t Read(void *apBuffer, size_t aNumberOfBytesToRead);
 
     /**
      * \brief Read exact amount of bytes into buffer
      * \param apBuffer
      * \param aNumberOfBytesToRead
      */
-    void ExactRead(void *apBuffer, std::size_t aNumberOfBytesToRead);
+    void ExactRead(void *apBuffer, size_t aNumberOfBytesToRead);
 
     /**
      * Write an amount of bytes from the buffer to the file.
@@ -101,14 +101,14 @@ public:
      * \param aNumberOfBytesToWrite
      * \return Number of bytes written.
      */
-    std::size_t Write(const void *apBuffer, std::size_t aNumberOfBytesToWrite);
+    size_t Write(const void *apBuffer, size_t aNumberOfBytesToWrite);
 
     /**
      * \brief Write an exact amount of bytes from the buffer to the file.
      * \param apBuffer
      * \param aNumberOfBytesToWrite
      */
-    void ExactWrite(const void *apBuffer, std::size_t aNumberOfBytesToWrite);
+    void ExactWrite(const void *apBuffer, size_t aNumberOfBytesToWrite);
 
     /**
      * Get the rest of the current line.
@@ -143,7 +143,7 @@ public:
      *
      * \return
      */
-    int GetHandle()
+    [[nodiscard]] int GetHandle() const
     {
         return mHandle;
     }
@@ -153,7 +153,7 @@ public:
      *
      * \return uint size of file.
      */
-    std::size_t GetSize();
+    [[nodiscard]] size_t GetSize();
 
     /**
      * Set size of the file.
@@ -162,16 +162,16 @@ public:
      *
      * \param aSize
      */
-    void SetSize(std::size_t aSize);
+    void SetSize(size_t aSize);
 
     /**
      * Wait for data to become ready in the open file or timeout.
      * This is useful when waiting for at character device file to become ready.
      *
-     * \param aTimeoutms
+     * \param aTimeoutMs
      * \return True if data in the file awaits reading.
      */
-    bool WaitForDataReady(int aTimeoutms);
+    [[nodiscard]] bool WaitForDataReady(int aTimeoutMs) const;
 
   protected:
     std::string mFileName{};
@@ -180,4 +180,4 @@ public:
 
 } // namespace rsp::posix
 
-#endif /* SRC_POSIX_FILEIO_H_ */
+#endif // RSP_CORE_LIB_POSIX_FILE_IO_H

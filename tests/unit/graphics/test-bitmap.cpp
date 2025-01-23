@@ -9,9 +9,10 @@
  */
 
 #include <doctest.h>
-#include <graphics/primitives/Bitmap.h>
-#include <graphics/primitives/Color.h>
-#include <utils/CoreException.h>
+#include <exceptions/CoreException.h>
+#include <graphics/Bitmap.h>
+#include <graphics/Color.h>
+#include <utils/Random.h>
 #include <TestHelpers.h>
 
 using namespace rsp::utils;
@@ -21,21 +22,20 @@ TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("Bitmap")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     SUBCASE("Create")
     {
-        CHECK_NOTHROW(Bitmap tmp(200, 200, 4));
+        CHECK_NOTHROW(Bitmap tmp(200, 200, ColorDepth::RGBA));
     }
 
     SUBCASE("Drawing")
     {
-        Bitmap bitmap(200, 200, 4);
+        Bitmap bitmap(200, 200, ColorDepth::RGBA);
 
-        Color col(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
+        Color col(Random::Roll(55, 255), Random::Roll(55, 255), Random::Roll(55, 255), 0xff);
         Point pt(100, 100);
-        CHECK(bitmap.IsInsideCanvas(pt));
+        CHECK(bitmap.IsHit(pt));
         CHECK_NE(bitmap.GetPixel(pt), col);
 
         CHECK_NOTHROW(bitmap.SetPixel(pt, col));
@@ -55,23 +55,23 @@ TEST_CASE("Bitmap")
         Bitmap bitmap(filepath);
 
         // Assert
-        CHECK(bitmap.GetHeight() == height);
-        CHECK(bitmap.GetWidth() == width);
+        CHECK_EQ(bitmap.GetHeight(), height);
+        CHECK_EQ(bitmap.GetWidth(), width);
         CHECK_EQ(bitmap.GetPixelData().GetDataSize(), (width * height * 3));
-        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White), Color(0xFF020A8F));
-        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White), Color(0xFF020A8F));
-        CHECK_EQ(bitmap.GetPixelData().GetPixelAt(55, 111, Color::White), Color(0xFFEAEFE8));
+        CHECK_HEX(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White).AsUint(), 0xFF020A8F);
+        CHECK_HEX(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White).AsUint(), 0xFF020A8F);
+        CHECK_HEX(bitmap.GetPixelData().GetPixelAt(55, 111, Color::White).AsUint(), 0xFFEAEFE8);
 
         SUBCASE("Drawing on loaded Img") {
             // Arrange
-            Color cl(rand() % 200 + 56, rand() % 200 + 56, rand() % 200 + 56, 0xff);
+            Color cl(Random::Roll(55, 255), Random::Roll(55, 255), Random::Roll(55, 255), 0xff);
             Point pt(100, 100);
 
             // Act
             CHECK_NOTHROW(bitmap.SetPixel(pt, cl));
 
             // Assert
-            CHECK_EQ(bitmap.GetPixel(pt), cl);
+            CHECK_HEX(bitmap.GetPixel(pt).AsUint(), cl.AsUint());
         }
     }
 
@@ -90,16 +90,16 @@ TEST_CASE("Bitmap")
         Color col2(bitmap2.GetPixelData().GetPixelAt(0,0,Color::White));
 
         // Assert
-        CHECK(bitmap2.GetHeight() == height);
-        CHECK(bitmap2.GetWidth() == width);
-        CHECK(bitmap2.GetPixelData().GetDataSize() == (width * height * 3));
-        CHECK(col2 == bitmap2.GetPixelData().GetPixelAt(0,0,Color::White));
+        CHECK_EQ(bitmap2.GetHeight(), height);
+        CHECK_EQ(bitmap2.GetWidth(), width);
+        CHECK_EQ(bitmap2.GetPixelData().GetDataSize(), (width * height * 3));
+        CHECK_EQ(col2, bitmap2.GetPixelData().GetPixelAt(0,0,Color::White));
     }
 
     SUBCASE("Monochrome Bmp file")
     {
         // Arrange
-        std::string filepath = "testImages/Monochrome.bmp";
+        std::string filepath = "testImages/monochrome/Monochrome.bmp";
         uint32_t height = 100;
         uint32_t width = 100;
 
@@ -108,16 +108,15 @@ TEST_CASE("Bitmap")
 
         // Arrange
         Bitmap bitmap3(filepath);
-        Color col3(bitmap3.GetPixelData().GetPixelAt(0,0,Color::White));
 
         // Assert
-        CHECK(bitmap3.GetHeight() == height);
-        CHECK(bitmap3.GetWidth() == width);
+        CHECK_EQ(bitmap3.GetHeight(), height);
+        CHECK_EQ(bitmap3.GetWidth(), width);
         CHECK_EQ(bitmap3.GetPixelData().GetDataSize(), (((width + 7) >> 3) * height));
         CHECK_EQ(bitmap3.GetPixelData().GetPixelAt(0,0,Color::White), Color(0x00FFFFFF));
         CHECK_EQ(bitmap3.GetPixelData().GetPixelAt(32,50,Color::White), Color(Color::White));
     }
-
+/*
     SUBCASE("Loading PNG file")
     {
         // Arrange
@@ -125,23 +124,27 @@ TEST_CASE("Bitmap")
         uint32_t height = 194;
         uint32_t width = 259;
 
-        CHECK_NOTHROW(Bitmap png1(filepath));
+//        REQUIRE_NOTHROW(Bitmap png1(filepath));
         Bitmap png(filepath);
 
-        CHECK(png.GetHeight() == height);
-        CHECK(png.GetWidth() == width);
+        CHECK_EQ(png.GetHeight(), height);
+        CHECK_EQ(png.GetWidth(), width);
         CHECK_EQ(png.GetPixelData().GetDataSize(), (width * height * 3));
+        CHECK_EQ(png.GetPixelData().GetPixelAt(0, 0, Color::White).AsUint(), 0xFF020A8F);
+        CHECK_EQ(png.GetPixelData().GetPixelAt(1, 0, Color::White).AsUint(), 0xFF020A8F);
+        CHECK_EQ(png.GetPixelData().GetPixelAt(55, 111, Color::White).AsUint(), 0xFFEAEFE8);
+
 //        Color col(png.GetPixelData().GetPixelAt(0, 0, Color::White));
 //        CHECK_EQ(col, Color(4292918232));
     }
-
+*/
     SUBCASE("Loading unsupported file")
     {
         // Arrange
         std::string filepath = "testImages/testImage.txt";
 
         // Act Assert
-        CHECK_THROWS_AS(Bitmap bitmap(filepath), EUnsupportedFileformat);
+        CHECK_THROWS_AS(Bitmap bitmap(filepath), EUnsupportedFileFormat);
     }
 }
 

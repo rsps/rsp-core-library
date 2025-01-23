@@ -1,0 +1,34 @@
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2022-2023 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Steffen Brummer
+ */
+
+#include "BmpLoader.h"
+#include <graphics/raster/ImgLoader.h>
+#include <memory>
+
+namespace rsp::graphics {
+
+std::shared_ptr<ImgLoader> ImgLoader::GetRasterLoader(const std::string &arFileType)
+{
+    if (arFileType == ".bmp") {
+        return std::make_shared<BmpLoader>();
+    }
+    else {
+        THROW_WITH_BACKTRACE1(EUnsupportedFileFormat, std::string("Raster loader not found for file type: ") + arFileType);
+    }
+}
+
+void ImgLoader::initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
+{
+    mPixelData.initAfterLoad(aWidth, aHeight, aDepth);
+}
+
+}
+
+

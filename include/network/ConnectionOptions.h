@@ -8,8 +8,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CONNECTIONOPTIONS_H
-#define CONNECTIONOPTIONS_H
+#ifndef RSP_CORE_LIB_NETWORK_CONNECTION_OPTIONS_H
+#define RSP_CORE_LIB_NETWORK_CONNECTION_OPTIONS_H
 
 #include <ostream>
 #include <string>
@@ -37,4 +37,4 @@ std::ostream& operator<<(std::ostream &o, const ConnectionOptions &arOptions);
 
 } //namespace rsp::network
 
-#endif
+#endif // RSP_CORE_LIB_NETWORK_CONNECTION_OPTIONS_H

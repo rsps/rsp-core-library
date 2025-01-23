@@ -14,13 +14,13 @@ enum LogLevel {
     Notice
     Info
     Debug
-    
-    +const cDefautLogLevel = Info
+
+    +const cDefaultLogLevel = Info
     +ToLogLevel(aLevelString: std::string): LogLevel
     +ToString(aLevel: LogLevel): std::string
 }
 
-enum LogType {
+enum LogFacility {
     Auth
     Cron
     Daemon
@@ -41,7 +41,7 @@ enum LogType {
 
 abstract LoggerInterface {
     +{static} GetDefault(): LoggerInterface&
-    +{static} SetDefault(apLogger: LoggerInterface*)
+    +{static} DestroyDefault(apLogger: LoggerInterface*)
     +{abstract} Emergency(): LogStream
     +{abstract} Alert(): LogStream
     +{abstract} Critical(): LogStream
@@ -51,7 +51,7 @@ abstract LoggerInterface {
     +{abstract} Info(): LogStream
     +{abstract} Debug(): LogStream
     +HasWriters() const: bool
-    +AddLogWriter(aWriter: std::shared_ptr<LogWriterInterface>): Handle_t
+    +addLogWriter(aWriter: std::shared_ptr<LogWriterInterface>): Handle_t
     +RemoveLogWriter(aHandle: Handle_t)
     #{abstract} write(apStream: const LogStreamInterface*, arMsg: const std::string&)
 }
@@ -109,7 +109,7 @@ class ConsoleLogWriter {
 }
 
 class SysLogWriter {
-    +SysLogWriter(aIdent: std::string, aType: LogType)
+    +SysLogWriter(aIdent: std::string, aType: LogFacility)
     +Write(arMsg: const std::string&, aCurrentLevel: LogLevel)
 }
 
@@ -127,7 +127,7 @@ OutStreamBuf *-- LogStream
 LogWriterInterface <|-- ConsoleLogWriter
 LogWriterInterface <|-- SysLogWriter
 LogWriterInterface <|--- FileLogWriter
-LogType *--- SysLogWriter
+LogFacility *--- SysLogWriter
 LogLevel *-- LogWriterInterface
 
 ConsoleLogStreamsInterface *-- ConsoleLogWriter

@@ -9,72 +9,123 @@
  */
 
 #include <doctest.h>
-#include <graphics/Framebuffer.h>
-#include <graphics/controls/Image.h>
+#include <graphics/Image.h>
+#include <graphics/Renderer.h>
 #include <posix/FileSystem.h>
 #include <utils/Random.h>
 #include <TestHelpers.h>
+#include <pixmap/GfxResources.h>
+#ifdef USE_GFX_SW
+#include <graphics/SW/Framebuffer.h>
+#endif
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
 
 TEST_SUITE_BEGIN("Graphics");
 
-TEST_CASE("Image Test")
+TEST_CASE("Image")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     // Arrange
+#ifdef USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
-    Framebuffer fb(p.empty() ? nullptr : p.string().c_str());
-    Rect testRect(20, 20, 200, 100);
-    Bitmap normal("testImages/Red.bmp");
-    Random::Seed(1234);
+    Renderer::SetDevicePath(p.string());
+#endif
 
-    Image testImage;
-    testImage.GetStyle(Control::States::normal).mBackground.SetPixelData(normal);
-    testImage.SetArea(testRect);
+    auto& renderer = Renderer::Init(480, 800);
+    CHECK_NOTHROW(renderer.Fill(Color::Grey));
+    CHECK_NOTHROW(renderer.Present());
 
-    SUBCASE("Render Image if Invalid")
+    auto fill_color = Color::Purple;
+
+    Canvas bmp(200, 100);
+    CHECK_NOTHROW(bmp.Fill(fill_color));
+
+    Point pos(20, 20);
+    Point insidePoint(Random::Roll(20, 219), Random::Roll(20, 119));
+
+    std::unique_ptr<Image> image;
+
+    SUBCASE("Default Constructor")
     {
-        // Arrange
-        Color red(0xFFc41616);
-        Point insidePoint(Random::Roll(testRect.GetLeft(), testRect.GetWidth()),
-                          Random::Roll(testRect.GetTop(), testRect.GetHeight()));
-        testImage.Invalidate();
-
-        // Act
-        testImage.Render(fb);
-        fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-
-//        MESSAGE("insidePoint: " << insidePoint);
-//        MESSAGE("Origin: " << testImage.GetOrigin());
-//        MESSAGE("Destination: " << testImage.GetStyle(Control::States::normal).mBackground.GetDestination());
-        // Assert
-        CHECK_EQ(fb.GetPixel(insidePoint, true), red.AsUint());
-        CHECK_NE(fb.GetPixel({19, 19}, true), red.AsUint());
-        CHECK_NE(fb.GetPixel({20, 19}, true), red.AsUint());
-        CHECK_NE(fb.GetPixel({19, 20}, true), red.AsUint());
-        CHECK_NE(fb.GetPixel({119, 19}, true), red.AsUint());
-        CHECK_NE(fb.GetPixel({220, 19}, true), red.AsUint());
-        CHECK_NE(fb.GetPixel({119, 120}, true), red.AsUint());
-        CHECK_EQ(fb.GetPixel({20, 20}, true), red.AsUint());
-        CHECK_EQ(fb.GetPixel({219, 20}, true), red.AsUint());
-        CHECK_EQ(fb.GetPixel({20, 119}, true), red.AsUint());
-        CHECK_EQ(fb.GetPixel({219, 119}, true), red.AsUint());
-        SUBCASE("Do not render if Image valid")
-        {
-            // Arrange
-            fb.SwapBuffer(BufferedCanvas::SwapOperations::Clear);
-
-            // Act
-            testImage.Render(fb);
-
-            // Assert
-            CHECK_NE(fb.GetPixel(insidePoint), red.AsUint());
-        }
+        CHECK_NOTHROW(image = std::make_unique<Image>());
+        CHECK_NOTHROW(*image = bmp);
     }
+
+    SUBCASE("Copy Constructor")
+    {
+        CHECK_NOTHROW(image = std::make_unique<Image>(bmp));
+    }
+
+    CHECK_NOTHROW(image->SetOrigin(pos));
+
+    CHECK(image->UpdateData());
+    // Check that UpdateData returns false if not invalid
+    CHECK_FALSE(image->UpdateData());
+    CHECK_NOTHROW(renderer.Fill(Color::Grey));
+    CHECK_NOTHROW(image->Render(renderer));
+    CHECK_NOTHROW(renderer.Present());
+    CHECK_NOTHROW(renderer.Fill(Color::Grey));
+    CHECK_NOTHROW(image->Render(renderer));
+
+    CHECK_EQ(renderer.GetPixel(insidePoint.GetX(), insidePoint.GetY()), fill_color);
+    CHECK_NE(renderer.GetPixel(19,   19), fill_color);
+    CHECK_NE(renderer.GetPixel(20,   19), fill_color);
+    CHECK_NE(renderer.GetPixel(19,   20), fill_color);
+    CHECK_NE(renderer.GetPixel(119,  19), fill_color);
+    CHECK_NE(renderer.GetPixel(220,  19), fill_color);
+    CHECK_NE(renderer.GetPixel(119, 120), fill_color);
+    CHECK_EQ(renderer.GetPixel(20,   20), fill_color);
+    CHECK_EQ(renderer.GetPixel(219,  20), fill_color);
+    CHECK_EQ(renderer.GetPixel(20,  119), fill_color);
+    CHECK_EQ(renderer.GetPixel(219, 119), fill_color);
+
+    using namespace std::chrono_literals;
+    std::this_thread::sleep_for(500ms);
+}
+
+TEST_CASE("TestImage")
+{
+    TestLogger logger;
+
+    // Arrange
+#ifdef USE_GFX_SW
+    std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+    sw::Framebuffer::mDevicePath = p;
+#endif
+
+    auto& renderer = Renderer::Init(480, 800);
+    CHECK_NOTHROW(renderer.Fill(Color::Grey));
+
+    PixelData bmp;
+
+    SUBCASE("Monochrome") {
+        bmp = PixelData(cMonochrome);
+    }
+    SUBCASE("Alpha") {
+        bmp = PixelData(cLowerCase);
+//        bmp.SaveToCFile("LowerCase-compressed.cpp", true);
+//        bmp.SaveToCFile("LowerCase-normal.cpp", false);
+    }
+    SUBCASE("RGB") {
+        bmp = PixelData(cTestImage480x800);
+//        bmp.SaveToCFile("TestImage480x800b.cpp");
+    }
+
+    BitmapView bv(bmp);
+    Image image(bv);
+    image.GetStyle(Control::States::Normal).mForegroundColor = Color::Black;
+    image.GetStyle(Control::States::Normal).mBackgroundColor = Color::Yellow;
+
+    image.SetTransparent(false).SetOrigin(Point((480 - bmp.GetWidth()) / 2, (800 - bmp.GetHeight()) / 2));
+
+    CHECK(image.UpdateData());
+    CHECK_NOTHROW(image.Render(renderer));
+    CHECK_NOTHROW(renderer.Present());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
 TEST_SUITE_END();

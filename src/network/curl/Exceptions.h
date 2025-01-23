@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_NETWORK_CURL_EXCEPTIONS_H_
-#define SRC_NETWORK_CURL_EXCEPTIONS_H_
+#ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_EXCEPTIONS_H
+#define RSP_CORE_LIB_SRC_NETWORK_CURL_EXCEPTIONS_H
 
 #include <string_view>
 #include <curl/curl.h>
@@ -27,10 +27,9 @@ namespace rsp::network::curl {
 class ECurlVersion: public rsp::network::NetworkException
 {
 public:
-    explicit ECurlVersion(const std::string &aMsg, std::string_view aVersion)
-        : NetworkException(aMsg)
+    explicit ECurlVersion(const std::string &arMsg, std::string_view aVersion)
+        : NetworkException(arMsg + ": " + std::string(aVersion))
     {
-        mMsg.append(": ").append(aVersion);
     }
 };
 
@@ -43,34 +42,46 @@ public:
 class ECurlError: public rsp::network::NetworkException
 {
 public:
-    explicit ECurlError(const std::string &aMsg, CURLcode aCode = CURLE_OK)
-        : NetworkException(aMsg)
+    explicit ECurlError(const std::string &arMsg, CURLcode aCode = CURLE_OK)
+        : NetworkException(formatError(arMsg, aCode))
     {
+    }
+
+    static std::string formatError(const std::string &arMsg, CURLcode aCode)
+    {
+        std::string result(arMsg);
         if (aCode != CURLE_OK) {
-            mMsg.append(" (")
+            result.append(" (")
                 .append(std::to_string(static_cast<unsigned long>(aCode)))
                 .append(") ")
                 .append(curl_easy_strerror(aCode));
         }
+        return result;
     }
 };
 
 class ECurlMError: public rsp::network::NetworkException
 {
 public:
-    explicit ECurlMError(const std::string &aMsg, CURLMcode aCode = CURLM_OK)
-        : NetworkException(aMsg)
+    explicit ECurlMError(const std::string &arMsg, CURLMcode aCode = CURLM_OK)
+        : NetworkException(formatError(arMsg, aCode))
     {
+    }
+
+    static std::string formatError(const std::string &arMsg, CURLMcode aCode)
+    {
+        std::string result(arMsg);
         if (aCode != CURLM_OK) {
-            mMsg.append(" (")
+            result.append(" (")
                 .append(std::to_string(static_cast<unsigned long>(aCode)))
                 .append(") ")
                 .append(curl_multi_strerror(aCode));
         }
+        return result;
     }
 };
 
 
 } // rsp::network::curl
 
-#endif /* SRC_NETWORK_CURL_EXCEPTIONS_H_ */
+#endif // RSP_CORE_LIB_SRC_NETWORK_CURL_EXCEPTIONS_H

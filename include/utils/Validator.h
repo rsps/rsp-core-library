@@ -8,12 +8,12 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_VALIDATOR_H_
-#define INCLUDE_UTILS_VALIDATOR_H_
+#ifndef RSP_CORE_LIB_UTILS_VALIDATOR_H
+#define RSP_CORE_LIB_UTILS_VALIDATOR_H
 
+#include <exceptions/CoreException.h>
 #include <string>
 #include <sstream>
-#include "CoreException.h"
 #include "InRange.h"
 
 namespace rsp::utils {
@@ -21,7 +21,7 @@ namespace rsp::utils {
 /**
  * \brief Base class for validator exceptions.
  */
-class ValidatorException : public CoreException
+class ValidatorException : public exceptions::CoreException
 {
 public:
     using CoreException::CoreException;
@@ -40,11 +40,17 @@ public:
 
     template <typename T>
     ENotInRange(T aLow, T aHigh, T aValue)
-        :ValidatorException("Value is not in range: (")
+        :ValidatorException("Value is not in range: " + format(aLow, aHigh, aValue))
+    {
+
+    }
+
+    template <typename T>
+    std::string format(T aLow, T aHigh, T aValue)
     {
         std::stringstream ss;
-        ss << aLow << " < " << aValue << " < " << aHigh << ")";
-        mMsg += ss.str();
+        ss << "(" << aLow << " < " << aValue << " < " << aHigh << ")";
+        return ss.str();
     }
 };
 
@@ -81,4 +87,4 @@ public:
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_VALIDATOR_H_ */
+#endif // RSP_CORE_LIB_UTILS_VALIDATOR_H

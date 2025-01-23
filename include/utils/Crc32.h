@@ -8,11 +8,11 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_UTILS_CRC32_H_
-#define SRC_UTILS_CRC32_H_
+#ifndef RSP_CORE_LIB_UTILS_CRC32_H
+#define RSP_CORE_LIB_UTILS_CRC32_H
 
+#include <exceptions/CoreException.h>
 #include <cstdint>
-#include "CoreException.h"
 
 namespace rsp::utils {
 
@@ -21,9 +21,9 @@ namespace rsp::utils {
  * \brief Exception thrown on CRC mismatch
  *
  */
-class ECrcError : public CoreException {
+class ECrcError : public exceptions::CoreException {
 public:
-    ECrcError(const char *apMsg) : CoreException(apMsg) {};
+    explicit ECrcError(const char *apMsg) : CoreException(apMsg) {};
 };
 
 /**
@@ -38,10 +38,10 @@ public:
      *
      * \param aInitial
      */
-    Crc32(uint32_t aInitial = 0);
+    explicit Crc32(uint32_t aInitial = 0);
 
     /**
-     * \fn std::uint32_t Calc(const void*, std::size_t, std::uint32_t=0)
+     * \fn uint32_t Calc(const void*, std::size_t, uint32_t=0)
      * \brief A standalone method to calculate the CRC32 of any buffer.
      *
      * \param aBuf
@@ -49,16 +49,16 @@ public:
      * \param aInitial
      * \return
      */
-    static std::uint32_t Calc(const void* aBuf, std::size_t aLen, std::uint32_t aInitial = 0);
+    static uint32_t Calc(const void* aBuf, size_t aLen, uint32_t aInitial = 0);
 
     /**
-     * \fn std::uint32_t Add(uint8_t)
+     * \fn uint32_t Add(uint8_t)
      * \brief An object method for incremental calculation of a CRC32 value.
      *
      * \param aByte
      * \return
      */
-    std::uint32_t Add(uint8_t aByte);
+    uint32_t Add(uint8_t aByte);
 
     /**
      * \fn bool Verify(uint32_t, bool=false)
@@ -69,10 +69,10 @@ public:
      * \param aThrowOnMismatch
      * \return
      */
-    bool Verify(uint32_t aResult, bool aThrowOnMismatch = false);
+    [[nodiscard]] bool Verify(uint32_t aResult, bool aThrowOnMismatch = false) const;
 
 protected:
-    static const std::uint32_t* getTable();
+    static const uint32_t* getTable();
     uint32_t mC{0};
 };
 
@@ -114,7 +114,7 @@ namespace crc32 {
             0xb3667a2eL, 0xc4614ab8L, 0x5d681b02L, 0x2a6f2b94L, 0xb40bbe37L, 0xc30c8ea1L, 0x5a05df1bL, 0x2d02ef8dL
         };
 
-        constexpr uint32_t crc32_add( const char *apU, uint32_t aC=0xFFFFFFFF )
+        constexpr uint32_t crc32_add( const char *apU, uint32_t aC=0xFFFFFFFF ) // NOLINT
         {
             return (*apU == '\0') ? aC : crc32_add(apU + 1, (aC >> 8) ^ crc_table[(aC ^ static_cast<uint8_t>(*apU)) & 0x000000FF]);
         }
@@ -126,11 +126,11 @@ namespace crc32 {
     }
 } /* namespace crc32 */
 
-size_t constexpr operator "" _crc32( const char* str, size_t len )
+size_t constexpr operator "" _crc32( const char* str, size_t /*len*/ )
 {
     return crc32::HashConst(str);
 }
 
 } /* namespace rsp */
 
-#endif /* SRC_UTILS_CRC32_H_ */
+#endif // RSP_CORE_LIB_UTILS_CRC32_H

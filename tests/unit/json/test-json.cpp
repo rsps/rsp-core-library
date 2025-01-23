@@ -10,22 +10,28 @@
 
 #include <json/Json.h>
 #include <json/JsonDecoder.h>
-
 #include "doctest.h"
 #include <iostream>
 #include <utils/StrUtils.h>
+#include <utils/StructElement.h>
 #include <utils/InRange.h>
 #include <TestHelpers.h>
+#include <optional>
 
 using namespace rsp::utils;
 using namespace rsp::json;
 
-TEST_CASE("Json") {
+enum class EType : uint8_t {
+    ONE,
+    TWO,
+    THREE
+};
 
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+TEST_CASE("Json")
+{
+    TestLogger logger;
 
-    std::string json_object{ R"(
+    std::string_view json_object{ R"(
 {
     "NullValue": null,
     "BooleanValue": true,
@@ -56,110 +62,115 @@ TEST_CASE("Json") {
 
 
     SUBCASE("Create Empty") {
-        JsonValue v1;
-        CHECK(v1.GetJsonType() == JsonTypes::Null);
-        CHECK_EQ("null", v1.Encode());
-        CHECK_THROWS_AS(v1.AsInt(), EConversionError);
-        CHECK_THROWS_AS(v1.AsFloat(), EConversionError);
-        CHECK_THROWS_AS(v1.AsDouble(), EConversionError);
+        DynamicData v1;
+        CHECK_EQ(Json::GetJsonType(v1), Json::Types::Null);
+        CHECK_EQ("null", JsonEncoder().Encode(v1));
+        CHECK_THROWS_AS(int a = v1.AsInt(), EConversionError);
+        CHECK_THROWS_AS(float a = v1.AsFloat(), EConversionError);
+        CHECK_THROWS_AS(double a = v1.AsDouble(), EConversionError);
         CHECK_EQ("null", v1.AsString());
 
-//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v1)) << "\n" << TestHelpers::ToHex(reinterpret_cast<std::uint8_t*>(&v1), sizeof(Variant)));
+//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v1)) << "\n" << TestHelpers::ToHex(reinterpret_cast<uint8_t*>(&v1), sizeof(Variant)));
 }
 
 
     SUBCASE("Create Float") {
-        JsonValue v1(1.42f);
-        CHECK(v1.GetJsonType() == JsonTypes::Number);
+        DynamicData v1(1.42f);
+        CHECK_EQ(Json::GetJsonType(v1), Json::Types::Number);
         CHECK(IsEqual(1.42f, static_cast<float>(v1), 0.000001f));
-        CHECK_EQ("1.41999996", v1.Encode());
+        CHECK_EQ("1.41999996", Json::Encode(v1));
     }
 
     SUBCASE("Create Double") {
-        JsonValue v1(456321.7651234);
-        CHECK(v1.GetJsonType() == JsonTypes::Number);
+        DynamicData v1(456321.7651234);
+        CHECK_EQ(Json::GetJsonType(v1), Json::Types::Number);
         CHECK(IsEqual(456321.7651234, static_cast<double>(v1), 0.00000001));
-        CHECK_EQ("456321.76512340002", v1.Encode());
+        CHECK_EQ("456321.76512340002", Json::Encode(v1));
 
-//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v1)) << "\nInt: " << v1.RawAsInt() << "\n" << TestHelpers::ToHex(reinterpret_cast<std::uint8_t*>(&v1), sizeof(Variant)));
+//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v1)) << "\nInt: " << v1.RawAsInt() << "\n" << TestHelpers::ToHex(reinterpret_cast<uint8_t*>(&v1), sizeof(Variant)));
 
-        auto v2 = JsonValue::Decode("{\"Value\": 456321.7651234}");
+        auto v2 = Json::Decode("{\"Value\": 456321.7651234}");
         auto &v3 = v2["Value"];
-        CHECK(v3.GetJsonType() == JsonTypes::Number);
+        CHECK_EQ(Json::GetJsonType(v3), Json::Types::Number);
         CHECK(IsEqual(456321.7651234, static_cast<double>(v3), 0.00000001));
-        CHECK_EQ("456321.76512340002", v3.Encode());
+        CHECK_EQ("456321.76512340002", Json::Encode(v3));
 
         // Explore output here: https://www.exploringbinary.com/floating-point-converter/
-//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v3)) << "\nInt: " << v3.RawAsInt() << "\n" << TestHelpers::ToHex(reinterpret_cast<std::uint8_t*>(&v3), sizeof(Variant)));
+//        MESSAGE("JsonValue: " << *(static_cast<Variant*>(&v3)) << "\nInt: " << v3.RawAsInt() << "\n" << TestHelpers::ToHex(reinterpret_cast<uint8_t*>(&v3), sizeof(Variant)));
     }
 
     SUBCASE("Create String") {
-        JsonValue v2("My World");
-        CHECK(v2.GetType() == JsonValue::Types::String);
-        CHECK("My World" == v2.AsString());
-        CHECK(StrUtils::Contains(v2.Encode(), "\"My World\""));
-        CHECK("\"My World\"" == v2.Encode());
+        DynamicData v2("My World");
+        CHECK_EQ(Json::GetJsonType(v2), Json::Types::String);
+        CHECK_EQ("My World", v2.AsString());
+        CHECK_EQ("\"My World\"", Json::Encode(v2));
     }
 
     SUBCASE("Create Unicode String") {
-        JsonValue v3 = JsonDecoder("\"My \\u0057orld\"").GetValue();
-        CHECK(v3.GetType() == JsonValue::Types::String);
-        CHECK("My World" == v3.AsString());
+        DynamicData v3 = JsonDecoder(R"("My \u0057orld")").Decode();
+        CHECK_EQ(Json::GetJsonType(v3), Json::Types::String);
+        CHECK_EQ("My World", v3.AsString());
 
-        v3 = JsonDecoder("\"Euro sign: \\u20AC\"").GetValue();
+        v3 = JsonDecoder(R"("Euro sign: \u20AC")").Decode();
 //            CHECK("Euro sign: €" == "Euro sign: \\u20AC");
-        CHECK(v3.GetType() == JsonValue::Types::String);
-        CHECK("Euro sign: €" == v3.AsString());
+        CHECK_EQ(int(v3.GetType()), int(Variant::Types::String));
+        CHECK_EQ("Euro sign: €", v3.AsString());
     }
 
     SUBCASE("Ignore Whitespace") {
-        std::string ws = R"({"whitespace":  
+        std::string ws = R"({"whitespace":
 
-	
+
 null }
 )";
-        Json v4;
+        DynamicData v4;
 
-        CHECK_NOTHROW(v4 = JsonDecoder(ws).GetValue());
+        CHECK_NOTHROW(v4 = JsonDecoder(ws).Decode());
 
-        CHECK_EQ(v4.GetJsonType(), JsonTypes::Object);
+        CHECK_EQ(Json::GetJsonType(v4), Json::Types::Object);
         CHECK_EQ(v4.GetCount(), 1);
         CHECK(v4["whitespace"].IsNull());
 //        MESSAGE(v4.Encode());
     }
 
     SUBCASE("Decode Object") {
-        JsonValue v;
+        Json v;
         CHECK_NOTHROW(v = Json::Decode(json_object));
 
-        CHECK(v.GetJsonType() == JsonTypes::Object);
-        CHECK(v.GetCount() == 7);
+        SUBCASE("Static") {
+        }
+        SUBCASE("Dynamic") {
+            CHECK_NOTHROW(v = Json(json_object));
+        }
+
+        CHECK_EQ(Json::GetJsonType(v), Json::Types::Object);
+        CHECK_EQ(v.GetCount(), 7);
 
         CHECK(v.MemberExists("NullValue"));
         CHECK(v["NullValue"].IsNull());
 
         CHECK(v.MemberExists("BooleanValue"));
-        CHECK(v["BooleanValue"].IsNull() == false);
-        CHECK(static_cast<bool>(v["BooleanValue"]) == true);
+        CHECK_FALSE(v["BooleanValue"].IsNull());
+        CHECK(static_cast<bool>(v["BooleanValue"]));
 
         CHECK(v.MemberExists("StringValue"));
-        CHECK(v["StringValue"].IsNull() == false);
+        CHECK_FALSE(v["StringValue"].IsNull());
 
         CHECK(v.MemberExists("IntValue"));
-        CHECK(v["IntValue"].IsNull() == false);
-        CHECK(v["IntValue"].GetType() == Variant::Types::Uint64);
-        CHECK(static_cast<int>(v["IntValue"]) == 42);
+        CHECK_FALSE(v["IntValue"].IsNull());
+        CHECK_EQ(int(v["IntValue"].GetType()), int(Variant::Types::Uint64));
+        CHECK_EQ(static_cast<int>(v["IntValue"]), 42);
 
         CHECK(v.MemberExists("FloatValue"));
-        CHECK(v["FloatValue"].IsNull() == false);
+        CHECK_FALSE(v["FloatValue"].IsNull());
 
         CHECK(v.MemberExists("ArrayValue"));
-        JsonValue a;
+        DynamicData a;
         CHECK_NOTHROW(a = v["ArrayValue"]);
-        CHECK(a.GetCount() == 4);
-        CHECK(a.IsNull() == false);
-        CHECK_EQ(static_cast<int>(a[static_cast<std::size_t>(0u)]), 32);
-        CHECK(a[1].AsString() == "string");
+        CHECK_EQ(a.GetCount(), 4);
+        CHECK_FALSE(a.IsNull());
+        CHECK_EQ(static_cast<int>(a[0]), 32);
+        CHECK_EQ(a[1].AsString(), "string");
         CHECK(static_cast<bool>(a[2]));
         CHECK(a[3].IsNull());
 
@@ -168,102 +179,124 @@ null }
         CHECK(v["ArrayValue"][2].AsBool());
 
         CHECK(v.MemberExists("ObjectMember"));
-        CHECK(v["ObjectMember"].IsNull() == false);
-        CHECK(v["ObjectMember"].GetCount() == 3);
+        CHECK_FALSE(v["ObjectMember"].IsNull());
+        CHECK_EQ(v["ObjectMember"].GetCount(), 3);
         CHECK_FALSE(static_cast<bool>(v["ObjectMember"]["Boolean"]));
         CHECK(v["ObjectMember"]["Empty"].IsNull());
 
-        CHECK_THROWS_AS(v["ObjectMember"]["empty"].IsNull(), const EJsonException &);
+        CHECK_THROWS_AS(v["ObjectMember"]["empty"].IsNull(), const EMemberNotExisting &);
 
         CHECK_NOTHROW(v["ObjectMember"]["Empty"] = 12.34);
         CHECK_FALSE(v["ObjectMember"]["Empty"].IsNull());
         CHECK(IsEqual(static_cast<double>(v["ObjectMember"]["Empty"]), 12.34, 0.00000000001));
 
         CHECK_EQ(v["ObjectMember"]["NestedObject"]["NestedValue"].AsString(), "Cheers");
-        CHECK_NOTHROW(v["ObjectMember"]["NestedObject"]["NestedValue"] = "Blurp");
-        CHECK_EQ(v["ObjectMember"]["NestedObject"]["NestedValue"].AsString(), "Blurp");
+        CHECK_NOTHROW(v["ObjectMember"]["NestedObject"]["NestedValue"] = "Cheese");
+        CHECK_EQ(v["ObjectMember"]["NestedObject"]["NestedValue"].AsString(), "Cheese");
     }
 
     SUBCASE("Encode Object") {
-        std::string orig = json_object;
-        JsonValue v = JsonDecoder(json_object).GetValue();
+        std::string orig(json_object);
+        DynamicData v = JsonDecoder(json_object).Decode();
 
-        CHECK(v.GetJsonType() == JsonTypes::Object);
-        CHECK(v.GetCount() == 7);
+        CHECK_EQ(Json::GetJsonType(v), Json::Types::Object);
+        CHECK_EQ(v.GetCount(), 7);
 
-        std::string result = v.Encode(true);
+        std::string result;
+        SUBCASE("Static") {
+            result = Json::Encode(v, true);
+        }
+        SUBCASE("Dynamic") {
+            Json js(v);
+            result = js.Encode(true);
+        }
 
         StrUtils::Trim(result);
         StrUtils::Trim(orig);
 //        MESSAGE(result.length());
 //        MESSAGE(orig.length());
-        CHECK(result == orig);
+        CHECK_EQ(result, orig);
 
         // Validate UCS2 code-points in output:
-        orig = "\"Euro sign: \\u20ac\"";
-        JsonValue v1 = JsonDecoder(orig).GetValue();
-        CHECK(v1.GetType() == JsonValue::Types::String);
-        CHECK("Euro sign: €" == v1.AsString());
-        result = v1.Encode(true, true);
-        CHECK(result == orig);
+        orig = R"("Euro sign: \u20ac")";
+        DynamicData v1 = Json::Decode(orig);
+        CHECK_EQ(int(v1.GetType()), int(DynamicData::Types::String));
+        CHECK_EQ("Euro sign: €", v1.AsString());
+        result = Json::Encode(v1, true, true);
+        CHECK_EQ(result, orig);
 
         CHECK(TestHelpers::ValidateJson(result));
     }
 
     SUBCASE("Validate") {
-        CHECK_THROWS_AS(JsonDecoder(R"(1.23456.7)").GetValue(), const EJsonNumberError &); // Bad number
-        CHECK_THROWS_AS(JsonDecoder(R"(BadString)").GetValue(), const EJsonParseError &);
-        CHECK_THROWS_AS(JsonDecoder(R"("Bad Character \k")").GetValue(), const EJsonFormatError &);
-        CHECK_THROWS_AS(JsonDecoder(R"(TRUE)").GetValue(), const EJsonParseError &);
-        CHECK_NOTHROW(JsonDecoder(R"([   ])").GetValue());
-        CHECK_NOTHROW(JsonDecoder(R"([ null ])").GetValue());
-        CHECK_THROWS_AS(JsonDecoder(R"([ , ])").GetValue(), const EJsonParseError &);
-        CHECK_THROWS_AS(JsonDecoder(R"([ "BadArray", "Excessive Delimiter",])").GetValue(), const EJsonParseError &);
-        CHECK_NOTHROW(JsonDecoder(R"({   })").GetValue());
-        CHECK_NOTHROW(JsonDecoder(R"({ "empty":null })").GetValue());
-        CHECK_THROWS_AS(JsonDecoder(R"({ null })").GetValue(), const EJsonParseError &);
-        CHECK_THROWS_AS(JsonDecoder(R"({ , })").GetValue(), const EJsonParseError &);
-        CHECK_THROWS_AS(JsonDecoder(R"({ "BadObject": "Excessive Delimiter",})").GetValue(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonDecoder(R"(1.23456.7)").Decode(), const EJsonNumberError &); // Bad number
+        CHECK_THROWS_AS(JsonDecoder(R"(BadString)").Decode(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonDecoder(R"("Bad Character \k")").Decode(), const EJsonFormatError &);
+        CHECK_THROWS_AS(JsonDecoder(R"(TRUE)").Decode(), const EJsonParseError &);
+        CHECK_NOTHROW(JsonDecoder(R"([   ])").Decode());
+        CHECK_NOTHROW(JsonDecoder(R"([ null ])").Decode());
+        CHECK_THROWS_AS(JsonDecoder(R"([ , ])").Decode(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonDecoder(R"([ "BadArray", "Excessive Delimiter",])").Decode(), const EJsonParseError &);
+        CHECK_NOTHROW(JsonDecoder(R"({   })").Decode());
+        CHECK_NOTHROW(JsonDecoder(R"({ "empty":null })").Decode());
+        CHECK_THROWS_AS(JsonDecoder(R"({ null })").Decode(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonDecoder(R"({ , })").Decode(), const EJsonParseError &);
+        CHECK_THROWS_AS(JsonDecoder(R"({ "BadObject": "Excessive Delimiter",})").Decode(), const EJsonParseError &);
     }
 
     SUBCASE("Copy") {
-        std::string orig = json_object;
+        std::string orig(json_object);
         StrUtils::Trim(orig);
-        JsonValue p = JsonValue::Decode(json_object);
+        auto p = Json::Decode(json_object);
 
-        JsonValue dst;
-        dst = p;
+        auto dst = p;
 
         dst["IntValue"] = 43;
 
-        CHECK(p.IsArray() == dst.IsArray());
-        CHECK(p.IsObject() == dst.IsObject());
-        CHECK(dst.IsObject() == true);
-        CHECK(p.GetCount() == dst.GetCount());
-        CHECK(p.GetType() == dst.GetType());
-        CHECK(p.GetJsonTypeAsString(p.GetJsonType()) == dst.GetJsonTypeAsString(dst.GetJsonType()));
-        CHECK(p["IntValue"].AsInt() != dst["IntValue"].AsInt());
+        CHECK_EQ(p.IsArray(), dst.IsArray());
+        CHECK_EQ(p.IsObject(), dst.IsObject());
+        CHECK(dst.IsObject());
+        CHECK_EQ(p.GetCount(), dst.GetCount());
+        CHECK_EQ(int(p.GetType()), int(dst.GetType()));
+        CHECK_EQ(Json::GetJsonTypeAsString(Json::GetJsonType(p)), Json::GetJsonTypeAsString(Json::GetJsonType(dst)));
+        CHECK_NE(p["IntValue"].AsInt(), dst["IntValue"].AsInt());
 
-        Json dst2(p);
+        DynamicData dst2(p);
+//        DynamicData dst2(static_cast<DynamicData&>(p));
 
         dst["IntValue"] = 42;
-        CHECK(p.Encode(true) == dst.Encode(true));
-        CHECK(p.Encode(true) == dst2.Encode(true));
-        CHECK(orig == dst2.Encode(true));
+        CHECK_EQ(Json::Encode(p, true), Json::Encode(dst, true));
+        CHECK_EQ(Json::Encode(p, true), Json::Encode(dst2, true));
+        auto result = Json::Encode(dst2, true);
+        CHECK_EQ(orig, result);
+    }
+
+    SUBCASE("Copy Self") {
+        std::string orig(R"({"key":"[10,20,30]"})");
+        Json js;
+        js = Json::Decode(orig);
+
+        CHECK(js.IsObject());
+        CHECK_EQ(js["key"].GetType(), Variant::Types::String);
+
+        js["key"] = Json::Decode(js["key"].AsString());
+
+        CHECK(js["key"].IsArray());
+        CHECK_EQ(js["key"][2].AsInt(), 30);
     }
 
     SUBCASE("Move") {
-        std::string orig = json_object;
+        std::string orig(json_object);
         StrUtils::Trim(orig);
-        JsonValue p = JsonDecoder(json_object).GetValue();
-        JsonValue dst = std::move(p);
+        auto p = JsonDecoder(json_object).Decode();
+        auto dst = std::move(p);
 
-        CHECK(orig == dst.Encode(true));
-        CHECK(p.IsNull());
+        CHECK_EQ(orig, Json::Encode(dst, true));
+        CHECK(p.IsNull()); // NOLINT
 
-        JsonValue dst2(std::move(dst));
-        CHECK(orig == dst2.Encode(true));
-        CHECK(dst.IsNull());
+        auto dst2(std::move(dst));
+        CHECK_EQ(orig, Json::Encode(dst2, true));
+        CHECK(dst.IsNull()); // NOLINT
     }
 
     SUBCASE("Interface") {
@@ -273,29 +306,29 @@ null }
         CHECK(o["NullValue"].IsNull());
 
         CHECK(o.MemberExists("BooleanValue"));
-        CHECK(o["BooleanValue"].IsNull() == false);
-        CHECK(static_cast<bool>(o["BooleanValue"]) == true);
+        CHECK_FALSE(o["BooleanValue"].IsNull());
+        CHECK(static_cast<bool>(o["BooleanValue"]));
 
         CHECK(o.MemberExists("StringValue"));
-        CHECK(o["StringValue"].IsNull() == false);
+        CHECK_FALSE(o["StringValue"].IsNull());
 
         CHECK(o.MemberExists("IntValue"));
-        CHECK(o["IntValue"].IsNull() == false);
-        CHECK(o["IntValue"].GetType() == Variant::Types::Uint64);
-        CHECK(static_cast<int>(o["IntValue"]) == 42);
+        CHECK_FALSE(o["IntValue"].IsNull());
+        CHECK_EQ(int(o["IntValue"].GetType()), int(Variant::Types::Uint64));
+        CHECK_EQ(static_cast<int>(o["IntValue"]), 42);
 
-        Json js1(o);
-        CHECK(o.Encode() == js1.Encode());
+        DynamicData js1(o);
+        CHECK_EQ(Json::Encode(o), Json::Encode(js1));
         js1["IntValue"] = 43;
 
-        CHECK(js1["IntValue"].AsInt() == 43);
-        CHECK(o["IntValue"].AsInt() == 42);
+        CHECK_EQ(js1["IntValue"].AsInt(), 43);
+        CHECK_EQ(o["IntValue"].AsInt(), 42);
 
-        Json js2(std::move(o));
+        DynamicData js2(std::move(o));
         js2["IntValue"] = 43;
 
-        CHECK(js2.Encode() == js1.Encode());
-        CHECK(o.IsNull());
+        CHECK_EQ(Json::Encode(js2), Json::Encode(js1));
+        CHECK(o.IsNull()); // NOLINT
     }
 
     SUBCASE("No Whitespace") {
@@ -318,22 +351,123 @@ null }
 
         double dbl_value = o.TryGet("FloatValue", 0.54321);
         CHECK_EQ(dbl_value, 1.234567);
+        dbl_value = o.TryGet("FloatValueX", 0.54321);
+        CHECK_EQ(dbl_value, 0.54321);
 
-        JsonValue js_value = o.TryGet("NonExisting", JsonValue().Add(1).Add(2));
+        DynamicData js_value = o.TryGet("NonExisting", DynamicData().Add(1).Add(2));
         CHECK(js_value.IsArray());
         CHECK_EQ(js_value[1].AsInt(), 2);
     }
 
     SUBCASE("Streaming") {
-        auto raw = R"({"Member1":1234,"Member2":{"NestedMember":"NestedValue"}})";
+        bool pretty = false;
+        std::string raw = R"({"Member1":1234,"Member2":{"NestedMember":"Nested\nValue"},"NullValue":null,"Optional":null,"Enum":"TWO","Boolean":true,"Date":null,"Float":1.23})";
+
+        SUBCASE("Ugly") {
+        }
+        SUBCASE("Pretty") {
+            raw = R"({
+    "Member1": 1234,
+    "Member2": {
+        "NestedMember": "Nested\nValue"
+    },
+    "NullValue": null,
+    "Optional": null,
+    "Enum": "TWO",
+    "Boolean": true,
+    "Date": null,
+    "Float": 1.23
+})";
+            pretty = true;
+        }
+
         std::stringstream ss;
-        CHECK_NOTHROW(ss << Json::Decode(raw));
+        CHECK_NOTHROW(ss << Json(raw).Encode(pretty));
 
         CHECK_EQ(ss.str(), raw);
 
         ss.str("");
-        ss << JsonTypes::Number;
+        ss << Json::Types::Number;
         CHECK_EQ(ss.str(), "Number");
+
+        std::string empty_string; // = "not empty";
+        Variant number(1234);
+        std::string not_empty_string(R"(Nested
+Value)");
+        std::optional<double> opt;
+        rsp::utils::StructElement<EType> enum_value(EType::TWO);
+        rsp::utils::StructElement<bool> bool_value(true);
+        rsp::utils::StructElement<float> float_value(1.23456789f);
+        float_value.SetPrecision(2);
+
+        JsonStream js(pretty);
+        js << OBegin()
+            << Key("Member1") << number << Comma()
+            << Key("Member2") << OBegin()
+                << Key("NestedMember") << Value(not_empty_string)
+            << OEnd() << Comma()
+            << Key("NullValue") << Value(empty_string) << Comma()
+            << Key("Optional") << Value(opt) << Comma()
+            << Key("Enum") << enum_value << Comma()
+            << Key("Boolean") << bool_value << Comma()
+            << Key("Date") << rsp::utils::DateTime::Null() << Comma()
+            << Key("Float") << float_value
+            << OEnd();
+        CHECK_EQ(js.GetSize(), raw.size());
+        CHECK_EQ(js.str(), raw);
+    }
+
+    SUBCASE("Decode2") {
+        std::string raw = R"(
+{
+    "Token": "",
+    "ConfigFingerprint": "",
+    "ItemId": 1,
+    "Queue": [
+        [
+            3,
+            "api/v1/log-entries",
+            {
+                "data": [
+                    {
+                        "device": "SN220001",
+                        "severity": {
+                            "slug": "critical"
+                        },
+                        "channel": "",
+                        "message": "Unhandled exception: From '/home/steffen/Projects/tgm/tgm-device/common/Application.cpp:63'->\nThe Application::Execute method is not defined.\ntrial-app   (+0x755bb) [0x56453fb365bb])\ntrial-app   (+0x73173) [0x56453fb34173])\ntrial-app   (+0x29916) [0x",
+                        "context": null,
+                        "timestamp": "2023-05-24T09:01:04.016Z",
+                        "context": {
+                            "original-message": "Unhandled exception: From '/home/steffen/Projects/tgm/tgm-device/common/Application.cpp:63'->\nThe Application::Execute method is not defined.\ntrial-app   (+0x755bb) [0x56453fb365bb])\ntrial-app   (+0x73173) [0x56453fb34173])\ntrial-app   (+0x29916) [0x56453faea916])\ntrial-app  main (+0x5b) [0x56453fae7012])\nlibc.so   (+0x29d90) [0x7fb3c81f2d90])\nlibc.so  __libc_start_main (+0x80) [0x7fb3c81f2e40])\ntrial-app   (+0x1ffe5) [0x56453fae0fe5])\n\n"
+                        }
+                    }
+                ]
+            },
+            0
+        ]
+    ]
+})";
+
+        auto o = Json::Decode(raw);
+
+        CHECK(o.MemberExists("Queue"));
+        CHECK(o["Queue"].IsArray());
+        CHECK_EQ(o["Queue"][0][0].AsInt(), 3);
+    }
+
+    SUBCASE("Escapes") {
+        std::string raw = R"(
+[
+            "String \"with\" escape characters",
+            "String \"with\" \u0000\u0001\u0002 binary data"
+])";
+        Json v;
+        CHECK_NOTHROW(v = Json::Decode(raw));
+        CHECK(v.IsArray());
+        CHECK_EQ(v.GetCount(), 2);
+        CHECK_EQ(v[0].AsString().size(), 31);
+        CHECK_EQ(v[1].AsString().size(), 29);
     }
 }
 
@@ -350,6 +484,6 @@ constexpr void func_print_all() {
 }
 
 TEST_CASE("Enum Traversal") {
-    func_print<JsonTypes, JsonTypes::Number, int(JsonTypes::Number)>();
-    func_print_all<JsonTypes, 10>();
+    func_print<Json::Types, Json::Types::Number, int(Json::Types::Number)>();
+    func_print_all<Json::Types, 10>();
 }

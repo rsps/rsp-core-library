@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_UTILS_ANSIESCAPECODES_H_
-#define SRC_UTILS_ANSIESCAPECODES_H_
+#ifndef RSP_CORE_LIB_UTILS_ANSI_ESCAPE_CODES_H
+#define RSP_CORE_LIB_UTILS_ANSI_ESCAPE_CODES_H
 
 /**
  * \namespace AnsiEscapeCodes
@@ -145,9 +145,9 @@ public:
     static EscString InverseScreenOff;
 
     static EscString ResetAll;
-    static EscString TputClear;
+    static EscString TPutClear;
 };
 
 } /* namespace AnsiEscapeCodes */
 
-#endif /* SRC_UTILS_ANSIESCAPECODES_H_ */
+#endif // RSP_CORE_LIB_UTILS_ANSI_ESCAPE_CODES_H

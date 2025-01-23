@@ -11,7 +11,7 @@
 #ifndef TESTS_HELPERS_SCENES_SCENES_H_
 #define TESTS_HELPERS_SCENES_SCENES_H_
 
-#include <graphics/controls/SceneMap.h>
+#include <graphics/SceneMap.h>
 
 #include "FirstScene.h"
 #include "SecondScene.h"
@@ -21,13 +21,19 @@
 class Scenes : public rsp::graphics::SceneMap
 {
 public:
+    enum : uint32_t {
+        First = 1,
+        Second,
+        Input
+    };
+
     Scenes()
         : SceneMap()
     {
         using namespace rsp::graphics;
-        AddFactory(FirstScene);
-        AddFactory(SecondScene);
-        AddFactory(InputScene);
+        AddFactory<FirstScene>(First);
+        AddFactory<SecondScene>(Second);
+        AddFactory<rsp::graphics::InputScene>(Input);
     }
 };
 

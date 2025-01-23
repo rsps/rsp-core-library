@@ -1,5 +1,5 @@
-file(GLOB_RECURSE SRC_FILES *.cpp)
-target_sources("rsp-core-lib" 
-    PRIVATE 
-        ${SRC_FILES}
+include(library-sources.cmake)
+target_sources("${PROJECT_NAME}"
+    PRIVATE
+        ${LIBRARY_SOURCES}
 )

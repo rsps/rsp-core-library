@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_NETWORK_NETWORKLIBRARY_H_
-#define INCLUDE_NETWORK_NETWORKLIBRARY_H_
+#ifndef RSP_CORE_LIB_NETWORK_NETWORK_LIBRARY_H
+#define RSP_CORE_LIB_NETWORK_NETWORK_LIBRARY_H
 
 #include <string_view>
 
@@ -24,7 +24,7 @@ namespace rsp::network {
 class NetworkLibrary
 {
 public:
-    virtual ~NetworkLibrary() {}
+    virtual ~NetworkLibrary() = default;
 
     /**
      * \fn NetworkLibrary Get&()
@@ -40,7 +40,7 @@ public:
      *
      * \return string
      */
-    virtual std::string_view GetLibraryName() const = 0;
+    [[nodiscard]] virtual std::string_view GetLibraryName() const = 0;
 
     /**
      * \fn std::string_view GetVersion()const =0
@@ -48,7 +48,7 @@ public:
      *
      * \return string
      */
-    virtual std::string_view GetVersion() const = 0;
+    [[nodiscard]] virtual std::string_view GetVersion() const = 0;
 
     /**
      * \fn std::string_view GetSslVersion()const =0
@@ -56,9 +56,9 @@ public:
      *
      * \return
      */
-    virtual std::string_view GetSslVersion() const = 0;
+    [[nodiscard]] virtual std::string_view GetSslVersion() const = 0;
 };
 
 } // namespace rsp::network
 
-#endif /* INCLUDE_NETWORK_NETWORKLIBRARY_H_ */
+#endif // RSP_CORE_LIB_NETWORK_NETWORK_LIBRARY_H

@@ -10,9 +10,13 @@
 
 #include <application/ApplicationBase.h>
 #include <application/Console.h>
+#include <logging/ConsoleLogWriter.h>
 #include <logging/FileLogWriter.h>
+#include <logging/SysLogWriter.h>
 #include <version.h>
 
+using namespace rsp::exceptions;
+using namespace rsp::logging;
 using namespace rsp::utils;
 
 namespace rsp::application {
@@ -20,41 +24,52 @@ namespace rsp::application {
 ApplicationBase* ApplicationBase::mpInstance = nullptr;
 
 
-ApplicationBase::ApplicationBase(int argc, const char **argv)
-    : mLogger(true),
+ApplicationBase::ApplicationBase(int argc, const char **argv, const char *apAppName)
+    : mAppName(apAppName ? apAppName : std::string()),
+      mLogger("main"),
       mCmd(argc, argv)
 {
     if (mpInstance) {
-        THROW_WITH_BACKTRACE(ESingletonViolation);
+        THROW_WITH_BACKTRACE1(rsp::exceptions::ESingletonViolation, "ApplicationBase");
     }
 
-    rsp::logging::LoggerInterface::SetDefault(&mLogger);
+    installLogWriters();
 
     mpInstance = this;
 }
 
 ApplicationBase::~ApplicationBase()
 {
-    rsp::logging::LoggerInterface::SetDefault(static_cast<rsp::logging::LoggerInterface*>(nullptr));
-
     mpInstance = nullptr;
 }
 
-
 int ApplicationBase::Run()
 {
-    beforeExecute();
-    while(!mTerminated) {
-        try {
-            execute();
-        }
-        catch(const std::exception &e) {
-            mLogger.Critical() << "Unhandled exception: " << e.what() << std::endl;
-            mApplicationResult = cResultUnhandledError;
-            mTerminated = true;
+    try {
+        beforeExecute();
+
+        while(!mTerminated) {
+            try {
+                execute();
+            }
+            catch(const ETerminate &e) {
+                mTerminated = true;
+                mApplicationResult = e.GetCode();
+            }
+            catch(const std::exception &e) {
+                mLogger.Critical() << "Unhandled exception: " << e.what() << " Attempting graceful shutdown" << std::endl;
+                mApplicationResult = cResultUnhandledError;
+                mTerminated = true;
+            }
         }
     }
+    catch(const ETerminate &e) {
+        mTerminated = true;
+        mApplicationResult = e.GetCode();
+    }
+
     afterExecute();
+
     return mApplicationResult;
 }
 
@@ -65,34 +80,67 @@ void ApplicationBase::beforeExecute()
 
 void ApplicationBase::handleOptions()
 {
-    std::string s;
-    if (mCmd.GetOptionValue("--log=", s)) {
-        std::string l;
-        if (!mCmd.GetOptionValue("--loglevel=", l)) {
-            l = ToString(rsp::logging::LogLevel::Info);
-        }
-
-        mLogger.AddLogWriter(std::make_shared<logging::FileLogWriter>(s, l));
-    }
-
     if ( mCmd.HasOption("-h") || mCmd.HasOption("--help")) {
         showHelp();
-        mTerminated = true;
+        THROW_WITH_BACKTRACE1(ETerminate, cResultSuccess);
     }
 
     if ( mCmd.HasOption("--version")) {
         showVersion();
-        mTerminated = true;
+        THROW_WITH_BACKTRACE1(ETerminate, cResultSuccess);
     }
 }
 
 void ApplicationBase::showHelp()
 {
-    Console::Info() << "No help text available." << std::endl;
+    Console::Info() << "No help text available.";
 }
 
 void ApplicationBase::showVersion()
 {
-    Console::Info() << "Library version: " << get_library_version() << std::endl;
+    Console::Info() << "Library version: " << get_library_version();
 }
+
+void ApplicationBase::installLogWriters()
+{
+    auto level = LogLevel::Notice;
+    if (mCmd.HasOption("-vv") || mCmd.HasOption("-vvv")) {
+        level = LogLevel::Debug;
+    }
+    else if (mCmd.HasOption("-v")) {
+        level = LogLevel::Info;
+    }
+    std::string l;
+    if (mCmd.GetOptionValue("--loglevel=", l)) {
+        level = ToLogLevel(l);
+    }
+
+    std::string s;
+    if (mCmd.GetOptionValue("--log=", s)) {
+#ifdef SYSLOG
+        if (s == "syslog") {
+            mLogWriter = mLogger.MakeLogWriter<SysLogWriter>(GetAppName(), level, LogFacility::User);
+        }
+        else
+#endif
+        if (s == "console") {
+            mLogWriter = mLogger.MakeLogWriter<ConsoleLogWriter>(level);
+        }
+        else {
+            mLogWriter = mLogger.MakeLogWriter<FileLogWriter>(s, level);
+        }
+    }
+    else {
+        mLogWriter = mLogger.MakeLogWriter<ConsoleLogWriter>(level);
+    }
+}
+
+const std::string &ApplicationBase::GetAppName() const
+{
+    if (mAppName.empty()) {
+        return mCmd.GetAppName();
+    }
+    return mAppName;
+}
+
 } /* namespace rsp::application */

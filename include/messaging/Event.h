@@ -7,12 +7,15 @@
  * \license     Mozilla Public License 2.0
  * \author      Simon Glashoff
  */
-#ifndef EVENT_H
-#define EVENT_H
+#ifndef RSP_CORE_LIB_MESSAGING_EVENT_H
+#define RSP_CORE_LIB_MESSAGING_EVENT_H
 
+#include <memory>
+#include <string_view>
 #include <type_traits>
 #include <typeinfo>
-#include <utils/ExceptionHelper.h>
+#include <exceptions/CoreException.h>
+#include <utils/ConstTypeInfo.h>
 
 namespace rsp::messaging
 {
@@ -20,32 +23,61 @@ namespace rsp::messaging
 class Event
 {
   public:
-    Event(std::size_t aHash) : mTypeHash(aHash) {}
-    virtual ~Event() {}
+    size_t Type;
+    std::string_view Name;
 
-    /**
-     * \brief Casts the event to the templated type
-     * \return A reference to the object after casting
-     */
-    template <class T>
-    T &GetAs()
-    {
-        if (typeid(T).hash_code() != mTypeHash) {
-            THROW_WITH_BACKTRACE(std::bad_alloc);
+    explicit Event(size_t aType = 0, std::string_view aName = "") : Type(aType), Name(aName) {}
+    virtual ~Event() = default;
+
+    Event(const Event& arOther) = default;
+
+    Event& operator=(const Event& arOther) {
+        if (&arOther != this) {
+            Type = arOther.Type;
+            Name = arOther.Name;
         }
-        return *reinterpret_cast<T *>(this);
+        return *this;
     }
 
-protected:
-    std::size_t mTypeHash;
+    template<class T>
+    [[nodiscard]] bool IsType() const {
+        return (T::ClassType == Type);
+    }
+
+    template<class T>
+    T& CastTo() {
+        if (!IsType<T>()) {
+            THROW_WITH_BACKTRACE2(rsp::exceptions::EBadCast, Name, T::ClassName);
+        }
+        return dynamic_cast<T&>(*this);
+    }
+
+    template<class T>
+    const T& CastTo() const {
+        if (!IsType<T>()) {
+            THROW_WITH_BACKTRACE2(rsp::exceptions::EBadCast, Name, T::ClassName);
+        }
+        return dynamic_cast<const T&>(*this);
+    }
+
 };
+
+std::ostream& operator<<(std::ostream &os, const rsp::messaging::Event &arEvent);
+
+using EventPtr_t = std::shared_ptr<rsp::messaging::Event>;
+
 
 template <class T>
-class EventType : public Event
+class EventBase : public Event
 {
   public:
-    EventType() : Event(typeid(T).hash_code()) {}
+    static constexpr size_t ClassType = rsp::utils::ID<T>();
+    static constexpr std::string_view ClassName = rsp::utils::NameOf<T>();
+
+    EventBase() : Event(ClassType, ClassName) {}
+    EventBase(size_t aType, std::string_view aName) : Event(aType, aName) {}
 };
 
+
 } // namespace rsp::messaging
-#endif // EVENT_H
+#endif // RSP_CORE_LIB_MESSAGING_EVENT_H

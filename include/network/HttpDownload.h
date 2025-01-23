@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_NETWORK_HTTPDOWNLOAD_H_
-#define INCLUDE_NETWORK_HTTPDOWNLOAD_H_
+#ifndef RSP_CORE_LIB_NETWORK_HTTP_DOWNLOAD_H
+#define RSP_CORE_LIB_NETWORK_HTTP_DOWNLOAD_H
 
 #include <string>
 #include <network/HttpRequest.h>
@@ -27,7 +27,7 @@ class HttpDownload: public HttpRequest
 {
 public:
     using HttpRequest::HttpRequest;
-    HttpDownload(const std::string &arFileName);
+    explicit HttpDownload(const std::string &arFileName);
 
     /**
      * \brief Set the filename to store the download into.
@@ -46,4 +46,4 @@ protected:
 
 } /* namespace rsp::network */
 
-#endif /* INCLUDE_NETWORK_HTTPDOWNLOAD_H_ */
+#endif // RSP_CORE_LIB_NETWORK_HTTP_DOWNLOAD_H

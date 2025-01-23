@@ -21,7 +21,12 @@ std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse)
         "Headers:\n";
 
     for(auto &tuple : arResponse.GetHeaders()) {
-        o << "  " << tuple.first << ": " << tuple.second << "\n";
+        if (rsp::utils::StrUtils::ToLower(tuple.first) == std::string("authorization")) {
+            o << "  " << tuple.first << ": " << std::string(tuple.second.size(), 'X') << "\n";
+        }
+        else {
+            o << "  " << tuple.first << ": " << tuple.second << "\n";
+        }
     }
 
     o <<

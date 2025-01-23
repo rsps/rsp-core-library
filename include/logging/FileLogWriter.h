@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_LOGGING_FILELOGWRITER_H_
-#define SRC_LOGGING_FILELOGWRITER_H_
+#ifndef RSP_CORE_LIB_LOGGING_FILE_LOG_WRITER_H
+#define RSP_CORE_LIB_LOGGING_FILE_LOG_WRITER_H
 
 #include <logging/LogWriterInterface.h>
 #include <fstream>
@@ -30,7 +30,7 @@ public:
      * \param aFileName
      * \param aAcceptLevel
      */
-    FileLogWriter(std::string aFileName, std::string aAcceptLevel);
+    FileLogWriter(const std::string& arFileName, const std::string& arAcceptLevel);
 
     /**
      * Construct a log writer with accept level given as LogLevel type.
@@ -38,7 +38,7 @@ public:
      * \param aFileName
      * \param aAcceptLevel
      */
-    FileLogWriter(std::string aFileName, LogLevel aAcceptLevel);
+    FileLogWriter(const std::string& arFileName, LogLevel aAcceptLevel);
     ~FileLogWriter() override;
 
 
@@ -51,4 +51,4 @@ protected:
 
 } /* namespace logging */
 
-#endif /* SRC_LOGGING_FILELOGWRITER_H_ */
+#endif // RSP_CORE_LIB_LOGGING_FILE_LOG_WRITER_H

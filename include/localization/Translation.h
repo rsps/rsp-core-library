@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_LOCALIZATION_TRANSLATION_H_
-#define INCLUDE_LOCALIZATION_TRANSLATION_H_
+#ifndef RSP_CORE_LIB_LOCALIZATION_TRANSLATION_H
+#define RSP_CORE_LIB_LOCALIZATION_TRANSLATION_H
 
 #include <localization/ITranslation.h>
 
@@ -18,13 +18,16 @@ namespace rsp::localization {
 class Translation: public ITranslation
 {
 public:
-    Translation() {};
-    Translation(const char *apLocale) { SetLocale(apLocale); }
+    Translation() = default;
+    explicit Translation(const char *apLocale)
+    {
+        ITranslation::SetLocale(apLocale);
+    }
 
-    std::string_view Translate(uint32_t aHash, std::string_view aDefault) const override;
+    [[nodiscard]] std::string_view Translate(uint32_t aHash, std::string_view aDefault) const override;
 };
 
 
 } /* namespace rsp::localization */
 
-#endif /* INCLUDE_LOCALIZATION_TRANSLATION_H_ */
+#endif // RSP_CORE_LIB_LOCALIZATION_TRANSLATION_H

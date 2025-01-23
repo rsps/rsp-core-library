@@ -11,34 +11,38 @@
 #ifndef SECONDSCENE_H
 #define SECONDSCENE_H
 
-#include <graphics/controls/Button.h>
-#include <graphics/controls/Scene.h>
-#include <graphics/TouchEvent.h>
+#include <graphics/Button.h>
+#include <graphics/GfxInputEvents.h>
+#include <graphics/Scene.h>
+#include <TestTouchParser.h>
 
 namespace rsp::graphics {
 
 class SecondScene : public SceneBase<SecondScene>
 {
 public:
-    using Clicked_t = rsp::utils::Function<void(void)>;
+    using Clicked_t = std::function<void(void)>;
 
-    static std::array<TouchEvent, 13>& GetTouchEvents() {
+    static std::array<TestEventItem_t, 15>& GetTouchEvents() {
         static std::array events {
-            TouchEvent(50, TouchEvent::Types::Press, Point(100, 100)),
-            TouchEvent(51, TouchEvent::Types::Lift, Point(100, 100)),  // Click outside any buttons
+            MAKE_TOUCH_ITEM(100, TouchTypes::Press, Point(100, 100)),
+            MAKE_TOUCH_ITEM(110, TouchTypes::Lift, Point(100, 100)),  // Click outside any buttons
 
-            TouchEvent(60, TouchEvent::Types::Press, Point(100, 150)),
-            TouchEvent(61, TouchEvent::Types::Lift, Point(100, 150)),  // Click top left corner of TopBtn
-            TouchEvent(62, TouchEvent::Types::Press, Point(299, 249)),
-            TouchEvent(63, TouchEvent::Types::Lift, Point(299, 249)),  // Click bottom right corner of TopBtn
+            MAKE_TOUCH_ITEM(200, TouchTypes::Press, Point(100, 150)),
+            MAKE_TOUCH_ITEM(210, TouchTypes::Lift, Point(100, 150)),  // Click top left corner of TopBtn
+            MAKE_TOUCH_ITEM(220, TouchTypes::Press, Point(299, 249)),
+            MAKE_TOUCH_ITEM(230, TouchTypes::Lift, Point(299, 249)),  // Click bottom right corner of TopBtn
 
-            TouchEvent(70, TouchEvent::Types::Press, Point(100, 300)), // Press top left corner of BotBtn
-            TouchEvent(71, TouchEvent::Types::Drag, Point(150, 320)),  // Drag over BotBtn
-            TouchEvent(72, TouchEvent::Types::Drag, Point(200, 340)),  // Drag over BotBtn
-            TouchEvent(73, TouchEvent::Types::Drag, Point(250, 360)),  // Drag over BotBtn
-            TouchEvent(74, TouchEvent::Types::Drag, Point(300, 380)),  // Drag over BotBtn
-            TouchEvent(75, TouchEvent::Types::Drag, Point(310, 390)),  // Drag outside BotBtn
-            TouchEvent(76, TouchEvent::Types::Lift, Point(310, 390))   // Lift outside BotBtn
+            MAKE_TOUCH_ITEM(300, TouchTypes::Press, Point(100, 300)), // Press top left corner of BotBtn
+            MAKE_TOUCH_ITEM(310, TouchTypes::Drag, Point(150, 320)),  // Drag over BotBtn
+            MAKE_TOUCH_ITEM(320, TouchTypes::Drag, Point(200, 340)),  // Drag over BotBtn
+            MAKE_TOUCH_ITEM(330, TouchTypes::Drag, Point(250, 360)),  // Drag over BotBtn
+            MAKE_TOUCH_ITEM(340, TouchTypes::Drag, Point(300, 380)),  // Drag over BotBtn
+            MAKE_TOUCH_ITEM(350, TouchTypes::Drag, Point(310, 390)),  // Drag outside BotBtn
+            MAKE_TOUCH_ITEM(360, TouchTypes::Lift, Point(310, 390)),  // Lift outside BotBtn
+
+            MakeEventItem<RefreshEvent>(400),   // Refresh display
+            MakeEventItem<QuitEvent>(410)       // Terminate
         };
         return events;
     }
@@ -52,18 +56,18 @@ public:
         //  Set member variables values
         mTopBtn.SetArea(GetTopRect());
         mTopBtn.SetTouchArea(GetTopRect());
-        mTopBtn.GetStyle(Control::States::normal).mBackground.SetPixelData(mNormal);
-        mTopBtn.GetStyle(Control::States::pressed).mBackground.SetPixelData(mPressed);
+        mTopBtn.GetStyle(Control::States::Normal).mTextures.push_back(Texture::Create(mNormal, Color::White, {}, GetTopRect().GetTopLeft()));
+        mTopBtn.GetStyle(Control::States::Pressed).mTextures.push_back(Texture::Create(mPressed, Color::White, {}, GetTopRect().GetTopLeft()));
         mTopBtn.SetDraggable(true);
-        mTopBtn.GetInfo().mName = "TopBtn";
+        mTopBtn.SetName("TopBtn");
 
         mBotBtn.SetArea(GetBotRect());
         mBotBtn.SetTouchArea(GetBotRect());
-        mBotBtn.GetStyle(Control::States::normal).mBackground.SetPixelData(mNormal);
-        mBotBtn.GetStyle(Control::States::pressed).mBackground.SetPixelData(mPressed);
-        mBotBtn.GetStyle(Control::States::dragged).mBackground.SetPixelData(mPressed);
+        mBotBtn.GetStyle(Control::States::Normal).mTextures.push_back(Texture::Create(mNormal, Color::White, {}, GetBotRect().GetTopLeft()));
+        mBotBtn.GetStyle(Control::States::Pressed).mTextures.push_back(Texture::Create(mPressed, Color::White, {}, GetBotRect().GetTopLeft()));
+        mBotBtn.GetStyle(Control::States::Dragged).mTextures.push_back(Texture::Create(mPressed, Color::White, {}, GetBotRect().GetTopLeft()));
         mBotBtn.SetDraggable(true);
-        mBotBtn.GetInfo().mName = "BotBtn";
+        mBotBtn.SetName("BotBtn");
 
         //  Add them to the lists?
         AddChild(&mTopBtn);

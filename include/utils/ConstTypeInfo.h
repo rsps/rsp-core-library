@@ -8,10 +8,10 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_CONSTTYPEINFO_H_
-#define INCLUDE_UTILS_CONSTTYPEINFO_H_
+#ifndef RSP_CORE_LIB_UTILS_CONST_TYPE_INFO_H
+#define RSP_CORE_LIB_UTILS_CONST_TYPE_INFO_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <string_view>
 #include "Crc32.h"
 #include "Fnv1a.h"
@@ -55,7 +55,6 @@ constexpr std::string_view NameOf() noexcept
                 break;
         }
     }
-    return {};
 }
 
 namespace fnv1a {
@@ -76,23 +75,68 @@ constexpr uint32_t HashOf() noexcept
     return crc32::HashConst(NameOf<T>().data());
 }
 
+constexpr uint32_t HashOf(const char *apName) noexcept
+{
+    return crc32::HashConst(apName);
+}
+
 } /* namespace crc32 */
 
-struct TypeInfo
+
+template <class T>
+constexpr uint32_t ID()
 {
-    std::string mName;
-    union {
-        uint32_t mId;
-        char32_t mIdChar;
-    };
+    return crc32::HashOf<T>();
+}
+
+class TypeInfo
+{
+public:
+    virtual ~TypeInfo() = default;
+
+    /**
+     * \brief Get the name of the specific scene.
+     *
+     * \return string with name of scene
+     */
+    [[nodiscard]] const std::string& GetName() const
+    {
+        return mName;
+    }
+
+    void SetName(const std::string &arName) { setName(arName); }
+    void SetName(const char *apName) { setName(std::string(apName)); }
+
+    [[nodiscard]] uint32_t GetId() const { return mId; }
+
+    void SetId(uint32_t aId) { setId(aId); }
+    void SetId(int aId) { setId(static_cast<uint32_t>(aId)); }
+    void SetId(char aId) { setId(static_cast<uint32_t>(aId)); }
+
+protected:
+    template <class T>
+    void initTypeInfo()
+    {
+        mName = std::string(NameOf<T>());
+        mId = ID<T>();
+    }
+
+    virtual void setId(uint32_t aId)
+    {
+        mId = aId;
+    }
+
+    virtual void setName(const std::string &arName)
+    {
+        mName = arName;
+    }
+
+private:
+    std::string mName{};
+    uint32_t mId = 0;
 };
 
-template<typename T>
-TypeInfo MakeTypeInfo() noexcept
-{
-    return {std::string(NameOf<T>()), crc32::HashOf<T>()};
-}
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_CONSTTYPEINFO_H_ */
+#endif // RSP_CORE_LIB_UTILS_CONST_TYPE_INFO_H

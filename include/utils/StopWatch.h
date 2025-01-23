@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_STOPWATCH_H_
-#define INCLUDE_UTILS_STOPWATCH_H_
+#ifndef RSP_CORE_LIB_UTILS_STOP_WATCH_H
+#define RSP_CORE_LIB_UTILS_STOP_WATCH_H
 
 #include <chrono>
 
@@ -54,4 +54,4 @@ protected:
 
 }
 
-#endif /* INCLUDE_UTILS_STOPWATCH_H_ */
+#endif // RSP_CORE_LIB_UTILS_STOP_WATCH_H

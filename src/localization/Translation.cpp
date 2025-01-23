@@ -12,7 +12,7 @@
 
 namespace rsp::localization {
 
-std::string_view Translation::Translate(uint32_t aHash, std::string_view aDefault) const
+std::string_view Translation::Translate(uint32_t /*aHash*/, std::string_view aDefault) const
 {
     return aDefault;
 }

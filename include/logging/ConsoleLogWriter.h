@@ -8,11 +8,12 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_LOGGING_CONSOLELOGWRITER_H_
-#define SRC_LOGGING_CONSOLELOGWRITER_H_
+#ifndef RSP_CORE_LIB_LOGGING_CONSOLE_LOG_WRITER_H
+#define RSP_CORE_LIB_LOGGING_CONSOLE_LOG_WRITER_H
 
 #include <logging/LogWriterInterface.h>
 #include <array>
+#include <magic_enum.hpp>
 
 namespace rsp::logging {
 
@@ -23,7 +24,7 @@ namespace rsp::logging {
 class ConsoleLogStreamsInterface
 {
 public:
-    virtual ~ConsoleLogStreamsInterface() {};
+    virtual ~ConsoleLogStreamsInterface() = default;
 
     virtual void Info(const std::string &arMsg) = 0;
     virtual void Error(const std::string &arMsg) = 0;
@@ -38,12 +39,12 @@ public:
  */
 class ConsoleLogWriter: public LogWriterInterface {
 public:
-	using ConsoleColors_t = std::array<const std::string, std::size_t(LogLevel::__END__)>;
+    using ConsoleColors_t = std::array<const std::string, std::size_t(magic_enum::enum_count<LogLevel>())>;
 
-    ConsoleLogWriter(std::string aAcceptLevel, ConsoleLogStreamsInterface *apConsole = nullptr, const ConsoleColors_t *apColors = nullptr);
-    ConsoleLogWriter(LogLevel aAcceptLevel, ConsoleLogStreamsInterface *apConsole = nullptr, const ConsoleColors_t *apColors = nullptr);
+    explicit ConsoleLogWriter(const std::string& arAcceptLevel, ConsoleLogStreamsInterface *apConsole = nullptr, const ConsoleColors_t *apColors = nullptr);
+    explicit ConsoleLogWriter(LogLevel aAcceptLevel, ConsoleLogStreamsInterface *apConsole = nullptr, const ConsoleColors_t *apColors = nullptr);
     ConsoleLogWriter(const ConsoleLogWriter&) = delete;
-    ~ConsoleLogWriter();
+    ~ConsoleLogWriter() override;
 
     void Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
 
@@ -56,4 +57,4 @@ protected:
 
 } /* namespace logging */
 
-#endif /* SRC_LOGGING_CONSOLELOGWRITER_H_ */
+#endif // RSP_CORE_LIB_LOGGING_CONSOLE_LOG_WRITER_H

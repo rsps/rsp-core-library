@@ -8,14 +8,17 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_LOGGING_LOGSTREAM_H_
-#define INCLUDE_LOGGING_LOGSTREAM_H_
+#ifndef RSP_CORE_LIB_LOGGING_LOG_STREAM_H
+#define RSP_CORE_LIB_LOGGING_LOG_STREAM_H
 
 #include <ostream>
+#include <memory>
 #include <sstream>
 #include <utils/DynamicData.h>
 #include "LogTypes.h"
 #include "SetLevel.h"
+#include "SetContext.h"
+#include "SetChannel.h"
 
 namespace rsp::logging {
 
@@ -32,13 +35,13 @@ class LoggerInterface;
 class LogStream
 {
 public:
-    LogStream(LoggerInterface *apOwner, LogLevel aLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext);
-    LogStream(const LogStream &arOther) = delete;
-    LogStream(LogStream &&arOther); /* No copy, move is OK */
+    LogStream(LoggerInterface &arOwner, LogLevel aLevel);
+    LogStream(const LogStream &arOther);
+    LogStream(LogStream &&arOther) noexcept; /* No copy, move is OK */
     virtual ~LogStream();
 
-    LogStream& operator=(const LogStream &arOther) = delete;
-    LogStream& operator=(LogStream &&arOther);
+    LogStream& operator=(const LogStream &arOther);
+    LogStream& operator=(LogStream &&arOther) noexcept;
 
     /**
      * \brief Get the current stream acceptance log level
@@ -51,8 +54,9 @@ public:
      * \brief Set the current stream acceptance log level
      *
      * \param aLevel
+     * \return self
      */
-    void SetLevel(LogLevel aLevel);
+    LogStream& SetLevel(LogLevel aLevel);
 
     /**
      * \brief Set the current stream channel
@@ -68,7 +72,7 @@ public:
      * \param arContext
      * \return self
      */
-    LogStream& SetContext(rsp::utils::DynamicData& arContext);
+    LogStream& SetContext(const rsp::utils::DynamicData &arContext);
 
     /**
      * \brief Template to declare streaming operators for individual types
@@ -77,14 +81,20 @@ public:
      * \param arValue
      * \return self
      */
-    template< class type>
-    LogStream& operator<<(const type &arValue) {
+    template< class T>
+    LogStream& operator<<(const T& arValue) {
+        mBuffer << arValue;
+        return *this;
+    }
+
+    template< class T>
+    LogStream& operator<<(T& arValue) {
         mBuffer << arValue;
         return *this;
     }
 
     /**
-     * \brief Streaming operator for functions
+     * \brief Streaming operator specialization  for functions
      *
      * \param apFunc
      * \return self
@@ -92,18 +102,31 @@ public:
     LogStream& operator<<(std::ostream&(*apFunc)(std::ostream&));
 
     /**
-     * \brief Streaming operator for SetLevel objects
-     *
-     * \param aLevel
-     * \return
+     * \brief Streaming operator specialization for SetLevel objects
+     * \param arLevel
+     * \return self
      */
-    LogStream& operator<<(rsp::logging::SetLevel aLevel);
+    LogStream& operator<<(const class SetLevel &arLevel);
+
+    /**
+     * \brief Streaming operator specialization for SetContext objects
+     * \param arContext
+     * \return self
+     */
+    LogStream& operator<<(const class SetContext& arContext);
+
+    /**
+     * \brief Streaming operator specialization for SetChannel objects
+     * \param arChannel
+     * \return self
+     */
+    LogStream& operator<<(const class SetChannel& arChannel);
 
 protected:
-    LoggerInterface *mpLogger;
+    LoggerInterface &mrLogger;
     LogLevel mLevel;
-    std::string mChannel;
-    rsp::utils::DynamicData mContext;
+    std::string mChannel{};
+    rsp::utils::DynamicData mContext{};
     std::stringstream mBuffer{};
 
     void flush();
@@ -112,4 +135,4 @@ protected:
 
 } /* namespace rsp::logging */
 
-#endif /* INCLUDE_LOGGING_LOGSTREAM_H_ */
+#endif // RSP_CORE_LIB_LOGGING_LOG_STREAM_H

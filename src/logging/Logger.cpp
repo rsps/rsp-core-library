@@ -8,13 +8,12 @@
  * \author      Steffen Brummer
  */
 
+#include <exceptions/CoreException.h>
 #include <iostream>
-#include <sstream>
 #include <map>
 #include <logging/Logger.h>
 #include <logging/OutStreamBuffer.h>
 #include <thread>
-#include <utils/CoreException.h>
 
 namespace rsp::logging {
 
@@ -26,12 +25,10 @@ Logger::Logger(bool aCaptureClog)
 Logger::~Logger()
 {
     if (mpClogBackup) {
-        OutStreamBuffer *buf = dynamic_cast<OutStreamBuffer*>(std::clog.rdbuf(mpClogBackup.get())); // Restore backup before delete, to avoid segfault.
+        auto *buf = dynamic_cast<OutStreamBuffer*>(std::clog.rdbuf(mpClogBackup.get())); // Restore backup before delete, to avoid segfault.
         mpClogBackup.reset();
-        if (buf) {
-            // If the old stream_buf was our OutStreamBuffer, then delete it. It could be set elsewhere.
-            delete buf;
-        }
+        // If the old stream_buf was our OutStreamBuffer, then delete it. It could be set elsewhere.
+        delete buf;
     }
 }
 
@@ -39,51 +36,76 @@ std::shared_ptr<std::streambuf> Logger::makeCLogStream(bool aCaptureLog)
 {
     std::streambuf *old = nullptr;
     if (aCaptureLog) {
-        old = std::clog.rdbuf(new OutStreamBuffer(this, cDefautLogLevel));
+        old = std::clog.rdbuf(new OutStreamBuffer(*this, cDefaultLogLevel));
     }
-    // Create shared_ptr with "do nothing" deallocator
-    return std::shared_ptr<std::streambuf>(old, [](std::streambuf*){});
+    // Create shared_ptr with "do nothing" de-allocator
+    return {old, [](std::streambuf*){}};
 }
 
 LogStream Logger::Emergency()
 {
-    return LogStream(this, LogLevel::Emergency, mChannel, mContext);
+    return {*this, LogLevel::Emergency};
 }
 
 LogStream Logger::Alert()
 {
-    return LogStream(this, LogLevel::Alert, mChannel, mContext);
+    return {*this, LogLevel::Alert};
 }
 
 LogStream Logger::Critical()
 {
-    return LogStream(this, LogLevel::Critical, mChannel, mContext);
+    return {*this, LogLevel::Critical};
 }
 
 LogStream Logger::Error()
 {
-    return LogStream(this, LogLevel::Error, mChannel, mContext);
+    return {*this, LogLevel::Error};
 }
 
 LogStream Logger::Warning()
 {
-    return LogStream(this, LogLevel::Warning, mChannel, mContext);
+    return {*this, LogLevel::Warning};
 }
 
 LogStream Logger::Notice()
 {
-    return LogStream(this, LogLevel::Notice, mChannel, mContext);
+    return {*this, LogLevel::Notice};
 }
 
 LogStream Logger::Info()
 {
-    return LogStream(this, LogLevel::Info, mChannel, mContext);
+    return {*this, LogLevel::Info};
 }
 
 LogStream Logger::Debug()
 {
-    return LogStream(this, LogLevel::Debug, mChannel, mContext);
+    return {*this, LogLevel::Debug};
+}
+
+LoggerInterface::Handle_t Logger::addLogWriter(std::shared_ptr<LogWriterInterface> aWriter)
+{
+    mWriters.push_back(aWriter);
+    return aWriter;
+}
+
+size_t Logger::GetWritersCount() const
+{
+    return mWriters.size();
+}
+
+void Logger::write(const LogStream &arStream, const std::string &arMsg, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
+{
+    LogLevel current_level = arStream.GetLevel();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+
+    std::erase_if(mWriters, [](auto ptr) noexcept { return ptr.expired(); });
+
+    for (const auto& weak_ptr : mWriters) {
+        auto writer = weak_ptr.lock();
+        if (writer) {
+            writer->Write(arMsg, current_level, arChannel, arContext);
+        }
+    }
 }
 
 } /* namespace rsp */
-

@@ -7,15 +7,14 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef SRC_SECURITY_OPENSSL_COMMON_H_
-#define SRC_SECURITY_OPENSSL_COMMON_H_
-
-#ifdef USE_OPENSSL
+#ifndef RSP_CORE_LIB_SRC_SECURITY_OPENSSL_COMMON_H
+#define RSP_CORE_LIB_SRC_SECURITY_OPENSSL_COMMON_H
 
 #include <memory>
 #include <openssl/evp.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
+#include <security/CryptBase.h>
 #include <security/SecureBuffer.h>
 #include <security/Sha.h>
 #include <utils/DataContainer.h>
@@ -26,19 +25,19 @@ class BlockBuffer : public SecureBuffer
 {
 public:
 
-    std::uint8_t* current()
+    uint8_t* current()
     {
         return data() + mOffset;
     }
 
-    void grow(std::size_t aSize)
+    void grow(size_t aSize)
     {
         resize(size() + aSize + EVP_MAX_BLOCK_LENGTH);
     }
 
     void moveOffset(int aLength)
     {
-        mOffset += static_cast<std::size_t>(aLength);
+        mOffset += static_cast<size_t>(aLength);
     }
 
     void shrinkToOffset()
@@ -46,8 +45,13 @@ public:
         resize(mOffset);
     }
 
+    SecureBuffer copyToSecureBuffer()
+    {
+        return {data(), size()};
+    }
+
 protected:
-    std::size_t mOffset = 0;
+    size_t mOffset = 0;
 };
 
 class OpenSSLCryptBase : public CryptBase
@@ -55,16 +59,16 @@ class OpenSSLCryptBase : public CryptBase
 public:
     using EvpCipherCtxPtr = std::unique_ptr<EVP_CIPHER_CTX, decltype(&::EVP_CIPHER_CTX_free)>;
 
-    OpenSSLCryptBase(CipherTypes aCipher)
+    explicit OpenSSLCryptBase(CipherTypes aCipher)
         : CryptBase(aCipher),
-          mCtx(EVP_CIPHER_CTX_new(), ::EVP_CIPHER_CTX_free)
+          mCipherCtx(EVP_CIPHER_CTX_new(), ::EVP_CIPHER_CTX_free)
     {
     }
 
 protected:
-    constexpr std::size_t getKeySize() const { return EVP_MAX_IV_LENGTH; }
+    [[nodiscard]] static constexpr std::size_t getKeySize() { return EVP_MAX_IV_LENGTH; }
     BlockBuffer mData{};
-    EvpCipherCtxPtr mCtx;
+    EvpCipherCtxPtr mCipherCtx;
 
     const EVP_CIPHER* getCipher()
     {
@@ -90,6 +94,4 @@ protected:
 
 } // namespace rsp::security
 
-#endif /* USE_OPENSSL */
-
-#endif /* SRC_SECURITY_OPENSSL_COMMON_H_ */
+#endif // RSP_CORE_LIB_SRC_SECURITY_OPENSSL_COMMON_H

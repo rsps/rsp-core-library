@@ -8,12 +8,13 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_NETWORK_CURL_CURLLIBRARY_H_
-#define SRC_NETWORK_CURL_CURLLIBRARY_H_
+#ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_LIBRARY_H
+#define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_LIBRARY_H
 
 #include <curl/curl.h>
 #include <string_view>
 #include <network/NetworkLibrary.h>
+#include <cstdint>
 
 namespace rsp::network::curl {
 
@@ -24,29 +25,30 @@ namespace rsp::network::curl {
 class CurlLibrary : public rsp::network::NetworkLibrary
 {
 public:
-    ~CurlLibrary();
+    CurlLibrary(const CurlLibrary&) = delete;
+    CurlLibrary& operator=(const CurlLibrary&) = delete;
+
+    ~CurlLibrary() override;
 
     static CurlLibrary& Get();
 
-    std::string_view GetLibraryName() const override { return "libcurl"; }
-    std::string_view GetVersion() const override { return mpVersionInfo->version; }
-    std::string_view GetSslVersion() const override { return mpVersionInfo->ssl_version; }
+    [[nodiscard]] std::string_view GetLibraryName() const override { return "libcurl"; }
+    [[nodiscard]] std::string_view GetVersion() const override { return mpVersionInfo->version; }
+    [[nodiscard]] std::string_view GetSslVersion() const override { return mpVersionInfo->ssl_version; }
 
 protected:
     curl_version_info_data* mpVersionInfo = nullptr;
 
     void checkVersion();
 
-    constexpr std::uint32_t minimumCurlVersion()
+    static constexpr uint32_t minimumCurlVersion()
     {
         return 0x072100;
     }
 private:
     CurlLibrary();
-    CurlLibrary(const CurlLibrary&) = delete;
-    CurlLibrary& operator=(const CurlLibrary&) = delete;
 };
 
 } /* namespace rsp::network::curl */
 
-#endif /* SRC_NETWORK_CURL_CURLLIBRARY_H_ */
+#endif // RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_LIBRARY_H

@@ -8,34 +8,29 @@
  * \author      Steffen Brummer
  */
 
-#ifndef RSP_UTILS_NULLABLE_H_
-#define RSP_UTILS_NULLABLE_H_
+#ifndef RSP_CORE_LIB_UTILS_NULLABLE_H
+#define RSP_CORE_LIB_UTILS_NULLABLE_H
 
-#include <type_traits>
-#include <string>
-#include <stdexcept>
-#include <cmath>
-#include <cstdlib>
-#include <utils/CoreException.h>
+#include <exceptions/CoreException.h>
 
 namespace rsp::utils {
 
 /**
  * \class ENullableException
- * \brief Base class for some helpful Nullable excetpions.
+ * \brief Base class for some helpful Nullable exceptions.
  */
-class ENullableException : public CoreException {
+class ENullableException : public exceptions::CoreException {
 public:
-    explicit ENullableException(const char *aMsg) : CoreException(aMsg) {}
+    using exceptions::CoreException::CoreException;
 };
 
 /**
  * \class ENullValueError
- * \brief Exception thrown on attempt to use a nulled value.
+ * \brief Exception thrown on attempt to use a null value.
  */
 class ENullValueError : public ENullableException {
 public:
-    explicit ENullValueError() : ENullableException("Value is null") {}
+    explicit ENullValueError(const std::string_view &arOrigin) : ENullableException(std::string("Value is null in ") + std::string(arOrigin)) {}
 };
 
 /**
@@ -57,12 +52,12 @@ public:
 class Nullable
 {
 public:
-    virtual ~Nullable() {};
+    virtual ~Nullable() = default;
 
-    virtual bool IsNull() const = 0;
+    [[nodiscard]] virtual bool IsNull() const = 0;
     virtual void Clear() = 0;
 };
 
 } /* namespace rsp::utils */
 
-#endif /* RSP_UTILS_NULLABLE_H_ */
+#endif // RSP_CORE_LIB_UTILS_NULLABLE_H

@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_ENCRYPT_H_
-#define INCLUDE_SECURITY_ENCRYPT_H_
+#ifndef RSP_CORE_LIB_SECURITY_ENCRYPT_H
+#define RSP_CORE_LIB_SECURITY_ENCRYPT_H
 
 #include <string>
 #include <memory>
@@ -24,7 +24,7 @@ namespace rsp::security {
 class Encrypt: public CryptBase
 {
 public:
-    Encrypt(CipherTypes aCipher = CipherTypes::AES_128_CBC);
+    explicit Encrypt(CipherTypes aCipher = CipherTypes::AES_128_CBC);
 
     void Init(const SecureBuffer& arIvSeed, const SecureBuffer& arSecret) override;
     SecureBuffer Finalize() override { return pImpl->Finalize(); }
@@ -36,4 +36,4 @@ protected:
 
 } /* namespace rsp::security */
 
-#endif /* INCLUDE_SECURITY_ENCRYPT_H_ */
+#endif // RSP_CORE_LIB_SECURITY_ENCRYPT_H

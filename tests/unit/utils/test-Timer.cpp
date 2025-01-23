@@ -19,14 +19,22 @@ using namespace std::literals::chrono_literals;
 
 TEST_CASE("Timer")
 {
-    Random::Seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+    CHECK_NOTHROW(Random::Seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count())));
 
     bool triggered[2] = {false , false};
     int triggered1_at = 0;
     int triggered2_count = 0;
     int loop_count = 0;
 
-    CHECK_NOTHROW(TimerQueue::Create());
+    CHECK_THROWS_AS(TimerQueue::GetInstance(), rsp::exceptions::ENoInstance);
+    CHECK_NOTHROW(
+        TimerQueue dummy;
+        TimerQueue::GetInstance();
+    );
+    CHECK_THROWS_AS(TimerQueue::GetInstance(), rsp::exceptions::ENoInstance);
+
+    TimerQueue timer_queue;
+    CHECK_NOTHROW(TimerQueue::GetInstance());
 
     CHECK_NOTHROW(Timer tmp);
     Timer t1;
@@ -63,7 +71,7 @@ TEST_CASE("Timer")
 
     for (; loop_count < 20 ; ++loop_count) {
         std::this_thread::sleep_for(5ms);
-        CHECK_NOTHROW(TimerQueue::Get().Poll());
+        CHECK_NOTHROW(TimerQueue::GetInstance().Poll());
     }
 
     CHECK(triggered[0]);
@@ -72,6 +80,5 @@ TEST_CASE("Timer")
     CHECK_EQ(t1.GetTimeout(), 50ms);
     CHECK_EQ(triggered2_count, 5);
     CHECK_EQ(t2.GetTimeout(), 20ms);
-
 }
 

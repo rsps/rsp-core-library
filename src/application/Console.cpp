@@ -69,11 +69,11 @@ ConsoleStream::ConsoleStream(Console *apConsole, TextColor aColor)
     mColor = aColor;
 }
 
-ConsoleStream::ConsoleStream(ConsoleStream &&aFrom)
+ConsoleStream::ConsoleStream(ConsoleStream &&aFrom) noexcept
     : std::stringstream(static_cast<std::stringstream&&>(aFrom))
 {
-    mpConsole = std::move(aFrom.mpConsole);
-    mColor = std::move(aFrom.mColor);
+    mpConsole = aFrom.mpConsole;
+    mColor = aFrom.mColor;
 }
 
 ConsoleStream::~ConsoleStream()
@@ -93,16 +93,8 @@ Console& Console::Get()
 
 Console::Console()
     : mPrintToDisplay(false),
-      mLcdDisplay(mTtyDeviceFile)
-//      mCoutBuf(this, std::cout, TextColor::Info),
-//      mCerrBuf(this, std::cerr, TextColor::Error)
+      mLcdDisplay()
 {
-    if (mLcdDisplay.is_open()) {
-        mLcdDisplay << ec::TputClear << ec::ResetAll << ec::DisableScreenSaver << ec::HideCursor << std::flush;
-    }
-    else {
-        std::cerr << mTtyDeviceFile << " could not be opened" << std::endl;
-    }
 }
 
 Console::~Console()
@@ -129,6 +121,35 @@ void Console::write(const std::string &arMsg, TextColor aColor)
     }
 }
 
+void Console::SetTtyDevice(const std::string &arTtyDevice)
+{
+    Get().updatePrintToDisplay(mTtyDeviceFile, Get().mPrintToDisplay);
+}
+
+void Console::SetPrintToDisplay(bool aEnable)
+{
+    Get().updatePrintToDisplay(mTtyDeviceFile, aEnable);
+}
+
+void Console::updatePrintToDisplay(const std::string &arTtyDevice, bool aEnable)
+{
+    mTtyDeviceFile = arTtyDevice;
+    mPrintToDisplay = aEnable;
+
+    if (mPrintToDisplay && !mTtyDeviceFile.empty()) {
+        mLcdDisplay.open(mTtyDeviceFile);
+        if (mLcdDisplay.is_open()) {
+            mLcdDisplay << ec::TPutClear << ec::ResetAll << ec::DisableScreenSaver << ec::HideCursor << std::flush;
+        }
+        else {
+            std::cerr << mTtyDeviceFile << " could not be opened" << std::endl;
+        }
+    }
+    else if (mLcdDisplay.is_open()) {
+        mLcdDisplay.close();
+    }
+}
+
 void ConsoleLogStreams::Error(const std::string &arMsg)
 {
     Console::Error() << arMsg;
@@ -141,4 +162,3 @@ void ConsoleLogStreams::Info(const std::string &arMsg)
 
 
 } /* namespace rsp::application */
-

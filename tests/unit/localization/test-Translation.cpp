@@ -10,6 +10,8 @@
 
 #include <doctest.h>
 #include <localization/Translation.h>
+#include <string>
+#include <string_view>
 
 using namespace rsp::localization;
 
@@ -21,6 +23,11 @@ TEST_CASE("Translation")
 
     CHECK_EQ(tr("Hello World"), "Hello World");
 
+    std::string_view sv("Hello World 1");
+    CHECK_EQ(tr(sv), "Hello World 1");
+
+    std::string s("Hello World 2");
+    CHECK_EQ(tr(s), "Hello World 2");
 }
 
 

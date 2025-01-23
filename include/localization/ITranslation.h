@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_LOCALIZATION_ITRANSLATION_H_
-#define INCLUDE_LOCALIZATION_ITRANSLATION_H_
+#ifndef RSP_CORE_LIB_LOCALIZATION_I_TRANSLATION_H
+#define RSP_CORE_LIB_LOCALIZATION_I_TRANSLATION_H
 
 #include <locale>
 #include <memory>
@@ -24,7 +24,10 @@ namespace rsp::localization {
 class ITranslation
 {
 public:
-    virtual ~ITranslation() { std::locale::global(mDefaultLocale); };
+    virtual ~ITranslation()
+    {
+        std::locale::global(mDefaultLocale);
+    }
 
     virtual ITranslation& SetLocale(const char *apLocale)
     {
@@ -32,10 +35,18 @@ public:
         return *this;
     }
 
-    virtual std::string_view Translate(std::uint32_t aHash, std::string_view aDefault) const = 0;
+    [[nodiscard]] virtual std::string_view Translate(uint32_t aHash, std::string_view aDefault) const = 0;
 
     constexpr std::string_view operator()(const char *apText) const {
         return Translate(rsp::utils::crc32::HashConst(apText), apText);
+    }
+
+    constexpr std::string_view operator()(const std::string_view aText) const {
+        return Translate(rsp::utils::crc32::HashConst(aText.data()), aText);
+    }
+
+    std::string_view operator()(const std::string& arText) const {
+        return Translate(rsp::utils::crc32::HashConst(arText.data()), arText);
     }
 
 protected:
@@ -44,4 +55,4 @@ protected:
 
 } /* rsp::localization */
 
-#endif /* INCLUDE_LOCALIZATION_ITRANSLATION_H_ */
+#endif // RSP_CORE_LIB_LOCALIZATION_I_TRANSLATION_H

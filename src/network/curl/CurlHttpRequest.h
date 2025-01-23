@@ -8,10 +8,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CURLHTTPREQUEST_H
-#define CURLHTTPREQUEST_H
+#ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
+#define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
 
 #include <network/IHttpRequest.h>
+#include <network/RequestData.h>
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -33,19 +34,15 @@ class CurlHttpRequest: public rsp::network::IHttpRequest, public EasyCurl
 {
 public:
     CurlHttpRequest();
-    ~CurlHttpRequest() override;
 
     CurlHttpRequest(const CurlHttpRequest&) = default;
-    CurlHttpRequest(CurlHttpRequest&&) = default;
-
-    CurlHttpRequest& operator=(const CurlHttpRequest&) = default;
-    CurlHttpRequest& operator=(CurlHttpRequest&&) = default;
+    CurlHttpRequest(CurlHttpRequest&&) noexcept = default;
 
     IHttpResponse& Execute() override;
-    const HttpRequestOptions& GetOptions() const override;
+    [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
-    IHttpRequest& SetBody(const std::string &arBody) override;
-    const std::string& GetBody() const override;
+    IHttpRequest& SetBody(std::shared_ptr<IHttpBodyStream> apBody) override;
+    [[nodiscard]] const IHttpBodyStream& GetBody() const override;
 
     IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override;
     IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override;
@@ -55,15 +52,26 @@ public:
 protected:
     CurlHttpResponse mResponse;
     HttpRequestOptions mRequestOptions{};
-    struct UploadBuffer {
+    struct StringBuffer
+    {
         size_t Remaining = 0;
-        const char* Data = nullptr;
+        const char *Data = nullptr;
     };
-    UploadBuffer mUploadBuffer{};
+    struct StreamBuffer
+    {
+        RequestData rd;
+        IHttpBodyStream* Body;
+    };
+    union UploadBuffer
+    {
+        StringBuffer String;
+        StreamBuffer Stream;
+    } mUploadBuffer{};
 
     void writeToFile(rsp::posix::FileIO *apFile);
     void readFromFile(rsp::posix::FileIO *apFile);
     void readFromString(const std::string &arString);
+    void readFromStream(const std::shared_ptr<IHttpBodyStream>& arBody);
 
     void prepareRequest() override;
     void requestDone() override;
@@ -74,14 +82,15 @@ private:
     static size_t fileWriteFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile);
     static size_t fileReadFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile);
     static size_t stringReadFunction(void *ptr, size_t size, size_t nmemb, UploadBuffer *apBuf);
+    static size_t streamReadFunction(void *ptr, size_t size, size_t nmemb, UploadBuffer *apBuf);
     static size_t headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse);
     static size_t progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
 
-    void checkRequestOptions(const HttpRequestOptions &arOpts);
+    static void checkRequestOptions(const HttpRequestOptions &arOpts);
     void populateOptions();
 
 };
 
 }
 
-#endif
+#endif // RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H

@@ -8,10 +8,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef NETWORKEXCEPTION_H
-#define NETWORKEXCEPTION_H
+#ifndef RSP_CORE_LIB_NETWORK_NETWORK_EXCEPTION_H
+#define RSP_CORE_LIB_NETWORK_NETWORK_EXCEPTION_H
 
-#include <utils/CoreException.h>
+#include <exceptions/CoreException.h>
 #include <string>
 
 namespace rsp::network
@@ -23,11 +23,11 @@ namespace rsp::network
  * \brief Base exception for handling network related issues in the rsp::network namespace
  *
  */
-class NetworkException: public rsp::utils::CoreException
+class NetworkException: public exceptions::CoreException
 {
 public:
     explicit NetworkException(const std::string &aMsg)
-        : rsp::utils::CoreException(aMsg)
+        : CoreException(aMsg)
     {
     }
 };
@@ -51,4 +51,4 @@ public:
 
 }// namespace rsp::network
 
-#endif //NETWORKEXCEPTION_H
+#endif // RSP_CORE_LIB_NETWORK_NETWORK_EXCEPTION_H

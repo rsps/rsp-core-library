@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_POSIX_FILESYSTEM_H_
-#define SRC_POSIX_FILESYSTEM_H_
+#ifndef RSP_CORE_LIB_POSIX_FILE_SYSTEM_H
+#define RSP_CORE_LIB_POSIX_FILE_SYSTEM_H
 
 #include <string>
 #include <vector>
@@ -32,15 +32,15 @@ namespace rsp::posix::FileSystem
  * \param aPath
  * \return bool
  */
-bool DirectoryExists(const std::string aPath);
+bool DirectoryExists(const std::string& arPath);
 
 /**
- * Chekc if a file exists.
+ * Check if a file exists.
  *
  * \param aPath
  * \return bool
  */
-bool FileExists(const std::string aPath);
+bool FileExists(const std::string& arPath);
 
 /**
  * Delete a file
@@ -54,14 +54,14 @@ void DeleteFile(const std::string &arFileName);
  *
  * \param aDir
  */
-void RecursiveDeleteDir(const std::string aDir);
+void RecursiveDeleteDir(const std::string& arDir);
 
 /**
  * Recursively create directories.
  *
  * \param aDir
  */
-void MakeDirectory(const std::string aDir);
+void MakeDirectory(const std::string& arDir);
 
 /**
  * Make a symlink to an existing path.
@@ -69,7 +69,7 @@ void MakeDirectory(const std::string aDir);
  * \param aExisting
  * \param aSymlink
  */
-void MakeSymlink(const std::string aExisting, const std::string aSymlink);
+void MakeSymlink(const std::string& arExisting, const std::string& arSymlink);
 
 /**
  * Sleep for the given number of milliseconds.
@@ -85,7 +85,8 @@ void Sleep(unsigned int aMilliSeconds);
  */
 std::string GetCurrentWorkingDirectory();
 
-void SetPermissions(const std::string aPath, int aPermissions);
+void SetPermissions(const std::string &arPath, uint32_t aPermissions);
+uint32_t GetPermissions(const std::string &arPath);
 
 /**
  * Get the current IP address of the default outgoing interface.
@@ -173,6 +174,22 @@ rsp::utils::DateTime GetFileModifiedTime(const std::filesystem::path &arFileName
  */
 void SetFileModifiedTime(const std::filesystem::path &arFileName, const rsp::utils::DateTime &arTime);
 
+/**
+ * \fn uint32_t GetUserId()
+ * \brief Get the current user id of this program
+ *
+ * \return Posix user id
+ */
+uint32_t GetUserId();
+
+/**
+ * \fn uint32_t GetGroupId()
+ * \brief Get the current group id of this program
+ *
+ * \return Posix group id
+ */
+uint32_t GetGroupId();
+
 }
 
-#endif /* SRC_POSIX_FILESYSTEM_H_ */
+#endif // RSP_CORE_LIB_POSIX_FILE_SYSTEM_H

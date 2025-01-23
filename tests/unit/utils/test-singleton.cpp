@@ -12,43 +12,44 @@
 #include <utils/Singleton.h>
 
 using namespace rsp::utils;
+using namespace rsp::exceptions;
 
 TEST_CASE("Singleton") {
 
     struct MyClass : Singleton<MyClass> {
-        bool Compare(int a, int b) {
+        [[nodiscard]] bool Compare(int a, int b) const { // NOLINT, Not static since we are testing singleton
             return a == b;
         }
     };
 
     SUBCASE("Self Owned") {
-        CHECK_THROWS_AS(MyClass::Get(), const ENoInstance&);
+        CHECK_THROWS_AS(MyClass::GetInstance(), const ENoInstance&);
 
-        CHECK_NOTHROW(MyClass::Create());
-        CHECK_NOTHROW(MyClass::Get());
-        CHECK(MyClass::Get().Compare(0, 0));
+        CHECK_NOTHROW(MyClass::CreateInstance());
+        CHECK_NOTHROW(MyClass::GetInstance());
+        CHECK(MyClass::GetInstance().Compare(0, 0));
 
-        CHECK_THROWS_AS(MyClass::Create(), const ESingletonViolation&);
-        CHECK_THROWS_AS(MyClass::Set(static_cast<MyClass*>(nullptr)), const ESingletonViolation&);
+        CHECK_THROWS_AS(MyClass::CreateInstance(), const ESingletonViolation&);
+        CHECK_THROWS_AS(MyClass::SetInstance(static_cast<MyClass*>(nullptr)), const ESingletonViolation&);
 
-        CHECK_NOTHROW(MyClass::Destroy());
-        CHECK_THROWS_AS(MyClass::Get(), const ENoInstance&);
+        CHECK_NOTHROW(MyClass::DestroyInstance());
+        CHECK_THROWS_AS(MyClass::GetInstance(), const ENoInstance&);
     }
 
     SUBCASE("External Owned") {
-        CHECK_THROWS_AS(MyClass::Get(), const ENoInstance&);
+        CHECK_THROWS_AS(MyClass::GetInstance(), const ENoInstance&);
 
         MyClass o;
-        CHECK_NOTHROW(MyClass::Set(&o));
-        CHECK_NOTHROW(MyClass::Get());
-        CHECK(MyClass::Get().Compare(1, 1));
+        CHECK_NOTHROW(MyClass::SetInstance(&o));
+        CHECK_NOTHROW(MyClass::GetInstance());
+        CHECK(MyClass::GetInstance().Compare(1, 1));
 
-        CHECK_THROWS_AS(MyClass::Create(), const ESingletonViolation&);
-        CHECK_NOTHROW(MyClass::Destroy());
-        CHECK_THROWS_AS(MyClass::Create(), const ESingletonViolation&);
+        CHECK_THROWS_AS(MyClass::CreateInstance(), const ESingletonViolation&);
+        CHECK_NOTHROW(MyClass::DestroyInstance());
+        CHECK_THROWS_AS(MyClass::CreateInstance(), const ESingletonViolation&);
 
-        CHECK_NOTHROW(MyClass::Set(static_cast<MyClass*>(nullptr)));
-        CHECK_THROWS_AS(MyClass::Get(), const ENoInstance&);
+        CHECK_NOTHROW(MyClass::SetInstance(static_cast<MyClass*>(nullptr)));
+        CHECK_THROWS_AS(MyClass::GetInstance(), const ENoInstance&);
     }
 }
 

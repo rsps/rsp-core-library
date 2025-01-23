@@ -12,15 +12,15 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
-#include <memory>
-#include <time.h>
 #include <doctest.h>
+#include <exceptions/CoreException.h>
+#include <logging/BufferToStream.h>
 #include <logging/Logger.h>
+#include <logging/LogChannel.h>
 #include <logging/ConsoleLogWriter.h>
 #include <logging/FileLogWriter.h>
 #include <utils/StrUtils.h>
 #include <utils/AnsiEscapeCodes.h>
-#include <utils/CoreException.h>
 
 using namespace rsp;
 using namespace rsp::utils;
@@ -40,7 +40,6 @@ std::ostream& operator<< (std::ostream& os, const MyType &arType)
     return os;
 }
 
-
 static std::vector<std::string> mConsoleInfoBuffer;
 static std::vector<std::string> mConsoleErrorBuffer;
 
@@ -48,46 +47,49 @@ class TestConsoleStream : public ConsoleLogStreamsInterface
 {
 public:
     void Error(const std::string &arMsg) override {
-        mConsoleErrorBuffer.push_back(std::string(arMsg));
+        mConsoleErrorBuffer.emplace_back(arMsg);
     }
 
     void Info(const std::string &arMsg) override {
-        mConsoleInfoBuffer.push_back(std::string(arMsg));
+        mConsoleInfoBuffer.emplace_back(arMsg);
     }
 };
 
-const rsp::logging::ConsoleLogWriter::ConsoleColors_t cConsoleColors {
-	AnsiEscapeCodes::ec::fg::Red,       // Emergency
-	AnsiEscapeCodes::ec::fg::Red,       // Alert
-	AnsiEscapeCodes::ec::fg::Red,       // Critical
-	AnsiEscapeCodes::ec::fg::Red,       // Error
-	AnsiEscapeCodes::ec::fg::Yellow,    // Warning
-	AnsiEscapeCodes::ec::fg::Cyan,      // Notice
-	AnsiEscapeCodes::ec::fg::LightBlue, // Info
-	AnsiEscapeCodes::ec::fg::LightGreen // Debug
-};
-
-
 TEST_CASE("Logging") {
+
+    const rsp::logging::ConsoleLogWriter::ConsoleColors_t cConsoleColors {
+            AnsiEscapeCodes::ec::fg::Red,       // Emergency
+            AnsiEscapeCodes::ec::fg::Red,       // Alert
+            AnsiEscapeCodes::ec::fg::Red,       // Critical
+            AnsiEscapeCodes::ec::fg::Red,       // Error
+            AnsiEscapeCodes::ec::fg::Yellow,    // Warning
+            AnsiEscapeCodes::ec::fg::Cyan,      // Notice
+            AnsiEscapeCodes::ec::fg::LightBlue, // Info
+            AnsiEscapeCodes::ec::fg::LightGreen // Debug
+    };
 
     std::remove(cFileName);
     mConsoleErrorBuffer.clear();
     mConsoleInfoBuffer.clear();
 
-    logging::Logger log(true);
 
-    CHECK_THROWS_AS(logging::LoggerInterface::GetDefault(), const utils::NotSetException &);
-    CHECK_NOTHROW(logging::LoggerInterface::SetDefault(&log));
+    CHECK_NOTHROW(logging::Logger dummy_logger(true));
 
-    CHECK_NOTHROW(log.SetChannel("Test Channel"));
-    CHECK_NOTHROW(log.SetContext(DynamicData().Add("Test Context").Add(42)));
+    CHECK_NOTHROW(logging::LoggerInterface::GetDefault());
+    CHECK_NOTHROW(logging::LoggerInterface::DestroyDefault());
 
-    CHECK_NOTHROW(log.AddLogWriter(std::make_shared<logging::FileLogWriter>(cFileName, logging::LogLevel::Info)));
-    CHECK_NOTHROW(log.AddLogWriter(std::make_shared<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors)));
+    CHECK_NOTHROW(logging::LogChannel dummy_log("Dummy Channel"));
+    logging::LogChannel log("Test Channel");
+
+    logging::LoggerInterface::Handle_t file;
+    logging::LoggerInterface::Handle_t console;
+
+    CHECK_NOTHROW(file = log.MakeLogWriter<logging::FileLogWriter>(cFileName, logging::LogLevel::Info));
+    CHECK_NOTHROW(console = log.MakeLogWriter<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors));
 
     CHECK_NOTHROW(log.Info() << "Test of logger");
     CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(7)));
-    CHECK_NOTHROW(log.Alert() << "Alert");
+    CHECK_NOTHROW(log.Alert() << SetContext(DynamicData().Add("Test Context").Add(42)) << "Alert");
     CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(2)));
     CHECK_NOTHROW(log.Error() << "Error");
     CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(3)));
@@ -101,20 +103,20 @@ TEST_CASE("Logging") {
     MyType type;
     CHECK_NOTHROW(log.Info() << type);
 
-    CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Critical) << "Critical to std::clog" << std::endl);
+    CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Critical) << "Critical to std::clog" << SetChannel("Main") << std::endl);
 
     CHECK_NOTHROW(log.Emergency() << "Sleeping for 1 second");
     auto end = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 
     std::thread t([&]() {
         for (int i=0; i < 12 ; i++) {
-            CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Info) << "Writing from thread " << i << std::endl);
+            CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Info) << SetChannel("Main") << "Writing from thread " << i << std::endl);
             std::this_thread::sleep_for(std::chrono::milliseconds(90));
         }
     });
 
     do {
-        CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Info) << "Writing from main" << std::endl);
+        CHECK_NOTHROW(std::clog << SetChannel("Main") << SetLevel(LogLevel::Info) << "Writing from main" << std::endl);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     while (std::chrono::high_resolution_clock::now() < end);
@@ -123,58 +125,70 @@ TEST_CASE("Logging") {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     t.join();
 
+    std::vector<uint8_t> vec = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    CHECK_NOTHROW(log.Info() << "Binary1: " << BufferToStream(reinterpret_cast<char*>(vec.data()), vec.size(), true));
+    CHECK_NOTHROW(log.Info() << "Binary2: " << BufferToStream(reinterpret_cast<char*>(vec.data()), vec.size()));
+
     std::ifstream fin;
     fin.open(cFileName);
 
-    CHECK(fin.is_open() == true);
+    CHECK_EQ(fin.is_open(), true);
 
     std::string line;
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "Test of logger") == true, line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "Test of logger"), line);
 
-    CHECK(mConsoleErrorBuffer.size() == 3);
-    CHECK(mConsoleInfoBuffer.size() == 0);
-
-    std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::EndsWith(line, "] <Test Channel> (Alert) Alert  [\"Test Context\",42]"), line);
+    CHECK_EQ(mConsoleErrorBuffer.size(), 3);
+    CHECK_EQ(mConsoleInfoBuffer.size(), 0);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "Error") == true, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "] Test Channel.ALERT: Alert [\"Test Context\",42]"), line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "Warning") == true, line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "ERROR:"), line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "Info") == true, line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "WARNING:"), line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "Debug") == false, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "Dbg-Info") == true, line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "INFO:"), line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "MyType: 666") == true, line);
+    CHECK_FALSE_MESSAGE(StrUtils::Contains(line, "DEBUG:"), line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "Dbg-Info") , line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::EndsWith(line, "(Critical) Critical to std::clog") == true, line);
-    CHECK_MESSAGE(StrUtils::Contains(mConsoleErrorBuffer[1], std::string(AnsiEscapeCodes::ec::fg::Red) + "Critical to std::clog") == true, mConsoleErrorBuffer[1]);
+    CHECK_MESSAGE(StrUtils::Contains(line, "MyType: 666"), line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "(Emergency) Sleeping for 1 second") == true, line);
-    CHECK_MESSAGE(StrUtils::StartsWith(mConsoleErrorBuffer[2], std::string(AnsiEscapeCodes::ec::fg::Red) + "<Test Channel> Sleeping for 1 second") == true, mConsoleErrorBuffer[2]);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, ".CRITICAL: Critical to std::clog"), line);
+    CHECK_MESSAGE(StrUtils::Contains(mConsoleErrorBuffer[1], std::string(AnsiEscapeCodes::ec::fg::Red) + "Main: Critical to std::clog"), mConsoleErrorBuffer[1]);
+
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "EMERGENCY: Sleeping for 1 second"), line);
+    CHECK_MESSAGE(StrUtils::StartsWith(mConsoleErrorBuffer[2], std::string(AnsiEscapeCodes::ec::fg::Red) + "Test Channel: Sleeping for 1 second"), mConsoleErrorBuffer[2]);
 
     for (int i = 0 ; i < 22 ; i++) {
         std::getline(fin, line);
-        CHECK_MESSAGE(StrUtils::Contains(line, "] (Info) Writing from ") == true, line);
+        CHECK_MESSAGE(StrUtils::Contains(line, "] Main.INFO: Writing from "), line);
     }
 
     std::getline(fin, line);
-    CHECK_MESSAGE(StrUtils::Contains(line, "(Info) Wakeup...") == true, line);
+    CHECK_MESSAGE(StrUtils::Contains(line, "] Main.INFO: Wakeup..."), line);
 
     std::getline(fin, line);
-    CHECK_MESSAGE(fin.eof() == true, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "] Test Channel.INFO: Binary1: .........\\n"), line);
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "..\\r..."), line);
 
-    CHECK(&(logging::LoggerInterface::GetDefault()) == &log);
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "] Test Channel.INFO: Binary2: ........."), line);
+    std::getline(fin, line);
+    CHECK_MESSAGE(StrUtils::EndsWith(line, "......"), line);
+
+    std::getline(fin, line);
+    CHECK_MESSAGE(fin.eof(), line);
+
+    CHECK_NOTHROW(logging::LoggerInterface::DestroyDefault());
 }
-
-

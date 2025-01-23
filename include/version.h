@@ -7,10 +7,12 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_VERSION_H_
-#define INCLUDE_VERSION_H_
+#ifndef RSP_CORE_LIB_VERSION_H
+#define RSP_CORE_LIB_VERSION_H
 
 #include <string>
+
+#define LIB_VERSION "0.1.0"
 
 namespace rsp {
 
@@ -18,4 +20,4 @@ std::string get_library_version();
 
 }
 
-#endif /* INCLUDE_VERSION_H_ */
+#endif // RSP_CORE_LIB_VERSION_H

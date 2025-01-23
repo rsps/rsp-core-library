@@ -8,8 +8,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef HTTPRESPONSE_H
-#define HTTPRESPONSE_H
+#ifndef RSP_CORE_LIB_NETWORK_HTTP_RESPONSE_H
+#define RSP_CORE_LIB_NETWORK_HTTP_RESPONSE_H
 
 #include <network/IHttpRequest.h>
 #include <network/IHttpResponse.h>
@@ -24,29 +24,29 @@ namespace rsp::network {
 class HttpResponse: public IHttpResponse
 {
 public:
-    HttpResponse(IHttpRequest &arRequest)
+    explicit HttpResponse(IHttpRequest &arRequest)
         : mrRequest(arRequest)
     {
     }
 
-    const std::map<std::string, std::string>& GetHeaders() const override
+    [[nodiscard]] const std::map<std::string, std::string>& GetHeaders() const override
     {
         return mHeaders;
     }
 
-    const std::string& GetHeader(const std::string &arName) const override;
+    [[nodiscard]] const std::string& GetHeader(const std::string &arName) const override;
 
-    int GetStatusCode() const override
+    [[nodiscard]] int GetStatusCode() const override
     {
         return mStatusCode;
     }
 
-    const IHttpRequest& GetRequest() const override
+    [[nodiscard]] const IHttpRequest& GetRequest() const override
     {
         return mrRequest;
     }
 
-    const std::string& GetBody() const override
+    [[nodiscard]] const std::string& GetBody() const override
     {
         return mBody;
     }
@@ -60,4 +60,4 @@ protected:
 
 }// namespace rsp::network
 
-#endif // HTTPRESPONSE_H
+#endif // RSP_CORE_LIB_NETWORK_HTTP_RESPONSE_H

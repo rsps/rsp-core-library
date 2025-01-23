@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_LOGGING_LOGWRITER_H_
-#define SRC_LOGGING_LOGWRITER_H_
+#ifndef RSP_CORE_LIB_LOGGING_LOG_WRITER_INTERFACE_H
+#define RSP_CORE_LIB_LOGGING_LOG_WRITER_INTERFACE_H
 
 #include <string>
 #include <utils/DynamicData.h>
@@ -24,7 +24,7 @@ namespace rsp::logging {
  */
 class LogWriterInterface {
 public:
-    virtual ~LogWriterInterface() {}
+    virtual ~LogWriterInterface() = default;
 
     /**
      * Write a string to the destination in a thread safe manner.
@@ -42,9 +42,9 @@ public:
     void SetAcceptLogLevel(LogLevel aLevel) { mAcceptLevel = aLevel; }
 
 protected:
-    LogLevel mAcceptLevel = cDefautLogLevel;
+    LogLevel mAcceptLevel = cDefaultLogLevel;
 };
 
 } /* namespace logging */
 
-#endif /* SRC_LOGGING_LOGWRITER_H_ */
+#endif // RSP_CORE_LIB_LOGGING_LOG_WRITER_INTERFACE_H

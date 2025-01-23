@@ -21,15 +21,15 @@ TEST_CASE("Stop Watch") {
     StopWatch sw;
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
-    CHECK(IsInRange(sw.Elapsed<std::chrono::milliseconds>(), std::int64_t(20), std::int64_t(25)));
+    CHECK(IsInRange(sw.Elapsed<std::chrono::milliseconds>(), int64_t(20), int64_t(25)));
 
     sw.Reset();
 
-    CHECK(IsInRange(sw.Elapsed<std::chrono::milliseconds>(), std::int64_t(0), std::int64_t(5)));
+    CHECK(IsInRange(sw.Elapsed<std::chrono::milliseconds>(), int64_t(0), int64_t(5)));
 
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
-    CHECK(IsInRange(sw.Elapsed<std::chrono::milliseconds>(), std::int64_t(20), std::int64_t(25)));
+    CHECK(IsInRange(sw.Elapsed<std::chrono::milliseconds>(), int64_t(20), int64_t(25)));
 }
 
 

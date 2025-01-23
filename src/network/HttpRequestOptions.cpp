@@ -26,18 +26,54 @@ std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)
         arOptions.RequestType << " " << arOptions.Uri << "\n";
     if (!arOptions.BasicAuthUsername.empty()) {
         o <<
-            "Basic Auth User: " << arOptions.BasicAuthUsername << "\n"
-            "Basic Auth Pw: " << arOptions.BasicAuthPassword << "\n";
+            "Basic Auth User: " << std::string(arOptions.BasicAuthUsername.size(), 'X') << "\n"
+            "Basic Auth Pw: " << std::string(arOptions.BasicAuthPassword.size(), 'X') << "\n";
     }
     o << "Headers:\n";
 
     for(auto &tuple : arOptions.Headers) {
-        o << "  " << tuple.first << ": " << tuple.second << "\n";
+        if (rsp::utils::StrUtils::ToLower(tuple.first) == std::string("authorization")) {
+            o << "  " << tuple.first << ": " << std::string(tuple.second.size(), 'X') << "\n";
+        }
+        else {
+            o << "  " << tuple.first << ": " << tuple.second << "\n";
+        }
     }
 
-    o <<
-        "Body:\n" << arOptions.Body;
+    if (arOptions.Body) {
+        o << "Body:\n" << *(arOptions.Body);
+    }
 
+    return o;
+}
+
+
+/**
+ * \brief Get up to aMaxLen characters from the body content.
+ * \param aMaxLen Maximum length of returned string. If entire content does not fit, the result will be appended with 3 dots e.g. "This is content..."
+ * \return string
+ */
+std::ostream& operator<<(std::ostream &o, IHttpBodyStream &s)
+{
+    char buffer[200];
+    size_t written;
+    size_t chunk_index = 0;
+    size_t payload_index = 0;
+    size_t total = 0;
+    bool eof = false;
+    while (!eof) {
+        eof = s.GetChunk(buffer, sizeof(buffer), written, chunk_index, payload_index);
+        total += written;
+        for (size_t i = 0 ; i < written ; ++i) {
+            auto c = buffer[i];
+            if (std::isprint(static_cast<unsigned char>(c)) || c == '\n' || c == '\r') {
+                o << c;
+            }
+            else {
+                o << '.';
+            }
+        }
+    }
     return o;
 }
 

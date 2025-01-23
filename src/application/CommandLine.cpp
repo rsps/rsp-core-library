@@ -23,23 +23,23 @@ CommandLine::CommandLine(int argc, const char **argv)
 
     for (int i = 1; i < argc; i++) {
         if (argv[i][0] == '-') {
-            mOptions.push_back(std::string(argv[i]));
+            mOptions.emplace_back(argv[i]);
         } else {
-            mCommands.push_back(std::string(argv[i]));
+            mCommands.emplace_back(argv[i]);
         }
     }
 }
 
-bool CommandLine::HasOption(const std::string aStr)
+bool CommandLine::HasOption(const std::string &arStr)
 {
-    return (std::find(mOptions.begin(), mOptions.end(), aStr) != mOptions.end());
+    return (std::find(mOptions.begin(), mOptions.end(), arStr) != mOptions.end());
 }
 
-bool CommandLine::GetOptionValue(const std::string aKey, std::string &arValue)
+bool CommandLine::GetOptionValue(const std::string &arKey, std::string &arValue)
 {
-    for (auto o : mOptions) {
-        if (o.find(aKey) != std::string::npos) {
-            arValue = o.substr(aKey.length());
+    for (auto &o : mOptions) {
+        if (o.find(arKey) != std::string::npos) {
+            arValue = o.substr(arKey.length());
             return true;
         }
     }

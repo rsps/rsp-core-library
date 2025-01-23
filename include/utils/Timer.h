@@ -8,11 +8,11 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_TIMER_H_
-#define INCLUDE_UTILS_TIMER_H_
+#ifndef RSP_CORE_LIB_UTILS_TIMER_H
+#define RSP_CORE_LIB_UTILS_TIMER_H
 
+#include <functional>
 #include <list>
-#include "Function.h"
 #include "Singleton.h"
 #include "RunTime.h"
 
@@ -27,20 +27,20 @@ class TimerQueue;
 class Timer
 {
 public:
-    using TimerCallback_t = rsp::utils::Function<void(Timer&)>;
+    using TimerCallback_t = std::function<void(Timer&)>;
 
-    Timer() {}
+    Timer() = default;
     Timer(int aId, std::chrono::milliseconds aTimeout) : mId(aId), mTimeout(aTimeout) {}
     virtual ~Timer();
 
     Timer& SetId(int aId) { mId = aId; return *this; }
-    int GetId() const { return mId; }
+    [[nodiscard]] int GetId() const { return mId; }
 
     Timer& SetTimeout(std::chrono::milliseconds aTimeout);
-    std::chrono::milliseconds GetTimeout() const { return mTimeout; }
+    [[nodiscard]] std::chrono::milliseconds GetTimeout() const { return mTimeout; }
 
     Timer& Enable(bool aOn = true);
-    bool IsEnabled() const { return mEnabled; }
+    [[nodiscard]] bool IsEnabled() const { return mEnabled; }
 
     TimerCallback_t& Callback() { return mCallback; }
 
@@ -63,6 +63,7 @@ class TimerQueue : public rsp::utils::Singleton<TimerQueue>
 {
 public:
     TimerQueue();
+    ~TimerQueue() override;
 
     /**
      * \brief Poll the timer queue to trigger expired timers
@@ -82,4 +83,4 @@ protected:
 
 } /* namespace rsp::graphics */
 
-#endif /* INCLUDE_UTILS_TIMER_H_ */
+#endif // RSP_CORE_LIB_UTILS_TIMER_H

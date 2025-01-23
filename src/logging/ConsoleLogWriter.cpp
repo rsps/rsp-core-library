@@ -31,23 +31,21 @@ public:
     }
 };
 
-ConsoleLogWriter::ConsoleLogWriter(std::string aAcceptLevel, ConsoleLogStreamsInterface *apConsole, const ConsoleColors_t *apColors)
-    : ConsoleLogWriter(ToLogLevel(aAcceptLevel), apConsole, apColors)
+ConsoleLogWriter::ConsoleLogWriter(const std::string& arAcceptLevel, ConsoleLogStreamsInterface *apConsole, const ConsoleColors_t *apColors)
+    : ConsoleLogWriter(ToLogLevel(arAcceptLevel), apConsole, apColors)
 {
 }
 
 ConsoleLogWriter::ConsoleLogWriter(LogLevel aAcceptLevel, ConsoleLogStreamsInterface *apConsole, const ConsoleColors_t *apColors)
     : mpConsole(apConsole ? apConsole : new DefaultConsoleStream()),
-	  mpColors(apColors)
+      mpColors(apColors)
 {
     mAcceptLevel = aAcceptLevel;
 }
 
 ConsoleLogWriter::~ConsoleLogWriter()
 {
-    if (mpConsole) {
-        delete mpConsole;
-    }
+    delete mpConsole;
 }
 
 void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
@@ -61,11 +59,11 @@ void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, c
         ss << (*mpColors)[std::size_t(aCurrentLevel)];
     }
     if (arChannel.length()) {
-        ss << "<" << arChannel << "> ";
+        ss << arChannel << ": ";
     }
     ss << arMsg;
     if (!arContext.IsNull()) {
-        ss << "  " << rsp::json::JsonEncoder::Encode(arContext);
+        ss << " " << rsp::json::JsonEncoder().Encode(arContext);
     }
     if (mpColors) {
         ss << std::string(AnsiEscapeCodes::ec::ConsoleDefault);
@@ -80,4 +78,3 @@ void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, c
 }
 
 } /* namespace logging */
-

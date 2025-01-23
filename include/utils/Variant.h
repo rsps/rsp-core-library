@@ -8,12 +8,12 @@
  * \author      Steffen Brummer
  */
 
-#ifndef RSP_UTILS_VARIANT_H_
-#define RSP_UTILS_VARIANT_H_
+#ifndef RSP_CORE_LIB_UTILS_VARIANT_H
+#define RSP_CORE_LIB_UTILS_VARIANT_H
 
+#include <exceptions/CoreException.h>
 #include <utils/Nullable.h>
 #include <string>
-#include "CoreException.h"
 #include <utils/StructElement.h>
 
 namespace rsp::utils {
@@ -23,19 +23,19 @@ namespace rsp::utils {
  * \brief Base exception for Variant class.
  *
  */
-class EVariantException : public CoreException {
+class EVariantException : public exceptions::CoreException {
 public:
     explicit EVariantException(const char *apMsg) : CoreException(apMsg) {}
+    explicit EVariantException(const std::string& arMsg) : CoreException(arMsg) {}
 };
 
 /**
  * \class EConversionError
- * \brief Thrown if tried to read a value as a type which is not convertible from the vurrent type of a Variant.
- *
+ * \brief Thrown if tried to read a value as a type which is not convertible from the current type of a Variant.
  */
 class EConversionError : public EVariantException {
 public:
-    explicit EConversionError(const std::string aFrom, const std::string aTo) : EVariantException(std::string("Variant Conversion Error. From " + aFrom + " to " + aTo).c_str()) {}
+    explicit EConversionError(const std::string& arFrom, const std::string& arTo) : EVariantException(std::string("Variant Conversion Error. From " + arFrom + " to " + arTo)) {}
 };
 
 /**
@@ -50,7 +50,7 @@ public:
      * \enum Types
      * \brief Type declaration used for each native type.
      */
-    enum class Types : std::uint32_t {Null, Bool, Int, Int64, Uint64, Uint32, Uint16, Float, Double, Pointer, String, Object, Array};
+    enum class Types : uint32_t {Null, Bool, Int, Int64, Uint64, Uint32, Uint16, Float, Double, Pointer, String, Object, Array};
 
     /**
      * \fn  Variant()
@@ -59,17 +59,20 @@ public:
     Variant();
 
     Variant(const Variant &arOther);
-    Variant(Variant &&arOther);
+    Variant(Variant &&arOther) noexcept;
 
     template<class T>
-    Variant(const rsp::utils::StructElement<T>& arOther) : Variant(ToVariant(arOther)) {}
+    explicit Variant(const rsp::utils::StructElement<T>& arOther)
+        : Variant(ToVariant<T>(arOther))
+    {
+    }
 
     Variant& operator=(const Variant &arOther);
-    Variant& operator=(Variant &&arOther);
+    Variant& operator=(Variant &&arOther) noexcept ;
 
     template<class T>
     Variant& operator=(const rsp::utils::StructElement<T>& arOther) {
-        *this = ToVariant(arOther);
+        *this = ToVariant<T>(arOther);
         return *this;
     }
 
@@ -77,12 +80,16 @@ public:
      * \brief operator overload for Variant
      */
     template<class T>
-    Variant ToVariant(const rsp::utils::StructElement<T>& arOther)
+    Variant ToVariant(const rsp::utils::StructElement<T>& arOther) noexcept
     {
         if (arOther.IsNull()) {
-            return Variant();
+            return {};
         }
-        return Variant(arOther.Get());
+        Variant result(arOther.Get());
+        if constexpr (std::is_floating_point_v<T>) {
+            result.mPrecision = arOther.mPrecision;
+        }
+        return result;
     }
 
     /**
@@ -91,23 +98,21 @@ public:
      *
      * \param aValue
      */
+    // NOLINTBEGIN, Conversion constructors.
     Variant(bool aValue);
-    Variant(int aValue);
-    Variant(std::int64_t aValue);
-    Variant(std::uint64_t aValue);
-    Variant(std::uint32_t aValue);
-    Variant(std::uint16_t aValue);
+    Variant(int64_t aValue);
+    Variant(uint64_t aValue);
+    Variant(int32_t aValue);
+    Variant(uint32_t aValue);
+    Variant(int16_t aValue);
+    Variant(uint16_t aValue);
     Variant(float aValue);
     Variant(double aValue);
     Variant(void* apValue);
-    Variant(const std::string &arValue);
+    Variant(const std::string& arValue);
+    Variant(std::string &&arValue) noexcept;
     Variant(const char *apValue);
-
-    /**
-     * \fn  ~Variant()
-     * \brief Virtual destructor
-     */
-    virtual ~Variant();
+    // NOLINTEND
 
     /**
      * \fn bool IsNull()const
@@ -115,7 +120,7 @@ public:
      *
      * \return bool
      */
-    bool IsNull() const override { return mType == Types::Null; }
+    [[nodiscard]] bool IsNull() const override { return mType == Types::Null; }
     /**
      * \fn void Clear()
      * \brief Resets the Variant content to null
@@ -127,29 +132,37 @@ public:
      *
      * \return Variant::Types
      */
-    Types GetType() const { return mType; }
+    [[nodiscard]] Types GetType() const { return mType; }
 
     /**
      * \brief Get a textual representation of the Variant content type
      * \return string
      */
-    std::string TypeToText() const;
+    [[nodiscard]] std::string TypeToText() const;
+
+    /**
+     * \brief Number of digits on string presentation of floating point types
+     * \param aDigits Set to -1 for max for specific type.
+     */
+    void SetPrecision(int aPrecision) { mPrecision = aPrecision; }
 
     /**
      * \fn  operator <T>()const
-     * \brief Operator overloads for all native types.
+     * \brief Conversion operators for all native types.
      */
+    // NOLINTBEGIN, Conversion operators.
     operator bool() const              { return AsBool(); }
-    operator int() const               { return static_cast<int>(AsInt()); }
-    operator std::int64_t() const      { return AsInt(); }
-    operator std::uint64_t() const     { return static_cast<std::uint64_t>(AsInt()); }
-    operator std::uint32_t() const     { return static_cast<std::uint32_t>(AsInt()); }
-    operator std::uint16_t() const     { return static_cast<std::uint16_t>(AsInt()); }
+    operator int64_t() const      { return AsInt(); }
+    operator uint64_t() const     { return static_cast<uint64_t>(AsInt()); }
+    operator int32_t() const      { return static_cast<int32_t>(AsInt()); }
+    operator uint32_t() const     { return static_cast<uint32_t>(AsInt()); }
+    operator int16_t() const      { return static_cast<int16_t>(AsInt()); }
+    operator uint16_t() const     { return static_cast<uint16_t>(AsInt()); }
     operator float() const             { return static_cast<float>(AsDouble()); }
     operator double() const            { return AsDouble(); }
     operator void*() const             { return AsPointer(); }
-    operator const std::string() const { return AsString(); }
-    operator const char*() const       { return AsString().c_str(); }
+    operator std::string() const { return AsString(); }
+    // NOLINTEND
 
     /**
      * \fn Variant operator =&(T)
@@ -160,10 +173,10 @@ public:
      */
     Variant& operator =(bool aValue);
     Variant& operator =(int aValue);
-    Variant& operator =(std::int64_t aValue);
-    Variant& operator =(std::uint64_t aValue);
-    Variant& operator =(std::uint32_t aValue);
-    Variant& operator =(std::uint16_t aValue);
+    Variant& operator =(int64_t aValue);
+    Variant& operator =(uint64_t aValue);
+    Variant& operator =(uint32_t aValue);
+    Variant& operator =(uint16_t aValue);
     Variant& operator =(float aValue);
     Variant& operator =(double aValue);
     Variant& operator =(void* apValue);
@@ -176,29 +189,30 @@ public:
      *
      * \return T
      */
-    bool AsBool() const;
-    std::int64_t AsInt() const;
-    double AsDouble() const;
-    float AsFloat() const { return static_cast<float>(AsDouble()); }
-    std::string AsString() const;
-    void* AsPointer() const;
+    [[nodiscard]] bool AsBool() const;
+    [[nodiscard]] int64_t AsInt() const;
+    [[nodiscard]] double AsDouble() const;
+    [[nodiscard]] float AsFloat() const { return static_cast<float>(AsDouble()); }
+    [[nodiscard]] std::string AsString() const;
+    [[nodiscard]] void* AsPointer() const;
 
-    std::int64_t RawAsInt() const { return mInt; }
+    [[nodiscard]] int64_t RawAsInt() const { return mInt; }
 
 protected:
-    Types mType;
+    Types mType = Types::Null;
     union {
         bool mBool;
-        std::int64_t mInt{0};
+        int64_t mInt{0};
         float mFloat;
         double mDouble;
         uintptr_t mPointer;
     };
     std::string mString{};
+    int mPrecision = -1;
 };
 
 std::ostream& operator<< (std::ostream& os, const Variant& arValue);
 
 } /* namespace rsp::utils */
 
-#endif /* RSP_UTILS_VARIANT_H_ */
+#endif // RSP_CORE_LIB_UTILS_VARIANT_H

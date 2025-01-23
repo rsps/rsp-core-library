@@ -9,45 +9,46 @@
  */
 
 #include <doctest.h>
+#include <cctype>
 #include <cstring>
 #include <iostream>
-#include <sstream>
 #include <chrono>
 #include <filesystem>
-#include <logging/Logger.h>
 #include <network/IHttpRequest.h>
 #include <network/HttpRequest.h>
 #include <network/HttpDownload.h>
 #include <network/NetworkLibrary.h>
 #include <network/HttpSession.h>
+#include <network/HttpStringBody.h>
+#include <network/MultipartBoundary.h>
 #include <network/NetworkException.h>
+#include <network/RequestData.h>
 #include <posix/FileSystem.h>
 #include <posix/FileIO.h>
-#include <utils/AnsiEscapeCodes.h>
 #include <utils/StrUtils.h>
 #include <TestHelpers.h>
 #include <cstdlib>
 #include <unistd.h>
-#include <sys/types.h>
 
 using namespace rsp::logging;
 using namespace rsp::network;
 using namespace rsp::utils;
-using namespace rsp::utils::AnsiEscapeCodes;
 using namespace rsp::posix;
 
 TEST_CASE("Network")
 {
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     HttpRequestOptions opt;
+//    opt.Body = std::make_shared<HttpStringBody>();
     opt.CertCaPath = "webserver/ssl/ca/ca.crt";
     opt.CertPath = "webserver/ssl/certs/SN1234.crt";
     opt.KeyPath = "webserver/ssl/private/SN1234.key";
 
     // Run lighttpd directly from build directory, no need to install it.
-    CHECK(0 == std::system("_deps/lighttpd_src-build/build/lighttpd -f webserver/lighttpd.conf -m _deps/lighttpd_src-build/build"));
+    std::string cwd = std::filesystem::current_path();
+    std::string command = cwd + "/_deps/lighttpd_src-build/build/lighttpd -f " + cwd + "/webserver/lighttpd.conf -m " + cwd + "/_deps/lighttpd_src-build/build";
+    CHECK_EQ(0, std::system(command.c_str()));
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     SUBCASE("Library Version"){
@@ -80,7 +81,7 @@ TEST_CASE("Network")
 
         logger.Info() << "Request:\n" << request << std::endl;
 
-        IHttpResponse *resp = nullptr;
+        IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
         logger.Info() << "Response:\n" << *resp << std::endl;
@@ -108,9 +109,8 @@ TEST_CASE("Network")
 
         request.SetOptions(opt);
 
-        IHttpResponse *resp = nullptr;
-        CHECK_THROWS_AS(resp = &request.Execute(), NetworkException);
-        CHECK_THROWS_WITH_AS(resp = &request.Execute(), doctest::Contains("curl_easy_perform() failed. (56) Failure when receiving data from the peer"), NetworkException);
+        CHECK_THROWS_AS(auto *resp = &request.Execute(), NetworkException);
+        CHECK_THROWS_WITH_AS(auto *resp = &request.Execute(), doctest::Contains(" (56) Failure when receiving data from the peer"), NetworkException);
     }
 
     SUBCASE("Validated Client") {
@@ -119,7 +119,7 @@ TEST_CASE("Network")
 
         request.SetOptions(opt);
 
-        IHttpResponse *resp = nullptr;
+        IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
 //        MESSAGE("Request:\n" << resp->GetRequest());
@@ -146,18 +146,18 @@ TEST_CASE("Network")
         IHttpResponse *resp = nullptr;
 
         SUBCASE("To Memory") {
-            FileSystem::DeleteFile(std::string(cFile));
+            FileSystem::DeleteFile(cFile);
             request.SetFileName("");
 
             CHECK_NOTHROW(resp = &request.Execute());
 
             CHECK_EQ(resp->GetBody().size(), source.size());
             CHECK_EQ(resp->GetStatusCode(), 200);
-            CHECK(std::memcmp(source.data(), resp->GetBody().data(), source.size()) == 0);
+            CHECK_EQ(std::memcmp(source.data(), resp->GetBody().data(), source.size()), 0);
         }
 
         SUBCASE("To File") {
-            FileSystem::DeleteFile(std::string(cFile));
+            FileSystem::DeleteFile(cFile);
 
             CHECK_NOTHROW(resp = &request.Execute());
 
@@ -166,7 +166,7 @@ TEST_CASE("Network")
         }
 
         SUBCASE("Partial To File") {
-            CHECK(0 == truncate(cFile.c_str(), 20*1024)); // This changes mtime
+            CHECK_EQ(0, truncate(cFile.c_str(), 20*1024)); // This changes mtime
 
             CHECK_NOTHROW(resp = &request.Execute());
 
@@ -178,7 +178,7 @@ TEST_CASE("Network")
             using namespace std::literals::chrono_literals;
 
             auto mtime = FileSystem::GetFileModifiedTime(cFile);
-            CHECK(0 == truncate(cFile.c_str(), 20*1024)); // This changes mtime
+            CHECK_EQ(0, truncate(cFile.c_str(), 20*1024)); // This changes mtime
             // This line will work, as the result is the partial data from an unmodified file.
             FileSystem::SetFileModifiedTime(cFile, mtime + 2h);
 
@@ -195,7 +195,7 @@ TEST_CASE("Network")
 //            request.SetOptions(opt);
 
             auto mtime = FileSystem::GetFileModifiedTime(cFile);
-            CHECK(0 == truncate(cFile.c_str(), 20*1024)); // This changes mtime
+            CHECK_EQ(0, truncate(cFile.c_str(), 20*1024)); // This changes mtime
             // FIXME: This line should fail with a "412 Precondition Failed", lighttpd does not send the correct result.
             FileSystem::SetFileModifiedTime(cFile, mtime - 2h);
 
@@ -217,7 +217,7 @@ TEST_CASE("Network")
             FileIO file2(cFile, std::ios_base::in);
             auto s2 = file2.GetContents();
             CHECK_EQ(s2.size(), source.size());
-            CHECK(std::memcmp(source.data(), s2.data(), source.size()) == 0);
+            CHECK_EQ(std::memcmp(source.data(), s2.data(), source.size()), 0);
         }
     }
 
@@ -237,7 +237,7 @@ TEST_CASE("Network")
         HttpRequest request;
         request.SetOptions(opt);
 
-        IHttpResponse *resp = nullptr;
+        IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
 //        MESSAGE(resp->GetBody());
@@ -249,7 +249,7 @@ TEST_CASE("Network")
         FileIO file2(cUploadedFile, std::ios_base::in);
         auto s2 = file2.GetContents();
         CHECK_EQ(s2.size(), source.size());
-        CHECK(std::memcmp(source.data(), s2.data(), source.size()) == 0);
+        CHECK_EQ(std::memcmp(source.data(), s2.data(), source.size()), 0);
 
         FileSystem::DeleteFile(std::string(cUploadedFile));
     }
@@ -271,7 +271,7 @@ TEST_CASE("Network")
         request.AddField("filename", "uploaded.png");
         request.AddFile("filedata", file);
 
-        IHttpResponse *resp = nullptr;
+        IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
         auto body = resp->GetBody();
@@ -295,9 +295,61 @@ TEST_CASE("Network")
         FileIO file2(cUploadedFile, std::ios_base::in);
         auto s2 = file2.GetContents();
         CHECK_EQ(s2.size(), source.size());
-        CHECK(std::memcmp(source.data(), s2.data(), source.size()) == 0);
+        CHECK_EQ(std::memcmp(source.data(), s2.data(), source.size()), 0);
 
         FileSystem::DeleteFile(std::string(cUploadedFile));
+    }
+
+    SUBCASE("Body Stream") {
+        HttpStringBody body(R"(
+              O freddled gruntbuggly thy micturations are to me
+                 As plured gabbleblochits on a lurgid bee.
+              Groop, I implore thee my foonting turlingdromes.
+           And hooptiously drangle me with crinkly bindlewurdles,
+Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
+)");
+
+//        MESSAGE(body.GetString(100));
+        std::stringstream ss;
+        ss << body;
+        CHECK_EQ(ss.str(), body.Get());
+
+        char buffer[52];
+        RequestData rd;
+
+        while (!rd.GetData(buffer, sizeof(buffer) - 1, body)) {
+            buffer[rd.GetWritten()] = '\0';
+//            MESSAGE("\nChunk:   " << buffer << "\nwritten: " << written << "\nindex:   " << chunk_index);
+        }
+        buffer[rd.GetWritten()] = '\0';
+        CHECK_EQ(rd.GetWritten(), 27);
+        CHECK_EQ(rd.GetChunkIndex(), 333);
+        CHECK_EQ("cruncheon, see if I don't.\n", std::string(buffer));
+    }
+
+    SUBCASE("Post JSON") {
+        opt.BaseUrl = "https://server.localhost:44300/cgi/post.sh";
+        opt.RequestType = HttpRequestType::POST;
+//        opt.Verbose = 1;
+
+        const std::string json(R"({ "name": "temperature", "value": 24.03 })");
+
+        HttpRequest request;
+        request.SetOptions(opt);
+        request.SetBody(std::make_shared<HttpStringBody>(json));
+
+        IHttpResponse *resp;
+        CHECK_NOTHROW(resp = &request.Execute());
+
+        auto body = resp->GetBody();
+//        MESSAGE(body);
+
+        std::string expected = R"(
+Content length: 41
+Request Method: POST
+Body: )" + json + "\n";
+
+        CHECK_EQ(body, expected);
     }
 
     SUBCASE("Http Session") {
@@ -350,5 +402,120 @@ TEST_CASE("Network")
         CHECK(resp2);
     }
 
-    CHECK(0 == std::system("killall lighttpd"));
+    SUBCASE("Authenticated") {
+        CHECK_NOTHROW(HttpSession session1(1));
+        bool respHead = false;
+        bool respHead2 = false;
+        bool respErrHead = false;
+        bool resp1 = false;
+        HttpSession session(5);
+
+        opt.BaseUrl = "https://server.localhost:44300/";
+//        opt.Verbose = 1;
+        session.SetDefaultOptions(opt);
+
+        session.Head("/authenticated/index.html",
+                                 [&respErrHead](IHttpResponse& resp) {
+//                                     MESSAGE("Request Head:\n" << resp.GetRequest());
+//                                     MESSAGE("Response Head:\n" << resp);
+                                     CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
+                                     CHECK_EQ(resp.GetHeaders().at("content-length"), "164");
+                                     CHECK_EQ(resp.GetHeaders().at("http/2 401"), "present");
+                                     CHECK_EQ(resp.GetBody().size(), 0);
+                                     CHECK_EQ(resp.GetStatusCode(), 401);
+                                     respErrHead = true;
+                                 });
+        CHECK_NOTHROW(session.ProcessRequests());
+
+        opt.BasicAuthUsername = "jb";
+        opt.BasicAuthPassword = "agent007";
+        session.SetDefaultOptions(opt);
+
+        session.Head("/authenticated/index.html",
+                                 [&respHead](IHttpResponse& resp) {
+//                                     MESSAGE("Request Head:\n" << resp.GetRequest());
+//                                     MESSAGE("Response Head:\n" << resp);
+                                     CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
+                                     CHECK_EQ(resp.GetHeaders().at("content-length"), "131");
+                                     CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
+                                     CHECK_EQ(resp.GetBody().size(), 0);
+                                     CHECK_EQ(resp.GetStatusCode(), 200);
+
+                                     CHECK_EQ(resp.GetRequest().GetOptions().BasicAuthUsername, "jb");
+                                     CHECK_EQ(resp.GetRequest().GetOptions().BasicAuthPassword, "agent007");
+                                     std::stringstream ss;
+                                     ss << resp.GetRequest();
+                                     CHECK_FALSE(StrUtils::Contains(ss.str(), "jb"));
+                                     CHECK_FALSE(StrUtils::Contains(ss.str(), "agent007"));
+                                     respHead = true;
+                                 });
+        CHECK_NOTHROW(session.ProcessRequests());
+
+        opt.BasicAuthUsername = "";
+        opt.BasicAuthPassword = "";
+        opt.Headers["Authorization"] = "Basic amI6YWdlbnQwMDc="; // Found in lighttpd error.log. Curl adds this from above used BasicAuthXXX credentials
+        session.SetDefaultOptions(opt);
+
+        session.Head("/authenticated/index.html",
+                     [&respHead2](IHttpResponse& resp) {
+//                         MESSAGE("Request Head:\n" << resp.GetRequest());
+//                         MESSAGE("Response Head:\n" << resp);
+                         CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
+                         CHECK_EQ(resp.GetHeaders().at("content-length"), "131");
+                         CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
+                         CHECK_EQ(resp.GetBody().size(), 0);
+                         CHECK_EQ(resp.GetStatusCode(), 200);
+                         CHECK_EQ(resp.GetRequest().GetOptions().Headers.at("Authorization"), "Basic amI6YWdlbnQwMDc=");
+                         std::stringstream ss;
+                         ss << resp.GetRequest();
+                         CHECK(StrUtils::Contains(ss.str(), "Authorization"));
+                         CHECK_FALSE(StrUtils::Contains(ss.str(), "Basic amI6YWdlbnQwMDc="));
+                         respHead2 = true;
+                     });
+        CHECK_NOTHROW(session.ProcessRequests());
+
+        session.Get("/authenticated/index.html",
+                    [&resp1](IHttpResponse& resp) {
+//                        MESSAGE("Response 1:\n" << resp);
+                        CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
+                        CHECK_EQ(resp.GetHeaders().at("content-length"), "131");
+                        CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
+                        CHECK_EQ(resp.GetBody().size(), 131);
+                        CHECK_EQ(200, resp.GetStatusCode());
+                        std::stringstream ss;
+                        ss << resp.GetRequest();
+                        CHECK(StrUtils::Contains(ss.str(), "Authorization"));
+                        CHECK_FALSE(StrUtils::Contains(ss.str(), "Basic amI6YWdlbnQwMDc="));
+                        resp1 = true;
+                    });
+        CHECK_NOTHROW(session.ProcessRequests());
+
+        CHECK(respErrHead);
+        CHECK(respHead);
+        CHECK(respHead2);
+        CHECK(resp1);
+    }
+
+    SUBCASE("MultipartBoundary") {
+        MultipartBoundary mb1;
+        CHECK_EQ(mb1.GetBoundary().size(), 32);
+        MESSAGE("Random boundary: " << mb1.GetBoundary());
+        for (auto c : mb1.GetBoundary()) {
+            CHECK(std::isprint(c));
+        }
+
+        MultipartBoundary mb("ABC");
+        CHECK_EQ(mb.GetBoundary(), "ABC");
+
+        CHECK_EQ(mb.GetContentTypeHeader(), std::string("multipart/form-data; boundary=ABC"));
+
+        CHECK_EQ(mb.MakeContentDisposition(""), std::string("--ABC\r\n\r\n"));
+        CHECK_EQ(mb.MakeContentDisposition("Field1"), std::string("--ABC\r\nContent-Disposition: form-data; name=\"Field1\"\r\n\r\n"));
+        CHECK_EQ(mb.MakeContentDisposition("File", "my-file.bin"), std::string("--ABC\r\nContent-Disposition: form-data; name=\"File\"; filename=\"my-file.bin\"\r\n\r\n"));
+        CHECK_EQ(mb.MakeContentDisposition("File", "my-file.bin", "application/octet-stream"), std::string("--ABC\r\nContent-Disposition: form-data; name=\"File\"; filename=\"my-file.bin\"\r\nContent-Type: application/octet-stream\r\n\r\n"));
+
+        CHECK_EQ(mb.GetEndBoundary(), std::string("\r\n--ABC--"));
+    }
+
+    CHECK_EQ(0, std::system("killall lighttpd"));
 }

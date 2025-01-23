@@ -7,10 +7,10 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_JSON_JSONEXCEPTIONS_H_
-#define INCLUDE_JSON_JSONEXCEPTIONS_H_
+#ifndef RSP_CORE_LIB_JSON_JSON_EXCEPTIONS_H
+#define RSP_CORE_LIB_JSON_JSON_EXCEPTIONS_H
 
-#include <utils/CoreException.h>
+#include <exceptions/CoreException.h>
 
 namespace rsp::json {
 
@@ -18,9 +18,9 @@ namespace rsp::json {
  * \class EJsonException
  * \brief Base class for all exceptions thrown by the json module.
  */
-class EJsonException : public rsp::utils::CoreException {
+class EJsonException : public exceptions::CoreException {
 public:
-    explicit EJsonException(const std::string &aMsg) : rsp::utils::CoreException(aMsg) {}
+    explicit EJsonException(const std::string &aMsg) : CoreException(aMsg) {}
 };
 
 class EJsonParseError : public EJsonException {
@@ -43,12 +43,7 @@ public:
     explicit EJsonTypeError(const std::string &aMsg) : EJsonException("Json Type Error: " + aMsg) {}
 };
 
-class EMemberNotExisting: public EJsonException {
-public:
-    explicit EMemberNotExisting(const std::string &arName) : EJsonException("Json object does not have a member named: " + arName) {}
-};
-
 
 } /* namespace rsp::json */
 
-#endif /* INCLUDE_JSON_JSONEXCEPTIONS_H_ */
+#endif // RSP_CORE_LIB_JSON_JSON_EXCEPTIONS_H

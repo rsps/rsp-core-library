@@ -9,13 +9,14 @@
  */
 
 
-#ifndef INCLUDE_UTILS_SINGLETON_H_
-#define INCLUDE_UTILS_SINGLETON_H_
+#ifndef RSP_CORE_LIB_UTILS_SINGLETON_H
+#define RSP_CORE_LIB_UTILS_SINGLETON_H
 
 #ifdef MT
 #include <mutex>
 #endif
-#include <utils/CoreException.h>
+#include <exceptions/CoreException.h>
+#include "ConstTypeInfo.h"
 
 namespace rsp::utils {
 
@@ -36,30 +37,60 @@ public:
     /**
      * \brief Construct a Singleton
      */
-    Singleton() {}
+    Singleton() = default;
 
     /**
      * \brief Prohibit copy of Singleton
      */
-    Singleton(Singleton<T> &other) = delete;
+    Singleton(const Singleton<T> &) = delete;
+
+    /**
+     * \brief Move constructor
+     * \param other
+     */
+    Singleton(Singleton<T> &&) = default;
+
+    virtual ~Singleton() = default;
 
     /**
      * \brief Prohibit singleton assignment.
      */
-    void operator=(const Singleton &) = delete;
+    Singleton& operator=(const Singleton &) = delete;
 
     /**
-     * \fn void Create()
+     * \brief Move assignment
+     */
+    Singleton& operator=(Singleton &&) = default;
+
+    /**
+     * \brief Check if this singleton is instantiated
+     * \return bool
+     */
+    static bool HasInstance() {
+        return (mpInstance);
+    }
+
+    /**
+     * \brief Check is this singleton instance is self owned
+     * \return bool
+     */
+    static bool OwnsInstance() {
+        return mOwnsInstance;
+    }
+
+    /**
+     * \fn void Create(...)
      * \brief Generic factory method.
      */
-    static void Create() {
+    template<typename... Args>
+    static void CreateInstance(Args &&... args) {
 #ifdef MT
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
         if (mpInstance) {
-            THROW_WITH_BACKTRACE(ESingletonViolation);
+            THROW_WITH_BACKTRACE1(exceptions::ESingletonViolation, NameOf<T>());
         }
-        mpInstance = new T();
+        mpInstance = new T(std::forward<Args>(args)...);
         mOwnsInstance = true;
     }
 
@@ -72,12 +103,12 @@ public:
      *
      * \param aObject
      */
-    static void Set(T* apObject) {
+    static void SetInstance(T* apObject) {
 #ifdef MT
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
         if (mpInstance && mOwnsInstance) {
-            THROW_WITH_BACKTRACE(ESingletonViolation);
+            THROW_WITH_BACKTRACE1(exceptions::ESingletonViolation, NameOf<T>());
         }
         mpInstance = apObject;
     }
@@ -88,9 +119,9 @@ public:
      *
      * \return
      */
-    static T& Get() {
+    static T& GetInstance() {
         if (!mpInstance) {
-            THROW_WITH_BACKTRACE(ENoInstance);
+            THROW_WITH_BACKTRACE1(exceptions::ENoInstance, NameOf<T>());
         }
         return *mpInstance;
     }
@@ -99,14 +130,14 @@ public:
      * \fn void Destroy()
      * \brief Call this to destroy a self owned instance. Useful during unit testing.
      */
-    static void Destroy() {
+    static void DestroyInstance() {
 #ifdef MT
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
         if (mpInstance && mOwnsInstance) {
+            mOwnsInstance = false;
             delete mpInstance;
             mpInstance = nullptr;
-            mOwnsInstance = false;
         }
     }
 
@@ -126,4 +157,4 @@ bool Singleton<T>::mOwnsInstance = false;
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_SINGLETON_H_ */
+#endif // RSP_CORE_LIB_UTILS_SINGLETON_H

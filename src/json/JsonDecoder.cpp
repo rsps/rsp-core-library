@@ -11,12 +11,12 @@
 #include <json/JsonDecoder.h>
 #include <json/JsonExceptions.h>
 #include <sstream>
-#include <logging/Logger.h>
 #include <utils/StrUtils.h>
 
 using namespace rsp::json;
+using namespace rsp::utils;
 
-//#define JLOG(a) DLOG(a)
+//#define JLOG(a) DLOG(a);
 #define JLOG(a)
 
 JsonDecoder::JsonDecoder(std::string_view aJson)
@@ -24,25 +24,7 @@ JsonDecoder::JsonDecoder(std::string_view aJson)
       mIt(begin()),
       mEnd(end())
 {
-//    JLOG("JsonString Created: " << std::distance(begin(), mIt) << ", " << getLength());
-}
-
-JsonDecoder::JsonDecoder(const JsonDecoder &arJson)
-    : std::string(arJson),
-      mIt(begin()),
-      mEnd(end())
-{
-//    JLOG("JsonString Copied: " << std::distance(begin(), mIt) << ", " << getLength());
-}
-
-JsonDecoder& JsonDecoder::operator=(const JsonDecoder &arJson)
-{
-    if (&arJson != this) {
-        std::string::operator=(arJson);
-        mIt = begin();
-        mEnd = end();
-    }
-    return *this;
+    JLOG("JsonString Created: " << std::distance(begin(), mIt) << ", " << getLength();)
 }
 
 /**
@@ -51,9 +33,9 @@ JsonDecoder& JsonDecoder::operator=(const JsonDecoder &arJson)
  * \param aToken1
  * \param aToken2
  */
-void JsonDecoder::findSubString(const char aToken1, const char aToken2)
+void JsonDecoder::findSubString(char aToken1, char aToken2)
 {
-    JLOG("findSubString(" << aToken1 << ", " << aToken2 << "), " << debug());
+    JLOG("findSubString(" << aToken1 << ", " << aToken2 << "), " << debug();)
     skipWhiteSpace();
 
     auto it = mIt;
@@ -69,32 +51,40 @@ void JsonDecoder::findSubString(const char aToken1, const char aToken2)
     mIt = it;
 
     int indent = 0;
+    bool in_quotes = false;
 
     while (it != mEnd) {
-        if (*it == aToken2) {
+        if (!in_quotes && (*it == aToken2)) {
             if (indent == 0) {
                 push();
                 mEnd = it;
-                JLOG("findSubString stacked: " << std::string(mIt, mEnd));
+                JLOG("findSubString stacked: " << std::string(mIt, mEnd) << "\n" << debug();)
                 return;
             }
             else {
                 indent--;
             }
         }
-        else if (*it == aToken1) {
+        else if (!in_quotes && (*it == aToken1)) {
             indent++;
         }
+//        else if (!in_quotes && (*it == '\\')) {
         else if (*it == '\\') {
             it++;
             if (*it == 'u') {
                 it += 4; // Advance u + 4 hex digits
             }
+            else if (*it == '"') {
+                // Skip escaped quote
+            }
+        }
+        else if (*it == '"') {
+            in_quotes = !in_quotes;
         }
         it++;
     }
 
-    THROW_WITH_BACKTRACE1(EJsonParseError, "End token was not found. " + aToken2);
+    THROW_WITH_BACKTRACE1(EJsonParseError, std::string("End token was not found. ") + aToken2);
 }
 
 void JsonDecoder::push()
@@ -121,14 +111,13 @@ void JsonDecoder::skipWhiteSpace()
 
             default:
                 return;
-                break;
         }
     }
 }
 
 std::string JsonDecoder::getString()
 {
-    JLOG("getString: " << debug(false, true));
+    JLOG("getString: " << debug(false, true);)
     findSubString('"', '"');
 
     std::string result;
@@ -183,7 +172,6 @@ std::string JsonDecoder::getString()
 
                 default:
                     THROW_WITH_BACKTRACE1(EJsonFormatError, "String contains illegal escape character. " + debug(false, true));
-                    break;
             }
         }
         else {
@@ -194,30 +182,30 @@ std::string JsonDecoder::getString()
     mIt = mEnd + 1;
 
     pop();
-    JLOG("getString exit (" << result << "): " << debug());
+    JLOG("getString exit (" << result << "): " << debug();)
     return result;
 }
 
-JsonValue JsonDecoder::getObject()
+DynamicData JsonDecoder::getObject() //NOLINT
 {
-    JLOG("getObject: " << debug(false, true));
+    JLOG("getObject: " << debug(false, true);)
     findSubString('{', '}');
 
     bool element_required = false;
 
     skipWhiteSpace();
 
-    JsonValue result(JsonTypes::Object);
+    DynamicData result;
 
     while (mIt != mEnd) {
         auto name = getString();
         skipWhiteSpace();
-//        JLOG("Object Name: " << name << ", next: " << *mIt);
+//        JLOG("Object Name: " << name << ", next: " << *mIt;)
         if (*mIt != ':') {
             THROW_WITH_BACKTRACE1(EJsonParseError, "Object key/value delimiter not found." + debug(false, true));
         }
         mIt++;
-        result.Add(name, GetValue());
+        result.Add(name, Decode());
         skipWhiteSpace();
         element_required = false;
         if (mIt != mEnd && *mIt == ',') {
@@ -226,32 +214,32 @@ JsonValue JsonDecoder::getObject()
         }
     }
     if (element_required) {
-        THROW_WITH_BACKTRACE1(EJsonParseError, "Excessive key/value delimiter found after " + result.mItems.back().mName + ":" + result.mItems.back().AsString());
+        THROW_WITH_BACKTRACE1(EJsonParseError, "Excessive key/value delimiter found after " + result.GetItems().back().GetName() + ":" + result.GetItems().back().AsString());
     }
-    JLOG("Skip next char: " << *mIt);
+    JLOG("Skip next char: " << *mIt;)
     mIt++;
 
     pop();
 
-    JLOG("getObject exit (" << result << "): " << debug());
+    JLOG("getObject exit (" << result << "): " << debug();)
     return result;
 }
 
-JsonValue JsonDecoder::getArray()
+DynamicData JsonDecoder::getArray() //NOLINT
 {
-    JLOG("getArray: " << debug(false, true));
+    JLOG("getArray: " << debug(false, true);)
     findSubString('[', ']');
 
     bool element_required = false;
 
     skipWhiteSpace();
 
-    JsonValue result(JsonTypes::Array);
+    DynamicData result;
 
     while (mIt != mEnd) {
-        result.Add(GetValue());
+        result.Add(Decode());
         skipWhiteSpace();
-//        JLOG("getArray: " << debug());
+//        JLOG("getArray: " << debug();)
         element_required = false;
         if (mIt != mEnd && *mIt == ',') {
             element_required = true;
@@ -263,7 +251,7 @@ JsonValue JsonDecoder::getArray()
     }
     mIt++;
     pop();
-    JLOG("getArray exit (" << result << "): " << debug());
+    JLOG("getArray exit (" << result << "): " << debug();)
     return result;
 }
 
@@ -273,9 +261,9 @@ JsonValue JsonDecoder::getArray()
  *
  * Exceptions are thrown if content has illegal number formatting.
  */
-JsonValue JsonDecoder::getNumber()
+DynamicData JsonDecoder::getNumber()
 {
-    JLOG("getNumber: " << debug(false, true));
+    JLOG("getNumber: " << debug(false, true);)
     bool is_float = false;
     bool is_negative = false;
     int i = 0;
@@ -286,7 +274,7 @@ JsonValue JsonDecoder::getNumber()
     while (mIt != mEnd) {
         char c = *mIt;
         int skip = 0;
-        JLOG("c: " << c << ", i: " << i);
+        JLOG("c: " << c << ", i: " << i;)
         switch (i) {
             case 0:
                 if (c == '-') {
@@ -403,41 +391,41 @@ JsonValue JsonDecoder::getNumber()
     }
 
     if (is_float) {
-        return JsonValue(rsp::utils::StrUtils::ToDouble(result));
+        return {rsp::utils::StrUtils::ToDouble(result)};
     }
     else if (is_negative) {
-        return JsonValue(static_cast<std::int64_t>(std::strtoll(result.c_str(), nullptr, 10)));
+        return {static_cast<int64_t>(std::strtoll(result.c_str(), nullptr, 10))};
     }
     else {
-        return JsonValue(static_cast<std::uint64_t>(std::strtoull(result.c_str(), nullptr, 10)));
+        return {static_cast<uint64_t>(std::strtoull(result.c_str(), nullptr, 10))};
     }
 }
 
-JsonValue JsonDecoder::GetValue()
+DynamicData JsonDecoder::Decode() // NOLINT
 {
-    JLOG("GetValue: " << debug(false, true));
-    JsonValue result;
+    JLOG("Decode: " << debug(false, true);)
+    DynamicData result;
 
     skipWhiteSpace();
 
     if (mIt != mEnd) {
         switch (*mIt) {
             case '{':
-                JLOG("Object detected: " << getOffset() << ", " << getLength() << "; " << substr(getOffset(), getLength()));
+                JLOG("Object detected: " << getOffset() << ", " << getLength() << "; " << substr(getOffset(), getLength()))
                 result = getObject();
-                JLOG("Result Type: " << result << ", Count: " << result.GetCount());
+                JLOG("Result Object: " << result << ", Count: " << result.GetCount();)
                 break;
 
             case '[':
-                JLOG("Array detected: " << substr(getOffset(), getLength()));
+                JLOG("Array detected: " << substr(getOffset(), getLength()))
                 result = getArray();
-                JLOG("Result Type: " << result << ", Count: " << result.GetCount());
+                JLOG("Result Array: " << result << ", Count: " << result.GetCount();)
                 break;
 
             case '"':
-                JLOG("String detected: " << substr(getOffset(), getLength()));
+                JLOG("String detected: " << substr(getOffset(), getLength()))
                 result = getString();
-                JLOG("Result Type: " << result << ", Length: " << result.AsString().size());
+                JLOG("Result String: " << result << ", Length: " << result.AsString().size();)
                 break;
 
             case '0':
@@ -451,13 +439,13 @@ JsonValue JsonDecoder::GetValue()
             case '8':
             case '9':
             case '-':
-                JLOG("Number detected: " << substr(getOffset(), getLength()));
+                JLOG("Number detected: " << substr(getOffset(), getLength()))
                 result = getNumber();
-                JLOG("Result Type: " << *result);
+                JLOG("Result Number: " << result;)
                 break;
 
             case 't':
-                JLOG("true detected: " << substr(getOffset(), getLength()));
+                JLOG("true detected: " << substr(getOffset(), getLength()))
                 if (substr(getOffset(), 4) == "true") {
                     mIt += 4;
                     result = true;
@@ -468,7 +456,7 @@ JsonValue JsonDecoder::GetValue()
                 break;
 
             case 'f':
-                JLOG("false detected: " << substr(getOffset(), getLength()));
+                JLOG("false detected: " << substr(getOffset(), getLength()))
                 if (substr(getOffset(), 5) == "false") {
                     mIt += 5;
                     result = false;
@@ -479,7 +467,7 @@ JsonValue JsonDecoder::GetValue()
                 break;
 
             case 'n':
-                JLOG("null detected: " << substr(getOffset(), getLength()));
+                JLOG("null detected: " << substr(getOffset(), getLength()))
                 if (substr(getOffset(), 4) == "null") {
                     mIt += 4;
 //                    result;
@@ -491,12 +479,11 @@ JsonValue JsonDecoder::GetValue()
 
             default:
                 THROW_WITH_BACKTRACE1(EJsonParseError, "Illegal start character: " + debug(false, true));
-                break;
         }
         skipWhiteSpace();
     }
 
-    JLOG("getValue exit (" << result << "): " << debug());
+    JLOG("Decode exit (" << result << "): " << debug();)
     return result;
 }
 

@@ -8,20 +8,22 @@
  * \author      Steffen Brummer
  */
 
+#ifdef SYSLOG
+
 #include <syslog.h>
 #include <logging/SysLogWriter.h>
 
 namespace rsp::logging {
 
-SysLogWriter::SysLogWriter(std::string aIdent, std::string aAcceptLevel, LogType aType)
-    : mIdent(aIdent),
-      mAcceptLevel(ToLogLevel(aAcceptLevel))
+SysLogWriter::SysLogWriter(std::string aIdentifier, const std::string& arAcceptLevel, LogFacility aType)
+    : mIdent(std::move(aIdentifier)),
+      mAcceptLevel(ToLogLevel(arAcceptLevel))
 {
     openlog(mIdent.c_str(), LOG_PID, static_cast<int>(aType));
 }
 
-SysLogWriter::SysLogWriter(std::string aIdent, LogLevel aAcceptLevel, LogType aType)
-    : mIdent(aIdent),
+SysLogWriter::SysLogWriter(std::string aIdentifier, LogLevel aAcceptLevel, LogFacility aType)
+    : mIdent(std::move(aIdentifier)),
       mAcceptLevel(aAcceptLevel)
 {
     openlog(mIdent.c_str(), LOG_PID, static_cast<int>(aType));
@@ -34,8 +36,8 @@ SysLogWriter::~SysLogWriter()
 
 void SysLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData&)
 {
-    if (arMsg.length() && (mAcceptLevel >= aCurrentLevel)) {
-        if (arChannel.length()) {
+    if (!arMsg.empty() && (mAcceptLevel >= aCurrentLevel)) {
+        if (!arChannel.empty()) {
             syslog(static_cast<int>(aCurrentLevel), "<%s> %s", arChannel.c_str(), arMsg.c_str());
         }
         else {
@@ -47,3 +49,4 @@ void SysLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, const
 
 } /* namespace logging */
 
+#endif /* SYSLOG */

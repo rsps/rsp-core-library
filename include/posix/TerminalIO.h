@@ -8,16 +8,12 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_POSIX_TERMINALIO_H_
-#define INCLUDE_POSIX_TERMINALIO_H_
+#ifndef RSP_CORE_LIB_POSIX_TERMINAL_IO_H
+#define RSP_CORE_LIB_POSIX_TERMINAL_IO_H
 
 #include <string>
 #include <vector>
-#ifdef __linux__
-extern "C" {
-    #include <termios.h>
-}
-#endif
+#include <sys/termios.h>
 
 namespace rsp::posix {
 
@@ -49,7 +45,7 @@ public:
      *
      * \param arPreset
      */
-    TerminalIO(const std::string &arPreset);
+    explicit TerminalIO(const std::string &arPreset);
 
     /**
      * Destructor
@@ -77,7 +73,7 @@ public:
      * \param arEscCode
      * \return char
      */
-    char GetChar(EscapeCodes &arEscCode);
+    char GetChar(EscapeCodes &arEscCode) const;
 
     /**
      * Read a full line from the input device.
@@ -91,7 +87,7 @@ public:
      *
      * \return bool
      */
-    bool HasPreset() const { return (mPreset.length() > 0); }
+    [[nodiscard]] bool HasPreset() const { return (!mPreset.empty()); }
     /**
      * Remove all presets.
      */
@@ -100,10 +96,10 @@ public:
     /**
      * Set the prompt prefix to be shown on the terminal.
      *
-     * \param aPrompt
+     * \param arPrompt
      * \return Reference to self for fluent call chain.
      */
-    TerminalIO& SetPrompt(const std::string aPrompt) { mPrompt = aPrompt; return *this; }
+    TerminalIO& SetPrompt(const std::string& arPrompt) { mPrompt = arPrompt; return *this; }
 
     /**
      * Set a list of strings that is used for auto completion in case the tab character is pressed on the terminal.
@@ -111,7 +107,11 @@ public:
      * \param aPrompt
      * \return Reference to self for fluent call chain.
      */
-    TerminalIO& SetAutocompletionDictionary(std::vector<std::string> const aDict) { mDictionary = aDict; return *this;}
+    TerminalIO& SetAutocompletionDictionary(std::vector<std::string> aDict)
+    {
+        mDictionary = std::move(aDict);
+        return *this;
+    }
 
     /**
      * Simply call this to wait for the "any key" to be pressed on the terminal.
@@ -126,15 +126,14 @@ protected:
     std::vector<std::string> mDictionary{};
     std::string mPreset{};
     std::string mPrompt{};
-#ifdef __linux__
     struct termios mOldTermios{};
     struct termios mCurrentTermios{};
 
-    EscapeCodes escString2Code(const char *apEscStr);
+    static char getChar();
+    static EscapeCodes escString2Code(const char *apEscStr);
     void handleTabulator(int &tab_count, std::string &line, unsigned int &cursor);
-#endif
 };
 
 } /* namespace rsp::posix */
 
-#endif /* INCLUDE_POSIX_TERMINALIO_H_ */
+#endif // RSP_CORE_LIB_POSIX_TERMINAL_IO_H

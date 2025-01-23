@@ -7,14 +7,15 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_UTILS_INSERTORDEREDMAP_H_
-#define INCLUDE_UTILS_INSERTORDEREDMAP_H_
+#ifndef RSP_CORE_LIB_UTILS_INSERT_ORDERED_MAP_H
+#define RSP_CORE_LIB_UTILS_INSERT_ORDERED_MAP_H
 
+#include <exceptions/CoreException.h>
+#include <algorithm>
 #include <map>
 #include <vector>
 #include <functional>
 #include <sstream>
-#include "CoreException.h"
 
 namespace rsp::utils {
 
@@ -36,13 +37,13 @@ namespace rsp::utils {
  * }
  * \endcode
  *
- * \tparam _Key
- * \tparam _Tp
- * \tparam _Compare
- * \tparam _Alloc
+ * \tparam Key_T
+ * \tparam Tp_T
+ * \tparam Compare_T
+ * \tparam Alloc_T
  */
-template <typename _Key, typename _Tp, typename _Compare = std::less<_Key>,
-          typename _Alloc = std::allocator<std::pair<const _Key, _Tp> > >
+template <typename Key_T, typename Tp_T, typename Compare_T = std::less<Key_T>,
+          typename Alloc_T = std::allocator<std::pair<const Key_T, Tp_T> > >
 class InsertOrderedMap
 {
 public:
@@ -50,7 +51,7 @@ public:
     /**
      * Construct an empty container.
      */
-    InsertOrderedMap() {}
+    InsertOrderedMap() = default;
 
     /**
      * Default copy constructors
@@ -63,7 +64,7 @@ public:
      *
      * \param aList Initializer list with elements.
      */
-    InsertOrderedMap(std::initializer_list<std::pair<const _Key, _Tp>> aList)
+    InsertOrderedMap(std::initializer_list<std::pair<const Key_T, Tp_T>> aList)
         : mMap(aList)
     {
         for(const auto &key : aList) {
@@ -84,7 +85,7 @@ public:
      * \param aKey Key to lookup.
      * \return Reference to value
      */
-    _Tp& operator[](const _Key aKey)
+    Tp_T& operator[](const Key_T aKey)
     {
         auto ret = mMap.try_emplace(aKey);
         if (ret.second) { // Insertion happened
@@ -100,30 +101,30 @@ public:
      * \return Reference to value
      * \throw std::out_of_range if aKey does not exist
      */
-    _Tp& at(_Key aKey)
+    Tp_T& at(Key_T aKey)
     {
-        _Tp* result;
+        Tp_T* result;
         try {
             result = &mMap.at(aKey);
         }
         catch(const std::exception &e) {
             std::stringstream ss;
             ss << "Failed to lookup key (" << aKey << "): " << e.what();
-            THROW_WITH_BACKTRACE1(CoreException, ss.str());
+            THROW_WITH_BACKTRACE1(exceptions::CoreException, ss.str());
         }
         return *result;
     }
 
-    const _Tp& at(const _Key aKey) const
+    const Tp_T& at(const Key_T aKey) const
     {
-        const _Tp* result;
+        const Tp_T* result;
         try {
             result = &mMap.at(aKey);
         }
         catch(const std::exception &e) {
             std::stringstream ss;
             ss << "Failed to lookup key (" << aKey << "): " << e.what();
-            THROW_WITH_BACKTRACE1(CoreException, ss.str());
+            THROW_WITH_BACKTRACE1(exceptions::CoreException, ss.str());
         }
         return *result;
     }
@@ -145,7 +146,7 @@ public:
      *
      * \return Number of elements.
      */
-    std::size_t size() const
+    [[nodiscard]] std::size_t size() const
     {
         return mMap.size();
     }
@@ -156,14 +157,14 @@ public:
      * \param aKey Key to the element to remove.
      * \return Reference to this
      */
-    InsertOrderedMap& Remove(const _Key aKey)
+    InsertOrderedMap& Remove(const Key_T aKey)
     {
         auto it = mMap.find(aKey);
         if (it != mMap.end()) {
             mMap.erase(it);
 
             mInsertionOrder.erase(std::find_if(mInsertionOrder.begin(), mInsertionOrder.end(),
-                [&](const std::reference_wrapper<const _Key> &el)
+                [&](const std::reference_wrapper<const Key_T> &el)
                 {
                     return el.get() == aKey;
                 })
@@ -179,20 +180,20 @@ public:
      *
      * \return const reference to std::vector
      */
-    const std::vector<std::reference_wrapper<const _Key>>& GetOrderList() const { return mInsertionOrder; }
+    const std::vector<std::reference_wrapper<const Key_T>>& GetOrderList() const { return mInsertionOrder; }
 
     /**
      * Get access to internal map with key/values.
      *
      * \return const reference to std::map.
      */
-    const std::map<_Key, _Tp>& GetMap() const { return mMap; }
+    const std::map<Key_T, Tp_T>& GetMap() const { return mMap; }
 
 protected:
-    std::map<_Key, _Tp, _Compare, _Alloc> mMap{};
-    std::vector<std::reference_wrapper<const _Key>> mInsertionOrder{};
+    std::map<Key_T, Tp_T, Compare_T, Alloc_T> mMap{};
+    std::vector<std::reference_wrapper<const Key_T>> mInsertionOrder{};
 };
 
 } // rsp::utils
 
-#endif /* INCLUDE_UTILS_INSERTORDEREDMAP_H_ */
+#endif // RSP_CORE_LIB_UTILS_INSERT_ORDERED_MAP_H

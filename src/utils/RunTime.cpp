@@ -40,7 +40,7 @@ bool RunTime::operator <(const RunTime &arOther)
     return mValue < arOther.mValue;
 }
 
-std::int64_t RunTime::Milliseconds() const
+int64_t RunTime::Milliseconds() const
 {
     return (mValue - mStartedAt).count();
 }

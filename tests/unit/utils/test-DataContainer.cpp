@@ -9,13 +9,10 @@
  */
 
 #include <doctest.h>
-#include <cstring>
-#include <array>
 #include <utils/DataContainer.h>
 #include <utils/FixedString.h>
 #include <posix/FileSystem.h>
 #include <TestHelpers.h>
-#include <security/SecureBuffer.h>
 
 using namespace rsp::utils;
 using namespace rsp::logging;
@@ -31,8 +28,7 @@ TEST_CASE("Data Container")
 {
     const char* cFileName = "DataContainer.bin";
 
-    Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     DataContainer<MyData> dc(cFileName);
 
@@ -60,8 +56,8 @@ TEST_CASE("Data Container")
 
         CHECK_EQ(dc.Get().String, "Hello Worl");
 
-        CHECK(dc.Get().String != std::string(p));
-        CHECK(dc.Get().String != p);
+        CHECK_NE(dc.Get().String, std::string(p));
+        CHECK_NE(dc.Get().String, p);
 
         CHECK_NOTHROW(dc.Save());
     }

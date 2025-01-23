@@ -12,9 +12,10 @@
 #include <filesystem>
 #include <doctest.h>
 #include <application/CommandLine.h>
+#include <application/Console.h>
+#include <exceptions/CoreException.h>
 #include <utils/StrUtils.h>
-#include <utils/CoreException.h>
-
+#include <utils/Function.h>
 #include "../../helpers/TestApplication.h"
 
 using namespace rsp::application;
@@ -32,19 +33,26 @@ TEST_CASE("Application")
 
     SUBCASE("Instantiate CommandLine") {
         CommandLine cmd(4, arguments);
+
+        CHECK_EQ(cmd.GetAppName(), "MyApplication");
+        CHECK_EQ(cmd.GetOptions().size(), 3);
+        CHECK(cmd.HasOption("-c"));
+        CHECK(cmd.HasOption("--version"));
+        CHECK(cmd.HasOption("--help"));
     }
 
     SUBCASE("Instantiate ApplicationBase") {
-        ApplicationBase app;
+        ApplicationBase app(1, arguments);
 
-        CHECK(app.GetCommandLine().GetOptions().size() == 0);
-        CHECK(app.GetCommandLine().GetCommands().size() == 0);
+        CHECK_EQ(app.GetAppName(), "MyApplication");
+        CHECK_EQ(app.GetCommandLine().GetOptions().size(), 0);
+        CHECK_EQ(app.GetCommandLine().GetCommands().size(), 0);
     }
 
     SUBCASE("Instantiate TestApplication") {
         std::remove(cLogFileName);
 
-        CHECK_THROWS_AS(ApplicationBase::Get<TestApplication>(), const rsp::utils::ENoInstance &);
+        CHECK_THROWS_AS(ApplicationBase::Get<TestApplication>(), const rsp::exceptions::ENoInstance &);
 
         TestApplication app(2, arguments);
 
@@ -54,10 +62,10 @@ TEST_CASE("Application")
 
         std::ifstream fin;
         fin.open(cLogFileName);
-        CHECK(fin.is_open() == true);
+        CHECK_EQ(fin.is_open(), true);
         std::string line;
         std::getline(fin, line);
-        CHECK(rsp::utils::StrUtils::EndsWith(line, "\"Hello World.\"") == true);
+        CHECK(rsp::utils::StrUtils::EndsWith(line, "MyApplication says \"Hello World.\""));
     }
 
     SUBCASE("Execute Callback") {
@@ -71,17 +79,17 @@ TEST_CASE("Application")
 
         std::ifstream fin;
         fin.open(cLogFileName);
-        CHECK(fin.is_open() == true);
+        CHECK_EQ(fin.is_open(), true);
         std::string line;
         std::getline(fin, line);
         std::getline(fin, line);
-        CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback.") == true);
+        CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback."));
     }
 
     SUBCASE("Execute Callback to member function") {
         class MyClass {
         public:
-            bool MyFunction(TestApplication &arApp) {
+            bool MyFunction(TestApplication &arApp) { // NOLINT, signature must match expected in callback
                 arApp.GetLog().Notice() << "Logged from callback to member function.";
                 return true;
             }
@@ -90,20 +98,34 @@ TEST_CASE("Application")
         MyClass cls;
         TestApplication app(1, arguments);
 
-        app.SetCallback(std::bind(&MyClass::MyFunction, &cls, std::placeholders::_1));
+        app.SetCallback(rsp::utils::Method(&cls, &MyClass::MyFunction));
 
-        ApplicationBase::Get<TestApplication>().Run();
+        ApplicationBase::Get().Run();
 
         std::ifstream fin;
         fin.open(cLogFileName);
-        CHECK(fin.is_open() == true);
+        CHECK_EQ(fin.is_open(), true);
         std::string line;
         std::getline(fin, line);
         std::getline(fin, line);
         std::getline(fin, line);
-        CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback to member function.") == true);
+        CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback to member function."));
     }
 
+    SUBCASE("Console") {
+        std::remove(cLogFileName);
+        Console::SetPrintToDisplay(true);
+        TestApplication app(2, arguments);
+
+        ApplicationBase::Get().Run();
+
+        CHECK(std::filesystem::exists(std::filesystem::path(cLogFileName)));
+
+        std::ifstream fin;
+        fin.open(cLogFileName);
+        CHECK_EQ(fin.is_open(), true);
+        std::string line;
+        std::getline(fin, line);
+        CHECK(rsp::utils::StrUtils::EndsWith(line, "MyApplication says \"Hello World.\""));
+    }
 }
-
-

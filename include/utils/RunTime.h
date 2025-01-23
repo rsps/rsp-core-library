@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_RUNTIME_H_
-#define INCLUDE_UTILS_RUNTIME_H_
+#ifndef RSP_CORE_LIB_UTILS_RUN_TIME_H
+#define RSP_CORE_LIB_UTILS_RUN_TIME_H
 
 #include <chrono>
 #include <ostream>
@@ -22,16 +22,16 @@ public:
     static void Init();
 
     RunTime();
-    RunTime(const std::chrono::milliseconds &arValue);
+    explicit RunTime(const std::chrono::milliseconds &arValue);
     RunTime(const RunTime&) = default;
     RunTime& operator=(const RunTime&) = default;
 
     bool operator<=(const RunTime& arOther);
     bool operator<(const RunTime& arOther);
 
-    std::int64_t Milliseconds() const;
+    [[nodiscard]] int64_t Milliseconds() const;
 
-    operator std::chrono::milliseconds() { return mValue; }
+    explicit operator std::chrono::milliseconds() { return mValue; }
 
 protected:
     static std::chrono::milliseconds mStartedAt;
@@ -42,4 +42,4 @@ std::ostream &operator<<(std::ostream &os, const RunTime &arRunTime);
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_RUNTIME_H_ */
+#endif // RSP_CORE_LIB_UTILS_RUN_TIME_H

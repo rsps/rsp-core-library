@@ -8,17 +8,19 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include <iostream>
 #include <map>
-#include <iterator>
 #include <string>
-#include <logging/Logger.h>
 #include <network/HttpRequest.h>
 #include <posix/FileIO.h>
 #include <utils/StrUtils.h>
 #include "CurlHttpRequest.h"
 #include "CurlSession.h"
 #include "Exceptions.h"
+
+//#define LOG_OUTPUT 1
+#ifdef LOG_OUTPUT
+    #include <logging/BufferToStream.h>
+#endif
 
 using namespace rsp::logging;
 using namespace rsp::network;
@@ -29,11 +31,6 @@ namespace rsp::network::curl
 
 CurlHttpRequest::CurlHttpRequest()
     : mResponse(*this)
-{
-}
-
-
-CurlHttpRequest::~CurlHttpRequest()
 {
 }
 
@@ -55,10 +52,24 @@ void CurlHttpRequest::readFromString(const std::string &arString)
 {
     setCurlOption(CURLOPT_UPLOAD, 1L);
     setCurlOption(CURLOPT_READFUNCTION, stringReadFunction);
-    mUploadBuffer.Remaining = arString.size();
-    mUploadBuffer.Data = arString.c_str();
+    mUploadBuffer.String = { arString.size(), arString.c_str() };
     setCurlOption(CURLOPT_READDATA, &mUploadBuffer);
     setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(arString.size()));
+}
+
+void CurlHttpRequest::readFromStream(const std::shared_ptr<IHttpBodyStream>& arBody)
+{
+    if (!arBody) {
+        return;
+    }
+    if (arBody->GetSize() == 0) {
+        return;
+    }
+    setCurlOption(CURLOPT_UPLOAD, 1L);
+    setCurlOption(CURLOPT_READFUNCTION, streamReadFunction);
+    mUploadBuffer.Stream = {{}, arBody.get() };
+    setCurlOption(CURLOPT_READDATA, &mUploadBuffer);
+    setCurlOption(CURLOPT_INFILESIZE_LARGE, arBody->GetSize());
 }
 
 size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
@@ -80,31 +91,46 @@ size_t CurlHttpRequest::fileReadFunction(void *ptr, size_t size, size_t nmemb, r
 size_t CurlHttpRequest::stringReadFunction(void *ptr, size_t size, size_t nmemb, UploadBuffer *apBuf)
 {
     size_t sz = size * nmemb;
-    if (sz > apBuf->Remaining) {
-        sz = apBuf->Remaining;
+    if (sz > apBuf->String.Remaining) {
+        sz = apBuf->String.Remaining;
     }
-//    Logger::GetDefault().Debug() << "Copying " << sz << " characters to network buffer";
-    std::memcpy(ptr, apBuf->Data, sz);
-    apBuf->Data += sz;
-    apBuf->Remaining -= sz;
+//    mLogger.Debug() << "Copying " << sz << " characters to network buffer";
+    std::memcpy(ptr, apBuf->String.Data, sz);
+#ifdef LOG_OUTPUT
+    auto o = rsp::logging::LoggerInterface::GetDefault()->Info();
+    o << "Request chunk (" << sz << ") " << BufferToStream(static_cast<char*>(ptr), sz, true);
+#endif
+    apBuf->String.Data += sz;
+    apBuf->String.Remaining -= sz;
     return sz;
+}
+
+size_t CurlHttpRequest::streamReadFunction(void *ptr, size_t size, size_t nmemb, CurlHttpRequest::UploadBuffer *apBuf)
+{
+    apBuf->Stream.rd.GetData(static_cast<char*>(ptr), size * nmemb, *(apBuf->Stream.Body));
+    size_t written = apBuf->Stream.rd.GetWritten();
+#ifdef LOG_OUTPUT
+    auto o = rsp::logging::LoggerInterface::GetDefault()->Info();
+    o << "Request chunk (" << written << ") " << BufferToStream(static_cast<char*>(ptr), written, true);
+#endif
+    return written;
 }
 
 size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
 {
     std::string header(data, size * nmemb);
-    size_t seperator = header.find_first_of(':');
-    if (std::string::npos == seperator) {
+    size_t separator = header.find_first_of(':');
+    if (std::string::npos == separator) {
         StrUtils::Trim(header);
-        if (0 == header.length()) {
+        if (header.empty()) {
             return (size * nmemb); // blank line;
         }
         apResponse->addHeader(StrUtils::ToLower(header), "present");
     }
     else {
-        std::string key = header.substr(0, seperator);
+        std::string key = header.substr(0, separator);
         StrUtils::Trim(key);
-        std::string value = header.substr(seperator + 1);
+        std::string value = header.substr(separator + 1);
         StrUtils::Trim(value);
         apResponse->addHeader(StrUtils::ToLower(key), value);
     }
@@ -112,10 +138,9 @@ size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, Cu
     return (size * nmemb);
 }
 
-size_t CurlHttpRequest::progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
+size_t CurlHttpRequest::progressFunction(CurlHttpRequest */*aRequest*/, curl_off_t /*dltotal*/, curl_off_t /*dlnow*/, curl_off_t /*ultotal*/, curl_off_t /*ulnow*/)
 {
     // TODO: Call progress callback on request here...
-
     return CURLE_OK;
 }
 
@@ -130,15 +155,15 @@ const HttpRequestOptions& CurlHttpRequest::GetOptions() const
     return mRequestOptions;
 }
 
-IHttpRequest& CurlHttpRequest::SetBody(const std::string &arBody)
+IHttpRequest& CurlHttpRequest::SetBody(std::shared_ptr<IHttpBodyStream> apBody)
 {
-    mRequestOptions.Body = arBody;
+    mRequestOptions.Body = apBody;
     return *this;
 }
 
-const std::string& CurlHttpRequest::GetBody() const
+const IHttpBodyStream& CurlHttpRequest::GetBody() const
 {
-    return mRequestOptions.Body;
+    return *mRequestOptions.Body;
 }
 
 
@@ -181,7 +206,7 @@ IHttpResponse& CurlHttpRequest::Execute()
 
 void CurlHttpRequest::checkRequestOptions(const HttpRequestOptions &arOpts)
 {
-    if (arOpts.RequestType == HttpRequestType::NONE || arOpts.BaseUrl == "") {
+    if (arOpts.RequestType == HttpRequestType::NONE || arOpts.BaseUrl.empty()) {
         THROW_WITH_BACKTRACE1(ERequestOptions, "Insufficient request option settings");
     }
 }
@@ -210,7 +235,7 @@ void CurlHttpRequest::requestDone()
     getCurlInfo(CURLINFO_RESPONSE_CODE, &resp_code);
     mResponse.setStatusCode(static_cast<int>(resp_code));
 
-    Logger::GetDefault().Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << resp_code;
+    mLogger.Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << resp_code;
 
     EasyCurl::requestDone();
 }
@@ -236,7 +261,7 @@ void CurlHttpRequest::populateOptions()
             }
             else {
                 setCurlOption(CURLOPT_CUSTOMREQUEST, "POST");
-                readFromString(mRequestOptions.Body);
+                readFromStream(mRequestOptions.Body);
             }
             break;
 
@@ -246,17 +271,13 @@ void CurlHttpRequest::populateOptions()
 
         case HttpRequestType::PATCH:
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PATCH");
-            if (mRequestOptions.Body.size() > 0) {
-                readFromString(mRequestOptions.Body);
-            }
+            readFromStream(mRequestOptions.Body);
             break;
 
         case HttpRequestType::PUT:
             // setCurlOption(CURLOPT_PUT, 1L); // Seems to put files only
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PUT");
-            if (mRequestOptions.Body.size() > 0) {
-                readFromString(mRequestOptions.Body);
-            }
+            readFromStream(mRequestOptions.Body);
             break;
 
         case HttpRequestType::DELETE:
@@ -311,7 +332,7 @@ void CurlHttpRequest::populateOptions()
     }
     for (auto const& tuple : mRequestOptions.Headers) {
         std::string header = tuple.first + ": " + tuple.second;
-        Logger::GetDefault().Debug() << "Add header: " << header;
+        mLogger.Debug() << "Add header: " << header;
         auto *temp = curl_slist_append(mpHeaders, header.c_str());
         if (temp == nullptr) {
             curl_slist_free_all(mpHeaders);
@@ -325,7 +346,7 @@ void CurlHttpRequest::populateOptions()
     }
 
     //Set basic auth
-    if (mRequestOptions.BasicAuthUsername.length() > 0) {
+    if (!mRequestOptions.BasicAuthUsername.empty()) {
         setCurlOption(CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         setCurlOption(CURLOPT_USERPWD,
             std::string(mRequestOptions.BasicAuthUsername + ":" + mRequestOptions.BasicAuthPassword).c_str());

@@ -8,24 +8,22 @@
  * \author      Steffen Brummer
  */
 
-#include <thread>
 #include <logging/SetLevel.h>
 #include <logging/OutStreamBuffer.h>
-#include <logging/Logger.h>
 
 namespace rsp::logging {
 
 std::ostream& SetLevel::operator ()(std::ostream &o) const
 {
-    OutStreamBuffer *stream = dynamic_cast<OutStreamBuffer*>(o.rdbuf());
+    auto *stream = dynamic_cast<OutStreamBuffer*>(o.rdbuf());
 
     if (stream) {
         stream->Lock();
-        DEBUG("Locked by " << std::this_thread::get_id());
+        DEBUG("Locked by " << std::this_thread::get_id())
         stream->SetLevel(mValue);
     }
     else {
-        LogStream *ls = dynamic_cast<LogStream*>(&o);
+        auto *ls = dynamic_cast<LogStream*>(&o);
         if (ls) {
             ls->SetLevel(mValue);
         }
@@ -34,9 +32,9 @@ std::ostream& SetLevel::operator ()(std::ostream &o) const
     return o;
 }
 
-std::ostream& operator<<(std::ostream &o, SetLevel aLevel)
+std::ostream& operator<<(std::ostream &o, const SetLevel &arLevel)
 {
-    return aLevel(o);
+    return arLevel(o);
 }
 
 } /* namespace rsp::logging */

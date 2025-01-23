@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_FNV1A_H_
-#define INCLUDE_UTILS_FNV1A_H_
+#ifndef RSP_CORE_LIB_UTILS_FNV1A_H
+#define RSP_CORE_LIB_UTILS_FNV1A_H
 
 #include <cstdint>
 #include <string_view>
@@ -20,15 +20,15 @@ namespace rsp::utils {
 class Fnv1a
 {
 public:
-    static std::uint32_t Hash32(const void *apData, std::uint32_t aLen);
-    static std::uint32_t Hash32(std::string_view aStr) { return Hash32(aStr.data(), aStr.size()); }
-    static std::uint32_t Hash32(const char *apCStr) { return Hash32(std::string_view(apCStr)); }
-    static std::uint32_t Hash32(const std::string &arStr) { return Hash32(arStr.data(), arStr.size()); }
+    static uint32_t Hash32(const void *apData, uint32_t aLen);
+    static uint32_t Hash32(std::string_view aStr) { return Hash32(aStr.data(), aStr.size()); }
+    static uint32_t Hash32(const char *apCStr) { return Hash32(std::string_view(apCStr)); }
+    static uint32_t Hash32(const std::string &arStr) { return Hash32(arStr.data(), arStr.size()); }
 
-    static std::uint64_t Hash64(const void *apData, std::uint64_t aLen);
-    static std::uint64_t Hash64(std::string_view aStr) { return Hash64(aStr.data(), aStr.size()); }
-    static std::uint64_t Hash64(const char *apCStr) { return Hash64(std::string_view(apCStr)); }
-    static std::uint64_t Hash64(const std::string &arStr) { return Hash64(arStr.data(), arStr.size()); }
+    static uint64_t Hash64(const void *apData, uint64_t aLen);
+    static uint64_t Hash64(std::string_view aStr) { return Hash64(aStr.data(), aStr.size()); }
+    static uint64_t Hash64(const char *apCStr) { return Hash64(std::string_view(apCStr)); }
+    static uint64_t Hash64(const std::string &arStr) { return Hash64(arStr.data(), arStr.size()); }
 };
 
 
@@ -39,22 +39,22 @@ namespace fnv1a {
     constexpr uint64_t cOffsetBasis64 = 14695981039346656037UL;
     constexpr uint64_t cPrime64 = 1099511628211UL;
 
-    inline constexpr uint32_t Hash32Const(const char* const str, const uint32_t value = cOffsetBasis32) noexcept
+    inline constexpr uint32_t Hash32Const(const char* const str, const uint32_t value = cOffsetBasis32) noexcept // NOLINT, recursive call chain
     {
         return (*str == '\0') ? value : Hash32Const(str + 1, (value ^ static_cast<uint8_t>(*str)) * cPrime32);
     }
 
-    inline constexpr uint64_t Hash64Const(const char* const str, const uint64_t value = cOffsetBasis64) noexcept
+    inline constexpr uint64_t Hash64Const(const char* const str, const uint64_t value = cOffsetBasis64) noexcept // NOLINT, recursive call chain
     {
         return (*str == '\0') ? value : Hash64Const(str + 1, (value ^ static_cast<uint8_t>(*str)) * cPrime64);
     }
 } /* namespace fnv1a */
 
-size_t constexpr operator "" _fnv1a( const char* str, size_t len )
+size_t constexpr operator "" _fnv1a( const char* str, size_t /*len*/ )
 {
     return fnv1a::Hash32Const(str);
 }
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_FNV1A_H_ */
+#endif // RSP_CORE_LIB_UTILS_FNV1A_H

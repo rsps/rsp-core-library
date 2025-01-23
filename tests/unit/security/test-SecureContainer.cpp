@@ -19,7 +19,7 @@ using namespace rsp::security;
 
 struct MyData
 {
-    std::uint32_t Integer = 42;
+    uint32_t Integer = 42;
     FixedString<100> String{};
 };
 
@@ -29,8 +29,7 @@ TEST_CASE("Secure Container")
     const char* cPlainText = "The big red fox, jumped over the fence.";
     const char* cShaSeed = "Seed for hash";
 
-    rsp::logging::Logger logger;
-    TestHelpers::AddConsoleLogger(logger);
+    TestLogger logger;
 
     SecureContainer<MyData> sc(cFileName, cShaSeed, CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));
 
@@ -51,8 +50,8 @@ TEST_CASE("Secure Container")
         MESSAGE("String: " << std::string(sc.Get().String));
         CHECK_EQ(sc.Get().String, cPlainText);
 
-        CHECK(sc.Get().String == std::string(cPlainText));
-        CHECK(sc.Get().String == cPlainText);
+        CHECK_EQ(sc.Get().String, std::string(cPlainText));
+        CHECK_EQ(sc.Get().String, cPlainText);
 
         CHECK_NOTHROW(sc.Save());
     }
@@ -69,7 +68,7 @@ TEST_CASE("Secure Container")
         MESSAGE("String: " << std::string(dcl.Get().String));
 
         CHECK_EQ(dcl.Get().Integer, 44);
-        CHECK(dcl.Get().String == cPlainText);
+        CHECK_EQ(dcl.Get().String, cPlainText);
     }
 
     SUBCASE("Encryption Integrity") {

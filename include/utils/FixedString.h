@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_FIXEDSTRING_H_
-#define INCLUDE_UTILS_FIXEDSTRING_H_
+#ifndef RSP_CORE_LIB_UTILS_FIXED_STRING_H
+#define RSP_CORE_LIB_UTILS_FIXED_STRING_H
 
 #include <string>
 #include <cstring>
@@ -30,7 +30,7 @@ class FixedString
 {
 public:
 
-    FixedString(const char *s = nullptr)
+    FixedString(const char *s = nullptr) // NOLINT, Conversion constructor
     {
         _mStr[0] = _mStr[N] = 0;
         if (s) {
@@ -38,7 +38,7 @@ public:
         }
     }
 
-    FixedString(const std::string &arString)
+    explicit FixedString(const std::string &arString)
         : FixedString(arString.data())
     {
     }
@@ -62,7 +62,7 @@ public:
         return _mStr;
     }
 
-    operator std::string() const
+    operator std::string() const // NOLINT, Conversion operator
     {
         return _mStr;
     }
@@ -77,15 +77,15 @@ public:
         return std::strncmp(_mStr, apS, N+1) == 0;
     }
 
-    std::size_t size() const
+    [[nodiscard]] std::size_t size() const
     {
         return std::strlen(&_mStr[0]);
     }
 
 private:
-    char _mStr[N + 1]; // keep an extra char for zero terminator
+    char _mStr[N + 1]{}; // keep an extra char for zero terminator
 } __attribute__((packed));
 
 } // namespace rsp::utils
 
-#endif /* INCLUDE_UTILS_FIXEDSTRING_H_ */
+#endif // RSP_CORE_LIB_UTILS_FIXED_STRING_H

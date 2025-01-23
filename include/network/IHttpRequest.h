@@ -8,8 +8,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef I_HTTPREQUEST_H
-#define I_HTTPREQUEST_H
+#ifndef RSP_CORE_LIB_NETWORK_I_HTTP_REQUEST_H
+#define RSP_CORE_LIB_NETWORK_I_HTTP_REQUEST_H
 
 #include <memory>
 #include <ostream>
@@ -29,7 +29,7 @@ class IHttpResponse;
 class IHttpRequest
 {
 public:
-    virtual ~IHttpRequest() {}
+    virtual ~IHttpRequest() = default;
 
     /**
      * \fn const HttpRequestOptions GetOptions&()const =0
@@ -37,7 +37,7 @@ public:
      *
      * \return Reference to options
      */
-    virtual const HttpRequestOptions& GetOptions() const = 0;
+    [[nodiscard]] virtual const HttpRequestOptions& GetOptions() const = 0;
 
     /**
      * \fn IHttpRequest SetOptions&(const HttpRequestOptions&)=0
@@ -49,19 +49,18 @@ public:
     virtual IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) = 0;
 
     /**
-     * \fn IHttpRequest SetBody&(const std::string&)=0
      * \brief Set the body content on the request.
      *
-     * \param arBody
+     * \param apBody Shared pointer to interface of IHttpBodyStream
      * \return self
      */
-    virtual IHttpRequest& SetBody(const std::string &arBody) = 0;
+    virtual IHttpRequest& SetBody(std::shared_ptr<IHttpBodyStream> apBody) = 0;
 
     /**
      * \brief Get the body content of this request
-     * \return string
+     * \return Reference to body stream
      */
-    virtual const std::string& GetBody() const = 0;
+    [[nodiscard]] virtual const IHttpBodyStream& GetBody() const = 0;
 
     /**
      * \fn IHttpForm AddField&(std::string_view, std::string_view)
@@ -110,6 +109,6 @@ public:
  */
 std::ostream& operator<<(std::ostream &o, const IHttpRequest& arReq);
 
-}
+} // namespace rsp::network
 
-#endif
+#endif // RSP_CORE_LIB_NETWORK_I_HTTP_REQUEST_H

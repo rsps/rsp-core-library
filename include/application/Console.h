@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_APPLICATION_CONSOLE_H_
-#define INCLUDE_APPLICATION_CONSOLE_H_
+#ifndef RSP_CORE_LIB_APPLICATION_CONSOLE_H
+#define RSP_CORE_LIB_APPLICATION_CONSOLE_H
 
 #include <string>
 #include <iostream>
@@ -39,13 +39,13 @@ class ConsoleStream : public std::stringstream
 {
 public:
     ConsoleStream(Console *apConsole, TextColor aColor);
-    ConsoleStream(ConsoleStream &&aFrom);
+    ConsoleStream(ConsoleStream &&aFrom) noexcept;
     ConsoleStream(const ConsoleStream &) = delete;
 
     ConsoleStream& operator=(const ConsoleStream &) = delete;
 
     friend class Console;
-    ~ConsoleStream();
+    ~ConsoleStream() override;
 
 protected:
     Console *mpConsole = nullptr;
@@ -78,18 +78,18 @@ public:
 
     static Console& Get();
 
-    static ConsoleStream Debug() { return ConsoleStream(&Get(), TextColor::Debug); }
-    static ConsoleStream Error() { return ConsoleStream(&Get(), TextColor::Error); }
-    static ConsoleStream HighLightInfo()  { return ConsoleStream(&Get(), TextColor::InfoHighLight); }
-    static ConsoleStream Info()  { return ConsoleStream(&Get(), TextColor::Info); }
+    static ConsoleStream Debug() { return {&Get(), TextColor::Debug}; }
+    static ConsoleStream Error() { return {&Get(), TextColor::Error}; }
+    static ConsoleStream HighLightInfo()  { return {&Get(), TextColor::InfoHighLight}; }
+    static ConsoleStream Info()  { return {&Get(), TextColor::Info}; }
 
     static void SetUseColors(bool aEnable) { mUseColors = aEnable; }
     static bool GetUseColors() { return mUseColors; }
 
-    static void SetTtyDevice(const std::string &arTtyDevice) { mTtyDeviceFile = arTtyDevice; }
+    static void SetTtyDevice(const std::string &arTtyDevice);
     static std::string GetTtyDevice() { return mTtyDeviceFile; }
 
-    static void SetPrintToDisplay(bool aEnable) { Get().mPrintToDisplay = aEnable; }
+    static void SetPrintToDisplay(bool aEnable);
     static bool PrintToDisplay() { return Get().mPrintToDisplay; }
 
 protected:
@@ -100,6 +100,7 @@ protected:
     static bool mUseColors;
 
     Console();
+    void updatePrintToDisplay(const std::string &arTtyDevice, bool aEnable);
 
     friend class ConsoleStream;
     void write(const std::string &arMsg, TextColor aColor);
@@ -108,4 +109,4 @@ protected:
 
 } /* namespace rsp::application */
 
-#endif /* INCLUDE_APPLICATION_CONSOLE_H_ */
+#endif // RSP_CORE_LIB_APPLICATION_CONSOLE_H

@@ -8,12 +8,13 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_NETWORK_CURL_EASYCURL_H_
-#define SRC_NETWORK_CURL_EASYCURL_H_
+#ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_EASY_CURL_H
+#define RSP_CORE_LIB_SRC_NETWORK_CURL_EASY_CURL_H
 
 #include <string>
 #include "CurlLibrary.h"
 #include "Exceptions.h"
+#include <logging/LogChannel.h>
 
 namespace rsp::network::curl {
 
@@ -21,21 +22,21 @@ class MultiCurl;
 
 /**
  * \class EasyCurl
- * \brief Low level wrapper for libcurls Easy interface.
+ * \brief Low level wrapper for libcurl's Easy interface.
  * This wrapper allocates an easy handle, but can also lookup this class object from a given handle.
  */
-class EasyCurl
+class EasyCurl : public logging::NamedLogger<EasyCurl>
 {
 public:
     EasyCurl();
     EasyCurl(const EasyCurl& arOther);
-    EasyCurl(EasyCurl&& arOther);
-    virtual ~EasyCurl();
+    EasyCurl(EasyCurl&& arOther) noexcept;
+    ~EasyCurl() override;
 
     static EasyCurl* GetFromHandle(CURL* apHandle);
 
     EasyCurl& operator=(const EasyCurl& arOther);
-    EasyCurl& operator=(EasyCurl&& arOther);
+    EasyCurl& operator=(EasyCurl&& arOther) noexcept;
 
 protected:
     static long const _followRedirects = 1L;
@@ -62,7 +63,7 @@ protected:
 
     template <typename T>
     void getCurlInfo(CURLINFO aInfo, T aArg) {
-        auto err = curl_easy_getinfo(mpCurl, CURLINFO_RESPONSE_CODE, aArg);
+        auto err = curl_easy_getinfo(mpCurl, aInfo, aArg);
         if (err != CURLE_OK) {
             THROW_WITH_BACKTRACE2(ECurlError, "curl_easy_getinfo() failed:", err);
         }
@@ -75,4 +76,4 @@ private:
 
 } /* namespace rsp::network::http::curl */
 
-#endif /* SRC_NETWORK_CURL_EASYCURL_H_ */
+#endif // RSP_CORE_LIB_SRC_NETWORK_CURL_EASY_CURL_H

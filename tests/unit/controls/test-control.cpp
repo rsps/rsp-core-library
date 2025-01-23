@@ -8,110 +8,163 @@
  * \author      Simon Glashoff
  */
 
-#include "graphics/controls/Control.h"
 #include <doctest.h>
+#include <graphics/Control.h>
+#include <graphics/Renderer.h>
+#include <posix/FileSystem.h>
+#include <TestHelpers.h>
 
 using namespace rsp::graphics;
 
-// To have a testable Control, that are not dependent on used types
-class TestControl : public Control
-{
-public:
-    TestControl() : Control(rsp::utils::MakeTypeInfo<TestControl>()) { mDirty = false; }
-
-    void MakeValid() { mDirty = false; }
-};
-
 TEST_SUITE_BEGIN("Graphics");
 
-TEST_CASE("Control Invalidation")
+TEST_CASE("Control")
 {
-    // Arrange
-    TestControl myControl;
+    TestLogger logger;
 
-    // Assert
-    CHECK(!myControl.IsInvalid());
+#ifdef USE_GFX_SW
+    std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
+    Renderer::SetDevicePath(p.string());
+#endif
 
-    // Act
-    myControl.Invalidate();
-
-    // Assert
+    CHECK_NOTHROW(Control dummy);
+    Control myControl;
     CHECK(myControl.IsInvalid());
-    myControl.MakeValid();
+
+    CHECK_NOTHROW(myControl.UpdateData());
+    CHECK_FALSE(myControl.IsInvalid());
 
     SUBCASE("Child Invalidation")
     {
-        // Arrange
-        TestControl childControl;
-        myControl.AddChild(&childControl);
-
-        // Act
-        myControl.Invalidate();
-
-        // Assert
+        Control childControl;
+        CHECK_NOTHROW(myControl.AddChild(nullptr));
+        CHECK_NOTHROW(myControl.AddChild(&childControl));
+        CHECK(myControl.IsInvalid());
         CHECK(childControl.IsInvalid());
-    }
 
-    SUBCASE("No Parent Invalidation")
-    {
-        // Arrange
-        TestControl childControl;
-        myControl.AddChild(&childControl);
+        CHECK_NOTHROW(childControl.UpdateData());
+        CHECK(myControl.IsInvalid());
+        CHECK_FALSE(childControl.IsInvalid());
 
-        // Act
-        childControl.Invalidate();
+        CHECK_NOTHROW(myControl.UpdateData());
+        CHECK_FALSE(myControl.IsInvalid());
 
-        // Assert
-        CHECK(!myControl.IsInvalid());
-    }
-
-    SUBCASE("Transparent Parent Invalidation")
-    {
-        CHECK(!myControl.IsInvalid());
-
-        TestControl childControl;
-        myControl.AddChild(&childControl);
-
-        CHECK(!myControl.IsInvalid());
-
-        childControl.SetTransparent(true);
+        CHECK_NOTHROW(myControl.Invalidate());
 
         CHECK(myControl.IsInvalid());
-    }
+        CHECK(childControl.IsInvalid());
 
-}
-TEST_CASE("Control States")
-{
-    // Arrange
-    TestControl myControl;
+        CHECK_NOTHROW(myControl.UpdateData());
+        CHECK_FALSE(myControl.IsInvalid());
+        CHECK_FALSE(childControl.IsInvalid());
+
+        CHECK_NOTHROW(childControl.Invalidate());
+        CHECK_FALSE(myControl.IsInvalid());
+        CHECK(childControl.IsInvalid());
+
+        CHECK_NOTHROW(childControl.UpdateData());
+        CHECK_FALSE(myControl.IsInvalid());
+        CHECK_FALSE(childControl.IsInvalid());
+
+        CHECK_NOTHROW(myControl.RemoveChild(&childControl));
+        CHECK(myControl.IsInvalid());
+        CHECK_FALSE(childControl.IsInvalid());
+
+        Control anotherChildControl;
+
+        CHECK_NOTHROW(myControl.AddChild(&childControl));
+        CHECK_NOTHROW(myControl.AddChild(&anotherChildControl));
+        CHECK_NOTHROW(childControl.AddChild(&anotherChildControl)); // Reassign to another parent
+
+        CHECK_NOTHROW(myControl.RemoveChild(&anotherChildControl));
+        CHECK_NOTHROW(childControl.RemoveChild(&anotherChildControl));
+        CHECK_NOTHROW(myControl.RemoveChild(nullptr));
+    }
 
     SUBCASE("Default State")
     {
-        // Act & Assert
-        CHECK(myControl.GetState() == Control::States::normal);
+        CHECK_EQ(myControl.GetState(), Control::States::Normal);
     }
-    SUBCASE("Change State")
+
+    SUBCASE("Change")
     {
-        // Act
-        myControl.SetState(Control::States::pressed);
+        CHECK_FALSE(myControl.IsInvalid());
 
-        // Assert
-        CHECK(myControl.GetState() == Control::States::pressed);
-        CHECK(myControl.IsInvalid());
-        myControl.MakeValid();
-
-        SUBCASE("Child Invalidated by Parent State Change")
-        {
-            // Arrange
-            TestControl childControl;
-            myControl.AddChild(&childControl);
-
-            // Act
-            myControl.SetState(Control::States::normal);
-
-            // Assert
-            CHECK(childControl.IsInvalid());
+        SUBCASE("State") {
+            CHECK_NOTHROW(myControl.SetPressed(true));
+            CHECK_EQ(myControl.GetState(), Control::States::Pressed);
         }
+
+        SUBCASE("Transparent") {
+            CHECK_NOTHROW(myControl.SetTransparent(true));
+            CHECK(myControl.IsTransparent());
+        }
+
+        SUBCASE("Checkable") {
+            CHECK_NOTHROW(myControl.SetCheckable(true));
+            CHECK(myControl.IsCheckable());
+        }
+
+        SUBCASE("Draggable") {
+            CHECK_NOTHROW(myControl.SetDraggable(true));
+            CHECK(myControl.IsDraggable());
+        }
+
+        SUBCASE("Visible") {
+            CHECK(myControl.IsVisible());
+            CHECK_NOTHROW(myControl.Hide());
+            CHECK_FALSE(myControl.IsVisible());
+            CHECK_NOTHROW(myControl.Show());
+            CHECK(myControl.IsVisible());
+        }
+
+        SUBCASE("Size") {
+            CHECK_NOTHROW(myControl.SetArea(Rect(10, 10, 20, 30)));
+            CHECK_EQ(myControl.GetArea(), Rect(10, 10, 20, 30));
+
+            CHECK_NOTHROW(myControl.SetOrigin(Point(12, 12)));
+            CHECK_EQ(myControl.GetArea(), Rect(12, 12, 20, 30));
+        }
+
+        CHECK(myControl.IsInvalid());
+    }
+
+    SUBCASE("Render")
+    {
+        auto &renderer = Renderer::Init(480, 800);
+
+        Canvas paper(150, 50);
+        paper.Fill(Color::Yellow);
+        auto texture = Texture::Create(paper);
+        texture->SetDestination({-100, 260}); // Relative to myControl
+
+        auto &style = myControl.GetStyle(Control::States::Normal);
+        style.mBackgroundColor = Color::Blue;
+        style.mTextures.push_back(texture->Clone());
+
+        CHECK_NOTHROW(myControl.SetTransparent(false).SetArea({200, 40, 100, 500}).Show().Invalidate());
+
+        CHECK(myControl.UpdateData());
+        CHECK_NOTHROW(renderer.Fill(Color::Grey));
+        CHECK_NOTHROW(myControl.Render(renderer));
+        CHECK_NOTHROW(renderer.Present());
+
+        // Paint again on back-buffer to allow checks below
+        CHECK_NOTHROW(renderer.Fill(Color::Grey));
+        CHECK_NOTHROW(myControl.Render(renderer));
+        CHECK_NOTHROW(renderer.Flush());
+
+        CHECK_HEX(renderer.GetPixel(200,  40).AsUint(), Color::Blue);
+        CHECK_HEX(renderer.GetPixel(299, 539).AsUint(), Color::Blue);
+        CHECK_HEX(renderer.GetPixel(300, 540).AsUint(), Color::Grey);
+
+        CHECK_HEX(renderer.GetPixel(100, 300).AsUint(), Color::Grey);
+        CHECK_HEX(renderer.GetPixel(200, 300).AsUint(), Color::Yellow);
+        CHECK_HEX(renderer.GetPixel(249, 349).AsUint(), Color::Yellow);
+        CHECK_HEX(renderer.GetPixel(250, 350).AsUint(), Color::Blue);
+
+//        using namespace std::chrono_literals;
+//        std::this_thread::sleep_for(2500ms);
     }
 }
 

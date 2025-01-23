@@ -17,7 +17,7 @@ TEST_CASE("CRC32") {
     const uint32_t cCorrectCRC = 0x1C5D8B51; // Verified result from: https://www.functions-online.com/crc32.html
 
     SUBCASE("Full buffer CRC") {
-        CHECK(rsp::utils::Crc32::Calc(cString.data(), cString.size()) == cCorrectCRC);
+        CHECK_EQ(rsp::utils::Crc32::Calc(cString.data(), cString.size()), cCorrectCRC);
     }
 
     SUBCASE("Incremental CRC") {
@@ -27,7 +27,7 @@ TEST_CASE("CRC32") {
             crc.Add(static_cast<uint8_t>(c));
         }
 
-        CHECK_THROWS_AS(crc.Verify(~cCorrectCRC, true), const rsp::utils::ECrcError&);
+        CHECK_THROWS_AS(bool a = crc.Verify(~cCorrectCRC, true), const rsp::utils::ECrcError&);
         CHECK(crc.Verify(cCorrectCRC, false));
     }
 }

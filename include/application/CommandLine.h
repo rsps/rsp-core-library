@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_APPLICATION_COMMANDLINE_H_
-#define INCLUDE_APPLICATION_COMMANDLINE_H_
+#ifndef RSP_CORE_LIB_APPLICATION_COMMAND_LINE_H
+#define RSP_CORE_LIB_APPLICATION_COMMAND_LINE_H
 
 #include <string>
 #include <vector>
@@ -37,13 +37,16 @@ public:
      * \return List of strings
      */
     std::vector<std::string>& GetOptions() { return mOptions; }
+
     /**
      * Check if a given option exist on the command line.
      *
      * \param aStr
      * \return True if the option exists
      */
-    bool HasOption(const std::string aStr);
+    bool HasOption(const std::string &arStr);
+    bool HasOption(const char *apStr) { return HasOption(std::string(apStr)); }
+
     /**
      * Get the value assigned to an extended option, e.g. '--name=value'
      *
@@ -51,7 +54,8 @@ public:
      * \param arValue Reference to string that is loaded with value.
      * \return bool True if the option exists
      */
-    bool GetOptionValue(const std::string aOption, std::string &arValue);
+    bool GetOptionValue(const std::string &arOption, std::string &arValue);
+    bool GetOptionValue(const char *apOption, std::string &arValue) { return GetOptionValue(std::string(apOption), arValue); }
 
     /**
      * Get a list of all commands on the command line, except the one invoking this application.
@@ -68,7 +72,7 @@ public:
      *
      * \return string
      */
-    const std::string& GetAppName() { return mAppName; }
+    [[nodiscard]] const std::string& GetAppName() const { return mAppName; }
 
 protected:
     std::string mAppName{};
@@ -78,4 +82,4 @@ protected:
 
 } /* namespace rsp::application */
 
-#endif /* INCLUDE_APPLICATION_COMMANDLINE_H_ */
+#endif // RSP_CORE_LIB_APPLICATION_COMMAND_LINE_H

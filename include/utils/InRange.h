@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_INRANGE_H_
-#define INCLUDE_UTILS_INRANGE_H_
+#ifndef RSP_CORE_LIB_UTILS_IN_RANGE_H
+#define RSP_CORE_LIB_UTILS_IN_RANGE_H
 
 #include <cmath>
 
@@ -29,7 +29,7 @@ namespace rsp::utils {
  */
 template <typename T>
 inline bool IsInRange(const T& value, const T& low, const T& high) {
-    return !(value < low) && !(high < value);
+    return value >= low && high >= value;
 }
 
 
@@ -50,4 +50,4 @@ inline bool IsEqual(const T& v1, const T& v2, const T& epsilon) {
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_INRANGE_H_ */
+#endif // RSP_CORE_LIB_UTILS_IN_RANGE_H

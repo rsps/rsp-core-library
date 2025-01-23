@@ -8,9 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <functional>
 #include "MultiCurl.h"
-#include <logging/Logger.h>
 #include <network/HttpRequest.h>
 
 using namespace rsp::logging;
@@ -32,7 +30,7 @@ MultiCurl& MultiCurl::Add(CurlSessionHttpRequest &arRequest)
 {
     static_cast<EasyCurl*>(&arRequest)->prepareRequest(); // EasyCurl is friendly
 
-    Logger::GetDefault().Debug() << "Adding Request: " << arRequest.GetOptions().RequestType << " " << arRequest.GetOptions().BaseUrl << arRequest.GetOptions().Uri;
+    mLogger.Debug() << "Adding Request: " << arRequest.GetOptions().RequestType << " " << arRequest.GetOptions().BaseUrl << arRequest.GetOptions().Uri;
 
     CURLMcode mc = curl_multi_add_handle(mpMultiHandle, reinterpret_cast<CURL*>(arRequest.GetHandle()));
     if (mc != CURLM_OK) {
@@ -44,7 +42,7 @@ MultiCurl& MultiCurl::Add(CurlSessionHttpRequest &arRequest)
 
 MultiCurl& MultiCurl::Remove(CurlSessionHttpRequest &arRequest)
 {
-    Logger::GetDefault().Debug() << "Removing Request: " << arRequest.GetOptions().RequestType << " " << arRequest.GetOptions().BaseUrl << arRequest.GetOptions().Uri;
+    mLogger.Debug() << "Removing Request: " << arRequest.GetOptions().RequestType << " " << arRequest.GetOptions().BaseUrl << arRequest.GetOptions().Uri;
 
     CURLMcode mc = curl_multi_remove_handle(mpMultiHandle, reinterpret_cast<CURL*>(arRequest.GetHandle()));
     if (mc != CURLM_OK) {
@@ -63,12 +61,12 @@ void MultiCurl::Execute()
     }
     timeout = (timeout < 0) ? 5000 : timeout;
 
-    Logger::GetDefault().Debug() << "Executing MultiCurl with timeout: " << timeout;
+    mLogger.Debug() << "Executing MultiCurl with timeout: " << timeout;
 
-    int count = 0;
+    int count;
     do {
         count = perform();
-        if (count > 0 && poll(timeout) == 0) {
+        if (count > 0 && poll(int(timeout)) == 0) {
             continue;
         }
 
@@ -108,7 +106,7 @@ void MultiCurl::processMessages()
                 THROW_WITH_BACKTRACE2(ECurlError, "curl_multi failed.", msg->data.result);
             }
             auto req = EasyCurl::GetFromHandle(msg->easy_handle);
-            Remove(*static_cast<CurlSessionHttpRequest*>(req));
+            Remove(*dynamic_cast<CurlSessionHttpRequest*>(req));
             req->requestDone();
         }
     }

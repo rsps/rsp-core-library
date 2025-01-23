@@ -8,11 +8,11 @@
  * \author      Steffen Brummer
  */
 
-#ifndef SRC_UTILS_CLOCK_CAST_H_
-#define SRC_UTILS_CLOCK_CAST_H_
+#ifndef RSP_CORE_LIB_UTILS_CLOCK_CAST_H
+#define RSP_CORE_LIB_UTILS_CLOCK_CAST_H
 
+#include <exceptions/CoreException.h>
 #include <chrono>
-#include <utils/CoreException.h>
 
 namespace rsp::utils
 {
@@ -68,8 +68,8 @@ DstTimePointT ClockCast(const SrcTimePointT tp,
     const SrcDurationT tolerance = std::chrono::nanoseconds { 100 },
     const int limit = 10)
 {
-    ASSERT(limit > 0);
-    auto itercnt = 0;
+    ASSERT(limit > 0)
+    auto iter_cnt = 0;
     auto src_now = SrcTimePointT { };
     auto dst_now = DstTimePointT { };
     auto epsilon = detail::max_duration<SrcDurationT>();
@@ -84,16 +84,16 @@ DstTimePointT ClockCast(const SrcTimePointT tp,
             dst_now = dst_between;
             epsilon = delta;
         }
-        if (++itercnt >= limit)
+        if (++iter_cnt >= limit)
             break;
     }
     while (epsilon > tolerance);
 #ifdef GLOBAL_ITERATION_COUNTER
-  GLOBAL_ITERATION_COUNTER = itercnt;
+  GLOBAL_ITERATION_COUNTER = iter_cnt;
 #endif
     return dst_now + (tp - src_now);
 }
 
 } // namespace rsp
 
-#endif /* SRC_UTILS_CLOCK_CAST_H_ */
+#endif // RSP_CORE_LIB_UTILS_CLOCK_CAST_H

@@ -3,13 +3,13 @@
  * \author      steffen
  */
 
-#ifndef INCLUDE_UTILS_DYNAMICDATA_H_
-#define INCLUDE_UTILS_DYNAMICDATA_H_
+#ifndef RSP_CORE_LIB_UTILS_DYNAMIC_DATA_H
+#define RSP_CORE_LIB_UTILS_DYNAMIC_DATA_H
 
+#include <exceptions/CoreException.h>
 #include <vector>
 #include <string>
 #include <string_view>
-#include <utils/CoreException.h>
 #include "Variant.h"
 
 namespace rsp::utils {
@@ -18,7 +18,7 @@ namespace rsp::utils {
  * \class EDynamicDataException
  * \brief Base class for all exceptions thrown by the DynamicData module.
  */
-class EDynamicDataException : public CoreException {
+class EDynamicDataException : public exceptions::CoreException {
 public:
     explicit EDynamicDataException(const std::string &aMsg) : CoreException(aMsg) {}
 };
@@ -33,6 +33,7 @@ public:
     explicit EDynamicTypeError(const std::string &aMsg) : EDynamicDataException("Json Type Error: " + aMsg) {}
 };
 
+#define OPTIONAL(a) try { a; } catch(...) {}
 
 /**
  * \class DynamicData
@@ -45,7 +46,39 @@ public:
 class DynamicData: public Variant
 {
 public:
-    typedef unsigned int  size_type;
+    /**
+     * \interface Decoder
+     * \brief Interface to use by DynamicData decoders
+     */
+    struct Decoder
+    {
+        virtual ~Decoder() = default;
+        virtual DynamicData Decode(const std::string &arStream) = 0;
+    };
+
+    /**
+     * \interface Decoder
+     * \brief Interface to use by DynamicData decoders
+     */
+    struct Encoder
+    {
+        virtual ~Encoder() = default;
+        virtual std::string Encode(const DynamicData &arData) = 0;
+    };
+
+    /**
+     * \interface Serializable
+     * \brief Interface to use by data objects that are able to convert to/from DynamicData
+     */
+    class Serializable
+    {
+    public:
+        virtual ~Serializable() = default;
+        [[nodiscard]] virtual DynamicData ToData() const = 0;
+        virtual void FromData(const DynamicData &arData);
+    };
+
+    typedef size_t size_type;
 
     /**
      * \fn DynamicData()
@@ -53,8 +86,11 @@ public:
      */
     DynamicData() : Variant() {}
 
-    DynamicData(const DynamicData&);
-    DynamicData(DynamicData&&);
+//    ~DynamicData() override;
+
+    DynamicData(const DynamicData&) = default;
+    DynamicData(DynamicData&&) noexcept = default;
+
     /**
      * \brief Construct a DynamicData holding the given value
      * \tparam T Type of value to contain
@@ -62,20 +98,13 @@ public:
      *
      * Use template to declare inherited constructors
      */
-    template<class T>
-    DynamicData(T aValue) : Variant(aValue) {}
-
-    virtual ~DynamicData() {}
+    template <class T, std::enable_if_t<!std::is_base_of_v<DynamicData, T>, bool> = true>
+    DynamicData(T aValue) : Variant(aValue) {} // NOLINT
 
     DynamicData& operator=(const DynamicData&);
-    DynamicData& operator=(DynamicData&&);
-    /**
-     * \brief Assign all types supported by Variant class
-     *
-     * Use template to declare inherited assignment operators
-     */
-    template<class T>
-    DynamicData& operator=(T aValue) { rsp::utils::Variant::operator=(aValue); return *this; }
+    DynamicData& operator=(DynamicData&&) noexcept;
+
+    using rsp::utils::Variant::operator=;
 
     /**
      * \brief Try to assign member value to lvalue.
@@ -86,9 +115,9 @@ public:
      * \return True if successful
      */
     template<class T, class I>
-    bool TryAssign(T& arLValue, const I& arIndex) try
+    bool TryAssign(T& arLValue, const I& arIndex) const try
     {
-        arLValue = (*this)[arIndex];
+        arLValue = static_cast<T>((*this)[arIndex]);
         return true;
     }
     catch(...) {
@@ -106,7 +135,7 @@ public:
     template<class T, class I>
     T TryGet(I &arIndex, const T& arDefault) try
     {
-        return (*this)[arIndex];
+        return static_cast<T>((*this)[arIndex]);
     }
     catch(...) {
         return arDefault;
@@ -116,12 +145,12 @@ public:
      * \brief Check if value content is an array
      * \return True if content is an array
      */
-    bool IsArray() const { return (GetType() == Types::Array); }
+    [[nodiscard]] bool IsArray() const { return (GetType() == Types::Array); }
     /**
      * \brief Check if value content is an object
      * \return True if content is an object
      */
-    bool IsObject() const { return (GetType() == Types::Object); }
+    [[nodiscard]] bool IsObject() const { return (GetType() == Types::Object); }
 
     /**
      * \brief Index operators for object members
@@ -153,21 +182,21 @@ public:
      * \brief Get the number of element in a object or array
      * \return unsigned int Number of elements
      */
-    size_type GetCount() const;
+    [[nodiscard]] size_type GetCount() const;
 
     /**
      * \brief Get a list of member names if this is a data object.
      *
      * \return Vector of strings
      */
-    std::vector<std::string> GetMemberNames() const;
+    [[nodiscard]] std::vector<std::string> GetMemberNames() const;
 
     /**
      * \brief Check if a data object has a member with the specified name
      * \param aKey
      * \return
      */
-    bool MemberExists(std::string_view aKey) const;
+    [[nodiscard]] bool MemberExists(std::string_view aKey) const;
 
     /**
      * \brief Add a new element to the array
@@ -220,8 +249,8 @@ public:
         return !((*this) == arOther);
     }
 
-    const std::string GetName() const { return mName; }
-    const std::vector<DynamicData>& GetItems() const { return mItems; }
+    [[nodiscard]] const std::string& GetName() const { return mName; }
+    [[nodiscard]] const std::vector<DynamicData>& GetItems() const { return mItems; }
 
 protected:
     std::string mName{}; // Name if this value is an object member
@@ -237,4 +266,4 @@ std::ostream& operator<< (std::ostream& os, const DynamicData& arValue);
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_DYNAMICDATA_H_ */
+#endif // RSP_CORE_LIB_UTILS_DYNAMIC_DATA_H

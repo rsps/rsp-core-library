@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_SECURITY_SHA_H_
-#define INCLUDE_SECURITY_SHA_H_
+#ifndef RSP_CORE_LIB_SECURITY_SHA_H
+#define RSP_CORE_LIB_SECURITY_SHA_H
 
 #include <security/SecureBuffer.h>
 #include <cstdint>
@@ -33,9 +33,11 @@ enum class HashAlgorithms {
  */
 struct DigestImpl {
     static DigestImpl* Create(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm);
-    virtual ~DigestImpl() {};
+    virtual ~DigestImpl() = default;
     virtual void Update(const uint8_t *apBuffer, std::size_t aSize) = 0;
     virtual SecureBuffer Finalize() = 0;
+    [[nodiscard]] virtual std::string GetLibraryVersion() const = 0;
+    [[nodiscard]] virtual std::string GetLibraryName() const = 0;
 };
 
 /**
@@ -55,8 +57,8 @@ public:
      * \brief Constructor for message digest SHA that takes the algorithm to use
      * \param aAlgorithm SHA algorithm to use
      */
-    Sha(HashAlgorithms aAlgorithm);
-    ~Sha();
+    explicit Sha(HashAlgorithms aAlgorithm);
+    ~Sha() = default;
 
     /**
      * \brief Call Update with the data to calculate the hash on. Can be called multiple times.
@@ -71,10 +73,24 @@ public:
      */
     SecureBuffer Get() { return mPimpl->Finalize(); }
 
+    /**
+     * \brief Get version of encryption library
+     *
+     * \return string
+     */
+    [[nodiscard]] std::string GetLibraryVersion() const { return mPimpl->GetLibraryVersion(); }
+
+    /**
+     * \brief Get name of encryption library
+     *
+     * \return string
+     */
+    [[nodiscard]] std::string GetLibraryName() const { return mPimpl->GetLibraryName(); }
+
 protected:
     std::unique_ptr<DigestImpl> mPimpl;
 };
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_SECURITY_SHA_H_ */
+#endif // RSP_CORE_LIB_SECURITY_SHA_H

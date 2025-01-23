@@ -8,9 +8,10 @@
  * \author      Steffen Brummer
  */
 
-#ifndef INCLUDE_UTILS_CPPOBJECTFILE_H_
-#define INCLUDE_UTILS_CPPOBJECTFILE_H_
+#ifndef RSP_CORE_LIB_UTILS_CPP_OBJECT_FILE_H
+#define RSP_CORE_LIB_UTILS_CPP_OBJECT_FILE_H
 
+#include <cstddef>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -21,7 +22,7 @@ namespace rsp::utils {
 class CppObjectFile
 {
 public:
-    CppObjectFile(const std::filesystem::path &arFileName);
+    explicit CppObjectFile(const std::filesystem::path &arFileName);
 
     std::string Name() { return mVariableName; }
 
@@ -38,7 +39,7 @@ public:
         return *this;
     }
 
-    CppObjectFile& Hex(const std::uint8_t *apData, std::size_t aSize);
+    CppObjectFile& Hex(const uint8_t *apData, size_t aSize, size_t aIndent = 4);
 protected:
     std::fstream mFile;
     std::string mVariableName;
@@ -46,4 +47,4 @@ protected:
 
 } /* namespace rsp::utils */
 
-#endif /* INCLUDE_UTILS_CPPOBJECTFILE_H_ */
+#endif // RSP_CORE_LIB_UTILS_CPP_OBJECT_FILE_H

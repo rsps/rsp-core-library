@@ -26,8 +26,8 @@ TEST_CASE("InsertOrderedMap") {
         };
         map[1] = "one";
 
-        CHECK(map[1] == "one");
-        CHECK(map[3] == "three");
+        CHECK_EQ(map[1], "one");
+        CHECK_EQ(map[3], "three");
 
         std::stringstream ss;
         for(auto key : map.GetOrderList()) {
@@ -40,7 +40,7 @@ TEST_CASE("InsertOrderedMap") {
             ss << map.at(key.get()) << ",";
         }
         MESSAGE(ss.str());
-        CHECK(ss.str() == "two,zero,three,one,");
+        CHECK_EQ(ss.str(), "two,zero,three,one,");
     }
 
     SUBCASE("string,string") {
@@ -51,15 +51,15 @@ TEST_CASE("InsertOrderedMap") {
         };
         map["1"] = "one";
 
-        CHECK(map["1"] == "one");
-        CHECK(map["3"] == "three");
+        CHECK_EQ(map["1"], "one");
+        CHECK_EQ(map["3"], "three");
 
         std::stringstream ss;
         for(auto key : map.GetOrderList()) {
             ss << map.at(key.get()) << ",";
         }
         MESSAGE(ss.str());
-        CHECK(ss.str() == "two,zero,three,one,");
+        CHECK_EQ(ss.str(), "two,zero,three,one,");
 
         SUBCASE("remove zero") {
             ss.str("");
@@ -68,7 +68,7 @@ TEST_CASE("InsertOrderedMap") {
                 ss << map.at(key.get()) << ",";
             }
             MESSAGE(ss.str());
-            CHECK(ss.str() == "two,three,one,");
+            CHECK_EQ(ss.str(), "two,three,one,");
         }
     }
 

@@ -7,12 +7,13 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef INCLUDE_SECURITY_CRYPTBASE_H_
-#define INCLUDE_SECURITY_CRYPTBASE_H_
+#ifndef RSP_CORE_LIB_SECURITY_CRYPT_BASE_H
+#define RSP_CORE_LIB_SECURITY_CRYPT_BASE_H
 
+#include <exceptions/CoreException.h>
+#include <utils/HexStream.h>
 #include <string_view>
 #include <vector>
-#include <utils/CoreException.h>
 #include "SecureBuffer.h"
 
 namespace rsp::security {
@@ -39,8 +40,8 @@ public:
      * \brief Constructor that takes a cipher to use
      * \param aCipher AES cipher to use for encryption.
      */
-    CryptBase(CipherTypes aCipher) : mCipherType(aCipher) {}
-    virtual ~CryptBase() {}
+    explicit CryptBase(CipherTypes aCipher) : mCipherType(aCipher) {}
+    virtual ~CryptBase() = default;
 
     /**
      * \brief Initialize the crypto module.
@@ -54,7 +55,7 @@ public:
      * \param apData Pointer to data to operate on.
      * \param aSize Size of data
      */
-    virtual void Update(const std::uint8_t *apData, std::size_t aSize) = 0;
+    virtual void Update(const uint8_t *apData, size_t aSize) = 0;
 
     /**
      * \brief End the current crypto operation.
@@ -68,7 +69,7 @@ public:
      * \param aDesiredKeyLen Length of key in bytes.
      * \return SecureBuffer with new key
      */
-    static SecureBuffer KeyGen(const SecureBuffer& arSeed, std::size_t aDesiredKeyLen = 64);
+    static SecureBuffer KeyGen(const SecureBuffer& arSeed, size_t aDesiredKeyLen = 64);
 
 protected:
     CipherTypes mCipherType;
@@ -79,15 +80,23 @@ protected:
 /**
  * \brief Base class for crypto exceptions.
  */
-class CryptException: public rsp::utils::CoreException
+class CryptException: public exceptions::CoreException
 {
 public:
-    explicit CryptException(const char *aMsg, const char *aErr)
-        : CoreException(std::string(aMsg) + ": " + std::string(aErr))
+    explicit CryptException(const char *apMsg)
+            : CoreException(std::string(apMsg))
+    {
+    }
+    explicit CryptException(const char *apMsg, const char *apErr)
+        : CoreException(std::string(apMsg) + ": " + std::string(apErr))
+    {
+    }
+    explicit CryptException(const char *aMsg, int aErrCode)
+            : CoreException(std::string(aMsg) + ((aErrCode < 0) ? ": -" + utils::ToHex(uint16_t(-aErrCode)) : ": " + std::to_string(aErrCode)))
     {
     }
 };
 
 } // namespace rsp::security
 
-#endif /* INCLUDE_SECURITY_CRYPTBASE_H_ */
+#endif // RSP_CORE_LIB_SECURITY_CRYPT_BASE_H

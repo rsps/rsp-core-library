@@ -12,7 +12,7 @@
 
 using namespace rsp::utils;
 
-enum class TestFlags : std::uint32_t {
+enum class TestFlags : uint32_t {
     None = 0,
     F1 = 1u << 0,
     F2 = 1u << 1,
