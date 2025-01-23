@@ -14,11 +14,24 @@
 
 namespace rsp::logging {
 
+/**
+ * \brief Stream formatter class for streaming binary content in a human readable format
+ */
 class BufferToStream
 {
 public:
+    /**
+     * \brief Construct the formatter object
+     * \param apBuffer Pointer to binary data
+     * \param aSize Size of the binary data
+     * \param aShowNewLines Set to show bytes containing '\n' (10) and '\r' (13) newlines as the two literal characters
+     */
     BufferToStream(char *apBuffer, size_t aSize, bool aShowNewLines = false);
 
+    /**
+     * \brief Print the buffer to the given stream
+     * \param o
+     */
     void Print(std::ostream &o) const;
 protected:
     friend std::ostream& operator<<(std::ostream &o, const BufferToStream &bts);
@@ -27,6 +40,12 @@ protected:
     bool mShowNewLines;
 };
 
+/**
+ * \brief Stream the given BufferToStream object to the given output stream.
+ * \param o
+ * \param bts
+ * \return o
+ */
 std::ostream& operator<<(std::ostream &o, const BufferToStream &bts);
 
 } // rsp::logging

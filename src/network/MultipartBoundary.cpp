@@ -18,7 +18,7 @@ MultipartBoundary::MultipartBoundary()
 {
     mBoundary.reserve(32);
     for (size_t i = 0 ; i < 32 ; ++i) {
-        switch (utils::Random::Roll(0, 2)) {
+        switch (utils::Random::Roll(0u, 2u)) {
             case 0:
                 mBoundary += utils::Random::Roll('A', 'Z');
                 break;
