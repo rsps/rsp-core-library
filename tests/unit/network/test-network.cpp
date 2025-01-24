@@ -222,7 +222,7 @@ TEST_CASE("Network")
     }
 
     SUBCASE("File Upload") {
-        const char* cUploadedFile = "./webserver/upload.png";
+        const char* cUploadedFile = "./webserver/uploaded.png";
         const char* cSourceFile = "./webserver/public/image.png";
 
         FileIO file(cSourceFile, std::ios_base::in);
@@ -232,6 +232,7 @@ TEST_CASE("Network")
         opt.BaseUrl = "https://server.localhost:44300/cgi/upload.sh";
         opt.RequestType = HttpRequestType::POST;
         opt.ReadFile = &file;
+        opt.Headers.emplace("x-filename", "uploaded.png");
 //        opt.Verbose = 1;
 
         HttpRequest request;
@@ -240,9 +241,9 @@ TEST_CASE("Network")
         IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
-//        MESSAGE(resp->GetBody());
+        MESSAGE(resp->GetBody());
 
-        CHECK_EQ(resp->GetBody().size(), 48);
+        CHECK_EQ(resp->GetBody().size(), 71);
         CHECK_EQ(resp->GetStatusCode(), 200);
 
         CHECK(FileSystem::FileExists(cUploadedFile));
@@ -278,17 +279,18 @@ TEST_CASE("Network")
 //        MESSAGE(body);
 
         std::string expected = "\n"
-            "Uploaded file size: 25437\n"
+            "Content Length: 25455\n"
             "CTYPE: multipart/form-data\n"
             "filename: uploaded.png\r\n"
-            "filedata: filename=\"image.png\"; Content-Type: image/png\r\n";
+            "filedata: filename=\"image.png\"; Content-Type: image/png\r\n"
+            "Filesize: 25138\n";
 
 //        std::cout << TestHelpers::ToHex(body) << std::endl;
 //        std::cout << TestHelpers::ToHex(expected) << std::endl;
 
         CHECK_EQ(body, expected);
 
-        CHECK_EQ(resp->GetBody().size(), 135);
+        CHECK_EQ(resp->GetBody().size(), 147);
         CHECK_EQ(resp->GetStatusCode(), 200);
 
         CHECK(FileSystem::FileExists(cUploadedFile));
@@ -509,10 +511,10 @@ Body: )" + json + "\n";
 
         CHECK_EQ(mb.GetContentTypeHeader(), std::string("multipart/form-data; boundary=ABC"));
 
-        CHECK_EQ(mb.MakeContentDisposition(""), std::string("--ABC\r\n\r\n"));
-        CHECK_EQ(mb.MakeContentDisposition("Field1"), std::string("--ABC\r\nContent-Disposition: form-data; name=\"Field1\"\r\n\r\n"));
-        CHECK_EQ(mb.MakeContentDisposition("File", "my-file.bin"), std::string("--ABC\r\nContent-Disposition: form-data; name=\"File\"; filename=\"my-file.bin\"\r\n\r\n"));
-        CHECK_EQ(mb.MakeContentDisposition("File", "my-file.bin", "application/octet-stream"), std::string("--ABC\r\nContent-Disposition: form-data; name=\"File\"; filename=\"my-file.bin\"\r\nContent-Type: application/octet-stream\r\n\r\n"));
+        CHECK_EQ(mb.MakeContentDisposition(""), std::string("\r\n--ABC\r\n\r\n"));
+        CHECK_EQ(mb.MakeContentDisposition("Field1"), std::string("\r\n--ABC\r\nContent-Disposition: form-data; name=\"Field1\"\r\n\r\n"));
+        CHECK_EQ(mb.MakeContentDisposition("File", "my-file.bin"), std::string("\r\n--ABC\r\nContent-Disposition: form-data; name=\"File\"; filename=\"my-file.bin\"\r\n\r\n"));
+        CHECK_EQ(mb.MakeContentDisposition("File", "my-file.bin", "application/octet-stream"), std::string("\r\n--ABC\r\nContent-Disposition: form-data; name=\"File\"; filename=\"my-file.bin\"\r\nContent-Type: application/octet-stream\r\n\r\n"));
 
         CHECK_EQ(mb.GetEndBoundary(), std::string("\r\n--ABC--"));
     }

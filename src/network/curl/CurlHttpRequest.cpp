@@ -337,7 +337,7 @@ void CurlHttpRequest::populateOptions()
         if (temp == nullptr) {
             curl_slist_free_all(mpHeaders);
             mpHeaders = nullptr;
-            THROW_WITH_BACKTRACE1(ECurlError, "curl_slist_free_all failed.");
+            THROW_WITH_BACKTRACE1(ECurlError, "curl_slist_append failed.");
         }
         mpHeaders = temp;
     }
