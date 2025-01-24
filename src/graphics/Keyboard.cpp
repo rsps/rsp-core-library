@@ -238,10 +238,6 @@ Keyboard::Keyboard()
     SetArea(Rect(Point(0, 0), mBtnSpecials.GetTouchArea().GetBottomRight()));
 }
 
-Keyboard::~Keyboard()
-{
-}
-
 void Keyboard::doKeyClick(const TouchEvent &/*arEvent*/, uint32_t aSymbol)
 {
     switch(aSymbol) {

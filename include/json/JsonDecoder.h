@@ -21,7 +21,7 @@ namespace rsp::json {
 
 /**
  * \class JsonString
- * \brief String derivative specialized in traversing a Json formatted string.
+ * \brief String derivative specialized in traversing self as a Json formatted string.
  */
 class JsonDecoder : public std::string
 {
@@ -44,13 +44,55 @@ protected:
     std::string::iterator mEnd; // Current end iterator, to limit the end of the current extraction.
     std::vector<std::string::iterator> mStack{}; // Used to stack end iterators when parsing sub-strings.
 
+    /**
+     * \brief Traverse the string to locate start and end of a substring.
+     * \param aToken1
+     * \param aToken2
+     */
     void findSubString(char aToken1, char aToken2);
+
+    /**
+     * \brief Push cursor on stack, when diving into an object or array.
+     */
     void push();
+
+    /**
+     * \brief Pop cursor from the stack, when exiting an object or array.
+     */
     void pop();
+
+    /**
+     * \brief Move cursor over all next whitespace characters.
+     */
     void skipWhiteSpace();
+
+    /**
+     * \brief Parse the JSON content and extract next as a string.
+     * \throw EJsonFormatError if contents is not correctly escaped according to json string rules.
+     * \return string
+     */
     std::string getString();
+
+    /**
+     * \brief Parse the JSON content and extract next as an object
+     * \throw EJsonParseError if content is not correctly formatted json object elements
+     * \return DynamicData with object content
+     */
     rsp::utils::DynamicData getObject();
+
+    /**
+     * \brief Parse the JSON content and extract next as an array
+     * \throw EJsonParseError if content is not correctly formatted json array elements
+     * \return DynamicData with array content
+     */
     rsp::utils::DynamicData getArray();
+
+    /**
+     * \brief Parse the JSON content and extract next as a number.
+     * \throw EJsonNumberError if content has illegal number formatting.
+     * \return DynamicData with numeric value in one of these native
+     *         formats: double, int64_t or uint64_t.
+     */
     rsp::utils::DynamicData getNumber();
 
     unsigned int getOffset() { return static_cast<unsigned int>(mIt - begin()); };

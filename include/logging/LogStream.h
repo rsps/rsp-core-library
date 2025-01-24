@@ -40,15 +40,15 @@ public:
     LogStream(LogStream &&arOther) noexcept; /* No copy, move is OK */
     virtual ~LogStream();
 
-    LogStream& operator=(const LogStream &arOther);
-    LogStream& operator=(LogStream &&arOther) noexcept;
+    LogStream& operator=(const LogStream &arOther) = delete;
+    LogStream& operator=(LogStream &&arOther) noexcept = delete;
 
     /**
      * \brief Get the current stream acceptance log level
      *
      * \return LogLevel
      */
-    LogLevel GetLevel() const;
+    [[nodiscard]] LogLevel GetLevel() const;
 
     /**
      * \brief Set the current stream acceptance log level

@@ -47,29 +47,6 @@ LogStream::~LogStream()
     }
 }
 
-LogStream& LogStream::operator=(const LogStream &arOther)
-{
-    if (&arOther != this) {
-        mrLogger = arOther.mrLogger;
-        mLevel   = arOther.mLevel;
-        mChannel = arOther.mChannel;
-        mContext = arOther.mContext;
-    }
-    return *this;
-}
-
-LogStream& LogStream::operator=(LogStream &&arOther) noexcept
-{
-    if (&arOther != this) {
-        mrLogger = arOther.mrLogger;
-        mLevel = arOther.mLevel;
-        mChannel = std::move(arOther.mChannel);
-        mContext = std::move(arOther.mContext);
-        mBuffer = std::move(arOther.mBuffer);
-    }
-    return *this;
-}
-
 void LogStream::flush()
 {
     if (mBuffer.rdbuf()->in_avail() > 0) {

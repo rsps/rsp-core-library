@@ -27,12 +27,6 @@ JsonDecoder::JsonDecoder(std::string_view aJson)
     JLOG("JsonString Created: " << std::distance(begin(), mIt) << ", " << getLength();)
 }
 
-/**
- * Traverse the string to locate start and end of a substring.
- *
- * \param aToken1
- * \param aToken2
- */
 void JsonDecoder::findSubString(char aToken1, char aToken2)
 {
     JLOG("findSubString(" << aToken1 << ", " << aToken2 << "), " << debug();)
@@ -75,7 +69,8 @@ void JsonDecoder::findSubString(char aToken1, char aToken2)
                 it += 4; // Advance u + 4 hex digits
             }
             else if (*it == '"') {
-                // Skip escaped quote
+                it++; // Skip escaped quote
+                continue;
             }
         }
         else if (*it == '"') {
@@ -255,12 +250,6 @@ DynamicData JsonDecoder::getArray() //NOLINT
     return result;
 }
 
-/*
- * Parse the JSON content and extract it as a number,
- * stored in one of three supported native types.
- *
- * Exceptions are thrown if content has illegal number formatting.
- */
 DynamicData JsonDecoder::getNumber()
 {
     JLOG("getNumber: " << debug(false, true);)

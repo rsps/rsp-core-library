@@ -104,7 +104,7 @@ protected:
      * \param aLocalAddress
      * \param aPeerAddress
      */
-    Socket(const Socket &arServer, int aHandle, SocketAddress aLocalAddress, SocketAddress aPeerAddress);
+    Socket(const Socket &arServer, int aHandle, const SocketAddress& arLocalAddress, const SocketAddress& arPeerAddress);
 
     [[nodiscard]] std::chrono::system_clock::duration getTimeoutOption(SockOptions aOption) const;
     void setTimeoutOption(SockOptions aOption, std::chrono::system_clock::duration aValue) const;

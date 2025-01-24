@@ -30,10 +30,10 @@ Socket::Socket(Domain aDomain, Type aType, Protocol aProtocol)
     mProtocol = aProtocol;
 }
 
-Socket::Socket(const Socket &arServer, int aHandle, SocketAddress aLocalAddress, SocketAddress aPeerAddress)
+Socket::Socket(const Socket &arServer, int aHandle, const SocketAddress& arLocalAddress, const SocketAddress& arPeerAddress)
     : mHandle(aHandle),
-      mLocalAddress(aLocalAddress),
-      mPeerAddress(aPeerAddress),
+      mLocalAddress(arLocalAddress),
+      mPeerAddress(arPeerAddress),
       mDomain(arServer.mDomain),
       mType(arServer.mType),
       mProtocol(arServer.mProtocol)

@@ -13,9 +13,9 @@
 namespace rsp::utils {
 
 #ifdef LITTLE_ENDIAN
-    static const uint32_t cCRC32_POLY     = 0xEDB88320;
+    constexpr uint32_t cCRC32_POLY     = 0xEDB88320;
 #else
-    static const uint32_t cCRC32_POLY     = 0x04C11DB7;
+    constexpr uint32_t cCRC32_POLY     = 0x04C11DB7;
 #endif
 
 static const uint32_t cCRC32_XOR_MASK = 0xFFFFFFFF;
@@ -24,32 +24,6 @@ static const uint32_t cCRC32_XOR_MASK = 0xFFFFFFFF;
 const uint32_t* Crc32::getTable()
 {
     return crc32::detail::crc_table;
-/*
-    static uint32_t mTable[256] = { 0 };
-
-    int out = 0;
-    if (mTable[0] == 0) {
-        uint32_t polynomial = cCRC32_POLY;
-        for (uint32_t i = 0; i < 256; i++) {
-            uint32_t c = i;
-            for (int j = 0; j < 8; j++) {
-                if (c & 1) {
-                    c = polynomial ^ (c >> 1);
-                }
-                else {
-                    c >>= 1;
-                }
-            }
-            std::cout << "0x" << std::hex << std::setfill('0') << std::setw(8) << c << "L, ";
-            if ((++out % 8) == 0) {
-                std::cout << std::endl;
-            }
-            mTable[i] = c;
-        }
-    }
-
-    return mTable;
-*/
 }
 
 

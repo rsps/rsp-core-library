@@ -180,7 +180,7 @@ Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) co
     switch (mColorDepth) {
         case ColorDepth::Monochrome:
             offset = (((GetWidth() + 7) >> 3) * aY) + (aX >> 3);
-            result.SetAlpha( ((mpData[offset] & (1 << (aX % 8))) > 0) ? 255 : 0);
+            result.SetAlpha( ((mpData[offset] & (1 << (aX % 8))) != 0) ? 255 : 0);
             break;
 
         case ColorDepth::Alpha:

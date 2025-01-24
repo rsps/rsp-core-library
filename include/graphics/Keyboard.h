@@ -147,6 +147,10 @@ protected:
     virtual void doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol) = 0;
 };
 
+/**
+ * \class Keyboard
+ * \brief GUI widget with a complete keyboard in multiple layouts.
+ */
 class Keyboard: public KeyboardBase
 {
 public:
@@ -173,12 +177,34 @@ public:
         All       = 0x3F
     };
 
+    /**
+     * \brief Constructor that builds all internal button objects.
+     *        This is a quite heavy object, so avoid local variables
+     *        of this type.
+     *        The different layouts are hardcoded manipulation of the
+     *        button objects, so they do not need additional memory.
+     */
     Keyboard();
-    ~Keyboard() override;
 
+    /**
+     * \brief Change the button layout to the given type.
+     * \param aLayout
+     * \return self
+     */
     Keyboard& SetLayout(LayoutType aLayout);
+
+    /**
+     * \brief Get the current layout shown.
+     * \return LayoutType
+     */
     [[nodiscard]] LayoutType GetLayout() const { return mLayout; }
 
+    /**
+     * \brief Use this to hide some buttons not allowed in all situations.
+     *        E.g. space or layout change buttons.
+     * \param aMask
+     * \return self
+     */
     Keyboard& AllowedButtons(utils::EnumFlags<Buttons> aMask);
 protected:
     Key mBtnShift{};
