@@ -16,7 +16,6 @@ FetchContent_Populate(lighttpd_src
     QUIET
     GIT_REPOSITORY "https://github.com/lighttpd/lighttpd1.4"
     GIT_TAG "lighttpd-1.4.75"
-    BUILD_COMMAND ""
     SOURCE_DIR ${FETCHCONTENT_BASE_DIR}/lighttpd_src-src
     BINARY_DIR ${FETCHCONTENT_BASE_DIR}/lighttpd_src-build
     SUBBUILD_DIR ${FETCHCONTENT_BASE_DIR}/lighttpd_src-subbuild
