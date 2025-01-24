@@ -59,6 +59,12 @@ class QuitEvent : public rsp::messaging::EventBase<QuitEvent>
 
 using GfxEvent = rsp::messaging::EventPtr_t;
 
+enum class GfxEvents : size_t {
+    Touch = TouchEvent::ClassType,
+    Refresh = RefreshEvent::ClassType,
+    Quit = QuitEvent::ClassType
+};
+
 } /* namespace rsp::graphics */
 
 #endif // RSP_CORE_LIB_GRAPHICS_GFX_EVENTS_H

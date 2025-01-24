@@ -11,8 +11,6 @@
 #include <doctest.h>
 #include <cctype>
 #include <cstring>
-#include <iostream>
-#include <chrono>
 #include <filesystem>
 #include <network/IHttpRequest.h>
 #include <network/HttpRequest.h>
@@ -256,7 +254,7 @@ TEST_CASE("Network")
     }
 
     SUBCASE("Form Upload") {
-        const char* cUploadedFile = "./webserver/upload.png";
+        const char* cUploadedFile = "./webserver/uploaded.png";
         const char* cSourceFile = "./webserver/public/image.png";
 
         FileIO file(cSourceFile, std::ios_base::in);

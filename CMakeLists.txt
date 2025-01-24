@@ -12,7 +12,7 @@ OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enable
 OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
 OPTION(MBEDTLS_CRYPTO "Build with Mbed TLS encryption engine." OFF) # Disabled by default.
 OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Enabled by default.
-OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
+OPTION(BUILD_TESTING "Set to build test binaries" OFF) # Enabled by default.
 OPTION(ZLIB "Build with ZLib Inflate/Deflate compression." OFF)
 OPTION(NET_WPA_SUPPLICANT "Build with libwpa-client wpa_supplicant library." ON) # Enabled by default.
 OPTION(STD_THREAD "Thread architecture to use." ON) # C++ std::thread

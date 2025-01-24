@@ -85,20 +85,7 @@ void FileIO::Close()
 
 size_t FileIO::Seek(size_t aOffset, std::ios_base::seekdir aSeekDir)
 {
-    int base;
-    switch (aSeekDir) {
-        default:
-        case std::ios_base::beg:
-            base = SEEK_SET;
-            break;
-        case std::ios_base::cur:
-            base = SEEK_CUR;
-            break;
-        case std::ios_base::end:
-            base = SEEK_END;
-            break;
-    }
-    off_t ret = lseek(mHandle, static_cast<off_t>(aOffset), base);
+    off_t ret = lseek(mHandle, static_cast<off_t>(aOffset), int(aSeekDir));
     if (ret < 0) {
         THROW_SYSTEM("Error moving cursor in file " + mFileName);
     }

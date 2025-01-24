@@ -67,9 +67,9 @@ public:
             THROW_WITH_BACKTRACE1(EObjectPoolException, "ObjectPool is exhausted.");
         }
 
-        Node* result = mpAvailable;
-        result->DetachFrom(mpAvailable);
-        result->PushTo(mpUsed);
+        auto result = mpAvailable;
+        detachFrom(mpAvailable, result);
+        pushTo(mpUsed, result);
 
         return result->mElement;
     }
@@ -83,9 +83,9 @@ public:
         if (!mpUsed) {
             THROW_WITH_BACKTRACE1(EObjectPoolException, "Element does not belong to ObjectPool.");
         }
-        auto *node = reinterpret_cast<NodePtr_t>(&arElement);
-        node->DetachFrom(mpUsed);
-        node->PushTo(mpAvailable);
+        auto node = reinterpret_cast<NodePtr_t>(&arElement);
+        detachFrom(mpUsed, node);
+        pushTo(mpAvailable, node);
     }
 
     [[nodiscard]] size_t Available() const
@@ -110,40 +110,6 @@ private:
         Node& operator=(const Node &arOther) = default;
         Node& operator=(Node &&arOther) = default;
 
-        void DetachFrom(NodePtr_t& arList)
-        {
-            if (arList == this) {
-                arList = mpPrevious;
-            }
-            if (!mpNext) { // Last in list
-                if (mpPrevious) { // Not alone in list
-                    mpPrevious->mpNext = mpNext;
-                }
-            }
-            else if (mpPrevious) { // Mid in list
-                mpPrevious->mpNext = mpNext;
-                mpNext->mpPrevious = mpPrevious;
-            }
-            else { // First in list
-                mpNext->mpPrevious = nullptr;
-            }
-            mpNext = nullptr;
-            mpPrevious = nullptr;
-        }
-
-        /**
-         * Add node to end of list.
-         * \param arList
-         */
-        void PushTo(NodePtr_t& arList)
-        {
-            if (arList) { // Current end of list should point to this
-                arList->mpNext = this;
-                mpPrevious = arList;
-            }
-            arList = this; // Set new end of list
-        }
-
         size_t GetIndex() {
             size_t result = 0;
             auto p = this;
@@ -158,6 +124,36 @@ private:
     std::vector<Node> mPool{};
     NodePtr_t mpAvailable = nullptr; // Pointer to last element in available list
     NodePtr_t mpUsed = nullptr;      // Pointer to last element in used list
+
+    void detachFrom(NodePtr_t& arList, NodePtr_t aNode)
+    {
+        if (arList == aNode) {
+            arList = aNode->mpPrevious;
+        }
+        if (!aNode->mpNext) { // Last in list
+            if (aNode->mpPrevious) { // Not alone in list
+                aNode->mpPrevious->mpNext = aNode->mpNext;
+            }
+        }
+        else if (aNode->mpPrevious) { // Mid in list
+            aNode->mpPrevious->mpNext = aNode->mpNext;
+            aNode->mpNext->mpPrevious = aNode->mpPrevious;
+        }
+        else { // First in list
+            aNode->mpNext->mpPrevious = nullptr;
+        }
+        aNode->mpNext = nullptr;
+        aNode->mpPrevious = nullptr;
+    }
+
+    void pushTo(NodePtr_t& arList, NodePtr_t aNode)
+    {
+        if (arList) { // Current end of list should point to this
+            arList->mpNext = aNode;
+            aNode->mpPrevious = arList;
+        }
+        arList = aNode; // Set new end of list
+    }
 };
 
 } // namespace rsp::utils

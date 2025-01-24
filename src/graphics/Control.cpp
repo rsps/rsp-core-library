@@ -403,8 +403,8 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent) // NOLINT
 
 bool Control::ProcessEvent(rsp::messaging::Event &arEvent) // NOLINT
 {
-    switch (arEvent.Type) {
-        case TouchEvent::ClassType:
+    switch (GfxEvents(arEvent.Type)) {
+        case GfxEvents::Touch:
             if (!IsVisible()) {
                 break;
             }
@@ -413,7 +413,7 @@ bool Control::ProcessEvent(rsp::messaging::Event &arEvent) // NOLINT
             }
             return handleTouchEvent(arEvent);
 
-        case RefreshEvent::ClassType:
+        case GfxEvents::Refresh:
             Invalidate();
             break;
 

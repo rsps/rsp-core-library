@@ -1,7 +1,7 @@
 echo "Content-type: text/html"
 echo ""
 echo ""
-echo "Uploaded file size: $HTTP_CONTENT_LENGTH"
+echo "Content Length: $HTTP_CONTENT_LENGTH"
 #echo "Request Method: $REQUEST_METHOD"
 #env
 
@@ -20,6 +20,8 @@ if [ "$CTYPE" -ne "multipart/form-data" ]; then
     echo "Wrong Content-Type"
     exit -401
 fi
+
+ACTUAL_FILENAME="upload.png"
 
 while read LINE;
 do
@@ -40,13 +42,15 @@ do
             read EMPTYLINE
             read DATA
             echo "filename: $DATA"
+            ACTUAL_FILENAME=${DATA//[$'\t\r\n ']}
         elif [[ $NAME == "name=\"filedata\"" ]]; then
             read DATA
             echo "filedata: $FILENAME; $DATA"
             read EMPTYLINE
-            cp -b /dev/stdin ../upload.png
-            SKIP=$(grep -oba -- "$BOUNDARY" ../upload.png |cut -d ':' -f 1)
-            truncate -c -s $(($SKIP - 4)) ../upload.png
+            cp -b /dev/stdin "../$ACTUAL_FILENAME"
+            SKIP=$(grep -oba -- "$BOUNDARY" "../$ACTUAL_FILENAME" |cut -d ':' -f 1)
+            truncate -c -s $(($SKIP - 4)) "../$ACTUAL_FILENAME"
+            stat --format="Filesize: %s" "../$ACTUAL_FILENAME"
             break
         fi
     fi
