@@ -44,7 +44,19 @@ static const char* GetEnv(const char *apName, const char *apDefault)
     return apDefault;
 }
 
-TEST_CASE("WLAN")
+static bool wpa_supplicant_not_available()
+{
+    std::string wpa_dir("/var/run/wpa_supplicant/");
+    NetworkInterfaces ifs;
+    std::string wifi_if(ifs.GetWireless()[0]);
+    if (!FileSystem::FileExists(wpa_dir + wifi_if)) {
+        std::cerr << "SKIPPING WLAN test. The wpa_supplicant directory " << wpa_dir << wifi_if << " is not accessible by this program/user";
+        return true;
+    }
+    return false;
+}
+
+TEST_CASE("WLAN" * doctest::skip(wpa_supplicant_not_available()))
 {
     const char* cSSID = GetEnv("SSID", "MyWLan");
     const char* cPSK = GetEnv("PSK", "VerySecurePW");
