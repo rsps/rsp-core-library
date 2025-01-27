@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef RSP_CORE_LIB_ADDRESSINFO_H
-#define RSP_CORE_LIB_ADDRESSINFO_H
+#ifndef RSP_CORE_LIB_ADDRESS_INFO_H
+#define RSP_CORE_LIB_ADDRESS_INFO_H
 
 #include <string_view>
 #include "SocketTypes.h"
@@ -40,4 +40,4 @@ protected:
 };
 } // rsp::posix
 
-#endif //RSP_CORE_LIB_ADDRESSINFO_H
+#endif //RSP_CORE_LIB_ADDRESS_INFO_H

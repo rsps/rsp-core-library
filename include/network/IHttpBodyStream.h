@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef RSP_CORE_LIB_IHTTPBODYSTREAM_H
-#define RSP_CORE_LIB_IHTTPBODYSTREAM_H
+#ifndef RSP_CORE_LIB_I_HTTP_BODY_STREAM_H
+#define RSP_CORE_LIB_I_HTTP_BODY_STREAM_H
 
 #include <string>
 
@@ -46,4 +46,4 @@ std::ostream& operator<<(std::ostream &o, IHttpBodyStream &s);
 
 } // rsp::network
 
-#endif //RSP_CORE_LIB_IHTTPBODYSTREAM_H
+#endif //RSP_CORE_LIB_I_HTTP_BODY_STREAM_H

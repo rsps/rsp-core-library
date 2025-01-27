@@ -1,7 +1,7 @@
 /*!
- * \copyright    Copyright 2022 RSP Systems A/S. All rights reserved.
+ * \copyright    Copyright 2022-2025 RSP Systems A/S. All rights reserved.
  * \license      Mozilla Public License 2.0
- * \author:      Jesper Madsen
+ * \author:      Steffen Brummer
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this

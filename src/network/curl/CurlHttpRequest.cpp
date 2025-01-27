@@ -288,11 +288,11 @@ void CurlHttpRequest::populateOptions()
             break;
     }
 
-    if (!mRequestOptions.WriteFile.IsNull()) {
-        writeToFile(mRequestOptions.WriteFile.Get());
+    if (mRequestOptions.WriteFile) {
+        writeToFile(mRequestOptions.WriteFile.value());
     }
-    if (!mRequestOptions.ReadFile.IsNull()) {
-        readFromFile(mRequestOptions.ReadFile.Get());
+    if (mRequestOptions.ReadFile) {
+        readFromFile(mRequestOptions.ReadFile.value());
     }
 
     setCurlOption(CURLOPT_VERBOSE, mRequestOptions.Verbose);
