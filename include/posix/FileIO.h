@@ -181,10 +181,14 @@ public:
     [[nodiscard]] bool WaitForDataReady(int aTimeoutMs) const;
 
 protected:
-//    static void close(int aHandle);
+    struct FileHandleDeleter
+    {
+        void operator()(int aHandle) noexcept {
+            ::close(aHandle);
+        }
+    };
 
-//    using FileHandle_t = utils::SystemHandle<int, decltype(&FileIO::close), -1>;
-    using FileHandle_t = utils::SystemHandle<int, decltype([](int const handle) noexcept { ::close(handle); }), -1>;
+    using FileHandle_t = rsp::utils::SystemHandle<int, FileHandleDeleter, -1>;
 
     std::string mFileName{};
     FileHandle_t mHandle{};

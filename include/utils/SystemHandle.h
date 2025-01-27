@@ -16,18 +16,18 @@
 
 namespace rsp::utils {
 
-template<typename T> concept IsTrivial = std::is_trivial_v<T>;
-
 /**
- * \brief Class to encapsulate integral type system handles.
+ * \brief class to encapsulate integral type system handles.
  * \tparam T System handle (like a Linux file handle)
- * \tparam D Invokable, called when this object is destroyed so handle can be released correctly.
- * \tparam invalid_handle Initializer value for empty/destroyed/invalidated handle
+ * \tparam D Deleter callable for handle release
+ * \tparam invalid_handle_v Initializer value for empty/destroyed/invalidated handle
  */
-template<IsTrivial T, typename D, T invalid_handle = T{}> requires std::invocable<D&, T>
+template<typename T, typename D, T invalid_handle_v = T{}> requires std::is_trivial_v<T> && std::is_invocable_v<D>
 class SystemHandle
 {
 public:
+    constexpr static T cInvalidHandle = invalid_handle_v;
+
     constexpr SystemHandle() = default;
 
     constexpr ~SystemHandle()
@@ -43,13 +43,13 @@ public:
     constexpr SystemHandle(SystemHandle&& arOther) noexcept
         : mHandle{arOther.mHandle}
     {
-        arOther.mHandle = invalid_handle;
+        arOther.mHandle = cInvalidHandle;
     }
 
     constexpr SystemHandle& operator=(SystemHandle&& arOther) noexcept
     {
         mHandle = arOther.mHandle;
-        arOther.mHandle = invalid_handle;
+        arOther.mHandle = cInvalidHandle;
         return *this;
     }
 
@@ -83,12 +83,12 @@ public:
 
     [[nodiscard]] constexpr explicit operator bool() const noexcept
     {
-        return mHandle != invalid_handle;
+        return mHandle != cInvalidHandle;
     }
 
     [[nodiscard]] constexpr bool operator!() const noexcept
     {
-        return mHandle == invalid_handle;
+        return mHandle == cInvalidHandle;
     }
 
     [[nodiscard]] constexpr bool operator==(SystemHandle const&) const noexcept requires std::equality_comparable<T> = default;
@@ -102,14 +102,14 @@ public:
 
     constexpr void Close()
     {
-        if (mHandle != invalid_handle) {
-            std::invoke(D{}, mHandle);
-            mHandle = invalid_handle;
+        if (mHandle != cInvalidHandle) {
+            D{}(mHandle);
+            mHandle = cInvalidHandle;
         }
     }
 
 private:
-    T mHandle{invalid_handle};
+    T mHandle = cInvalidHandle;
 };
 
 } // rsp::utils
