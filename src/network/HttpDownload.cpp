@@ -8,6 +8,8 @@
  * \author      Steffen Brummer
  */
 
+#include <algorithm>
+#include <list>
 #include <string>
 #include <network/HttpDownload.h>
 #include <posix/FileSystem.h>
@@ -19,7 +21,13 @@ using namespace rsp::utils;
 
 namespace rsp::network {
 
+HttpDownload::HttpDownload()
+    : mPimpl(Create())
+{
+}
+
 HttpDownload::HttpDownload(const std::string &arFileName)
+    : mPimpl(Create())
 {
     SetFileName(arFileName);
 }
@@ -33,45 +41,55 @@ HttpDownload& HttpDownload::SetFileName(const std::string &arFileName)
 IHttpResponse& HttpDownload::Execute()
 {
     if (mFileName.empty()) {
-        return HttpRequest::Execute();
+        return mPimpl->Execute();
     }
 
     std::string modified_time{};
     if (FileSystem::FileExists(mFileName)) {
-        auto mtime = FileSystem::GetFileModifiedTime(mFileName);
-        modified_time = mtime.ToHTTP();
+        auto fmt = FileSystem::GetFileModifiedTime(mFileName);
+        modified_time = fmt.ToHTTP();
     }
 
     rsp::posix::FileIO file(mFileName, std::ios::in | std::ios::out | std::ios_base::ate, 0640);
 
-    HttpRequestOptions orig_opt = GetOptions();
-    orig_opt.RequestType = HttpRequestType::GET;
-
-    HttpRequestOptions opt = orig_opt;
-    opt.WriteFile = &file; // Redirect response body to file
-    opt.Headers["Range"] = std::string("bytes=") + std::to_string(file.GetSize()) + "-"; // Returns 206 if range request succeeds
+    HttpRequestOptions opt = GetOptions();
+    opt.RequestType = HttpRequestType::HEAD;
     if (!modified_time.empty()) {
         opt.Headers["If-Unmodified-Since"] = modified_time; // Returns 412 if condition fails.
     }
-    SetOptions(opt);
 
     IHttpResponse* resp = &(mPimpl->Execute());
+    if (resp->GetStatusCode() != StatusCodes::Ok) {
+        return *resp;
+    }
 
-    if (resp->GetStatusCode() != 206) {
+    if (resp->GetHeaders().contains("accept-ranges") && resp->GetHeader("accept-ranges") != "none") {
+        opt.Headers["Range"] = std::string("bytes=") + std::to_string(file.GetSize()) + "-"; // Returns 206 if range request succeeds
+    }
+    else {
         file.SetSize(0);
-        SetOptions(orig_opt);
-        resp = &(mPimpl->Execute());
+    }
+    opt.RequestType = HttpRequestType::GET;
+    opt.WriteFile = file; // Redirect response body to file
+    SetOptions(opt);
+
+    resp = &(mPimpl->Execute());
+
+    const auto haystack = std::list{StatusCodes::Ok, StatusCodes::PartialContent};
+    if (!std::ranges::contains(haystack, resp->GetStatusCode())) {
+        file.SetSize(0);
     }
 
     file.Close();
-    SetFileModifiedTime(resp->GetHeader("last-modified"));
+    if (resp->GetHeaders().contains("last-modified")) {
+        setFileModifiedTime(resp->GetHeader("last-modified"));
+    }
 
     return *resp;
 }
 
-void HttpDownload::SetFileModifiedTime(const std::string &arTimeString)
+void HttpDownload::setFileModifiedTime(const std::string &arTimeString)
 {
-    using namespace std::chrono;
     DateTime dt(arTimeString, DateTime::Formats::HTTP);
     FileSystem::SetFileModifiedTime(mFileName, dt);
 }

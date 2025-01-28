@@ -289,10 +289,10 @@ void CurlHttpRequest::populateOptions()
     }
 
     if (mRequestOptions.WriteFile) {
-        writeToFile(mRequestOptions.WriteFile.value());
+        writeToFile(&mRequestOptions.WriteFile.value());
     }
     if (mRequestOptions.ReadFile) {
-        readFromFile(mRequestOptions.ReadFile.value());
+        readFromFile(&mRequestOptions.ReadFile.value());
     }
 
     setCurlOption(CURLOPT_VERBOSE, mRequestOptions.Verbose);
@@ -358,9 +358,9 @@ void CurlHttpRequest::populateOptions()
 /**
  * \brief Factory function to decouple dependency
  *
- * \return IHttpRequest*
+ * \return IHttpRequest unique pointer
  */
-IHttpRequest* rsp::network::HttpRequest::MakeRequest()
+std::unique_ptr<IHttpRequest> rsp::network::IHttpRequest::Create()
 {
-    return new rsp::network::curl::CurlHttpRequest();
+    return std::make_unique<rsp::network::curl::CurlHttpRequest>();
 }

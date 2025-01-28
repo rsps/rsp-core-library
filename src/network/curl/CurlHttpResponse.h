@@ -36,7 +36,7 @@ protected:
     }
     void setStatusCode(int aCode)
     {
-        mStatusCode = aCode;
+        mStatusCode = StatusCodes(aCode);
     }
     [[nodiscard]] std::string& getBody() // NOLINT
     {
@@ -45,7 +45,7 @@ protected:
     void clear()
     {
         mHeaders.clear();
-        mStatusCode = 0;
+        mStatusCode = StatusCodes::Unknown;
         mBody.clear();
     }
 

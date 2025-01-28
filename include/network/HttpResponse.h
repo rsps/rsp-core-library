@@ -36,7 +36,7 @@ public:
 
     [[nodiscard]] const std::string& GetHeader(const std::string &arName) const override;
 
-    [[nodiscard]] int GetStatusCode() const override
+    [[nodiscard]] StatusCodes GetStatusCode() const override
     {
         return mStatusCode;
     }
@@ -53,7 +53,7 @@ public:
 
 protected:
     IHttpRequest &mrRequest;
-    int mStatusCode = 0;
+    StatusCodes mStatusCode = StatusCodes::Unknown;
     std::map<std::string, std::string> mHeaders { };
     std::string mBody { };
 };

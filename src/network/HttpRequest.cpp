@@ -12,21 +12,13 @@
 
 namespace rsp::network {
 
-std::ostream& operator<<(std::ostream &o, const IHttpRequest& arReq)
-{
-    o << arReq.GetOptions();
-
-    return o;
-}
-
-
 HttpRequest::HttpRequest()
-    : mPimpl(MakeRequest())
+    : mPimpl(Create())
 {
 }
 
 HttpRequest::HttpRequest(const HttpRequestOptions& arOptions)
-    : mPimpl(MakeRequest())
+    : mPimpl(Create())
 {
     mPimpl->SetOptions(arOptions);
 }

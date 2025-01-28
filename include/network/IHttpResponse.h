@@ -15,7 +15,8 @@
 #include <ostream>
 #include <map>
 #include <string>
-#include <network/IHttpRequest.h>
+#include "IHttpRequest.h"
+#include "StatusCodes.h"
 
 namespace rsp::network {
 
@@ -59,9 +60,9 @@ public:
      * \fn int GetStatusCode()const =0
      * \brief Get the status code of the response
      *
-     * \return integer status code
+     * \return StatusCodes status code returned from server
      */
-    [[nodiscard]] virtual int GetStatusCode() const = 0;
+    [[nodiscard]] virtual StatusCodes GetStatusCode() const = 0;
 
     /**
      * \fn const IHttpRequest GetRequest&()const =0

@@ -183,7 +183,7 @@ Socket &Socket::Bind(const AddressInfo &arAddrInfo, bool aBindAll)
     int err = 0;
     for (auto &sa : arAddrInfo.GetAddresses()) {
         if (sa.GetDomain() == Domain::Unix) {
-            deleteOldSocketInode(sa);
+            deleteOldSocketINode(sa);
         }
         res = bind(mHandle.Get(), &sa.Get(), sa.GetSize());
         if (res == 0) {
@@ -368,7 +368,7 @@ Socket& Socket::Shutdown(ShutdownFlags aFlag)
     return *this;
 }
 
-void Socket::deleteOldSocketInode(const SocketAddress &arAddr)
+void Socket::deleteOldSocketINode(const SocketAddress &arAddr)
 {
     FileSystem::DeleteFile(arAddr.AsString());
 }

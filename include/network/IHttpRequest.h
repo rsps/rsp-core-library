@@ -29,6 +29,8 @@ class IHttpResponse;
 class IHttpRequest
 {
 public:
+    static std::unique_ptr<IHttpRequest> Create();
+
     virtual ~IHttpRequest() = default;
 
     /**
@@ -107,7 +109,12 @@ public:
  * \param arReq The HTTP request to dump to the stream.
  * \return output stream
  */
-std::ostream& operator<<(std::ostream &o, const IHttpRequest& arReq);
+inline std::ostream& operator<<(std::ostream &o, const IHttpRequest& arReq)
+{
+    o << arReq.GetOptions();
+    return o;
+}
+
 
 } // namespace rsp::network
 

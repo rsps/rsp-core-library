@@ -111,7 +111,7 @@ protected:
     Type mType = Type::Stream;
     Protocol mProtocol = Protocol::Unspecified;
 
-    static void deleteOldSocketInode(const SocketAddress &arAddr);
+    static void deleteOldSocketINode(const SocketAddress &arAddr);
 
     /**
      * \brief Special constructor for use in Accept

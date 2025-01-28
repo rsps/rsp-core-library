@@ -66,7 +66,6 @@ public:
 
 protected:
     std::unique_ptr<IHttpRequest> mPimpl;
-    static IHttpRequest* MakeRequest();
 };
 
 } // rsp::network

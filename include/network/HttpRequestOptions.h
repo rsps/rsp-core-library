@@ -53,8 +53,8 @@ public:
     HttpRequestType RequestType = HttpRequestType::GET;
     std::string BasicAuthUsername{};
     std::string BasicAuthPassword{};
-    std::optional<rsp::posix::FileIO*> WriteFile{};
-    std::optional<rsp::posix::FileIO*> ReadFile{};
+    std::optional<rsp::posix::FileIO> WriteFile{};
+    std::optional<rsp::posix::FileIO> ReadFile{};
 
     void Clear() {
         Headers.clear();
