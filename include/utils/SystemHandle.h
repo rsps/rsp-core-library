@@ -22,7 +22,7 @@ namespace rsp::utils {
  * \tparam D Deleter callable for handle release
  * \tparam invalid_handle_v Initializer value for empty/destroyed/invalidated handle
  */
-template<typename T, typename D, T invalid_handle_v = T{}> requires std::is_trivial_v<T> && std::is_invocable_v<D>
+template<typename T, typename D, T invalid_handle_v = T{}> requires std::is_trivial_v<T> && std::is_invocable_v<D, T&>
 class SystemHandle
 {
 public:

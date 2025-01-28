@@ -15,10 +15,12 @@
 #include <netinet/in.h>
 #include <sys/un.h>
 #include <exceptions/CoreException.h>
+#include <exceptions/ExceptionHelper.h>
 #include "SocketAddress.h"
 #include "SocketTypes.h"
 #include "AddressInfo.h"
 #include <logging/LogChannel.h>
+#include <utils/SystemHandle.h>
 
 namespace rsp::posix {
 
@@ -42,7 +44,6 @@ public:
     Socket(Domain aDomain, Type aType, Protocol aProtocol = Protocol::Unspecified);
     Socket(const Socket&) = delete;
     Socket(Socket&&) noexcept;
-    ~Socket() override;
 
     Socket& operator=(const Socket&) = delete;
     Socket& operator=(Socket&&) noexcept;
@@ -77,9 +78,15 @@ public:
     Socket& Connect(const AddressInfo &arAddrInfo);
     [[nodiscard]] int GetOptions(SockOptions aOption, int aLevel = SOL_SOCKET) const;
     Socket& Listen(size_t aAcceptQueueSize = 0);
-    size_t Receive(uint8_t *apBuffer, size_t aBufLen, int aFlags = 0) const;
-    size_t ReceiveFrom(Socket &arPeer, uint8_t *apBuffer, size_t aBufLen, int aFlags = 0) const;
-    size_t Send(const uint8_t *apBuffer, size_t aBufLen, int aFlags = 0) const;
+    [[nodiscard]] size_t Receive(std::span<std::byte> aBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t Receive(std::string &arStringBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t ReceiveFrom(Socket &arPeer, std::span<std::byte> aBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t ReceiveFrom(Socket &arPeer, std::string &arStringBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t Send(std::span<const std::byte> aBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t Send(const std::string &arStringBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t SendTo(const Socket &arPeer, std::span<const std::byte> aBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t SendTo(const Socket &arPeer, const std::string &arStringBuffer, int aFlags = 0) const;
+
     Socket& SetOptions(SockOptions aOption, int aValue, int aLevel = SOL_SOCKET);
     Socket& Shutdown(ShutdownFlags aFlag);
 
@@ -88,7 +95,16 @@ public:
     [[nodiscard]] int GetFd() const;
 
 protected:
-    int mHandle = 0;
+    struct SocketHandleDeleter
+    {
+        void operator()(int aHandle) noexcept {
+            ::shutdown(aHandle, int(ShutdownFlags::ReadWrite));
+            ::close(aHandle);
+        }
+    };
+    using SocketHandle_t = rsp::utils::SystemHandle<int, SocketHandleDeleter, -1>;
+
+    SocketHandle_t mHandle{};
     SocketAddress mLocalAddress{};
     SocketAddress mPeerAddress{};
     Domain mDomain = Domain::Unspecified;

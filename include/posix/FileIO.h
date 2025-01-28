@@ -187,8 +187,12 @@ protected:
             ::close(aHandle);
         }
     };
-
     using FileHandle_t = rsp::utils::SystemHandle<int, FileHandleDeleter, -1>;
+
+/*  Solution with lambda make the compiler bark with Internal linkage error:
+ *  using FileHandle_t = rsp::utils::SystemHandle<int, decltype([](int handle){ ::close(handle); }), -1>;
+ *  It might work if code is placed in *.cpp file.
+ */
 
     std::string mFileName{};
     FileHandle_t mHandle{};

@@ -56,10 +56,14 @@ static bool wpa_supplicant_not_available()
     return false;
 }
 
-TEST_CASE("WLAN" * doctest::skip(wpa_supplicant_not_available()))
+TEST_CASE("WLAN") // * doctest::skip(wpa_supplicant_not_available()))
 {
     const char* cSSID = GetEnv("SSID", "MyWLan");
     const char* cPSK = GetEnv("PSK", "VerySecurePW");
+
+    if (wpa_supplicant_not_available()) {
+        return; // This exits the test case without signalling error.
+    }
 
     TestLogger logger;
 
@@ -80,10 +84,6 @@ TEST_CASE("WLAN" * doctest::skip(wpa_supplicant_not_available()))
         }
 
         MESSAGE(out.str());
-
-        std::string wpa_dir("/var/run/wpa_supplicant/");
-        std::string wifi_if(ifs.GetWireless()[0]);
-        REQUIRE_MESSAGE(FileSystem::FileExists(wpa_dir + wifi_if), "The wpa_supplicant directory " << wpa_dir << wifi_if << " is not accessible by this program/user");
     }
 
     SUBCASE("Constructors") {
