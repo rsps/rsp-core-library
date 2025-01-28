@@ -4,8 +4,8 @@ find_package(Git REQUIRED)
 # Include external projects Doctest from github.
 FetchContent_Declare(
     DocTest
-    GIT_REPOSITORY "https://github.com/onqtam/doctest"
-    GIT_TAG "v2.4.11"
+    URL https://raw.githubusercontent.com/doctest/doctest/v2.4.11/doctest/doctest.h
+    DOWNLOAD_NO_EXTRACT TRUE
 )
 FetchContent_MakeAvailable(DocTest)
 
@@ -39,10 +39,10 @@ enable_testing()
 set (TEST_BINARY "rsp-core-lib-test")
 
 add_executable(${TEST_BINARY})
-add_dependencies(${TEST_BINARY} doctest lighttpd)
+add_dependencies(${TEST_BINARY} lighttpd)
 target_include_directories(${TEST_BINARY}
     PUBLIC
-        ${doctest_SOURCE_DIR}/doctest
+        ${doctest_SOURCE_DIR}
         ${PROJECT_SOURCE_DIR}/include
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src
