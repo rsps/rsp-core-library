@@ -177,7 +177,7 @@ TEST_CASE("Network")
             auto mtime = FileSystem::GetFileModifiedTime(cFile);
             CHECK_EQ(0, truncate(cFile.c_str(), 20*1024)); // This changes mtime
             // This line will work, as the result is the partial data from an unmodified file.
-            FileSystem::SetFileModifiedTime(cFile, mtime + 2h);
+            FileSystem::SetFileModifiedTime(cFile, mtime);
 
             CHECK_NOTHROW(resp = &request.Execute());
 
@@ -185,23 +185,13 @@ TEST_CASE("Network")
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
         }
 
-        SUBCASE("Modified To Fail") {
+        SUBCASE("Existing To File") {
             using namespace std::literals::chrono_literals;
-
-//            opt.Verbose = 1;
-//            request.SetOptions(opt);
-
-            auto mtime = FileSystem::GetFileModifiedTime(cFile);
-            CHECK_EQ(0, truncate(cFile.c_str(), 20*1024)); // This changes mtime
-            // FIXME: This line should fail with a "412 Precondition Failed", lighttpd does not send the correct result.
-            FileSystem::SetFileModifiedTime(cFile, mtime - 2h);
 
             CHECK_NOTHROW(resp = &request.Execute());
 
             CHECK_EQ(resp->GetBody().size(), 0);
-//            CHECK_EQ(resp->GetStatusCode(), 412); // This is the correct result.
-            CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent); // FIXME: This is the wrong result!!!
-            MESSAGE("Warning: This test should currently fail!!! It passes because of a bug in lighttpd.");
+            CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
         }
 
         CHECK_EQ(resp->GetHeader("content-type"), "image/png");

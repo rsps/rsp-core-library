@@ -50,17 +50,24 @@ IHttpResponse& HttpDownload::Execute()
         modified_time = fmt.ToHTTP();
     }
 
-    rsp::posix::FileIO file(mFileName, std::ios::in | std::ios::out | std::ios_base::ate, 0640);
-
     HttpRequestOptions opt = GetOptions();
     opt.RequestType = HttpRequestType::HEAD;
     if (!modified_time.empty()) {
         opt.Headers["If-Unmodified-Since"] = modified_time; // Returns 412 if condition fails.
     }
+    SetOptions(opt);
 
     IHttpResponse* resp = &(mPimpl->Execute());
     if (resp->GetStatusCode() != StatusCodes::Ok) {
         return *resp;
+    }
+
+    rsp::posix::FileIO file(mFileName, std::ios::in | std::ios::out | std::ios_base::ate, 0640);
+
+    if (resp->GetHeaders().contains("content-length") && std::stoul(resp->GetHeader("content-length")) == file.GetSize()) {
+        if (resp->GetHeaders().contains("last-modified") && resp->GetHeader("last-modified") == modified_time) {
+            return *resp;
+        }
     }
 
     if (resp->GetHeaders().contains("accept-ranges") && resp->GetHeader("accept-ranges") != "none") {

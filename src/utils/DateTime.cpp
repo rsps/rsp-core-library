@@ -223,7 +223,7 @@ std::string DateTime::ToLogging() const
 
 std::string DateTime::ToHTTP() const
 {
-    return ToString("%a, %d %b %Y %H:%M:%S");
+    return ToString("%a, %d %b %Y %H:%M:%S GMT");
 }
 
 DateTime& DateTime::FromString(const std::string &arTimeString, const char *apFormat)
