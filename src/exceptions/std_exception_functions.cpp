@@ -15,6 +15,8 @@
 #include <typeinfo>
 #include <functional>
 #include <future>
+#include <cstdio>
+#include <cstdarg>
 
 /**
  * \brief Override all standard exception functions with backtraced alternatives.
@@ -87,12 +89,18 @@ __throw_out_of_range(const char* apMsg)
     THROW_WITH_BACKTRACE1(out_of_range, apMsg);
 }
 
-//void
-//__throw_out_of_range_fmt(const char*, ...)
+void
+__throw_out_of_range_fmt(const char* format, ...)
 //__attribute__((__format__(__gnu_printf__, 1, 2)))
-//{
-//    throw OutOfRange(apMsg);
-//}
+{
+    char buffer[256];
+    va_list args;
+    va_start (args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end (args);
+
+    THROW_WITH_BACKTRACE1(out_of_range, buffer);
+}
 
 void
 __throw_runtime_error(const char* apMsg)

@@ -82,7 +82,7 @@ IHttpResponse& HttpDownload::Execute()
 
     resp = &(mPimpl->Execute());
 
-    const auto haystack = std::list{StatusCodes::Ok, StatusCodes::PartialContent};
+    constexpr StatusCodes haystack[] = {StatusCodes::Ok, StatusCodes::PartialContent};
     if (!std::ranges::contains(haystack, resp->GetStatusCode())) {
         file.SetSize(0);
     }

@@ -29,6 +29,10 @@ class IHttpResponse;
 class IHttpRequest
 {
 public:
+    /**
+     * \brief Factory method for creating IHttpRequest objects.
+     * \return Pointer to IHttpRequest object.
+     */
     static std::unique_ptr<IHttpRequest> Create();
 
     virtual ~IHttpRequest() = default;
