@@ -13,21 +13,25 @@
 #include <array>
 #include <cstring>
 #include <exceptions/CoreException.h>
+#include <span>
 
 namespace rsp::utils {
 
 /**
- * \class FifoBuffer
- * \brief FIFO implementation with chunked read and write capability.
- *        The internal memory structure is continuous, so direct C style buffer pointer access is also possible.
- *        This class can be used as proxy for chunked data to true streaming.
+ * \class FifoBufferBase
+ * \brief Adds FIFO capability to the given data buffer.
  * \tparam T Type of fifo elements
- * \tparam N Number of elements in fifo
  */
-template<class T, size_t N>
-class FifoBuffer
+template<class T>
+class FifoBufferBase
 {
 public:
+    /**
+     * \brief Construct a fifo on the given buffer
+     * \param aBuffer
+     */
+    explicit FifoBufferBase(std::span<T> aBuffer) : mBuffer(aBuffer) {}
+
     /**
      * \brief Get a pointer to the first element in the buffer
      * \return Pointer of type T
@@ -44,13 +48,13 @@ public:
      * \param aHead
      * \return
      */
-    FifoBuffer& SetHead(size_t aHead)
+    FifoBufferBase& SetHead(size_t aHead)
     {
         ASSERT(mHead == 0)
-        ASSERT(mHead <= N)
+        ASSERT(mHead <= mBuffer.size())
         ASSERT(mTail == 0)
         if (aHead > 0) {
-            mHead = aHead % N;
+            mHead = aHead % mBuffer.size();
             mFull = (mHead == mTail);
         }
         return *this;
@@ -71,7 +75,7 @@ public:
      */
     [[nodiscard]] bool IsEmpty() const
     {
-        return mHead == mTail && !mFull;
+        return ((mHead == mTail) && (!mFull));
     }
 
     /**
@@ -81,12 +85,12 @@ public:
     [[nodiscard]] size_t Used() const
     {
         if (mFull) {
-            return N;
+            return mBuffer.size();
         }
         if (mTail <= mHead) {
             return mHead - mTail;
         }
-        return (N - mTail) + mHead;
+        return (mBuffer.size() - mTail) + mHead;
     }
 
     /**
@@ -101,7 +105,7 @@ public:
         if (mHead < mTail) {
             return mTail - mHead;
         }
-        return (N - mHead) + mTail;
+        return (mBuffer.size() - mHead) + mTail;
     }
 
     /**
@@ -112,7 +116,7 @@ public:
     {
         ASSERT(!IsEmpty())
         T result;
-        Read(&result, 1);
+        Read({&result, 1});
         return result;
     }
 
@@ -122,7 +126,7 @@ public:
      */
     void Push(T aValue)
     {
-        auto sz = Write(&aValue, 1);
+        auto sz = Write({&aValue, 1});
         ASSERT(sz == 1)
     }
 
@@ -132,62 +136,79 @@ public:
      * \param aMaxSize Number of elements the buffer can hold
      * \return Number of elements stored in given buffer
      */
-    size_t Read(T *apBuffer, size_t aMaxSize)
+    size_t Read(std::span<T> aBuffer)
     {
-        size_t size = std::min(Used(), aMaxSize);
+        size_t size = std::min(Used(), aBuffer.size());
         if (IsEmpty()) {
             return size;
         }
 
         if (mHead > mTail) {
-            std::memcpy(apBuffer, &mBuffer.at(mTail), size);
+            std::memcpy(aBuffer.data(), &mBuffer[mTail], size);
         }
         else {
             auto sz = std::min(size, mBuffer.size() - mTail);
-            std::memcpy(apBuffer, &mBuffer.at(mTail), sz);
+            std::memcpy(aBuffer.data(), &mBuffer[mTail], sz);
             if (size > sz) {
                 sz = std::min(mHead, size - sz);
-                std::memcpy(&apBuffer[sz], &mBuffer.at(0), sz);
+                std::memcpy(aBuffer.data() + sz, mBuffer.data(), sz);
             }
         }
-        mTail = (mTail + size) % N;
+        mTail = (mTail + size) % mBuffer.size();
         mFull = false;
         return size;
     }
 
     /**
      * \brief Copy the given number of elements from given buffer to this fifo.
-     * \param apBuffer Pointer to continuous memory region with elements.
-     * \param aSize Number of elements to copy
+     * \param apBuffer Span of continuous memory region with elements.
      * \return Number of elements written (Can be smaller than given size, if fifo does not have enough free slots.
      */
-    size_t Write(const T *apBuffer, size_t aSize)
+    size_t Write(std::span<const T> aBuffer)
     {
-        size_t size = std::min(Free(), aSize);
+        size_t size = std::min(Free(), aBuffer.size());
         if (size == 0) {
             return 0;
         }
         if (mHead >= mTail) {
             auto sz = std::min(size, mBuffer.size() - mHead);
-            std::memcpy(&mBuffer.at(mHead), apBuffer, sz);
+            std::memcpy(&mBuffer[mHead], aBuffer.data(), sz);
             if (sz < size) {
-                std::memcpy(&mBuffer.at(sz), &apBuffer[sz], size - sz);
+                std::memcpy(&mBuffer[sz], &aBuffer[sz], size - sz);
             }
         }
         else {
             auto sz = std::min(size, mTail - mHead - 1);
-            std::memcpy(&mBuffer.at(mHead), apBuffer, sz);
+            std::memcpy(&mBuffer[mHead], aBuffer.data(), sz);
         }
-        mHead = (mHead + size) % N;
+        mHead = (mHead + size) % mBuffer.size();
         mFull = (mHead == mTail);
         return size;
     }
 
-protected:
-    std::array<T, N> mBuffer{};
+private:
+    std::span<T> mBuffer;
     size_t mHead = 0;
     size_t mTail = 0;
     bool mFull = false;
+};
+
+/**
+ * \class FifoBuffer
+ * \brief FIFO implementation with chunked read and write capability.
+ *        The internal memory structure is continuous, so direct C style buffer pointer access is also possible.
+ *        This class can be used as proxy for chunked data to true streaming.
+ * \tparam T Type of fifo elements
+ * \tparam N Number of elements in fifo
+ */
+template<class T, size_t N>
+class FifoBuffer : public FifoBufferBase<T>
+{
+public:
+    FifoBuffer() : FifoBufferBase<T>(mBuffer) {}
+
+protected:
+    std::array<T, N> mBuffer{};
 };
 
 } // namespace rsp::utils

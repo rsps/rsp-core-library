@@ -20,7 +20,7 @@
 #include <network/HttpStringBody.h>
 #include <network/MultipartBoundary.h>
 #include <network/NetworkException.h>
-#include <network/RequestData.h>
+#include <network/ChunkedDataController.h>
 #include <posix/FileSystem.h>
 #include <posix/FileIO.h>
 #include <utils/StrUtils.h>
@@ -304,7 +304,7 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
         CHECK_EQ(ss.str(), body.Get());
 
         char buffer[52];
-        RequestData rd;
+        ChunkedDataController rd;
 
         while (!rd.GetData(buffer, sizeof(buffer) - 1, body)) {
             buffer[rd.GetWritten()] = '\0';

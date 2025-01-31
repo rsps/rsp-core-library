@@ -57,7 +57,7 @@ void CurlHttpRequest::readFromString(const std::string &arString)
     setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(arString.size()));
 }
 
-void CurlHttpRequest::readFromStream(const std::shared_ptr<IHttpBodyStream>& arBody)
+void CurlHttpRequest::readFromStream(const std::shared_ptr<IChunkedDataProvider>& arBody)
 {
     if (!arBody) {
         return;
@@ -155,13 +155,13 @@ const HttpRequestOptions& CurlHttpRequest::GetOptions() const
     return mRequestOptions;
 }
 
-IHttpRequest& CurlHttpRequest::SetBody(std::shared_ptr<IHttpBodyStream> apBody)
+IHttpRequest& CurlHttpRequest::SetBody(std::shared_ptr<IChunkedDataProvider> apBody)
 {
     mRequestOptions.Body = apBody;
     return *this;
 }
 
-const IHttpBodyStream& CurlHttpRequest::GetBody() const
+const IChunkedDataProvider& CurlHttpRequest::GetBody() const
 {
     return *mRequestOptions.Body;
 }

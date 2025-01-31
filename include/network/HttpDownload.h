@@ -49,13 +49,13 @@ public:
         return *this;
     }
 
-    HttpDownload& SetBody(std::shared_ptr<IHttpBodyStream> apBody) override
+    HttpDownload& SetBody(std::shared_ptr<IChunkedDataProvider> apBody) override
     {
         mPimpl->SetBody(apBody);
         return *this;
     }
 
-    [[nodiscard]] const IHttpBodyStream& GetBody() const override
+    [[nodiscard]] const IChunkedDataProvider& GetBody() const override
     {
         return mPimpl->GetBody();
     }

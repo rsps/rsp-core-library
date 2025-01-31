@@ -12,7 +12,7 @@
 #define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
 
 #include <network/IHttpRequest.h>
-#include <network/RequestData.h>
+#include <network/ChunkedDataController.h>
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -41,8 +41,8 @@ public:
     IHttpResponse& Execute() override;
     [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
-    IHttpRequest& SetBody(std::shared_ptr<IHttpBodyStream> apBody) override;
-    [[nodiscard]] const IHttpBodyStream& GetBody() const override;
+    IHttpRequest& SetBody(std::shared_ptr<IChunkedDataProvider> apBody) override;
+    [[nodiscard]] const IChunkedDataProvider& GetBody() const override;
 
     IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override;
     IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override;
@@ -59,8 +59,8 @@ protected:
     };
     struct StreamBuffer
     {
-        RequestData rd;
-        IHttpBodyStream* Body;
+        ChunkedDataController<512> rd;
+        IChunkedDataProvider* Body;
     };
     union UploadBuffer
     {
@@ -71,7 +71,7 @@ protected:
     void writeToFile(rsp::posix::FileIO *apFile);
     void readFromFile(rsp::posix::FileIO *apFile);
     void readFromString(const std::string &arString);
-    void readFromStream(const std::shared_ptr<IHttpBodyStream>& arBody);
+    void readFromStream(const std::shared_ptr<IChunkedDataProvider>& arBody);
 
     void prepareRequest() override;
     void requestDone() override;

@@ -7,32 +7,32 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <network/RequestData.h>
+#include <network/ChunkedDataController.h>
 
 namespace rsp::network {
 
-bool RequestData::GetData(char *apBuffer, size_t aLen, IHttpBodyStream &arBody)
+bool ChunkedDataControllerBase::GetData(std::span<char> aBuffer, IChunkedDataProvider &arBody)
 {
     bool done = false;
     mWritten = 0;
-    while (mWritten < aLen) {
-        if (mFiFo.IsEmpty()) {
+    while (mWritten < aBuffer.size()) {
+        if (mrFiFo.IsEmpty()) {
             if (done) {
                 return true;
             }
-            mFiFo.Clear(); // Fifo is empty, now make sure buffer Head is on index 0 for maximal continuous space.
+            mrFiFo.Clear(); // Fifo is empty, now make sure buffer Head is on index 0 for maximal continuous space.
             size_t sz = 0;
-            done = arBody.GetChunk(mFiFo.GetData(), mFiFo.Free(), sz, mChunkIndex, mPayloadIndex);
-            mFiFo.SetHead(sz);
+            done = arBody.GetChunk({mrFiFo.GetData(), mrFiFo.Free()}, sz, mChunkIndex, mPayloadIndex);
+            mrFiFo.SetHead(sz);
         }
-        mWritten += mFiFo.Read(&apBuffer[mWritten], aLen - mWritten);
+        mWritten += mrFiFo.Read(aBuffer.subspan(mWritten, aBuffer.size() - mWritten));
     }
     return false;
 }
 
-RequestData& RequestData::Clear()
+ChunkedDataControllerBase& ChunkedDataControllerBase::Clear()
 {
-    mFiFo.Clear();
+    mrFiFo.Clear();
     mChunkIndex = 0;
     mPayloadIndex = 0;
     mWritten = 0;

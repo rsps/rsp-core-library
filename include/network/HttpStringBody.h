@@ -10,12 +10,12 @@
 #ifndef RSP_CORE_LIB_HTTPSTRINGBODY_H
 #define RSP_CORE_LIB_HTTPSTRINGBODY_H
 
-#include <network/IHttpBodyStream.h>
+#include <network/IChunkedDataProvider.h>
 #include <string>
 
 namespace rsp::network {
 
-class HttpStringBody : public IHttpBodyStream
+class HttpStringBody : public IChunkedDataProvider
 {
 public:
     HttpStringBody() = default;
@@ -29,7 +29,7 @@ public:
     HttpStringBody& Set(const std::string &arContent);
     [[nodiscard]] const std::string& Get() const;
     HttpStringBody& operator=(const std::string &arContent);
-    [[nodiscard]] bool GetChunk(char *apBuffer, size_t aBufferSize, size_t &arWritten, size_t &arChunkIndex, size_t &arPayloadIndex) override;
+    [[nodiscard]] bool GetChunk(std::span<char> aBuffer, size_t &arWritten, size_t &arChunkIndex, size_t &arPayloadIndex) override;
     [[nodiscard]] size_t GetSize() override;
 protected:
     std::string mContent{};

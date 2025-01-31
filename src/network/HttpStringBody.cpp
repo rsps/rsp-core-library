@@ -64,13 +64,13 @@ HttpStringBody& HttpStringBody::operator=(const std::string &arContent)
     return *this;
 }
 
-bool HttpStringBody::GetChunk(char *apBuffer, size_t aBufferSize, size_t &arWritten, size_t &arChunkIndex, size_t &)
+bool HttpStringBody::GetChunk(std::span<char> aBuffer, size_t &arWritten, size_t &arChunkIndex, size_t &)
 {
     size_t len = mContent.size() - arChunkIndex;
-    if (len > aBufferSize) {
-        len = aBufferSize;
+    if (len > aBuffer.size()) {
+        len = aBuffer.size();
     }
-    std::memcpy(apBuffer, mContent.data() + arChunkIndex, len);
+    std::memcpy(aBuffer.data(), mContent.data() + arChunkIndex, len);
     arChunkIndex += len;
     arWritten = len;
     return (arChunkIndex == mContent.size());

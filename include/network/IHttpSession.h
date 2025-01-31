@@ -12,9 +12,9 @@
 #ifndef RSP_CORE_LIB_NETWORK_I_HTTP_SESSION_H
 #define RSP_CORE_LIB_NETWORK_I_HTTP_SESSION_H
 
+#include <memory>
 #include <network/IHttpRequest.h>
 #include <network/HttpRequestOptions.h>
-
 #include <utility>
 
 namespace rsp::network {
@@ -29,6 +29,8 @@ class IHttpSession
 {
 public:
     typedef std::function<void(IHttpResponse&)> ResponseCallback_t;
+
+    static std::unique_ptr<IHttpSession> Create(size_t aSize);
 
     virtual ~IHttpSession() = default;
 

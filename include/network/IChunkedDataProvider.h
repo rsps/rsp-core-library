@@ -7,34 +7,34 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef RSP_CORE_LIB_I_HTTP_BODY_STREAM_H
-#define RSP_CORE_LIB_I_HTTP_BODY_STREAM_H
+#ifndef RSP_CORE_LIB_CHUNKED_DATA_PROVIDER_INTERFACE_H
+#define RSP_CORE_LIB_CHUNKED_DATA_PROVIDER_INTERFACE_H
 
+#include <spanstream>
 #include <string>
 
 namespace rsp::network {
 
 /**
- * \brief Interface to http body data.
+ * \brief Interface for data containers with content that can only be delivered in chunks bigger than on byte.
  *        This allows for low memory usage during transmission of large body content.
  *        Body content can be encoded and output in smaller chunks.
  */
-class IHttpBodyStream
+class IChunkedDataProvider
 {
 public:
-    virtual ~IHttpBodyStream() = default;
+    virtual ~IChunkedDataProvider() = default;
 
     /**
-     * \brief Fill the given buffer with the next chunk of body data.
+     * \brief Fill the given buffer with the next chunk of data.
      *        This function must be able to correctly handle a buffer size as small as 1 byte.
-     * \param apBuffer Pointer to buffer to fill
-     * \param aBufferSize Size of buffer
+     * \param aBuffer Span of the buffer to fill
      * \param arBytesWritten Size of chunk written to buffer
      * \param arChunkIndex Zero initialized index to delivered chunks, entirely controlled by implementation to keep function const.
      * \param arPayloadIndex Zero initialized sub index to delivered chunk, entirely controlled by implementation to keep function const.
      * \return True if entire body has been written
      */
-    [[nodiscard]] virtual bool GetChunk(char *apBuffer, size_t aBufferSize, size_t &arBytesWritten, size_t &arChunkIndex, size_t &arPayloadIndex) = 0;
+    [[nodiscard]] virtual bool GetChunk(std::span<char> aBuffer, size_t &arBytesWritten, size_t &arChunkIndex, size_t &arPayloadIndex) = 0;
     /**
      * \brief Get the total size of the encoded body data
      * \return Size of encoded body
@@ -42,8 +42,8 @@ public:
     [[nodiscard]] virtual size_t GetSize() = 0;
 };
 
-std::ostream& operator<<(std::ostream &o, IHttpBodyStream &s);
+std::ostream& operator<<(std::ostream &o, IChunkedDataProvider &s);
 
 } // rsp::network
 
-#endif //RSP_CORE_LIB_I_HTTP_BODY_STREAM_H
+#endif //RSP_CORE_LIB_CHUNKED_DATA_PROVIDER_INTERFACE_H
