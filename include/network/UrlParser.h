@@ -31,6 +31,12 @@ public:
 
 /**
  * \brief Class that decodes a URI/URL according to RFC-3986
+ *
+ * URI format, from RFC-3986:
+ *    foo://example.com:8042/over/there?name=ferret#nose
+ *    \_/   \______________/\_________/ \_________/ \__/
+ *     |           |            |            |        |
+ *  scheme     authority       path        query   fragment
  */
 class UrlParser
 {
@@ -42,25 +48,56 @@ public:
     };
     using Port = uint16_t;
 
+    /**
+     * \brief Constructor that takes the URL string to be decoded.
+     *        The original url string must be kept alive during the
+     *        lifetime of this object.
+     * \param aUrl
+     */
     explicit UrlParser(std::string_view aUrl);
 
+    /**
+     * \brief Check if the URL scheme requires TLS.
+     * \return boolean
+     */
     [[nodiscard]] bool RequiresTLS() const;
-
+    /**
+     * \brief Get the scheme from the URL. Only http and https are supported at the moment.
+     * \return UrlParser::Scheme
+     */
     [[nodiscard]] Scheme GetScheme() const { return mScheme; }
+    /**
+     * \brief Get the host part of the url
+     * \return string_view
+     */
     [[nodiscard]] std::string_view GetHost() const { return mHost; }
+    /**
+     * \brief Get the port from the url, either default by scheme or specifically given.
+     * \return Port
+     */
     [[nodiscard]] Port GetPort() const { return mPort; }
+    /**
+     * \brief Get the path component of the URL
+     * \return string_view
+     */
     [[nodiscard]] std::string_view GetPath() const { return mPath; }
+    /**
+     * \brief Get the query part of the URL.
+     * \return string_view
+     */
     [[nodiscard]] std::string_view GetQuery() const { return mQuery; }
+    /**
+     * \brief Get the fragment part of the URL.
+     * \return string_view
+     */
     [[nodiscard]] std::string_view GetFragment() const { return mFragment; }
+    /**
+     * \brief Get the userinfo part of the URL.
+     * \return string_view
+     */
     [[nodiscard]] std::string_view GetUserInfo() const { return mUserInfo; }
 
 protected:
-    /* URI format, from RFC-3986:
-     *    foo://example.com:8042/over/there?name=ferret#nose
-     *    \_/   \______________/\_________/ \_________/ \__/
-     *     |           |            |            |        |
-     *  scheme     authority       path        query   fragment
-     */
     Scheme mScheme = Scheme::Unknown; // scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
     std::string_view mHost{}; // authority = [ userinfo "@" ] host [ ":" port ]
     std::string_view mUserInfo{};

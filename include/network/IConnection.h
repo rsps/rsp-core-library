@@ -23,18 +23,50 @@ class IConnection
 public:
     virtual ~IConnection() = default;
 
+    /**
+     * \brief Set the options to be used for this connection
+     * \param arOptions
+     * \return self
+     */
     virtual IConnection& SetOptions(const ConnectionOptions& arOptions) = 0;
 
     /**
-     * \brief Establish the connection.
-     * \return
+     * \brief Establish a connection to the base url in the options.
+     * \return self
      */
-    virtual bool Connect() = 0;
+    virtual IConnection& Connect() = 0;
+
+    /**
+     * \brief Close the connection.
+     * \return self
+     */
+    virtual IConnection& Close() = 0;
+
+    /**
+     * \brief Check if a connection is established
+     * \return boolean
+     */
     [[nodiscard]] virtual bool IsConnected() const = 0;
+
+    /**
+     * \brief Check if a connection has been closed
+     * \return boolean
+     */
     [[nodiscard]] virtual bool IsClosed() const = 0;
 
-    virtual void Write(const std::span<std::byte const> aData) = 0;
-    virtual void Read(const std::span<std::byte> aBuffer) = 0;
+    /**
+     * \brief Attempt to write the given data to the connection
+     * \param aData
+     * \return The actual amount of data written in bytes
+     */
+    virtual size_t Write(const std::span<std::byte const> aData) = 0;
+
+    /**
+     * \brief Attempt to read data into the given buffer
+     * \param aBuffer
+     * \return The actual amount of bytes read into the buffer
+     */
+    virtual size_t Read(const std::span<std::byte> aBuffer) = 0;
 };
 
 } // namespace rsp::network
