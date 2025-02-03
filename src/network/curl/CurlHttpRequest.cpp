@@ -11,6 +11,8 @@
 #include <map>
 #include <string>
 #include <network/HttpRequest.h>
+#include <network/ChunkStreamer.h>
+#include <network/HttpStringBody.h>
 #include <posix/FileIO.h>
 #include <utils/StrUtils.h>
 #include "CurlHttpRequest.h"
@@ -51,9 +53,9 @@ void CurlHttpRequest::readFromFile(rsp::posix::FileIO* apFile)
 void CurlHttpRequest::readFromString(const std::string &arString)
 {
     setCurlOption(CURLOPT_UPLOAD, 1L);
-    setCurlOption(CURLOPT_READFUNCTION, stringReadFunction);
-    mUploadBuffer.String = { arString.size(), arString.c_str() };
-    setCurlOption(CURLOPT_READDATA, &mUploadBuffer);
+    setCurlOption(CURLOPT_READFUNCTION, streamReadFunction);
+    mpUploadBuffer = std::make_shared<HttpStringBody>(arString);
+    setCurlOption(CURLOPT_READDATA, mpUploadBuffer.get());
     setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(arString.size()));
 }
 
@@ -67,8 +69,8 @@ void CurlHttpRequest::readFromStream(const std::shared_ptr<IChunkedDataProvider>
     }
     setCurlOption(CURLOPT_UPLOAD, 1L);
     setCurlOption(CURLOPT_READFUNCTION, streamReadFunction);
-    mUploadBuffer.Stream = {{}, arBody.get() };
-    setCurlOption(CURLOPT_READDATA, &mUploadBuffer);
+    mpUploadBuffer = std::make_shared<ChunkStreamer<512>>(*arBody);
+    setCurlOption(CURLOPT_READDATA, mpUploadBuffer.get());
     setCurlOption(CURLOPT_INFILESIZE_LARGE, arBody->GetSize());
 }
 
@@ -88,27 +90,9 @@ size_t CurlHttpRequest::fileReadFunction(void *ptr, size_t size, size_t nmemb, r
     return apFile->Read(ptr, size * nmemb);
 }
 
-size_t CurlHttpRequest::stringReadFunction(void *ptr, size_t size, size_t nmemb, UploadBuffer *apBuf)
+size_t CurlHttpRequest::streamReadFunction(void *ptr, size_t size, size_t nmemb, IStreamDataProvider *apDataProvider)
 {
-    size_t sz = size * nmemb;
-    if (sz > apBuf->String.Remaining) {
-        sz = apBuf->String.Remaining;
-    }
-//    mLogger.Debug() << "Copying " << sz << " characters to network buffer";
-    std::memcpy(ptr, apBuf->String.Data, sz);
-#ifdef LOG_OUTPUT
-    auto o = rsp::logging::LoggerInterface::GetDefault()->Info();
-    o << "Request chunk (" << sz << ") " << BufferToStream(static_cast<char*>(ptr), sz, true);
-#endif
-    apBuf->String.Data += sz;
-    apBuf->String.Remaining -= sz;
-    return sz;
-}
-
-size_t CurlHttpRequest::streamReadFunction(void *ptr, size_t size, size_t nmemb, CurlHttpRequest::UploadBuffer *apBuf)
-{
-    apBuf->Stream.rd.GetData(static_cast<char*>(ptr), size * nmemb, *(apBuf->Stream.Body));
-    size_t written = apBuf->Stream.rd.GetWritten();
+    size_t written = apDataProvider->Read(std::span(static_cast<std::byte*>(ptr), size * nmemb));
 #ifdef LOG_OUTPUT
     auto o = rsp::logging::LoggerInterface::GetDefault()->Info();
     o << "Request chunk (" << written << ") " << BufferToStream(static_cast<char*>(ptr), written, true);

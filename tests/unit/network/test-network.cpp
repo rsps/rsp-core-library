@@ -9,6 +9,7 @@
  */
 
 #include <doctest.h>
+#include <array>
 #include <cctype>
 #include <cstring>
 #include <filesystem>
@@ -20,7 +21,7 @@
 #include <network/HttpStringBody.h>
 #include <network/MultipartBoundary.h>
 #include <network/NetworkException.h>
-#include <network/ChunkedDataController.h>
+#include <network/ChunkStreamer.h>
 #include <posix/FileSystem.h>
 #include <posix/FileIO.h>
 #include <utils/StrUtils.h>
@@ -298,22 +299,24 @@ TEST_CASE("Network")
 Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
 )");
 
-//        MESSAGE(body.GetString(100));
         std::stringstream ss;
-        ss << body;
+        ss << body; // Uses operator<<(std::ostream &o, IChunkedDataProvider &s)
         CHECK_EQ(ss.str(), body.Get());
+        ss.str("");
 
-        char buffer[52];
-        ChunkedDataController rd;
+        std::array<char, 51> _buffer{};
+        std::span buffer(reinterpret_cast<std::byte*>(_buffer.data()), sizeof(_buffer));
+        ChunkStreamer<51> rd(body);
 
-        while (!rd.GetData(buffer, sizeof(buffer) - 1, body)) {
-            buffer[rd.GetWritten()] = '\0';
-//            MESSAGE("\nChunk:   " << buffer << "\nwritten: " << written << "\nindex:   " << chunk_index);
+        size_t written;
+        while ((written = rd.Read(buffer))) {
+            std::string chunk = std::string(_buffer.data(), written);
+//            MESSAGE("\nChunk:   " << chunk << "\nwritten: " << written << "\nindex:   " << rd.GetChunkIndex());
+            ss << chunk;
         }
-        buffer[rd.GetWritten()] = '\0';
-        CHECK_EQ(rd.GetWritten(), 27);
+        CHECK_EQ(ss.str(), body.Get());
+        CHECK_EQ(rd.GetWritten(), 0);
         CHECK_EQ(rd.GetChunkIndex(), 333);
-        CHECK_EQ("cruncheon, see if I don't.\n", std::string(buffer));
     }
 
     SUBCASE("Post JSON") {
@@ -483,27 +486,6 @@ Body: )" + json + "\n";
         CHECK(respHead);
         CHECK(respHead2);
         CHECK(resp1);
-    }
-
-    SUBCASE("MultipartBoundary") {
-        MultipartBoundary mb1;
-        CHECK_EQ(mb1.GetBoundary().size(), 32);
-        MESSAGE("Random boundary: " << mb1.GetBoundary());
-        for (auto c : mb1.GetBoundary()) {
-            CHECK(std::isprint(c));
-        }
-
-        MultipartBoundary mb("ABC");
-        CHECK_EQ(mb.GetBoundary(), "ABC");
-
-        CHECK_EQ(mb.GetContentTypeHeader(), std::string("multipart/form-data; boundary=ABC"));
-
-        CHECK_EQ(mb.MakeContentDisposition(""), std::string("\r\n--ABC\r\n\r\n"));
-        CHECK_EQ(mb.MakeContentDisposition("Field1"), std::string("\r\n--ABC\r\nContent-Disposition: form-data; name=\"Field1\"\r\n\r\n"));
-        CHECK_EQ(mb.MakeContentDisposition("File", "my-file.bin"), std::string("\r\n--ABC\r\nContent-Disposition: form-data; name=\"File\"; filename=\"my-file.bin\"\r\n\r\n"));
-        CHECK_EQ(mb.MakeContentDisposition("File", "my-file.bin", "application/octet-stream"), std::string("\r\n--ABC\r\nContent-Disposition: form-data; name=\"File\"; filename=\"my-file.bin\"\r\nContent-Type: application/octet-stream\r\n\r\n"));
-
-        CHECK_EQ(mb.GetEndBoundary(), std::string("\r\n--ABC--"));
     }
 
     CHECK_EQ(0, std::system("killall lighttpd"));

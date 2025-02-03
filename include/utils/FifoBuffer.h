@@ -205,10 +205,10 @@ template<class T, size_t N>
 class FifoBuffer : public FifoBufferBase<T>
 {
 public:
-    FifoBuffer() : FifoBufferBase<T>(mBuffer) {}
+    FifoBuffer() : FifoBufferBase<T>(mArrayBuffer) {}
 
 protected:
-    std::array<T, N> mBuffer{};
+    std::array<T, N> mArrayBuffer{};
 };
 
 } // namespace rsp::utils

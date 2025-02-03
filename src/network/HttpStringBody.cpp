@@ -66,19 +66,34 @@ HttpStringBody& HttpStringBody::operator=(const std::string &arContent)
 
 bool HttpStringBody::GetChunk(std::span<char> aBuffer, size_t &arWritten, size_t &arChunkIndex, size_t &)
 {
-    size_t len = mContent.size() - arChunkIndex;
-    if (len > aBuffer.size()) {
-        len = aBuffer.size();
-    }
-    std::memcpy(aBuffer.data(), mContent.data() + arChunkIndex, len);
-    arChunkIndex += len;
-    arWritten = len;
+    mChunkReadIndex = arChunkIndex;
+    arWritten = Read(std::as_writable_bytes(aBuffer));
+    arChunkIndex += arWritten;
     return (arChunkIndex == mContent.size());
 }
 
 size_t HttpStringBody::GetSize()
 {
     return mContent.size();
+}
+
+size_t HttpStringBody::Write(const std::span<const std::byte> aData)
+{
+    auto sz = aData.size();
+    auto spc = std::span<const char>(reinterpret_cast<const char*>(aData.data()), sz);
+    mContent += std::string(spc.data(), sz);
+    return sz;
+}
+
+size_t HttpStringBody::Read(const std::span<std::byte> aBuffer)
+{
+    size_t len = mContent.size() - mChunkReadIndex;
+    if (len > aBuffer.size()) {
+        len = aBuffer.size();
+    }
+    std::memcpy(aBuffer.data(), mContent.data() + mChunkReadIndex, len);
+    mChunkReadIndex += len;
+    return len;
 }
 
 } // rsp::network

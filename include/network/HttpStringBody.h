@@ -7,15 +7,16 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef RSP_CORE_LIB_HTTPSTRINGBODY_H
-#define RSP_CORE_LIB_HTTPSTRINGBODY_H
+#ifndef RSP_CORE_LIB_HTTP_STRING_BODY_H
+#define RSP_CORE_LIB_HTTP_STRING_BODY_H
 
 #include <network/IChunkedDataProvider.h>
+#include <network/IStreamDataProvider.h>
 #include <string>
 
 namespace rsp::network {
 
-class HttpStringBody : public IChunkedDataProvider
+class HttpStringBody : public IChunkedDataProvider, public IStreamDataProvider
 {
 public:
     HttpStringBody() = default;
@@ -31,6 +32,9 @@ public:
     HttpStringBody& operator=(const std::string &arContent);
     [[nodiscard]] bool GetChunk(std::span<char> aBuffer, size_t &arWritten, size_t &arChunkIndex, size_t &arPayloadIndex) override;
     [[nodiscard]] size_t GetSize() override;
+
+    [[nodiscard]] size_t Write(std::span<const std::byte> aData) override;
+    [[nodiscard]] size_t Read(std::span<std::byte> aBuffer) override;
 protected:
     std::string mContent{};
     size_t mChunkReadIndex = 0;
@@ -38,4 +42,4 @@ protected:
 
 } // rsp::network
 
-#endif //RSP_CORE_LIB_HTTPSTRINGBODY_H
+#endif //RSP_CORE_LIB_HTTP_STRING_BODY_H

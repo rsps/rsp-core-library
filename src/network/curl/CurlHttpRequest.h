@@ -12,7 +12,7 @@
 #define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
 
 #include <network/IHttpRequest.h>
-#include <network/ChunkedDataController.h>
+#include <network/ChunkStreamer.h>
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -52,21 +52,7 @@ public:
 protected:
     CurlHttpResponse mResponse;
     HttpRequestOptions mRequestOptions{};
-    struct StringBuffer
-    {
-        size_t Remaining = 0;
-        const char *Data = nullptr;
-    };
-    struct StreamBuffer
-    {
-        ChunkedDataController<512> rd;
-        IChunkedDataProvider* Body;
-    };
-    union UploadBuffer
-    {
-        StringBuffer String;
-        StreamBuffer Stream;
-    } mUploadBuffer{};
+    std::shared_ptr<IStreamDataProvider> mpUploadBuffer{};
 
     void writeToFile(rsp::posix::FileIO *apFile);
     void readFromFile(rsp::posix::FileIO *apFile);
@@ -81,8 +67,8 @@ private:
     static size_t writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *data);
     static size_t fileWriteFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile);
     static size_t fileReadFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile);
-    static size_t stringReadFunction(void *ptr, size_t size, size_t nmemb, UploadBuffer *apBuf);
-    static size_t streamReadFunction(void *ptr, size_t size, size_t nmemb, UploadBuffer *apBuf);
+    static size_t stringReadFunction(void *ptr, size_t size, size_t nmemb, IStreamDataProvider *apDataProvider);
+    static size_t streamReadFunction(void *ptr, size_t size, size_t nmemb, IStreamDataProvider *apDataProvider);
     static size_t headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse);
     static size_t progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
 
