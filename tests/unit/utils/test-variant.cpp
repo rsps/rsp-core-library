@@ -16,6 +16,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("Variant")
 {
     Variant v;
@@ -134,5 +136,6 @@ TEST_CASE("Variant")
         CHECK_EQ(r.AsDouble(), 1.235);
         CHECK_EQ(v.AsDouble(), 1.234567);
     }
-
 }
+
+TEST_SUITE_END();

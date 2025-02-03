@@ -18,6 +18,8 @@
 using namespace rsp::network;
 using namespace rsp::posix;
 
+TEST_SUITE_BEGIN("Network");
+
 static void FetchMonitorEvents(WLan &arWlan)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -244,3 +246,5 @@ TEST_CASE("WLAN") // * doctest::skip(wpa_supplicant_not_available()))
         CHECK_NOTHROW(FetchMonitorEvents(wlan));
     }
 }
+
+TEST_SUITE_END();

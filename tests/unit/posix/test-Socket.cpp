@@ -15,6 +15,8 @@
 
 using namespace rsp::posix;
 
+TEST_SUITE_BEGIN("Posix");
+
 TEST_CASE("Socket")
 {
     auto logger = rsp::logging::LoggerInterface::GetDefault();
@@ -132,3 +134,5 @@ TEST_CASE("Socket")
     }
 
 }
+
+TEST_SUITE_END();

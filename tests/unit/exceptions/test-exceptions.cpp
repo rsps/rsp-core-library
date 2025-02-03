@@ -18,6 +18,8 @@
 using namespace rsp::utils;
 using namespace rsp::exceptions;
 
+TEST_SUITE_BEGIN("Exceptions");
+
 static BackTrace MyFunc()
 {
     return BackTrace(0);
@@ -120,4 +122,4 @@ TEST_CASE("Exceptions") {
     }
 }
 
-
+TEST_SUITE_END();

@@ -13,6 +13,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 static bool Formatter(std::string &arResult, const DynamicData &arValue)
 {
     std::string sep;
@@ -113,3 +115,5 @@ TEST_CASE("CSV")
         CHECK_EQ(result, "Column1\n42\n43\n44\n45\n46\n");
     }
 }
+
+TEST_SUITE_END();

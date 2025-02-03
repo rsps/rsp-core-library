@@ -17,6 +17,8 @@
 using namespace rsp::utils;
 using namespace rsp::logging;
 
+TEST_SUITE_BEGIN("Utils");
+
 struct MyData {
     float Float = 43.1f;
     int Integer = 42;
@@ -113,4 +115,4 @@ TEST_CASE("Data Container")
     }
 }
 
-
+TEST_SUITE_END();

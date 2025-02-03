@@ -19,6 +19,8 @@ using namespace rsp::json;
 using namespace rsp::logging;
 using namespace rsp::security;
 
+TEST_SUITE_BEGIN("Security");
+
 struct ConfigData {
     FixedString<100> ApplicationName{};
     int PlacementCount = 3;
@@ -122,3 +124,5 @@ TEST_CASE("Config")
 
     CHECK_NOTHROW(config.Validate());
 }
+
+TEST_SUITE_END();

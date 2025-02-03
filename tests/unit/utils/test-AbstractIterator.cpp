@@ -15,6 +15,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 struct IElement
 {
     virtual ~IElement() = default;
@@ -141,3 +143,5 @@ TEST_CASE("AbstractIterator")
     }
 
 }
+
+TEST_SUITE_END();

@@ -16,6 +16,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("Stop Watch") {
 
     StopWatch sw;
@@ -32,5 +34,4 @@ TEST_CASE("Stop Watch") {
     CHECK(IsInRange(sw.Elapsed<std::chrono::milliseconds>(), int64_t(20), int64_t(25)));
 }
 
-
-
+TEST_SUITE_END();

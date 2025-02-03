@@ -17,6 +17,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 enum class EType : uint8_t {
     NONE,
     ONE,
@@ -98,3 +100,5 @@ TEST_CASE("BinaryStream") {
         CHECK_EQ(bs.Get().str().size(), 305);
     }
 }
+
+TEST_SUITE_END();

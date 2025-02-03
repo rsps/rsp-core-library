@@ -16,6 +16,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("InsertOrderedMap") {
 
     SUBCASE("int,string") {
@@ -74,3 +76,4 @@ TEST_CASE("InsertOrderedMap") {
 
 }
 
+TEST_SUITE_END();

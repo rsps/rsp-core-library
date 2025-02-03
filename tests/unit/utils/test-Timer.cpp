@@ -17,6 +17,8 @@
 using namespace rsp::utils;
 using namespace std::literals::chrono_literals;
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("Timer")
 {
     CHECK_NOTHROW(Random::Seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count())));
@@ -82,3 +84,4 @@ TEST_CASE("Timer")
     CHECK_EQ(t2.GetTimeout(), 20ms);
 }
 
+TEST_SUITE_END();

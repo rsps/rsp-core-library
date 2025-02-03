@@ -13,6 +13,8 @@
 
 using namespace rsp::security;
 
+TEST_SUITE_BEGIN("Security");
+
 TEST_CASE("Secure Buffers")
 {
 
@@ -67,3 +69,4 @@ TEST_CASE("Secure Buffers")
     }
 }
 
+TEST_SUITE_END();

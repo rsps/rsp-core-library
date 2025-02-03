@@ -12,6 +12,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 static bool Compare(std::span<char> aData, std::initializer_list<char> aList)
 {
     return (std::memcmp(aData.data(), std::data(aList), aList.size()) == 0);
@@ -95,3 +97,5 @@ TEST_CASE("FifoBuffer")
 
     CHECK(Compare(out, {2, 3, 4, 5}));
 }
+
+TEST_SUITE_END();

@@ -17,6 +17,8 @@
 using namespace rsp::utils;
 using namespace rsp::security;
 
+TEST_SUITE_BEGIN("Security");
+
 struct MyData
 {
     uint32_t Integer = 42;
@@ -104,4 +106,4 @@ TEST_CASE("Secure Container")
 
 }
 
-
+TEST_SUITE_END();

@@ -24,6 +24,7 @@ using namespace rsp::graphics;
 using namespace rsp::utils;
 using namespace std::literals::chrono_literals;
 
+TEST_SUITE_BEGIN("Integration");
 
 TEST_CASE("GfxEngine")
 {
@@ -190,3 +191,5 @@ TEST_CASE("GfxEngine")
 #endif
     CHECK_NOTHROW(gfx.ClearOverlays());
 }
+
+TEST_SUITE_END();

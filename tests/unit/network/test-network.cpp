@@ -35,6 +35,8 @@ using namespace rsp::utils;
 using namespace rsp::posix;
 using namespace std::chrono_literals;
 
+TEST_SUITE_BEGIN("Network");
+
 TEST_CASE("Network")
 {
     TestLogger logger;
@@ -490,3 +492,5 @@ Body: )" + json + "\n";
 
     CHECK_EQ(0, std::system("killall lighttpd"));
 }
+
+TEST_SUITE_END();

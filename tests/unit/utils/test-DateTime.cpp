@@ -16,6 +16,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 //#define DMESG(a) MESSAGE(a)
 #define DMESG(a)
 
@@ -216,5 +218,4 @@ TEST_CASE("DateTime")
     }
 }
 
-
-
+TEST_SUITE_END();

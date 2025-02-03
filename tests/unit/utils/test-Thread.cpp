@@ -16,6 +16,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("Threads")
 {
     TestLogger logger;
@@ -78,5 +80,6 @@ TEST_CASE("Threads")
             FAIL("Wrong exception was thrown");
         }
     }
-
 }
+
+TEST_SUITE_END();

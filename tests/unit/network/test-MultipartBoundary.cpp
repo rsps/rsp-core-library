@@ -12,6 +12,8 @@
 
 using namespace rsp::network;
 
+TEST_SUITE_BEGIN("Network");
+
 TEST_CASE("MultipartBoundary")
 {
     MultipartBoundary mb1;
@@ -34,3 +36,5 @@ TEST_CASE("MultipartBoundary")
 
     CHECK_EQ(mb.GetEndBoundary(), std::string("\r\n--ABC--"));
 }
+
+TEST_SUITE_END();

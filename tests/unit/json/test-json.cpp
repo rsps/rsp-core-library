@@ -21,6 +21,8 @@
 using namespace rsp::utils;
 using namespace rsp::json;
 
+TEST_SUITE_BEGIN("Json");
+
 enum class EType : uint8_t {
     ONE,
     TWO,
@@ -487,3 +489,5 @@ TEST_CASE("Enum Traversal") {
     func_print<Json::Types, Json::Types::Number, int(Json::Types::Number)>();
     func_print_all<Json::Types, 10>();
 }
+
+TEST_SUITE_END();

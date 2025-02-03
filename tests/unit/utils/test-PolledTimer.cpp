@@ -14,6 +14,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("PollTimer") {
     using namespace std::chrono_literals;
 
@@ -41,3 +43,5 @@ TEST_CASE("PollTimer") {
     std::this_thread::sleep_for(100ms);
     CHECK(pt.IsExpired());
 }
+
+TEST_SUITE_END();

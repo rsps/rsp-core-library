@@ -12,6 +12,8 @@
 #include <utils/Rounding.h>
 #include <cmath>
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("Rounding") {
 
 #define COMPARE_AND_CHECK(a, b) CHECK_LT(std::fabs(a - b), 0.00000001f)
@@ -60,4 +62,4 @@ TEST_CASE("Rounding") {
 
 }
 
-
+TEST_SUITE_END();

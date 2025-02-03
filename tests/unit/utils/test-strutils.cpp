@@ -14,6 +14,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("StrUtils") {
     CHECK(StrUtils::GetHomeDir() != "");
 
@@ -60,3 +62,5 @@ TEST_CASE("StrUtils") {
     CHECK_EQ(StrUtils::ToString(4.4783619199999997e-06, 12, true), "0.000004478362");
     std::locale::global(std::locale::classic());
 }
+
+TEST_SUITE_END();

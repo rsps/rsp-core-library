@@ -12,6 +12,8 @@
 
 using namespace rsp::network;
 
+TEST_SUITE_BEGIN("Network");
+
 TEST_CASE("UrlParser")
 {
     SUBCASE("Empty") {
@@ -80,3 +82,5 @@ TEST_CASE("UrlParser")
         CHECK_THROWS_AS(UrlParser("google.com"), EInvalidUrl);
     }
 }
+
+TEST_SUITE_END();

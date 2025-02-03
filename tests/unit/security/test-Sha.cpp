@@ -15,6 +15,8 @@
 
 using namespace rsp::security;
 
+TEST_SUITE_BEGIN("Security");
+
 /**
  * \brief Test case for SHA implementation
  *
@@ -97,5 +99,4 @@ TEST_CASE("SHA")
 
 }
 
-
-
+TEST_SUITE_END();

@@ -14,6 +14,8 @@
 
 using namespace rsp::posix;
 
+TEST_SUITE_BEGIN("Posix");
+
 TEST_CASE("File IO") {
     const std::string cFileName = "temp.txt";
 
@@ -65,3 +67,5 @@ TEST_CASE("File IO") {
         unlink(cFileName.c_str());
     }
 }
+
+TEST_SUITE_END();
