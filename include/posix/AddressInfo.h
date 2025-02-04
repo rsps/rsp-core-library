@@ -22,7 +22,7 @@ public:
     explicit AddressInfo(std::string_view aUrn, bool aServer = false, Domain aFamily = Domain::Unspecified,
                          Type aType = Type::Unspecified, Protocol aProtocol = Protocol::Unspecified);
 
-    size_t GetCount();
+    [[nodiscard]] size_t GetCount() const;
     [[nodiscard]] const SocketAddress &operator[](size_t aIndex) const;
     [[nodiscard]] const std::vector<SocketAddress> &GetAddresses() const;
 

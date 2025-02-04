@@ -59,14 +59,14 @@ public:
      * \param aData
      * \return The actual amount of data written in bytes
      */
-    virtual size_t Write(const std::span<std::byte const> aData) = 0;
+    virtual size_t Write(std::span<std::byte const> aData) = 0;
 
     /**
      * \brief Attempt to read data into the given buffer
      * \param aBuffer
      * \return The actual amount of bytes read into the buffer
      */
-    virtual size_t Read(const std::span<std::byte> aBuffer) = 0;
+    virtual size_t Read(std::span<std::byte> aBuffer) = 0;
 };
 
 } // namespace rsp::network

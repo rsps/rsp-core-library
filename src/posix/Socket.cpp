@@ -29,6 +29,11 @@ Socket::Socket(Domain aDomain, Type aType, Protocol aProtocol)
     mProtocol = aProtocol;
 }
 
+Socket::~Socket()
+{
+    Close();
+}
+
 Socket::Socket(const Socket &arServer, int aHandle, const SocketAddress& arLocalAddress, const SocketAddress& arPeerAddress)
     : mHandle(aHandle),
       mLocalAddress(arLocalAddress),
@@ -210,12 +215,18 @@ Socket &Socket::Bind(const AddressInfo &arAddrInfo, bool aBindAll)
 
 Socket &Socket::Connect(const AddressInfo &arAddrInfo)
 {
-    auto &sa = arAddrInfo[0];
-    int res = connect(mHandle.Get(), &sa.Get(), sa.GetSize());
+    int res;
+    for (size_t i=0 ; i < arAddrInfo.GetCount() ; ++i) {
+        auto &sa = arAddrInfo[i];
+        res = connect(mHandle.Get(), &sa.Get(), sa.GetSize());
+        if (res == 0) {
+            mPeerAddress = sa;
+            break;
+        }
+    }
     if (res < 0) {
         THROW_SYSTEM("connect() failed.");
     }
-    mPeerAddress = sa;
     return *this;
 }
 
@@ -364,6 +375,14 @@ Socket& Socket::Shutdown(ShutdownFlags aFlag)
     int res = shutdown(mHandle.Get(), int(aFlag));
     if (res < 0) {
         THROW_SYSTEM("shutdown() failed.");
+    }
+    return *this;
+}
+
+Socket& Socket::Close()
+{
+    if (IsConnected()) {
+        Shutdown(ShutdownFlags::ReadWrite);
     }
     return *this;
 }

@@ -44,6 +44,7 @@ public:
     Socket(Domain aDomain, Type aType, Protocol aProtocol = Protocol::Unspecified);
     Socket(const Socket&) = delete;
     Socket(Socket&&) noexcept;
+    ~Socket() override;
 
     Socket& operator=(const Socket&) = delete;
     Socket& operator=(Socket&&) noexcept;
@@ -76,6 +77,7 @@ public:
     [[nodiscard]] Socket Accept();
     Socket& Bind(const AddressInfo &arAddrInfo, bool aBindAll = false);
     Socket& Connect(const AddressInfo &arAddrInfo);
+    Socket& Close();
     [[nodiscard]] int GetOptions(SockOptions aOption, int aLevel = SOL_SOCKET) const;
     Socket& Listen(size_t aAcceptQueueSize = 0);
     [[nodiscard]] size_t Receive(std::span<std::byte> aBuffer, int aFlags = 0) const;

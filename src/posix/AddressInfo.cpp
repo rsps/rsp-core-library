@@ -25,7 +25,7 @@ AddressInfo::AddressInfo(std::string_view aUrn, bool aServer, Domain aFamily, Ty
     }
 }
 
-size_t AddressInfo::GetCount()
+size_t AddressInfo::GetCount() const
 {
     return mAddresses.size();
 }
