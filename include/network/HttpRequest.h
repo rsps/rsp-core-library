@@ -59,7 +59,7 @@ public:
         return mPimpl->Execute();
     }
 
-    std::uintptr_t GetHandle() override
+    [[nodiscard]] std::uintptr_t GetHandle() const override
     {
         return mPimpl->GetHandle();
     }

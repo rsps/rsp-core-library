@@ -12,7 +12,7 @@
 #define RSP_CORE_LIB_NETWORK_HTTP_DOWNLOAD_H
 
 #include <string>
-#include "IHttpRequest.h"
+#include "HttpRequest.h"
 
 namespace rsp::network {
 
@@ -23,10 +23,10 @@ namespace rsp::network {
  * If the file already exists, its size and hash is checked against the file on the server.
  * If the file is only partially downloaded, download will be resumed.
  */
-class HttpDownload: public IHttpRequest
+class HttpDownload: public HttpRequest
 {
 public:
-    HttpDownload();
+    using HttpRequest::HttpRequest;
     explicit HttpDownload(const std::string &arFileName);
 
     /**
@@ -38,47 +38,7 @@ public:
 
     [[nodiscard]] IHttpResponse& Execute() override;
 
-    [[nodiscard]] const HttpRequestOptions& GetOptions() const override
-    {
-        return mPimpl->GetOptions();
-    }
-
-    HttpDownload& SetOptions(const HttpRequestOptions &arOptions) override
-    {
-        mPimpl->SetOptions(arOptions);
-        return *this;
-    }
-
-    HttpDownload& SetBody(std::shared_ptr<IChunkedDataProvider> apBody) override
-    {
-        mPimpl->SetBody(apBody);
-        return *this;
-    }
-
-    [[nodiscard]] const IChunkedDataProvider& GetBody() const override
-    {
-        return mPimpl->GetBody();
-    }
-
-    HttpDownload& AddField(const std::string &arFieldName, const std::string &arValue) override
-    {
-        mPimpl->AddField(arFieldName, arValue);
-        return *this;
-    }
-
-    HttpDownload& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override
-    {
-        mPimpl->AddFile(arFieldName, arFile);
-        return *this;
-    }
-
-    std::uintptr_t GetHandle() override
-    {
-        return mPimpl->GetHandle();
-    }
-
 protected:
-    std::unique_ptr<IHttpRequest> mPimpl;
     std::string mFileName{};
 
     void setFileModifiedTime(const std::string &arTimeString);

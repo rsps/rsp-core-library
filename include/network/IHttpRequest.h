@@ -102,7 +102,7 @@ public:
      *
      * \return Low level handle stored in generic uintptr_t type.
      */
-    virtual std::uintptr_t GetHandle() = 0;
+    [[nodiscard]] virtual std::uintptr_t GetHandle() const = 0;
 };
 
 /**

@@ -21,13 +21,8 @@ using namespace rsp::utils;
 
 namespace rsp::network {
 
-HttpDownload::HttpDownload()
-    : mPimpl(Create())
-{
-}
-
 HttpDownload::HttpDownload(const std::string &arFileName)
-    : mPimpl(Create())
+    : HttpRequest()
 {
     SetFileName(arFileName);
 }

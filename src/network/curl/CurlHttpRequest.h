@@ -47,7 +47,7 @@ public:
     IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override;
     IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override;
 
-    std::uintptr_t GetHandle() override;
+    [[nodiscard]] std::uintptr_t GetHandle() const override;
 
 protected:
     CurlHttpResponse mResponse;

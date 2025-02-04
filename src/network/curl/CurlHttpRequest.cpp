@@ -224,7 +224,7 @@ void CurlHttpRequest::requestDone()
     EasyCurl::requestDone();
 }
 
-std::uintptr_t CurlHttpRequest::GetHandle()
+std::uintptr_t CurlHttpRequest::GetHandle() const
 {
     return std::uintptr_t(mpCurl);
 }
