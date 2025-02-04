@@ -25,7 +25,11 @@ EHttpSession::EHttpSession(size_t aRequestPoolSize)
 
 void EHttpSession::ProcessRequests()
 {
-
+/**
+ * \see https://stackoverflow.com/questions/7698488/turn-a-simple-socket-into-an-ssl-socket
+ * \see https://github.com/openssl/openssl/blob/691064c47fd6a7d11189df00a0d1b94d8051cbe0/demos/ssl/cli.cpp
+ * \see https://os.mbed.com/docs/mbed-os/v6.16/apis/tls-tutorial.html
+ */
 }
 
 IHttpSession& EHttpSession::SetDefaultOptions(const HttpRequestOptions& arOptions)
