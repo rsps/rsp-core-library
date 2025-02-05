@@ -30,6 +30,12 @@ void EHttpSession::ProcessRequests()
  * \see https://github.com/openssl/openssl/blob/691064c47fd6a7d11189df00a0d1b94d8051cbe0/demos/ssl/cli.cpp
  * \see https://os.mbed.com/docs/mbed-os/v6.16/apis/tls-tutorial.html
  */
+
+    for (auto r : mPending) {
+        r->Execute();
+        mPool.Put(*r);
+    }
+    mPending.clear();
 }
 
 IHttpSession& EHttpSession::SetDefaultOptions(const HttpRequestOptions& arOptions)
@@ -55,9 +61,9 @@ IHttpRequest& EHttpSession::Request(HttpRequestType aType, std::string_view aUri
     opt.Uri = aUri;
 
     auto &req = mPool.Get();
-//    req.mpSession = this;
     req.SetOptions(opt);
-    req.OnResponse() = aCallback;
+    req.mResponseCallback = aCallback;
+    req.mpSession = this;
     mPending.push_back(&req);
 
     return req;

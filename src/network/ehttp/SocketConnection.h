@@ -18,13 +18,15 @@ namespace rsp::network::ehttp {
 class SocketConnection : public rsp::network::IConnection
 {
 public:
-    IConnection& SetOptions(const ConnectionOptions& arOptions) override;
-    IConnection& Connect() override;
-    IConnection& Close() override;
+    SocketConnection& SetOptions(const ConnectionOptions& arOptions) override;
+    SocketConnection& Connect() override;
+    SocketConnection& Close() override;
     [[nodiscard]] bool IsConnected() const override;
     [[nodiscard]] bool IsClosed() const override;
     size_t Write(std::span<const std::byte> aData) override;
     size_t Read(std::span<std::byte> aBuffer) override;
+
+    [[nodiscard]] std::string_view GetHost() const { return mOptions.host; } // Valid after Connect()
 
 protected:
     ConnectionOptions mOptions{};

@@ -25,28 +25,23 @@ class ChunkStreamer : public IStreamDataProvider
 public:
     explicit ChunkStreamer(IChunkedDataProvider &arProvider) : mrProvider(arProvider) {}
 
-    [[nodiscard]] size_t Write(const std::span<const std::byte>) override
-    {
-        return 0;
-    }
-
     [[nodiscard]] size_t Read(const std::span<std::byte> aBuffer) override
     {
         mWritten = 0;
         while (mWritten < aBuffer.size()) {
             if (mFiFo.IsEmpty()) {
-                mFiFo.Clear(); // Fifo is empty, now make sure buffer Head is on index 0 for maximal continuous space.
-                size_t sz = 0;
-                auto done = mrProvider.GetChunk(std::span(reinterpret_cast<char*>(mFiFo.GetData()), mFiFo.Free()), sz, mChunkIndex, mPayloadIndex);
-                if (done && sz == 0) {
+                if (loadFifo()) {
                     return mWritten;
                 }
-                mFiFo.SetHead(sz);
             }
             mWritten += mFiFo.Read(aBuffer.subspan(mWritten, aBuffer.size() - mWritten));
         }
         return mWritten;
     }
+
+    std:span<std::byte> GetChunk()
+    {
+    };
 
     /**
      * \brief Clear the internal book keeping. Used in case of errors that needs to restart streaming.
@@ -84,6 +79,23 @@ protected:
     size_t mChunkIndex = 0;
     size_t mPayloadIndex = 0;
     size_t mWritten = 0;
+
+    [[nodiscard]] size_t Write(const std::span<const std::byte>) override
+    {
+        return 0;
+    }
+
+    bool loadFifo()
+    {
+        mFiFo.Clear(); // Fifo is empty, now make sure buffer Head is on index 0 for maximal continuous space.
+        size_t sz = 0;
+        auto done = mrProvider.GetChunk(std::span(reinterpret_cast<char*>(mFiFo.GetData()), mFiFo.Free()), sz, mChunkIndex, mPayloadIndex);
+        if (done && sz == 0) {
+            return true;
+        }
+        mFiFo.SetHead(sz);
+        return false;
+    }
 };
 
 } // rsp::network

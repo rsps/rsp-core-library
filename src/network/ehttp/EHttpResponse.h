@@ -11,27 +11,42 @@
 #define RSP_CORE_LIB_SRC_NETWORK_EHTTP_E_HTTP_RESPONSE_H
 
 #include <map>
-#include <network/IHttpResponse.h>
-#include <network/IHttpRequest.h>
+#include <network/HttpResponse.h>
 
 namespace rsp::network::ehttp {
 
-class EHttpResponse : public IHttpResponse
+class EHttpRequest;
+
+
+class EHttpResponse : public HttpResponse
 {
 public:
-    explicit EHttpResponse(IHttpRequest& arRequest) : mrRequest(arRequest) {}
-
-    [[nodiscard]] const std::map<std::string, std::string>& GetHeaders() const override;
-    [[nodiscard]] const std::string& GetHeader(const std::string& arName) const override;
-    [[nodiscard]] StatusCodes GetStatusCode() const override;
-    [[nodiscard]] const IHttpRequest& GetRequest() const override;
-    [[nodiscard]] const std::string& GetBody() const override;
+    using HttpResponse::HttpResponse;
 
 protected:
-    IHttpRequest& mrRequest;
-    std::map<std::string, std::string> mHeaders{};
-    StatusCodes mStatusCode = StatusCodes::Unknown;
-    std::string mBody{};
+    friend class EHttpRequest;
+
+    void addHeader(const std::string& arKey, std::string aValue)
+    {
+        mHeaders[arKey] = std::move(aValue);
+    }
+
+    void setStatusCode(int aCode)
+    {
+        mStatusCode = StatusCodes(aCode);
+    }
+
+    [[nodiscard]] std::string& getBody()
+    {
+        return mBody;
+    }
+
+    void clear()
+    {
+        mHeaders.clear();
+        mStatusCode = StatusCodes::Unknown;
+        mBody.clear();
+    }
 };
 
 } // rsp::network::ehttp

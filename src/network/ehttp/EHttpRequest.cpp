@@ -8,6 +8,8 @@
 * \author      steffen
 */
 #include "EHttpRequest.h"
+#include "EHttpSession.h"
+#include <network/ChunkStreamer.h>
 
 namespace rsp::network::ehttp {
 
@@ -51,12 +53,63 @@ IHttpRequest& EHttpRequest::AddFile(const std::string& arFieldName, posix::FileI
 
 IHttpResponse& EHttpRequest::Execute()
 {
+    // Get connection
+    auto &connection = getConnection();
+
+    mOptions.Headers["Content-Length"] = std::to_string(mOptions.Body->GetSize());
+
+    // Send <request type> <path> <protocol>
+    // Send host header
+    // Send headers from options + empty line
+    auto headers = formatHeaders();
+    connection.Write({ reinterpret_cast<std::byte*>(headers.data()), headers.size() });
+
+    // Send body
+    ChunkStreamer<512> streamer(*mOptions.Body);
+    streamer.Read();
+    connection.Write()
+
     return mResponse;
 }
 
 uintptr_t EHttpRequest::GetHandle() const
 {
     return 0;
+}
+
+SocketConnection& EHttpRequest::getConnection()
+{
+    if (mpSession) {
+        return dynamic_cast<EHttpSession&>(*mpSession).GetConnection().Connect();
+    }
+
+    if (!mpConnection) {
+        mpConnection = std::make_unique<SocketConnection>();
+        mpConnection->SetOptions(mOptions);
+        mpConnection->Connect();
+    }
+
+    return *mpConnection;
+}
+
+std::string EHttpRequest::formatHeaders()
+{
+    using namespace std::string_view_literals;
+    constexpr auto cNewLine = "\r\n"sv;
+
+    std::stringstream ss;
+    ss
+          << mOptions.RequestType << " "
+          << mOptions.Uri
+          << " HTTP/1.1\r\nHost: "sv
+          << getConnection().GetHost()
+          << cNewLine;
+    for (auto &h : mOptions.Headers) {
+        ss << h.first << ": " << h.second << cNewLine;
+    }
+    ss << cNewLine; // Empty line before body
+
+    return ss.str();
 }
 
 } // rsp::network::ehttp

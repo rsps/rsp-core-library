@@ -48,8 +48,6 @@ protected:
         mStatusCode = StatusCodes::Unknown;
         mBody.clear();
     }
-
-
 };
 
 } /* namespace rsp::network::curl */

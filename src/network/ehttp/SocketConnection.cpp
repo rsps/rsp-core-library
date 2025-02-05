@@ -13,17 +13,22 @@
 namespace rsp::network::ehttp {
 
 
-IConnection& SocketConnection::SetOptions(const ConnectionOptions& arOptions)
+SocketConnection& SocketConnection::SetOptions(const ConnectionOptions& arOptions)
 {
     mOptions = arOptions;
     return *this;
 }
 
-IConnection& SocketConnection::Connect()
+SocketConnection& SocketConnection::Connect()
 {
     using namespace rsp::posix;
 
+    if (mSocket.IsConnected()) {
+        return *this;
+    }
+
     UrlParser up(mOptions.BaseUrl);
+    mOptions.host = up.GetHost();
 
     auto urn = std::string(up.GetHost()) + ":" + std::to_string(static_cast<unsigned int>(up.GetPort()));
     AddressInfo ai(urn);
@@ -39,7 +44,7 @@ IConnection& SocketConnection::Connect()
     return *this;
 }
 
-IConnection& SocketConnection::Close()
+SocketConnection& SocketConnection::Close()
 {
     mSocket.Close();
     return *this;

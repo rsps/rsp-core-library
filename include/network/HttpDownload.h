@@ -30,6 +30,14 @@ public:
     explicit HttpDownload(const std::string &arFileName);
 
     /**
+     * TODO: Refactor this class into IHttpRequest + Pimpl
+     * Otherwise HttpDownload can NOT be executed as part of session request
+     * pool, which only contains Pimpl request objects.
+     * It can only be executed as independent connection, which might not
+     * be desired.
+     */
+
+    /**
      * \brief Set the filename to store the download into.
      * \param arFileName
      * \return self

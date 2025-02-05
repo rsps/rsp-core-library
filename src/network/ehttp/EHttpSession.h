@@ -13,6 +13,7 @@
 #include <network/IHttpSession.h>
 #include <utils/ObjectPool.h>
 #include "EHttpRequest.h"
+#include "SocketConnection.h"
 
 namespace rsp::network::ehttp {
 
@@ -27,10 +28,12 @@ public:
     [[nodiscard]] const HttpRequestOptions& GetDefaultOptions() const override;
     IHttpRequest& Request(HttpRequestType aType, std::string_view aUri, ResponseCallback_t aCallback) override;
 
+    SocketConnection& GetConnection() { return mConnection; }
 protected:
     rsp::utils::ObjectPool<EHttpRequest> mPool;
     std::vector<EHttpRequest*> mPending{};
     HttpRequestOptions mDefaultOptions{};
+    SocketConnection mConnection{};
 };
 
 } // rsp::network::ehttp

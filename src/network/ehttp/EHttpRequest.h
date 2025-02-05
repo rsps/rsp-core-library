@@ -10,12 +10,16 @@
 #ifndef RSP_CORE_LIB_SRC_NETWORK_EHTTP_E_HTTP_REQUEST_H
 #define RSP_CORE_LIB_SRC_NETWORK_EHTTP_E_HTTP_REQUEST_H
 
+#include <memory>
 #include <network/IHttpRequest.h>
+#include <network/IHttpSession.h>
 #include "EHttpResponse.h"
+#include "SocketConnection.h"
 
 namespace rsp::network::ehttp {
 
 class EHttpResponse;
+class EHttpSession;
 
 class EHttpRequest : public rsp::network::IHttpRequest
 {
@@ -23,6 +27,8 @@ public:
     typedef std::function<void(EHttpResponse&)> ResponseCallback_t;
 
     EHttpRequest();
+    EHttpRequest(const EHttpRequest&) = delete;
+    EHttpRequest& operator=(const EHttpRequest&) = delete;
 
     [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions& arOptions) override;
@@ -33,12 +39,17 @@ public:
     IHttpResponse& Execute() override;
     [[nodiscard]] uintptr_t GetHandle() const override;
 
-    ResponseCallback_t& OnResponse() { return mCallback; }
-
 protected:
     HttpRequestOptions mOptions{};
     EHttpResponse mResponse;
-    ResponseCallback_t mCallback{};
+
+    friend class EHttpSession;
+    ResponseCallback_t mResponseCallback{};
+    IHttpSession* mpSession = nullptr;
+    std::unique_ptr<SocketConnection> mpConnection{};
+
+    SocketConnection& getConnection();
+    std::string formatHeaders();
 };
 
 } // rsp::network::ehttp
