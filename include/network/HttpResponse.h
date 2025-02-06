@@ -13,8 +13,12 @@
 
 #include <network/IHttpRequest.h>
 #include <network/IHttpResponse.h>
+#include <network/StatusLine.h>
 
 namespace rsp::network {
+
+class ResponseParser;
+
 /**
  * \class HttpResponse
  *
@@ -52,7 +56,9 @@ public:
     }
 
 protected:
+    friend class ResponseParser;
     IHttpRequest &mrRequest;
+    StatusLine mStatusLine{};
     StatusCodes mStatusCode = StatusCodes::Unknown;
     std::map<std::string, std::string> mHeaders { };
     std::string mBody { };

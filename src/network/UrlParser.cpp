@@ -7,11 +7,9 @@
 * \license     Mozilla Public License 2.0
 * \author      steffen
 */
-#include <algorithm>
-#include <charconv>
 #include <magic_enum.hpp>
+#include <network/parser-helpers.h>
 #include <network/UrlParser.h>
-#include <ranges>
 
 using namespace std::string_view_literals;
 
@@ -29,33 +27,6 @@ std::ostream& operator<<(std::ostream& o, const UrlParser& arParser)
         << "Fragment:  " << arParser.GetFragment() << "\n"
         << "User Info: " << arParser.GetUserInfo();
     return o;
-}
-
-/**
- * \brief Whitespace characters to be ignored
- */
-constexpr auto cWhitespaceCharacters = " \t\r\n"sv;
-
-/**
- * \brief delimiter between scheme and host
- */
-constexpr auto cSchemeSuffix = "://"sv;
-
-/**
- * \brief Transforms a range of chars into its lowercase equivalent.
- */
-constexpr auto ascii_lowercase_transform = std::views::transform([](char const c) noexcept {
-    return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-});
-
-/**
- * \brief Returns whether lhs and rhs are equal, regardless of casing, assuming both are encoded in ASCII.
- * \param lhs
- * \param rhs
- * \return True if lhs and rhs are equal
- */
-[[nodiscard]] constexpr bool equal_ascii_case_insensitive(std::string_view const lhs, std::string_view const rhs) noexcept {
-    return std::ranges::equal(lhs | ascii_lowercase_transform, rhs | ascii_lowercase_transform);
 }
 
 /**
@@ -154,12 +125,11 @@ void UrlParser::parseHostAndPort(std::string_view aDomainName)
     }
     mHost = aDomainName.substr(0, colon_pos);
 
-    int number;
-    auto result = std::from_chars(&aDomainName.at(colon_pos + 1), &aDomainName.back() + 1, number);
-    if (number < 0 || number > std::numeric_limits<Port>::max() || result.ec == std::errc::invalid_argument || result.ptr != (&aDomainName.back() + 1)) {
+    auto number = string_to_integral<int>(aDomainName.substr(colon_pos + 1));
+    if (!number || *number < 0 || *number > std::numeric_limits<Port>::max()) {
         THROW_WITH_BACKTRACE1(EInvalidUrl, "Url does not have a valid port number");
     }
-    mPort = Port(number);
+    mPort = Port(*number);
 }
 
 void UrlParser::parsePath(size_t& arPosition, std::string_view aUrl)

@@ -10,6 +10,7 @@
 #include "EHttpRequest.h"
 #include "EHttpSession.h"
 #include <network/ChunkStreamer.h>
+#include <network/ResponseParser.h>
 
 namespace rsp::network::ehttp {
 
@@ -61,13 +62,38 @@ IHttpResponse& EHttpRequest::Execute()
     // Send <request type> <path> <protocol>
     // Send host header
     // Send headers from options + empty line
-    auto headers = formatHeaders();
-    connection.Write({ reinterpret_cast<std::byte*>(headers.data()), headers.size() });
+    {
+        auto headers = formatHeaders();
+        connection.Write({reinterpret_cast<std::byte*>(headers.data()), headers.size()});
+    }
 
     // Send body
-    ChunkStreamer<512> streamer(*mOptions.Body);
-    streamer.Read();
-    connection.Write()
+    {
+        ChunkStreamer<256> streamer(*mOptions.Body);
+        while (true) {
+            auto chunk = streamer.GetChunk();
+            if (chunk.empty()) {
+                break;
+            }
+            connection.Write(chunk);
+        }
+    }
+
+    // Read response...
+    {
+        ResponseParser parser(mResponse);
+        auto buffer = std::array<std::byte, 256>();
+        while (true) {
+            auto sz = connection.Read(buffer);
+            if (sz == 0) {
+                break; // What if timeout?
+            }
+            if (parser.ParseNewData({buffer.data(), sz})) {
+                // mResponse is now filled.
+                break;
+            }
+        }
+    }
 
     return mResponse;
 }
@@ -79,8 +105,8 @@ uintptr_t EHttpRequest::GetHandle() const
 
 SocketConnection& EHttpRequest::getConnection()
 {
-    if (mpSession) {
-        return dynamic_cast<EHttpSession&>(*mpSession).GetConnection().Connect();
+    if (mrSession.has_value()) {
+        return dynamic_cast<EHttpSession&>(mrSession.value().get()).GetConnection().Connect();
     }
 
     if (!mpConnection) {

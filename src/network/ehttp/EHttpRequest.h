@@ -27,8 +27,6 @@ public:
     typedef std::function<void(EHttpResponse&)> ResponseCallback_t;
 
     EHttpRequest();
-    EHttpRequest(const EHttpRequest&) = delete;
-    EHttpRequest& operator=(const EHttpRequest&) = delete;
 
     [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions& arOptions) override;
@@ -45,7 +43,7 @@ protected:
 
     friend class EHttpSession;
     ResponseCallback_t mResponseCallback{};
-    IHttpSession* mpSession = nullptr;
+    std::optional<std::reference_wrapper<IHttpSession>> mrSession{};
     std::unique_ptr<SocketConnection> mpConnection{};
 
     SocketConnection& getConnection();

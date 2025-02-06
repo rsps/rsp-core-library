@@ -39,8 +39,10 @@ public:
         return mWritten;
     }
 
-    std:span<std::byte> GetChunk()
+    [[nodiscard]] std::span<std::byte> GetChunk()
     {
+        loadFifo();
+        return mFiFo.GetBuffer();
     };
 
     /**

@@ -33,6 +33,16 @@ public:
     explicit FifoBufferBase(std::span<T> aBuffer) : mBuffer(aBuffer) {}
 
     /**
+     * \brief Get a span of the currently filled buffer.
+     * \return span
+     */
+    std::span<T> GetBuffer()
+    {
+        ASSERT(mHead == 0)
+        return { mBuffer.data(), mTail };
+    }
+
+    /**
      * \brief Get a pointer to the first element in the buffer
      * \return Pointer of type T
      */

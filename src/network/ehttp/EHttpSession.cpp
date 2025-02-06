@@ -63,7 +63,7 @@ IHttpRequest& EHttpSession::Request(HttpRequestType aType, std::string_view aUri
     auto &req = mPool.Get();
     req.SetOptions(opt);
     req.mResponseCallback = aCallback;
-    req.mpSession = this;
+    req.mrSession = *this;
     mPending.push_back(&req);
 
     return req;

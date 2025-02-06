@@ -10,7 +10,6 @@
 #ifndef RSP_CORE_LIB_INCLUDE_NETWORK_URL_PARSER_H
 #define RSP_CORE_LIB_INCLUDE_NETWORK_URL_PARSER_H
 
-#include <cstdint>
 #include <exceptions/CoreException.h>
 #include <ostream>
 #include <string_view>
