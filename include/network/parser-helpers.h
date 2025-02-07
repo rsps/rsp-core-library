@@ -15,9 +15,9 @@
 #include <ranges>
 #include <string_view>
 
-using namespace std::string_view_literals;
-
 namespace rsp::network {
+
+using namespace std::string_view_literals;
 
 /**
  * \brief Whitespace characters to be ignored

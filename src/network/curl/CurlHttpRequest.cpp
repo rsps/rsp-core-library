@@ -12,7 +12,7 @@
 #include <string>
 #include <network/HttpRequest.h>
 #include <network/ChunkStreamer.h>
-#include <network/HttpStringBody.h>
+#include <network/StringBody.h>
 #include <posix/FileIO.h>
 #include <utils/StrUtils.h>
 #include "CurlHttpRequest.h"
@@ -54,7 +54,7 @@ void CurlHttpRequest::readFromString(const std::string &arString)
 {
     setCurlOption(CURLOPT_UPLOAD, 1L);
     setCurlOption(CURLOPT_READFUNCTION, streamReadFunction);
-    mpUploadBuffer = std::make_shared<HttpStringBody>(arString);
+    mpUploadBuffer = std::make_shared<StringBody>(arString);
     setCurlOption(CURLOPT_READDATA, mpUploadBuffer.get());
     setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(arString.size()));
 }

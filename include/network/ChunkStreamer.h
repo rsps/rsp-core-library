@@ -75,6 +75,12 @@ public:
      * \return size_t
      */
     [[nodiscard]] size_t GetWritten() const { return mWritten; }
+
+        std::optional<size_t> GetStreamSize() override
+    {
+        return mrProvider.GetSize();
+    }
+
 protected:
     IChunkedDataProvider &mrProvider;
     rsp::utils::FifoBuffer<std::byte, N> mFiFo{};

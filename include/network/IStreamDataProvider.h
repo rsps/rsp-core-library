@@ -10,6 +10,9 @@
 #ifndef RSP_CORE_LIB_INCLUDE_NETWORK_I_STREAM_DATA_PROVIDER_H
 #define RSP_CORE_LIB_INCLUDE_NETWORK_I_STREAM_DATA_PROVIDER_H
 
+#include <cctype>
+#include <optional>
+#include <ostream>
 #include <span>
 
 namespace rsp::network {
@@ -32,7 +35,41 @@ public:
      * \return The actual amount of bytes read into the buffer
      */
     virtual size_t Read(std::span<std::byte> aBuffer) = 0;
+
+    /**
+     * \brief Get the the size of this stream, if possible.
+     * \return Optional size
+     */
+    virtual std::optional<size_t> GetStreamSize() = 0;
+
+    /**
+     * \brief Visualizer method. For debugging/trace output.
+     * \param o ostream
+     * \return self
+     */
+    virtual std::ostream& PrintContent(std::ostream& o)
+    {
+        std::byte buffer[100];
+        auto sp = std::span<std::byte>(buffer);
+        while (auto written = Read(sp)) {
+            for (size_t i = 0 ; i < written ; ++i) {
+                auto c = int(buffer[i]);
+                if (std::isprint(c) || c == '\n' || c == '\r') {
+                    o << c;
+                }
+                else {
+                    o << '.';
+                }
+            }
+        }
+        return o;
+    }
 };
+
+inline std::ostream& operator<<(std::ostream& o, IStreamDataProvider &arStream)
+{
+    return arStream.PrintContent(o);
+}
 
 } // namespace rsp::network
 

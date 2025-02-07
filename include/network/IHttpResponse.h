@@ -12,10 +12,13 @@
 #define RSP_CORE_LIB_NETWORK_I_HTTP_RESPONSE_H
 
 #include <exceptions/CoreException.h>
-#include <ostream>
+#include <functional>
 #include <map>
+#include <memory>
+#include <ostream>
 #include <string>
 #include "IHttpRequest.h"
+#include "IStreamDataProvider.h"
 #include "StatusCodes.h"
 
 namespace rsp::network {
@@ -40,6 +43,8 @@ class IHttpRequest;
 class IHttpResponse
 {
 public:
+    using HeaderList = std::map<std::string_view, std::string_view>;
+
     virtual ~IHttpResponse() = default;
 
     /**
@@ -47,14 +52,14 @@ public:
      *
      * \return Reference to headers.
      */
-    [[nodiscard]] virtual const std::map<std::string, std::string>& GetHeaders() const = 0;
+    [[nodiscard]] virtual const HeaderList& GetHeaders() const = 0;
 
     /**
      * \brief Get a const reference to the specific header value.
      * \param arName
      * \return Reference to header value
      */
-    [[nodiscard]] virtual const std::string& GetHeader(const std::string &arName) const = 0;
+    [[nodiscard]] virtual std::string_view GetHeader(std::string_view aName) const = 0;
 
     /**
      * \fn int GetStatusCode()const =0
@@ -63,6 +68,12 @@ public:
      * \return StatusCodes status code returned from server
      */
     [[nodiscard]] virtual StatusCodes GetStatusCode() const = 0;
+
+    /**
+     * \brief Get the length of the body part.
+     * \return size_t
+     */
+    [[nodiscard]] virtual size_t GetContentLength() const = 0;
 
     /**
      * \fn const IHttpRequest GetRequest&()const =0
@@ -78,7 +89,14 @@ public:
      *
      * \return String with body content
      */
-    [[nodiscard]] virtual const std::string& GetBody() const = 0;
+    [[nodiscard]] virtual IStreamDataProvider& GetBody() const = 0;
+
+    /**
+     * \brief Create the Body object. This is to be called when header section
+     *        is completed, and remaining data should go to the body.
+     * \return self
+     */
+    virtual IHttpResponse& MakeBody() = 0;
 };
 
 std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse);

@@ -18,7 +18,7 @@
 #include <network/HttpDownload.h>
 #include <network/NetworkLibrary.h>
 #include <network/HttpSession.h>
-#include <network/HttpStringBody.h>
+#include <network/StringBody.h>
 #include <network/MultipartBoundary.h>
 #include <network/NetworkException.h>
 #include <network/ChunkStreamer.h>
@@ -94,10 +94,10 @@ TEST_CASE("Network")
         CHECK_EQ(resp->GetHeader("content-type"), "text/html");
 
         if (opt.RequestType == HttpRequestType::HEAD) {
-            CHECK_EQ(resp->GetBody().size(), 0);
+            CHECK_EQ(resp->GetBody().GetStreamSize(), 0);
         }
         else {
-            CHECK_EQ(resp->GetBody().size(), 120);
+            CHECK_EQ(resp->GetBody().GetStreamSize(), 120);
         }
 
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
@@ -128,7 +128,7 @@ TEST_CASE("Network")
 //        MESSAGE("Response:\n" << *resp);
 
         CHECK_EQ(resp->GetHeader("content-type"), "text/html");
-        CHECK_EQ(resp->GetBody().size(), 120);
+        CHECK_EQ(resp->GetBody().GetStreamSize(), 120);
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
     }
 
@@ -153,9 +153,12 @@ TEST_CASE("Network")
 
             CHECK_NOTHROW(resp = &request.Execute());
 
-            CHECK_EQ(resp->GetBody().size(), source.size());
+            CHECK_EQ(resp->GetBody().GetStreamSize(), source.size());
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
-            CHECK_EQ(std::memcmp(source.data(), resp->GetBody().data(), source.size()), 0);
+            std::string buf;
+            buf.resize(source.size());
+            resp->GetBody().Read({ reinterpret_cast<std::byte*>(buf.data()), buf.size() });
+            CHECK_EQ(std::memcmp(source.data(), buf.data(), source.size()), 0);
         }
 
         SUBCASE("To File") {
@@ -163,7 +166,7 @@ TEST_CASE("Network")
 
             CHECK_NOTHROW(resp = &request.Execute());
 
-            CHECK_EQ(resp->GetBody().size(), 0);
+            CHECK_EQ(resp->GetBody().GetStreamSize(), 0);
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
         }
 
@@ -172,7 +175,7 @@ TEST_CASE("Network")
 
             CHECK_NOTHROW(resp = &request.Execute());
 
-            CHECK_EQ(resp->GetBody().size(), 0);
+            CHECK_EQ(resp->GetBody().GetStreamSize(), 0);
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
         }
 
@@ -184,7 +187,7 @@ TEST_CASE("Network")
 
             CHECK_NOTHROW(resp = &request.Execute());
 
-            CHECK_EQ(resp->GetBody().size(), 0);
+            CHECK_EQ(resp->GetBody().GetStreamSize(), 0);
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
         }
 
@@ -193,7 +196,7 @@ TEST_CASE("Network")
 
             CHECK_NOTHROW(resp = &request.Execute());
 
-            CHECK_EQ(resp->GetBody().size(), 0);
+            CHECK_EQ(resp->GetBody().GetStreamSize(), 0);
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
         }
 
@@ -233,7 +236,7 @@ TEST_CASE("Network")
 
         MESSAGE(resp->GetBody());
 
-        CHECK_EQ(resp->GetBody().size(), 71);
+        CHECK_EQ(resp->GetBody().GetStreamSize(), 71);
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
 
         CHECK(FileSystem::FileExists(cUploadedFile));
@@ -265,7 +268,7 @@ TEST_CASE("Network")
         IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
-        auto body = resp->GetBody();
+        auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
 //        MESSAGE(body);
 
         std::string expected = "\n"
@@ -280,7 +283,7 @@ TEST_CASE("Network")
 
         CHECK_EQ(body, expected);
 
-        CHECK_EQ(resp->GetBody().size(), 147);
+        CHECK_EQ(resp->GetBody().GetStreamSize(), 147);
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
 
         CHECK(FileSystem::FileExists(cUploadedFile));
@@ -293,7 +296,7 @@ TEST_CASE("Network")
     }
 
     SUBCASE("Body Stream") {
-        HttpStringBody body(R"(
+        StringBody body(R"(
               O freddled gruntbuggly thy micturations are to me
                  As plured gabbleblochits on a lurgid bee.
               Groop, I implore thee my foonting turlingdromes.
@@ -302,23 +305,22 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
 )");
 
         std::stringstream ss;
-        ss << body; // Uses operator<<(std::ostream &o, IChunkedDataProvider &s)
+        ss << body; // Uses operator<<(std::ostream &o, IStreamDataProvider &s)
         CHECK_EQ(ss.str(), body.Get());
         ss.str("");
 
         std::array<char, 51> _buffer{};
         std::span buffer(reinterpret_cast<std::byte*>(_buffer.data()), sizeof(_buffer));
-        ChunkStreamer<51> rd(body);
 
         size_t written;
-        while ((written = rd.Read(buffer))) {
+        while ((written = body.Read(buffer))) {
             std::string chunk = std::string(_buffer.data(), written);
 //            MESSAGE("\nChunk:   " << chunk << "\nwritten: " << written << "\nindex:   " << rd.GetChunkIndex());
             ss << chunk;
         }
         CHECK_EQ(ss.str(), body.Get());
-        CHECK_EQ(rd.GetWritten(), 0);
-        CHECK_EQ(rd.GetChunkIndex(), 333);
+//        CHECK_EQ(rd.GetWritten(), 0);
+//        CHECK_EQ(rd.GetChunkIndex(), 333);
     }
 
     SUBCASE("Post JSON") {
@@ -330,12 +332,12 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
 
         HttpRequest request;
         request.SetOptions(opt);
-        request.SetBody(std::make_shared<HttpStringBody>(json));
+        request.SetBody(std::make_shared<StringBody>(json));
 
         IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
-        auto body = resp->GetBody();
+        auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
 //        MESSAGE(body);
 
         std::string expected = R"(
@@ -363,7 +365,7 @@ Body: )" + json + "\n";
                 CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                 CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
                 CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
-                CHECK_EQ(resp.GetBody().size(), 0);
+                CHECK_EQ(resp.GetBody().GetStreamSize(), 0);
                 CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
                 respHead = true;
             });
@@ -375,7 +377,7 @@ Body: )" + json + "\n";
                 CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                 CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
                 CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
-                CHECK_EQ(resp.GetBody().size(), 120);
+                CHECK_EQ(resp.GetBody().GetStreamSize(), 120);
                 CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
                 resp1 = true;
             });
@@ -385,7 +387,7 @@ Body: )" + json + "\n";
                 CHECK_EQ(resp.GetHeaders().at("content-type"), "image/png");
                 CHECK_EQ(resp.GetHeaders().at("content-length"), "25138");
                 CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
-                CHECK_EQ(resp.GetBody().size(), 25138);
+                CHECK_EQ(resp.GetBody().GetStreamSize(), 25138);
                 CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
                 resp2 = true;
             });
@@ -415,7 +417,7 @@ Body: )" + json + "\n";
                                      CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                                      CHECK_EQ(resp.GetHeaders().at("content-length"), "164");
                                      CHECK_EQ(resp.GetHeaders().at("http/2 401"), "present");
-                                     CHECK_EQ(resp.GetBody().size(), 0);
+                                     CHECK_EQ(resp.GetBody().GetStreamSize(), 0);
                                      CHECK_EQ(resp.GetStatusCode(), StatusCodes::Unauthorized);
                                      respErrHead = true;
                                  });
@@ -432,7 +434,7 @@ Body: )" + json + "\n";
                                      CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                                      CHECK_EQ(resp.GetHeaders().at("content-length"), "131");
                                      CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
-                                     CHECK_EQ(resp.GetBody().size(), 0);
+                                     CHECK_EQ(resp.GetBody().GetStreamSize(), 0);
                                      CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
 
                                      CHECK_EQ(resp.GetRequest().GetOptions().BasicAuthUsername, "jb");
@@ -457,7 +459,7 @@ Body: )" + json + "\n";
                          CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                          CHECK_EQ(resp.GetHeaders().at("content-length"), "131");
                          CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
-                         CHECK_EQ(resp.GetBody().size(), 0);
+                         CHECK_EQ(resp.GetBody().GetStreamSize(), 0);
                          CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
                          CHECK_EQ(resp.GetRequest().GetOptions().Headers.at("Authorization"), "Basic amI6YWdlbnQwMDc=");
                          std::stringstream ss;
@@ -474,7 +476,7 @@ Body: )" + json + "\n";
                         CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                         CHECK_EQ(resp.GetHeaders().at("content-length"), "131");
                         CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
-                        CHECK_EQ(resp.GetBody().size(), 131);
+                        CHECK_EQ(resp.GetBody().GetStreamSize(), 131);
                         CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
                         std::stringstream ss;
                         ss << resp.GetRequest();

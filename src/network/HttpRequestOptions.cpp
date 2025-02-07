@@ -47,36 +47,5 @@ std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)
     return o;
 }
 
-
-/**
- * \brief Get up to aMaxLen characters from the body content.
- * \param aMaxLen Maximum length of returned string. If entire content does not fit, the result will be appended with 3 dots e.g. "This is content..."
- * \return string
- */
-std::ostream& operator<<(std::ostream &o, IChunkedDataProvider &s)
-{
-    char buffer[200];
-    auto sp = std::span<char>(buffer);
-    size_t written;
-    size_t chunk_index = 0;
-    size_t payload_index = 0;
-    size_t total = 0;
-    bool eof = false;
-    while (!eof) {
-        eof = s.GetChunk(sp, written, chunk_index, payload_index);
-        total += written;
-        for (size_t i = 0 ; i < written ; ++i) {
-            auto c = buffer[i];
-            if (std::isprint(static_cast<unsigned char>(c)) || c == '\n' || c == '\r') {
-                o << c;
-            }
-            else {
-                o << '.';
-            }
-        }
-    }
-    return o;
-}
-
 } // namespace rsp::network
 

@@ -11,6 +11,7 @@
 #define RSP_CORE_LIB_RESPONSE_PARSER_H
 
 #include "HttpResponse.h"
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -35,7 +36,7 @@ protected:
     States mState = States::Headers;
 
     void decodeHeaders(std::string_view aHeaderData);
-    void addHeader(std::string_view aHeaderLine);
+    void addHeader(std::string_view aKey, std::string_view aValue);
 };
 
 } // rsp::network

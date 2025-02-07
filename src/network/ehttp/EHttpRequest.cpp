@@ -11,6 +11,7 @@
 #include "EHttpSession.h"
 #include <network/ChunkStreamer.h>
 #include <network/ResponseParser.h>
+#include <network/parser-helpers.h>
 
 namespace rsp::network::ehttp {
 
@@ -31,13 +32,13 @@ IHttpRequest& EHttpRequest::SetOptions(const HttpRequestOptions& arOptions)
     return *this;
 }
 
-IHttpRequest& EHttpRequest::SetBody(std::shared_ptr<IChunkedDataProvider> apBody)
+IHttpRequest& EHttpRequest::SetBody(std::shared_ptr<IStreamDataProvider> apBody)
 {
     mOptions.Body = apBody;
     return *this;
 }
 
-const IChunkedDataProvider& EHttpRequest::GetBody() const
+const IStreamDataProvider& EHttpRequest::GetBody() const
 {
     return *(mOptions.Body);
 }
@@ -57,7 +58,10 @@ IHttpResponse& EHttpRequest::Execute()
     // Get connection
     auto &connection = getConnection();
 
-    mOptions.Headers["Content-Length"] = std::to_string(mOptions.Body->GetSize());
+    auto len = mOptions.Body->GetStreamSize();
+    if (len) {
+        mOptions.Headers["Content-Length"] = std::to_string(*len);
+    }
 
     // Send <request type> <path> <protocol>
     // Send host header
@@ -69,13 +73,9 @@ IHttpResponse& EHttpRequest::Execute()
 
     // Send body
     {
-        ChunkStreamer<256> streamer(*mOptions.Body);
-        while (true) {
-            auto chunk = streamer.GetChunk();
-            if (chunk.empty()) {
-                break;
-            }
-            connection.Write(chunk);
+        std::byte buffer[256];
+        while (auto sz = mOptions.Body->Read(buffer)) {
+            connection.Write({buffer, sz});
         }
     }
 
@@ -121,7 +121,6 @@ SocketConnection& EHttpRequest::getConnection()
 std::string EHttpRequest::formatHeaders()
 {
     using namespace std::string_view_literals;
-    constexpr auto cNewLine = "\r\n"sv;
 
     std::stringstream ss;
     ss

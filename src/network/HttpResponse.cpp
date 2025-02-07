@@ -9,9 +9,13 @@
  */
 
 #include <network/HttpResponse.h>
+#include <network/parser-helpers.h>
 #include <iostream>
 #include <stdexcept>
 #include <utils/StrUtils.h>
+#include <network/StringBody.h>
+#include <network/BinaryBody.h>
+#include <network/FileBody.h>
 
 namespace rsp::network {
 
@@ -21,7 +25,7 @@ std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse)
         "Headers:\n";
 
     for(auto &tuple : arResponse.GetHeaders()) {
-        if (rsp::utils::StrUtils::ToLower(tuple.first) == std::string("authorization")) {
+        if (tuple.first == std::string("authorization")) {
             o << "  " << tuple.first << ": " << std::string(tuple.second.size(), 'X') << "\n";
         }
         else {
@@ -31,19 +35,68 @@ std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse)
 
     o <<
         "StatusCode: " << int(arResponse.GetStatusCode()) << "\n"
-        "Body: " << arResponse.GetBody() << "\n";
+        "Body: ";
+    arResponse.GetBody().PrintContent(o);
+    o << "\n";
 
     return o;
 }
 
-const std::string& HttpResponse::GetHeader(const std::string &arName) const
+std::string_view HttpResponse::GetHeader(std::string_view aName) const
 {
     try {
-        return mHeaders.at(arName);
+        return mHeaders.at(aName);
     }
     catch (const std::out_of_range &e) {
     }
-    THROW_WITH_BACKTRACE1(EHeaderNotFound, rsp::utils::StrUtils::Format("No response header named %s was found", arName.c_str()));
+    THROW_WITH_BACKTRACE1(EHeaderNotFound, rsp::utils::StrUtils::Format("No response header named %s was found", aName.data()));
 }
+
+[[nodiscard]] StatusCodes HttpResponse::GetStatusCode() const
+{
+    if (auto number = string_to_integral<int>(mStatusLine.GetStatusCode())) {
+        return StatusCodes(*number);
+    }
+    return StatusCodes::Unknown;
+}
+
+IHttpResponse& HttpResponse::MakeBody()
+{
+    if (mpBody) {
+        return *this;
+    }
+
+    if (mHeaders.contains("content-type")) {
+        auto content_type = mHeaders["content-type"];
+
+        if (content_type.starts_with("application/json") || content_type.starts_with("application/xml") || content_type.starts_with("text/")) {
+            mpBody = std::make_shared<StringBody>();
+        }
+        else if (content_type.starts_with("application/octet-stream")) {
+            mpBody = std::make_shared<BinaryBody>();
+        }
+        else {
+            mpBody = std::make_shared<FileBody>();
+        }
+    }
+    else {
+        mpBody = std::make_shared<StringBody>();
+    }
+    return *this;
+}
+
+size_t HttpResponse::GetContentLength() const
+{
+    if (!mContentLength) {
+        if (mHeaders.contains("content-length")) {
+            const_cast<HttpResponse*>(this)->mContentLength = string_to_integral<size_t>(mHeaders.at("content-length"));
+        }
+    }
+    if (mContentLength) {
+        return *mContentLength;
+    }
+    return 0;
+}
+
 
 }

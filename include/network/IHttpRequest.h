@@ -60,13 +60,13 @@ public:
      * \param apBody Shared pointer to interface of IHttpBodyStream
      * \return self
      */
-    virtual IHttpRequest& SetBody(std::shared_ptr<IChunkedDataProvider> apBody) = 0;
+    virtual IHttpRequest& SetBody(std::shared_ptr<IStreamDataProvider> apBody) = 0;
 
     /**
      * \brief Get the body content of this request
      * \return Reference to body stream
      */
-    [[nodiscard]] virtual const IChunkedDataProvider& GetBody() const = 0;
+    [[nodiscard]] virtual const IStreamDataProvider& GetBody() const = 0;
 
     /**
      * \fn IHttpForm AddField&(std::string_view, std::string_view)

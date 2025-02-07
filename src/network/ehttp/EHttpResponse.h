@@ -25,28 +25,6 @@ public:
 
 protected:
     friend class EHttpRequest;
-
-    void addHeader(const std::string& arKey, std::string aValue)
-    {
-        mHeaders[arKey] = std::move(aValue);
-    }
-
-    void setStatusCode(int aCode)
-    {
-        mStatusCode = StatusCodes(aCode);
-    }
-
-    [[nodiscard]] std::string& getBody()
-    {
-        return mBody;
-    }
-
-    void clear()
-    {
-        mHeaders.clear();
-        mStatusCode = StatusCodes::Unknown;
-        mBody.clear();
-    }
 };
 
 } // rsp::network::ehttp

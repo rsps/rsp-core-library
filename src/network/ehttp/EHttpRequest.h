@@ -30,8 +30,8 @@ public:
 
     [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions& arOptions) override;
-    IHttpRequest& SetBody(std::shared_ptr<IChunkedDataProvider> apBody) override;
-    [[nodiscard]] const IChunkedDataProvider& GetBody() const override;
+    IHttpRequest& SetBody(std::shared_ptr<IStreamDataProvider> apBody) override;
+    [[nodiscard]] const IStreamDataProvider& GetBody() const override;
     IHttpRequest& AddField(const std::string& arFieldName, const std::string& arValue) override;
     IHttpRequest& AddFile(const std::string& arFieldName, posix::FileIO& arFile) override;
     IHttpResponse& Execute() override;

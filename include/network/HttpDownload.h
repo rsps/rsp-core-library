@@ -49,7 +49,7 @@ public:
 protected:
     std::string mFileName{};
 
-    void setFileModifiedTime(const std::string &arTimeString);
+    void setFileModifiedTime(std::string_view aTimeString);
 };
 
 } /* namespace rsp::network */

@@ -59,7 +59,7 @@ IHttpResponse& HttpDownload::Execute()
 
     rsp::posix::FileIO file(mFileName, std::ios::in | std::ios::out | std::ios_base::ate, 0640);
 
-    if (resp->GetHeaders().contains("content-length") && std::stoul(resp->GetHeader("content-length")) == file.GetSize()) {
+    if (resp->GetContentLength() == file.GetSize()) {
         if (resp->GetHeaders().contains("last-modified") && resp->GetHeader("last-modified") == modified_time) {
             return *resp;
         }
@@ -90,9 +90,9 @@ IHttpResponse& HttpDownload::Execute()
     return *resp;
 }
 
-void HttpDownload::setFileModifiedTime(const std::string &arTimeString)
+void HttpDownload::setFileModifiedTime(std::string_view aTimeString)
 {
-    DateTime dt(arTimeString, DateTime::Formats::HTTP);
+    DateTime dt(std::string(aTimeString), DateTime::Formats::HTTP);
     FileSystem::SetFileModifiedTime(mFileName, dt);
 }
 

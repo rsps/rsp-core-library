@@ -33,35 +33,37 @@ public:
     {
     }
 
-    [[nodiscard]] const std::map<std::string, std::string>& GetHeaders() const override
+    [[nodiscard]] const HeaderList& GetHeaders() const override
     {
         return mHeaders;
     }
 
-    [[nodiscard]] const std::string& GetHeader(const std::string &arName) const override;
+    [[nodiscard]] std::string_view GetHeader(std::string_view aName) const override;
 
-    [[nodiscard]] StatusCodes GetStatusCode() const override
-    {
-        return mStatusCode;
-    }
+    [[nodiscard]] StatusCodes GetStatusCode() const override;
 
     [[nodiscard]] const IHttpRequest& GetRequest() const override
     {
         return mrRequest;
     }
 
-    [[nodiscard]] const std::string& GetBody() const override
+    [[nodiscard]] IStreamDataProvider& GetBody() const override
     {
-        return mBody;
+        return *mpBody;
     }
+
+    IHttpResponse& MakeBody() override;
+
+    [[nodiscard]] size_t GetContentLength() const override;
 
 protected:
     friend class ResponseParser;
     IHttpRequest &mrRequest;
+    std::string mHeaderData{};
     StatusLine mStatusLine{};
-    StatusCodes mStatusCode = StatusCodes::Unknown;
-    std::map<std::string, std::string> mHeaders { };
-    std::string mBody { };
+    HeaderList mHeaders{};
+    std::optional<size_t> mContentLength{};
+    std::shared_ptr<IStreamDataProvider> mpBody{};
 };
 
 }// namespace rsp::network

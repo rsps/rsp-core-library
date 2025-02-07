@@ -7,6 +7,9 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
+#include <network/StringBody.h>
+#include <network/HttpText.h>
 #include <network/parser-helpers.h>
 #include <network/ResponseParser.h>
 #include <utils/StrUtils.h>
@@ -25,24 +28,27 @@ bool ResponseParser::ParseNewData(std::span<std::byte> aNewData)
     switch (mState) {
         case States::Headers:
             if (auto position = mRemaining.find(cHeaderEnd); position != std::string::npos) {
-                decodeHeaders({ mRemaining.data(), position + 2 }); // Include newline before empty line
+                mrResponse.mHeaderData = mRemaining.substr(0, position + 2);
+                decodeHeaders(mrResponse.mHeaderData); // Include newline before empty line
+                mrResponse.MakeBody();
+                (void)mrResponse.GetContentLength(); // Attempt to parse content-length from headers.
                 mRemaining = mRemaining.substr(position);
-                if (mrResponse.GetHeaders().contains("transfer-encoding") && mrResponse.GetHeader("transfer-encoding") == "chunked") {
+                if (mrResponse.GetHeaders().contains("transfer-encoding") && mrResponse.GetHeader("transfer-encoding").ends_with("chunked")) {
                     mState = States::ChunkedBody;
                 }
                 else {
                     mState = States::Body;
-                    mrResponse.mBody = std::move(mRemaining);
+                    mrResponse.mpBody->Write({ reinterpret_cast<const std::byte*>(mRemaining.data()), mRemaining.size() });
                     mRemaining.clear();
-                    result = std::stoul(mrResponse.GetHeader("content-length")) == mrResponse.mBody.size();
+                    result = mrResponse.mContentLength == mrResponse.mpBody->GetStreamSize();
                 }
             }
             break;
 
         case States::Body:
-            mrResponse.mBody = std::move(mRemaining);
+            mrResponse.mpBody->Write({ reinterpret_cast<const std::byte*>(mRemaining.data()), mRemaining.size() });
             mRemaining.clear();
-            result = std::stoul(mrResponse.GetHeader("content-length")) == mrResponse.mBody.size();
+            result = mrResponse.mContentLength == mrResponse.mpBody->GetStreamSize();
             break;
 
         case States::ChunkedBody:
@@ -55,46 +61,23 @@ bool ResponseParser::ParseNewData(std::span<std::byte> aNewData)
 
 void ResponseParser::decodeHeaders(std::string_view aHeaderData)
 {
-    auto position = aHeaderData.find(cNewLine);
-    if (position != std::string_view::npos) {
-        mrResponse.mStatusLine = StatusLine({aHeaderData.data(), position });
+    auto ht = HttpText(aHeaderData);
+    mrResponse.mStatusLine = StatusLine(std::string(ht.Line().Source()));
 
-        if (auto number = string_to_integral<int>(mrResponse.mStatusLine.GetStatusCode())) {
-            mrResponse.mStatusCode = StatusCodes(*number);
-        }
+    while (auto line = ht.Line()) {
+        addHeader(line.FieldName(), line.FieldValue());
     }
-
-    while(true) {
-        auto end_position = aHeaderData.find(cNewLine, position);
-        if (end_position == std::string_view::npos) {
-            break; // Finished
-        }
-        addHeader(std::string(aHeaderData.substr(position, end_position - position)));
-        position = end_position + 2;
-    }
-
 }
 
-void ResponseParser::addHeader(std::string_view aHeaderLine)
+void ResponseParser::addHeader(std::string_view aKey, std::string_view aValue)
 {
-    std::string header(aHeaderLine);
-    size_t separator = header.find_first_of(':');
-    if (std::string::npos == separator) {
-        StrUtils::ToLower(StrUtils::Trim(header));
-        if (header.empty()) {
-            return; // blank line;
-        }
-        mrResponse.mHeaders[header] = "present";
-    }
-    else {
-        std::string key = header.substr(0, separator);
-        StrUtils::ToLower(StrUtils::Trim(key));
-        std::string value = header.substr(separator + 1);
-        StrUtils::Trim(value);
-        if (key == "content-length" && mrResponse.mHeaders.contains(key) && mrResponse.mHeaders.at(key) != value) {
-            //
-        }
-        mrResponse.mHeaders[key] = value;
+    std::string key(aKey);
+    StrUtils::ToLower(key);
+    std::string value(aValue);
+    mrResponse.mHeaders.try_emplace(key, value);
+
+    if (key == "content-length" && mrResponse.mHeaders.at(key) != value) {
+        THROW_WITH_BACKTRACE1(EHttpParseError, "Multiple Content-Length given with different values.");
     }
 }
 
