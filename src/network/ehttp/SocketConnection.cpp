@@ -33,13 +33,13 @@ SocketConnection& SocketConnection::Connect()
     auto urn = std::string(up.GetHost()) + ":" + std::to_string(static_cast<unsigned int>(up.GetPort()));
     AddressInfo ai(urn);
 
-    if (up.RequiresTLS()) {
-//        mSocket = TLSSocket(Domain::Inet, Type::Stream, Protocol::Inet);
-    }
-    else {
-        mSocket = Socket(Domain::Inet, Type::Stream, Protocol::Inet);
-    }
+    mSocket = Socket(Domain::Inet, Type::Stream, Protocol::Unspecified);
     mSocket.Connect(ai);
+
+    if (up.RequiresTLS()) {
+        mpTls = security::ITLSSocket::Create();
+        mpTls->SetSocket(mSocket);
+    }
 
     return *this;
 }
@@ -47,6 +47,7 @@ SocketConnection& SocketConnection::Connect()
 SocketConnection& SocketConnection::Close()
 {
     mSocket.Close();
+    mpTls = nullptr;
     return *this;
 }
 
@@ -62,11 +63,17 @@ bool SocketConnection::IsClosed() const
 
 size_t SocketConnection::Write(const std::span<const std::byte> aData)
 {
+    if (mpTls) {
+        return mpTls->Write(aData);
+    }
     return mSocket.Send(aData);
 }
 
 size_t SocketConnection::Read(const std::span<std::byte> aBuffer)
 {
+    if (mpTls) {
+        return mpTls->Read(aBuffer);
+    }
     return mSocket.Receive(aBuffer);
 }
 

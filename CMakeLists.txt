@@ -91,7 +91,7 @@ endif()
 
 if (OPENSSL_CRYPTO)
     find_package(OpenSSL REQUIRED)
-    list(APPEND LIBRARIES OpenSSL::Crypto)
+    list(APPEND LIBRARIES OpenSSL::Crypto OpenSSL::SSL)
     list(APPEND BUILD_OPTIONS -DUSE_OPENSSL)
 endif ()
 

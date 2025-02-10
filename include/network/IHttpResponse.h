@@ -16,6 +16,7 @@
 #include <map>
 #include <memory>
 #include <ostream>
+#include "parser-helpers.h"
 #include <string>
 #include "IHttpRequest.h"
 #include "IStreamDataProvider.h"
@@ -36,6 +37,19 @@ public:
 //Forward declarations
 class IHttpRequest;
 
+namespace detail
+{
+
+struct CaseInsensitiveComparator
+{
+    bool operator()(std::string_view a, std::string_view b) const noexcept
+    {
+        return equal_ascii_case_insensitive(a, b);
+    }
+};
+
+}   // namespace detail
+
 /**
  * \class IHttpResponse
  * \brief Interface for a HTTP response object
@@ -43,7 +57,7 @@ class IHttpRequest;
 class IHttpResponse
 {
 public:
-    using HeaderList = std::map<std::string_view, std::string_view>;
+    using HeaderList = std::map<std::string_view, std::string_view, detail::CaseInsensitiveComparator>;
 
     virtual ~IHttpResponse() = default;
 

@@ -12,6 +12,7 @@
 
 #include <network/IConnection.h>
 #include <posix/Socket.h>
+#include <security/ITLSSocket.h>
 
 namespace rsp::network::ehttp {
 
@@ -31,6 +32,7 @@ public:
 protected:
     ConnectionOptions mOptions{};
     posix::Socket mSocket{};
+    std::shared_ptr<security::ITLSSocket> mpTls{};
 };
 
 } // rsp::network::ehttp

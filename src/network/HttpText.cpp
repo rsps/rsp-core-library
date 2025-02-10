@@ -126,7 +126,8 @@ std::string_view HttpText::FieldName()
         PARSE_ERROR();
     }
 
-    auto sub = mSource.substr(mCursor, colon_pos);
+    // "Content-Type: text/html\r\nContent-Length: 162\r\nConnection: close\r\nDate: Mon, 10 Feb 2025 17:01:28 GMT\r\nServer: lighttpd/1.4.75\r\n"
+    auto sub = mSource.substr(mCursor, colon_pos - mCursor);
     for (auto c : sub) {
         if (!std::isgraph(c)) {
             PARSE_ERROR();
@@ -147,8 +148,8 @@ std::string_view HttpText::FieldValue()
     }
     auto sub = mSource.substr(mCursor);
     auto end_pos = sub.find_last_not_of(cSpaceTab);
-    mCursor += sub.size();
-    return sub.substr(0, end_pos);
+    mCursor = end_pos + 1;
+    return sub.substr(0, mCursor);
 }
 
 std::string_view HttpText::quotedString()
@@ -162,7 +163,7 @@ std::string_view HttpText::quotedString()
     }
     auto start = mCursor;
     mCursor = end_pos + 1;
-    return mSource.substr(start, end_pos);
+    return mSource.substr(start, end_pos - start);
 }
 
 HttpText& HttpText::Rewind()
@@ -175,8 +176,8 @@ HttpText HttpText::Line()
 {
     auto pos = mSource.find(cCRLF, mCursor);
     auto start = mCursor;
-    mCursor += pos + 2;
-    return HttpText(mSource.substr(start, pos));
+    mCursor = pos + 2;
+    return HttpText(mSource.substr(start, pos - start));
 }
 
 bool HttpText::IsNewLine() const

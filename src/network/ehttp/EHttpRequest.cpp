@@ -58,9 +58,11 @@ IHttpResponse& EHttpRequest::Execute()
     // Get connection
     auto &connection = getConnection();
 
-    auto len = mOptions.Body->GetStreamSize();
-    if (len) {
-        mOptions.Headers["Content-Length"] = std::to_string(*len);
+    if (mOptions.Body) {
+        auto len = mOptions.Body->GetStreamSize();
+        if (len) {
+            mOptions.Headers["Content-Length"] = std::to_string(*len);
+        }
     }
 
     // Send <request type> <path> <protocol>
@@ -72,7 +74,7 @@ IHttpResponse& EHttpRequest::Execute()
     }
 
     // Send body
-    {
+    if (mOptions.Body) {
         std::byte buffer[256];
         while (auto sz = mOptions.Body->Read(buffer)) {
             connection.Write({buffer, sz});

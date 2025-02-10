@@ -65,20 +65,21 @@ void ResponseParser::decodeHeaders(std::string_view aHeaderData)
     mrResponse.mStatusLine = StatusLine(std::string(ht.Line().Source()));
 
     while (auto line = ht.Line()) {
-        addHeader(line.FieldName(), line.FieldValue());
+        auto key = line.FieldName();
+        addHeader(key, line.FieldValue());
     }
 }
 
 void ResponseParser::addHeader(std::string_view aKey, std::string_view aValue)
 {
-    std::string key(aKey);
-    StrUtils::ToLower(key);
-    std::string value(aValue);
-    mrResponse.mHeaders.try_emplace(key, value);
-
-    if (key == "content-length" && mrResponse.mHeaders.at(key) != value) {
-        THROW_WITH_BACKTRACE1(EHttpParseError, "Multiple Content-Length given with different values.");
+    if (equal_ascii_case_insensitive(aKey, "content-length") && mrResponse.mHeaders.contains(aKey)) {
+        auto old_value= mrResponse.mHeaders.at(aKey);
+        if (old_value != aValue) {
+            THROW_WITH_BACKTRACE1(EHttpParseError, "Multiple Content-Length given with different values.");
+        }
     }
+
+    mrResponse.mHeaders.try_emplace(aKey, aValue);
 }
 
 } // rsp::network
