@@ -12,23 +12,22 @@
 #include <network/HttpText.h>
 #include <network/parser-helpers.h>
 #include <network/ResponseParser.h>
-#include <utils/StrUtils.h>
 
 using namespace std::string_view_literals;
 using namespace rsp::utils;
 
 namespace rsp::network {
 
-bool ResponseParser::ParseNewData(std::span<std::byte> aNewData)
+bool ResponseParser::ParseNewData(std::span<const std::byte> aNewData)
 {
     bool result = false;
 
-    mRemaining += std::string(reinterpret_cast<char*>(aNewData.data()), aNewData.size());
+    mRemaining += std::string(reinterpret_cast<const char*>(aNewData.data()), aNewData.size());
 
     switch (mState) {
         case States::Headers:
             if (auto position = mRemaining.find(cHeaderEnd); position != std::string::npos) {
-                mrResponse.mHeaderData = mRemaining.substr(0, position + 2);
+                mrResponse.mHeaderData = mRemaining.substr(0, position + 4);
                 decodeHeaders(mrResponse.mHeaderData); // Include newline before empty line
                 mrResponse.MakeBody();
                 (void)mrResponse.GetContentLength(); // Attempt to parse content-length from headers.
@@ -62,7 +61,7 @@ bool ResponseParser::ParseNewData(std::span<std::byte> aNewData)
 void ResponseParser::decodeHeaders(std::string_view aHeaderData)
 {
     auto ht = HttpText(aHeaderData);
-    mrResponse.mStatusLine = StatusLine(std::string(ht.Line().Source()));
+    mrResponse.mStatusLine = StatusLine(ht.Line());
 
     while (auto line = ht.Line()) {
         auto key = line.FieldName();
@@ -72,10 +71,11 @@ void ResponseParser::decodeHeaders(std::string_view aHeaderData)
 
 void ResponseParser::addHeader(std::string_view aKey, std::string_view aValue)
 {
-    if (equal_ascii_case_insensitive(aKey, "content-length") && mrResponse.mHeaders.contains(aKey)) {
-        auto old_value= mrResponse.mHeaders.at(aKey);
-        if (old_value != aValue) {
-            THROW_WITH_BACKTRACE1(EHttpParseError, "Multiple Content-Length given with different values.");
+    if (equal_ascii_case_insensitive(aKey, "content-length")) {
+        if (auto it = mrResponse.mHeaders.find(aKey); it != mrResponse.mHeaders.end()) {
+            if (it->second != aValue) {
+                THROW_WITH_BACKTRACE1(EHttpParseError, "Multiple Content-Length given with different values.");
+            }
         }
     }
 

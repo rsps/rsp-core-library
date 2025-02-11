@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <charconv>
+#include <functional>
 #include <ranges>
 #include <string_view>
 

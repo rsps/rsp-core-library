@@ -74,6 +74,12 @@ public:
     HttpText& LF();
 
     /**
+     * \brief Traverse an expected space, or fail
+     * \return self
+     */
+    HttpText& SP();
+
+    /**
      * \brief Traverse all Optional White Space characters from current position.
      * \return self
      */
@@ -92,6 +98,18 @@ public:
      * \return string_view
      */
     std::string_view Alpha(size_t aSize = npos);
+
+    /**
+     * \brief Get the string fulfilling VCHAR+HTB+SP character rules from current position.
+     * \return string_view
+     */
+    std::string_view AsciiText();
+
+    /**
+     * \brief Get HTTP version string. (HTTP/x.x)
+     * \return string_view
+     */
+    std::string_view HttpVersion();
 
     /**
      * \brief Parse the next aCount amount of characters as a decimal value.

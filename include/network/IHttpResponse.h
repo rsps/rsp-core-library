@@ -37,6 +37,34 @@ public:
 //Forward declarations
 class IHttpRequest;
 
+struct ci_char_traits : public std::char_traits<char> {
+    static bool eq(char c1, char c2) { return toupper(c1) == toupper(c2); }
+    static bool ne(char c1, char c2) { return toupper(c1) != toupper(c2); }
+    static bool lt(char c1, char c2) { return toupper(c1) <  toupper(c2); }
+    static int compare(const char* s1, const char* s2, size_t n) {
+        while( n-- != 0 ) {
+            if( toupper(*s1) < toupper(*s2) ) return -1;
+            if( toupper(*s1) > toupper(*s2) ) return 1;
+            ++s1; ++s2;
+        }
+        return 0;
+    }
+    static const char* find(const char* s, int n, char a) {
+        while( n-- > 0 && toupper(*s) != toupper(a) ) {
+            ++s;
+        }
+        return s;
+    }
+};
+
+//using string_view_ci = std::basic_string_view<char, ci_char_traits>;
+
+//std::string s1{ "Ignore my CASE" };
+//std::string s2{ "ignore my case" };
+//std::basic_string_view<std::string::value_type, ci_char_traits> ci_view{ s1.c_str() };
+//std::cout << std::boolalpha << "\"" << s1 << "\" equals \"" << s2 << "\": " << (s1.compare(s2) == 0) << std::endl;
+//std::cout << "\"" << s1 << "\" equals \"" << s2 << "\" (ignore casing): " << (ci_view.compare(s2.c_str()) == 0) << std::endl;
+
 namespace detail
 {
 
@@ -44,7 +72,9 @@ struct CaseInsensitiveComparator
 {
     bool operator()(std::string_view a, std::string_view b) const noexcept
     {
-        return equal_ascii_case_insensitive(a, b);
+        std::basic_string_view<std::string::value_type, ci_char_traits> ci_view1{ a.data(), a.size() };
+        std::basic_string_view<std::string::value_type, ci_char_traits> ci_view2{ b.data(), b.size() };
+        return ci_view1 < ci_view2;
     }
 };
 

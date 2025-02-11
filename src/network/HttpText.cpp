@@ -52,6 +52,15 @@ HttpText& HttpText::LF()
     return *this;
 }
 
+HttpText& HttpText::SP()
+{
+    if (mSource.at(mCursor) != ' ') {
+        PARSE_ERROR();
+    }
+    mCursor++;
+    return *this;
+}
+
 HttpText& HttpText::OWS()
 {
     mCursor = mSource.find_first_not_of(cSpaceTab, mCursor);
@@ -78,6 +87,36 @@ std::string_view HttpText::Alpha(size_t aSize)
     mCursor += sub.size();
     return sub;
 //    return { sub.data(), sub.size() };
+}
+
+std::string_view HttpText::AsciiText()
+{
+    auto pos = mSource.find(cCRLF);
+    if (pos == npos) {
+        PARSE_ERROR();
+    }
+    auto sub = mSource.substr(mCursor, pos - mCursor);
+    for (auto c : sub) {
+        if (cDelimiters.contains(c)) {
+            PARSE_ERROR();
+        }
+    }
+    mCursor = pos + 2;
+    return sub;
+}
+
+std::string_view HttpText::HttpVersion()
+{
+    auto pos = mSource.find("HTTP/");
+    if (pos != 0) {
+        PARSE_ERROR();
+    }
+    pos = mSource.find_first_of(' ');
+    if (pos > 8) {
+        PARSE_ERROR();
+    }
+    mCursor = pos + 1;
+    return mSource.substr(0, pos);
 }
 
 int HttpText::Digit(size_t aCount)
@@ -126,7 +165,6 @@ std::string_view HttpText::FieldName()
         PARSE_ERROR();
     }
 
-    // "Content-Type: text/html\r\nContent-Length: 162\r\nConnection: close\r\nDate: Mon, 10 Feb 2025 17:01:28 GMT\r\nServer: lighttpd/1.4.75\r\n"
     auto sub = mSource.substr(mCursor, colon_pos - mCursor);
     for (auto c : sub) {
         if (!std::isgraph(c)) {
@@ -146,10 +184,14 @@ std::string_view HttpText::FieldValue()
     if (mSource.at(mCursor) == '"') {
         return quotedString();
     }
-    auto sub = mSource.substr(mCursor);
-    auto end_pos = sub.find_last_not_of(cSpaceTab);
-    mCursor = end_pos + 1;
-    return sub.substr(0, mCursor);
+    auto end_pos = mSource.find(cCRLF, mCursor);
+    if (end_pos == npos) {
+        PARSE_ERROR();
+    }
+    auto sub = mSource.substr(mCursor, end_pos - mCursor);
+    mCursor += sub.size() + 2;
+    end_pos = sub.find_last_not_of(cSpaceTab);
+    return sub.substr(0, end_pos + 1);
 }
 
 std::string_view HttpText::quotedString()
@@ -175,17 +217,20 @@ HttpText& HttpText::Rewind()
 HttpText HttpText::Line()
 {
     auto pos = mSource.find(cCRLF, mCursor);
+    if (pos == npos) {
+        PARSE_ERROR();
+    }
     auto start = mCursor;
     mCursor = pos + 2;
-    return HttpText(mSource.substr(start, pos - start));
+    return HttpText(mSource.substr(start, mCursor - start));
 }
 
 bool HttpText::IsNewLine() const
 {
-    if ((mCursor+2) >= mSource.size()) {
+    if ((mCursor+2) > mSource.size()) {
         return false;
     }
-    return (mSource.at(mCursor) != '\r') && (mSource.at(mCursor+1) != '\n');
+    return (mSource.at(mCursor) == '\r') && (mSource.at(mCursor+1) == '\n');
 }
 
 bool HttpText::Eof() const

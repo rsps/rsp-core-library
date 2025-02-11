@@ -25,7 +25,7 @@ std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse)
         "Headers:\n";
 
     for(auto &tuple : arResponse.GetHeaders()) {
-        if (tuple.first == std::string("authorization")) {
+        if (tuple.first == std::string_view("authorization")) {
             o << "  " << tuple.first << ": " << std::string(tuple.second.size(), 'X') << "\n";
         }
         else {
@@ -54,10 +54,7 @@ std::string_view HttpResponse::GetHeader(std::string_view aName) const
 
 [[nodiscard]] StatusCodes HttpResponse::GetStatusCode() const
 {
-    if (auto number = string_to_integral<int>(mStatusLine.GetStatusCode())) {
-        return StatusCodes(*number);
-    }
-    return StatusCodes::Unknown;
+    return StatusCodes(mStatusLine.GetStatusCode());
 }
 
 IHttpResponse& HttpResponse::MakeBody()

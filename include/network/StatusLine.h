@@ -10,8 +10,7 @@
 #ifndef RSP_CORE_LIB_STATUS_LINE_H
 #define RSP_CORE_LIB_STATUS_LINE_H
 
-#include <string>
-#include <string_view>
+#include "HttpText.h"
 
 namespace rsp::network {
 
@@ -20,34 +19,21 @@ class StatusLine
 public:
     StatusLine() = default;
 
-    explicit StatusLine(std::string aStatusLine)
-        : mStatusLine(std::move(aStatusLine))
+    explicit StatusLine(HttpText aStatusLine)
     {
-        auto sp1 = mStatusLine.find(' ');
-        if (sp1 == std::string::npos) {
-            return;
-        }
-        mHttpVersion = {mStatusLine.data(), sp1 };
-
-        sp1 += 1;
-        auto sp2 = mStatusLine.find(' ', sp1);
-        if (sp2 == std::string::npos) {
-            return;
-        }
-        mStatusCode = {mStatusLine.data() + sp1, sp2 };
-        sp2 += 1;
-
-        mReasonPhrase = {mStatusLine.data() + sp2, sp2 - mStatusLine.size() };
+        mHttpVersion = aStatusLine.HttpVersion();
+        mStatusCode = aStatusLine.Digit(3);
+        aStatusLine.SP();
+        mReasonPhrase = aStatusLine.AsciiText();
     }
 
     [[nodiscard]] std::string_view GetHttpVersion() const { return mHttpVersion; }
-    [[nodiscard]] std::string_view GetStatusCode() const { return mStatusCode; }
+    [[nodiscard]] int GetStatusCode() const { return mStatusCode; }
     [[nodiscard]] std::string_view GetReasonPhrase() const { return mReasonPhrase; }
 
 protected:
-    std::string mStatusLine{};
     std::string_view mHttpVersion{};
-    std::string_view mStatusCode{};
+    int mStatusCode{};
     std::string_view mReasonPhrase{};
 };
 

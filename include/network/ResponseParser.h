@@ -12,6 +12,7 @@
 
 #include "HttpResponse.h"
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 
@@ -22,7 +23,7 @@ class ResponseParser
 public:
     explicit ResponseParser(HttpResponse& arResponse) : mrResponse(arResponse) {}
 
-    bool ParseNewData(std::span<std::byte> aNewData);
+    bool ParseNewData(std::span<const std::byte> aNewData);
 
 protected:
     enum class States {
