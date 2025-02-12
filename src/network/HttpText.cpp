@@ -181,31 +181,26 @@ std::string_view HttpText::FieldName()
 std::string_view HttpText::FieldValue()
 {
     OWS();
-    if (mSource.at(mCursor) == '"') {
-        return quotedString();
-    }
     auto end_pos = mSource.find(cCRLF, mCursor);
     if (end_pos == npos) {
         PARSE_ERROR();
     }
     auto sub = mSource.substr(mCursor, end_pos - mCursor);
     mCursor += sub.size() + 2;
-    end_pos = sub.find_last_not_of(cSpaceTab);
-    return sub.substr(0, end_pos + 1);
-}
-
-std::string_view HttpText::quotedString()
-{
-    if (mSource.at(mCursor) != '"') {
-        PARSE_ERROR();
+    if (sub.at(0) == '"') { // DQUOTE rules
+        end_pos = sub.find_last_of('"');
+        if (end_pos == npos) {
+            PARSE_ERROR();
+        }
+        return sub.substr(1, end_pos - 1);
     }
-    auto end_pos = mSource.find_last_not_of(cSpaceTab);
-    if (end_pos == npos || mSource.at(end_pos) != '"') {
-        PARSE_ERROR();
+    else {
+        end_pos = sub.find_last_not_of(cSpaceTab);
+        if (end_pos == npos) {
+            PARSE_ERROR();
+        }
+        return sub.substr(0, end_pos + 1);
     }
-    auto start = mCursor;
-    mCursor = end_pos + 1;
-    return mSource.substr(start, end_pos - start);
 }
 
 HttpText& HttpText::Rewind()

@@ -123,6 +123,9 @@ SocketConnection& EHttpRequest::getConnection()
 std::string EHttpRequest::formatHeaders()
 {
     using namespace std::string_view_literals;
+    if (mOptions.Uri.empty()) {
+        mOptions.Uri = "/";
+    }
 
     std::stringstream ss;
     ss

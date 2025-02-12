@@ -31,7 +31,11 @@ Socket::Socket(Domain aDomain, Type aType, Protocol aProtocol)
 
 Socket::~Socket()
 {
-    Close();
+    try {
+        Close();
+    }
+    catch (const std::exception &e) {
+    }
 }
 
 Socket::Socket(const Socket &arServer, int aHandle, const SocketAddress& arLocalAddress, const SocketAddress& arPeerAddress)

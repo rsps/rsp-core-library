@@ -10,7 +10,6 @@
 
 #include <doctest.h>
 #include <array>
-#include <cctype>
 #include <cstring>
 #include <filesystem>
 #include <network/IHttpRequest.h>
@@ -21,7 +20,6 @@
 #include <network/StringBody.h>
 #include <network/MultipartBoundary.h>
 #include <network/NetworkException.h>
-#include <network/ChunkStreamer.h>
 #include <posix/FileSystem.h>
 #include <posix/FileIO.h>
 #include <utils/StrUtils.h>
@@ -42,7 +40,6 @@ TEST_CASE("Network")
     TestLogger logger;
 
     HttpRequestOptions opt;
-//    opt.Body = std::make_shared<HttpStringBody>();
     opt.CertCaPath = "webserver/ssl/ca/ca.crt";
     opt.CertPath = "webserver/ssl/certs/SN1234.crt";
     opt.KeyPath = "webserver/ssl/private/SN1234.key";
@@ -97,7 +94,7 @@ TEST_CASE("Network")
             CHECK_EQ(resp->GetBody().GetStreamSize(), 0);
         }
         else {
-            CHECK_EQ(resp->GetBody().GetStreamSize(), 120);
+            CHECK_EQ(resp->GetBody().GetStreamSize().value(), 120);
         }
 
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);

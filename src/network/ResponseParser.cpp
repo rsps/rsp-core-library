@@ -20,42 +20,43 @@ namespace rsp::network {
 
 bool ResponseParser::ParseNewData(std::span<const std::byte> aNewData)
 {
-    bool result = false;
-
-    mRemaining += std::string(reinterpret_cast<const char*>(aNewData.data()), aNewData.size());
+    auto work = std::string_view(reinterpret_cast<const char*>(aNewData.data()), aNewData.size());
 
     switch (mState) {
         case States::Headers:
-            if (auto position = mRemaining.find(cHeaderEnd); position != std::string::npos) {
-                mrResponse.mHeaderData = mRemaining.substr(0, position + 4);
+            if (auto position = work.find(cHeaderEnd); position == std::string::npos) {
+                mrResponse.mHeaderData += work;
+            }
+            else {
+                mrResponse.mHeaderData += work.substr(0, position + 4);
                 decodeHeaders(mrResponse.mHeaderData); // Include newline before empty line
                 mrResponse.MakeBody();
+                if (mrResponse.GetRequest().GetOptions().RequestType == HttpRequestType::HEAD) {
+                    return true;
+                }
                 (void)mrResponse.GetContentLength(); // Attempt to parse content-length from headers.
-                mRemaining = mRemaining.substr(position);
                 if (mrResponse.GetHeaders().contains("transfer-encoding") && mrResponse.GetHeader("transfer-encoding").ends_with("chunked")) {
                     mState = States::ChunkedBody;
                 }
                 else {
                     mState = States::Body;
-                    mrResponse.mpBody->Write({ reinterpret_cast<const std::byte*>(mRemaining.data()), mRemaining.size() });
-                    mRemaining.clear();
-                    result = mrResponse.mContentLength == mrResponse.mpBody->GetStreamSize();
+                    auto body = work.substr(position + 4);
+                    mrResponse.mpBody->Write({ reinterpret_cast<const std::byte*>(body.data()), body.size() });
+                    return mrResponse.mContentLength == mrResponse.mpBody->GetStreamSize();
                 }
             }
             break;
 
         case States::Body:
-            mrResponse.mpBody->Write({ reinterpret_cast<const std::byte*>(mRemaining.data()), mRemaining.size() });
-            mRemaining.clear();
-            result = mrResponse.mContentLength == mrResponse.mpBody->GetStreamSize();
-            break;
+            mrResponse.mpBody->Write({ reinterpret_cast<const std::byte*>(work.data()), work.size() });
+            return mrResponse.mContentLength == mrResponse.mpBody->GetStreamSize();
 
         case States::ChunkedBody:
         case States::ChunkedTrail:
             break;
     }
 
-    return result;
+    return false;
 }
 
 void ResponseParser::decodeHeaders(std::string_view aHeaderData)
@@ -64,6 +65,9 @@ void ResponseParser::decodeHeaders(std::string_view aHeaderData)
     mrResponse.mStatusLine = StatusLine(ht.Line());
 
     while (auto line = ht.Line()) {
+        if (line.IsNewLine()) {
+            break; // Empty line is reached
+        }
         auto key = line.FieldName();
         addHeader(key, line.FieldValue());
     }

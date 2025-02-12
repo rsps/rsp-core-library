@@ -19,7 +19,7 @@ TEST_SUITE_BEGIN("Network");
 
 TEST_CASE("HttpText")
 {
-    const std::string_view cNormalResponse("HTTP/1.0 200 Ok\r\nContent-Length: 21\r\n\r\nThis is the body text");
+    const std::string_view cNormalResponse("HTTP/1.0 200 Ok\r\nContent-Length: 21\r\nETag: \"1550381373\"\r\n\r\nThis is the body text");
     const std::string_view cHeadResponse("HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\nContent-Length: 162\r\nConnection: close\r\nDate: Tue, 11 Feb 2025 07:02:09 GMT\r\nServer: lighttpd/1.4.75\r\n\r\n");
 
     SUBCASE("ICaseCompare") {
@@ -72,6 +72,9 @@ TEST_CASE("HttpText")
 
         CHECK_EQ(ht.FieldName(), "Content-Length");
         CHECK_EQ(ht.FieldValue(), "21");
+
+        CHECK_EQ(ht.FieldName(), "ETag");
+        CHECK_EQ(ht.FieldValue(), "1550381373");
 
         CHECK(ht.IsNewLine());
         CHECK_NOTHROW(ht.CRLF());

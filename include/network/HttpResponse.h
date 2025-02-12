@@ -13,6 +13,7 @@
 
 #include <network/IHttpRequest.h>
 #include <network/IHttpResponse.h>
+#include <network/NetworkException.h>
 #include <network/StatusLine.h>
 
 namespace rsp::network {
@@ -49,6 +50,9 @@ public:
 
     [[nodiscard]] IStreamDataProvider& GetBody() const override
     {
+        if (!mpBody) {
+            THROW_WITH_BACKTRACE1(NetworkException, "HTTP response body has not been created.");
+        }
         return *mpBody;
     }
 

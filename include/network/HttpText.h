@@ -171,12 +171,6 @@ public:
 protected:
     std::string_view mSource;
     size_t mCursor = 0;
-
-    /**
-     * \brief Decode a string according to DQUOTE rules, from current position.
-     * \return string_view
-     */
-    std::string_view quotedString();
 };
 
 } // rsp::network

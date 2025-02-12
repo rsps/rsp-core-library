@@ -33,7 +33,6 @@ protected:
         ChunkedTrail
     };
     HttpResponse& mrResponse;
-    std::string mRemaining{};
     States mState = States::Headers;
 
     void decodeHeaders(std::string_view aHeaderData);
