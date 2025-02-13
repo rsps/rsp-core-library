@@ -170,7 +170,7 @@ target_link_libraries("${PROJECT_NAME}"
 # -------------------------------------------------------------------------------------------------------------- #
 
 # Keep symbol information for exception stack traces
-SET (CMAKE_ENABLE_EXPORTS TRUE)
+set(CMAKE_ENABLE_EXPORTS TRUE)
 
 # Define headers for this library. PUBLIC headers are used for compiling the library, and will be added to
 # consumers' build paths.
