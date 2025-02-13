@@ -56,6 +56,9 @@ string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" GCC_TOOL_VERSION "${GCC_TOOL_VERSION}")
 
 message(STATUS "🔖 GCC ${GCC_TOOL_VERSION} (${GCC_TOOL})")
 
+# Define CPP standards, ...etc
+set(CMAKE_CXX_STANDARD 23)
+
 # -------------------------------------------------------------------------------------------------------------- #
 # Project
 # -------------------------------------------------------------------------------------------------------------- #
@@ -73,8 +76,6 @@ if ("${GCC_TOOL}" MATCHES "\/g\\+\\+-1[3-9]+$")
 elseif ("${GCC_TOOL}" MATCHES "\/g\\+\\+-12$")
     list(APPEND LIBRARIES "-lstdc++_libbacktrace")
 endif()
-
-set (CMAKE_CXX_STANDARD 23)
 
 # -------------------------------------------------------------------------------------------------------------- #
 # Dependencies
