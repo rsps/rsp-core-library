@@ -63,7 +63,16 @@ set(CMAKE_CXX_STANDARD 23)
 # Project
 # -------------------------------------------------------------------------------------------------------------- #
 
+# Get project's version from file
+include("rsp/version")
+version_from_file(
+    FILE "${CMAKE_CURRENT_SOURCE_DIR}/VERSION"
+    OUTPUT version
+    EXIT_ON_FAILURE
+)
+
 project (rsp-core-lib
+    VERSION "${version_VERSION}"
     DESCRIPTION "Open-source library for medical device software."
     HOMEPAGE_URL "https://github.com/rsps/rsp-core-library"
 )
