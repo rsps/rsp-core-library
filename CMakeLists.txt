@@ -33,6 +33,10 @@ include(FetchContent)
 FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.1.0")
 FetchContent_MakeAvailable("rsp-cmake-scripts")
 
+# Abort if building in-source
+include("rsp/helpers")
+fail_in_source_build()
+
 # Append this project's local module paths.
 list(FIND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" has_rsp_core_lib_module_path)
 if(has_rsp_core_lib_module_path EQUAL -1)
