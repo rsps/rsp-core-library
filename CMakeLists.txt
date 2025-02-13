@@ -28,6 +28,8 @@ OPTION(SYSLOG "Include syslog interface" ON)
 # Setup
 # -------------------------------------------------------------------------------------------------------------- #
 
+find_package(Git REQUIRED)
+
 # Install "CMake Scripts" dependency
 include(FetchContent)
 FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.1.0")
@@ -89,9 +91,6 @@ endif()
 # -------------------------------------------------------------------------------------------------------------- #
 # Dependencies
 # -------------------------------------------------------------------------------------------------------------- #
-
-#include(FetchContent)
-find_package(Git REQUIRED)
 
 if (GFX)
     list(APPEND BUILD_OPTIONS -DUSE_GFX)
