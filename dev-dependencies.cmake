@@ -2,7 +2,7 @@
 # Development Dependencies
 # -------------------------------------------------------------------------------------------------------------- #
 
-include_guard()
+include_guard(GLOBAL)
 
 # Include regular dependencies
 include("dependencies.cmake")
