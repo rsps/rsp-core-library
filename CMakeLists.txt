@@ -195,9 +195,14 @@ target_include_directories("${PROJECT_NAME}"
         ${SDL_INCLUDE_DIRS}
 )
 
+# Configure compile options for this project
 include("rsp/compiler")
+
+set(RSP_CORE_LIB_COMPILE_OPTIONS "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
+list(REMOVE_ITEM RSP_CORE_LIB_COMPILE_OPTIONS "-Wswitch-default")
+
 if (NOT RELEASE_BUILD)
-    add_compile_options("${RSP_GCC_STRICT_COMPILE_OPTIONS}")
+    add_compile_options("${RSP_CORE_LIB_COMPILE_OPTIONS}")
 endif()
 
 target_compile_options("${PROJECT_NAME}" PUBLIC
@@ -207,10 +212,10 @@ target_compile_options("${PROJECT_NAME}" PUBLIC
 
 if (NOT RELEASE_BUILD)
     target_compile_options("${PROJECT_NAME}" PRIVATE
-        "${RSP_GCC_STRICT_COMPILE_OPTIONS}"
-        -DDEBUG_LOG
-        -g
-        -O0
+            "${RSP_CORE_LIB_COMPILE_OPTIONS}"
+            -DDEBUG_LOG
+            -g
+            -O0
     )
 else()
     target_compile_options("${PROJECT_NAME}" PRIVATE
