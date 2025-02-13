@@ -194,13 +194,12 @@ std::string_view HttpText::FieldValue()
         }
         return sub.substr(1, end_pos - 1);
     }
-    else {
-        end_pos = sub.find_last_not_of(cSpaceTab);
-        if (end_pos == npos) {
-            PARSE_ERROR();
-        }
-        return sub.substr(0, end_pos + 1);
+
+    end_pos = sub.find_last_not_of(cSpaceTab);
+    if (end_pos == npos) {
+        PARSE_ERROR();
     }
+    return sub.substr(0, end_pos + 1);
 }
 
 HttpText& HttpText::Rewind()

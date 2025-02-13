@@ -56,7 +56,7 @@ IHttpRequest& EHttpRequest::AddFile(const std::string& arFieldName, posix::FileI
 IHttpResponse& EHttpRequest::Execute()
 {
     // Get connection
-    auto &connection = getConnection();
+    auto &connection = getConnection().Connect();
 
     if (mOptions.Body) {
         auto len = mOptions.Body->GetStreamSize();
@@ -108,13 +108,12 @@ uintptr_t EHttpRequest::GetHandle() const
 SocketConnection& EHttpRequest::getConnection()
 {
     if (mrSession.has_value()) {
-        return dynamic_cast<EHttpSession&>(mrSession.value().get()).GetConnection().Connect();
+        return dynamic_cast<EHttpSession&>(mrSession.value().get()).GetConnection();
     }
 
     if (!mpConnection) {
         mpConnection = std::make_unique<SocketConnection>();
         mpConnection->SetOptions(mOptions);
-        mpConnection->Connect();
     }
 
     return *mpConnection;

@@ -76,7 +76,7 @@ IHttpResponse& HttpResponse::MakeBody()
             mpBody = std::make_shared<FileBody>();
         }
     }
-    else {
+    if (!mpBody) {
         mpBody = std::make_shared<StringBody>();
     }
     return *this;

@@ -12,6 +12,7 @@
 
 #include <memory>
 #include <posix/Socket.h>
+#include <network/ConnectionOptions.h>
 #include <string_view>
 
 namespace rsp::security {
@@ -19,12 +20,11 @@ namespace rsp::security {
 class ITLSSocket
 {
 public:
-    static std::shared_ptr<ITLSSocket> Create();
+    static std::shared_ptr<ITLSSocket> Create(const network::ConnectionOptions& arOptions);
 
     virtual ~ITLSSocket() = default;
 
     virtual ITLSSocket& SetSocket(posix::Socket &arSocket) = 0;
-    virtual ITLSSocket& SetRootCACert(std::string_view aCaCert) = 0;
     virtual ITLSSocket& Close() = 0;
 
     virtual size_t Write(std::span<std::byte const> aData) = 0;

@@ -37,7 +37,7 @@ SocketConnection& SocketConnection::Connect()
     mSocket.Connect(ai);
 
     if (up.RequiresTLS()) {
-        mpTls = security::ITLSSocket::Create();
+        mpTls = security::ITLSSocket::Create(mOptions);
         mpTls->SetSocket(mSocket);
     }
 
