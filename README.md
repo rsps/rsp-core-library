@@ -50,9 +50,6 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave 
 sudo update-alternatives --config gcc
 ```
 
-Also cmake should be at least version 3.18.
-
-
 ## Build and tests
 
 To build the library and accompanied test, simply go into the build directory and run `cmake ..`:

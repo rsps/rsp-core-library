@@ -1,6 +1,12 @@
-cmake_minimum_required (VERSION 3.16)
+# -------------------------------------------------------------------------------------------------------------- #
+# RSP Core Library
+# -------------------------------------------------------------------------------------------------------------- #
 
-# https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
+cmake_minimum_required (VERSION 3.30)
+
+# -------------------------------------------------------------------------------------------------------------- #
+# Options
+# -------------------------------------------------------------------------------------------------------------- #
 
 # Usage: cmake [-DRELEASE_BUILD=ON] [-DPLATFORM_P05=ON] [FREETYPE_FONTS=OFF] [-DOPENSSL_CRYPTO=OFF] ..
 
@@ -18,16 +24,60 @@ OPTION(NET_WPA_SUPPLICANT "Build with libwpa-client wpa_supplicant library." ON)
 OPTION(STD_THREAD "Thread architecture to use." ON) # C++ std::thread
 OPTION(SYSLOG "Include syslog interface" ON)
 
-if(ARCH_ARM)
-    set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
+# -------------------------------------------------------------------------------------------------------------- #
+# Setup
+# -------------------------------------------------------------------------------------------------------------- #
+
+find_package(Git REQUIRED)
+
+# Install "CMake Scripts" dependency
+include(FetchContent)
+FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.1.0")
+FetchContent_MakeAvailable("rsp-cmake-scripts")
+
+# Abort if building in-source
+include("rsp/helpers")
+fail_in_source_build()
+
+# Append this project's local module paths.
+list(FIND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" has_rsp_core_lib_module_path)
+if(has_rsp_core_lib_module_path EQUAL -1)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 endif()
 
+# Set toolchain file, if needed.
+if(ARCH_ARM)
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt")
+endif()
+
+# Obtain GCC info.
+# TODO: This part here SHOULD be extracted into util in our "CMake Scripts"
 find_program(GCC_TOOL NAMES g++-latest g++-HEAD g++-14 g++-13 g++-12 g++-11)
 execute_process(COMMAND ${GCC_TOOL} --version OUTPUT_VARIABLE GCC_TOOL_VERSION ERROR_VARIABLE GCC_TOOL_VERSION)
 string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" GCC_TOOL_VERSION "${GCC_TOOL_VERSION}")
+
 message(STATUS "🔖 GCC ${GCC_TOOL_VERSION} (${GCC_TOOL})")
 
-project (rsp-core-lib)
+# Define CPP standards, ...etc
+set(CMAKE_CXX_STANDARD 23)
+
+# -------------------------------------------------------------------------------------------------------------- #
+# Project
+# -------------------------------------------------------------------------------------------------------------- #
+
+# Get project's version from file
+include("rsp/version")
+version_from_file(
+    FILE "${CMAKE_CURRENT_SOURCE_DIR}/VERSION"
+    OUTPUT version
+    EXIT_ON_FAILURE
+)
+
+project (rsp-core-lib
+    VERSION "${version_VERSION}"
+    DESCRIPTION "Open-source library for medical device software."
+    HOMEPAGE_URL "https://github.com/rsps/rsp-core-library"
+)
 
 # Declare empty lists
 set(BUILD_OPTIONS "")
@@ -38,12 +88,9 @@ elseif ("${GCC_TOOL}" MATCHES "\/g\\+\\+-12$")
     list(APPEND LIBRARIES "-lstdc++_libbacktrace")
 endif()
 
-set (CMAKE_CXX_STANDARD 23)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
-include(FetchContent)
-find_package(Git REQUIRED)
+# -------------------------------------------------------------------------------------------------------------- #
+# Dependencies
+# -------------------------------------------------------------------------------------------------------------- #
 
 if (GFX)
     list(APPEND BUILD_OPTIONS -DUSE_GFX)
@@ -120,21 +167,21 @@ endif ()
 
 add_library("${PROJECT_NAME}" STATIC)
 
-
-# Must use GNUInstallDirs to install libraries into correct
-# locations on all platforms.
+# Must use GNUInstallDirs to install libraries into correct locations on all platforms.
 include(GNUInstallDirs)
-
-target_link_libraries ("${PROJECT_NAME}"
-        ${LIBRARIES}
+target_link_libraries("${PROJECT_NAME}"
+    ${LIBRARIES}
 )
 
-# Keep symbol information for exception stack traces
-SET (CMAKE_ENABLE_EXPORTS TRUE)
+# -------------------------------------------------------------------------------------------------------------- #
+# Targets & Compile Options
+# -------------------------------------------------------------------------------------------------------------- #
 
-# Define headers for this library. PUBLIC headers are used for
-# compiling the library, and will be added to consumers' build
-# paths.
+# Keep symbol information for exception stack traces
+set(CMAKE_ENABLE_EXPORTS TRUE)
+
+# Define headers for this library. PUBLIC headers are used for compiling the library, and will be added to
+# consumers' build paths.
 target_include_directories("${PROJECT_NAME}"
     PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -148,9 +195,9 @@ target_include_directories("${PROJECT_NAME}"
         ${SDL_INCLUDE_DIRS}
 )
 
-include("cmake/strict-compile-options.cmake")
+include("rsp/compiler")
 if (NOT RELEASE_BUILD)
-    add_compile_options(${STRICT_COMPILE_OPTIONS})
+    add_compile_options("${RSP_GCC_STRICT_COMPILE_OPTIONS}")
 endif()
 
 target_compile_options("${PROJECT_NAME}" PUBLIC
@@ -159,26 +206,33 @@ target_compile_options("${PROJECT_NAME}" PUBLIC
 )
 
 if (NOT RELEASE_BUILD)
-target_compile_options("${PROJECT_NAME}" PRIVATE
-    ${STRICT_COMPILE_OPTIONS}
-    -DDEBUG_LOG
-    -g
-    -O0
-)
+    target_compile_options("${PROJECT_NAME}" PRIVATE
+        "${RSP_GCC_STRICT_COMPILE_OPTIONS}"
+        -DDEBUG_LOG
+        -g
+        -O0
+    )
 else()
-target_compile_options("${PROJECT_NAME}" PRIVATE
-    -O3
-)
+    target_compile_options("${PROJECT_NAME}" PRIVATE
+        -O3
+    )
 endif()
 
 add_subdirectory(src)
 
-#--------------------------------------------------------
-# Rules to make tests
-#-----------------------
+# -------------------------------------------------------------------------------------------------------------- #
+# Tests
+# -------------------------------------------------------------------------------------------------------------- #
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 if (BUILD_TESTING)
     add_subdirectory(tests)
 endif()
+
+# -------------------------------------------------------------------------------------------------------------- #
+# Misc.
+# -------------------------------------------------------------------------------------------------------------- #
+
+# Resources:
+# https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
