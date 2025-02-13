@@ -28,6 +28,11 @@ OPTION(SYSLOG "Include syslog interface" ON)
 # Setup
 # -------------------------------------------------------------------------------------------------------------- #
 
+# Install "CMake Scripts" dependency
+include(FetchContent)
+FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.1.0")
+FetchContent_MakeAvailable("rsp-cmake-scripts")
+
 # Append this project's local module paths.
 list(FIND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" has_rsp_core_lib_module_path)
 if(has_rsp_core_lib_module_path EQUAL -1)
@@ -71,7 +76,7 @@ set (CMAKE_CXX_STANDARD 23)
 # Dependencies
 # -------------------------------------------------------------------------------------------------------------- #
 
-include(FetchContent)
+#include(FetchContent)
 find_package(Git REQUIRED)
 
 if (GFX)
