@@ -66,12 +66,7 @@ set(CMAKE_CXX_STANDARD 23)
 # -------------------------------------------------------------------------------------------------------------- #
 
 # Get project's version from file
-include("rsp/version")
-version_from_file(
-    FILE "${CMAKE_CURRENT_SOURCE_DIR}/VERSION"
-    OUTPUT version
-    EXIT_ON_FAILURE
-)
+include("setup-version")
 
 project (rsp-core-lib
     VERSION "${version_VERSION}"
