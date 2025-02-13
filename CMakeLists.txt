@@ -4,7 +4,9 @@
 
 cmake_minimum_required (VERSION 3.30)
 
-# https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
+# -------------------------------------------------------------------------------------------------------------- #
+# Options
+# -------------------------------------------------------------------------------------------------------------- #
 
 # Usage: cmake [-DRELEASE_BUILD=ON] [-DPLATFORM_P05=ON] [FREETYPE_FONTS=OFF] [-DOPENSSL_CRYPTO=OFF] ..
 
@@ -22,6 +24,10 @@ OPTION(NET_WPA_SUPPLICANT "Build with libwpa-client wpa_supplicant library." ON)
 OPTION(STD_THREAD "Thread architecture to use." ON) # C++ std::thread
 OPTION(SYSLOG "Include syslog interface" ON)
 
+# -------------------------------------------------------------------------------------------------------------- #
+# Setup
+# -------------------------------------------------------------------------------------------------------------- #
+
 if(ARCH_ARM)
     set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
 endif()
@@ -31,7 +37,14 @@ execute_process(COMMAND ${GCC_TOOL} --version OUTPUT_VARIABLE GCC_TOOL_VERSION E
 string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" GCC_TOOL_VERSION "${GCC_TOOL_VERSION}")
 message(STATUS "🔖 GCC ${GCC_TOOL_VERSION} (${GCC_TOOL})")
 
-project (rsp-core-lib)
+# -------------------------------------------------------------------------------------------------------------- #
+# Project
+# -------------------------------------------------------------------------------------------------------------- #
+
+project (rsp-core-lib
+    DESCRIPTION "Open-source library for medical device software."
+    HOMEPAGE_URL "https://github.com/rsps/rsp-core-library"
+)
 
 # Declare empty lists
 set(BUILD_OPTIONS "")
@@ -45,6 +58,10 @@ endif()
 set (CMAKE_CXX_STANDARD 23)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+# -------------------------------------------------------------------------------------------------------------- #
+# Dependencies
+# -------------------------------------------------------------------------------------------------------------- #
 
 include(FetchContent)
 find_package(Git REQUIRED)
@@ -124,6 +141,9 @@ endif ()
 
 add_library("${PROJECT_NAME}" STATIC)
 
+# -------------------------------------------------------------------------------------------------------------- #
+# Targets & Compile Options
+# -------------------------------------------------------------------------------------------------------------- #
 
 # Must use GNUInstallDirs to install libraries into correct
 # locations on all platforms.
@@ -177,12 +197,19 @@ endif()
 
 add_subdirectory(src)
 
-#--------------------------------------------------------
-# Rules to make tests
-#-----------------------
+# -------------------------------------------------------------------------------------------------------------- #
+# Tests
+# -------------------------------------------------------------------------------------------------------------- #
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 if (BUILD_TESTING)
     add_subdirectory(tests)
 endif()
+
+# -------------------------------------------------------------------------------------------------------------- #
+# Misc.
+# -------------------------------------------------------------------------------------------------------------- #
+
+# Resources:
+# https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
