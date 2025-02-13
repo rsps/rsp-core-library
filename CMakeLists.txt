@@ -198,16 +198,16 @@ target_compile_options("${PROJECT_NAME}" PUBLIC
 )
 
 if (NOT RELEASE_BUILD)
-target_compile_options("${PROJECT_NAME}" PRIVATE
-    ${STRICT_COMPILE_OPTIONS}
-    -DDEBUG_LOG
-    -g
-    -O0
-)
+    target_compile_options("${PROJECT_NAME}" PRIVATE
+        ${STRICT_COMPILE_OPTIONS}
+        -DDEBUG_LOG
+        -g
+        -O0
+    )
 else()
-target_compile_options("${PROJECT_NAME}" PRIVATE
-    -O3
-)
+    target_compile_options("${PROJECT_NAME}" PRIVATE
+        -O3
+    )
 endif()
 
 add_subdirectory(src)
