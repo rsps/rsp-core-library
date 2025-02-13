@@ -1,8 +1,6 @@
 # -------------------------------------------------------------------------------------------------------------- #
-# FreeType Fonts
-# @see https://freetype.org/
-#
-# @see https://cmake.org/cmake/help/latest/module/FindFreetype.html
+# Magic Enum C++ Fonts
+# @see https://github.com/Neargye/magic_enum
 # -------------------------------------------------------------------------------------------------------------- #
 
 include_guard(GLOBAL)
