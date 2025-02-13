@@ -28,13 +28,23 @@ OPTION(SYSLOG "Include syslog interface" ON)
 # Setup
 # -------------------------------------------------------------------------------------------------------------- #
 
-if(ARCH_ARM)
-    set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
+# Append this project's local module paths.
+list(FIND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" has_rsp_core_lib_module_path)
+if(has_rsp_core_lib_module_path EQUAL -1)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 endif()
 
+# Set toolchain file, if needed.
+if(ARCH_ARM)
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt")
+endif()
+
+# Obtain GCC info.
+# TODO: This part here SHOULD be extracted into util in our "CMake Scripts"
 find_program(GCC_TOOL NAMES g++-latest g++-HEAD g++-14 g++-13 g++-12 g++-11)
 execute_process(COMMAND ${GCC_TOOL} --version OUTPUT_VARIABLE GCC_TOOL_VERSION ERROR_VARIABLE GCC_TOOL_VERSION)
 string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" GCC_TOOL_VERSION "${GCC_TOOL_VERSION}")
+
 message(STATUS "🔖 GCC ${GCC_TOOL_VERSION} (${GCC_TOOL})")
 
 # -------------------------------------------------------------------------------------------------------------- #
@@ -56,8 +66,6 @@ elseif ("${GCC_TOOL}" MATCHES "\/g\\+\\+-12$")
 endif()
 
 set (CMAKE_CXX_STANDARD 23)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # -------------------------------------------------------------------------------------------------------------- #
 # Dependencies
@@ -141,24 +149,21 @@ endif ()
 
 add_library("${PROJECT_NAME}" STATIC)
 
+# Must use GNUInstallDirs to install libraries into correct locations on all platforms.
+include(GNUInstallDirs)
+target_link_libraries("${PROJECT_NAME}"
+    ${LIBRARIES}
+)
+
 # -------------------------------------------------------------------------------------------------------------- #
 # Targets & Compile Options
 # -------------------------------------------------------------------------------------------------------------- #
 
-# Must use GNUInstallDirs to install libraries into correct
-# locations on all platforms.
-include(GNUInstallDirs)
-
-target_link_libraries ("${PROJECT_NAME}"
-        ${LIBRARIES}
-)
-
 # Keep symbol information for exception stack traces
 SET (CMAKE_ENABLE_EXPORTS TRUE)
 
-# Define headers for this library. PUBLIC headers are used for
-# compiling the library, and will be added to consumers' build
-# paths.
+# Define headers for this library. PUBLIC headers are used for compiling the library, and will be added to
+# consumers' build paths.
 target_include_directories("${PROJECT_NAME}"
     PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
