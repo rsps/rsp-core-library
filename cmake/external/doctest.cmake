@@ -22,7 +22,7 @@ CPMAddPackage(
 )
 
 # Debug
-message(STATUS "Using Doctest v${FREETYPE_VERSION_STRING}")
+message(STATUS "Using Doctest v${DOCTEST_VERSION}")
 
 # Include & link...
 target_include_directories(${TEST_BINARY}
