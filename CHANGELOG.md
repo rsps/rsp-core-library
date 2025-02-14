@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * `rsp-cmake-scripts` as top level project dependency, in `CMakeLists.txt`.
 * `VERSION` file in root directory.
-* Description and version of top level project, in `CMakeLists.txt`. 
+* Description and version of top level project, in `CMakeLists.txt`.
+* `setup-version.cmake` module.
 * `CHANGELOG.md`.
 
 ### Changed
@@ -19,8 +20,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Minimum required CMake version set to `3.30.0`.
 * Local module path is now appended to `CMAKE_MODULE_PATH`, instead of "forced" set.
 * CMake now fails, if attempted to be built in the same location as the source code.
-* Replaced `STRICT_COMPILE_OPTIONS` with `RSP_GCC_STRICT_COMPILE_OPTIONS`, in top level `CMakeLists.txt`. 
-* Restyled / formatted top level `CMakeLists.txt`.
+* Replaced `STRICT_COMPILE_OPTIONS` with `RSP_GCC_STRICT_COMPILE_OPTIONS`, in top level `CMakeLists.txt`.
+* Extracted installation of 3rd party dependencies into `dependencies.cmake` and `dev-dependencies.cmake`. 
+* Refactored top level `CMakeLists.txt`.
+* Refactored `tests/CMakeLists.txt`.
+
+### Deprecated
+
+* `FindMbedTLS.cmake`. Replaced by `external/mbed-tls.cmake` module.
 
 ### Removed
 
