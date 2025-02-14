@@ -57,16 +57,17 @@ file(
 add_dependencies(${TEST_BINARY} doctest lighttpd)
 
 target_include_directories(${TEST_BINARY}
-        PUBLIC
-        ${PROJECT_SOURCE_DIR}/include
-        PRIVATE
-        ${PROJECT_SOURCE_DIR}/src
-        ${PROJECT_BINARY_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/helpers
+    PUBLIC
+        "${PROJECT_SOURCE_DIR}/include"
+    PRIVATE
+        "${PROJECT_SOURCE_DIR}/src"
+        "${PROJECT_BINARY_DIR}/src"
+        "${CMAKE_CURRENT_SOURCE_DIR}/helpers"
 )
 
 if (NOT RELEASE_BUILD)
-    target_compile_options(${TEST_BINARY} PRIVATE
+    target_compile_options(${TEST_BINARY}
+        PRIVATE
             -DGFX_FPS=20
             -DDEBUG_LOG
             -g
@@ -75,8 +76,8 @@ if (NOT RELEASE_BUILD)
 endif()
 
 target_link_libraries (${TEST_BINARY}
-        rsp-core-lib
-        Threads::Threads
+    rsp-core-lib
+    Threads::Threads
 )
 
 # Add "test binary" as a CTest test...
@@ -85,7 +86,7 @@ add_test("tests" ${TEST_BINARY})
 # Test files...
 file(GLOB_RECURSE SRC_FILES *.cpp)
 target_sources(${TEST_BINARY}
-        PRIVATE
+    PRIVATE
         ${SRC_FILES}
 )
 
