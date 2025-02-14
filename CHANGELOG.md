@@ -27,6 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Refactored `tests/CMakeLists.txt`.
 * `README.md` now references the newly added `install-runtime.sh` script.
 
+### Fixed
+
+* JSON related tests fail, due to missing [JSON Lint](https://github.com/Seldaek/jsonlint) dev-dependency.
+
 ### Deprecated
 
 * `FindMbedTLS.cmake`. Replaced by `external/mbed-tls.cmake` module.
@@ -35,8 +39,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * `cmake/strict-compile-options.cmake` (_replaced by `RSP_GCC_STRICT_COMPILE_OPTIONS`, in `rsp-cmake-scripts` package_).
 
-### Fixed
-
-* JSON related tests fail, due to missing [JSON Lint](https://github.com/Seldaek/jsonlint) dev-dependency. 
 
 [Unreleased]: https://github.com/rsps/rsp-core-library/compare/main...development
