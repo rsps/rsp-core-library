@@ -23,4 +23,5 @@ apt install -y libssl-dev \
 # -------------------------------------------------------------------------------------------------------------- #
 
 apt install -y libpcre2-dev \
-        pkg-config
+        pkg-config \
+        jsonlint

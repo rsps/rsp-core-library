@@ -14,6 +14,7 @@ macro(install_dev_dependencies)
 
     include("external/doctest")
     include("external/lighttpd")
+    include("external/jsonlint")
 
     # -------------------------------------------------------------------------------------------------------------- #
 
