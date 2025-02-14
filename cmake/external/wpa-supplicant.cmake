@@ -15,13 +15,13 @@ message(VERBOSE "Installing WPA Supplicant")
 
 # find_package(WPA_SUPPLICANT REQUIRED) # NOT going to work without a custom `FindWPASupplicant` module
 
-find_library(wpa_supplicant NAMES "wpa_client" REQUIRED)
+find_library(wpa_supplicant NAMES "wpa_client" REQUIRED DOC " RSP Core Lib - Path to WPA Supplicant Library (libwpa-client-dev)")
 
 # Debug
 if (DEFINED "wpa_supplicant-NOTFOUND")
     message(STATUS "WPA Supplicant (${COLOR_RED}${TEXT_ITALIC}not found${RESTORE})")
 else ()
-    message(STATUS "Found WPA Supplicant (${COLOR_WHITE}${TEXT_ITALIC}${wpa_supplicant}${RESTORE})")
+    message(STATUS "Using WPA Supplicant (${COLOR_WHITE}${TEXT_ITALIC}${wpa_supplicant}${RESTORE})")
 endif ()
 
 # Include & link...
