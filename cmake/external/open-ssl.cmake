@@ -24,7 +24,7 @@ message(STATUS "Found OpenSSL v${OPENSSL_VERSION}")
 # target_link_libraries(${PROJECT_NAME} ${OPENSSL_CRYPTO_LIBRARIES})
 
 # NOTE: Only link to the Crypto library for this project.
-target_link_libraries(${PROJECT_NAME} ${OPENSSL_CRYPTO_LIBRARY})
+target_link_libraries(${PROJECT_NAME} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
 
 # -------------------------------------------------------------------------------------------------------------- #
 
