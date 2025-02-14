@@ -8,6 +8,9 @@
 * \author      steffen
 */
 #include "EHttpLibrary.h"
+#ifdef USE_OPENSSL
+    #include <openssl/ssl.h>
+#endif
 
 namespace rsp::network {
 
@@ -22,6 +25,13 @@ EHttpLibrary& EHttpLibrary::Get()
 {
     static EHttpLibrary instance;
     return instance;
+}
+
+EHttpLibrary::EHttpLibrary()
+{
+#ifdef USE_OPENSSL
+    SSL_library_init();
+#endif
 }
 
 } // namespace ehttp

@@ -45,6 +45,7 @@ TEST_CASE("Network")
     opt.KeyPath = "webserver/ssl/private/SN1234.key";
 
     // Run lighttpd directly from build directory, no need to install it.
+    std::system("killall lighttpd"); // Make sure it is not running
     std::string cwd = std::filesystem::current_path();
     std::string command = cwd + "/_deps/lighttpd_src-build/build/lighttpd -f " + cwd + "/webserver/lighttpd.conf -m " + cwd + "/_deps/lighttpd_src-build/build";
     CHECK_EQ(0, std::system(command.c_str()));

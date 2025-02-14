@@ -8,6 +8,7 @@
 * \author      steffen
 */
 #include "TLSSocket.h"
+#include "X509Certs.h"
 
 namespace rsp::security {
 
@@ -15,9 +16,6 @@ std::shared_ptr<ITLSSocket> ITLSSocket::Create(const network::ConnectionOptions&
 {
     return std::make_shared<TLSSocket>(arOptions);
 }
-
-#define CHK_NULL(x) if (!(x)) THROW_WITH_BACKTRACE1(EOpenSSL, "Allocation error")
-#define CHK_SSL(err) if ((err) <= 0) THROW_WITH_BACKTRACE1(EOpenSSLError, ERR_get_error())
 
 TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
     : mrOptions(arOptions)
@@ -51,19 +49,14 @@ TLSSocket& TLSSocket::SetSocket(posix::Socket& arSocket)
     }
 
     if (!mrOptions.CertCaPath.empty()) {
-        BIO *bioCert = BIO_new_mem_buf(mrOptions.CertCaPath.data(), -1);
-        X509* pCert = PEM_read_bio_X509(bioCert, nullptr, nullptr, nullptr);
-        X509_STORE_add_cert(SSL_CTX_get_cert_store(mpContext.get()), pCert);;
-
+        X509Certs x509(mpContext.get());
+        x509.LoadCertificateAuthority(mrOptions.CertCaPath);
         SSL_CTX_set_verify(mpContext.get(), SSL_VERIFY_PEER, nullptr);
-
-        BIO_free_all(bioCert);
-        X509_free(pCert);
     }
 
     if (!mrOptions.CertPath.empty()) {
-        SSL_CTX_use_certificate(mpContext.get(), &ca);
-        SSL_CTX_use_PrivateKey(mpContext.get(), &key);
+        X509Certs x509(mpContext.get());
+        x509.LoadClientCertificate(mrOptions.CertPath, mrOptions.KeyPath);
     }
 
     SSL_CTX_set_options(mpContext.get(), SSL_OP_NO_SSLv2|SSL_OP_NO_SSLv3);  // other options not used atm  SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1 | SSL_OP_NO_TLSv1_2

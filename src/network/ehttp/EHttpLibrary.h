@@ -27,7 +27,7 @@ public:
     [[nodiscard]] std::string_view GetSslVersion() const override { return "mBedTLS"; }
 
 private:
-    EHttpLibrary() = default;
+    EHttpLibrary();
 };
 
 } // rsp::network::ehttp

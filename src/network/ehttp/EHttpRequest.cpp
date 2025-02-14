@@ -12,13 +12,14 @@
 #include <network/ChunkStreamer.h>
 #include <network/ResponseParser.h>
 #include <network/parser-helpers.h>
+#include <network/NetworkLibrary.h>
 
 namespace rsp::network::ehttp {
 
 EHttpRequest::EHttpRequest()
     : mResponse(*this)
 {
-
+    NetworkLibrary::Get();
 }
 
 const HttpRequestOptions& EHttpRequest::GetOptions() const

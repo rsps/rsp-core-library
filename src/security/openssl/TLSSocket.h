@@ -10,7 +10,7 @@
 #ifndef RSP_CORE_LIB_INCLUDE_SECURITY_TLS_SOCKET_H
 #define RSP_CORE_LIB_INCLUDE_SECURITY_TLS_SOCKET_H
 
-#include <network/NetworkException.h>
+#include "exceptions.h"
 #include <posix/Socket.h>
 #include <security/ITLSSocket.h>
 #include <span>
@@ -20,47 +20,15 @@
 #include <openssl/x509.h>
 #include <openssl/pem.h>
 #include <openssl/ssl.h>
-#include <openssl/err.h>
 
 namespace rsp::security {
-
-class EOpenSSL : public rsp::network::NetworkException
-{
-public:
-    using rsp::network::NetworkException::NetworkException;
-};
-
-class EOpenSSLError : public EOpenSSL
-{
-public:
-    using error_type_t = unsigned long;
-
-    explicit EOpenSSLError(error_type_t aErr)
-        : EOpenSSL(std::string(ERR_lib_error_string(aErr)) + " Lib:" + std::to_string(ERR_GET_LIB(aErr)) + ", Reason:" + std::to_string(ERR_GET_REASON(aErr))),
-          mCode(aErr)
-    {
-        ERR_LIB_SSL;
-        SSL_R_TLSV13_ALERT_CERTIFICATE_REQUIRED;
-    }
-
-    [[nodiscard]] int GetErrorLibrary() const { return ERR_GET_LIB(mCode); }
-    [[nodiscard]] int GetErrorReason() const { return ERR_GET_REASON(mCode); }
-
-protected:
-    error_type_t mCode = 0;
-};
 
 
 class TLSSocket : public ITLSSocket
 {
 public:
-    TLSSocket(const network::ConnectionOptions& arOptions);
+    explicit TLSSocket(const network::ConnectionOptions& arOptions);
     ~TLSSocket() override;
-
-//    TLSSocket(const TLSSocket&) = delete;
-//    TLSSocket(TLSSocket&&) = default;
-//    TLSSocket& operator=(const TLSSocket&) = delete;
-//    TLSSocket& operator=(TLSSocket&&) = default;
 
     TLSSocket& SetSocket(posix::Socket &arSocket) override;
     TLSSocket& Close() override;
@@ -83,6 +51,10 @@ protected:
     TLS_Context mpContext{};
     TLS_Connection mpSSL{};
     int mFd = -1;
+
+    void loadCertificateAuthority(std::string_view aCAPem);
+    void loadClientCertificate(std::string_view aCertPem, std::string_view aKeyPem);
+    void loadServerCertificateChain(std::string_view aChainPem);
 };
 
 } // rsp::security
