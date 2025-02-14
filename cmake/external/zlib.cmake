@@ -14,7 +14,7 @@ message(VERBOSE "Installing ZLib")
 find_package(ZLIB REQUIRED)
 
 # Debug
-message(STATUS "Found ZLib v${ZLIB_VERSION}")
+message(STATUS "Using ZLib v${ZLIB_VERSION}")
 
 # Include & link...
 target_include_directories(${PROJECT_NAME}

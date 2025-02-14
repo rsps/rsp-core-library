@@ -16,7 +16,7 @@ CPMAddPackage(
 )
 
 # Debug
-message(VERBOSE "Magic Enum C++ v${MAGIC_ENUM_VERSION} installed")
+message(STATUS "Using Magic Enum C++ v${MAGIC_ENUM_VERSION}")
 
 # Include & link...
 target_include_directories(${PROJECT_NAME}

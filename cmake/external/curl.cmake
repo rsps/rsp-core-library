@@ -13,7 +13,7 @@ message(VERBOSE "Installing cURL")
 find_package(CURL 7.33 REQUIRED)
 
 # Debug
-message(STATUS "Found cURL v${CURL_VERSION_STRING}")
+message(STATUS "Using cURL v${CURL_VERSION_STRING}")
 
 # Include & link...
 target_include_directories(${PROJECT_NAME}

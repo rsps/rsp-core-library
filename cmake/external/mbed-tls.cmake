@@ -17,7 +17,7 @@ CPMAddPackage(
 )
 
 # Debug
-message(VERBOSE "MBed TLS v${MBED_TLS_VERSION} installed")
+message(STATUS "Using MBed TLS v${MBED_TLS_VERSION}")
 
 # Include & link...
 

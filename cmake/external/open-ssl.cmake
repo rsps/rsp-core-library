@@ -13,7 +13,7 @@ message(VERBOSE "Installing OpenSSL")
 find_package(OpenSSL REQUIRED)
 
 # Debug
-message(STATUS "Found OpenSSL v${OPENSSL_VERSION}")
+message(STATUS "Using OpenSSL v${OPENSSL_VERSION}")
 
 # Include & link...
 #target_include_directories(${PROJECT_NAME}

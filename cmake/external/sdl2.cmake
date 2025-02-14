@@ -13,7 +13,7 @@ message(VERBOSE "Installing SDL2")
 find_package(SDL2 REQUIRED)
 
 # Debug
-message(STATUS "Found SDL2 v${SDL2_VERSION}")
+message(STATUS "Using SDL2 v${SDL2_VERSION}")
 
 # Include & link...
 target_include_directories(${PROJECT_NAME}

@@ -13,7 +13,7 @@ message(VERBOSE "Installing FreeType")
 find_package(Freetype REQUIRED)
 
 # Debug
-message(STATUS "Found FreeType v${FREETYPE_VERSION_STRING}")
+message(STATUS "Using FreeType v${FREETYPE_VERSION_STRING}")
 
 # Include & link...
 target_include_directories(${PROJECT_NAME}

@@ -17,7 +17,7 @@ set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
 
 # Debug
-message(STATUS "Found Threads")
+message(STATUS "Using std::thread")
 
 # Include & link...
 target_link_libraries(${PROJECT_NAME} Threads::Threads)
