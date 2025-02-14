@@ -8,7 +8,7 @@ include_guard(GLOBAL)
 include("dependencies.cmake")
 
 macro(install_dev_dependencies)
-    message(VERBOSE "Installing Development Dependencies for ${PROJECT_NAME}")
+    message(NOTICE "${COLOR_WHITE}Installing Development Dependencies for${RESTORE} ${PROJECT_NAME}")
 
     # Avoid building tests for dependencies...
     set(BUILD_TESTING off)
