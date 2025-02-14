@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* `install-runtime.sh` script, for installing project's runtime dependencies.
 * `rsp-cmake-scripts` as top level project dependency, in `CMakeLists.txt`.
 * `VERSION` file in root directory.
 * Description and version of top level project, in `CMakeLists.txt`.
@@ -24,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Extracted installation of 3rd party dependencies into `dependencies.cmake` and `dev-dependencies.cmake`. 
 * Refactored top level `CMakeLists.txt`.
 * Refactored `tests/CMakeLists.txt`.
+* `README.md` now references the newly added `install-runtime.sh` script.
 
 ### Deprecated
 
@@ -32,5 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 * `cmake/strict-compile-options.cmake` (_replaced by `RSP_GCC_STRICT_COMPILE_OPTIONS`, in `rsp-cmake-scripts` package_).
+
+### Fixed
+
+* JSON related tests fail, due to missing [JSON Lint](https://github.com/Seldaek/jsonlint) dev-dependency. 
 
 [Unreleased]: https://github.com/rsps/rsp-core-library/compare/main...development
