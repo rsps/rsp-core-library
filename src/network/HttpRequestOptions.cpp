@@ -40,8 +40,8 @@ std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)
         }
     }
 
-    if (arOptions.Body) {
-        o << "Body:\n" << *(arOptions.Body);
+    if (arOptions.RequestBody) {
+        o << "RequestBody:\n" << *(arOptions.RequestBody);
     }
 
     return o;

@@ -63,6 +63,7 @@ void X509Certs::ContextLoadCertificateAuthority(std::string_view aCAPem)
 {
     if (rsp::posix::FileSystem::FileExists(std::string(aCAPem))) {
         int err = SSL_CTX_load_verify_file(mpContext, aCAPem.data());
+//        int err = SSL_CTX_load_verify_locations(mpContext, aCAPem.data(), nullptr);
         CHK_SSL(err);
         return;
     }

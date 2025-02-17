@@ -28,7 +28,6 @@ SocketConnection& SocketConnection::Connect()
     }
 
     UrlParser up(mOptions.BaseUrl);
-    mOptions.host = up.GetHost();
 
     auto urn = std::string(up.GetHost()) + ":" + std::to_string(static_cast<unsigned int>(up.GetPort()));
     AddressInfo ai(urn);

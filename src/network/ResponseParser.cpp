@@ -12,6 +12,8 @@
 #include <network/HttpText.h>
 #include <network/parser-helpers.h>
 #include <network/ResponseParser.h>
+#include <network/StringBody.h>
+#include <network/BinaryBody.h>
 
 using namespace std::string_view_literals;
 using namespace rsp::utils;

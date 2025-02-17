@@ -141,13 +141,13 @@ const HttpRequestOptions& CurlHttpRequest::GetOptions() const
 
 IHttpRequest& CurlHttpRequest::SetBody(std::shared_ptr<IChunkedDataProvider> apBody)
 {
-    mRequestOptions.Body = apBody;
+    mRequestOptions.RequestBody = apBody;
     return *this;
 }
 
 const IChunkedDataProvider& CurlHttpRequest::GetBody() const
 {
-    return *mRequestOptions.Body;
+    return *mRequestOptions.RequestBody;
 }
 
 
@@ -245,7 +245,7 @@ void CurlHttpRequest::populateOptions()
             }
             else {
                 setCurlOption(CURLOPT_CUSTOMREQUEST, "POST");
-                readFromStream(mRequestOptions.Body);
+                readFromStream(mRequestOptions.RequestBody);
             }
             break;
 
@@ -255,13 +255,13 @@ void CurlHttpRequest::populateOptions()
 
         case HttpRequestType::PATCH:
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PATCH");
-            readFromStream(mRequestOptions.Body);
+            readFromStream(mRequestOptions.RequestBody);
             break;
 
         case HttpRequestType::PUT:
             // setCurlOption(CURLOPT_PUT, 1L); // Seems to put files only
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PUT");
-            readFromStream(mRequestOptions.Body);
+            readFromStream(mRequestOptions.RequestBody);
             break;
 
         case HttpRequestType::DELETE:

@@ -11,6 +11,11 @@
 
 namespace rsp::network {
 
+FileBody::FileBody(posix::FileIO& arFile)
+    : mFile(arFile)
+{
+}
+
 size_t FileBody::Write(std::span<const std::byte> aData)
 {
     return mFile.Write(aData.data(), aData.size());

@@ -13,6 +13,7 @@
 #include <network/ResponseParser.h>
 #include <network/parser-helpers.h>
 #include <network/NetworkLibrary.h>
+#include <network/UrlParser.h>
 
 namespace rsp::network::ehttp {
 
@@ -35,13 +36,13 @@ IHttpRequest& EHttpRequest::SetOptions(const HttpRequestOptions& arOptions)
 
 IHttpRequest& EHttpRequest::SetBody(std::shared_ptr<IStreamDataProvider> apBody)
 {
-    mOptions.Body = apBody;
+    mOptions.RequestBody = apBody;
     return *this;
 }
 
 const IStreamDataProvider& EHttpRequest::GetBody() const
 {
-    return *(mOptions.Body);
+    return *(mOptions.RequestBody);
 }
 
 IHttpRequest& EHttpRequest::AddField(const std::string& arFieldName, const std::string& arValue)
@@ -59,8 +60,8 @@ IHttpResponse& EHttpRequest::Execute()
     // Get connection
     auto &connection = getConnection().Connect();
 
-    if (mOptions.Body) {
-        auto len = mOptions.Body->GetStreamSize();
+    if (mOptions.RequestBody) {
+        auto len = mOptions.RequestBody->GetStreamSize();
         if (len) {
             mOptions.Headers["Content-Length"] = std::to_string(*len);
         }
@@ -75,9 +76,9 @@ IHttpResponse& EHttpRequest::Execute()
     }
 
     // Send body
-    if (mOptions.Body) {
+    if (mOptions.RequestBody) {
         std::byte buffer[256];
-        while (auto sz = mOptions.Body->Read(buffer)) {
+        while (auto sz = mOptions.RequestBody->Read(buffer)) {
             connection.Write({buffer, sz});
         }
     }
@@ -123,16 +124,16 @@ SocketConnection& EHttpRequest::getConnection()
 std::string EHttpRequest::formatHeaders()
 {
     using namespace std::string_view_literals;
-    if (mOptions.Uri.empty()) {
-        mOptions.Uri = "/";
-    }
+
+    std::string uri(mOptions.BaseUrl + mOptions.Uri);
+    UrlParser up(uri);
 
     std::stringstream ss;
     ss
           << mOptions.RequestType << " "
-          << mOptions.Uri
+          << up.GetPath() << up.GetQuery() << up.GetFragment()
           << " HTTP/1.1\r\nHost: "sv
-          << getConnection().GetHost()
+          << up.GetHost()
           << cNewLine;
     for (auto &h : mOptions.Headers) {
         ss << h.first << ": " << h.second << cNewLine;

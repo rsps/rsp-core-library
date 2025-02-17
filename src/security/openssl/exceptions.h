@@ -32,8 +32,6 @@ public:
             : EOpenSSL(std::string(ERR_lib_error_string(aErr)) + " Lib:" + std::to_string(ERR_GET_LIB(aErr)) + ", Reason:" + std::to_string(ERR_GET_REASON(aErr))),
               mCode(aErr)
     {
-        ERR_LIB_SSL;
-        SSL_R_TLSV13_ALERT_CERTIFICATE_REQUIRED;
     }
 
     [[nodiscard]] int GetErrorLibrary() const { return ERR_GET_LIB(mCode); }

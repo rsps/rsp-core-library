@@ -31,7 +31,6 @@ public:
     std::string KeyPath{};
     std::string KeyPasswd{};
     int Verbose = 0;
-    std::string_view host{};
 };
 
 std::ostream& operator<<(std::ostream &o, const ConnectionOptions &arOptions);

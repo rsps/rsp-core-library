@@ -27,8 +27,6 @@ public:
     size_t Write(std::span<const std::byte> aData) override;
     size_t Read(std::span<std::byte> aBuffer) override;
 
-    [[nodiscard]] std::string_view GetHost() const { return mOptions.host; } // Valid after Connect()
-
 protected:
     ConnectionOptions mOptions{};
     posix::Socket mSocket{};

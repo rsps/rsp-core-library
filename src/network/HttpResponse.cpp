@@ -63,22 +63,16 @@ IHttpResponse& HttpResponse::MakeBody()
         return *this;
     }
 
-    if (mHeaders.contains("content-type")) {
-        auto content_type = mHeaders["content-type"];
-
-        if (content_type.starts_with("application/json") || content_type.starts_with("application/xml") || content_type.starts_with("text/")) {
-            mpBody = std::make_shared<StringBody>();
-        }
-        else if (content_type.starts_with("application/octet-stream")) {
-            mpBody = std::make_shared<BinaryBody>();
-        }
-        else {
-            mpBody = std::make_shared<FileBody>();
-        }
+    if (mrRequest.GetOptions().ResponseBody) {
+        mpBody = mrRequest.GetOptions().ResponseBody;
     }
-    if (!mpBody) {
+    else if (mHeaders.contains("content-type") && mHeaders["content-type"].starts_with("application/octet-stream")) {
+        mpBody = std::make_shared<BinaryBody>();
+    }
+    else {
         mpBody = std::make_shared<StringBody>();
     }
+
     return *this;
 }
 

@@ -12,6 +12,7 @@
 #include <array>
 #include <cstring>
 #include <filesystem>
+#include <network/FileBody.h>
 #include <network/IHttpRequest.h>
 #include <network/HttpRequest.h>
 #include <network/HttpDownload.h>
@@ -222,7 +223,7 @@ TEST_CASE("Network")
 
         opt.BaseUrl = "https://server.localhost:44300/cgi/upload.sh";
         opt.RequestType = HttpRequestType::POST;
-        opt.ReadFile = file;
+        opt.RequestBody = std::make_shared<FileBody>(file);
         opt.Headers.emplace("x-filename", "uploaded.png");
 //        opt.Verbose = 1;
 
@@ -293,7 +294,7 @@ TEST_CASE("Network")
         FileSystem::DeleteFile(std::string(cUploadedFile));
     }
 
-    SUBCASE("Body Stream") {
+    SUBCASE("RequestBody Stream") {
         StringBody body(R"(
               O freddled gruntbuggly thy micturations are to me
                  As plured gabbleblochits on a lurgid bee.
@@ -341,7 +342,7 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
         std::string expected = R"(
 Content length: 41
 Request Method: POST
-Body: )" + json + "\n";
+RequestBody: )" + json + "\n";
 
         CHECK_EQ(body, expected);
     }

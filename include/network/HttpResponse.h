@@ -30,7 +30,8 @@ class HttpResponse: public IHttpResponse
 {
 public:
     explicit HttpResponse(IHttpRequest &arRequest)
-        : mrRequest(arRequest)
+        : mrRequest(arRequest),
+          mpBody(arRequest.GetOptions().ResponseBody)
     {
     }
 

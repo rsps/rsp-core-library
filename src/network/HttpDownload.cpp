@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <list>
 #include <string>
+#include <network/FileBody.h>
 #include <network/HttpDownload.h>
 #include <posix/FileSystem.h>
 #include <posix/FileIO.h>
@@ -38,6 +39,7 @@ IHttpResponse& HttpDownload::Execute()
     if (mFileName.empty()) {
         return mPimpl->Execute();
     }
+
 
     std::string modified_time{};
     if (FileSystem::FileExists(mFileName)) {
@@ -72,7 +74,7 @@ IHttpResponse& HttpDownload::Execute()
         file.SetSize(0);
     }
     opt.RequestType = HttpRequestType::GET;
-    opt.WriteFile = file; // Redirect response body to file
+    opt.ResponseBody = std::make_shared<FileBody>(file); // Redirect response body to file
     SetOptions(opt);
 
     resp = &(mPimpl->Execute());

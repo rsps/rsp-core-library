@@ -49,19 +49,17 @@ class HttpRequestOptions: public ConnectionOptions
 public:
     std::map<std::string, std::string> Headers{};
     std::string Uri{};
-    std::shared_ptr<IStreamDataProvider> Body{};
+    std::shared_ptr<IStreamDataProvider> RequestBody{};
+    std::shared_ptr<IStreamDataProvider> ResponseBody{};
     HttpRequestType RequestType = HttpRequestType::GET;
     std::string BasicAuthUsername{};
     std::string BasicAuthPassword{};
-    std::optional<rsp::posix::FileIO> WriteFile{};
-    std::optional<rsp::posix::FileIO> ReadFile{};
 
     void Clear() {
         Headers.clear();
         Uri.clear();
-        Body.reset();
-        WriteFile.reset();
-        ReadFile.reset();
+        RequestBody.reset();
+        ResponseBody.reset();
     }
 };
 

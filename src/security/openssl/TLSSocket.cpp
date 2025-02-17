@@ -9,6 +9,7 @@
 */
 #include "TLSSocket.h"
 #include "X509Certs.h"
+#include <network/UrlParser.h>
 
 namespace rsp::security {
 
@@ -20,12 +21,29 @@ std::shared_ptr<ITLSSocket> ITLSSocket::Create(const network::ConnectionOptions&
 TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
     : mrOptions(arOptions)
 {
-    OpenSSL_add_ssl_algorithms();
+    OpenSSL_add_all_algorithms();
     SSL_load_error_strings();
     auto method = TLS_client_method();
     CHK_NULL(method);
     mpContext = TLS_Context(SSL_CTX_new(method));
     CHK_NULL(mpContext);
+
+    if (!mrOptions.CertCaPath.empty()) {
+        X509Certs x509(mpContext.get());
+        x509.LoadCertificateAuthority(mrOptions.CertCaPath);
+        SSL_CTX_set_verify(mpContext.get(), SSL_VERIFY_PEER, nullptr);
+    }
+
+    if (!mrOptions.CertPath.empty()) {
+        X509Certs x509(mpContext.get());
+        x509.LoadClientCertificate(mrOptions.CertPath, mrOptions.KeyPath);
+    }
+
+    if (SSL_CTX_set_min_proto_version(mpContext.get(), TLS1_3_VERSION) <= 0) {
+        THROW_WITH_BACKTRACE1(EOpenSSL, "Could not configure minimum protocol version");
+    }
+
+    SSL_CTX_set_session_cache_mode(mpContext.get(), SSL_SESS_CACHE_OFF);
 }
 
 TLSSocket::~TLSSocket()
@@ -39,7 +57,9 @@ TLSSocket& TLSSocket::SetSocket(posix::Socket& arSocket)
     mpSSL = TLS_Connection(SSL_new(mpContext.get()));
     CHK_NULL(mpSSL);
 
-    std::string host(mrOptions.host);
+    rsp::network::UrlParser up(mrOptions.BaseUrl);
+
+    std::string host(up.GetHost());
 
     if (1 != SSL_ctrl(mpSSL.get(), SSL_CTRL_SET_TLSEXT_HOSTNAME, TLSEXT_NAMETYPE_host_name, const_cast<char*>(host.c_str()))) {
         THROW_WITH_BACKTRACE1(EOpenSSL, "Could not enable SNI"); // Server Name Identification
@@ -47,20 +67,6 @@ TLSSocket& TLSSocket::SetSocket(posix::Socket& arSocket)
     if (1 != SSL_set1_host(mpSSL.get(), host.c_str())) {
         THROW_WITH_BACKTRACE1(EOpenSSL, "Could not enable host name check");
     }
-
-    if (!mrOptions.CertCaPath.empty()) {
-        X509Certs x509(mpContext.get());
-        x509.LoadCertificateAuthority(mrOptions.CertCaPath);
-        SSL_CTX_set_verify(mpContext.get(), SSL_VERIFY_PEER, nullptr);
-    }
-
-    if (!mrOptions.CertPath.empty()) {
-        X509Certs x509(mpContext.get());
-        x509.LoadClientCertificate(mrOptions.CertPath, mrOptions.KeyPath);
-    }
-
-    SSL_CTX_set_options(mpContext.get(), SSL_OP_NO_SSLv2|SSL_OP_NO_SSLv3);  // other options not used atm  SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1 | SSL_OP_NO_TLSv1_2
-    SSL_CTX_set_session_cache_mode(mpContext.get(), SSL_SESS_CACHE_OFF);
 
     SSL_set_fd(mpSSL.get(), mFd);
     int err = SSL_connect(mpSSL.get());
@@ -93,6 +99,8 @@ size_t TLSSocket::Read(std::span<std::byte> aData)
 {
     int err = SSL_read(mpSSL.get(), aData.data(), int(aData.size()));
     CHK_SSL(err);
+//    ERR_LIB_SSL = 20;
+//    SSL_R_TLSV13_ALERT_CERTIFICATE_REQUIRED = 1116;
     return size_t(err);
 }
 
