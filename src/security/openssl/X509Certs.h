@@ -11,6 +11,7 @@
 #define RSP_CORE_LIB_SRC_SECURITY_OPENSSL_X509CERTS_H
 
 #include <string_view>
+#define OPENSSL_NO_DEPRECATED 1
 #include <openssl/crypto.h>
 #include <openssl/x509.h>
 #include <openssl/pem.h>

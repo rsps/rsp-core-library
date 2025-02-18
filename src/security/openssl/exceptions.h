@@ -28,10 +28,21 @@ class EOpenSSLError : public EOpenSSL
 public:
     using error_type_t = unsigned long;
 
+    // For ERR_get_error()
     explicit EOpenSSLError(error_type_t aErr)
             : EOpenSSL(std::string(ERR_lib_error_string(aErr)) + " Lib:" + std::to_string(ERR_GET_LIB(aErr)) + ", Reason:" + std::to_string(ERR_GET_REASON(aErr))),
               mCode(aErr)
     {
+//    ERR_LIB_SSL = 20;
+//    SSL_R_TLSV13_ALERT_CERTIFICATE_REQUIRED = 1116;
+    }
+
+    // For SSL_get_error()
+    explicit EOpenSSLError(int aErr)
+            : EOpenSSL("SSL error code: " + std::to_string(aErr)),
+              mCode(error_type_t(aErr))
+    {
+        SSL_ERROR_NONE;
     }
 
     [[nodiscard]] int GetErrorLibrary() const { return ERR_GET_LIB(mCode); }

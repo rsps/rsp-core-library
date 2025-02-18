@@ -16,6 +16,7 @@
 #include <span>
 #include <string_view>
 
+#define OPENSSL_NO_DEPRECATED 1
 #include <openssl/crypto.h>
 #include <openssl/x509.h>
 #include <openssl/pem.h>
@@ -51,10 +52,6 @@ protected:
     TLS_Context mpContext{};
     TLS_Connection mpSSL{};
     int mFd = -1;
-
-    void loadCertificateAuthority(std::string_view aCAPem);
-    void loadClientCertificate(std::string_view aCertPem, std::string_view aKeyPem);
-    void loadServerCertificateChain(std::string_view aChainPem);
 };
 
 } // rsp::security

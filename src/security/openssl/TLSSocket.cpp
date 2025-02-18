@@ -48,6 +48,7 @@ TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
 
 TLSSocket::~TLSSocket()
 {
+    Close();
     close(mFd);
 }
 
@@ -90,18 +91,22 @@ TLSSocket& TLSSocket::Close()
 
 size_t TLSSocket::Write(std::span<const std::byte> aData)
 {
-    int err = SSL_write(mpSSL.get(), aData.data(), int(aData.size()));
-    CHK_SSL(err);
-    return size_t(err);
+    size_t write_bytes = 0;
+    int err = SSL_write_ex(mpSSL.get(), aData.data(), aData.size(), &write_bytes);
+    if (!err) {
+        THROW_WITH_BACKTRACE1(EOpenSSLError, SSL_get_error(mpSSL.get(), err));
+    }
+    return size_t(write_bytes);
 }
 
 size_t TLSSocket::Read(std::span<std::byte> aData)
 {
-    int err = SSL_read(mpSSL.get(), aData.data(), int(aData.size()));
-    CHK_SSL(err);
-//    ERR_LIB_SSL = 20;
-//    SSL_R_TLSV13_ALERT_CERTIFICATE_REQUIRED = 1116;
-    return size_t(err);
+    size_t read_bytes = 0;
+    int err = SSL_read_ex(mpSSL.get(), aData.data(), aData.size(), &read_bytes);
+    if (!err) {
+        THROW_WITH_BACKTRACE1(EOpenSSLError, SSL_get_error(mpSSL.get(), err));
+    }
+    return size_t(read_bytes);
 }
 
 } // rsp::security

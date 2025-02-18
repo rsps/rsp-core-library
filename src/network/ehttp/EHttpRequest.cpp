@@ -31,6 +31,7 @@ const HttpRequestOptions& EHttpRequest::GetOptions() const
 IHttpRequest& EHttpRequest::SetOptions(const HttpRequestOptions& arOptions)
 {
     mOptions = arOptions;
+    mResponse.Clear();
     return *this;
 }
 
@@ -97,6 +98,10 @@ IHttpResponse& EHttpRequest::Execute()
                 break;
             }
         }
+    }
+
+    if (mResponseCallback) {
+        mResponseCallback(mResponse);
     }
 
     return mResponse;

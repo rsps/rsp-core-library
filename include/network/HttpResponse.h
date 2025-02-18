@@ -30,8 +30,7 @@ class HttpResponse: public IHttpResponse
 {
 public:
     explicit HttpResponse(IHttpRequest &arRequest)
-        : mrRequest(arRequest),
-          mpBody(arRequest.GetOptions().ResponseBody)
+        : mrRequest(arRequest)
     {
     }
 
@@ -60,6 +59,7 @@ public:
     IHttpResponse& MakeBody() override;
 
     [[nodiscard]] size_t GetContentLength() const override;
+    IHttpResponse& Clear() override;
 
 protected:
     friend class ResponseParser;

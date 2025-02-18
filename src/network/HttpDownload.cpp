@@ -40,7 +40,6 @@ IHttpResponse& HttpDownload::Execute()
         return mPimpl->Execute();
     }
 
-
     std::string modified_time{};
     if (FileSystem::FileExists(mFileName)) {
         auto fmt = FileSystem::GetFileModifiedTime(mFileName);
@@ -73,6 +72,7 @@ IHttpResponse& HttpDownload::Execute()
     else {
         file.SetSize(0);
     }
+
     opt.RequestType = HttpRequestType::GET;
     opt.ResponseBody = std::make_shared<FileBody>(file); // Redirect response body to file
     SetOptions(opt);

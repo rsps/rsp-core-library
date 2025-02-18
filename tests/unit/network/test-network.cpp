@@ -131,6 +131,31 @@ TEST_CASE("Network")
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
     }
 
+    SUBCASE("Request Reuse") {
+        HttpRequest request;
+        opt.BaseUrl = "https://server.localhost:44300";
+        opt.Uri = "/";
+        opt.RequestType = HttpRequestType::HEAD;
+        request.SetOptions(opt);
+
+        IHttpResponse *resp;
+        CHECK_NOTHROW(resp = &request.Execute());
+
+        CHECK_EQ(resp->GetHeader("content-type"), "text/html");
+        CHECK_EQ(resp->GetHeader("content-length"), "120");
+        CHECK_EQ(resp->GetBody().GetStreamSize(), 0);
+        CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
+
+        opt.RequestType = HttpRequestType::GET;
+        request.SetOptions(opt);
+
+        CHECK_NOTHROW(resp = &request.Execute());
+        CHECK_EQ(resp->GetHeader("content-type"), "text/html");
+        CHECK_EQ(resp->GetHeader("content-length"), "120");
+        CHECK_EQ(resp->GetBody().GetStreamSize(), 120);
+        CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
+    }
+
     SUBCASE("File Download") {
         const std::string cFile("./image.png");
         const std::string cSourceFile("./webserver/public/image.png");
@@ -165,7 +190,7 @@ TEST_CASE("Network")
 
             CHECK_NOTHROW(resp = &request.Execute());
 
-            CHECK_EQ(resp->GetBody().GetStreamSize(), 0);
+            CHECK_EQ(resp->GetBody().GetStreamSize().value(), 25138);
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
         }
 
@@ -174,7 +199,7 @@ TEST_CASE("Network")
 
             CHECK_NOTHROW(resp = &request.Execute());
 
-            CHECK_EQ(resp->GetBody().GetStreamSize(), 0);
+            CHECK_EQ(resp->GetBody().GetStreamSize().value(), 25138);
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
         }
 

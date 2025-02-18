@@ -89,5 +89,15 @@ size_t HttpResponse::GetContentLength() const
     return 0;
 }
 
+IHttpResponse& HttpResponse::Clear()
+{
+    mStatusLine = {};
+    mHeaders.clear();
+    mHeaderData.clear();
+    mContentLength.reset();
+    mpBody = nullptr;
+    return *this;
+}
+
 
 }

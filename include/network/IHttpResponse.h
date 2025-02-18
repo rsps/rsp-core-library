@@ -147,6 +147,12 @@ public:
      * \return self
      */
     virtual IHttpResponse& MakeBody() = 0;
+
+    /**
+     * \brief Clear the response so it can be reused.
+     * \return self
+     */
+    virtual IHttpResponse& Clear() = 0;
 };
 
 std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse);
