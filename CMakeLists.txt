@@ -78,6 +78,7 @@ add_library("${PROJECT_NAME}" STATIC)
 
 # Debug
 message("${COLOR_GREEN}${TEXT_BOLD}Building${COLOR_DEFAULT} ${PROJECT_NAME}${TEXT_BOLD_RESTORE}")
+message(STATUS "Using CMAKE (${COLOR_WHITE}${TEXT_ITALIC}${CMAKE_VERSION}${RESTORE})")
 message(STATUS "Using GCC ${GCC_TOOL_VERSION} (${COLOR_WHITE}${TEXT_ITALIC}${GCC_TOOL}${RESTORE})")
 
 # -------------------------------------------------------------------------------------------------------------- #
