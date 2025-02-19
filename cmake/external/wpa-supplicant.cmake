@@ -18,7 +18,7 @@ message(VERBOSE "Installing WPA Supplicant")
 find_library(wpa_supplicant NAMES "wpa_client" DOC " RSP Core Lib - Path to WPA Supplicant Library (libwpa-client-dev)")
 
 # Debug
-if (DEFINED "wpa_supplicant-NOTFOUND")
+if (wpa_supplicant STREQUAL "wpa_supplicant-NOTFOUND")
     message(STATUS "WPA Supplicant (${COLOR_RED}${TEXT_ITALIC}not found${RESTORE})")
 else ()
     message(STATUS "Using WPA Supplicant (${COLOR_WHITE}${TEXT_ITALIC}${wpa_supplicant}${RESTORE})")
