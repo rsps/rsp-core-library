@@ -9,14 +9,14 @@ Developed by [RSP Systems A/S](https://rspsystems.com/).
 
 ## Prerequisites
 
-This project has several runtime dependencies that must be installed, before you are able to build it.
+This project has several development dependencies that must be installed, before you are able to build it.
 
 ### Debian / Ubuntu
 
 In the root of the project, run the following script:
 
 ```sh
-sudo ./install-runtime.sh
+sudo ./install-dev-libraries.sh
 ```
 
 ### GCC
