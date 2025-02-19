@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* `install-runtime.sh` script, for installing project's runtime dependencies.
+* `install-dev-libraries.sh` script, for installing project's runtime dependencies.
 * `rsp-cmake-scripts` as top level project dependency, in `CMakeLists.txt`.
 * `VERSION` file in root directory.
 * Description and version of top level project, in `CMakeLists.txt`.
