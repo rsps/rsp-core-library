@@ -40,6 +40,8 @@ public:
 protected:
     HttpRequestOptions mOptions{};
     EHttpResponse mResponse;
+    std::array<std::byte, 256> mWorkBuffer{};
+
 
     friend class EHttpSession;
     ResponseCallback_t mResponseCallback{};

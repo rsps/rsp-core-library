@@ -95,7 +95,7 @@ IHttpResponse& HttpResponse::Clear()
     mHeaders.clear();
     mHeaderData.clear();
     mContentLength.reset();
-    mpBody = nullptr;
+    mpBody.reset();
     return *this;
 }
 

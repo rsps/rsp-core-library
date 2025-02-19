@@ -39,7 +39,7 @@ public:
 
     // For SSL_get_error()
     explicit EOpenSSLError(int aErr)
-            : EOpenSSL("SSL error code: " + std::to_string(aErr)),
+            : EOpenSSL("SSL error (" + std::to_string(aErr) + ") " + sslErrToString(aErr)),
               mCode(error_type_t(aErr))
     {
         SSL_ERROR_NONE;
@@ -47,6 +47,26 @@ public:
 
     [[nodiscard]] int GetErrorLibrary() const { return ERR_GET_LIB(mCode); }
     [[nodiscard]] int GetErrorReason() const { return ERR_GET_REASON(mCode); }
+
+    static std::string sslErrToString(int aErr)
+    {
+        switch (aErr) {
+            case SSL_ERROR_NONE:                return { "No error" };
+            case SSL_ERROR_SSL:                 return { "Error SSL" };
+            case SSL_ERROR_WANT_READ:           return { "Want Read" };
+            case SSL_ERROR_WANT_WRITE:          return { "Want Write" };
+            case SSL_ERROR_WANT_X509_LOOKUP:    return { "Want X509 Lookup" };
+            case SSL_ERROR_SYSCALL:             return { "System Call" };
+            case SSL_ERROR_ZERO_RETURN:         return { "Zero Return" };
+            case SSL_ERROR_WANT_CONNECT:        return { "Want Connect" };
+            case SSL_ERROR_WANT_ACCEPT:         return { "Want Accept" };
+            case SSL_ERROR_WANT_ASYNC:          return { "Want Async" };
+            case SSL_ERROR_WANT_ASYNC_JOB:      return { "Want Async Job" };
+            case SSL_ERROR_WANT_CLIENT_HELLO_CB:return { "Want Client Hello Callback" };
+            case SSL_ERROR_WANT_RETRY_VERIFY:   return { "Want Retry Verify" };
+            default:                            return { "Unknown" };
+        }
+    }
 
 protected:
     error_type_t mCode = 0;

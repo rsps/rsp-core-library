@@ -12,6 +12,7 @@
 #include <list>
 #include <string>
 #include <network/FileBody.h>
+#include <network/StringBody.h>
 #include <network/HttpDownload.h>
 #include <posix/FileSystem.h>
 #include <posix/FileIO.h>
@@ -74,6 +75,7 @@ IHttpResponse& HttpDownload::Execute()
     }
 
     opt.RequestType = HttpRequestType::GET;
+//    opt.ResponseBody = std::make_shared<StringBody>();
     opt.ResponseBody = std::make_shared<FileBody>(file); // Redirect response body to file
     SetOptions(opt);
 

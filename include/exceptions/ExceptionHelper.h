@@ -36,7 +36,7 @@ public:
     BackTracedException(const char *aFilename, int aLineNum, Args &&... args)
             : BaseException(std::forward<Args>(args)...)
     {
-        BackTrace bt(1);
+        BackTrace bt(2);
         std::stringstream ss;
         ss << "From '" << aFilename << ":" << aLineNum << "'->\n"
                 << BaseException::what() << "\n" << bt;
@@ -47,7 +47,7 @@ public:
     BackTracedException(const std::exception &e, const char *aFilename, int aLineNum)
             : BaseException(static_cast<const BaseException&>(e))
     {
-        BackTrace bt(1);
+        BackTrace bt(2);
         std::stringstream ss;
         ss << "From '" << aFilename << ":" << aLineNum << "'->\n"
                 << e.what() << "\n" << bt;

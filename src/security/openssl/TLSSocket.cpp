@@ -48,7 +48,9 @@ TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
 
 TLSSocket::~TLSSocket()
 {
-    Close();
+    if (mpSSL) {
+        SSL_shutdown(mpSSL.get());
+    }
     close(mFd);
 }
 

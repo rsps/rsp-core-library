@@ -55,7 +55,7 @@ public:
             for (size_t i = 0 ; i < written ; ++i) {
                 auto c = int(buffer[i]);
                 if (std::isprint(c) || c == '\n' || c == '\r') {
-                    o << c;
+                    o << char(c);
                 }
                 else {
                     o << '.';

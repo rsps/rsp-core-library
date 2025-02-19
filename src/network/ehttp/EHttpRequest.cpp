@@ -78,22 +78,20 @@ IHttpResponse& EHttpRequest::Execute()
 
     // Send body
     if (mOptions.RequestBody) {
-        std::byte buffer[256];
-        while (auto sz = mOptions.RequestBody->Read(buffer)) {
-            connection.Write({buffer, sz});
+        while (auto sz = mOptions.RequestBody->Read(mWorkBuffer)) {
+            connection.Write({mWorkBuffer.data(), sz});
         }
     }
 
     // Read response...
     {
         ResponseParser parser(mResponse);
-        auto buffer = std::array<std::byte, 256>();
         while (true) {
-            auto sz = connection.Read(buffer);
+            auto sz = connection.Read(mWorkBuffer);
             if (sz == 0) {
-                break; // What if timeout?
+                break; // TODO: Test for timeout...
             }
-            if (parser.ParseNewData({buffer.data(), sz})) {
+            if (parser.ParseNewData({mWorkBuffer.data(), sz})) {
                 // mResponse is now filled.
                 break;
             }

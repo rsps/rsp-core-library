@@ -35,8 +35,12 @@ server.breakagelog = basedir + "/cgi.log"
 
 debug.log-request-handling = "enable"
 debug.log-request-header = "enable"
+debug.log-response-header = "enable"
+debug.log-response-body = "enable"
 #debug.log-state-handling = "enable"
 debug.log-ssl-noise = "enable"
+debug.log-file-not-found = "enable"
+#debug.log-condition-handling = "enable"
 
 server.upload-dirs=( basedir )
 server.stream-request-body = 1

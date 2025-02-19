@@ -147,6 +147,7 @@ TEST_CASE("Network")
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
 
         opt.RequestType = HttpRequestType::GET;
+//        opt.ResponseBody = std::make_shared<StringBody>(); // Predefine response body
         request.SetOptions(opt);
 
         CHECK_NOTHROW(resp = &request.Execute());
@@ -154,6 +155,9 @@ TEST_CASE("Network")
         CHECK_EQ(resp->GetHeader("content-length"), "120");
         CHECK_EQ(resp->GetBody().GetStreamSize(), 120);
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
+//        std::stringstream ss;
+//        ss << resp->GetBody();
+//        MESSAGE("Body: " << ss.str());
     }
 
     SUBCASE("File Download") {
