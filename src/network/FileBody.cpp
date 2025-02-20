@@ -12,24 +12,24 @@
 namespace rsp::network {
 
 FileBody::FileBody(posix::FileIO& arFile)
-    : mFile(arFile)
+    : mrFile(arFile)
 {
 }
 
 size_t FileBody::Write(std::span<const std::byte> aData)
 {
-    return mFile.Write(aData.data(), aData.size());
+    return mrFile.Write(aData.data(), aData.size());
 }
 
 size_t FileBody::Read(std::span<std::byte> aBuffer)
 {
-    return mFile.Read(aBuffer.data(), aBuffer.size());
+    return mrFile.Read(aBuffer.data(), aBuffer.size());
 }
 
 std::optional<size_t> FileBody::GetStreamSize()
 {
-    if (mFile.IsOpen()) {
-        return { mFile.GetSize() };
+    if (mrFile.IsOpen()) {
+        return { mrFile.GetSize() };
     }
     return {};
 }

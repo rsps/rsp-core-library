@@ -50,6 +50,9 @@ public:
     Socket& operator=(Socket&&) noexcept;
 
     //---- Socket Options ----
+    [[nodiscard]] bool IsBlocking() const;
+    Socket& SetBlocking(bool aBlocking);
+
     [[nodiscard]] bool IsConnected() const;
     [[nodiscard]] bool IsListening() const;
 

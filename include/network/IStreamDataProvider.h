@@ -29,6 +29,18 @@ public:
      */
     virtual size_t Write(std::span<std::byte const> aData) = 0;
 
+    size_t CopyFrom(IStreamDataProvider& arSource)
+    {
+        std::array<std::byte, 256> buffer{};
+        size_t total_written = 0;
+
+        while(auto sz = arSource.Read(buffer)) {
+            total_written += Write({buffer.data(), sz});
+        }
+
+        return total_written;
+    }
+
     /**
      * \brief Attempt to read data from the stream into the given buffer
      * \param aBuffer

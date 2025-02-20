@@ -34,19 +34,6 @@ StringBody& StringBody::operator=(const std::string &arContent)
     return *this;
 }
 
-//bool StringBody::GetChunk(std::span<char> aBuffer, size_t &arWritten, size_t &arChunkIndex, size_t &)
-//{
-//    mChunkReadIndex = arChunkIndex;
-//    arWritten = Read(std::as_writable_bytes(aBuffer));
-//    arChunkIndex += arWritten;
-//    return (arChunkIndex == mContent.size());
-//}
-//
-//size_t StringBody::GetSize()
-//{
-//    return mContent.size();
-//}
-
 size_t StringBody::Write(const std::span<const std::byte> aData)
 {
     auto sz = aData.size();
@@ -57,12 +44,9 @@ size_t StringBody::Write(const std::span<const std::byte> aData)
 
 size_t StringBody::Read(const std::span<std::byte> aBuffer)
 {
-    size_t len = mContent.size() - mChunkReadIndex;
-    if (len > aBuffer.size()) {
-        len = aBuffer.size();
-    }
-    std::memcpy(aBuffer.data(), mContent.data() + mChunkReadIndex, len);
-    mChunkReadIndex += len;
+    size_t len = std::min(mContent.size() - mReadOffset, aBuffer.size());
+    std::memcpy(aBuffer.data(), mContent.data() + mReadOffset, len);
+    mReadOffset += len;
     return len;
 }
 

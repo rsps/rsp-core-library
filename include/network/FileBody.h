@@ -23,10 +23,10 @@ public:
     size_t Read(std::span<std::byte> aBuffer) override;
     std::optional<size_t> GetStreamSize() override;
 
-    posix::FileIO& Get() { return mFile; }
+    posix::FileIO& Get() { return mrFile; }
 
 protected:
-    posix::FileIO mFile{};
+    posix::FileIO& mrFile;
 };
 
 } // rsp::network

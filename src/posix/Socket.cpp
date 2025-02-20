@@ -8,13 +8,14 @@
 * \author      steffen
 */
 
+#include <arpa/inet.h>
 #include <charconv>
+#include <fcntl.h>
+#include <posix/FileSystem.h>
 #include <posix/Socket.h>
 #include <sys/poll.h>
-#include <unistd.h>
-#include <posix/FileSystem.h>
-#include <arpa/inet.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 namespace rsp::posix {
 
@@ -394,6 +395,36 @@ Socket& Socket::Close()
 void Socket::deleteOldSocketINode(const SocketAddress &arAddr)
 {
     FileSystem::DeleteFile(arAddr.AsString());
+}
+
+bool Socket::IsBlocking() const
+{
+    long arg;
+    if ((arg = fcntl(mHandle.Get(), F_GETFL, NULL)) < 0) {
+        THROW_SYSTEM("fcntl() failed.");
+    }
+    return ((arg & O_NONBLOCK) == 0);
+}
+
+Socket& Socket::SetBlocking(bool aBlocking)
+{
+    long arg;
+    if ((arg = fcntl(mHandle.Get(), F_GETFL, NULL)) < 0) {
+        THROW_SYSTEM("fcntl() failed.");
+    }
+
+    if (aBlocking) {
+        arg &= ~O_NONBLOCK;
+    }
+    else {
+        arg |= O_NONBLOCK;
+    }
+
+    if (fcntl(mHandle.Get(), F_SETFL, arg) < 0) {
+        THROW_SYSTEM("fcntl() failed.");
+    }
+
+    return *this;
 }
 
 } // rsp::posix

@@ -33,7 +33,9 @@ SocketConnection& SocketConnection::Connect()
     AddressInfo ai(urn);
 
     mSocket = Socket(Domain::Inet, Type::Stream, Protocol::Unspecified);
-    mSocket.Connect(ai);
+    mSocket.SetSendTimeout(std::chrono::seconds(mOptions.ConnectionTimeout))
+        .Connect(ai)
+        .SetReceiveTimeout(std::chrono::seconds(mOptions.ResponseTimeout));
 
     if (up.RequiresTLS()) {
         mpTls = security::ITLSSocket::Create(mOptions);
@@ -70,6 +72,7 @@ size_t SocketConnection::Write(const std::span<const std::byte> aData)
 
 size_t SocketConnection::Read(const std::span<std::byte> aBuffer)
 {
+    ASSERT(mSocket.IsConnected());
     if (mpTls) {
         return mpTls->Read(aBuffer);
     }

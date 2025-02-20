@@ -21,17 +21,10 @@ class StringBody : public IStreamDataProvider
 public:
     StringBody() = default;
     explicit StringBody(std::string aContent);
-//    StringBody(const StringBody &arOther) = default;
-//    StringBody(StringBody &&arOther) noexcept = default;
-//
-//    StringBody& operator=(const StringBody &arOther) = default;
-//    StringBody& operator=(StringBody &&arOther) noexcept = default;
 
     StringBody& Set(const std::string &arContent);
     [[nodiscard]] const std::string& Get() const;
     StringBody& operator=(const std::string &arContent);
-//    [[nodiscard]] bool GetChunk(std::span<char> aBuffer, size_t &arWritten, size_t &arChunkIndex, size_t &arPayloadIndex) override;
-//    [[nodiscard]] size_t GetSize() override;
 
     [[nodiscard]] size_t Write(std::span<const std::byte> aData) override;
     [[nodiscard]] size_t Read(std::span<std::byte> aBuffer) override;
@@ -39,7 +32,7 @@ public:
 
 protected:
     std::string mContent{};
-    size_t mChunkReadIndex = 0;
+    size_t mReadOffset = 0;
 };
 
 } // rsp::network
