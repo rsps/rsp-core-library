@@ -46,20 +46,20 @@ public:
      * \param aBuffer
      * \return The actual amount of bytes read into the buffer
      */
-    virtual size_t Read(std::span<std::byte> aBuffer) = 0;
+    [[nodiscard]] virtual size_t Read(std::span<std::byte> aBuffer) const = 0;
 
     /**
-     * \brief Get the the size of this stream, if possible.
-     * \return Optional size
+     * \brief Get the the size of this stream.
+     * \return size_t
      */
-    virtual std::optional<size_t> GetStreamSize() = 0;
+    [[nodiscard]] virtual size_t GetStreamSize() const = 0;
 
     /**
      * \brief Visualizer method. For debugging/trace output.
      * \param o ostream
      * \return self
      */
-    virtual std::ostream& PrintContent(std::ostream& o)
+    virtual std::ostream& PrintContent(std::ostream& o) const
     {
         std::byte buffer[100];
         auto sp = std::span<std::byte>(buffer);
@@ -78,7 +78,7 @@ public:
     }
 };
 
-inline std::ostream& operator<<(std::ostream& o, IStreamDataProvider &arStream)
+inline std::ostream& operator<<(std::ostream& o, const IStreamDataProvider &arStream)
 {
     return arStream.PrintContent(o);
 }

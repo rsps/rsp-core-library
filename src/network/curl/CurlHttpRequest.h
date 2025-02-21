@@ -41,7 +41,7 @@ public:
     IHttpResponse& Execute() override;
     [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
-    IHttpRequest& SetBody(std::shared_ptr<IChunkedDataProvider> apBody) override;
+    IHttpRequest& SetBody(HttpBody_t apBody) override;
     [[nodiscard]] const IChunkedDataProvider& GetBody() const override;
 
     IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override;
@@ -52,7 +52,7 @@ public:
 protected:
     CurlHttpResponse mResponse;
     HttpRequestOptions mRequestOptions{};
-    std::shared_ptr<IStreamDataProvider> mpUploadBuffer{};
+    HttpBody_t mpUploadBuffer{};
 
     void writeToFile(rsp::posix::FileIO *apFile);
     void readFromFile(rsp::posix::FileIO *apFile);

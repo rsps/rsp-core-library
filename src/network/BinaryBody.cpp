@@ -16,14 +16,18 @@ size_t BinaryBody::Write(std::span<const std::byte> aData)
     return size_t(mContent.PutN(aData.data(), std::streamsize(aData.size())));
 }
 
-size_t BinaryBody::Read(std::span<std::byte> aBuffer)
+size_t BinaryBody::Read(std::span<std::byte> aBuffer) const
 {
     return size_t(mContent.GetN(aBuffer.data(), std::streamsize(aBuffer.size())));
 }
 
-std::optional<size_t> BinaryBody::GetStreamSize()
+size_t BinaryBody::GetStreamSize() const
 {
-    return mContent.GetStreamSize();
+    auto sz = mContent.GetStreamSize();
+    if (sz) {
+        return sz.value();
+    }
+    return 0;
 }
 
 } // rsp::network

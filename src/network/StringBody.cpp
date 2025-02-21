@@ -19,7 +19,7 @@ StringBody::StringBody(std::string aContent)
 
 StringBody& StringBody::Set(const std::string &arContent)
 {
-    *this = arContent;
+    mContent = arContent;
     return *this;
 }
 
@@ -30,7 +30,7 @@ const std::string& StringBody::Get() const
 
 StringBody& StringBody::operator=(const std::string &arContent)
 {
-    mContent = arContent;
+    Set(arContent);
     return *this;
 }
 
@@ -42,17 +42,23 @@ size_t StringBody::Write(const std::span<const std::byte> aData)
     return sz;
 }
 
-size_t StringBody::Read(const std::span<std::byte> aBuffer)
+size_t StringBody::Read(const std::span<std::byte> aBuffer) const
 {
     size_t len = std::min(mContent.size() - mReadOffset, aBuffer.size());
     std::memcpy(aBuffer.data(), mContent.data() + mReadOffset, len);
-    mReadOffset += len;
+    const_cast<StringBody*>(this)->mReadOffset += len;
     return len;
 }
 
-std::optional<size_t> StringBody::GetStreamSize()
+size_t StringBody::GetStreamSize() const
 {
-    return { mContent.size() };
+    return mContent.size();
+}
+
+StringBody& StringBody::Rewind()
+{
+    mReadOffset = 0;
+    return *this;
 }
 
 } // rsp::network

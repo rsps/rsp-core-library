@@ -25,18 +25,19 @@ class ChunkStreamer : public IStreamDataProvider
 public:
     explicit ChunkStreamer(IChunkedDataProvider &arProvider) : mrProvider(arProvider) {}
 
-    [[nodiscard]] size_t Read(const std::span<std::byte> aBuffer) override
+    [[nodiscard]] size_t Read(const std::span<std::byte> aBuffer) const override
     {
-        mWritten = 0;
-        while (mWritten < aBuffer.size()) {
+        auto self = const_cast<ChunkStreamer*>(this);
+        size_t written = 0;
+        while (written < aBuffer.size()) {
             if (mFiFo.IsEmpty()) {
-                if (loadFifo()) {
-                    return mWritten;
+                if (self->loadFifo()) {
+                    return written;
                 }
             }
-            mWritten += mFiFo.Read(aBuffer.subspan(mWritten, aBuffer.size() - mWritten));
+            written += self->mFiFo.Read(aBuffer.subspan(written, aBuffer.size() - written));
         }
-        return mWritten;
+        return written;
     }
 
     [[nodiscard]] std::span<std::byte> GetChunk()
@@ -54,7 +55,6 @@ public:
         mFiFo.Clear();
         mChunkIndex = 0;
         mPayloadIndex = 0;
-        mWritten = 0;
         return *this;
     }
 
@@ -70,13 +70,7 @@ public:
      */
     [[nodiscard]] size_t GetPayloadIndex() const { return mPayloadIndex; }
 
-    /**
-     * \brief Get the amount of bytes stored in last call to GetData()
-     * \return size_t
-     */
-    [[nodiscard]] size_t GetWritten() const { return mWritten; }
-
-        std::optional<size_t> GetStreamSize() override
+    [[nodiscard]] size_t GetStreamSize() const override
     {
         return mrProvider.GetSize();
     }
@@ -86,7 +80,6 @@ protected:
     rsp::utils::FifoBuffer<std::byte, N> mFiFo{};
     size_t mChunkIndex = 0;
     size_t mPayloadIndex = 0;
-    size_t mWritten = 0;
 
     [[nodiscard]] size_t Write(const std::span<const std::byte>) override
     {

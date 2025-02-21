@@ -60,7 +60,7 @@ public:
      * \param apBody Shared pointer to interface of IHttpBodyStream
      * \return self
      */
-    virtual IHttpRequest& SetBody(std::shared_ptr<IStreamDataProvider> apBody) = 0;
+    virtual IHttpRequest& SetBody(HttpBody_t apBody) = 0;
 
     /**
      * \brief Get the body content of this request

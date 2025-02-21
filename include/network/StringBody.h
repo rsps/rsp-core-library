@@ -25,10 +25,11 @@ public:
     StringBody& Set(const std::string &arContent);
     [[nodiscard]] const std::string& Get() const;
     StringBody& operator=(const std::string &arContent);
+    StringBody& Rewind();
 
     [[nodiscard]] size_t Write(std::span<const std::byte> aData) override;
-    [[nodiscard]] size_t Read(std::span<std::byte> aBuffer) override;
-    std::optional<size_t> GetStreamSize() override;
+    [[nodiscard]] size_t Read(std::span<std::byte> aBuffer) const override;
+    [[nodiscard]] size_t GetStreamSize() const override;
 
 protected:
     std::string mContent{};

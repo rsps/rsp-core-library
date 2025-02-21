@@ -33,7 +33,7 @@ public:
         return *this;
     }
 
-    HttpRequest& SetBody(std::shared_ptr<IStreamDataProvider> apBody) override
+    HttpRequest& SetBody(HttpBody_t apBody) override
     {
         mPimpl->SetBody(apBody);
         return *this;

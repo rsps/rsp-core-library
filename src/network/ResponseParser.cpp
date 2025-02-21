@@ -33,6 +33,7 @@ bool ResponseParser::ParseNewData(std::span<const std::byte> aNewData)
                 mrResponse.mHeaderData += work.substr(0, position + cHeaderEnd.size());
                 decodeHeaders(mrResponse.mHeaderData); // Include newline before empty line
                 mrResponse.MakeBody();
+                mContentReceived = 0;
                 if (mrResponse.GetRequest().GetOptions().RequestType == HttpRequestType::HEAD) {
                     return true;
                 }
@@ -43,15 +44,15 @@ bool ResponseParser::ParseNewData(std::span<const std::byte> aNewData)
                 else {
                     mState = States::Body;
                     auto body = work.substr(position + cHeaderEnd.size());
-                    mrResponse.mpBody->Write({ reinterpret_cast<const std::byte*>(body.data()), body.size() });
-                    return mrResponse.mContentLength == mrResponse.mpBody->GetStreamSize();
+                    mContentReceived+= mrResponse.mpBody->Write({ reinterpret_cast<const std::byte*>(body.data()), body.size() });
+                    return mrResponse.mContentLength == mContentReceived;
                 }
             }
             break;
 
         case States::Body:
-            mrResponse.mpBody->Write(aNewData);
-            return mrResponse.mContentLength == mrResponse.mpBody->GetStreamSize();
+            mContentReceived += mrResponse.mpBody->Write(aNewData);
+            return mrResponse.mContentLength == mContentReceived;
 
         case States::ChunkedBody:
         case States::ChunkedTrail:

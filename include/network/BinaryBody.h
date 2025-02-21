@@ -19,8 +19,8 @@ class BinaryBody : public IStreamDataProvider
 {
 public:
     size_t Write(std::span<const std::byte> aData) override;
-    size_t Read(std::span<std::byte> aBuffer) override;
-    std::optional<size_t> GetStreamSize() override;
+    [[nodiscard]] size_t Read(std::span<std::byte> aBuffer) const override;
+    [[nodiscard]] size_t GetStreamSize() const override;
 
     utils::BinaryStringStream& Get() { return mContent; }
 

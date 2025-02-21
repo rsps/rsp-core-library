@@ -40,6 +40,8 @@ enum class HttpRequestType
  */
 std::ostream& operator<<(std::ostream &o, HttpRequestType aType);
 
+using HttpBody_t = std::shared_ptr<IStreamDataProvider>;
+
 /**
  * \class HttpRequestOptions
  * \brief Common Options for a HttpRequest, inherits connection options.
@@ -49,8 +51,8 @@ class HttpRequestOptions: public ConnectionOptions
 public:
     std::map<std::string, std::string> Headers{};
     std::string Uri{};
-    std::shared_ptr<IStreamDataProvider> RequestBody{};
-    std::shared_ptr<IStreamDataProvider> ResponseBody{};
+    HttpBody_t RequestBody{};
+    HttpBody_t ResponseBody{};
     HttpRequestType RequestType = HttpRequestType::GET;
     std::string BasicAuthUsername{};
     std::string BasicAuthPassword{};

@@ -34,6 +34,11 @@ public:
     {
     }
 
+    [[nodiscard]] const StatusLine& GetStatusLine() const override
+    {
+        return mStatusLine;
+    }
+
     [[nodiscard]] const HeaderList& GetHeaders() const override
     {
         return mHeaders;
@@ -68,7 +73,7 @@ protected:
     StatusLine mStatusLine{};
     HeaderList mHeaders{};
     std::optional<size_t> mContentLength{};
-    std::shared_ptr<IStreamDataProvider> mpBody{};
+    HttpBody_t mpBody{};
 };
 
 }// namespace rsp::network

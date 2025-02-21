@@ -41,6 +41,7 @@ void EHttpSession::ProcessRequests()
 IHttpSession& EHttpSession::SetDefaultOptions(const HttpRequestOptions& arOptions)
 {
     mDefaultOptions = arOptions;
+    mConnection.SetOptions(arOptions);
     return *this;
 }
 

@@ -21,17 +21,17 @@ size_t FileBody::Write(std::span<const std::byte> aData)
     return mrFile.Write(aData.data(), aData.size());
 }
 
-size_t FileBody::Read(std::span<std::byte> aBuffer)
+size_t FileBody::Read(std::span<std::byte> aBuffer) const
 {
     return mrFile.Read(aBuffer.data(), aBuffer.size());
 }
 
-std::optional<size_t> FileBody::GetStreamSize()
+size_t FileBody::GetStreamSize() const
 {
     if (mrFile.IsOpen()) {
-        return { mrFile.GetSize() };
+        return mrFile.GetSize();
     }
-    return {};
+    return 0;
 }
 
 } // rsp::network

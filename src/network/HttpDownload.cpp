@@ -75,10 +75,7 @@ IHttpResponse& HttpDownload::Execute()
     }
 
     opt.RequestType = HttpRequestType::GET;
-//    opt.ResponseBody = std::make_shared<FileBody>(file);
-    FileBody fb(file);
-    opt.ResponseBody = std::make_shared<StringBody>("1");
-
+    opt.ResponseBody = std::make_shared<FileBody>(file);
     SetOptions(opt);
 
     resp = &(mPimpl->Execute());
@@ -86,9 +83,6 @@ IHttpResponse& HttpDownload::Execute()
     constexpr StatusCodes haystack[] = {StatusCodes::Ok, StatusCodes::PartialContent};
     if (!std::ranges::contains(haystack, resp->GetStatusCode())) {
         file.SetSize(0);
-    }
-    else {
-        fb.CopyFrom(resp->GetBody());
     }
 
     file.Close();

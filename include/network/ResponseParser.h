@@ -33,6 +33,7 @@ protected:
         ChunkedTrail
     };
     HttpResponse& mrResponse;
+    size_t mContentReceived = 0;
     States mState = States::Headers;
 
     void decodeHeaders(std::string_view aHeaderData);

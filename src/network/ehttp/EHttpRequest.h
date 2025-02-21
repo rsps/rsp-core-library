@@ -10,9 +10,11 @@
 #ifndef RSP_CORE_LIB_SRC_NETWORK_EHTTP_E_HTTP_REQUEST_H
 #define RSP_CORE_LIB_SRC_NETWORK_EHTTP_E_HTTP_REQUEST_H
 
+#include <filesystem>
 #include <memory>
 #include <network/IHttpRequest.h>
 #include <network/IHttpSession.h>
+#include <network/MultipartBoundary.h>
 #include "EHttpResponse.h"
 #include "SocketConnection.h"
 
@@ -30,7 +32,7 @@ public:
 
     [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions& arOptions) override;
-    IHttpRequest& SetBody(std::shared_ptr<IStreamDataProvider> apBody) override;
+    IHttpRequest& SetBody(HttpBody_t apBody) override;
     [[nodiscard]] const IStreamDataProvider& GetBody() const override;
     IHttpRequest& AddField(const std::string& arFieldName, const std::string& arValue) override;
     IHttpRequest& AddFile(const std::string& arFieldName, posix::FileIO& arFile) override;
@@ -41,7 +43,8 @@ protected:
     HttpRequestOptions mOptions{};
     EHttpResponse mResponse;
     std::array<std::byte, 256> mWorkBuffer{};
-
+    MultipartBoundary mBoundary{};
+    bool mMultipartFormType = false;
 
     friend class EHttpSession;
     ResponseCallback_t mResponseCallback{};
@@ -50,6 +53,7 @@ protected:
 
     SocketConnection& getConnection();
     std::string formatHeaders();
+    IStreamDataProvider& getRequestBody();
 };
 
 } // rsp::network::ehttp

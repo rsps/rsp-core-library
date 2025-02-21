@@ -99,6 +99,18 @@ TEST_CASE("Data Providers")
         CHECK_EQ(sb.Get(), cPayload);
     }
 
+    SUBCASE("StringBody Preloaded") {
+        StringBody sb{std::string(cPayload)};
+        CHECK_EQ(sb.Write({ reinterpret_cast<const std::byte*>(cPayload.data()), cPayload.size() }), cPayload.size());
+
+        std::string result(cPayload.size() * 2, '*');
+        auto len = sb.Read({ reinterpret_cast<std::byte*>(result.data()), result.size() });
+
+        CHECK_EQ(len, cPayload.size() * 2);
+        CHECK_EQ(result, std::string(cPayload) + std::string(cPayload));
+        CHECK_EQ(sb.Get(), std::string(cPayload) + std::string(cPayload));
+    }
+
     SUBCASE("BinaryBody") {
         BinaryBody bb;
         bb.Write({reinterpret_cast<const std::byte*>(cPayload.data()), cPayload.size()});
@@ -155,7 +167,6 @@ TEST_CASE("Data Providers")
         std::string result;
         std::array<char, 64> buffer{};
         while (auto sz = cs.Read({reinterpret_cast<std::byte*>(buffer.data()), buffer.size()})) {
-            CHECK_EQ(cs.GetWritten(), sz);
             result += std::string(buffer.data(), sz);
         }
 

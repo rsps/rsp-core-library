@@ -96,7 +96,7 @@ TEST_CASE("Network")
             CHECK_EQ(resp->GetBody().GetStreamSize(), 0);
         }
         else {
-            CHECK_EQ(resp->GetBody().GetStreamSize().value(), 120);
+            CHECK_EQ(resp->GetBody().GetStreamSize(), 120);
         }
 
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
@@ -147,7 +147,6 @@ TEST_CASE("Network")
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
 
         opt.RequestType = HttpRequestType::GET;
-//        opt.ResponseBody = std::make_shared<StringBody>(); // Predefine response body
         request.SetOptions(opt);
 
         CHECK_NOTHROW(resp = &request.Execute());
@@ -194,7 +193,7 @@ TEST_CASE("Network")
 
             CHECK_NOTHROW(resp = &request.Execute());
 
-            CHECK_EQ(resp->GetBody().GetStreamSize().value(), 25138);
+            CHECK_EQ(resp->GetContentLength(), 25138);
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
         }
 
@@ -203,7 +202,7 @@ TEST_CASE("Network")
 
             CHECK_NOTHROW(resp = &request.Execute());
 
-            CHECK_EQ(resp->GetBody().GetStreamSize().value(), 25138 - (20*1024));
+            CHECK_EQ(resp->GetContentLength(), 25138 - (20*1024));
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
         }
 
@@ -262,7 +261,7 @@ TEST_CASE("Network")
         IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
-        MESSAGE(resp->GetBody());
+        MESSAGE("Body: " << resp->GetBody());
 
         CHECK_EQ(resp->GetBody().GetStreamSize(), 71);
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
@@ -300,7 +299,7 @@ TEST_CASE("Network")
 //        MESSAGE(body);
 
         std::string expected = "\n"
-            "Content Length: 25455\n"
+            "Content Length: " + std::to_string(request.GetBody().GetStreamSize()) + "\n"
             "CTYPE: multipart/form-data\n"
             "filename: uploaded.png\r\n"
             "filedata: filename=\"image.png\"; Content-Type: image/png\r\n"
@@ -336,6 +335,7 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
         ss << body; // Uses operator<<(std::ostream &o, IStreamDataProvider &s)
         CHECK_EQ(ss.str(), body.Get());
         ss.str("");
+        body.Rewind();
 
         std::array<char, 51> _buffer{};
         std::span buffer(reinterpret_cast<std::byte*>(_buffer.data()), sizeof(_buffer));
@@ -371,7 +371,7 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
         std::string expected = R"(
 Content length: 41
 Request Method: POST
-RequestBody: )" + json + "\n";
+Body: )" + json + "\n";
 
         CHECK_EQ(body, expected);
     }
@@ -387,38 +387,26 @@ RequestBody: )" + json + "\n";
 //        opt.Verbose = 1;
         session.SetDefaultOptions(opt);
 
-        session.Head("index.html",
-            [&respHead](IHttpResponse& resp) {
-//                MESSAGE("Response Head:\n" << resp);
-                CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
-                CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
-                CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
-                CHECK_EQ(resp.GetBody().GetStreamSize(), 0);
-                CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
-                respHead = true;
-            });
+        auto req = [&session](HttpRequestType aType, std::string_view aUri, std::string_view aMimeType, size_t aLength, size_t aBodySize, bool &result) {
+            session.Request(aType,
+                            aUri,
+                            [=,&result](IHttpResponse& resp) {
+//                               MESSAGE("Response " << aType << ":\n" << resp);
+                               CHECK_EQ(resp.GetHeaders().at("content-type"), aMimeType);
+                               CHECK_EQ(resp.GetContentLength(), aLength);
+                               CHECK_EQ(resp.GetStatusLine().GetStatusCode(), 200);
+                               CHECK_EQ(resp.GetStatusLine().GetHttpVersion(), "HTTP/1.1");
+                               CHECK_EQ(resp.GetBody().GetStreamSize(), aBodySize);
+                               CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
+                               result = true;
+                           });
+        };
+
+        req(HttpRequestType::HEAD, "index.html", "text/html", 120, 0, respHead);
         CHECK_NOTHROW(session.ProcessRequests());
 
-        session.Get("index.html",
-            [&resp1](IHttpResponse& resp) {
-//                MESSAGE("Response 1:\n" << resp);
-                CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
-                CHECK_EQ(resp.GetHeaders().at("content-length"), "120");
-                CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
-                CHECK_EQ(resp.GetBody().GetStreamSize(), 120);
-                CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
-                resp1 = true;
-            });
-        session.Get("image.png",
-            [&resp2](IHttpResponse& resp) {
-//                MESSAGE("Response 2:\n" << resp);
-                CHECK_EQ(resp.GetHeaders().at("content-type"), "image/png");
-                CHECK_EQ(resp.GetHeaders().at("content-length"), "25138");
-                CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
-                CHECK_EQ(resp.GetBody().GetStreamSize(), 25138);
-                CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
-                resp2 = true;
-            });
+        req(HttpRequestType::GET, "index.html", "text/html", 120, 120, resp1);
+        req(HttpRequestType::GET, "image.png", "image/png", 25138, 25138, resp2);
         CHECK_NOTHROW(session.ProcessRequests());
 
         CHECK(respHead);
@@ -443,8 +431,9 @@ RequestBody: )" + json + "\n";
 //                                     MESSAGE("Request Head:\n" << resp.GetRequest());
 //                                     MESSAGE("Response Head:\n" << resp);
                                      CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
-                                     CHECK_EQ(resp.GetHeaders().at("content-length"), "164");
-                                     CHECK_EQ(resp.GetHeaders().at("http/2 401"), "present");
+                                     CHECK_EQ(resp.GetContentLength(), 164);
+                                     CHECK_EQ(resp.GetStatusLine().GetStatusCode(), 401);
+                                     CHECK_EQ(resp.GetStatusLine().GetHttpVersion(), "HTTP/1.1");
                                      CHECK_EQ(resp.GetBody().GetStreamSize(), 0);
                                      CHECK_EQ(resp.GetStatusCode(), StatusCodes::Unauthorized);
                                      respErrHead = true;
@@ -457,11 +446,12 @@ RequestBody: )" + json + "\n";
 
         session.Head("/authenticated/index.html",
                                  [&respHead](IHttpResponse& resp) {
-//                                     MESSAGE("Request Head:\n" << resp.GetRequest());
-//                                     MESSAGE("Response Head:\n" << resp);
+                                     MESSAGE("Request Head:\n" << resp.GetRequest());
+                                     MESSAGE("Response Head:\n" << resp);
                                      CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
-                                     CHECK_EQ(resp.GetHeaders().at("content-length"), "131");
-                                     CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
+                                     CHECK_EQ(resp.GetContentLength(), 131);
+                                     CHECK_EQ(resp.GetStatusLine().GetStatusCode(), 200);
+                                     CHECK_EQ(resp.GetStatusLine().GetHttpVersion(), "HTTP/1.1");
                                      CHECK_EQ(resp.GetBody().GetStreamSize(), 0);
                                      CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
 
@@ -485,8 +475,9 @@ RequestBody: )" + json + "\n";
 //                         MESSAGE("Request Head:\n" << resp.GetRequest());
 //                         MESSAGE("Response Head:\n" << resp);
                          CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
-                         CHECK_EQ(resp.GetHeaders().at("content-length"), "131");
-                         CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
+                         CHECK_EQ(resp.GetContentLength(), 131);
+                         CHECK_EQ(resp.GetStatusLine().GetStatusCode(), 200);
+                         CHECK_EQ(resp.GetStatusLine().GetHttpVersion(), "HTTP/1.1");
                          CHECK_EQ(resp.GetBody().GetStreamSize(), 0);
                          CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
                          CHECK_EQ(resp.GetRequest().GetOptions().Headers.at("Authorization"), "Basic amI6YWdlbnQwMDc=");
@@ -502,8 +493,9 @@ RequestBody: )" + json + "\n";
                     [&resp1](IHttpResponse& resp) {
 //                        MESSAGE("Response 1:\n" << resp);
                         CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
-                        CHECK_EQ(resp.GetHeaders().at("content-length"), "131");
-                        CHECK_EQ(resp.GetHeaders().at("http/2 200"), "present");
+                        CHECK_EQ(resp.GetContentLength(), 131);
+                        CHECK_EQ(resp.GetStatusLine().GetStatusCode(), 200);
+                        CHECK_EQ(resp.GetStatusLine().GetHttpVersion(), "HTTP/1.1");
                         CHECK_EQ(resp.GetBody().GetStreamSize(), 131);
                         CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
                         std::stringstream ss;

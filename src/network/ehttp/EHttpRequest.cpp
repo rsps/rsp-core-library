@@ -7,12 +7,15 @@
 * \license     Mozilla Public License 2.0
 * \author      steffen
 */
+#include <filesystem>
 #include "EHttpRequest.h"
 #include "EHttpSession.h"
-#include <network/ChunkStreamer.h>
 #include <network/ResponseParser.h>
 #include <network/parser-helpers.h>
 #include <network/NetworkLibrary.h>
+#include <network/FileBody.h>
+#include <network/MimeTypes.h>
+#include <network/StringBody.h>
 #include <network/UrlParser.h>
 
 namespace rsp::network::ehttp {
@@ -35,7 +38,7 @@ IHttpRequest& EHttpRequest::SetOptions(const HttpRequestOptions& arOptions)
     return *this;
 }
 
-IHttpRequest& EHttpRequest::SetBody(std::shared_ptr<IStreamDataProvider> apBody)
+IHttpRequest& EHttpRequest::SetBody(HttpBody_t apBody)
 {
     mOptions.RequestBody = apBody;
     return *this;
@@ -48,11 +51,30 @@ const IStreamDataProvider& EHttpRequest::GetBody() const
 
 IHttpRequest& EHttpRequest::AddField(const std::string& arFieldName, const std::string& arValue)
 {
+    mMultipartFormType = true;
+
+    std::string s = mBoundary.MakeContentDisposition(arFieldName);
+    s += arValue;
+    getRequestBody().Write({ reinterpret_cast<const std::byte*>(s.data()), s.size()});
+
     return *this;
 }
 
 IHttpRequest& EHttpRequest::AddFile(const std::string& arFieldName, posix::FileIO& arFile)
 {
+    mMultipartFormType = true;
+
+    auto &body = getRequestBody();
+
+    std::filesystem::path file = arFile.GetFileName();
+    std::string ext = file.extension();
+    std::string mime_type(MimeTypes::GetType(ext));
+
+    std::string s = mBoundary.MakeContentDisposition(arFieldName, file.filename(), mime_type);
+    body.Write({ reinterpret_cast<const std::byte*>(s.data()), s.size()});
+    FileBody fb(arFile);
+    body.CopyFrom(fb);
+
     return *this;
 }
 
@@ -61,10 +83,20 @@ IHttpResponse& EHttpRequest::Execute()
     // Get connection
     auto &connection = getConnection().Connect();
 
+    if (!mOptions.BasicAuthUsername.empty()) {
+        mOptions.Headers.emplace("Authorization", "Basic " + mOptions.BasicAuthPassword);
+    }
+
+    if (mMultipartFormType) {
+        mOptions.Headers.emplace("Content-Type", mBoundary.GetContentTypeHeader());
+        std::string s = mBoundary.GetEndBoundary();
+        mOptions.RequestBody->Write({ reinterpret_cast<const std::byte*>(s.data()), s.size()});
+    }
+
     if (mOptions.RequestBody) {
         auto len = mOptions.RequestBody->GetStreamSize();
         if (len) {
-            mOptions.Headers["Content-Length"] = std::to_string(*len);
+            mOptions.Headers["Content-Length"] = std::to_string(len);
         }
     }
 
@@ -89,7 +121,7 @@ IHttpResponse& EHttpRequest::Execute()
         while (true) {
             auto sz = connection.Read(mWorkBuffer);
             if (sz == 0) {
-                break; // TODO: Test for timeout...
+                break;
             }
             if (parser.ParseNewData({mWorkBuffer.data(), sz})) {
                 // mResponse is now filled.
@@ -144,6 +176,14 @@ std::string EHttpRequest::formatHeaders()
     ss << cNewLine; // Empty line before body
 
     return ss.str();
+}
+
+IStreamDataProvider& EHttpRequest::getRequestBody()
+{
+    if (!mOptions.RequestBody) {
+        mOptions.RequestBody = std::make_shared<StringBody>();
+    }
+    return *mOptions.RequestBody;
 }
 
 } // rsp::network::ehttp
