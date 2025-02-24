@@ -29,6 +29,11 @@ public:
      */
     virtual size_t Write(std::span<std::byte const> aData) = 0;
 
+    size_t Write(std::string_view aString)
+    {
+        return Write({ reinterpret_cast<const std::byte*>(aString.data()), aString.size()});
+    }
+
     size_t CopyFrom(IStreamDataProvider& arSource)
     {
         std::array<std::byte, 256> buffer{};

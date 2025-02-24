@@ -30,10 +30,7 @@ namespace rsp::network {
 class EHeaderNotFound : public exceptions::CoreException
 {
 public:
-    explicit EHeaderNotFound(const std::string &arMsg)
-        : CoreException(arMsg)
-    {
-    }
+    using rsp::exceptions::CoreException::CoreException;
 };
 
 //Forward declarations

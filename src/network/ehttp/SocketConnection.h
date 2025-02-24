@@ -25,6 +25,7 @@ public:
     [[nodiscard]] bool IsConnected() const override;
     [[nodiscard]] bool IsClosed() const override;
     size_t Write(std::span<const std::byte> aData) override;
+    using IConnection::Write;
     size_t Read(std::span<std::byte> aBuffer) override;
 
 protected:

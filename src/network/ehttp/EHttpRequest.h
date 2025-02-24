@@ -51,6 +51,7 @@ protected:
     std::optional<std::reference_wrapper<IHttpSession>> mrSession{};
     std::unique_ptr<SocketConnection> mpConnection{};
 
+    void prepareRequest();
     SocketConnection& getConnection();
     std::string formatHeaders();
     IStreamDataProvider& getRequestBody();

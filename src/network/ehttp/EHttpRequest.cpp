@@ -79,11 +79,8 @@ IHttpRequest& EHttpRequest::AddFile(const std::string& arFieldName, posix::FileI
     return *this;
 }
 
-IHttpResponse& EHttpRequest::Execute()
+void EHttpRequest::prepareRequest()
 {
-    // Get connection
-    auto &connection = getConnection().Connect();
-
     if (!mOptions.BasicAuthUsername.empty()) {
         // Add authorization header with base64 encoded credentials
         mOptions.Headers.emplace("Authorization", "Basic " + utils::Base64::Encode(mOptions.BasicAuthUsername + ":" + mOptions.BasicAuthPassword));
@@ -91,8 +88,8 @@ IHttpResponse& EHttpRequest::Execute()
 
     if (mMultipartFormType) {
         mOptions.Headers.emplace("Content-Type", mBoundary.GetContentTypeHeader()); // Add header with boundary
-        std::string s = mBoundary.GetEndBoundary();
-        mOptions.RequestBody->Write({ reinterpret_cast<const std::byte*>(s.data()), s.size()}); // Terminate body with end boundary
+
+        getRequestBody().Write(mBoundary.GetEndBoundary()); // Terminate body with end boundary
     }
 
     if (mOptions.RequestBody) {
@@ -101,14 +98,16 @@ IHttpResponse& EHttpRequest::Execute()
             mOptions.Headers["Content-Length"] = std::to_string(len);
         }
     }
+}
 
-    // Send <request type> <path> <protocol>
-    // Send host header
-    // Send headers from options + empty line
-    {
-        auto headers = formatHeaders();
-        connection.Write({reinterpret_cast<std::byte*>(headers.data()), headers.size()});
-    }
+IHttpResponse& EHttpRequest::Execute()
+{
+    prepareRequest();
+
+    // Get connection
+    auto &connection = getConnection().Connect();
+
+    connection.Write(formatHeaders());
 
     // Send body
     if (mOptions.RequestBody) {
@@ -166,17 +165,15 @@ std::string EHttpRequest::formatHeaders()
     UrlParser up(uri);
 
     std::stringstream ss;
-    ss
-          << mOptions.RequestType << " "
-          << up.GetPath() << up.GetQuery() << up.GetFragment()
-          << " HTTP/1.1\r\nHost: "sv
-          << up.GetHost()
-          << cNewLine;
+    ss  << mOptions.RequestType << " "
+        << up.GetPath() << up.GetQuery() << up.GetFragment()
+        << " HTTP/1.1\r\nHost: "sv
+        << up.GetHost()
+        << cNewLine;
     for (auto &h : mOptions.Headers) {
         ss << h.first << ": " << h.second << cNewLine;
     }
     ss << cNewLine; // Empty line before body
-
     return ss.str();
 }
 

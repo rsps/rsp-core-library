@@ -61,6 +61,11 @@ public:
      */
     virtual size_t Write(std::span<std::byte const> aData) = 0;
 
+    size_t Write(std::string_view aData)
+    {
+        return Write({ reinterpret_cast<const std::byte*>(aData.data()), aData.size() });
+    }
+
     /**
      * \brief Attempt to read data into the given buffer
      * \param aBuffer
