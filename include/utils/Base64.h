@@ -12,20 +12,27 @@
 
 #include <span>
 #include <string>
+#include <exceptions/CoreException.h>
 
 namespace rsp::utils {
 
+class EBase64FormatError: public exceptions::CoreException
+{
+public:
+    using rsp::exceptions::CoreException::CoreException;
+};
+
+/**
+ * \brief An Base64 encoder and decoder for HTTP encoding
+ * \see https://en.wikipedia.org/wiki/Base64
+ */
 class Base64
 {
 public:
     static std::string Encode(std::span<const std::byte> aData);
     static std::string Encode(std::string_view aText)     { return Encode({ reinterpret_cast<const std::byte*>(aText.data()), aText.size() }); }
-    static std::string Encode(const std::string& arText)  { return Encode({ reinterpret_cast<const std::byte*>(arText.data()), arText.size() }); }
 
     static std::string Decode(std::string_view aBase64);
-
-protected:
-    static std::array<char, 64> mMap64;
 };
 
 } // rsp::utils

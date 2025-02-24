@@ -17,6 +17,7 @@
 #include <network/MimeTypes.h>
 #include <network/StringBody.h>
 #include <network/UrlParser.h>
+#include <utils/Base64.h>
 
 namespace rsp::network::ehttp {
 
@@ -84,13 +85,14 @@ IHttpResponse& EHttpRequest::Execute()
     auto &connection = getConnection().Connect();
 
     if (!mOptions.BasicAuthUsername.empty()) {
-        mOptions.Headers.emplace("Authorization", "Basic " + mOptions.BasicAuthPassword);
+        // Add authorization header with base64 encoded credentials
+        mOptions.Headers.emplace("Authorization", "Basic " + utils::Base64::Encode(mOptions.BasicAuthUsername + ":" + mOptions.BasicAuthPassword));
     }
 
     if (mMultipartFormType) {
-        mOptions.Headers.emplace("Content-Type", mBoundary.GetContentTypeHeader());
+        mOptions.Headers.emplace("Content-Type", mBoundary.GetContentTypeHeader()); // Add header with boundary
         std::string s = mBoundary.GetEndBoundary();
-        mOptions.RequestBody->Write({ reinterpret_cast<const std::byte*>(s.data()), s.size()});
+        mOptions.RequestBody->Write({ reinterpret_cast<const std::byte*>(s.data()), s.size()}); // Terminate body with end boundary
     }
 
     if (mOptions.RequestBody) {
