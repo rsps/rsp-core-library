@@ -72,21 +72,21 @@ TEST_CASE("Exceptions") {
             result4 << "Finally, got this exception of type " << typeid(e).name() << ":\n" << e.what() << std::endl;
         }
 
-        MESSAGE(result1.str());
+//        MESSAGE(result1.str());
         CHECK_EQ(StrUtils::Contains(result1.str(), "This is an example!\n"), true);
-        CHECK_EQ(StrUtils::Contains(result1.str(), "test-exceptions.cpp:45"), true);
+        CHECK_EQ(StrUtils::Contains(result1.str(), "test-exceptions.cpp:47"), true);
 
         MESSAGE(result2.str());
         CHECK_EQ(StrUtils::Contains(result2.str(), "This is an example!\n"), true);
-        CHECK_EQ(StrUtils::Contains(result2.str(), "test-exceptions.cpp:54"), true);
+        CHECK_EQ(StrUtils::Contains(result2.str(), "test-exceptions.cpp:56"), true);
 
         MESSAGE(result3.str());
         CHECK_EQ(StrUtils::Contains(result3.str(), "This is an example!\n"), true);
-        CHECK_EQ(StrUtils::Contains(result3.str(), "test-exceptions.cpp:60"), true);
+        CHECK_EQ(StrUtils::Contains(result3.str(), "test-exceptions.cpp:62"), true);
 
         MESSAGE(result4.str());
         CHECK_EQ(StrUtils::Contains(result4.str(), "This is an example!\n"), true);
-        CHECK_EQ(StrUtils::Contains(result4.str(), "test-exceptions.cpp:66"), true);
+        CHECK_EQ(StrUtils::Contains(result4.str(), "test-exceptions.cpp:68"), true);
     }
 
 
@@ -102,7 +102,7 @@ TEST_CASE("Exceptions") {
 
         MESSAGE(result1.str());
         CHECK_EQ(StrUtils::Contains(result1.str(), "File IO error: Input/output error\n"), true);
-        CHECK_EQ(StrUtils::Contains(result1.str(), "test-exceptions.cpp:95"), true);
+        CHECK_EQ(StrUtils::Contains(result1.str(), "test-exceptions.cpp:97"), true);
     }
 
     SUBCASE("Assertions") {
@@ -116,7 +116,7 @@ TEST_CASE("Exceptions") {
 
         MESSAGE(result1.str());
         CHECK_EQ(StrUtils::Contains(result1.str(), "true == false\n"), true);
-        CHECK_EQ(StrUtils::Contains(result1.str(), "test-exceptions.cpp:109"), true);
+        CHECK_EQ(StrUtils::Contains(result1.str(), "test-exceptions.cpp:111"), true);
 
         CHECK_NOTHROW(ASSERT(true));
     }
