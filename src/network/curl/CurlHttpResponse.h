@@ -30,24 +30,6 @@ public:
 
 protected:
     friend class CurlHttpRequest;
-    void addHeader(const std::string& arKey, std::string aValue)
-    {
-        mHeaders[arKey] = std::move(aValue);
-    }
-    void setStatusCode(int aCode)
-    {
-        mStatusCode = StatusCodes(aCode);
-    }
-    [[nodiscard]] std::string& getBody() // NOLINT
-    {
-        return mBody;
-    }
-    void clear()
-    {
-        mHeaders.clear();
-        mStatusCode = StatusCodes::Unknown;
-        mBody.clear();
-    }
 };
 
 } /* namespace rsp::network::curl */

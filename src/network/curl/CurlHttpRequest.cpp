@@ -10,11 +10,10 @@
 
 #include <map>
 #include <string>
-#include <network/HttpRequest.h>
 #include <network/ChunkStreamer.h>
+#include <network/ResponseParser.h>
 #include <network/StringBody.h>
 #include <posix/FileIO.h>
-#include <utils/StrUtils.h>
 #include "CurlHttpRequest.h"
 #include "CurlSession.h"
 #include "Exceptions.h"
@@ -36,58 +35,24 @@ CurlHttpRequest::CurlHttpRequest()
 {
 }
 
-void CurlHttpRequest::writeToFile(rsp::posix::FileIO* apFile)
-{
-    setCurlOption(CURLOPT_WRITEFUNCTION, fileWriteFunction);
-    setCurlOption(CURLOPT_WRITEDATA, apFile);
-}
-
-void CurlHttpRequest::readFromFile(rsp::posix::FileIO* apFile)
-{
-    setCurlOption(CURLOPT_UPLOAD, 1L);
-    setCurlOption(CURLOPT_READFUNCTION, fileReadFunction);
-    setCurlOption(CURLOPT_READDATA, apFile);
-    setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(apFile->GetSize()));
-}
-
-void CurlHttpRequest::readFromString(const std::string &arString)
-{
-    setCurlOption(CURLOPT_UPLOAD, 1L);
-    setCurlOption(CURLOPT_READFUNCTION, streamReadFunction);
-    mpUploadBuffer = std::make_shared<StringBody>(arString);
-    setCurlOption(CURLOPT_READDATA, mpUploadBuffer.get());
-    setCurlOption(CURLOPT_INFILESIZE_LARGE, static_cast<unsigned long>(arString.size()));
-}
-
-void CurlHttpRequest::readFromStream(const std::shared_ptr<IChunkedDataProvider>& arBody)
+void CurlHttpRequest::readFromStream(const HttpBody_t& arBody)
 {
     if (!arBody) {
         return;
     }
-    if (arBody->GetSize() == 0) {
+    if (arBody->GetStreamSize() == 0) {
         return;
     }
     setCurlOption(CURLOPT_UPLOAD, 1L);
     setCurlOption(CURLOPT_READFUNCTION, streamReadFunction);
-    mpUploadBuffer = std::make_shared<ChunkStreamer<512>>(*arBody);
-    setCurlOption(CURLOPT_READDATA, mpUploadBuffer.get());
-    setCurlOption(CURLOPT_INFILESIZE_LARGE, arBody->GetSize());
+    setCurlOption(CURLOPT_READDATA, arBody.get());
+    setCurlOption(CURLOPT_INFILESIZE_LARGE, arBody->GetStreamSize());
 }
 
 size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
 {
-    apResponse->getBody().append(static_cast<char*>(ptr), size * nmemb);
+    apResponse->mpBody->Write({ static_cast<std::byte*>(ptr), size * nmemb });
     return size * nmemb;
-}
-
-size_t CurlHttpRequest::fileWriteFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile)
-{
-    return apFile->Write(ptr, size * nmemb);
-}
-
-size_t CurlHttpRequest::fileReadFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile)
-{
-    return apFile->Read(ptr, size * nmemb);
 }
 
 size_t CurlHttpRequest::streamReadFunction(void *ptr, size_t size, size_t nmemb, IStreamDataProvider *apDataProvider)
@@ -102,21 +67,10 @@ size_t CurlHttpRequest::streamReadFunction(void *ptr, size_t size, size_t nmemb,
 
 size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
 {
-    std::string header(data, size * nmemb);
-    size_t separator = header.find_first_of(':');
-    if (std::string::npos == separator) {
-        StrUtils::Trim(header);
-        if (header.empty()) {
-            return (size * nmemb); // blank line;
-        }
-        apResponse->addHeader(StrUtils::ToLower(header), "present");
-    }
-    else {
-        std::string key = header.substr(0, separator);
-        StrUtils::Trim(key);
-        std::string value = header.substr(separator + 1);
-        StrUtils::Trim(value);
-        apResponse->addHeader(StrUtils::ToLower(key), value);
+    apResponse->mHeaderData += std::string(data, size * nmemb);
+    if (apResponse->mHeaderData.ends_with(cHeaderEnd)) {
+        ResponseParser parser(*apResponse);
+        parser.ParseNewData({ reinterpret_cast<const std::byte*>(apResponse->mHeaderData.data()), apResponse->mHeaderData.size() });
     }
 
     return (size * nmemb);
@@ -139,13 +93,13 @@ const HttpRequestOptions& CurlHttpRequest::GetOptions() const
     return mRequestOptions;
 }
 
-IHttpRequest& CurlHttpRequest::SetBody(std::shared_ptr<IChunkedDataProvider> apBody)
+IHttpRequest& CurlHttpRequest::SetBody(HttpBody_t apBody)
 {
     mRequestOptions.RequestBody = apBody;
     return *this;
 }
 
-const IChunkedDataProvider& CurlHttpRequest::GetBody() const
+const IStreamDataProvider& CurlHttpRequest::GetBody() const
 {
     return *mRequestOptions.RequestBody;
 }
@@ -210,17 +164,12 @@ void CurlHttpRequest::prepareRequest()
 
     checkRequestOptions(mRequestOptions);
     populateOptions();
-    mResponse.clear();
+    mResponse.Clear();
 }
 
 void CurlHttpRequest::requestDone()
 {
-    long resp_code = 0;
-    getCurlInfo(CURLINFO_RESPONSE_CODE, &resp_code);
-    mResponse.setStatusCode(static_cast<int>(resp_code));
-
-    mLogger.Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << resp_code;
-
+    mLogger.Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << int(mResponse.GetStatusCode());
     EasyCurl::requestDone();
 }
 
@@ -270,13 +219,6 @@ void CurlHttpRequest::populateOptions()
 
         default:
             break;
-    }
-
-    if (mRequestOptions.WriteFile) {
-        writeToFile(&mRequestOptions.WriteFile.value());
-    }
-    if (mRequestOptions.ReadFile) {
-        readFromFile(&mRequestOptions.ReadFile.value());
     }
 
     setCurlOption(CURLOPT_VERBOSE, mRequestOptions.Verbose);

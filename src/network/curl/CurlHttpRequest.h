@@ -42,7 +42,7 @@ public:
     [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
     IHttpRequest& SetBody(HttpBody_t apBody) override;
-    [[nodiscard]] const IChunkedDataProvider& GetBody() const override;
+    [[nodiscard]] const IStreamDataProvider& GetBody() const override;
 
     IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override;
     IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override;
@@ -54,10 +54,7 @@ protected:
     HttpRequestOptions mRequestOptions{};
     HttpBody_t mpUploadBuffer{};
 
-    void writeToFile(rsp::posix::FileIO *apFile);
-    void readFromFile(rsp::posix::FileIO *apFile);
-    void readFromString(const std::string &arString);
-    void readFromStream(const std::shared_ptr<IChunkedDataProvider>& arBody);
+    void readFromStream(const HttpBody_t& arBody);
 
     void prepareRequest() override;
     void requestDone() override;
@@ -65,9 +62,6 @@ protected:
 private:
 
     static size_t writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *data);
-    static size_t fileWriteFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile);
-    static size_t fileReadFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile);
-    static size_t stringReadFunction(void *ptr, size_t size, size_t nmemb, IStreamDataProvider *apDataProvider);
     static size_t streamReadFunction(void *ptr, size_t size, size_t nmemb, IStreamDataProvider *apDataProvider);
     static size_t headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse);
     static size_t progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);

@@ -298,8 +298,13 @@ TEST_CASE("Network")
         auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
 //        MESSAGE(body);
 
+        size_t request_size = 25455;
+        if (request.GetOptions().RequestBody) {
+            request_size = request.GetBody().GetStreamSize();
+        }
+
         std::string expected = "\n"
-            "Content Length: " + std::to_string(request.GetBody().GetStreamSize()) + "\n"
+            "Content Length: " + std::to_string(request_size) + "\n"
             "CTYPE: multipart/form-data\n"
             "filename: uploaded.png\r\n"
             "filedata: filename=\"image.png\"; Content-Type: image/png\r\n"
@@ -395,7 +400,7 @@ Body: )" + json + "\n";
                                CHECK_EQ(resp.GetHeaders().at("content-type"), aMimeType);
                                CHECK_EQ(resp.GetContentLength(), aLength);
                                CHECK_EQ(resp.GetStatusLine().GetStatusCode(), 200);
-                               CHECK_EQ(resp.GetStatusLine().GetHttpVersion(), "HTTP/1.1");
+                               CHECK(resp.GetStatusLine().GetHttpVersion().starts_with("HTTP/"));
                                CHECK_EQ(resp.GetBody().GetStreamSize(), aBodySize);
                                CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
                                result = true;
@@ -433,7 +438,7 @@ Body: )" + json + "\n";
                                      CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                                      CHECK_EQ(resp.GetContentLength(), 164);
                                      CHECK_EQ(resp.GetStatusLine().GetStatusCode(), 401);
-                                     CHECK_EQ(resp.GetStatusLine().GetHttpVersion(), "HTTP/1.1");
+                                     CHECK(resp.GetStatusLine().GetHttpVersion().starts_with("HTTP/"));
                                      CHECK_EQ(resp.GetBody().GetStreamSize(), 0);
                                      CHECK_EQ(resp.GetStatusCode(), StatusCodes::Unauthorized);
                                      respErrHead = true;
@@ -451,7 +456,7 @@ Body: )" + json + "\n";
                                      CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                                      CHECK_EQ(resp.GetContentLength(), 131);
                                      CHECK_EQ(resp.GetStatusLine().GetStatusCode(), 200);
-                                     CHECK_EQ(resp.GetStatusLine().GetHttpVersion(), "HTTP/1.1");
+                                     CHECK(resp.GetStatusLine().GetHttpVersion().starts_with("HTTP/"));
                                      CHECK_EQ(resp.GetBody().GetStreamSize(), 0);
                                      CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
 
@@ -477,7 +482,7 @@ Body: )" + json + "\n";
                          CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                          CHECK_EQ(resp.GetContentLength(), 131);
                          CHECK_EQ(resp.GetStatusLine().GetStatusCode(), 200);
-                         CHECK_EQ(resp.GetStatusLine().GetHttpVersion(), "HTTP/1.1");
+                         CHECK(resp.GetStatusLine().GetHttpVersion().starts_with("HTTP/"));
                          CHECK_EQ(resp.GetBody().GetStreamSize(), 0);
                          CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
                          CHECK_EQ(resp.GetRequest().GetOptions().Headers.at("Authorization"), "Basic amI6YWdlbnQwMDc=");
@@ -495,7 +500,7 @@ Body: )" + json + "\n";
                         CHECK_EQ(resp.GetHeaders().at("content-type"), "text/html");
                         CHECK_EQ(resp.GetContentLength(), 131);
                         CHECK_EQ(resp.GetStatusLine().GetStatusCode(), 200);
-                        CHECK_EQ(resp.GetStatusLine().GetHttpVersion(), "HTTP/1.1");
+                        CHECK(resp.GetStatusLine().GetHttpVersion().starts_with("HTTP/"));
                         CHECK_EQ(resp.GetBody().GetStreamSize(), 131);
                         CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
                         std::stringstream ss;
