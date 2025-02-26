@@ -44,9 +44,6 @@ public:
     IHttpRequest& SetBody(HttpBody_t apBody) override;
     [[nodiscard]] const IStreamDataProvider& GetBody() const override;
 
-    IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override;
-    IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override;
-
     [[nodiscard]] std::uintptr_t GetHandle() const override;
 
 protected:

@@ -12,6 +12,7 @@
 #include <string>
 #include <network/ChunkStreamer.h>
 #include <network/ResponseParser.h>
+#include <network/MultipartBody.h>
 #include <network/StringBody.h>
 #include <posix/FileIO.h>
 #include "CurlHttpRequest.h"
@@ -43,6 +44,10 @@ void CurlHttpRequest::readFromStream(const HttpBody_t& arBody)
     if (arBody->GetStreamSize() == 0) {
         return;
     }
+    if (dynamic_cast<MultipartBody*>(arBody.get())) {
+        mRequestOptions.Headers.emplace("Content-Type", dynamic_cast<MultipartBody&>(*arBody).GetBoundary().GetContentTypeHeader()); // Add header with boundary
+    }
+
     setCurlOption(CURLOPT_UPLOAD, 1L);
     setCurlOption(CURLOPT_READFUNCTION, streamReadFunction);
     setCurlOption(CURLOPT_READDATA, arBody.get());
@@ -104,28 +109,6 @@ const IStreamDataProvider& CurlHttpRequest::GetBody() const
     return *mRequestOptions.RequestBody;
 }
 
-
-IHttpRequest& CurlHttpRequest::AddField(const std::string &arFieldName, const std::string &arValue)
-{
-    curl_mimepart *field = curl_mime_addpart(getForm());
-    if (field == nullptr) {
-        THROW_WITH_BACKTRACE1(ECurlError, "curl_mime_addpart() failed.");
-    }
-    curl_mime_name(field, arFieldName.c_str());
-    curl_mime_data(field, arValue.c_str(), CURL_ZERO_TERMINATED);
-    return *this;
-}
-
-IHttpRequest& CurlHttpRequest::AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile)
-{
-    curl_mimepart *field = curl_mime_addpart(getForm());
-    if (field == nullptr) {
-        THROW_WITH_BACKTRACE1(ECurlError, "curl_mime_addpart() failed.");
-    }
-    curl_mime_name(field, arFieldName.c_str());
-    curl_mime_filedata(field, arFile.GetFileName().c_str());
-    return *this;
-}
 
 IHttpResponse& CurlHttpRequest::Execute()
 {

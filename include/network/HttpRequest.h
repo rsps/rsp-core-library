@@ -44,16 +44,6 @@ public:
         return mPimpl->GetBody();
     }
 
-    IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override
-    {
-        return mPimpl->AddField(arFieldName, arValue);
-    }
-
-    IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override
-    {
-        return mPimpl->AddFile(arFieldName, arFile);
-    }
-
     [[nodiscard]] IHttpResponse& Execute() override
     {
         return mPimpl->Execute();

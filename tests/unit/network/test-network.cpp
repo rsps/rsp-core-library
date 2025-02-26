@@ -13,14 +13,15 @@
 #include <cstring>
 #include <filesystem>
 #include <network/FileBody.h>
-#include <network/IHttpRequest.h>
-#include <network/HttpRequest.h>
 #include <network/HttpDownload.h>
-#include <network/NetworkLibrary.h>
+#include <network/HttpRequest.h>
 #include <network/HttpSession.h>
-#include <network/StringBody.h>
+#include <network/IHttpRequest.h>
+#include <network/MultipartBody.h>
 #include <network/MultipartBoundary.h>
 #include <network/NetworkException.h>
+#include <network/NetworkLibrary.h>
+#include <network/StringBody.h>
 #include <posix/FileSystem.h>
 #include <posix/FileIO.h>
 #include <utils/StrUtils.h>
@@ -283,20 +284,21 @@ TEST_CASE("Network")
         auto source = file.GetContents();
         file.Seek(0);
 
+        auto form = std::make_shared<MultipartBody>();
         opt.BaseUrl = "https://server.localhost:44300/cgi/upload-form.sh";
         opt.RequestType = HttpRequestType::POST;
+        opt.RequestBody = form;
 //        opt.Verbose = 1;
 
         HttpRequest request;
         request.SetOptions(opt);
-        request.AddField("filename", "uploaded.png");
-        request.AddFile("filedata", file);
+        form->Add("filename", "uploaded.png");
+        form->Add("filedata", file);
 
         IHttpResponse *resp;
         CHECK_NOTHROW(resp = &request.Execute());
 
         auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
-//        MESSAGE(body);
 
         size_t request_size = 25455;
         if (request.GetOptions().RequestBody) {
@@ -304,18 +306,19 @@ TEST_CASE("Network")
         }
 
         std::string expected = "\n"
-            "Content Length: " + std::to_string(request_size) + "\n"
-            "CTYPE: multipart/form-data\n"
-            "filename: uploaded.png\r\n"
-            "filedata: filename=\"image.png\"; Content-Type: image/png\r\n"
-            "Filesize: 25138\n";
+                               "Content Length: " + std::to_string(request_size) + "\n"
+                               "CTYPE: multipart/form-data\n"
+                               "filename: uploaded.png\r\n"
+                               "filedata: filename=\"image.png\"; Content-Type: image/png\r\n"
+                               "file-size: 25138\n";
 
 //        std::cout << TestHelpers::ToHex(body) << std::endl;
 //        std::cout << TestHelpers::ToHex(expected) << std::endl;
 
         CHECK_EQ(body, expected);
 
-        CHECK_EQ(resp->GetBody().GetStreamSize(), 147);
+        CHECK_EQ(body.size(), 148);
+        CHECK_EQ(resp->GetBody().GetStreamSize(), 148);
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
 
         CHECK(FileSystem::FileExists(cUploadedFile));

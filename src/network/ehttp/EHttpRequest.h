@@ -34,8 +34,6 @@ public:
     IHttpRequest& SetOptions(const HttpRequestOptions& arOptions) override;
     IHttpRequest& SetBody(HttpBody_t apBody) override;
     [[nodiscard]] const IStreamDataProvider& GetBody() const override;
-    IHttpRequest& AddField(const std::string& arFieldName, const std::string& arValue) override;
-    IHttpRequest& AddFile(const std::string& arFieldName, posix::FileIO& arFile) override;
     IHttpResponse& Execute() override;
     [[nodiscard]] uintptr_t GetHandle() const override;
 
@@ -43,8 +41,6 @@ protected:
     HttpRequestOptions mOptions{};
     EHttpResponse mResponse;
     std::array<std::byte, 256> mWorkBuffer{};
-    MultipartBoundary mBoundary{};
-    bool mMultipartFormType = false;
 
     friend class EHttpSession;
     ResponseCallback_t mResponseCallback{};

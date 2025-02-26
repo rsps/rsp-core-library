@@ -11,13 +11,13 @@ IFS=\= read NAME BOUNDARY <<< "$B"
 echo "CTYPE: $CTYPE"
 #echo "BOUNDARY: $BOUNDARY"
 
-if [ "$REQUEST_METHOD" -ne "POST" ]; then
-    echo "Wrong Request Method"
+if [[ $REQUEST_METHOD != "POST" ]]; then
+    echo "Wrong Request Method: '$REQUEST_METHOD'"
     exit -401
 fi
 
-if [ "$CTYPE" -ne "multipart/form-data" ]; then
-    echo "Wrong Content-Type"
+if [[ $CTYPE != "multipart/form-data" ]]; then
+    echo "Wrong Content-Type: '$CTYPE'"
     exit -401
 fi
 
@@ -30,7 +30,7 @@ do
 
         IFS=\; read DISPOSITION NAME FILENAME <<<"$DISPOSITION"
         if [[ $DISPOSITION != "Content-Disposition: form-data" ]]; then
-            echo "Wrong disposition";
+            echo "Wrong disposition: '$DISPOSITION'";
             exit -400
         fi
 
@@ -50,7 +50,7 @@ do
             cp -b /dev/stdin "../$ACTUAL_FILENAME"
             SKIP=$(grep -oba -- "$BOUNDARY" "../$ACTUAL_FILENAME" |cut -d ':' -f 1)
             truncate -c -s $(($SKIP - 4)) "../$ACTUAL_FILENAME"
-            stat --format="Filesize: %s" "../$ACTUAL_FILENAME"
+            stat --format="file-size: %s" "../$ACTUAL_FILENAME"
             break
         fi
     fi
