@@ -1,6 +1,12 @@
-cmake_minimum_required (VERSION 3.16)
+# -------------------------------------------------------------------------------------------------------------- #
+# RSP Core Library
+# -------------------------------------------------------------------------------------------------------------- #
 
-# https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf
+cmake_minimum_required (VERSION 3.30)
+
+# -------------------------------------------------------------------------------------------------------------- #
+# Options
+# -------------------------------------------------------------------------------------------------------------- #
 
 # Usage: cmake [-DRELEASE_BUILD=ON] [-DPLATFORM_P05=ON] [FREETYPE_FONTS=OFF] [-DOPENSSL_CRYPTO=OFF] ..
 
@@ -19,139 +25,101 @@ OPTION(NET_WPA_SUPPLICANT "Build with libwpa-client wpa_supplicant library." ON)
 OPTION(STD_THREAD "Thread architecture to use." ON) # C++ std::thread
 OPTION(SYSLOG "Include syslog interface" ON)
 
-if(ARCH_ARM)
-    set (CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt)
+# -------------------------------------------------------------------------------------------------------------- #
+# Setup
+# -------------------------------------------------------------------------------------------------------------- #
+
+find_package(Git REQUIRED)
+
+# Install "CMake Scripts" dependency
+include(FetchContent)
+FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.1.0")
+FetchContent_MakeAvailable("rsp-cmake-scripts")
+
+# Abort if building in-source
+include("rsp/helpers")
+fail_in_source_build()
+
+# Append this project's local module paths.
+list(FIND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" has_rsp_core_lib_module_path)
+if(has_rsp_core_lib_module_path EQUAL -1)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 endif()
 
+# Set toolchain file, if needed.
+if(ARCH_ARM)
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ToolchainFile.txt")
+endif()
+
+# Obtain GCC info.
+# TODO: This part here SHOULD be extracted into util in our "CMake Scripts"
 find_program(GCC_TOOL NAMES g++-latest g++-HEAD g++-14 g++-13 g++-12 g++-11)
 execute_process(COMMAND ${GCC_TOOL} --version OUTPUT_VARIABLE GCC_TOOL_VERSION ERROR_VARIABLE GCC_TOOL_VERSION)
 string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" GCC_TOOL_VERSION "${GCC_TOOL_VERSION}")
 message(STATUS "🔖 GCC ${GCC_TOOL_VERSION} (${GCC_TOOL})")
 
-project (rsp-core-lib)
+# Define CPP standards, ...etc
+set(CMAKE_CXX_STANDARD 23)
 
-# Declare empty lists
-set(BUILD_OPTIONS "")
-set(LIBRARIES "")
-if ("${GCC_TOOL}" MATCHES "\/g\\+\\+-1[3-9]+$")
-    list(APPEND LIBRARIES "-lstdc++exp")
-elseif ("${GCC_TOOL}" MATCHES "\/g\\+\\+-12$")
-    list(APPEND LIBRARIES "-lstdc++_libbacktrace")
-endif()
+# -------------------------------------------------------------------------------------------------------------- #
+# Project
+# -------------------------------------------------------------------------------------------------------------- #
 
-set (CMAKE_CXX_STANDARD 23)
+# Get project's version from file
+include("setup-version")
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
-include(FetchContent)
-find_package(Git REQUIRED)
-
-if (GFX)
-    list(APPEND BUILD_OPTIONS -DUSE_GFX)
-
-    if (SDL2)
-        find_package(SDL2 REQUIRED)
-        list(APPEND BUILD_OPTIONS -DUSE_GFX_SDL)
-        list(APPEND LIBRARIES -lSDL2)
-    else()
-        list(APPEND BUILD_OPTIONS -DUSE_GFX_SW)
-    endif()
-
-    if (FREETYPE_FONTS)
-        find_package(Freetype REQUIRED)
-        list(APPEND BUILD_OPTIONS -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
-        list(APPEND LIBRARIES Freetype::Freetype)
-    endif()
-endif()
-
-if (SYSLOG)
-    list(APPEND BUILD_OPTIONS -DSYSLOG)
-endif ()
-
-# Include external project magic_enum from github.
-FetchContent_Declare(
-    magic_enum
-    GIT_REPOSITORY "https://github.com/Neargye/magic_enum"
-    GIT_TAG "v0.8.2"
+project (rsp-core-lib
+    VERSION "${version_VERSION}"
+    DESCRIPTION "Open-source library for medical device software."
+    HOMEPAGE_URL "https://github.com/rsps/rsp-core-library"
 )
-FetchContent_MakeAvailable(magic_enum)
 
-if (NET_LIBCURL)
-#    set(CURL_LIBRARY "-lcurl")
-    find_package(CURL 7.33 REQUIRED)
-    list(APPEND LIBRARIES CURL::libcurl)
-#    include_directories(${CURL_INCLUDE_DIR})
-endif()
-
-if (NET_WPA_SUPPLICANT)
-    #sudo apt install libwpa-client-dev
-    #find_package(WPA_SUPPLICANT REQUIRED)
-    list(APPEND LIBRARIES wpa_client)
-endif()
-
-if (OPENSSL_CRYPTO)
-    find_package(OpenSSL REQUIRED)
-    list(APPEND LIBRARIES OpenSSL::Crypto OpenSSL::SSL)
-    list(APPEND BUILD_OPTIONS -DUSE_OPENSSL)
-endif ()
-
-if (MBEDTLS_CRYPTO)
-    if (NOT ESP_PLATFORM)
-        find_package(MbedTLS REQUIRED)
-        list(APPEND LIBRARIES MbedTLS::mbedcrypto)
-    endif()
-    list(APPEND BUILD_OPTIONS -DUSE_MBEDTLS)
-endif()
-
-if (ZLIB)
-    find_package(ZLIB REQUIRED)
-    list(APPEND BUILD_OPTIONS -DUSE_ZLIB)
-    list(APPEND LIBRARIES ${ZLIB_LIBRARIES})
-endif()
-
-#message(STATUS "BinDir: ${CMAKE_CURRENT_BINARY_DIR}")
-
-if (STD_THREAD)
-    set (CMAKE_THREAD_PREFER_PTHREAD TRUE)
-    set (THREADS_PREFER_PTHREAD_FLAG TRUE)
-    find_package(Threads REQUIRED)
-    list(APPEND BUILD_OPTIONS -DUSE_STD_THREAD)
-    list(APPEND LIBRARIES Threads::Threads)
-endif ()
-
+# Add this project as "library". This MUST be declared such, or dependencies
+# will not be added or linked correctly!
 add_library("${PROJECT_NAME}" STATIC)
 
+# Debug
+message("${COLOR_GREEN}${TEXT_BOLD}Building${COLOR_DEFAULT} ${PROJECT_NAME}${TEXT_BOLD_RESTORE}")
+message(STATUS "Using CMAKE (${COLOR_WHITE}${TEXT_ITALIC}${CMAKE_VERSION}${RESTORE})")
+message(STATUS "Using GCC ${GCC_TOOL_VERSION} (${COLOR_WHITE}${TEXT_ITALIC}${GCC_TOOL}${RESTORE})")
 
-# Must use GNUInstallDirs to install libraries into correct
-# locations on all platforms.
-include(GNUInstallDirs)
+# -------------------------------------------------------------------------------------------------------------- #
+# Dependencies
+# -------------------------------------------------------------------------------------------------------------- #
 
-target_link_libraries ("${PROJECT_NAME}"
-        ${LIBRARIES}
-)
+# List of build options that dependencies can append to.
+set(BUILD_OPTIONS "")
+
+include("dependencies.cmake")
+
+# Debug
+# dump(BUILD_OPTIONS)
+
+# -------------------------------------------------------------------------------------------------------------- #
+# Targets & Compile Options
+# -------------------------------------------------------------------------------------------------------------- #
 
 # Keep symbol information for exception stack traces
-SET (CMAKE_ENABLE_EXPORTS TRUE)
+set(CMAKE_ENABLE_EXPORTS TRUE)
 
-# Define headers for this library. PUBLIC headers are used for
-# compiling the library, and will be added to consumers' build
-# paths.
+# Define headers for this library. PUBLIC headers are used for compiling the library, and will be added to
+# consumers' build paths.
 target_include_directories("${PROJECT_NAME}"
     PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-        ${magic_enum_SOURCE_DIR}/include
     PRIVATE
         ${PROJECT_BINARY_DIR}/src
-        ${FREETYPE_INCLUDE_DIRS}
-        ${CURL_INCLUDE_DIRS}
-        ${ZLIB_INCLUDE_DIRS}
-        ${SDL_INCLUDE_DIRS}
 )
 
-include("cmake/strict-compile-options.cmake")
+# Configure compile options for this project
+include("rsp/compiler")
+
+set(RSP_CORE_LIB_COMPILE_OPTIONS "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
+list(REMOVE_ITEM RSP_CORE_LIB_COMPILE_OPTIONS "-Wswitch-default")
+
 if (NOT RELEASE_BUILD)
-    add_compile_options(${STRICT_COMPILE_OPTIONS})
+    add_compile_options("${RSP_CORE_LIB_COMPILE_OPTIONS}")
 endif()
 
 target_compile_options("${PROJECT_NAME}" PUBLIC
@@ -160,26 +128,40 @@ target_compile_options("${PROJECT_NAME}" PUBLIC
 )
 
 if (NOT RELEASE_BUILD)
-target_compile_options("${PROJECT_NAME}" PRIVATE
-    ${STRICT_COMPILE_OPTIONS}
-    -DDEBUG_LOG
-    -g
-    -O0
-)
+    target_compile_options("${PROJECT_NAME}" PRIVATE
+            "${RSP_CORE_LIB_COMPILE_OPTIONS}"
+            -DDEBUG_LOG
+            -g
+            -O0
+    )
 else()
-target_compile_options("${PROJECT_NAME}" PRIVATE
-    -O3
-)
+    target_compile_options("${PROJECT_NAME}" PRIVATE
+        -O3
+    )
 endif()
 
 add_subdirectory(src)
 
-#--------------------------------------------------------
-# Rules to make tests
-#-----------------------
+# -------------------------------------------------------------------------------------------------------------- #
+# Tests
+# -------------------------------------------------------------------------------------------------------------- #
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 if (BUILD_TESTING)
+    # Define "test binary" such that dev-dependencies can include or link
+    # resources for it...
+    set(TEST_BINARY "rsp-core-lib-test")
+    add_executable(${TEST_BINARY})
+
+    include("dev-dependencies.cmake")
+
     add_subdirectory(tests)
 endif()
+
+# -------------------------------------------------------------------------------------------------------------- #
+# Misc.
+# -------------------------------------------------------------------------------------------------------------- #
+
+# Resources:
+# https://cliutils.gitlab.io/modern-cmake/modern-cmake.pdf

@@ -1,3 +1,9 @@
+# -------------------------------------------------------------------------------------------------------------- #
+# @deprecated - Replaced by "external/mbed-tls.cmake" module.
+#
+# @see dependencies.cmake for additional details
+# -------------------------------------------------------------------------------------------------------------- #
+
 include(FetchContent)
 find_package(Git REQUIRED)
 
