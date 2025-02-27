@@ -8,8 +8,9 @@
 * \author      steffen
 */
 #include "TLSSocket.h"
-#include "X509Certs.h"
 #include <network/UrlParser.h>
+
+using namespace rsp::network;
 
 namespace rsp::security {
 
@@ -18,67 +19,77 @@ std::shared_ptr<ITLSSocket> ITLSSocket::Create(const network::ConnectionOptions&
     return std::make_shared<TLSSocket>(arOptions);
 }
 
-TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
-    : mrOptions(arOptions)
+TLSSocket::tlsRandom::tlsRandom(tlsEntropy& arEntropy, const security::SecureBuffer &arNonce)
+    : mbedtls_ctr_drbg_context()
 {
-    OpenSSL_add_all_algorithms();
-    SSL_load_error_strings();
-    auto method = TLS_client_method();
-    CHK_NULL(method);
-    mpContext = TLS_Context(SSL_CTX_new(method));
-    CHK_NULL(mpContext);
+    mbedtls_ctr_drbg_init(this);
+    CHK_0(mbedtls_ctr_drbg_seed(this, mbedtls_entropy_func, &arEntropy, arNonce.data(), arNonce.size()));
+}
+
+TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
+    : NamedLogChannel("MbedTLS-TLSSocket"),
+      mrOptions(arOptions),
+      mRandom(mEntropy, mrOptions.Nonce)
+{
+    CHK_0(mbedtls_ssl_config_defaults(&mConfig, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT));
+    mbedtls_ssl_conf_authmode( &mConfig, MBEDTLS_SSL_VERIFY_REQUIRED );
+    mbedtls_ssl_conf_rng( &mConfig, mbedtls_ctr_drbg_random, &mRandom );
+    mbedtls_ssl_conf_dbg( &mConfig, debugLog, &mLogger );
 
     if (!mrOptions.CertCaPath.empty()) {
-        X509Certs x509(mpContext.get());
-        x509.LoadCertificateAuthority(mrOptions.CertCaPath);
-        SSL_CTX_set_verify(mpContext.get(), SSL_VERIFY_PEER, nullptr);
+        CHK_0(mbedtls_x509_crt_parse_file(&mCaChain, mrOptions.CertCaPath.c_str()));
+        mbedtls_ssl_conf_ca_chain(&mConfig, &mCaChain, nullptr);
     }
 
     if (!mrOptions.CertPath.empty()) {
-        X509Certs x509(mpContext.get());
-        x509.LoadClientCertificate(mrOptions.CertPath, mrOptions.KeyPath);
+        CHK_0(mbedtls_x509_crt_parse_file(&mClientCert, mrOptions.CertPath.c_str()));
+        CHK_0(mbedtls_pk_parse_keyfile(&mPrivateKey, mrOptions.KeyPath.c_str(), mrOptions.KeyPasswd.c_str(), &rng_get, &mRandom));
+        CHK_0(mbedtls_ssl_conf_own_cert(&mConfig, &mClientCert, &mPrivateKey));
     }
 
-    if (SSL_CTX_set_min_proto_version(mpContext.get(), TLS1_3_VERSION) <= 0) {
-        THROW_WITH_BACKTRACE1(EOpenSSL, "Could not configure minimum protocol version");
-    }
+    CHK_0(mbedtls_ssl_setup(&mSsl, &mConfig));
 
-    SSL_CTX_set_session_cache_mode(mpContext.get(), SSL_SESS_CACHE_OFF);
-}
+    UrlParser up(mrOptions.BaseUrl);
+    CHK_0(mbedtls_ssl_set_hostname(&mSsl, std::string(up.GetHost()).c_str()));
 
-TLSSocket::~TLSSocket()
-{
-    if (mpSSL) {
-        SSL_shutdown(mpSSL.get());
-    }
-    close(mFd);
+    CHK_0(psa_crypto_init());
 }
 
 TLSSocket& TLSSocket::SetSocket(posix::Socket& arSocket)
 {
-    mFd = arSocket.GetFd();
-    mpSSL = TLS_Connection(SSL_new(mpContext.get()));
-    CHK_NULL(mpSSL);
+    mNet.fd = arSocket.GetFd();
+    mbedtls_ssl_set_bio( &mSsl, &mNet, mbedtls_net_send, mbedtls_net_recv, nullptr);
 
-    rsp::network::UrlParser up(mrOptions.BaseUrl);
+    CHK_0(mbedtls_net_set_block(&mNet));
 
-    std::string host(up.GetHost());
+    int ret;
+    while ((ret = mbedtls_ssl_handshake(&mSsl)) != 0) {
+        if (ret != MBEDTLS_ERR_SSL_WANT_READ &&
+            ret != MBEDTLS_ERR_SSL_WANT_WRITE &&
+            ret != MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS) {
 
-    if (1 != SSL_ctrl(mpSSL.get(), SSL_CTRL_SET_TLSEXT_HOSTNAME, TLSEXT_NAMETYPE_host_name, const_cast<char*>(host.c_str()))) {
-        THROW_WITH_BACKTRACE1(EOpenSSL, "Could not enable SNI"); // Server Name Identification
-    }
-    if (1 != SSL_set1_host(mpSSL.get(), host.c_str())) {
-        THROW_WITH_BACKTRACE1(EOpenSSL, "Could not enable host name check");
-    }
+#if defined(MBEDTLS_SSL_HANDSHAKE_WITH_CERT_ENABLED)
+            if (ret == MBEDTLS_ERR_X509_CERT_VERIFY_FAILED ||
+                ret == MBEDTLS_ERR_SSL_BAD_CERTIFICATE) {
+                mLogger.Error() <<
+                        "    Unable to verify the server's certificate. "
+                        "Either it is invalid,\n"
+                        "    or you didn't set ca_file or ca_path "
+                        "to an appropriate value.\n"
+                        "    Alternatively, you may want to use "
+                        "auth_mode=optional for testing purposes if "
+                        "not using TLS 1.3.\n"
+                        "    For TLS 1.3 server, try `ca_path=/etc/ssl/certs/`"
+                        "or other folder that has root certificates\n";
 
-    SSL_set_fd(mpSSL.get(), mFd);
-    int err = SSL_connect(mpSSL.get());
-    CHK_SSL(err);
+                auto flags = mbedtls_ssl_get_verify_result(&mSsl);
+                char vrfy_buf[512];
+                mbedtls_x509_crt_verify_info(vrfy_buf, sizeof(vrfy_buf), "  ! ", flags);
+                mLogger.Error() << vrfy_buf;
+            }
+#endif
 
-    if (!mrOptions.CertCaPath.empty()) {
-        auto const verify_result = SSL_get_verify_result(mpSSL.get());
-        if (X509_V_OK != verify_result) {
-            THROW_WITH_BACKTRACE1(EOpenSSL, "Certificate verification failed");
+            THROW_WITH_BACKTRACE2(EMbedTLSError, "mbedtls_ssl_handshake", ret);
         }
     }
 
@@ -87,28 +98,84 @@ TLSSocket& TLSSocket::SetSocket(posix::Socket& arSocket)
 
 TLSSocket& TLSSocket::Close()
 {
-    SSL_shutdown(mpSSL.get());  /* send SSL/TLS close_notify */
+    // Todo: This entire object should be destroyed here...
     return *this;
 }
 
 size_t TLSSocket::Write(std::span<const std::byte> aData)
 {
     size_t write_bytes = 0;
-    int err = SSL_write_ex(mpSSL.get(), aData.data(), aData.size(), &write_bytes);
-    if (!err) {
-        THROW_WITH_BACKTRACE1(EOpenSSLError, SSL_get_error(mpSSL.get(), err));
+    while(write_bytes < aData.size()) {
+        auto ret = mbedtls_ssl_write(&mSsl, reinterpret_cast<const unsigned char*>(aData.data() + write_bytes), aData.size() - write_bytes);
+        if (ret <= 0) {
+            THROW_WITH_BACKTRACE2(EMbedTLSError, "mbedtls_ssl_write", ret);
+        }
+        else {
+            write_bytes += size_t(ret);
+        }
     }
-    return size_t(write_bytes);
+    return write_bytes;
 }
 
 size_t TLSSocket::Read(std::span<std::byte> aData)
 {
     size_t read_bytes = 0;
-    int err = SSL_read_ex(mpSSL.get(), aData.data(), aData.size(), &read_bytes);
-    if (!err) {
-        THROW_WITH_BACKTRACE1(EOpenSSLError, SSL_get_error(mpSSL.get(), err));
+    int ret;
+    while(read_bytes < aData.size()) {
+        ret = mbedtls_ssl_read(&mSsl, reinterpret_cast<unsigned char*>(aData.data()), aData.size());
+
+        if (ret <= 0) {
+            switch (ret) {
+                case MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS:
+                    mLogger.Info() << "got crypto in progress";
+                    continue;
+
+                case MBEDTLS_ERR_SSL_WANT_READ:
+                case MBEDTLS_ERR_SSL_WANT_WRITE:
+                    continue;
+
+                case MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY:
+                    mLogger.Info() << "connection was closed gracefully";
+                    return read_bytes;
+
+                case 0:
+                case MBEDTLS_ERR_NET_CONN_RESET:
+                    THROW_WITH_BACKTRACE2(EMbedTLSError, " connection was reset by peer", ret);
+
+                case MBEDTLS_ERR_SSL_RECEIVED_NEW_SESSION_TICKET:
+                    /* We were waiting for application data but got
+                     * a NewSessionTicket instead. */
+                    mLogger.Info() << "got new session ticket";
+                    continue;
+
+                default:
+                    THROW_WITH_BACKTRACE2(EMbedTLSError, "mbedtls_ssl_read", ret);
+            }
+        }
+        else {
+            read_bytes += size_t(ret);
+        }
     }
-    return size_t(read_bytes);
+
+    return read_bytes;
+}
+
+void TLSSocket::debugLog(void* ctx, [[maybe_unused]] int level, const char* file, int line, const char* str)
+{
+    if (ctx == nullptr) {
+        return;
+    }
+    auto logger = static_cast<logging::LogChannel*>(ctx);
+    logger->Debug().SetLevel(logging::LogLevel(5 - level)) << file << ":" << line << ": " << str;
+}
+
+int TLSSocket::rng_get(void* p_rng, unsigned char* output, size_t output_len)
+{
+    if (p_rng == nullptr) {
+        return -1;
+    }
+    auto random = static_cast<tlsRandom*>(p_rng);
+    return mbedtls_ctr_drbg_random(&random, output, output_len);
 }
 
 } // rsp::security

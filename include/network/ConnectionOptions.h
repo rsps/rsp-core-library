@@ -13,6 +13,7 @@
 
 #include <ostream>
 #include <string>
+#include <security/SecureBuffer.h>
 
 namespace rsp::network {
 
@@ -30,6 +31,7 @@ public:
     std::string CertPath{};
     std::string KeyPath{};
     std::string KeyPasswd{};
+    security::SecureBuffer Nonce{};
     int Verbose = 0;
 };
 
