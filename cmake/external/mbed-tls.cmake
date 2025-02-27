@@ -22,17 +22,15 @@ message(STATUS "Using MBed TLS v${MBED_TLS_VERSION}")
 # Include & link...
 
 # NOTE: how to include libraries for v3.x
-#target_link_libraries(${PROJECT_NAME}
-#    PUBLIC
-#        MbedTLS::mbedtls
-#        MbedTLS::mbedcrypto
-#        MbedTLS::mbedx509
-#)
+target_link_libraries(${PROJECT_NAME}
+    MbedTLS::mbedtls
+    MbedTLS::mbedcrypto
+    MbedTLS::mbedx509
+)
 
 # NOTE: how to include libraries for future releases (v4.x)
 # @see https://github.com/Mbed-TLS/mbedtls?tab=readme-ov-file#consuming-mbed-tls
 #target_link_libraries(${PROJECT_NAME}
-#    PUBLIC
 #        MbedTLS::mbedtls
 #        MbedTLS::tfpsacrypto
 #        MbedTLS::mbedx509
