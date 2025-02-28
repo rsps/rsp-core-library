@@ -58,38 +58,13 @@ TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
 TLSSocket& TLSSocket::SetSocket(posix::Socket& arSocket)
 {
     mNet.fd = arSocket.GetFd();
-    mbedtls_ssl_set_bio( &mSsl, &mNet, mbedtls_net_send, mbedtls_net_recv, nullptr);
-
+    mbedtls_ssl_set_bio( &mSsl, &mNet, mbedtls_net_send, mbedtls_net_recv, mbedtls_net_recv_timeout);
     CHK_0(mbedtls_net_set_block(&mNet));
 
     int ret;
     while ((ret = mbedtls_ssl_handshake(&mSsl)) != 0) {
-        if (ret != MBEDTLS_ERR_SSL_WANT_READ &&
-            ret != MBEDTLS_ERR_SSL_WANT_WRITE &&
-            ret != MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS) {
-
-#if defined(MBEDTLS_SSL_HANDSHAKE_WITH_CERT_ENABLED)
-            if (ret == MBEDTLS_ERR_X509_CERT_VERIFY_FAILED ||
-                ret == MBEDTLS_ERR_SSL_BAD_CERTIFICATE) {
-                mLogger.Error() <<
-                        "    Unable to verify the server's certificate. "
-                        "Either it is invalid,\n"
-                        "    or you didn't set ca_file or ca_path "
-                        "to an appropriate value.\n"
-                        "    Alternatively, you may want to use "
-                        "auth_mode=optional for testing purposes if "
-                        "not using TLS 1.3.\n"
-                        "    For TLS 1.3 server, try `ca_path=/etc/ssl/certs/`"
-                        "or other folder that has root certificates\n";
-
-                auto flags = mbedtls_ssl_get_verify_result(&mSsl);
-                char vrfy_buf[512];
-                mbedtls_x509_crt_verify_info(vrfy_buf, sizeof(vrfy_buf), "  ! ", flags);
-                mLogger.Error() << vrfy_buf;
-            }
-#endif
-
-            THROW_WITH_BACKTRACE2(EMbedTLSError, "mbedtls_ssl_handshake", ret);
+        if (resultHandler(ret)) {
+            break;
         }
     }
 
@@ -98,7 +73,11 @@ TLSSocket& TLSSocket::SetSocket(posix::Socket& arSocket)
 
 TLSSocket& TLSSocket::Close()
 {
-    // Todo: This entire object should be destroyed here...
+    int ret;
+    do {
+        ret = mbedtls_ssl_close_notify(&mSsl);
+    }
+    while (ret == MBEDTLS_ERR_SSL_WANT_WRITE);
     return *this;
 }
 
@@ -108,7 +87,9 @@ size_t TLSSocket::Write(std::span<const std::byte> aData)
     while(write_bytes < aData.size()) {
         auto ret = mbedtls_ssl_write(&mSsl, reinterpret_cast<const unsigned char*>(aData.data() + write_bytes), aData.size() - write_bytes);
         if (ret <= 0) {
-            THROW_WITH_BACKTRACE2(EMbedTLSError, "mbedtls_ssl_write", ret);
+            if (resultHandler(ret)) {
+                break;
+            }
         }
         else {
             write_bytes += size_t(ret);
@@ -123,33 +104,9 @@ size_t TLSSocket::Read(std::span<std::byte> aData)
     int ret;
     while(read_bytes < aData.size()) {
         ret = mbedtls_ssl_read(&mSsl, reinterpret_cast<unsigned char*>(aData.data()), aData.size());
-
         if (ret <= 0) {
-            switch (ret) {
-                case MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS:
-                    mLogger.Info() << "got crypto in progress";
-                    continue;
-
-                case MBEDTLS_ERR_SSL_WANT_READ:
-                case MBEDTLS_ERR_SSL_WANT_WRITE:
-                    continue;
-
-                case MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY:
-                    mLogger.Info() << "connection was closed gracefully";
-                    return read_bytes;
-
-                case 0:
-                case MBEDTLS_ERR_NET_CONN_RESET:
-                    THROW_WITH_BACKTRACE2(EMbedTLSError, " connection was reset by peer", ret);
-
-                case MBEDTLS_ERR_SSL_RECEIVED_NEW_SESSION_TICKET:
-                    /* We were waiting for application data but got
-                     * a NewSessionTicket instead. */
-                    mLogger.Info() << "got new session ticket";
-                    continue;
-
-                default:
-                    THROW_WITH_BACKTRACE2(EMbedTLSError, "mbedtls_ssl_read", ret);
+            if (resultHandler(ret)) {
+                break;
             }
         }
         else {
@@ -176,6 +133,52 @@ int TLSSocket::rng_get(void* p_rng, unsigned char* output, size_t output_len)
     }
     auto random = static_cast<tlsRandom*>(p_rng);
     return mbedtls_ctr_drbg_random(&random, output, output_len);
+}
+
+bool TLSSocket::resultHandler(int aErr)
+{
+    switch (aErr) {
+        case MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS:
+            mLogger.Info() << "SSL got crypto in progress";
+            break;
+
+        case MBEDTLS_ERR_SSL_WANT_READ:
+            mLogger.Debug() << "SSL want read";
+            break;
+
+        case MBEDTLS_ERR_SSL_WANT_WRITE:
+            mLogger.Debug() << "SSL want write";
+            break;
+
+        case MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY:
+            mLogger.Info() << "SSL connection was closed gracefully";
+            return true;
+
+        case MBEDTLS_ERR_SSL_RECEIVED_NEW_SESSION_TICKET:
+            /* We were waiting for application data but got
+             * a NewSessionTicket instead. */
+            mLogger.Info() << "SSL got new session ticket";
+            break;
+
+        case MBEDTLS_ERR_X509_CERT_VERIFY_FAILED:
+        case MBEDTLS_ERR_SSL_BAD_CERTIFICATE: {
+            auto flags = mbedtls_ssl_get_verify_result(&mSsl);
+            char verify_info[512];
+            mbedtls_x509_crt_verify_info(verify_info, sizeof(verify_info), "  ! ", flags);
+            THROW_WITH_BACKTRACE2(EMbedTLSInvalidCertificate, verify_info, aErr);
+        }
+
+        case MBEDTLS_ERR_SSL_RECEIVED_EARLY_DATA:
+            THROW_WITH_BACKTRACE2(EMbedTLSEarlyData, "SSL early data received", aErr);
+
+        case 0:
+        case MBEDTLS_ERR_NET_CONN_RESET:
+            THROW_WITH_BACKTRACE2(EMbedTLSReconnect, "SSL connection was reset by peer", aErr);
+
+        default:
+            THROW_WITH_BACKTRACE2(EMbedTLSFatal, "mbedtls_ssl_read", aErr);
+    }
+    return false;
 }
 
 } // rsp::security

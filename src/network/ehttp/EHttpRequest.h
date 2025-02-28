@@ -38,6 +38,8 @@ public:
     [[nodiscard]] uintptr_t GetHandle() const override;
 
 protected:
+    using AutoHeaders = std::map<std::string, std::string>;
+
     HttpRequestOptions mOptions{};
     EHttpResponse mResponse;
     std::array<std::byte, 256> mWorkBuffer{};
@@ -47,9 +49,9 @@ protected:
     std::optional<std::reference_wrapper<IHttpSession>> mrSession{};
     std::unique_ptr<SocketConnection> mpConnection{};
 
-    void prepareRequest();
+    void prepareRequest(AutoHeaders& arHeaders);
     SocketConnection& getConnection();
-    std::string formatHeaders();
+    std::string formatHeaders(AutoHeaders& arHeaders);
     IStreamDataProvider& getRequestBody();
 };
 

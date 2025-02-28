@@ -50,33 +50,35 @@ const IStreamDataProvider& EHttpRequest::GetBody() const
     return *(mOptions.RequestBody);
 }
 
-void EHttpRequest::prepareRequest()
+void EHttpRequest::prepareRequest(AutoHeaders& arHeaders)
 {
+    arHeaders.emplace("Connection", "keep-alive");
+
     if (!mOptions.BasicAuthUsername.empty()) {
         // Add authorization header with base64 encoded credentials
-        mOptions.Headers.emplace("Authorization", "Basic " + utils::Base64::Encode(mOptions.BasicAuthUsername + ":" + mOptions.BasicAuthPassword));
+        arHeaders.emplace("Authorization", "Basic " + utils::Base64::Encode(mOptions.BasicAuthUsername + ":" + mOptions.BasicAuthPassword));
     }
 
     if (mOptions.RequestBody) {
-        if (dynamic_cast<MultipartBody*>(mOptions.RequestBody.get())) {
-            mOptions.Headers.emplace("Content-Type", dynamic_cast<MultipartBody&>(*mOptions.RequestBody).GetBoundary().GetContentTypeHeader()); // Add header with boundary
+        if (auto p_options = dynamic_cast<MultipartBody*>(mOptions.RequestBody.get())) {
+            arHeaders.emplace("Content-Type", p_options->GetBoundary().GetContentTypeHeader()); // Add header with boundary
         }
 
         auto len = mOptions.RequestBody->GetStreamSize();
-        if (len) {
-            mOptions.Headers["Content-Length"] = std::to_string(len);
+        if (len && !mOptions.Headers.contains("content-length")) {
+            arHeaders["Content-Length"] = std::to_string(len);
         }
     }
 }
 
 IHttpResponse& EHttpRequest::Execute()
 {
-    prepareRequest();
-
     // Get connection
     auto &connection = getConnection().Connect();
 
-    connection.Write(formatHeaders());
+    AutoHeaders headers;
+    prepareRequest(headers);
+    connection.Write(formatHeaders(headers));
 
     // Send body
     if (mOptions.RequestBody) {
@@ -126,7 +128,7 @@ SocketConnection& EHttpRequest::getConnection()
     return *mpConnection;
 }
 
-std::string EHttpRequest::formatHeaders()
+std::string EHttpRequest::formatHeaders(AutoHeaders& arHeaders)
 {
     using namespace std::string_view_literals;
 
@@ -140,6 +142,9 @@ std::string EHttpRequest::formatHeaders()
         << up.GetHost()
         << cNewLine;
     for (auto &h : mOptions.Headers) {
+        ss << h.first << ": " << h.second << cNewLine;
+    }
+    for (auto &h : arHeaders) {
         ss << h.first << ": " << h.second << cNewLine;
     }
     ss << cNewLine; // Empty line before body

@@ -86,6 +86,13 @@ protected:
 
     static void debugLog(void *ctx, int level, const char *file, int line, const char *str);
     static int rng_get(void *p_rng, unsigned char *output, size_t output_len);
+    /**
+     * \brief Handle results from many SSL functions.
+     * \param aErr Negative integer result from operation
+     * \return True if result is ending operation. False to continue.
+     * \throws EMbedTLSError derivatives if any error is detected
+     */
+    bool resultHandler(int aErr);
 };
 
 } // rsp::security

@@ -46,6 +46,27 @@ protected:
     error_type_t mCode = 0;
 };
 
+struct EMbedTLSFatal : public EMbedTLSError
+{
+    using EMbedTLSError::EMbedTLSError;
+};
+
+struct EMbedTLSReconnect : public EMbedTLSError
+{
+    using EMbedTLSError::EMbedTLSError;
+};
+
+struct EMbedTLSEarlyData : public EMbedTLSError
+{
+    using EMbedTLSError::EMbedTLSError;
+};
+
+struct EMbedTLSInvalidCertificate : public EMbedTLSFatal
+{
+    using EMbedTLSFatal::EMbedTLSFatal;
+};
+
+
 #define CHK_0(x) { auto ret = (x); if (ret != 0) { THROW_WITH_BACKTRACE2(EMbedTLSError, #x, ret); }}
 
 
