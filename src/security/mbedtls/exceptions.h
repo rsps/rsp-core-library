@@ -67,7 +67,12 @@ struct EMbedTLSInvalidCertificate : public EMbedTLSFatal
 };
 
 
-#define CHK_0(x) { auto ret = (x); if (ret != 0) { THROW_WITH_BACKTRACE2(EMbedTLSError, #x, ret); }}
+#define CHK_0(x) {  \
+    auto ret = (x); \
+    if (ret != 0) { \
+        THROW_WITH_BACKTRACE2(EMbedTLSError, #x, ret); \
+    } \
+}
 
 
 } // namespace rsp::security

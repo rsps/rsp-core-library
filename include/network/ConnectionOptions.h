@@ -25,8 +25,8 @@ class ConnectionOptions
 {
 public:
     std::string BaseUrl{};
-    long ConnectionTimeout = 5L;
-    long ResponseTimeout = 10L;
+    long ConnectionTimeout = 5L; // In seconds
+    long ResponseTimeout = 10L;  // In seconds
     std::string CertCaPath{};
     std::string CertPath{};
     std::string KeyPath{};

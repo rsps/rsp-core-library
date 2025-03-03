@@ -53,6 +53,7 @@ bool ResponseParser::ParseNewData(std::span<const std::byte> aNewData)
             return mrResponse.mContentLength == mContentReceived;
 
         case States::ChunkedBody:
+            // TODO: Implement chunked support. Format: 0x<length>\r\n<body part>\r\n
         case States::ChunkedTrail:
             break;
     }

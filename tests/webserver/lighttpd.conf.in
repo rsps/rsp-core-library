@@ -80,3 +80,7 @@ $SERVER["socket"] == ":44300" {
     ssl.verifyclient.enforce    = "enable"
     ssl.verifyclient.depth      = 3
 }
+
+$SERVER["socket"] == ":48080" {
+    ssl.engine  = "disable"
+}

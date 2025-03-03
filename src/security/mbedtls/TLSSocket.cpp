@@ -9,6 +9,7 @@
 */
 #include "TLSSocket.h"
 #include <network/UrlParser.h>
+#include <utils/DateTime.h>
 
 using namespace rsp::network;
 
@@ -23,7 +24,7 @@ TLSSocket::tlsRandom::tlsRandom(tlsEntropy& arEntropy, const security::SecureBuf
     : mbedtls_ctr_drbg_context()
 {
     mbedtls_ctr_drbg_init(this);
-    CHK_0(mbedtls_ctr_drbg_seed(this, mbedtls_entropy_func, &arEntropy, arNonce.data(), arNonce.size()));
+    CHK_0(mbedtls_ctr_drbg_seed(this, mbedtls_entropy_func, &arEntropy, arNonce.data(), arNonce.size()))
 }
 
 TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
@@ -31,35 +32,42 @@ TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
       mrOptions(arOptions),
       mRandom(mEntropy, mrOptions.Nonce)
 {
-    CHK_0(mbedtls_ssl_config_defaults(&mConfig, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT));
+    CHK_0(mbedtls_ssl_config_defaults(&mConfig, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT))
     mbedtls_ssl_conf_authmode( &mConfig, MBEDTLS_SSL_VERIFY_REQUIRED );
     mbedtls_ssl_conf_rng( &mConfig, mbedtls_ctr_drbg_random, &mRandom );
-    mbedtls_ssl_conf_dbg( &mConfig, debugLog, &mLogger );
+    if (mrOptions.Verbose) {
+        mbedtls_ssl_conf_dbg(&mConfig, debugLog, &mLogger);
+        mbedtls_debug_set_threshold(4);
+    }
 
     if (!mrOptions.CertCaPath.empty()) {
-        CHK_0(mbedtls_x509_crt_parse_file(&mCaChain, mrOptions.CertCaPath.c_str()));
+        CHK_0(mbedtls_x509_crt_parse_file(&mCaChain, mrOptions.CertCaPath.c_str()))
         mbedtls_ssl_conf_ca_chain(&mConfig, &mCaChain, nullptr);
     }
 
     if (!mrOptions.CertPath.empty()) {
-        CHK_0(mbedtls_x509_crt_parse_file(&mClientCert, mrOptions.CertPath.c_str()));
-        CHK_0(mbedtls_pk_parse_keyfile(&mPrivateKey, mrOptions.KeyPath.c_str(), mrOptions.KeyPasswd.c_str(), &rng_get, &mRandom));
-        CHK_0(mbedtls_ssl_conf_own_cert(&mConfig, &mClientCert, &mPrivateKey));
+        CHK_0(mbedtls_x509_crt_parse_file(&mClientCert, mrOptions.CertPath.c_str()))
+        CHK_0(mbedtls_pk_parse_keyfile(&mPrivateKey, mrOptions.KeyPath.c_str(), mrOptions.KeyPasswd.c_str(), &rng_get, &mRandom))
+        CHK_0(mbedtls_ssl_conf_own_cert(&mConfig, &mClientCert, &mPrivateKey))
     }
 
-    CHK_0(mbedtls_ssl_setup(&mSsl, &mConfig));
+    mbedtls_ssl_conf_read_timeout(&mConfig, mrOptions.ResponseTimeout * 1000);
+
+    CHK_0(mbedtls_ssl_setup(&mSsl, &mConfig))
+
+//    mbedtls_ssl_set_timer_cb(&mSsl, mbedtls_timing_set_delay, mbedtls_timing_get_delay);
 
     UrlParser up(mrOptions.BaseUrl);
-    CHK_0(mbedtls_ssl_set_hostname(&mSsl, std::string(up.GetHost()).c_str()));
+    CHK_0(mbedtls_ssl_set_hostname(&mSsl, std::string(up.GetHost()).c_str()))
 
-    CHK_0(psa_crypto_init());
+    CHK_0(psa_crypto_init())
 }
 
 TLSSocket& TLSSocket::SetSocket(posix::Socket& arSocket)
 {
     mNet.fd = arSocket.GetFd();
     mbedtls_ssl_set_bio( &mSsl, &mNet, mbedtls_net_send, mbedtls_net_recv, mbedtls_net_recv_timeout);
-    CHK_0(mbedtls_net_set_block(&mNet));
+    CHK_0(mbedtls_net_set_block(&mNet))
 
     int ret;
     while ((ret = mbedtls_ssl_handshake(&mSsl)) != 0) {
@@ -111,6 +119,7 @@ size_t TLSSocket::Read(std::span<std::byte> aData)
         }
         else {
             read_bytes += size_t(ret);
+            break;
         }
     }
 
@@ -119,11 +128,14 @@ size_t TLSSocket::Read(std::span<std::byte> aData)
 
 void TLSSocket::debugLog(void* ctx, [[maybe_unused]] int level, const char* file, int line, const char* str)
 {
+    using namespace rsp::logging;
     if (ctx == nullptr) {
         return;
     }
-    auto logger = static_cast<logging::LogChannel*>(ctx);
-    logger->Debug().SetLevel(logging::LogLevel(5 - level)) << file << ":" << line << ": " << str;
+    auto logger = static_cast<LogChannel*>(ctx);
+    auto msg = std::string_view(str);
+    utils::DateTime dt;
+    logger->Debug().SetLevel(LogLevel(level + int(LogLevel::Error))) << "[" << dt.ToLogging() << "] " << file << ":" << line << ": " << msg.substr(0, msg.size() - 1);
 }
 
 int TLSSocket::rng_get(void* p_rng, unsigned char* output, size_t output_len)

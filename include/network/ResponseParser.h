@@ -18,6 +18,9 @@
 
 namespace rsp::network {
 
+/**
+ * \brief HTTP Response parser, for traversing incoming data according to RFC-7230.
+ */
 class ResponseParser
 {
 public:

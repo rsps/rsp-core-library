@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * \copyright   Copyright 2022 RSP Systems A/S. All rights reserved.
+ * \copyright   Copyright 2022-2025 RSP Systems A/S. All rights reserved.
  * \license     Mozilla Public License 2.0
  * \author      Jesper Madsen, Steffen Brummer
  */
@@ -39,6 +39,7 @@ TEST_SUITE_BEGIN("Network");
 
 TEST_CASE("Network")
 {
+//    TestLogger::mLogLevel = rsp::logging::LogLevel::Notice;
     TestLogger logger;
 
     HttpRequestOptions opt;
@@ -66,6 +67,69 @@ TEST_CASE("Network")
         MESSAGE("IP: " << ip);
         std::vector<std::string> list;
         CHECK_EQ(StrUtils::Split(ip, list, '.', false), 4);
+    }
+
+    SUBCASE("HTTP to localhost") {
+        HttpRequest request;
+        opt.BaseUrl = "http://server.localhost:48080";
+
+        SUBCASE("HEAD") {
+            opt.RequestType = HttpRequestType::HEAD;
+        }
+        SUBCASE("GET") {
+            opt.RequestType = HttpRequestType::GET;
+        }
+
+        request.SetOptions(opt);
+
+        logger.Info() << "Request:\n" << request << std::endl;
+
+        IHttpResponse *resp;
+        CHECK_NOTHROW(resp = &request.Execute());
+
+        logger.Info() << "Response:\n" << *resp << std::endl;
+
+//        MESSAGE("Request:\n" << resp->GetRequest());
+//        MESSAGE("Response:\n" << *resp);
+
+        CHECK_EQ(resp->GetHeader("content-type"), "text/html");
+
+        if (opt.RequestType == HttpRequestType::HEAD) {
+            CHECK_EQ(resp->GetBody().GetStreamSize(), 0);
+        }
+        else {
+            CHECK_EQ(resp->GetBody().GetStreamSize(), 120);
+        }
+
+        CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
+    }
+
+    SUBCASE("HTTP Request Reuse") {
+        HttpRequest request;
+        opt.BaseUrl = "http://server.localhost:48080";
+        opt.Uri = "/";
+        opt.RequestType = HttpRequestType::HEAD;
+        request.SetOptions(opt);
+
+        IHttpResponse *resp;
+        CHECK_NOTHROW(resp = &request.Execute());
+
+        CHECK_EQ(resp->GetHeader("content-type"), "text/html");
+        CHECK_EQ(resp->GetHeader("content-length"), "120");
+        CHECK_EQ(resp->GetBody().GetStreamSize(), 0);
+        CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
+
+        opt.RequestType = HttpRequestType::GET;
+        request.SetOptions(opt);
+
+        CHECK_NOTHROW(resp = &request.Execute());
+        CHECK_EQ(resp->GetHeader("content-type"), "text/html");
+        CHECK_EQ(resp->GetHeader("content-length"), "120");
+        CHECK_EQ(resp->GetBody().GetStreamSize(), 120);
+        CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
+//        std::stringstream ss;
+//        ss << resp->GetBody();
+//        MESSAGE("Body: " << ss.str());
     }
 
     SUBCASE("TLS to localhost") {

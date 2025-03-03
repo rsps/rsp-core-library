@@ -11,10 +11,10 @@
 #ifndef TESTS_HELPERS_TESTLOGGER_H_
 #define TESTS_HELPERS_TESTLOGGER_H_
 
-#include <logging/Logger.h>
+#include <logging/LogChannel.h>
 
 
-class TestLogger : public rsp::logging::Logger
+class TestLogger : public rsp::logging::LogChannel
 {
 public:
     TestLogger();
