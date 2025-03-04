@@ -217,7 +217,8 @@ void CurlHttpRequest::populateOptions()
     setCurlOption(CURLOPT_CONNECTTIMEOUT, mRequestOptions.ConnectionTimeout);
     setCurlOption(CURLOPT_SERVER_RESPONSE_TIMEOUT, mRequestOptions.ResponseTimeout);
 
-    setCurlOption(CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
+//    setCurlOption(CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
+    setCurlOption(CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
 
 //    CURLMOPT_PIPELINING to CURLPIPE_MULTIPLEX
 //    CURLOPT_PIPEWAIT
