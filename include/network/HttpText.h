@@ -93,6 +93,12 @@ public:
     HttpText& RWS(size_t aCount = 1); // Required White Space
 
     /**
+     * \brief Check that current position is an optional chunk-ext separator (';'), decode and move cursor if it is
+     * \return Optional key/value pair
+     */
+    std::optional<std::pair<std::string_view, std::string_view>> OChunkExt();
+
+    /**
      * \brief Get the string fulfilling alpha character rules from current position.
      * \param aSize
      * \return string_view
@@ -114,16 +120,16 @@ public:
     /**
      * \brief Parse the next aCount amount of characters as a decimal value.
      * \param aCount
-     * \return int
+     * \return size_t
      */
-    int Digit(size_t aCount);
+    size_t Digit(size_t aCount = 0);
 
     /**
-     * \brief PArse thr next aCount amount of characters as a hexadecimal value.
+     * \brief Parse the next aCount amount of characters as a hexadecimal value.
      * \param aCount
-     * \return int
+     * \return size_t
      */
-    int HexDigit(size_t aCount);
+    size_t HexDigit(size_t aCount = 0);
 
     /**
      * \brief Get the next aSize amount of bytes from the current position.
@@ -168,9 +174,23 @@ public:
      */
     [[nodiscard]] std::string_view Source() const { return mSource; }
 
+    /**
+     * \brief Get the current cursor position into the source string
+     * \return size_t
+     */
+    [[nodiscard]] size_t GetCursor() const { return mCursor; }
+
+    /**
+     * \brief Return the remaining source string from the current cursor position.
+     * \return string_view
+     */
+    [[nodiscard]] std::string_view GetRemaining() const { return {mSource.substr(mCursor)}; }
+
 protected:
     std::string_view mSource;
     size_t mCursor = 0;
+
+    std::string_view token(std::string_view aSub);
 };
 
 } // rsp::network

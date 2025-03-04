@@ -56,12 +56,14 @@ public:
     HttpRequestType RequestType = HttpRequestType::GET;
     std::string BasicAuthUsername{};
     std::string BasicAuthPassword{};
+    std::function<void(std::string_view /*key*/, std::string_view /*value*/)> ResponseChunkExtHandler{};
 
     void Clear() {
         Headers.clear();
         Uri.clear();
         RequestBody.reset();
         ResponseBody.reset();
+        ResponseChunkExtHandler = nullptr;
     }
 };
 

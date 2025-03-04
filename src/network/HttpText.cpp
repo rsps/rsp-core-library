@@ -19,7 +19,7 @@ constexpr auto cDelimiters = R"("(),/:;<=>?@[\]{})"sv;
 constexpr auto cCRLF = "\r\n"sv;
 constexpr auto cSpaceTab = " \t"sv;
 
-#define PARSE_ERROR() THROW_WITH_BACKTRACE2(EHttpParseError, mSource, mCursor);
+#define PARSE_ERROR() THROW_WITH_BACKTRACE2(EHttpParseError, mSource, mCursor)
 
 
 HttpText::HttpText(std::string_view aSource)
@@ -65,6 +65,30 @@ HttpText& HttpText::OWS()
 {
     mCursor = mSource.find_first_not_of(cSpaceTab, mCursor);
     return *this;
+}
+
+std::optional<std::pair<std::string_view, std::string_view>> HttpText::OChunkExt()
+{
+    if (mSource.at(mCursor) == ';') {
+        mCursor++;
+        auto end = mSource.find_first_of(";\r", mCursor);
+        if (end == npos) {
+            PARSE_ERROR();
+        }
+        std::string_view key{};
+        std::string_view value{};
+        auto pos = mSource.find('=', mCursor);
+        if (pos != npos) {
+            key = token(mSource.substr(mCursor, pos - mCursor));
+            value = token(mSource.substr(pos + 1, end - pos - 1));
+        }
+        else {
+            key = token(mSource.substr(mCursor, end));
+        }
+        mCursor = end;
+        return {{key, value}};
+    }
+    return {};
 }
 
 HttpText& HttpText::RWS(size_t aCount)
@@ -119,8 +143,11 @@ std::string_view HttpText::HttpVersion()
     return mSource.substr(0, pos);
 }
 
-int HttpText::Digit(size_t aCount)
+size_t HttpText::Digit(size_t aCount)
 {
+    if (aCount == 0) {
+        aCount = mSource.find_first_of(cWhitespaceCharacters, mCursor) - mCursor;
+    }
     auto sub = mSource.substr(mCursor, aCount);
     for (auto c : sub) {
         if (!std::isdigit(c)) {
@@ -128,15 +155,18 @@ int HttpText::Digit(size_t aCount)
         }
     }
     mCursor += sub.size();
-    auto result = string_to_integral<int>(sub);
+    auto result = string_to_integral<size_t>(sub);
     if (!result) {
         PARSE_ERROR();
     }
     return *result;
 }
 
-int HttpText::HexDigit(size_t aCount)
+size_t HttpText::HexDigit(size_t aCount)
 {
+    if (aCount == 0) {
+        aCount = mSource.find_first_of("; \t\r\n", mCursor) - mCursor;
+    }
     auto sub = mSource.substr(mCursor, aCount);
     for (auto c : sub) {
         if (!std::isxdigit(c)) {
@@ -144,7 +174,7 @@ int HttpText::HexDigit(size_t aCount)
         }
     }
     mCursor += sub.size();
-    auto result = string_to_integral<int>(sub, 16);
+    auto result = string_to_integral<size_t>(sub, 16);
     if (!result) {
         PARSE_ERROR();
     }
@@ -166,7 +196,14 @@ std::string_view HttpText::FieldName()
     }
 
     auto sub = mSource.substr(mCursor, colon_pos - mCursor);
-    for (auto c : sub) {
+    auto result = token(sub);
+    mCursor = colon_pos + 1;
+    return result;
+}
+
+std::string_view HttpText::token(std::string_view aSub)
+{
+    for (auto c : aSub) {
         if (!std::isgraph(c)) {
             PARSE_ERROR();
         }
@@ -174,8 +211,7 @@ std::string_view HttpText::FieldName()
             PARSE_ERROR();
         }
     }
-    mCursor = colon_pos + 1;
-    return sub;
+    return aSub;
 }
 
 std::string_view HttpText::FieldValue()

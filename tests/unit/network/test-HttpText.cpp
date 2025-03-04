@@ -20,7 +20,6 @@ TEST_SUITE_BEGIN("Network");
 TEST_CASE("HttpText")
 {
     const std::string_view cNormalResponse("HTTP/1.0 200 Ok\r\nContent-Length: 21\r\nETag: \"1550381373\"\r\n\r\nThis is the body text");
-    const std::string_view cHeadResponse("HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\nContent-Length: 162\r\nConnection: close\r\nDate: Tue, 11 Feb 2025 07:02:09 GMT\r\nServer: lighttpd/1.4.75\r\n\r\n");
 
     SUBCASE("ICaseCompare") {
         CHECK_FALSE(equal_ascii_case_insensitive(cNormalResponse, "Content-Length"));
@@ -37,6 +36,7 @@ TEST_CASE("HttpText")
     }
 
     SUBCASE("Parse Head Response") {
+        const std::string_view cHeadResponse("HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\nContent-Length: 162\r\nConnection: close\r\nDate: Tue, 11 Feb 2025 07:02:09 GMT\r\nServer: lighttpd/1.4.75\r\n\r\n");
         HttpText ht(cHeadResponse);
         StatusLine sl(ht.Line());
 
@@ -81,6 +81,65 @@ TEST_CASE("HttpText")
 
         auto span= ht.Octets(21);
         CHECK_EQ(std::string_view(reinterpret_cast<const char*>(span.data()), span.size()), "This is the body text");
+    }
+
+    SUBCASE("Parse Chunked Response") {
+        const std::string_view cChunkedResponse("HTTP/1.0 200 Ok\r\nTransfer-Encoding: chunked\r\n\r\n5;progress=30\r\nThis \r\n10;progress=90\r\nis the body text\r\n0;progress=100\r\nCustom-Header: \"custom-value\"\r\n");
+        HttpText ht(cChunkedResponse);
+        StatusLine sl(ht.Line());
+
+        CHECK_EQ(sl.GetHttpVersion(), "HTTP/1.0");
+        CHECK_EQ(sl.GetStatusCode(), 200);
+        CHECK_EQ(sl.GetReasonPhrase(), "Ok");
+
+        CHECK_EQ(ht.FieldName(), "Transfer-Encoding");
+        CHECK_EQ(ht.FieldValue(), "chunked");
+
+        CHECK(ht.IsNewLine());
+        CHECK_NOTHROW(ht.CRLF());
+
+        auto chunk_len = ht.HexDigit();
+        CHECK_EQ(chunk_len, 5);
+        ht.OWS();
+        auto pair = ht.OChunkExt();
+        CHECK(ht.IsNewLine());
+        CHECK_NOTHROW(ht.CRLF());
+        CHECK(pair);
+        CHECK_EQ(pair->first, "progress");
+        CHECK_EQ(pair->second, "30");
+        auto span= ht.Octets(chunk_len);
+        CHECK_EQ(std::string_view(reinterpret_cast<const char*>(span.data()), span.size()), "This ");
+        CHECK(ht.IsNewLine());
+        CHECK_NOTHROW(ht.CRLF());
+
+        chunk_len = ht.HexDigit();
+        CHECK_EQ(chunk_len, 16);
+        ht.OWS();
+        pair = ht.OChunkExt();
+        CHECK(ht.IsNewLine());
+        CHECK_NOTHROW(ht.CRLF());
+        CHECK(pair);
+        CHECK_EQ(pair->first, "progress");
+        CHECK_EQ(pair->second, "90");
+        span= ht.Octets(chunk_len);
+        CHECK_EQ(std::string_view(reinterpret_cast<const char*>(span.data()), span.size()), "is the body text");
+        CHECK(ht.IsNewLine());
+        CHECK_NOTHROW(ht.CRLF());
+
+        chunk_len = ht.HexDigit();
+        CHECK_EQ(chunk_len, 0);
+        ht.OWS();
+        pair = ht.OChunkExt();
+        CHECK(ht.IsNewLine());
+        CHECK_NOTHROW(ht.CRLF());
+        CHECK(pair);
+        CHECK_EQ(pair->first, "progress");
+        CHECK_EQ(pair->second, "100");
+
+        CHECK_FALSE(ht.Eof());
+        CHECK_EQ(ht.FieldName(), "Custom-Header");
+        CHECK_EQ(ht.FieldValue(), "custom-value");
+        CHECK(ht.Eof());
     }
 
 }

@@ -36,13 +36,16 @@ bool ResponseParser::ParseNewData(std::span<const std::byte> aNewData)
                     return true;
                 }
                 (void)mrResponse.GetContentLength(); // Attempt to parse content-length from headers.
+                auto body = work.substr(position + cHeaderEnd.size());
                 if (mrResponse.GetHeaders().contains("transfer-encoding") && mrResponse.GetHeader("transfer-encoding").ends_with("chunked")) {
                     mState = States::ChunkedBody;
+                    return decodeChunkedBody(body);
                 }
                 else {
                     mState = States::Body;
-                    auto body = work.substr(position + cHeaderEnd.size());
-                    mContentReceived+= mrResponse.mpBody->Write({ reinterpret_cast<const std::byte*>(body.data()), body.size() });
+                    if (!body.empty()) {
+                        mContentReceived += mrResponse.mpBody->Write({reinterpret_cast<const std::byte*>(body.data()), body.size()});
+                    }
                     return mrResponse.mContentLength == mContentReceived;
                 }
             }
@@ -53,9 +56,14 @@ bool ResponseParser::ParseNewData(std::span<const std::byte> aNewData)
             return mrResponse.mContentLength == mContentReceived;
 
         case States::ChunkedBody:
-            // TODO: Implement chunked support. Format: 0x<length>\r\n<body part>\r\n
-        case States::ChunkedTrail:
+            if (decodeChunkedBody({reinterpret_cast<const char*>(aNewData.data()), aNewData.size()})) {
+                mState = States::ChunkedTrail;
+                return decodeChunkedTrailer("");
+            }
             break;
+
+        case States::ChunkedTrail:
+            return decodeChunkedTrailer({reinterpret_cast<const char*>(aNewData.data()), aNewData.size()});
     }
 
     return false;
@@ -86,6 +94,84 @@ void ResponseParser::addHeader(std::string_view aKey, std::string_view aValue)
     }
 
     mrResponse.mHeaders.try_emplace(aKey, aValue);
+}
+
+bool ResponseParser::decodeChunkedBody(std::string_view aData)
+{
+    if (aData.empty()) {
+        return false;
+    }
+    mContentReceived += aData.size();
+    mChunkData += aData;
+    if (mChunkData.size() < 2) { // Wait for at least a cr+lf
+        return false;
+    }
+
+    try {
+        while (true) {
+            auto ht = HttpText(mChunkData);
+            auto line = ht.Line(); // Throws if line is not complete
+            auto line_size = ht.GetCursor();
+
+            size_t mChunkLength = line.HexDigit();
+            decodeChunkExtension(line);
+
+            if (mChunkLength == 0) { // EOF
+                mChunkData = mChunkData.substr(line_size);
+                return true;
+            }
+
+            if (mChunkLength <= ht.GetRemaining().size()) {
+                auto chunk_data = ht.Octets(mChunkLength);
+                ht.CRLF(); // Body must end with cr+lf to be valid.
+                auto written = mrResponse.mpBody->Write(chunk_data);
+                mChunkData = mChunkData.substr(written + line_size + 2);
+            }
+        }
+    }
+    catch (const EHttpParseError &e) {
+        // Ignore parser errors, data could be incomplete
+    }
+
+    return false;
+}
+
+void ResponseParser::decodeChunkExtension(HttpText& arLine)
+{
+    arLine.OWS();
+    auto opt = mrResponse.GetRequest().GetOptions();
+    while (auto pair = arLine.OChunkExt()) {
+        if (opt.ResponseChunkExtHandler) {
+            opt.ResponseChunkExtHandler(pair->first, pair->second);
+        }
+    }
+}
+
+bool ResponseParser::decodeChunkedTrailer(std::string_view aData)
+{
+    mContentReceived += aData.size();
+    mChunkData += aData;
+    if (mChunkData.size() < 2) { // Wait for at least a cr+lf
+        return false;
+    }
+
+    auto ht = HttpText(mChunkData);
+
+    try {
+        while (auto line = ht.Line()) {
+            if (line.IsNewLine()) {
+                return true; // Empty line is reached
+            }
+            auto key = line.FieldName();
+            addHeader(key, line.FieldValue());
+        }
+    }
+    catch(const EHttpParseError &e) {
+        // Ignore parser errors, data could be incomplete
+    }
+    mChunkData = mChunkData.substr(ht.GetCursor());
+
+    return false;
 }
 
 } // rsp::network

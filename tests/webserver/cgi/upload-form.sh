@@ -1,6 +1,5 @@
 echo "Content-type: text/html"
 echo ""
-echo ""
 echo "Content Length: $HTTP_CONTENT_LENGTH"
 #echo "Request Method: $REQUEST_METHOD"
 #env

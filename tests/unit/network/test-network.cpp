@@ -328,7 +328,7 @@ TEST_CASE("Network")
 
         MESSAGE("Body: " << resp->GetBody());
 
-        CHECK_EQ(resp->GetBody().GetStreamSize(), 71);
+        CHECK_EQ(resp->GetBody().GetStreamSize(), 70);
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
 
         CHECK(FileSystem::FileExists(cUploadedFile));
@@ -369,8 +369,7 @@ TEST_CASE("Network")
             request_size = request.GetBody().GetStreamSize();
         }
 
-        std::string expected = "\n"
-                               "Content Length: " + std::to_string(request_size) + "\n"
+        std::string expected = "Content Length: " + std::to_string(request_size) + "\n"
                                "CTYPE: multipart/form-data\n"
                                "filename: uploaded.png\r\n"
                                "filedata: filename=\"image.png\"; Content-Type: image/png\r\n"
@@ -381,8 +380,8 @@ TEST_CASE("Network")
 
         CHECK_EQ(body, expected);
 
-        CHECK_EQ(body.size(), 148);
-        CHECK_EQ(resp->GetBody().GetStreamSize(), 148);
+        CHECK_EQ(body.size(), 147);
+        CHECK_EQ(resp->GetBody().GetStreamSize(), 147);
         CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
 
         CHECK(FileSystem::FileExists(cUploadedFile));
@@ -440,8 +439,7 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
         auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
 //        MESSAGE(body);
 
-        std::string expected = R"(
-Content length: 41
+        std::string expected = R"(Content length: 41
 Request Method: POST
 Body: )" + json + "\n";
 

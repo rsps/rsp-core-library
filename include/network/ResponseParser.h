@@ -38,9 +38,13 @@ protected:
     HttpResponse& mrResponse;
     size_t mContentReceived = 0;
     States mState = States::Headers;
+    std::string mChunkData{};
 
     void decodeHeaders(std::string_view aHeaderData);
     void addHeader(std::string_view aKey, std::string_view aValue);
+    bool decodeChunkedBody(std::string_view aData);
+    bool decodeChunkedTrailer(std::string_view aData);
+    void decodeChunkExtension(HttpText &arLine);
 };
 
 } // rsp::network

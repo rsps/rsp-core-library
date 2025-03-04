@@ -43,6 +43,7 @@ debug.log-condition-handling = "enable"
 
 server.upload-dirs=( basedir )
 server.stream-request-body = 1
+server.stream-response-body = 2
 
 static-file.exclude-extensions = ( ".fcgi", ".php", ".rb", "~", ".inc" )
 index-file.names = ( "index.html" )

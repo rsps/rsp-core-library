@@ -1,6 +1,5 @@
 echo "Content-type: text/html"
 echo ""
-echo ""
 echo "Uploaded file size: $HTTP_CONTENT_LENGTH"
 echo "Request Method: $REQUEST_METHOD"
 echo "Filename: $HTTP_X_FILENAME"

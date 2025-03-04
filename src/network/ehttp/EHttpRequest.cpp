@@ -52,8 +52,6 @@ const IStreamDataProvider& EHttpRequest::GetBody() const
 
 void EHttpRequest::prepareRequest(AutoHeaders& arHeaders)
 {
-    arHeaders.emplace("Connection", "keep-alive");
-
     if (!mOptions.BasicAuthUsername.empty()) {
         // Add authorization header with base64 encoded credentials
         arHeaders.emplace("Authorization", "Basic " + utils::Base64::Encode(mOptions.BasicAuthUsername + ":" + mOptions.BasicAuthPassword));
