@@ -110,7 +110,6 @@ std::string_view HttpText::Alpha(size_t aSize)
     }
     mCursor += sub.size();
     return sub;
-//    return { sub.data(), sub.size() };
 }
 
 std::string_view HttpText::AsciiText()

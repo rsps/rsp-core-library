@@ -237,9 +237,4 @@ void FileIO::PutContents(const std::string &arData)
     PutLine(arData);
 }
 
-//void FileIO::close(int aHandle)
-//{
-//    ::close(aHandle);
-//}
-
 } // namespace rsp::posix

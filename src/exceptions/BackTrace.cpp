@@ -25,7 +25,6 @@ namespace rsp::exceptions {
 
 std::ostream& operator <<(std::ostream &o, const StackEntry &arEntry)
 {
-//    o << arEntry.mFileName << "  " << arEntry.mFunction << " (" << arEntry.mLineNumber << ")";
     o << arEntry.mFileName << ":" << arEntry.mLineNumber << "  " << arEntry.mFunction;
     return o;
 }

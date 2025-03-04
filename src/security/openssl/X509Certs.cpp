@@ -63,7 +63,6 @@ void X509Certs::ContextLoadCertificateAuthority(std::string_view aCAPem)
 {
     if (rsp::posix::FileSystem::FileExists(std::string(aCAPem))) {
         int err = SSL_CTX_load_verify_file(mpContext, aCAPem.data());
-//        int err = SSL_CTX_load_verify_locations(mpContext, aCAPem.data(), nullptr);
         CHK_SSL(err);
         return;
     }
@@ -102,8 +101,6 @@ void X509Certs::ContextLoadClientCertificate(std::string_view aCertPem, std::str
     CHK_NULL(cert);
     int err = SSL_CTX_use_certificate(mpContext, cert);
     CHK_SSL(err);
-
-//    X509_STORE_add_cert(SSL_CTX_get_cert_store(mpContext.get()), cert);;
 
     BioBuffer key_bio(aKeyPem);
     auto key = PEM_read_bio_PrivateKey(key_bio.Get(), nullptr, nullptr, nullptr);

@@ -20,9 +20,6 @@ namespace rsp::network {
 
 size_t MultipartBody::Write(std::span<const std::byte> aData)
 {
-//    if (mParts.back().mpBody) {
-//        return mParts.back().mpBody->Write(aData);
-//    }
     return 0;
 }
 
