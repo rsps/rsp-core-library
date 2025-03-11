@@ -16,6 +16,7 @@
 rsp::logging::LogLevel TestLogger::mLogLevel = rsp::logging::LogLevel::Notice;
 
 TestLogger::TestLogger()
+    : LogChannel("unit-test")
 {
     mConsoleLogWriter = MakeLogWriter<rsp::logging::ConsoleLogWriter>(mLogLevel);
 }

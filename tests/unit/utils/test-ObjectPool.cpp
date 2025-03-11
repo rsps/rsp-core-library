@@ -12,6 +12,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 static int counter = 0;
 
 struct MyType {
@@ -56,3 +58,5 @@ TEST_CASE("ObjectPool")
     CHECK_EQ(pool.Available(), 2);
     CHECK_EQ(e4.member, 1);
 }
+
+TEST_SUITE_END();

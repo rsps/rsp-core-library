@@ -13,6 +13,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 static int test_func()
 {
     return 84;
@@ -55,4 +57,4 @@ TEST_CASE("Functions") {
 //    CHECK(bind_func3() == 6);
 }
 
-
+TEST_SUITE_END();

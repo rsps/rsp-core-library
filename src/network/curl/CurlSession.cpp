@@ -8,14 +8,14 @@
  * \author      Steffen Brummer
  */
 
-#include <network/HttpSession.h>
+#include <memory>
 #include "CurlSession.h"
 
 using namespace rsp::network;
 
-IHttpSession* rsp::network::HttpSession::MakePimpl(size_t aSize)
+std::unique_ptr<IHttpSession> rsp::network::IHttpSession::Create(size_t aSize)
 {
-    return new rsp::network::curl::CurlSession(aSize);
+    return std::make_unique<rsp::network::curl::CurlSession>(aSize);
 }
 
 namespace rsp::network::curl {

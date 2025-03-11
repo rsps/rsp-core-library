@@ -11,6 +11,8 @@
 #include "doctest.h"
 #include <utils/Average.h>
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("Average") {
     using namespace rsp::utils;
 
@@ -79,3 +81,5 @@ TEST_CASE("Average") {
         CHECK_EQ(avr.Get(), 9.0f);
     }
 }
+
+TEST_SUITE_END();

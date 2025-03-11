@@ -19,12 +19,12 @@
 #include <utils/Timer.h>
 #include <scenes/Scenes.h>
 #include <TestEngine.h>
-#include <TestHelpers.h>
 
 using namespace rsp::graphics;
 using namespace rsp::utils;
 using namespace std::literals::chrono_literals;
 
+TEST_SUITE_BEGIN("Integration");
 
 TEST_CASE("Touch Events" * doctest::skip())
 {
@@ -68,3 +68,5 @@ TEST_CASE("Touch Events" * doctest::skip())
 
     MESSAGE("Finished with " << gfx.GetFPS() << " FPS and a maximum event delay of " << gh.mTouchParser.GetMaxDelay() << "ms");
 }
+
+TEST_SUITE_END();

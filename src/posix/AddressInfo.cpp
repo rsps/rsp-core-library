@@ -25,7 +25,7 @@ AddressInfo::AddressInfo(std::string_view aUrn, bool aServer, Domain aFamily, Ty
     }
 }
 
-size_t AddressInfo::GetCount()
+size_t AddressInfo::GetCount() const
 {
     return mAddresses.size();
 }
@@ -50,18 +50,18 @@ bool AddressInfo::splitURN(std::string_view aUrn)
     }
 
     if ((colon_pos = aUrn.find(']')) != std::string::npos) { // IPv6 with service/port
-//        if (mFamilyHint == Domain::Unspecified) {
-//            mFamilyHint = Domain::Inet6;
-//        }
+        if (mFamilyHint == Domain::Unspecified) {
+            mFamilyHint = Domain::Inet6;
+        }
         mNode = aUrn.substr(0, colon_pos);
         mService = aUrn.substr(colon_pos + 2);
         return true;
     }
 
     if ((colon_pos = aUrn.find(':')) != std::string::npos) { // IPv4 with service/port
-//        if (mFamilyHint == Domain::Unspecified) {
-//            mFamilyHint = Domain::Inet;
-//        }
+        if (mFamilyHint == Domain::Unspecified) {
+            mFamilyHint = Domain::Inet;
+        }
         mNode = aUrn.substr(0, colon_pos);
         mService = aUrn.substr(colon_pos + 1);
         return true;

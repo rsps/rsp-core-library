@@ -17,6 +17,8 @@
 
 using namespace rsp::security;
 
+TEST_SUITE_BEGIN("Security");
+
 /**
  * \brief Test case for AES encryption implementation
  *
@@ -78,4 +80,4 @@ TEST_CASE("Crypt")
 //    MESSAGE("Sizes: " << plain.size() << " vs " << cTestStr.size());
 }
 
-
+TEST_SUITE_END();

@@ -14,6 +14,8 @@
 using namespace rsp::utils;
 using namespace rsp::exceptions;
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("Singleton") {
 
     struct MyClass : Singleton<MyClass> {
@@ -53,5 +55,4 @@ TEST_CASE("Singleton") {
     }
 }
 
-
-
+TEST_SUITE_END();

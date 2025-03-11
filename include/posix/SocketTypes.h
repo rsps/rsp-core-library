@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#ifndef RSP_CORE_LIB_SOCKETTYPES_H
-#define RSP_CORE_LIB_SOCKETTYPES_H
+#ifndef RSP_CORE_LIB_SOCKET_TYPES_H
+#define RSP_CORE_LIB_SOCKET_TYPES_H
 
 #include <sys/socket.h>
 
@@ -86,4 +86,4 @@ enum class ShutdownFlags {
 
 } // namespace rsp::posix
 
-#endif //RSP_CORE_LIB_SOCKETTYPES_H
+#endif //RSP_CORE_LIB_SOCKET_TYPES_H

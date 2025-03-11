@@ -29,6 +29,12 @@ class IHttpResponse;
 class IHttpRequest
 {
 public:
+    /**
+     * \brief Factory method for creating IHttpRequest objects.
+     * \return Pointer to IHttpRequest object.
+     */
+    static std::unique_ptr<IHttpRequest> Create();
+
     virtual ~IHttpRequest() = default;
 
     /**
@@ -54,33 +60,13 @@ public:
      * \param apBody Shared pointer to interface of IHttpBodyStream
      * \return self
      */
-    virtual IHttpRequest& SetBody(std::shared_ptr<IHttpBodyStream> apBody) = 0;
+    virtual IHttpRequest& SetBody(HttpBody_t apBody) = 0;
 
     /**
      * \brief Get the body content of this request
      * \return Reference to body stream
      */
-    [[nodiscard]] virtual const IHttpBodyStream& GetBody() const = 0;
-
-    /**
-     * \fn IHttpForm AddField&(std::string_view, std::string_view)
-     * \brief Add a form field as key/value pair
-     *
-     * \param aFieldName Name of the field
-     * \param aValue Value of the field
-     * \return self
-     */
-    virtual IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) = 0;
-
-    /**
-     * \fn IHttpForm AddFile&(std::string_view, rsp::posix::FileIO&)
-     * \brief Add a file field to the form
-     *
-     * \param aFieldName Name of the field
-     * \param arFile File value of the field
-     * \return self
-     */
-    virtual IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) = 0;
+    [[nodiscard]] virtual const IStreamDataProvider& GetBody() const = 0;
 
     /**
      * \fn IHttpResponse Execute&()=0
@@ -96,7 +82,7 @@ public:
      *
      * \return Low level handle stored in generic uintptr_t type.
      */
-    virtual std::uintptr_t GetHandle() = 0;
+    [[nodiscard]] virtual std::uintptr_t GetHandle() const = 0;
 };
 
 /**
@@ -107,7 +93,12 @@ public:
  * \param arReq The HTTP request to dump to the stream.
  * \return output stream
  */
-std::ostream& operator<<(std::ostream &o, const IHttpRequest& arReq);
+inline std::ostream& operator<<(std::ostream &o, const IHttpRequest& arReq)
+{
+    o << arReq.GetOptions();
+    return o;
+}
+
 
 } // namespace rsp::network
 

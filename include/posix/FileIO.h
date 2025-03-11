@@ -15,6 +15,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <utils/SystemHandle.h>
+#include <unistd.h>
 
 namespace rsp::posix
 {
@@ -33,9 +35,14 @@ public:
     /**
      * Construct a FileIO object, open/create file if given as argument.
      */
-    FileIO();
+    FileIO() = default;
     FileIO(const std::string &arFileName, std::ios_base::openmode aMode, int aPermissions = 0);
+    FileIO(const FileIO& arOther);
+    FileIO(FileIO&& arOther) noexcept = default;
     virtual ~FileIO();
+
+    FileIO& operator=(const FileIO& arOther);
+    FileIO& operator=(FileIO&& arOther) noexcept = default;
 
     /**
      * Get the name of the current file.
@@ -66,7 +73,7 @@ public:
      */
     [[nodiscard]] bool IsOpen() const
     {
-        return (mHandle >= 0);
+        return bool(mHandle);
     }
 
     /**
@@ -145,7 +152,7 @@ public:
      */
     [[nodiscard]] int GetHandle() const
     {
-        return mHandle;
+        return mHandle.Get();
     }
 
     /**
@@ -173,9 +180,17 @@ public:
      */
     [[nodiscard]] bool WaitForDataReady(int aTimeoutMs) const;
 
-  protected:
+protected:
+    struct FileHandleDeleter
+    {
+        void operator()(int aHandle) noexcept {
+            ::close(aHandle);
+        }
+    };
+    using FileHandle_t = rsp::utils::SystemHandle<int, FileHandleDeleter, -1>;
+
     std::string mFileName{};
-    int mHandle = -1;
+    FileHandle_t mHandle{};
 };
 
 } // namespace rsp::posix

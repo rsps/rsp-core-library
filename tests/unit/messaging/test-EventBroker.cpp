@@ -15,6 +15,8 @@
 
 using namespace rsp::messaging;
 
+TEST_SUITE_BEGIN("Messaging");
+
 static int event1_count = 0;
 static int event2_count = 0;
 
@@ -97,3 +99,4 @@ TEST_CASE("EventBroker")
     CHECK_EQ(event2_count, 42);
 }
 
+TEST_SUITE_END();

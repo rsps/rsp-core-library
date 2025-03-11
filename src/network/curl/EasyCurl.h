@@ -47,7 +47,7 @@ protected:
     curl_slist *mpHeaders = nullptr;
 
     curl_mime* getForm();
-    bool hasForm() { return (mpForm != nullptr); }
+    [[nodiscard]] bool hasForm() const { return (mpForm != nullptr); }
 
     virtual void prepareRequest();
     virtual void requestDone() {};

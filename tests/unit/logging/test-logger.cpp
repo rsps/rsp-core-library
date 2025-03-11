@@ -26,6 +26,8 @@ using namespace rsp;
 using namespace rsp::utils;
 using namespace rsp::logging;
 
+TEST_SUITE_BEGIN("Logging");
+
 const char *cFileName = "__logger-test.log";
 
 struct MyType {
@@ -192,3 +194,5 @@ TEST_CASE("Logging") {
 
     CHECK_NOTHROW(logging::LoggerInterface::DestroyDefault());
 }
+
+TEST_SUITE_END();

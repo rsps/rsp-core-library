@@ -22,6 +22,8 @@ using namespace rsp::posix;
 using namespace rsp::utils;
 using namespace std::chrono;
 
+TEST_SUITE_BEGIN("Posix");
+
 TEST_CASE("FileSystem") {
 
     const std::string cSubDir = "subdir/subdir1/subdir2";
@@ -121,6 +123,4 @@ TEST_CASE("FileSystem") {
     }
 }
 
-
-
-
+TEST_SUITE_END();

@@ -1,7 +1,7 @@
 /*!
  * \copyright    Copyright 2022 RSP Systems A/S. All rights reserved.
  * \license      Mozilla Public License 2.0
- * \author:      Jesper Madsen, Steffen Brummer
+ * \author:      Steffen Brummer
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -23,7 +23,7 @@ std::ostream& operator <<(std::ostream &o, const ConnectionOptions &arOptions)
             "CertCaPath:        " << arOptions.CertCaPath << "\n"
             "CertPath:          " << arOptions.CertPath << "\n"
             "KeyPath:           " << arOptions.KeyPath << "\n"
-            "KeyPasswd:         " << arOptions.KeyPasswd;
+            "KeyPasswd:         " << std::string(arOptions.KeyPasswd.length(), '*');
     }
 
     return o;

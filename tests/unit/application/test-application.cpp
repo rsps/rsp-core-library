@@ -20,6 +20,8 @@
 
 using namespace rsp::application;
 
+TEST_SUITE_BEGIN("Application");
+
 const char *cLogFileName = "MyApplication.log";
 
 TEST_CASE("Application")
@@ -129,3 +131,5 @@ TEST_CASE("Application")
         CHECK(rsp::utils::StrUtils::EndsWith(line, "MyApplication says \"Hello World.\""));
     }
 }
+
+TEST_SUITE_END();

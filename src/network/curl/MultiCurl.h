@@ -29,7 +29,7 @@ class MultiCurl : public logging::NamedLogger<MultiCurl>
 {
 public:
     MultiCurl();
-    ~MultiCurl();
+    ~MultiCurl() override;
 
     MultiCurl(const MultiCurl&) = delete;
     MultiCurl(const MultiCurl&&) = delete;

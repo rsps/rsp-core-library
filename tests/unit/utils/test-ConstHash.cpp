@@ -14,6 +14,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 static uint32_t hash_32_fnv1a(const char* data)
 {
     return Fnv1a::Hash32(data);
@@ -60,3 +62,4 @@ TEST_CASE("ConstHash")
 
 }
 
+TEST_SUITE_END();

@@ -25,7 +25,7 @@ namespace rsp::exceptions {
 
 std::ostream& operator <<(std::ostream &o, const StackEntry &arEntry)
 {
-    o << arEntry.mFileName << "  " << arEntry.mFunction << " (" << arEntry.mLineNumber << ")";
+    o << arEntry.mFileName << ":" << arEntry.mLineNumber << "  " << arEntry.mFunction;
     return o;
 }
 
@@ -42,7 +42,11 @@ BackTrace::BackTrace(size_t aEntriesToDiscard)
 {
 #if defined(_GLIBCXX_HAVE_STACKTRACE)
     for (auto &st : std::stacktrace::current()) {
-        mStackEntries.emplace_back(st.source_file(), st.description(), std::to_string(st.source_line()));
+        if (aEntriesToDiscard > 0) {
+            aEntriesToDiscard--;
+            continue;
+        }
+        mStackEntries.emplace_back(st.source_file(), st.description(), st.source_line());
     }
 #elif defined(__x86_64__)
     using namespace abi;
@@ -75,7 +79,7 @@ BackTrace::BackTrace(size_t aEntriesToDiscard)
             offset = s.substr(end, s.length());
         }
 
-        mStackEntries.emplace_back(file, function, offset);
+        mStackEntries.emplace_back(file, function, std:stoul(offset));
     }
 
     free(strings);

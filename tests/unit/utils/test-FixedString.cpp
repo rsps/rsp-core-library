@@ -13,6 +13,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("Fixed String")
 {
     const char *p = "Hello World";
@@ -39,5 +41,4 @@ TEST_CASE("Fixed String")
     CHECK_EQ(f12, "Hello Worl");
 }
 
-
-
+TEST_SUITE_END();

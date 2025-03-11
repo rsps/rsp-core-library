@@ -20,13 +20,7 @@
 namespace rsp::posix
 {
 
-FileIO::FileIO()
-    : mHandle(-1)
-{
-}
-
 FileIO::FileIO(const std::string &arFileName, std::ios_base::openmode aMode, int aPermissions)
-    : mHandle(-1)
 {
     Open(arFileName, aMode, aPermissions);
 }
@@ -34,6 +28,23 @@ FileIO::FileIO(const std::string &arFileName, std::ios_base::openmode aMode, int
 FileIO::~FileIO()
 {
     Close();
+}
+
+FileIO::FileIO(const FileIO& arOther)
+{
+    if (this != &arOther) {
+        mFileName = arOther.mFileName;
+        mHandle = dup(arOther.mHandle.Get());
+    }
+}
+
+FileIO& FileIO::operator=(const FileIO& arOther)
+{
+    if (this != &arOther) {
+        mFileName = arOther.mFileName;
+        mHandle = dup(arOther.mHandle.Get());
+    }
+    return *this;
 }
 
 void FileIO::Open(const std::string &arFileName, std::ios_base::openmode aMode, int aPermissions)
@@ -77,15 +88,12 @@ void FileIO::Open(const std::string &arFileName, std::ios_base::openmode aMode, 
 
 void FileIO::Close()
 {
-    if (mHandle >= 0) {
-        close(mHandle);
-        mHandle = -1;
-    }
+    mHandle.Close();
 }
 
 size_t FileIO::Seek(size_t aOffset, std::ios_base::seekdir aSeekDir)
 {
-    off_t ret = lseek(mHandle, static_cast<off_t>(aOffset), int(aSeekDir));
+    off_t ret = lseek(mHandle.Get(), static_cast<off_t>(aOffset), int(aSeekDir));
     if (ret < 0) {
         THROW_SYSTEM("Error moving cursor in file " + mFileName);
     }
@@ -95,7 +103,7 @@ size_t FileIO::Seek(size_t aOffset, std::ios_base::seekdir aSeekDir)
 
 size_t FileIO::Read(void *apBuffer, size_t aNumberOfBytesToRead)
 {
-    off_t ret = read(mHandle, apBuffer, aNumberOfBytesToRead);
+    off_t ret = read(mHandle.Get(), apBuffer, aNumberOfBytesToRead);
     if (ret < 0) {
         THROW_SYSTEM("Error reading from file " + mFileName);
     }
@@ -120,7 +128,7 @@ void FileIO::ExactRead(void *apBuffer, size_t aNumberOfBytesToRead)
 
 size_t FileIO::Write(const void *apBuffer, size_t aNumberOfBytesToWrite)
 {
-    ssize_t ret = write(mHandle, apBuffer, aNumberOfBytesToWrite);
+    ssize_t ret = write(mHandle.Get(), apBuffer, aNumberOfBytesToWrite);
     if (ret < 0) {
         THROW_SYSTEM("Error writing to file " + mFileName);
     }
@@ -182,7 +190,7 @@ size_t FileIO::GetSize()
 
 void FileIO::SetSize(size_t aSize)
 {
-    int ret = ftruncate(mHandle, static_cast<long int>(aSize));
+    int ret = ftruncate(mHandle.Get(), static_cast<long int>(aSize));
     if (ret < 0) {
         THROW_SYSTEM("Error resizing file " + mFileName);
     }
@@ -194,7 +202,7 @@ bool FileIO::WaitForDataReady(int aTimeoutMs) const
     int ret;
     bool result = false;
 
-    fd.fd = mHandle;
+    fd.fd = mHandle.Get();
     fd.events = POLLIN;
 
     ret = poll(&fd, 1, aTimeoutMs);

@@ -11,6 +11,8 @@
 #include "doctest.h"
 #include <utils/Crc32.h>
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("CRC32") {
 
     const std::string cString = "The red-brown lazy fox jumped over the chicken fence.";
@@ -32,4 +34,4 @@ TEST_CASE("CRC32") {
     }
 }
 
-
+TEST_SUITE_END();

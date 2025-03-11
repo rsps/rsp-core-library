@@ -14,6 +14,8 @@
 
 using namespace rsp::messaging;
 
+TEST_SUITE_BEGIN("Messaging");
+
 static std::string s_param = "Hello World";
 static int checker_called = 0;
 
@@ -116,5 +118,4 @@ TEST_CASE("Emitter")
     }
 }
 
-
-
+TEST_SUITE_END();

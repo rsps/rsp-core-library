@@ -12,7 +12,7 @@
 #define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
 
 #include <network/IHttpRequest.h>
-#include <network/RequestData.h>
+#include <network/ChunkStreamer.h>
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -41,37 +41,17 @@ public:
     IHttpResponse& Execute() override;
     [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
-    IHttpRequest& SetBody(std::shared_ptr<IHttpBodyStream> apBody) override;
-    [[nodiscard]] const IHttpBodyStream& GetBody() const override;
+    IHttpRequest& SetBody(HttpBody_t apBody) override;
+    [[nodiscard]] const IStreamDataProvider& GetBody() const override;
 
-    IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override;
-    IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override;
-
-    std::uintptr_t GetHandle() override;
+    [[nodiscard]] std::uintptr_t GetHandle() const override;
 
 protected:
     CurlHttpResponse mResponse;
     HttpRequestOptions mRequestOptions{};
-    struct StringBuffer
-    {
-        size_t Remaining = 0;
-        const char *Data = nullptr;
-    };
-    struct StreamBuffer
-    {
-        RequestData rd;
-        IHttpBodyStream* Body;
-    };
-    union UploadBuffer
-    {
-        StringBuffer String;
-        StreamBuffer Stream;
-    } mUploadBuffer{};
+    HttpBody_t mpUploadBuffer{};
 
-    void writeToFile(rsp::posix::FileIO *apFile);
-    void readFromFile(rsp::posix::FileIO *apFile);
-    void readFromString(const std::string &arString);
-    void readFromStream(const std::shared_ptr<IHttpBodyStream>& arBody);
+    void readFromStream(const HttpBody_t& arBody);
 
     void prepareRequest() override;
     void requestDone() override;
@@ -79,10 +59,7 @@ protected:
 private:
 
     static size_t writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *data);
-    static size_t fileWriteFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile);
-    static size_t fileReadFunction(void *ptr, size_t size, size_t nmemb, rsp::posix::FileIO *apFile);
-    static size_t stringReadFunction(void *ptr, size_t size, size_t nmemb, UploadBuffer *apBuf);
-    static size_t streamReadFunction(void *ptr, size_t size, size_t nmemb, UploadBuffer *apBuf);
+    static size_t streamReadFunction(void *ptr, size_t size, size_t nmemb, IStreamDataProvider *apDataProvider);
     static size_t headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse);
     static size_t progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
 

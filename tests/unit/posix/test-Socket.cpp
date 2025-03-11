@@ -15,6 +15,8 @@
 
 using namespace rsp::posix;
 
+TEST_SUITE_BEGIN("Posix");
+
 TEST_CASE("Socket")
 {
     auto logger = rsp::logging::LoggerInterface::GetDefault();
@@ -44,20 +46,20 @@ TEST_CASE("Socket")
         Socket sc;
         CHECK_NOTHROW(sc = server.Accept());
         CHECK_FALSE(client.IsDataReady());
-        CHECK_NOTHROW(sc.Send(reinterpret_cast<const uint8_t*>(msg.data()), msg.size()));
+        CHECK_EQ(sc.Send(msg), msg.size());
         CHECK(client.IsDataReady());
 
         std::string result(20, 'A');
         size_t len;
-        CHECK_NOTHROW(len = client.Receive(reinterpret_cast<uint8_t*>(result.data()), result.size()));
+        CHECK_NOTHROW(len = client.Receive(result));
         CHECK_NOTHROW(result.resize(len));
         MESSAGE(result);
         CHECK_EQ(result, msg);
     }
 
     SUBCASE("TCP Socket") {
-        const std::string hello_client("Hello Client");
-        const std::string hello_server("Hello Server");
+        const std::string hello_client("Hello TCP Client");
+        const std::string hello_server("Hello TCP Server");
         std::string socket_path("localhost:46555");
 
         AddressInfo info(socket_path, true, Domain::Unspecified, Type::Stream);
@@ -73,25 +75,64 @@ TEST_CASE("Socket")
         Socket sc;
         CHECK_NOTHROW(sc = server.Accept());
         CHECK_FALSE(client.IsDataReady());
-        CHECK_NOTHROW(sc.Send(reinterpret_cast<const uint8_t*>(hello_client.data()), hello_client.size()));
+        CHECK_EQ(sc.Send(hello_client), hello_client.size());
         CHECK(client.IsDataReady());
 
         std::string result(32, 'A');
         size_t len;
-        CHECK_NOTHROW(len = client.Receive(reinterpret_cast<uint8_t*>(result.data()), result.size()));
+        CHECK_NOTHROW(len = client.Receive(result));
         CHECK_NOTHROW(result.resize(len));
         MESSAGE(result);
         CHECK_EQ(result, hello_client);
 
         CHECK_FALSE(sc.IsDataReady());
-        CHECK_NOTHROW(client.Send(reinterpret_cast<const uint8_t*>(hello_server.data()), hello_server.size()));
+        CHECK_EQ(client.Send(hello_server), hello_server.size());
         CHECK(sc.IsDataReady());
         result.clear();
         result.resize(32);
-        CHECK_NOTHROW(len = sc.Receive(reinterpret_cast<uint8_t*>(result.data()), result.size()));
+        CHECK_NOTHROW(len = sc.Receive(result));
         CHECK_NOTHROW(result.resize(len));
         MESSAGE(result);
         CHECK_EQ(result, hello_server);
     }
 
+    SUBCASE("UDP Socket") {
+        const std::string hello_client("Hello UDP Client");
+        const std::string hello_server("Hello UDP Server");
+        std::string socket_path("localhost:46555");
+
+        AddressInfo info(socket_path, true, Domain::Unspecified, Type::Stream);
+        CHECK_GE(info.GetCount(), 1);
+
+        Socket server(Domain::Inet, Type::Datagram);
+        CHECK_NOTHROW(server.SetOptions(SockOptions::ReUseAddress, 1));
+        CHECK_NOTHROW(server.Bind(info));
+        CHECK_FALSE(server.IsDataReady());
+
+        Socket client(Domain::Inet, Type::Datagram);
+        CHECK_NOTHROW(client.Connect(info));
+        CHECK_FALSE(client.IsDataReady());
+        CHECK_EQ(client.Send(hello_server), hello_server.size());
+
+        std::string result(32, 'A');
+        size_t len;
+        Socket peer;
+        CHECK(server.IsDataReady());
+        CHECK_NOTHROW(len = server.ReceiveFrom(peer, result));
+        CHECK_NOTHROW(result.resize(len));
+        MESSAGE(result);
+        CHECK_EQ(result, hello_server);
+
+        CHECK_EQ(server.SendTo(peer, hello_client), hello_client.size());
+        CHECK(client.IsDataReady());
+        result.clear();
+        result.resize(32);
+        CHECK_NOTHROW(len = client.Receive(result));
+        CHECK_NOTHROW(result.resize(len));
+        MESSAGE(result);
+        CHECK_EQ(result, hello_client);
+    }
+
 }
+
+TEST_SUITE_END();

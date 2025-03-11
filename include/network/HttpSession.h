@@ -29,7 +29,6 @@ public:
 
 protected:
     std::unique_ptr<IHttpSession> mPimpl;
-    static IHttpSession* MakePimpl(size_t aSize);
 };
 
 } /* namespace rsp::network */

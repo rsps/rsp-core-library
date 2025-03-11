@@ -1,7 +1,7 @@
 /*!
  * \copyright    Copyright 2022 RSP Systems A/S. All rights reserved.
  * \license      Mozilla Public License 2.0
- * \author:      Jesper Madsen
+ * \author:      Steffen Brummer
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,6 +13,7 @@
 
 #include <ostream>
 #include <string>
+#include <security/SecureBuffer.h>
 
 namespace rsp::network {
 
@@ -24,12 +25,13 @@ class ConnectionOptions
 {
 public:
     std::string BaseUrl{};
-    long ConnectionTimeout = 5L;
-    long ResponseTimeout = 10L;
+    long ConnectionTimeout = 5L; // In seconds
+    long ResponseTimeout = 10L;  // In seconds
     std::string CertCaPath{};
     std::string CertPath{};
     std::string KeyPath{};
     std::string KeyPasswd{};
+    security::SecureBuffer Nonce{};
     int Verbose = 0;
 };
 

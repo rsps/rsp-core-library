@@ -13,6 +13,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("Hex")
 {
     SUBCASE("Byte")
@@ -38,5 +40,6 @@ TEST_CASE("Hex")
         std::uint64_t u = 9347932587862587583u;
         CHECK_EQ(ToHex(u), "0x81ba872943d8f8bf");
     }
-
 }
+
+TEST_SUITE_END();

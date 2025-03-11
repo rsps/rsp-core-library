@@ -35,11 +35,15 @@ server.breakagelog = basedir + "/cgi.log"
 
 debug.log-request-handling = "enable"
 debug.log-request-header = "enable"
-#debug.log-state-handling = "enable"
+#debug.log-request-header-on-error = "enable"
+debug.log-response-header = "enable"
 debug.log-ssl-noise = "enable"
+debug.log-file-not-found = "enable"
+debug.log-condition-handling = "enable"
 
 server.upload-dirs=( basedir )
 server.stream-request-body = 1
+server.stream-response-body = 2
 
 static-file.exclude-extensions = ( ".fcgi", ".php", ".rb", "~", ".inc" )
 index-file.names = ( "index.html" )
@@ -76,4 +80,8 @@ $SERVER["socket"] == ":44300" {
     ssl.verifyclient.username   = "SSL_CLIENT_S_DN_CN"
     ssl.verifyclient.enforce    = "enable"
     ssl.verifyclient.depth      = 3
+}
+
+$SERVER["socket"] == ":48080" {
+    ssl.engine  = "disable"
 }

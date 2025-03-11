@@ -11,6 +11,7 @@
 #define RSP_CORE_LIB_INCLUDE_UTILS_STREAM_STORAGE_H
 
 #include <fstream>
+#include <optional>
 #include <sstream>
 #include <type_traits>
 #include <bit>
@@ -73,6 +74,17 @@ struct BinaryStream
     std::streamsize PutN(const void* apBuffer, std::streamsize aSize) const
     {
         return mpStreamBuf->sputn(reinterpret_cast<const char *>(apBuffer), aSize);
+    }
+
+    [[nodiscard]] std::optional<size_t> GetStreamSize() const
+    {
+        auto in = mpStreamBuf->pubseekoff(0, std::ios_base::cur, std::ios_base::in);
+        auto out = mpStreamBuf->pubseekoff(0, std::ios_base::cur, std::ios_base::out);
+        auto result = std::max(in, out);
+        if (result >= 0) {
+            return { size_t(result) };
+        }
+        return {};
     }
 
 protected:

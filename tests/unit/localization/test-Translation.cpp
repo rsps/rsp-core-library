@@ -15,6 +15,8 @@
 
 using namespace rsp::localization;
 
+TEST_SUITE_BEGIN("Localization");
+
 TEST_CASE("Translation")
 {
     CHECK_NOTHROW(Translation tmp;);
@@ -30,5 +32,4 @@ TEST_CASE("Translation")
     CHECK_EQ(tr(s), "Hello World 2");
 }
 
-
-
+TEST_SUITE_END();

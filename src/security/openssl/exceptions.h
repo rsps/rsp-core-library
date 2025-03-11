@@ -1,0 +1,81 @@
+/**
+* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*
+* \copyright   Copyright 2025 RSP Systems A/S. All rights reserved.
+* \license     Mozilla Public License 2.0
+* \author      steffen
+*/
+#ifndef RSP_CORE_LIB_SRC_SECURITY_OPENSSL_EXCEPTIONS_H
+#define RSP_CORE_LIB_SRC_SECURITY_OPENSSL_EXCEPTIONS_H
+
+#include <network/NetworkException.h>
+
+#include <openssl/err.h>
+#include <openssl/ssl.h>
+
+namespace rsp::security {
+
+class EOpenSSL : public rsp::network::NetworkException
+{
+public:
+    using rsp::network::NetworkException::NetworkException;
+};
+
+class EOpenSSLError : public EOpenSSL
+{
+public:
+    using error_type_t = unsigned long;
+
+    // For ERR_get_error()
+    explicit EOpenSSLError(error_type_t aErr)
+            : EOpenSSL(std::string(ERR_lib_error_string(aErr)) + " Lib:" + std::to_string(ERR_GET_LIB(aErr)) + ", Reason:" + std::to_string(ERR_GET_REASON(aErr))),
+              mCode(aErr)
+    {
+        /// \see ERR_LIB_SSL for ERR_GET_LIB
+        /// \see SSL_R_TLSV13_ALERT_CERTIFICATE_REQUIRED for code example
+    }
+
+    // For SSL_get_error()
+    explicit EOpenSSLError(int aErr)
+            : EOpenSSL("SSL error (" + std::to_string(aErr) + ") " + sslErrToString(aErr)),
+              mCode(error_type_t(aErr))
+    {
+        SSL_ERROR_NONE;
+    }
+
+    [[nodiscard]] int GetErrorLibrary() const { return ERR_GET_LIB(mCode); }
+    [[nodiscard]] int GetErrorReason() const { return ERR_GET_REASON(mCode); }
+
+    static std::string sslErrToString(int aErr)
+    {
+        switch (aErr) {
+            case SSL_ERROR_NONE:                return { "No error" };
+            case SSL_ERROR_SSL:                 return { "Error SSL" };
+            case SSL_ERROR_WANT_READ:           return { "Want Read" };
+            case SSL_ERROR_WANT_WRITE:          return { "Want Write" };
+            case SSL_ERROR_WANT_X509_LOOKUP:    return { "Want X509 Lookup" };
+            case SSL_ERROR_SYSCALL:             return { "System Call" };
+            case SSL_ERROR_ZERO_RETURN:         return { "Zero Return" };
+            case SSL_ERROR_WANT_CONNECT:        return { "Want Connect" };
+            case SSL_ERROR_WANT_ACCEPT:         return { "Want Accept" };
+            case SSL_ERROR_WANT_ASYNC:          return { "Want Async" };
+            case SSL_ERROR_WANT_ASYNC_JOB:      return { "Want Async Job" };
+            case SSL_ERROR_WANT_CLIENT_HELLO_CB:return { "Want Client Hello Callback" };
+            case SSL_ERROR_WANT_RETRY_VERIFY:   return { "Want Retry Verify" };
+            default:                            return { "Unknown" };
+        }
+    }
+
+protected:
+    error_type_t mCode = 0;
+};
+
+#define CHK_NULL(x) if (!(x)) THROW_WITH_BACKTRACE1(EOpenSSL, "Allocation error")
+#define CHK_SSL(err) if ((err) <= 0) THROW_WITH_BACKTRACE1(EOpenSSLError, ERR_get_error())
+
+
+} // namespace rsp::security
+
+#endif //RSP_CORE_LIB_SRC_SECURITY_OPENSSL_EXCEPTIONS_H

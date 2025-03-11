@@ -16,6 +16,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 //#define DMESG(a) MESSAGE(a)
 #define DMESG(a)
 
@@ -26,7 +28,7 @@ TEST_CASE("DateTime")
     const std::string cISO8601("2022-11-08 15:43:23+0000");
     const std::string cISO8601UTC("2022-11-08 15:43:23");
     const std::string cLogging("2022-11-08 15:43:23.813");
-    const std::string cHTTP("Tue, 08 Nov 2022 15:43:23");
+    const std::string cHTTP("Tue, 08 Nov 2022 15:43:23 GMT");
     const std::string cCustom("08-2022-11 23:43(15).813"); // Format: "%d-%Y-%m %S:%M:%H."
 
     SUBCASE("Zero") {
@@ -216,5 +218,4 @@ TEST_CASE("DateTime")
     }
 }
 
-
-
+TEST_SUITE_END();

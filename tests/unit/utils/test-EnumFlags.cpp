@@ -12,6 +12,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 enum class TestFlags : uint32_t {
     None = 0,
     F1 = 1u << 0,
@@ -67,5 +69,4 @@ TEST_CASE("EnumFlags")
 
 }
 
-
-
+TEST_SUITE_END();

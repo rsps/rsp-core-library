@@ -21,10 +21,10 @@ namespace rsp::exceptions {
 class StackEntry
 {
 public:
-    StackEntry(std::string aFile, std::string aFunc, std::string aLine) noexcept
+    StackEntry(std::string aFile, std::string aFunc, unsigned long aLine) noexcept
         : mFileName(std::move(aFile)),
           mFunction(std::move(aFunc)),
-          mLineNumber(std::move(aLine))
+          mLineNumber(aLine)
     {
     }
 
@@ -33,7 +33,7 @@ protected:
 
     std::string mFileName;
     std::string mFunction;
-    std::string mLineNumber;
+    unsigned long mLineNumber;
 };
 
 std::ostream& operator<<(std::ostream& o, const StackEntry& arEntry);
@@ -48,7 +48,9 @@ public:
     virtual ~BackTrace() noexcept = default;
 
 protected:
+#if !defined(_GLIBCXX_HAVE_STACKTRACE) && defined(__x86_64__)
     static std::string demangle(const std::string& arMangled);
+#endif
 
     friend std::ostream& operator<<(std::ostream& o, const BackTrace& arBackTrace);
     std::vector<StackEntry> mStackEntries{};

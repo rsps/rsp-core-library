@@ -1,7 +1,7 @@
 /**
- * \copyright    Copyright 2022 RSP Systems A/S. All rights reserved.
+ * \copyright    Copyright 2022-2025 RSP Systems A/S. All rights reserved.
  * \license      Mozilla Public License 2.0
- * \author:      Jesper Madsen
+ * \author:      Steffen Brummer
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,12 +12,12 @@
 #define RSP_CORE_LIB_NETWORK_HTTP_REQUEST_OPTIONS_H
 
 #include <network/ConnectionOptions.h>
-#include <network/IHttpBodyStream.h>
+#include <network/IStreamDataProvider.h>
 #include <memory>
 #include <string>
 #include <map>
 #include <posix/FileIO.h>
-#include <utils/StructElement.h>
+#include <optional>
 
 namespace rsp::network {
 
@@ -40,6 +40,8 @@ enum class HttpRequestType
  */
 std::ostream& operator<<(std::ostream &o, HttpRequestType aType);
 
+using HttpBody_t = std::shared_ptr<IStreamDataProvider>;
+
 /**
  * \class HttpRequestOptions
  * \brief Common Options for a HttpRequest, inherits connection options.
@@ -49,19 +51,19 @@ class HttpRequestOptions: public ConnectionOptions
 public:
     std::map<std::string, std::string> Headers{};
     std::string Uri{};
-    std::shared_ptr<IHttpBodyStream> Body{};
+    HttpBody_t RequestBody{};
+    HttpBody_t ResponseBody{};
     HttpRequestType RequestType = HttpRequestType::GET;
     std::string BasicAuthUsername{};
     std::string BasicAuthPassword{};
-    rsp::utils::StructElement<rsp::posix::FileIO*> WriteFile{};
-    rsp::utils::StructElement<rsp::posix::FileIO*> ReadFile{};
+    std::function<void(std::string_view /*key*/, std::string_view /*value*/)> ResponseChunkExtHandler{};
 
     void Clear() {
         Headers.clear();
         Uri.clear();
-        Body.reset();
-        WriteFile.Clear();
-        ReadFile.Clear();
+        RequestBody.reset();
+        ResponseBody.reset();
+        ResponseChunkExtHandler = nullptr;
     }
 };
 

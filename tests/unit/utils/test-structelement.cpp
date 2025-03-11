@@ -15,6 +15,8 @@
 
 using namespace rsp::utils;
 
+TEST_SUITE_BEGIN("Utils");
+
 TEST_CASE("StructElement") {
 
     struct MyData {
@@ -97,5 +99,4 @@ TEST_CASE("StructElement") {
     }
 }
 
-
-
+TEST_SUITE_END();

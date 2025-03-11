@@ -26,10 +26,7 @@ namespace rsp::network
 class NetworkException: public exceptions::CoreException
 {
 public:
-    explicit NetworkException(const std::string &aMsg)
-        : CoreException(aMsg)
-    {
-    }
+    using exceptions::CoreException::CoreException;
 };
 
 /**
@@ -41,10 +38,7 @@ public:
 class ERequestOptions: public NetworkException
 {
 public:
-    explicit ERequestOptions(const std::string &aMsg)
-        : NetworkException(aMsg)
-    {
-    }
+    using NetworkException::NetworkException;
 };
 
 

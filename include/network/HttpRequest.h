@@ -33,25 +33,15 @@ public:
         return *this;
     }
 
-    HttpRequest& SetBody(std::shared_ptr<IHttpBodyStream> apBody) override
+    HttpRequest& SetBody(HttpBody_t apBody) override
     {
         mPimpl->SetBody(apBody);
         return *this;
     }
 
-    [[nodiscard]] const IHttpBodyStream& GetBody() const override
+    [[nodiscard]] const IStreamDataProvider& GetBody() const override
     {
         return mPimpl->GetBody();
-    }
-
-    IHttpRequest& AddField(const std::string &arFieldName, const std::string &arValue) override
-    {
-        return mPimpl->AddField(arFieldName, arValue);
-    }
-
-    IHttpRequest& AddFile(const std::string &arFieldName, rsp::posix::FileIO &arFile) override
-    {
-        return mPimpl->AddFile(arFieldName, arFile);
     }
 
     [[nodiscard]] IHttpResponse& Execute() override
@@ -59,14 +49,13 @@ public:
         return mPimpl->Execute();
     }
 
-    std::uintptr_t GetHandle() override
+    [[nodiscard]] std::uintptr_t GetHandle() const override
     {
         return mPimpl->GetHandle();
     }
 
 protected:
     std::unique_ptr<IHttpRequest> mPimpl;
-    static IHttpRequest* MakeRequest();
 };
 
 } // rsp::network

@@ -8,26 +8,35 @@
 * \author      steffen
 */
 
+#include <arpa/inet.h>
 #include <charconv>
-#include <exceptions/ExceptionHelper.h>
+#include <fcntl.h>
+#include <posix/FileSystem.h>
 #include <posix/Socket.h>
 #include <sys/poll.h>
-#include <unistd.h>
-#include <posix/FileSystem.h>
-#include <arpa/inet.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 namespace rsp::posix {
 
 Socket::Socket(Domain aDomain, Type aType, Protocol aProtocol)
 {
     mHandle = socket(int(aDomain), int(aType), int(aProtocol));
-    if (mHandle < 0) {
+    if (!mHandle) {
         THROW_SYSTEM("socket() failed.");
     }
     mDomain = aDomain;
     mType = aType;
     mProtocol = aProtocol;
+}
+
+Socket::~Socket()
+{
+    try {
+        Close();
+    }
+    catch (const std::exception &e) {
+    }
 }
 
 Socket::Socket(const Socket &arServer, int aHandle, const SocketAddress& arLocalAddress, const SocketAddress& arPeerAddress)
@@ -41,29 +50,21 @@ Socket::Socket(const Socket &arServer, int aHandle, const SocketAddress& arLocal
 }
 
 Socket::Socket(Socket &&arOther) noexcept
-    : mHandle(arOther.mHandle),
+    : mHandle(std::move(arOther.mHandle)),
       mLocalAddress(arOther.mLocalAddress),
       mPeerAddress(arOther.mPeerAddress),
       mDomain(arOther.mDomain)
 {
-    arOther.mHandle = 0;
-}
-
-Socket::~Socket()
-{
-    if (mHandle) {
-        Shutdown(ShutdownFlags::ReadWrite);
-        close(mHandle);
-    }
 }
 
 Socket& Socket::operator=(Socket &&arOther) noexcept
 {
-    mHandle = arOther.mHandle;
-    mLocalAddress = arOther.mLocalAddress;
-    mPeerAddress  = arOther.mPeerAddress;
-    mDomain = arOther.mDomain;
-    arOther.mHandle = 0;
+    if (this != &arOther) {
+        mHandle = std::move(arOther.mHandle);
+        mLocalAddress = arOther.mLocalAddress;
+        mPeerAddress = arOther.mPeerAddress;
+        mDomain = arOther.mDomain;
+    }
     return *this;
 }
 
@@ -159,7 +160,7 @@ SocketAddress Socket::GetAddr()
         struct sockaddr sa{};
         socklen_t len = sizeof(sa);
 
-        int res = getsockname(mHandle, &sa, &len);
+        int res = getsockname(mHandle.Get(), &sa, &len);
         if (res < 0) {
             THROW_SYSTEM("getsockname() failed.");
         }
@@ -174,9 +175,9 @@ Socket Socket::Accept()
     SocketAddress result;
     socklen_t len = result.GetSize();
 
-    int res = accept(mHandle, &result.Get(), &len);
+    int res = accept(mHandle.Get(), &result.Get(), &len);
     if (res < 0) {
-        THROW_SYSTEM("accept() failed. Handle: " + std::to_string(mHandle));
+        THROW_SYSTEM("accept() failed. Handle: " + std::to_string(mHandle.Get()));
     }
     result.UpdateFromParent(mLocalAddress);
 
@@ -192,9 +193,9 @@ Socket &Socket::Bind(const AddressInfo &arAddrInfo, bool aBindAll)
     int err = 0;
     for (auto &sa : arAddrInfo.GetAddresses()) {
         if (sa.GetDomain() == Domain::Unix) {
-            deleteOldSocketInode(sa);
+            deleteOldSocketINode(sa);
         }
-        res = bind(mHandle, &sa.Get(), sa.GetSize());
+        res = bind(mHandle.Get(), &sa.Get(), sa.GetSize());
         if (res == 0) {
             if (first) {
                 mLocalAddress = sa;
@@ -219,39 +220,51 @@ Socket &Socket::Bind(const AddressInfo &arAddrInfo, bool aBindAll)
 
 Socket &Socket::Connect(const AddressInfo &arAddrInfo)
 {
-    auto &sa = arAddrInfo[0];
-    int res = connect(mHandle, &sa.Get(), sa.GetSize());
+    int res;
+    for (size_t i=0 ; i < arAddrInfo.GetCount() ; ++i) {
+        auto &sa = arAddrInfo[i];
+        res = connect(mHandle.Get(), &sa.Get(), sa.GetSize());
+        if (res == 0) {
+            mPeerAddress = sa;
+            break;
+        }
+    }
     if (res < 0) {
         THROW_SYSTEM("connect() failed.");
     }
-    mPeerAddress = sa;
     return *this;
 }
 
 Socket &Socket::Listen(size_t aAcceptQueueSize)
 {
-    int res = listen(mHandle, int(aAcceptQueueSize));
+    int res = listen(mHandle.Get(), int(aAcceptQueueSize));
     if (res < 0) {
         THROW_SYSTEM("listen() failed.");
     }
     return *this;
 }
 
-size_t Socket::Receive(uint8_t *apBuffer, size_t aBufLen, int aFlags) const
+size_t Socket::Receive(std::span<std::byte> aBuffer, int aFlags) const
 {
-    ssize_t res = recv(mHandle, apBuffer, aBufLen, aFlags);
+    ssize_t res = recv(mHandle.Get(), aBuffer.data(), aBuffer.size_bytes(), aFlags);
     if (res == -1) {
         THROW_SYSTEM("recv() failed.");
     }
     return size_t(res);
 }
 
-size_t Socket::ReceiveFrom(Socket &arPeer, uint8_t *apBuffer, size_t aBufLen, int aFlags) const
+
+size_t Socket::Receive(std::string &arStringBuffer, int aFlags) const
+{
+    return Receive({reinterpret_cast<std::byte*>(arStringBuffer.data()), arStringBuffer.size()}, aFlags);
+}
+
+size_t Socket::ReceiveFrom(Socket &arPeer, std::span<std::byte> aBuffer, int aFlags) const
 {
     SocketAddress sa{};
     socklen_t len = sizeof(sa);
 
-    ssize_t res = recvfrom(mHandle, apBuffer, aBufLen, aFlags, &sa.Get(), &len);
+    ssize_t res = recvfrom(mHandle.Get(), aBuffer.data(), aBuffer.size_bytes(), aFlags, &sa.Get(), &len);
     if (res == -1) {
         THROW_SYSTEM("recvfrom() failed.");
     }
@@ -259,13 +272,37 @@ size_t Socket::ReceiveFrom(Socket &arPeer, uint8_t *apBuffer, size_t aBufLen, in
     return size_t(res);
 }
 
-size_t Socket::Send(const uint8_t *apBuffer, size_t aBufLen, int aFlags) const
+size_t Socket::ReceiveFrom(Socket &arPeer, std::string &arStringBuffer, int aFlags) const
 {
-    ssize_t res = send(mHandle, apBuffer, aBufLen, aFlags);
+    return ReceiveFrom(arPeer, {reinterpret_cast<std::byte*>(arStringBuffer.data()), arStringBuffer.size()}, aFlags);
+}
+
+size_t Socket::Send(std::span<const std::byte> aBuffer, int aFlags) const
+{
+    ssize_t res = send(mHandle.Get(), aBuffer.data(), aBuffer.size_bytes(), aFlags);
     if (res == -1) {
         THROW_SYSTEM("send() failed.");
     }
     return size_t(res);
+}
+
+size_t Socket::Send(const std::string &arStringBuffer, int aFlags) const
+{
+    return Send({reinterpret_cast<const std::byte*>(arStringBuffer.data()), arStringBuffer.size()}, aFlags);
+}
+
+size_t Socket::SendTo(const Socket &arPeer, std::span<const std::byte> aBuffer, int aFlags) const
+{
+    ssize_t res = sendto(mHandle.Get(), aBuffer.data(), aBuffer.size_bytes(), aFlags, &arPeer.mLocalAddress.Get(), sizeof(arPeer.mLocalAddress));
+    if (res == -1) {
+        THROW_SYSTEM("sendto() failed.");
+    }
+    return size_t(res);
+}
+
+size_t Socket::SendTo(const Socket &arPeer, const std::string &arStringBuffer, int aFlags) const
+{
+    return SendTo(arPeer, {reinterpret_cast<const std::byte*>(arStringBuffer.data()), arStringBuffer.size()}, aFlags);
 }
 
 bool Socket::IsDataReady() const
@@ -275,7 +312,7 @@ bool Socket::IsDataReady() const
     bool result = false;
     int timeout = 0;
 
-    fd.fd = mHandle;
+    fd.fd = mHandle.Get();
     fd.events = POLLIN;
 
     ret = poll(&fd, 1, timeout);
@@ -291,14 +328,14 @@ bool Socket::IsDataReady() const
 
 int Socket::GetFd() const
 {
-    return mHandle;
+    return mHandle.Get();
 }
 
 int Socket::GetOptions(SockOptions aOption, int aLevel) const
 {
     int result;
     socklen_t len = sizeof(result);
-    int res = getsockopt(mHandle, aLevel, int(aOption), &result, &len);
+    int res = getsockopt(mHandle.Get(), aLevel, int(aOption), &result, &len);
     if (res < 0) {
         THROW_SYSTEM("getsockopt() failed.");
     }
@@ -307,7 +344,7 @@ int Socket::GetOptions(SockOptions aOption, int aLevel) const
 
 Socket &Socket::SetOptions(SockOptions aOption, int aValue, int aLevel)
 {
-    int res = setsockopt(mHandle, aLevel, int(aOption), &aValue, sizeof(aValue));
+    int res = setsockopt(mHandle.Get(), aLevel, int(aOption), &aValue, sizeof(aValue));
     if (res < 0) {
         THROW_SYSTEM("setsockopt() failed.");
     }
@@ -319,7 +356,7 @@ std::chrono::system_clock::duration Socket::getTimeoutOption(SockOptions aOption
     using namespace std::chrono;
     struct timeval tv{};
     socklen_t len = sizeof(tv);
-    int res = getsockopt(mHandle, SOL_SOCKET, int(aOption), &tv, &len);
+    int res = getsockopt(mHandle.Get(), SOL_SOCKET, int(aOption), &tv, &len);
     if (res < 0) {
         THROW_SYSTEM("getsockopt() failed.");
     }
@@ -332,7 +369,7 @@ void Socket::setTimeoutOption(SockOptions aOption, std::chrono::system_clock::du
     struct timeval tv{};
     tv.tv_sec = time_t(duration_cast<seconds>(aValue).count());
     tv.tv_usec = suseconds_t(duration_cast<microseconds>(aValue).count() % 1000000);
-    int res = setsockopt(mHandle, SOL_SOCKET, int(aOption), &tv, sizeof(tv));
+    int res = setsockopt(mHandle.Get(), SOL_SOCKET, int(aOption), &tv, sizeof(tv));
     if (res < 0) {
         THROW_SYSTEM("setsockopt() failed.");
     }
@@ -340,16 +377,54 @@ void Socket::setTimeoutOption(SockOptions aOption, std::chrono::system_clock::du
 
 Socket& Socket::Shutdown(ShutdownFlags aFlag)
 {
-    int res = shutdown(mHandle, int(aFlag));
+    int res = shutdown(mHandle.Get(), int(aFlag));
     if (res < 0) {
         THROW_SYSTEM("shutdown() failed.");
     }
     return *this;
 }
 
-void Socket::deleteOldSocketInode(const SocketAddress &arAddr)
+Socket& Socket::Close()
+{
+    if (IsConnected()) {
+        Shutdown(ShutdownFlags::ReadWrite);
+    }
+    return *this;
+}
+
+void Socket::deleteOldSocketINode(const SocketAddress &arAddr)
 {
     FileSystem::DeleteFile(arAddr.AsString());
+}
+
+bool Socket::IsBlocking() const
+{
+    long arg;
+    if ((arg = fcntl(mHandle.Get(), F_GETFL, NULL)) < 0) {
+        THROW_SYSTEM("fcntl() failed.");
+    }
+    return ((arg & O_NONBLOCK) == 0);
+}
+
+Socket& Socket::SetBlocking(bool aBlocking)
+{
+    long arg;
+    if ((arg = fcntl(mHandle.Get(), F_GETFL, NULL)) < 0) {
+        THROW_SYSTEM("fcntl() failed.");
+    }
+
+    if (aBlocking) {
+        arg &= ~O_NONBLOCK;
+    }
+    else {
+        arg |= O_NONBLOCK;
+    }
+
+    if (fcntl(mHandle.Get(), F_SETFL, arg) < 0) {
+        THROW_SYSTEM("fcntl() failed.");
+    }
+
+    return *this;
 }
 
 } // rsp::posix

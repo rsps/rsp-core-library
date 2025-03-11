@@ -12,7 +12,7 @@
 #define RSP_CORE_LIB_NETWORK_HTTP_DOWNLOAD_H
 
 #include <string>
-#include <network/HttpRequest.h>
+#include "HttpRequest.h"
 
 namespace rsp::network {
 
@@ -36,12 +36,12 @@ public:
      */
     HttpDownload& SetFileName(const std::string &arFileName);
 
-    IHttpResponse& Execute() override;
+    [[nodiscard]] IHttpResponse& Execute() override;
 
 protected:
     std::string mFileName{};
 
-    void SetFileModifiedTime(const std::string &arTimeString);
+    void setFileModifiedTime(std::string_view aTimeString);
 };
 
 } /* namespace rsp::network */
