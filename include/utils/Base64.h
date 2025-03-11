@@ -30,7 +30,10 @@ class Base64
 {
 public:
     static std::string Encode(std::span<const std::byte> aData);
-    static std::string Encode(std::string_view aText)     { return Encode({ reinterpret_cast<const std::byte*>(aText.data()), aText.size() }); }
+    static std::string Encode(std::string_view aText)
+    {
+        return Encode({ reinterpret_cast<const std::byte*>(aText.data()), aText.size() });
+    }
 
     static std::string Decode(std::string_view aBase64);
 };

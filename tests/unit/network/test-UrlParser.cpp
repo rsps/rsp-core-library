@@ -26,6 +26,26 @@ TEST_CASE("UrlParser")
         CHECK_EQ(up.GetHost(), "google.com");
         CHECK_EQ(up.GetPort(), 443);
         CHECK_EQ(up.GetPath(), "/");
+
+        up = UrlParser("https://google.com/");
+        CHECK_EQ(up.GetScheme(), UrlParser::Scheme::Https);
+        CHECK_EQ(up.GetHost(), "google.com");
+        CHECK_EQ(up.GetPort(), 443);
+        CHECK_EQ(up.GetPath(), "/");
+
+        up = UrlParser("https://google.com#hint");
+        CHECK_EQ(up.GetScheme(), UrlParser::Scheme::Https);
+        CHECK_EQ(up.GetHost(), "google.com");
+        CHECK_EQ(up.GetPort(), 443);
+        CHECK_EQ(up.GetPath(), "/");
+        CHECK_EQ(up.GetFragment(), "hint");
+
+        up = UrlParser("https://google.com?key=value");
+        CHECK_EQ(up.GetScheme(), UrlParser::Scheme::Https);
+        CHECK_EQ(up.GetHost(), "google.com");
+        CHECK_EQ(up.GetPort(), 443);
+        CHECK_EQ(up.GetPath(), "/");
+        CHECK_EQ(up.GetQuery(), "key=value");
     }
 
     SUBCASE("With Port") {

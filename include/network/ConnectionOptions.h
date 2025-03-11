@@ -1,5 +1,5 @@
 /*!
- * \copyright    Copyright 2022-2025 RSP Systems A/S. All rights reserved.
+ * \copyright    Copyright 2022 RSP Systems A/S. All rights reserved.
  * \license      Mozilla Public License 2.0
  * \author:      Steffen Brummer
  *

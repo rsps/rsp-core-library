@@ -56,7 +56,6 @@ endif()
 find_program(GCC_TOOL NAMES g++-latest g++-HEAD g++-14 g++-13 g++-12 g++-11)
 execute_process(COMMAND ${GCC_TOOL} --version OUTPUT_VARIABLE GCC_TOOL_VERSION ERROR_VARIABLE GCC_TOOL_VERSION)
 string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" GCC_TOOL_VERSION "${GCC_TOOL_VERSION}")
-message(STATUS "🔖 GCC ${GCC_TOOL_VERSION} (${GCC_TOOL})")
 
 # Define CPP standards, ...etc
 set(CMAKE_CXX_STANDARD 23)
