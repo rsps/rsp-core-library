@@ -40,14 +40,15 @@ TEST_CASE("ResponseParser")
     }
 
     SUBCASE("Parse Normal Response") {
-        const std::string_view cNormalResponse("HTTP/1.0 200 Ok\r\nContent-Length: 21\r\n\r\nThis is the body text");
+        const std::string_view cNormalResponse("HTTP/1.0 200 Ok\r\nX-HttpsTime: 123.4567\r\nContent-Length: 21\r\n\r\nThis is the body text");
 
         CHECK_NOTHROW(rp.ParseNewData({ reinterpret_cast<const std::byte*>(cNormalResponse.data()), cNormalResponse.size() }));
         CHECK_EQ(resp.GetStatusCode(), StatusCodes::Ok);
         CHECK_EQ(resp.GetContentLength(), 21);
-        CHECK_EQ(resp.GetHeaders().size(), 1);
+        CHECK_EQ(resp.GetHeaders().size(), 2);
+        CHECK_EQ(resp.GetHeader("X-HTTPSTIME"), "123.4567");
+        CHECK_EQ(string_to_floating_point<double>(resp.GetHeader("X-HTTPSTIME")), 123.4567);
     }
-
 }
 
 TEST_SUITE_END();

@@ -75,6 +75,23 @@ template<std::integral T>
     return {};
 }
 
+/**
+ * \brief Convert a string_view to the floating point of type T
+ * \tparam T of type std::floating_point
+ * \param string string_view to convert
+ * \param fmt Conversion format
+ * \return optional<T>
+ */
+template<std::floating_point T>
+[[nodiscard]] std::optional<T> string_to_floating_point(std::string_view const string, std::chars_format fmt = std::chars_format::general)
+{
+    std::floating_point auto number_result = T{};
+    if (std::from_chars(string.data(), string.data() + string.size(), number_result, fmt).ec == std::errc{}) {
+        return number_result;
+    }
+    return {};
+}
+
 } // rsp::network
 
 #endif //RSP_CORE_LIB_PARSER_HELPERS_H
