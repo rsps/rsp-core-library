@@ -53,7 +53,7 @@ endif()
 
 # Obtain GCC info.
 # TODO: This part here SHOULD be extracted into util in our "CMake Scripts"
-find_program(GCC_TOOL NAMES g++-latest g++-HEAD g++-14 g++-13 g++-12 g++-11)
+find_program(COMPILER GCC_TOOL NAMES g++-latest g++-HEAD g++15 g++-14 g++-13 g++-12 g++-11 g++)
 execute_process(COMMAND ${GCC_TOOL} --version OUTPUT_VARIABLE GCC_TOOL_VERSION ERROR_VARIABLE GCC_TOOL_VERSION)
 string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" GCC_TOOL_VERSION "${GCC_TOOL_VERSION}")
 
