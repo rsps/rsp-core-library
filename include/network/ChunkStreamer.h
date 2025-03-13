@@ -56,6 +56,7 @@ public:
         mFiFo.Clear();
         mChunkIndex = 0;
         mPayloadIndex = 0;
+        mDone = false;
         return *this;
     }
 
