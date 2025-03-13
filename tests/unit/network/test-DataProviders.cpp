@@ -13,6 +13,7 @@
 #include <network/FileBody.h>
 #include <network/StringBody.h>
 #include <network/ChunkStreamer.h>
+#include <utils/Random.h>
 
 using namespace rsp::network;
 
@@ -162,18 +163,20 @@ TEST_CASE("Data Providers")
 
     SUBCASE("ChunkStreamer") {
         ChunkDataProvider provider;
-        ChunkStreamer<128> cs(provider); // Internal fifo must be bigger than minimum chunk requirement. (96 bytes for ChunkDataProvider)
+        ChunkStreamer<100> cs(provider); // Internal fifo must be bigger than minimum chunk requirement. (96 bytes for ChunkDataProvider)
 
         std::string result;
         std::array<char, 64> buffer{};
-        while (auto sz = cs.Read({reinterpret_cast<std::byte*>(buffer.data()), buffer.size()})) {
+        size_t max_size = 7;
+        while (auto sz = cs.Read({reinterpret_cast<std::byte*>(buffer.data()), max_size})) {
             result += std::string(buffer.data(), sz);
+            max_size = rsp::utils::Random::Roll(1ul, buffer.size());
         }
 
         CHECK_EQ(result.size(), cPayload.size());
         CHECK_EQ(result, cPayload);
         CHECK_EQ(cs.GetChunkIndex(), 1);
-        CHECK_EQ(cs.GetPayloadIndex(), 7);
+        CHECK_EQ(cs.GetPayloadIndex(), 8);
     }
 
 }

@@ -94,11 +94,8 @@ protected:
         mFiFo.Clear(); // Fifo is empty, now make sure buffer Head is on index 0 for maximal continuous space.
         size_t sz = 0;
         auto done = mrProvider.GetChunk(std::span(reinterpret_cast<char*>(mFiFo.GetData()), mFiFo.Free()), sz, mChunkIndex, mPayloadIndex);
-        if (done) {
-            return true;
-        }
         mFiFo.SetHead(sz);
-        return false;
+        return done;
     }
 };
 
