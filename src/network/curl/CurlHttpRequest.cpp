@@ -1,7 +1,7 @@
 /*!
  * \copyright    Copyright 2022 RSP Systems A/S. All rights reserved.
  * \license      Mozilla Public License 2.0
- * \author:      Jesper Madsen
+ * \author:      Jesper Madsen, Steffen Brummer
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,7 +10,6 @@
 
 #include <map>
 #include <string>
-#include <network/ChunkStreamer.h>
 #include <network/ResponseParser.h>
 #include <network/MultipartBody.h>
 #include <network/StringBody.h>

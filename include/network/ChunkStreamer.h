@@ -31,9 +31,10 @@ public:
         size_t written = 0;
         while (written < aBuffer.size()) {
             if (mFiFo.IsEmpty()) {
-                if (self->loadFifo()) {
+                if (mDone) {
                     return written;
                 }
+                self->mDone = self->loadFifo();
             }
             written += self->mFiFo.Read(aBuffer.subspan(written, aBuffer.size() - written));
         }
@@ -80,6 +81,7 @@ protected:
     rsp::utils::FifoBuffer<std::byte, N> mFiFo{};
     size_t mChunkIndex = 0;
     size_t mPayloadIndex = 0;
+    bool mDone = false;
 
     [[nodiscard]] size_t Write(const std::span<const std::byte>) override
     {
@@ -91,7 +93,7 @@ protected:
         mFiFo.Clear(); // Fifo is empty, now make sure buffer Head is on index 0 for maximal continuous space.
         size_t sz = 0;
         auto done = mrProvider.GetChunk(std::span(reinterpret_cast<char*>(mFiFo.GetData()), mFiFo.Free()), sz, mChunkIndex, mPayloadIndex);
-        if (done && sz == 0) {
+        if (done) {
             return true;
         }
         mFiFo.SetHead(sz);

@@ -12,7 +12,6 @@
 #define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
 
 #include <network/IHttpRequest.h>
-#include <network/ChunkStreamer.h>
 #include <iostream>
 #include <string>
 #include <cstring>

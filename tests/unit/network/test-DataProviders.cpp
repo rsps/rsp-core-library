@@ -173,7 +173,7 @@ TEST_CASE("Data Providers")
         CHECK_EQ(result.size(), cPayload.size());
         CHECK_EQ(result, cPayload);
         CHECK_EQ(cs.GetChunkIndex(), 1);
-        CHECK_EQ(cs.GetPayloadIndex(), 8);
+        CHECK_EQ(cs.GetPayloadIndex(), 7);
     }
 
 }
