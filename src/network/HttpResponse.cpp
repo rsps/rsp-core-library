@@ -79,7 +79,10 @@ IHttpResponse& HttpResponse::MakeBody()
 size_t HttpResponse::GetContentLength() const
 {
     if (!mContentLength) {
-        if (mHeaders.contains("content-length")) {
+        if (GetStatusCode() == StatusCodes::NoContent) {
+            const_cast<HttpResponse*>(this)->mContentLength = 0;
+        }
+        else if (mHeaders.contains("content-length")) {
             const_cast<HttpResponse*>(this)->mContentLength = string_to_integral<size_t>(mHeaders.at("content-length"));
         }
     }

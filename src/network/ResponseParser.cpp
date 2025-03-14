@@ -32,10 +32,10 @@ bool ResponseParser::ParseNewData(std::span<const std::byte> aNewData)
                 decodeHeaders(mrResponse.mHeaderData); // Include newline before empty line
                 mrResponse.MakeBody();
                 mContentReceived = 0;
+                (void)mrResponse.GetContentLength(); // Attempt to parse content-length from headers.
                 if (mrResponse.GetRequest().GetOptions().RequestType == HttpRequestType::HEAD) {
                     return true;
                 }
-                (void)mrResponse.GetContentLength(); // Attempt to parse content-length from headers.
                 auto body = work.substr(position + cHeaderEnd.size());
                 if (mrResponse.GetHeaders().contains("transfer-encoding") && mrResponse.GetHeader("transfer-encoding").ends_with("chunked")) {
                     mState = States::ChunkedBody;
