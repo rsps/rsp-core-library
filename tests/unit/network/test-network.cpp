@@ -26,7 +26,6 @@
 #include <posix/FileIO.h>
 #include <utils/StrUtils.h>
 #include <TestHelpers.h>
-#include <cstdlib>
 #include <unistd.h>
 
 using namespace rsp::logging;
@@ -48,10 +47,7 @@ TEST_CASE("Network")
     opt.KeyPath = "webserver/ssl/private/SN1234.key";
 
     // Run lighttpd directly from build directory, no need to install it.
-    std::system("killall lighttpd -q"); // Make sure it is not running
-    std::string cwd = std::filesystem::current_path();
-    std::string command = cwd + "/_deps/lighttpd_src-build/build/lighttpd -f " + cwd + "/webserver/lighttpd.conf -m " + cwd + "/_deps/lighttpd_src-build/build";
-    CHECK_EQ(0, std::system(command.c_str()));
+    CHECK_EQ(TestHelpers::StartWebServer(), 0);
     std::this_thread::sleep_for(50ms);
 
     SUBCASE("Library Version"){
@@ -582,7 +578,7 @@ Body: )" + json + "\n";
         CHECK(resp1);
     }
 
-    CHECK_EQ(0, std::system("killall lighttpd"));
+    CHECK_EQ(0, TestHelpers::StopWebServer());
 }
 
 TEST_SUITE_END();

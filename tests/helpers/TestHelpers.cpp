@@ -8,7 +8,9 @@
  * \author      Steffen Brummer
  */
 
+#include <cstdlib>
 #include <cstring>
+#include <filesystem>
 #include <string>
 #include <posix/FileIO.h>
 #include <posix/FileSystem.h>
@@ -74,5 +76,18 @@ bool TestHelpers::ValidateJsonFile(const std::string &arJsonFile)
     int result = std::system((std::string("/usr/bin/jsonlint-php ") + arJsonFile).c_str());
 
     return (result == 0);
+}
+
+int TestHelpers::StartWebServer()
+{
+    std::system("killall lighttpd -q"); // Make sure it is not running
+    std::string cwd = std::filesystem::current_path();
+    std::string command = cwd + "/_deps/lighttpd_src-build/build/lighttpd -f " + cwd + "/webserver/lighttpd.conf -m " + cwd + "/_deps/lighttpd_src-build/build";
+    return std::system(command.c_str());
+}
+
+int TestHelpers::StopWebServer()
+{
+    return std::system("killall lighttpd -q");
 }
 

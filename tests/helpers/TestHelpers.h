@@ -30,6 +30,9 @@ public:
 
     static bool ValidateJson(const std::string &arJson);
     static bool ValidateJsonFile(const std::string &arJsonFile);
+
+    static int StartWebServer();
+    static int StopWebServer();
 };
 
 template <class T>
