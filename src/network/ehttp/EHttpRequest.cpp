@@ -135,8 +135,14 @@ std::string EHttpRequest::formatHeaders(AutoHeaders& arHeaders)
 
     std::stringstream ss;
     ss  << mOptions.RequestType << " "
-        << up.GetPath() << up.GetQuery() << up.GetFragment()
-        << " HTTP/1.1\r\nHost: "sv
+        << up.GetPath();
+    if (!up.GetQuery().empty()) {
+        ss << '?' << up.GetQuery();
+    }
+    if (!up.GetFragment().empty()) {
+        ss << '#' << up.GetFragment();
+    }
+    ss  << " HTTP/1.1\r\nHost: "sv
         << up.GetHost()
         << cNewLine;
     for (auto &h : mOptions.Headers) {

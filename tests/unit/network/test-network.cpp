@@ -12,6 +12,7 @@
 #include <array>
 #include <cstring>
 #include <filesystem>
+#include <json/Json.h>
 #include <network/FileBody.h>
 #include <network/HttpDownload.h>
 #include <network/HttpRequest.h>
@@ -576,6 +577,28 @@ Body: )" + json + "\n";
         CHECK(respHead);
         CHECK(respHead2);
         CHECK(resp1);
+    }
+
+    SUBCASE("GET with arguments") {
+        opt.BaseUrl = "https://server.localhost:44300/cgi/get.sh/subdir1/?key1=value1;key2=value2#Fragment1";
+        opt.RequestType = HttpRequestType::GET;
+//        opt.Verbose = 1;
+
+        HttpRequest request;
+        request.SetOptions(opt);
+
+        IHttpResponse *resp;
+        CHECK_NOTHROW(resp = &request.Execute());
+
+        auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
+        MESSAGE(body);
+        CHECK(TestHelpers::ValidateJson(body));
+        auto js = rsp::json::Json::Decode(body);
+
+        CHECK_EQ(js["request-uri"].AsString(), "/cgi/get.sh/subdir1/?key1=value1;key2=value2#Fragment1");
+        CHECK_EQ(js["method"].AsString(), "GET");
+        CHECK_EQ(js["path"].AsString(), "/subdir1/");
+        CHECK_EQ(js["query"].AsString(), "key1=value1;key2=value2");
     }
 
     CHECK_EQ(0, TestHelpers::StopWebServer());
