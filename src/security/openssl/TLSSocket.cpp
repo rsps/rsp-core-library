@@ -106,7 +106,10 @@ size_t TLSSocket::Read(std::span<std::byte> aData)
     size_t read_bytes = 0;
     int err = SSL_read_ex(mpSSL.get(), aData.data(), aData.size(), &read_bytes);
     if (!err) {
-        THROW_WITH_BACKTRACE1(EOpenSSLError, SSL_get_error(mpSSL.get(), err));
+        auto code = SSL_get_error(mpSSL.get(), err);
+        if (code != SSL_ERROR_ZERO_RETURN) {
+            THROW_WITH_BACKTRACE1(EOpenSSLError, code);
+        }
     }
     return size_t(read_bytes);
 }
