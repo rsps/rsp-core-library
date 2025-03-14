@@ -73,7 +73,7 @@ bool TestHelpers::ValidateJson(const std::string &arJson)
 
 bool TestHelpers::ValidateJsonFile(const std::string &arJsonFile)
 {
-    int result = std::system((std::string("/usr/bin/jsonlint-php ") + arJsonFile).c_str());
+    int result = std::system((std::string("/usr/bin/jsonlint-php --quiet ") + arJsonFile).c_str());
 
     return (result == 0);
 }
