@@ -63,7 +63,7 @@ bool TestHelpers::ValidateJson(const std::string &arJson)
 
     int result = 1;
     if (rsp::posix::FileSystem::FileExists("/usr/bin/jsonlint-php")) {
-        result = std::system("/usr/bin/jsonlint-php /tmp/ValidateJson.json");
+        result = std::system("/usr/bin/jsonlint-php --quiet /tmp/ValidateJson.json");
     }
 
     std::remove("/tmp/ValidateJson.json");
