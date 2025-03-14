@@ -125,9 +125,15 @@ bool ResponseParser::decodeChunkedBody(std::string_view aData)
                 auto chunk_data = ht.Octets(mChunkLength);
                 ht.CRLF(); // Body must end with cr+lf to be valid.
                 auto written = mrResponse.mpBody->Write(chunk_data);
-                mChunkData = mChunkData.substr(written + line_size + 2);
+                mChunkData = mChunkData.substr(written + line_size + 2); // Remove parsed part from mChunkData
+                continue; // loop around and try again with remaining part
             }
+
+            break;
         }
+    }
+    catch (const std::out_of_range &e) {
+        // Ignore std::string_view out of range errors, data could be incomplete
     }
     catch (const EHttpParseError &e) {
         // Ignore parser errors, data could be incomplete
