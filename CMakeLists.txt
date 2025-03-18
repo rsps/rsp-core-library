@@ -33,7 +33,7 @@ find_package(Git REQUIRED)
 
 # Install "CMake Scripts" dependency
 include(FetchContent)
-FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.1.0")
+FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.2.0")
 FetchContent_MakeAvailable("rsp-cmake-scripts")
 
 # Abort if building in-source
@@ -52,10 +52,8 @@ if(ARCH_ARM)
 endif()
 
 # Obtain GCC info.
-# TODO: This part here SHOULD be extracted into util in our "CMake Scripts"
-find_program(GCC_TOOL NAMES g++-latest g++-HEAD g++-15 g++-14 g++-13 g++-12 g++-11 g++)
-execute_process(COMMAND ${GCC_TOOL} --version OUTPUT_VARIABLE GCC_TOOL_VERSION ERROR_VARIABLE GCC_TOOL_VERSION)
-string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" GCC_TOOL_VERSION "${GCC_TOOL_VERSION}")
+include("rsp/compiler")
+gcc_version(OUTPUT GCC_TOOL_VERSION)
 
 # Define CPP standards, ...etc
 set(CMAKE_CXX_STANDARD 23)
@@ -112,8 +110,6 @@ target_include_directories("${PROJECT_NAME}"
 )
 
 # Configure compile options for this project
-include("rsp/compiler")
-
 set(RSP_CORE_LIB_COMPILE_OPTIONS "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
 list(REMOVE_ITEM RSP_CORE_LIB_COMPILE_OPTIONS "-Wswitch-default")
 
