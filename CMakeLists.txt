@@ -33,7 +33,7 @@ find_package(Git REQUIRED)
 
 # Install "CMake Scripts" dependency
 include(FetchContent)
-FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.2.0")
+FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.3.0")
 FetchContent_MakeAvailable("rsp-cmake-scripts")
 
 # Abort if building in-source
@@ -50,7 +50,7 @@ endif()
 
 # Obtain GCC info.
 include("rsp/compiler")
-gcc_version(OUTPUT GCC_TOOL_VERSION)
+gcc_info(OUTPUT GCC_TOOL)
 
 # Define CPP standards, ...etc
 set(CMAKE_CXX_STANDARD 23)
