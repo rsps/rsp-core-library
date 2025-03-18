@@ -41,10 +41,7 @@ include("rsp/helpers")
 fail_in_source_build()
 
 # Append this project's local module paths.
-list(FIND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" has_rsp_core_lib_module_path)
-if(has_rsp_core_lib_module_path EQUAL -1)
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-endif()
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Set toolchain file, if needed.
 if(ARCH_ARM)
