@@ -220,7 +220,7 @@ Socket &Socket::Bind(const AddressInfo &arAddrInfo, bool aBindAll)
 
 Socket &Socket::Connect(const AddressInfo &arAddrInfo)
 {
-    int res;
+    int res = -1;
     for (size_t i=0 ; i < arAddrInfo.GetCount() ; ++i) {
         auto &sa = arAddrInfo[i];
         res = connect(mHandle.Get(), &sa.Get(), sa.GetSize());

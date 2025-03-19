@@ -39,7 +39,7 @@ public:
             : EMbedTLS(std::string(apMsg) + " (-" + utils::ToHex(uint16_t(std::abs(aErr))) + ")"),
               mCode(aErr)
     {
-        MBEDTLS_ERR_SSL_WANT_READ;
+//        MBEDTLS_ERR_SSL_WANT_READ;
     }
 
 protected:
