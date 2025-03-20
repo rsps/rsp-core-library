@@ -12,6 +12,7 @@
 
 #include "exceptions.h"
 #include <logging/LogChannel.h>
+#include <optional>
 #include <posix/Socket.h>
 #include <security/ITLSSocket.h>
 #include <span>
@@ -75,6 +76,7 @@ protected:
    };
 
     const network::ConnectionOptions& mrOptions;
+    std::optional<std::reference_wrapper<posix::Socket>> mrSocket{};
     tlsNet mNet{};
     tlsEntropy mEntropy{};
     tlsSSL mSsl{};

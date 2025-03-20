@@ -30,6 +30,15 @@ public:
 };
 
 /**
+ * \brief Exception needed by TLS connections, to inform when connection must be reconnected to perform the desired operation.
+ */
+class ENetReconnect: public NetworkException
+{
+public:
+    using NetworkException::NetworkException;
+};
+
+/**
  * \class ERequestOptions
  *
  * \brief Exception regarding Request options

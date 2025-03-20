@@ -8,6 +8,7 @@
 * \author      steffen
 */
 #include "SocketConnection.h"
+#include <network/NetworkException.h>
 #include <network/UrlParser.h>
 
 namespace rsp::network::ehttp {
@@ -64,19 +65,48 @@ bool SocketConnection::IsClosed() const
 
 size_t SocketConnection::Write(const std::span<const std::byte> aData)
 {
-    if (mpTls) {
-        return mpTls->Write(aData);
+    int retries = 3;
+    for (;;) {
+        try {
+            if (mpTls) {
+                return mpTls->Write(aData);
+            }
+            return mSocket.Send(aData);
+        }
+        catch (const network::ENetReconnect &e) {
+            if (mpTls) {
+                mpTls->Close();
+            }
+            mSocket.Close();
+            Connect();
+            if (--retries <= 0) {
+                throw;
+            }
+        }
     }
-    return mSocket.Send(aData);
 }
 
 size_t SocketConnection::Read(const std::span<std::byte> aBuffer)
 {
-    ASSERT(mSocket.IsConnected());
-    if (mpTls) {
-        return mpTls->Read(aBuffer);
+    int retries = 3;
+    for (;;) {
+        try {
+            if (mpTls) {
+                return mpTls->Read(aBuffer);
+            }
+            return mSocket.Receive(aBuffer);
+        }
+        catch (const network::ENetReconnect &e) {
+            if (mpTls) {
+                mpTls->Close();
+            }
+            mSocket.Close();
+            Connect();
+            if (--retries <= 0) {
+                throw;
+            }
+        }
     }
-    return mSocket.Receive(aBuffer);
 }
 
 } // rsp::network::ehttp

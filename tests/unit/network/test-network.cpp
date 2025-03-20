@@ -139,6 +139,11 @@ TEST_CASE("Network")
         SUBCASE("GET") {
             opt.RequestType = HttpRequestType::GET;
         }
+        SUBCASE("Omit Client Validation") {
+            opt.RequestType = HttpRequestType::HEAD;
+            opt.CertPath.clear();
+            opt.KeyPath.clear();
+        }
 
         request.SetOptions(opt);
 

@@ -51,11 +51,6 @@ struct EMbedTLSFatal : public EMbedTLSError
     using EMbedTLSError::EMbedTLSError;
 };
 
-struct EMbedTLSReconnect : public EMbedTLSError
-{
-    using EMbedTLSError::EMbedTLSError;
-};
-
 struct EMbedTLSEarlyData : public EMbedTLSError
 {
     using EMbedTLSError::EMbedTLSError;
@@ -66,6 +61,10 @@ struct EMbedTLSInvalidCertificate : public EMbedTLSFatal
     using EMbedTLSFatal::EMbedTLSFatal;
 };
 
+struct EmbedTLSCaChainMissing : public EMbedTLS
+{
+    using EMbedTLS::EMbedTLS;
+};
 
 #define CHK_0(x) {  \
     auto ret = (x); \

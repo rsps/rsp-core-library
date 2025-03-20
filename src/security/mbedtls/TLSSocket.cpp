@@ -33,7 +33,7 @@ TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
       mRandom(mEntropy, mrOptions.Nonce)
 {
     CHK_0(mbedtls_ssl_config_defaults(&mConfig, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT))
-    mbedtls_ssl_conf_authmode( &mConfig, MBEDTLS_SSL_VERIFY_REQUIRED );
+    mbedtls_ssl_conf_authmode( &mConfig, MBEDTLS_SSL_VERIFY_REQUIRED);
     mbedtls_ssl_conf_rng( &mConfig, mbedtls_ctr_drbg_random, &mRandom );
     if (mrOptions.Verbose) {
         mbedtls_ssl_conf_dbg(&mConfig, debugLog, &mLogger);
@@ -43,6 +43,9 @@ TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
     if (!mrOptions.CertCaPath.empty()) {
         CHK_0(mbedtls_x509_crt_parse_file(&mCaChain, mrOptions.CertCaPath.c_str()))
         mbedtls_ssl_conf_ca_chain(&mConfig, &mCaChain, nullptr);
+    }
+    else {
+        THROW_WITH_BACKTRACE1(EmbedTLSCaChainMissing, "A server CA certificate chain MUST be provided for TLS-1.3");
     }
 
     if (!mrOptions.CertPath.empty()) {
@@ -173,7 +176,8 @@ bool TLSSocket::resultHandler(int aErr)
             break;
 
         case MBEDTLS_ERR_X509_CERT_VERIFY_FAILED:
-        case MBEDTLS_ERR_SSL_BAD_CERTIFICATE: {
+        case MBEDTLS_ERR_SSL_BAD_CERTIFICATE:
+        {
             auto flags = mbedtls_ssl_get_verify_result(&mSsl);
             char verify_info[512];
             mbedtls_x509_crt_verify_info(verify_info, sizeof(verify_info), "  ! ", flags);
@@ -185,7 +189,10 @@ bool TLSSocket::resultHandler(int aErr)
 
         case 0:
         case MBEDTLS_ERR_NET_CONN_RESET:
-            THROW_WITH_BACKTRACE2(EMbedTLSReconnect, "SSL connection was reset by peer", aErr);
+            THROW_WITH_BACKTRACE1(ENetReconnect, "SSL connection was reset by peer");
+
+        case MBEDTLS_ERR_SSL_CA_CHAIN_REQUIRED:
+            THROW_WITH_BACKTRACE2(EMbedTLSInvalidCertificate, "A certificate chain is required", aErr);
 
         default:
             THROW_WITH_BACKTRACE2(EMbedTLSFatal, "mbedtls_ssl_read", aErr);
