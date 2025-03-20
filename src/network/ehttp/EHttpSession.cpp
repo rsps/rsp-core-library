@@ -31,9 +31,20 @@ void EHttpSession::ProcessRequests()
  * \see https://os.mbed.com/docs/mbed-os/v6.16/apis/tls-tutorial.html
  */
 
+    size_t i = 0;
     for (auto r : mPending) {
-        r->Execute();
-        mPool.Put(*r);
+        try {
+            r->Execute();
+            mPool.Put(*r);
+            ++i;
+        }
+        catch(...) {
+            for (; i < mPending.size() ; ++i) {
+                mPool.Put(*mPending[i]);
+            }
+            mPending.clear();
+            throw;
+        }
     }
     mPending.clear();
 }
