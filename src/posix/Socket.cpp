@@ -378,7 +378,7 @@ void Socket::setTimeoutOption(SockOptions aOption, std::chrono::system_clock::du
 Socket& Socket::Shutdown(ShutdownFlags aFlag)
 {
     int res = shutdown(mHandle.Get(), int(aFlag));
-    if (res < 0) {
+    if ((res < 0) && (errno != ENOTCONN)) {
         THROW_SYSTEM("shutdown() failed.");
     }
     return *this;
