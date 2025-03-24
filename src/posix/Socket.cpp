@@ -388,6 +388,7 @@ Socket& Socket::Close()
 {
     if (IsConnected()) {
         Shutdown(ShutdownFlags::ReadWrite);
+        mPeerAddress.SetDomain(Domain::Unspecified); // Mark as unconnected
     }
     return *this;
 }
