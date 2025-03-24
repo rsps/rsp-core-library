@@ -60,6 +60,7 @@ Socket::Socket(Socket &&arOther) noexcept
 Socket& Socket::operator=(Socket &&arOther) noexcept
 {
     if (this != &arOther) {
+        mHandle.Close();
         mHandle = std::move(arOther.mHandle);
         mLocalAddress = arOther.mLocalAddress;
         mPeerAddress = arOther.mPeerAddress;
@@ -70,7 +71,7 @@ Socket& Socket::operator=(Socket &&arOther) noexcept
 
 bool Socket::IsConnected() const
 {
-    return !mPeerAddress.IsEmpty();
+    return !mPeerAddress.IsEmpty() && bool(mHandle);
 }
 
 bool Socket::IsListening() const

@@ -77,7 +77,7 @@ size_t SocketConnection::Write(const std::span<const std::byte> aData)
             return mSocket.Send(aData);
         }
         catch (const network::ENetReconnect &e) {
-            Close();
+            destroy();
             Connect();
             if (--retries <= 0) {
                 throw;
@@ -97,13 +97,22 @@ size_t SocketConnection::Read(const std::span<std::byte> aBuffer)
             return mSocket.Receive(aBuffer);
         }
         catch (const network::ENetReconnect &e) {
-            Close();
+            destroy();
             Connect();
             if (--retries <= 0) {
                 throw;
             }
         }
     }
+}
+
+void SocketConnection::destroy()
+{
+    if (mpTls) {
+        mpTls->Close();
+        mpTls = nullptr;
+    }
+    mSocket = posix::Socket();
 }
 
 } // rsp::network::ehttp
