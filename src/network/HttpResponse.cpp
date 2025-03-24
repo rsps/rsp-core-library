@@ -99,6 +99,7 @@ IHttpResponse& HttpResponse::Clear()
     mHeaderData.clear();
     mContentLength.reset();
     mpBody.reset();
+    MakeBody();
     return *this;
 }
 
