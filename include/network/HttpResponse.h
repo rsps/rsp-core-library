@@ -32,6 +32,7 @@ public:
     explicit HttpResponse(IHttpRequest &arRequest)
         : mrRequest(arRequest)
     {
+        MakeBody();
     }
 
     [[nodiscard]] const StatusLine& GetStatusLine() const override

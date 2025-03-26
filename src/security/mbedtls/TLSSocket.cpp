@@ -175,6 +175,9 @@ bool TLSSocket::resultHandler(int aErr)
             mLogger.Info() << "SSL got new session ticket";
             break;
 
+        case MBEDTLS_ERR_SSL_CA_CHAIN_REQUIRED:
+            THROW_WITH_BACKTRACE2(EMbedTLSInvalidCertificate, "A certificate chain is required", aErr);
+
         case MBEDTLS_ERR_X509_CERT_VERIFY_FAILED:
         case MBEDTLS_ERR_SSL_BAD_CERTIFICATE:
         {
@@ -191,11 +194,12 @@ bool TLSSocket::resultHandler(int aErr)
         case MBEDTLS_ERR_NET_CONN_RESET:
             THROW_WITH_BACKTRACE1(ENetReconnect, "SSL connection was reset by peer");
 
-        case MBEDTLS_ERR_SSL_CA_CHAIN_REQUIRED:
-            THROW_WITH_BACKTRACE2(EMbedTLSInvalidCertificate, "A certificate chain is required", aErr);
+        case MBEDTLS_ERR_NET_RECV_FAILED:
+        case MBEDTLS_ERR_NET_SEND_FAILED:
+            THROW_WITH_BACKTRACE1(ENetReconnect, "Net R/W error. Reconnecting.");
 
         default:
-            THROW_WITH_BACKTRACE2(EMbedTLSFatal, "mbedtls_ssl_read", aErr);
+            THROW_WITH_BACKTRACE2(EMbedTLSFatal, "TLSSocket", aErr);
     }
     return false;
 }

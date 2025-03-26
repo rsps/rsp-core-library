@@ -60,7 +60,7 @@ std::string_view HttpResponse::GetHeader(std::string_view aName) const
 IHttpResponse& HttpResponse::MakeBody()
 {
     if (mpBody) {
-        return *this;
+        mpBody.reset();
     }
 
     if (mrRequest.GetOptions().ResponseBody) {
@@ -98,7 +98,7 @@ IHttpResponse& HttpResponse::Clear()
     mHeaders.clear();
     mHeaderData.clear();
     mContentLength.reset();
-    mpBody.reset();
+    MakeBody();
     return *this;
 }
 
