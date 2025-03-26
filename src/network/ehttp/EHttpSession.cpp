@@ -32,20 +32,33 @@ void EHttpSession::ProcessRequests()
  */
 
     size_t i = 0;
-    for (auto r : mPending) {
-        try {
-            r->Execute();
+    try {
+        for (auto r: mPending) {
+            size_t retries = 1;
+            for (;;) {
+                try {
+                    r->Execute();
+                    break;
+                }
+                catch (const network::ENetReconnect& e) {
+                    if (retries--) {
+                        continue;
+                    }
+                    throw;
+                }
+            }
             mPool.Put(*r);
             ++i;
         }
-        catch(...) {
-            for (; i < mPending.size() ; ++i) {
-                mPool.Put(*mPending[i]);
-            }
-            mPending.clear();
-            throw;
-        }
     }
+    catch (...) {
+        for (; i < mPending.size(); ++i) {
+            mPool.Put(*mPending[i]);
+        }
+        mPending.clear();
+        throw;
+    }
+
     mPending.clear();
 }
 

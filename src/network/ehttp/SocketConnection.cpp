@@ -48,8 +48,16 @@ SocketConnection& SocketConnection::Connect()
 
 SocketConnection& SocketConnection::Close()
 {
-    mSocket.Close();
-    mpTls = nullptr;
+    if (mpTls) {
+        mpTls->Close();
+        mpTls = nullptr;
+    }
+    try {
+        mSocket.Close();
+    }
+    catch(...) {
+    }
+    mSocket = posix::Socket();
     return *this;
 }
 
@@ -65,47 +73,29 @@ bool SocketConnection::IsClosed() const
 
 size_t SocketConnection::Write(const std::span<const std::byte> aData)
 {
-    int retries = 3;
-    for (;;) {
-        try {
-            if (mpTls) {
-                return mpTls->Write(aData);
-            }
-            return mSocket.Send(aData);
+    try {
+        if (mpTls) {
+            return mpTls->Write(aData);
         }
-        catch (const network::ENetReconnect &e) {
-            if (mpTls) {
-                mpTls->Close();
-            }
-            mSocket.Close();
-            Connect();
-            if (--retries <= 0) {
-                throw;
-            }
-        }
+        return mSocket.Send(aData);
+    }
+    catch (const network::ENetReconnect &e) {
+        Close();
+        throw;
     }
 }
 
 size_t SocketConnection::Read(const std::span<std::byte> aBuffer)
 {
-    int retries = 3;
-    for (;;) {
-        try {
-            if (mpTls) {
-                return mpTls->Read(aBuffer);
-            }
-            return mSocket.Receive(aBuffer);
+    try {
+        if (mpTls) {
+            return mpTls->Read(aBuffer);
         }
-        catch (const network::ENetReconnect &e) {
-            if (mpTls) {
-                mpTls->Close();
-            }
-            mSocket.Close();
-            Connect();
-            if (--retries <= 0) {
-                throw;
-            }
-        }
+        return mSocket.Receive(aBuffer);
+    }
+    catch (const network::ENetReconnect &e) {
+        Close();
+        throw;
     }
 }
 

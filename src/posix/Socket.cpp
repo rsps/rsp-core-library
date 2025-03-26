@@ -70,7 +70,7 @@ Socket& Socket::operator=(Socket &&arOther) noexcept
 
 bool Socket::IsConnected() const
 {
-    return !mPeerAddress.IsEmpty();
+    return !mPeerAddress.IsEmpty() && bool(mHandle);
 }
 
 bool Socket::IsListening() const
