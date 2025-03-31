@@ -20,6 +20,10 @@
 
 namespace rsp::network::ehttp {
 
+#ifndef EHTTP_REQUEST_BUFFER_SIZE
+    #define EHTTP_REQUEST_BUFFER_SIZE 512
+#endif
+
 class EHttpResponse;
 class EHttpSession;
 
@@ -42,7 +46,7 @@ protected:
 
     HttpRequestOptions mOptions{};
     EHttpResponse mResponse;
-    std::array<std::byte, 256> mWorkBuffer{};
+    std::array<std::byte, EHTTP_REQUEST_BUFFER_SIZE> mWorkBuffer{};
 
     friend class EHttpSession;
     ResponseCallback_t mResponseCallback{};

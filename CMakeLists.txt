@@ -132,6 +132,13 @@ else()
     )
 endif()
 
+if (EHTTP_REQUEST_BUFFER_SIZE)
+    message(STATUS "Compiling eHttp with request buffer size: ${EHTTP_REQUEST_BUFFER_SIZE}")
+    target_compile_options("${PROJECT_NAME}" PRIVATE
+        -DEHTTP_REQUEST_BUFFER_SIZE=${EHTTP_REQUEST_BUFFER_SIZE}
+    )
+endif ()
+
 add_subdirectory(src)
 
 # -------------------------------------------------------------------------------------------------------------- #
