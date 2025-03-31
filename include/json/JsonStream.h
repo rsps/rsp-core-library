@@ -105,7 +105,7 @@ public:
     std::string newLine{};
 
 protected:
-    size_t mMaxSize = 0;
+    size_t mMaxSize = size_t(std::numeric_limits<std::streamsize>::max());
 };
 
 JsonStream& operator<<(JsonStream& o, const Comma &arComma);
