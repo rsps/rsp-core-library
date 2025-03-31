@@ -108,6 +108,23 @@ void JsonStream::StringToStream(const char *apString, size_t aSize, std::ostream
     o << "\"";
 }
 
+JsonStream& JsonStream::SetBuffer(char* apBuffer, size_t aSize)
+{
+    mMaxSize = aSize;
+    this->rdbuf()->pubsetbuf(apBuffer, std::streamsize(aSize));
+    return *this;
+}
+
+size_t JsonStream::GetMaxSize() const
+{
+    return mMaxSize;
+}
+
+size_t JsonStream::GetAvailable()
+{
+    return size_t(std::max(std::streamsize(mMaxSize) - std::streamsize(GetSize()), std::streamsize(0)));
+}
+
 JsonStream& operator <<(JsonStream &o, const Comma &arComma)
 {
     static_cast<std::ostringstream&>(o) << arComma.mValue << o.newLine << o.indentation;
