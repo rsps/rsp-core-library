@@ -194,6 +194,9 @@ bool TLSSocket::resultHandler(int aErr)
         case MBEDTLS_ERR_NET_CONN_RESET:
             THROW_WITH_BACKTRACE1(ENetReconnect, "SSL connection was reset by peer");
 
+        case MBEDTLS_ERR_SSL_TIMEOUT:
+            THROW_WITH_BACKTRACE1(ENetReconnect, "SSL timeout");
+
         case MBEDTLS_ERR_NET_RECV_FAILED:
         case MBEDTLS_ERR_NET_SEND_FAILED:
             THROW_WITH_BACKTRACE1(ENetReconnect, "Net R/W error. Reconnecting.");
