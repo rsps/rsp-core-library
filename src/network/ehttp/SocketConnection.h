@@ -10,15 +10,18 @@
 #ifndef RSP_CORE_LIB_SRC_NETWORK_EHTTP_SOCKET_CONNECTION_H
 #define RSP_CORE_LIB_SRC_NETWORK_EHTTP_SOCKET_CONNECTION_H
 
+#include <logging/LogChannel.h>
 #include <network/IConnection.h>
 #include <posix/Socket.h>
 #include <security/ITLSSocket.h>
 
 namespace rsp::network::ehttp {
 
-class SocketConnection : public rsp::network::IConnection
+class SocketConnection : public rsp::network::IConnection, public rsp::logging::NamedLogChannel
 {
 public:
+    SocketConnection();
+
     SocketConnection& SetOptions(const ConnectionOptions& arOptions) override;
     SocketConnection& Connect() override;
     SocketConnection& Close() override;

@@ -13,6 +13,10 @@
 
 namespace rsp::network::ehttp {
 
+SocketConnection::SocketConnection()
+    : NamedLogChannel("SocketConnection")
+{
+}
 
 SocketConnection& SocketConnection::SetOptions(const ConnectionOptions& arOptions)
 {
@@ -31,6 +35,7 @@ SocketConnection& SocketConnection::Connect()
     UrlParser up(mOptions.BaseUrl);
 
     auto urn = std::string(up.GetHost()) + ":" + std::to_string(static_cast<unsigned int>(up.GetPort()));
+    mLogger.Info() << "Connecting to " << urn;
     AddressInfo ai(urn);
 
     mSocket = Socket(Domain::Inet, Type::Stream, Protocol::Unspecified);
