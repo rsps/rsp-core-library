@@ -95,6 +95,7 @@ IHttpResponse& EHttpRequest::Execute()
             }
             if (parser.ParseNewData({mWorkBuffer.data(), sz})) {
                 // mResponse is now filled.
+                mResponse.mCompleted = true;
                 break;
             }
         }

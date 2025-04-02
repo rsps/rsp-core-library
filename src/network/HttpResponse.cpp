@@ -94,6 +94,7 @@ size_t HttpResponse::GetContentLength() const
 
 IHttpResponse& HttpResponse::Clear()
 {
+    mCompleted = false;
     mStatusLine = {};
     mHeaders.clear();
     mHeaderData.clear();
@@ -101,6 +102,5 @@ IHttpResponse& HttpResponse::Clear()
     MakeBody();
     return *this;
 }
-
 
 }

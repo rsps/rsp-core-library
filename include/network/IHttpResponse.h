@@ -48,6 +48,12 @@ public:
     virtual ~IHttpResponse() = default;
 
     /**
+     * \brief Check if the response has been fully populated
+     * \return True if all response data has been parsed
+     */
+    [[nodiscard]] virtual bool IsComplete() const = 0;
+
+    /**
      * \brief Get the received status line as a decoded object
      * \return StatusLine
      */

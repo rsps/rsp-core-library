@@ -68,7 +68,31 @@ public:
      */
     explicit JsonStream(bool aPrettyPrint = false, unsigned aLevel = 0);
 
+    /**
+     * \brief Set the internal work buffer to use.
+     * \param apBuffer
+     * \param aSize
+     * \return self
+     */
+    JsonStream& SetBuffer(char *apBuffer, size_t aSize);
+
+    /**
+     * \brief Get the current size, in bytes, of the stream
+     * \return size_t
+     */
     [[nodiscard]] size_t GetSize();
+
+    /**
+     * \brief Get the maximum size, in bytes, of the stream.
+     * \return size_t
+     */
+    [[nodiscard]] size_t GetMaxSize() const;
+
+    /**
+     * \brief Get available space, in bytes, in the stream
+     * \return
+     */
+    [[nodiscard]] size_t GetAvailable();
 
     static void StringToStream(const std::string &arString, std::ostream &o, bool aForceToUCS2 = false);
     static void StringToStream(std::string_view aString, std::ostream &o, bool aForceToUCS2 = false);
@@ -79,6 +103,9 @@ public:
     std::string indentation{};
     std::string space{};
     std::string newLine{};
+
+protected:
+    size_t mMaxSize = size_t(std::numeric_limits<std::streamsize>::max());
 };
 
 JsonStream& operator<<(JsonStream& o, const Comma &arComma);
