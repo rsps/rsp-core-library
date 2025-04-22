@@ -78,7 +78,7 @@ ThreadInterface& Thread::SetExecute(Thread::ThreadCallback_t aCb)
 
 void Thread::run()
 {
-    mLogger.Debug() << "Running thread '" << mName << "'";
+    mLogger.Info() << "Running";
     try {
         try {
             while (!mTerminated) {
@@ -86,12 +86,14 @@ void Thread::run()
             }
         }
         catch (const std::exception &e) {
-            mLogger.Error() << "Thread '" << GetName() << "'" << " excepted with: " << e.what();
+            mLogger.Error() << "Excepted with: " << e.what();
             throw ThreadException(GetName(), e.what());
         }
     }
     catch(...) {
+        mLogger.Error() << "Terminating";
         mpException = std::current_exception();
+        mTerminated = true;
     }
 }
 
