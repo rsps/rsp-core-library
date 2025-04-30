@@ -20,7 +20,7 @@ namespace rsp::security {
 class ITLSSocket
 {
 public:
-    static std::shared_ptr<ITLSSocket> Create(const network::ConnectionOptions& arOptions);
+    static std::shared_ptr<ITLSSocket> Create(network::ConnectionOptions& arOptions);
 
     virtual ~ITLSSocket() = default;
 

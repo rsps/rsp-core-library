@@ -48,7 +48,7 @@ protected:
     using TLS_Context = std::unique_ptr<SSL_CTX, ContextDeleter>;
     using TLS_Connection = std::unique_ptr<SSL, ConnectionDeleter>;
 
-    const network::ConnectionOptions& mrOptions;
+    network::ConnectionOptions& mrOptions;
     TLS_Context mpContext{};
     TLS_Connection mpSSL{};
     int mFd = -1;

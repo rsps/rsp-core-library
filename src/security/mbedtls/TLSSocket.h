@@ -37,7 +37,7 @@ namespace rsp::security {
 class TLSSocket : public ITLSSocket, public logging::NamedLogChannel
 {
 public:
-    explicit TLSSocket(const network::ConnectionOptions& arOptions);
+    explicit TLSSocket(network::ConnectionOptions& arOptions);
 
     TLSSocket& SetSocket(posix::Socket &arSocket) override;
     TLSSocket& Close() override;
@@ -75,7 +75,6 @@ protected:
         ~tlsRandom() { mbedtls_ctr_drbg_free(this); }
    };
 
-    const network::ConnectionOptions& mrOptions;
     std::optional<std::reference_wrapper<posix::Socket>> mrSocket{};
     tlsNet mNet{};
     tlsEntropy mEntropy{};
