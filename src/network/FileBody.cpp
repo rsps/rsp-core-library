@@ -11,6 +11,12 @@
 
 namespace rsp::network {
 
+FileBody::FileBody(const std::string& arFileName)
+    : mpFile(std::make_unique<posix::FileIO>(arFileName, std::ios::in | std::ios::out | std::ios::ate, 0640)),
+      mrFile(*mpFile)
+{
+}
+
 FileBody::FileBody(posix::FileIO& arFile)
     : mrFile(arFile)
 {

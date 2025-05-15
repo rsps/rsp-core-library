@@ -14,7 +14,6 @@
 #include <filesystem>
 #include <json/Json.h>
 #include <network/FileBody.h>
-#include <network/HttpDownload.h>
 #include <network/HttpRequest.h>
 #include <network/HttpSession.h>
 #include <network/IHttpRequest.h>
@@ -233,17 +232,18 @@ TEST_CASE("Network")
         FileIO file(cSourceFile, std::ios_base::in);
         auto source = file.GetContents();
 
-        HttpDownload request(cFile);
+        HttpRequest request;
         opt.BaseUrl = "https://server.localhost:44300/image.png";
 //        opt.Verbose = 1;
-
+        opt.ResponseBody = std::make_shared<FileBody>(cFile);
         request.SetOptions(opt);
 
         IHttpResponse *resp = nullptr;
 
         SUBCASE("To Memory") {
             FileSystem::DeleteFile(cFile);
-            request.SetFileName("");
+            opt.ResponseBody = nullptr; // Omit destination file to download to memory
+            request.SetOptions(opt);
 
             CHECK_NOTHROW(resp = &request.Execute());
 
@@ -257,15 +257,19 @@ TEST_CASE("Network")
 
         SUBCASE("To File") {
             FileSystem::DeleteFile(cFile);
+            opt.ResponseBody = std::make_shared<FileBody>(cFile); // Reload after removing file
+            request.SetOptions(opt);
 
             CHECK_NOTHROW(resp = &request.Execute());
 
             CHECK_EQ(resp->GetContentLength(), 25138);
-            CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
+            CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
         }
 
         SUBCASE("Partial To File") {
             CHECK_EQ(0, truncate(cFile.c_str(), 20*1024)); // This changes mtime
+            opt.ResponseBody = std::make_shared<FileBody>(cFile); // Reload after removing file
+            request.SetOptions(opt);
 
             CHECK_NOTHROW(resp = &request.Execute());
 

@@ -71,41 +71,13 @@ void EHttpRequest::prepareRequest(AutoHeaders& arHeaders)
 
 IHttpResponse& EHttpRequest::Execute()
 {
-    // Get connection
-    auto &connection = getConnection().Connect();
-
-    AutoHeaders headers;
-    prepareRequest(headers);
-    connection.Write(formatHeaders(headers));
-
-    // Send body
-    if (mOptions.RequestBody) {
-        while (auto sz = mOptions.RequestBody->Read(mWorkBuffer)) {
-            connection.Write({mWorkBuffer.data(), sz});
-        }
-    }
-
-    // Read response...
-    {
-        ResponseParser parser(mResponse);
-        while (true) {
-            auto sz = connection.Read(mWorkBuffer);
-            if (sz == 0) {
-                break;
-            }
-            if (parser.ParseNewData({mWorkBuffer.data(), sz})) {
-                // mResponse is now filled.
-                mResponse.mCompleted = true;
-                break;
-            }
-        }
-    }
+    auto &response = defaultExecute();
 
     if (mResponseCallback) {
-        mResponseCallback(mResponse);
+        mResponseCallback(response);
     }
 
-    return mResponse;
+    return response;
 }
 
 uintptr_t EHttpRequest::GetHandle() const
@@ -162,6 +134,41 @@ IStreamDataProvider& EHttpRequest::getRequestBody()
         mOptions.RequestBody = std::make_shared<StringBody>();
     }
     return *mOptions.RequestBody;
+}
+
+IHttpResponse& EHttpRequest::execute()
+{
+    // Get connection
+    auto &connection = getConnection().Connect();
+
+    AutoHeaders headers;
+    prepareRequest(headers);
+    connection.Write(formatHeaders(headers));
+
+    // Send body
+    if (mOptions.RequestBody) {
+        while (auto sz = mOptions.RequestBody->Read(mWorkBuffer)) {
+            connection.Write({mWorkBuffer.data(), sz});
+        }
+    }
+
+    // Read response...
+    {
+        ResponseParser parser(mResponse);
+        while (true) {
+            auto sz = connection.Read(mWorkBuffer);
+            if (sz == 0) {
+                break;
+            }
+            if (parser.ParseNewData({mWorkBuffer.data(), sz})) {
+                // mResponse is now filled.
+                mResponse.mCompleted = true;
+                break;
+            }
+        }
+    }
+
+    return mResponse;
 }
 
 } // rsp::network::ehttp

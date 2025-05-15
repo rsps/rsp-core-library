@@ -18,7 +18,7 @@ HttpRequest::HttpRequest()
 }
 
 HttpRequest::HttpRequest(const HttpRequestOptions& arOptions)
-    : mPimpl(Create())
+    : HttpRequest()
 {
     mPimpl->SetOptions(arOptions);
 }

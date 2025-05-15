@@ -12,7 +12,7 @@
 
 #include <filesystem>
 #include <memory>
-#include <network/IHttpRequest.h>
+#include <network/HttpRequestBase.h>
 #include <network/IHttpSession.h>
 #include <network/MultipartBoundary.h>
 #include "EHttpResponse.h"
@@ -27,11 +27,9 @@ namespace rsp::network::ehttp {
 class EHttpResponse;
 class EHttpSession;
 
-class EHttpRequest : public rsp::network::IHttpRequest
+class EHttpRequest : public rsp::network::HttpRequestBase
 {
 public:
-    typedef std::function<void(EHttpResponse&)> ResponseCallback_t;
-
     EHttpRequest();
 
     [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
@@ -49,9 +47,10 @@ protected:
     std::array<std::byte, EHTTP_REQUEST_BUFFER_SIZE> mWorkBuffer{};
 
     friend class EHttpSession;
-    ResponseCallback_t mResponseCallback{};
     std::optional<std::reference_wrapper<IHttpSession>> mrSession{};
     std::unique_ptr<SocketConnection> mpConnection{};
+
+    IHttpResponse& execute() override;
 
     void prepareRequest(AutoHeaders& arHeaders);
     SocketConnection& getConnection();
