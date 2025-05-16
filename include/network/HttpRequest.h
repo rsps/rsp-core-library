@@ -44,6 +44,17 @@ public:
         return mPimpl->GetBody();
     }
 
+    IHttpRequest& SetResponseBody(HttpBody_t apBody) override
+    {
+        mPimpl->SetResponseBody(apBody);
+        return *this;
+    }
+
+    [[nodiscard]] const IStreamDataProvider& GetResponseBody() const override
+    {
+        return mPimpl->GetResponseBody();
+    }
+
     [[nodiscard]] IHttpResponse& Execute() override
     {
         return mPimpl->Execute();

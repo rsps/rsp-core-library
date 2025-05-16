@@ -21,11 +21,11 @@ IHttpResponse& HttpRequestBase::Execute()
 
 IHttpResponse& HttpRequestBase::defaultExecute()
 {
-    if (GetOptions().RequestType != HttpRequestType::GET || !(dynamic_cast<FileBody*>(GetOptions().RequestBody.get()))) {
+    if (GetOptions().RequestType != HttpRequestType::GET || !(dynamic_cast<FileBody*>(GetOptions().ResponseBody.get()))) {
         return execute();
     }
 
-    auto f_body  = GetOptions().RequestBody;
+    auto f_body  = GetOptions().ResponseBody;
     auto &file = dynamic_cast<FileBody&>(*f_body).Get();
 
     std::string modified_time{};

@@ -242,8 +242,7 @@ TEST_CASE("Network")
 
         SUBCASE("To Memory") {
             FileSystem::DeleteFile(cFile);
-            opt.ResponseBody = nullptr; // Omit destination file to download to memory
-            request.SetOptions(opt);
+            request.SetResponseBody(nullptr); // Omit destination file to download to memory
 
             CHECK_NOTHROW(resp = &request.Execute());
 
@@ -257,19 +256,16 @@ TEST_CASE("Network")
 
         SUBCASE("To File") {
             FileSystem::DeleteFile(cFile);
-            opt.ResponseBody = std::make_shared<FileBody>(cFile); // Reload after removing file
-            request.SetOptions(opt);
+            request.MakeResponseBody<FileBody>(cFile); // Reload after removing file
 
             CHECK_NOTHROW(resp = &request.Execute());
 
             CHECK_EQ(resp->GetContentLength(), 25138);
-            CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
+            CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
         }
 
         SUBCASE("Partial To File") {
             CHECK_EQ(0, truncate(cFile.c_str(), 20*1024)); // This changes mtime
-            opt.ResponseBody = std::make_shared<FileBody>(cFile); // Reload after removing file
-            request.SetOptions(opt);
 
             CHECK_NOTHROW(resp = &request.Execute());
 
@@ -604,7 +600,7 @@ Body: )" + json + "\n";
         CHECK(TestHelpers::ValidateJson(body));
         auto js = rsp::json::Json::Decode(body);
 
-        CHECK_EQ(js["request-uri"].AsString(), "/cgi/get.sh/subdir1/?key1=value1;key2=value2#Fragment1");
+        CHECK_EQ(js["request-uri"].AsString(), "/cgi/get.sh/subdir1/?key1=value1;key2=value2");
         CHECK_EQ(js["method"].AsString(), "GET");
         CHECK_EQ(js["path"].AsString(), "/subdir1/");
         CHECK_EQ(js["query"].AsString(), "key1=value1;key2=value2");

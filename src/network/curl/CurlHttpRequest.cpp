@@ -108,8 +108,18 @@ const IStreamDataProvider& CurlHttpRequest::GetBody() const
     return *mRequestOptions.RequestBody;
 }
 
+IHttpRequest& CurlHttpRequest::SetResponseBody(HttpBody_t apBody)
+{
+    mRequestOptions.ResponseBody = apBody;
+    return *this;
+}
 
-IHttpResponse& CurlHttpRequest::Execute()
+const IStreamDataProvider& CurlHttpRequest::GetResponseBody() const
+{
+    return *mRequestOptions.ResponseBody;
+}
+
+IHttpResponse& CurlHttpRequest::execute()
 {
     prepareRequest();
 

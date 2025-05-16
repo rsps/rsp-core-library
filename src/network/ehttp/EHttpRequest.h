@@ -36,6 +36,8 @@ public:
     IHttpRequest& SetOptions(const HttpRequestOptions& arOptions) override;
     IHttpRequest& SetBody(HttpBody_t apBody) override;
     [[nodiscard]] const IStreamDataProvider& GetBody() const override;
+    IHttpRequest& SetResponseBody(HttpBody_t apBody) override;
+    [[nodiscard]] const IStreamDataProvider& GetResponseBody() const override;
     IHttpResponse& Execute() override;
     [[nodiscard]] uintptr_t GetHandle() const override;
 

@@ -11,7 +11,7 @@
 #ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
 #define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
 
-#include <network/IHttpRequest.h>
+#include <network/HttpRequestBase.h>
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -29,7 +29,7 @@ namespace rsp::network::curl {
  *
  * \brief IHttpRequest implementation using libcurl.
  */
-class CurlHttpRequest: public rsp::network::IHttpRequest, public EasyCurl
+class CurlHttpRequest: public rsp::network::HttpRequestBase, public EasyCurl
 {
 public:
     CurlHttpRequest();
@@ -37,26 +37,26 @@ public:
     CurlHttpRequest(const CurlHttpRequest&) = default;
     CurlHttpRequest(CurlHttpRequest&&) noexcept = default;
 
-    IHttpResponse& Execute() override;
     [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions &arOptions) override;
     IHttpRequest& SetBody(HttpBody_t apBody) override;
     [[nodiscard]] const IStreamDataProvider& GetBody() const override;
+    IHttpRequest& SetResponseBody(HttpBody_t apBody) override;
+    [[nodiscard]] const IStreamDataProvider& GetResponseBody() const override;
 
     [[nodiscard]] std::uintptr_t GetHandle() const override;
 
 protected:
-    CurlHttpResponse mResponse;
     HttpRequestOptions mRequestOptions{};
     HttpBody_t mpUploadBuffer{};
+    CurlHttpResponse mResponse; // Note: Must be declared after mRequestOptions injected in constructor
 
+    IHttpResponse& execute() override;
     void readFromStream(const HttpBody_t& arBody);
-
     void prepareRequest() override;
     void requestDone() override;
 
 private:
-
     static size_t writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *data);
     static size_t streamReadFunction(void *ptr, size_t size, size_t nmemb, IStreamDataProvider *apDataProvider);
     static size_t headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse);
@@ -64,7 +64,6 @@ private:
 
     static void checkRequestOptions(const HttpRequestOptions &arOpts);
     void populateOptions();
-
 };
 
 }

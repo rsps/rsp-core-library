@@ -28,7 +28,7 @@ namespace rsp::security {
 class TLSSocket : public ITLSSocket
 {
 public:
-    explicit TLSSocket(const network::ConnectionOptions& arOptions);
+    explicit TLSSocket(network::ConnectionOptions& arOptions);
     ~TLSSocket() override;
 
     TLSSocket& SetSocket(posix::Socket &arSocket) override;

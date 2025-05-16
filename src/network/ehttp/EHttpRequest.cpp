@@ -50,6 +50,17 @@ const IStreamDataProvider& EHttpRequest::GetBody() const
     return *(mOptions.RequestBody);
 }
 
+IHttpRequest& EHttpRequest::SetResponseBody(HttpBody_t apBody)
+{
+    mOptions.ResponseBody = apBody;
+    return *this;
+}
+
+const IStreamDataProvider& EHttpRequest::GetResponseBody() const
+{
+    return *(mOptions.ResponseBody);
+}
+
 void EHttpRequest::prepareRequest(AutoHeaders& arHeaders)
 {
     if (!mOptions.BasicAuthUsername.empty()) {
@@ -112,9 +123,14 @@ std::string EHttpRequest::formatHeaders(AutoHeaders& arHeaders)
     if (!up.GetQuery().empty()) {
         ss << '?' << up.GetQuery();
     }
-    if (!up.GetFragment().empty()) {
-        ss << '#' << up.GetFragment();
-    }
+/**
+ * The Fragment part should not be send to the server.
+ * \see https://en.wikipedia.org/wiki/URI_fragment
+ * Quote: "its processing is exclusively client-sided with no participation from the web server,"
+ *    if (!up.GetFragment().empty()) {
+ *         ss << '#' << up.GetFragment();
+ *    }
+ */
     ss  << " HTTP/1.1\r\nHost: "sv
         << up.GetHost()
         << cNewLine;
