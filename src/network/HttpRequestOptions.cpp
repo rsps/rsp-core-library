@@ -44,6 +44,10 @@ std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)
         o << "RequestBody:\n" << *(arOptions.RequestBody);
     }
 
+    if (arOptions.ResponseBody) {
+        o << "ResponseBody:\n" << *(arOptions.ResponseBody);
+    }
+
     return o;
 }
 
