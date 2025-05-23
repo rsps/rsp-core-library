@@ -60,6 +60,13 @@ public:
     [[nodiscard]] virtual size_t GetStreamSize() const = 0;
 
     /**
+     * \brief Rewind the stream, if possible.
+     *        Useful for debugging, before calling PrintContent below.
+     * \return self
+     */
+    virtual IStreamDataProvider& Rewind() = 0;
+
+    /**
      * \brief Visualizer method. For debugging/trace output.
      * \param o ostream
      * \return self
@@ -85,6 +92,7 @@ public:
 
 inline std::ostream& operator<<(std::ostream& o, const IStreamDataProvider &arStream)
 {
+    const_cast<IStreamDataProvider&>(arStream).Rewind();
     return arStream.PrintContent(o);
 }
 

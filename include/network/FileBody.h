@@ -25,6 +25,8 @@ public:
     [[nodiscard]] size_t Read(std::span<std::byte> aBuffer) const override;
     [[nodiscard]] size_t GetStreamSize() const override;
 
+    FileBody& Rewind() override;
+
     posix::FileIO& Get() { return mrFile; }
 
 protected:
