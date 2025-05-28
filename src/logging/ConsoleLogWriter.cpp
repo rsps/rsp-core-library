@@ -50,30 +50,38 @@ ConsoleLogWriter::~ConsoleLogWriter()
 
 void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
 {
-    if (!arMsg.length() || (mAcceptLevel < aCurrentLevel)) {
+    if (arMsg.empty() || (mAcceptLevel < aCurrentLevel)) {
         return;
     }
 
-    std::stringstream ss;
-    if (mpColors) {
-        ss << (*mpColors)[std::size_t(aCurrentLevel)];
-    }
-    if (arChannel.length()) {
-        ss << arChannel << ": ";
-    }
-    ss << arMsg;
+    std::string context;
     if (!arContext.IsNull()) {
-        ss << " " << rsp::json::JsonEncoder().Encode(arContext);
+        context = rsp::json::JsonEncoder().Encode(arContext);
+    }
+
+    std::string s;
+    s.reserve(arMsg.size() + context.size() + 20);
+    if (mpColors) {
+        s += (*mpColors)[std::size_t(aCurrentLevel)];
+    }
+    if (!arChannel.empty()) {
+        s += arChannel;
+        s += ": ";
+    }
+    s += arMsg;
+    if (!context.empty()) {
+        s += " ";
+        s += context;
     }
     if (mpColors) {
-        ss << std::string(AnsiEscapeCodes::ec::ConsoleDefault);
+        s += std::string(AnsiEscapeCodes::ec::ConsoleDefault);
     }
 
     if (aCurrentLevel < LogLevel::Warning) {
-        mpConsole->Error(ss.str()); // Write to std::cerr
+        mpConsole->Error(s); // Write to std::cerr
     }
     else {
-        mpConsole->Info(ss.str());
+        mpConsole->Info(s);
     }
 }
 

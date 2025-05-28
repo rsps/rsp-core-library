@@ -25,6 +25,7 @@
 using namespace rsp;
 using namespace rsp::utils;
 using namespace rsp::logging;
+using namespace std::chrono;
 
 TEST_SUITE_BEGIN("Logging");
 
@@ -90,15 +91,15 @@ TEST_CASE("Logging") {
     CHECK_NOTHROW(console = log.MakeLogWriter<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors));
 
     CHECK_NOTHROW(log.Info() << "Test of logger");
-    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(7)));
+    CHECK_NOTHROW(std::this_thread::sleep_for(7ms));
     CHECK_NOTHROW(log.Alert() << SetContext(DynamicData().Add("Test Context").Add(42)) << "Alert");
-    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(2)));
+    CHECK_NOTHROW(std::this_thread::sleep_for(2ms));
     CHECK_NOTHROW(log.Error() << "Error");
-    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(3)));
+    CHECK_NOTHROW(std::this_thread::sleep_for(3ms));
     CHECK_NOTHROW(log.Warning() << "Warning");
-    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(5)));
+    CHECK_NOTHROW(std::this_thread::sleep_for(5ms));
     CHECK_NOTHROW(log.Info() << "Info");
-    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(4)));
+    CHECK_NOTHROW(std::this_thread::sleep_for(4ms));
     CHECK_NOTHROW(log.Debug() << "Debug");
     CHECK_NOTHROW(log.Debug() << SetLevel(LogLevel::Info) << "Dbg-Info");
 
@@ -108,23 +109,23 @@ TEST_CASE("Logging") {
     CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Critical) << "Critical to std::clog" << SetChannel("Main") << std::endl);
 
     CHECK_NOTHROW(log.Emergency() << "Sleeping for 1 second");
-    auto end = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
+    auto end = std::chrono::high_resolution_clock::now() + 1s;
 
     std::thread t([&]() {
         for (int i=0; i < 12 ; i++) {
             CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Info) << SetChannel("Main") << "Writing from thread " << i << std::endl);
-            std::this_thread::sleep_for(std::chrono::milliseconds(90));
+            std::this_thread::sleep_for(90ms);
         }
     });
 
     do {
         CHECK_NOTHROW(std::clog << SetChannel("Main") << SetLevel(LogLevel::Info) << "Writing from main" << std::endl);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(100ms);
     }
     while (std::chrono::high_resolution_clock::now() < end);
     CHECK_NOTHROW(std::clog << "Wakeup..." << std::endl);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(100ms);
     t.join();
 
     std::vector<uint8_t> vec = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
