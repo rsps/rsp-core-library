@@ -35,8 +35,7 @@ std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse)
 
     o <<
         "StatusCode: " << int(arResponse.GetStatusCode()) << "\n"
-        "Body: ";
-    arResponse.GetBody().PrintContent(o);
+        "Body: " << arResponse.GetBody();
     o << "\n";
 
     return o;

@@ -73,6 +73,15 @@ size_t MultipartBody::GetStreamSize() const
     return result;
 }
 
+MultipartBody& MultipartBody::Rewind()
+{
+    mReadPartIndex = 0;
+    for (auto &part : mParts) {
+        part.mReadIndex = 0;
+    }
+    return *this;
+}
+
 MultipartBody& MultipartBody::Add(const std::string& arName, posix::FileIO& arFile, const std::string& arContentType)
 {
     return Add(arName, std::make_shared<FileBody>(arFile), arContentType);

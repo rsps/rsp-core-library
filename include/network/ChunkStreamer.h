@@ -60,6 +60,12 @@ public:
         return *this;
     }
 
+    ChunkStreamer& Rewind() override
+    {
+        Clear();
+        return *this;
+    }
+
     /**
      * \brief Get current chunk index
      * \return size_t

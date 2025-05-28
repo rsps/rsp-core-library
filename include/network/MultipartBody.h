@@ -35,6 +35,7 @@ public:
     [[nodiscard]] size_t Write(std::span<const std::byte> aData) override;
     [[nodiscard]] size_t Read(std::span<std::byte> aBuffer) const override;
     [[nodiscard]] size_t GetStreamSize() const override;
+    MultipartBody& Rewind() override;
 
     /**
      * \brief Add a file body part

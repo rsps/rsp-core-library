@@ -40,4 +40,12 @@ size_t FileBody::GetStreamSize() const
     return 0;
 }
 
+FileBody& FileBody::Rewind()
+{
+    if (mrFile.IsOpen()) {
+        mrFile.Seek(0);
+    }
+    return *this;
+}
+
 } // rsp::network
