@@ -14,6 +14,7 @@
 #include <iostream>
 #include <doctest.h>
 #include <exceptions/CoreException.h>
+#include <json/Json.h>
 #include <logging/BufferToStream.h>
 #include <logging/Logger.h>
 #include <logging/LogChannel.h>
@@ -49,12 +50,30 @@ static std::vector<std::string> mConsoleErrorBuffer;
 class TestConsoleStream : public ConsoleLogStreamsInterface
 {
 public:
-    void Error(const std::string &arMsg) override {
-        mConsoleErrorBuffer.emplace_back(arMsg);
-    }
+    void Write(std::string_view aMsg, LogLevel aCurrentLevel, const std::string& arChannel, const DynamicData& arContext, const std::string& arColor) override
+    {
+        std::stringstream out;
+        if (!arColor.empty()) {
+            out << arColor;
+        }
+        if (!arChannel.empty()) {
+            out << arChannel << ": ";
+        }
+        out << aMsg;
+        if (!arContext.IsNull()) {
+            out << " " << rsp::json::JsonEncoder().Encode(arContext);
+        }
+        if (!arColor.empty()) {
+            out << std::string(utils::AnsiEscapeCodes::ec::ConsoleDefault);
+        }
+        out << std::endl;
 
-    void Info(const std::string &arMsg) override {
-        mConsoleInfoBuffer.emplace_back(arMsg);
+        if (aCurrentLevel < logging::LogLevel::Warning) {
+            mConsoleErrorBuffer.emplace_back(out.str());
+        }
+        else {
+            mConsoleInfoBuffer.emplace_back(out.str());
+        }
     }
 };
 

@@ -93,9 +93,9 @@ LoggerInterface::Handle_t LogChannel::addLogWriter(std::shared_ptr<LogWriterInte
     return LoggerInterface::GetDefault()->addLogWriter(aWriter);
 }
 
-void LogChannel::write(const LogStream &arStream, const std::string &arMsg, const std::string &arChannel, const utils::DynamicData &arContext)
+void LogChannel::write(const LogStream &arStream, std::string_view aMsg, const std::string &arChannel, const utils::DynamicData &arContext)
 {
-    LoggerInterface::GetDefault()->write(arStream, arMsg, arChannel, arContext);
+    LoggerInterface::GetDefault()->write(arStream, aMsg, arChannel, arContext);
 }
 
 } /* namespace rsp::logging */

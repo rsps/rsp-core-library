@@ -50,14 +50,15 @@ LogStream::~LogStream()
 void LogStream::flush()
 {
     if (mBuffer.rdbuf()->in_avail() > 0) {
-        writeToLogger(mBuffer.str());
+        writeToLogger(mBuffer.view());
+        mBuffer.str(std::string());
         mBuffer.clear();
     }
 }
 
-void LogStream::writeToLogger(const std::string &arMsg)
+void LogStream::writeToLogger(std::string_view aMsg)
 {
-    mrLogger.write(*this, arMsg, mChannel, mContext);
+    mrLogger.write(*this, aMsg, mChannel, mContext);
 }
 
 LogLevel LogStream::GetLevel() const

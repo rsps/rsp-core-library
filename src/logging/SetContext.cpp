@@ -13,18 +13,13 @@ namespace rsp::logging {
 
 std::ostream& SetContext::operator ()(std::ostream &o) const
 {
-    auto *stream = dynamic_cast<OutStreamBuffer*>(o.rdbuf());
-
-    if (stream) {
+    if (auto *stream = dynamic_cast<OutStreamBuffer*>(o.rdbuf())) {
         stream->Lock();
         DEBUG("Locked by " << std::this_thread::get_id())
         stream->SetContext(mValue);
     }
-    else {
-        auto *ls = dynamic_cast<LogStream*>(&o);
-        if (ls) {
-            ls->SetContext(mValue);
-        }
+    else if (auto *ls = dynamic_cast<LogStream*>(&o)) {
+        ls->SetContext(mValue);
     }
 
     return o;

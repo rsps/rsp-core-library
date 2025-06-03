@@ -99,11 +99,11 @@ protected:
     /**
      * \brief Delegates a log message to the registered writers.
      * \param arStream
-     * \param arMsg
+     * \param aMsg
      * \param arChannel
      * \param arContext
      */
-    virtual void write(const LogStream &arStream, const std::string &arMsg,
+    virtual void write(const LogStream &arStream, std::string_view aMsg,
                        const std::string &arChannel, const rsp::utils::DynamicData &arContext) = 0;
 };
 

@@ -10,7 +10,6 @@
 
 #include <iostream>
 #include <string>
-#include <sstream>
 #include <utils/AnsiEscapeCodes.h>
 #include <logging/ConsoleLogWriter.h>
 #include <json/JsonEncoder.h>
@@ -22,12 +21,24 @@ namespace rsp::logging {
 class DefaultConsoleStream : public ConsoleLogStreamsInterface
 {
 public:
-    void Error(const std::string &arMsg) override {
-        std::cerr << arMsg << std::endl;
-    }
+    void Write(std::string_view aMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext, const std::string& arColor) override
+    {
+        auto &out = (aCurrentLevel < LogLevel::Warning) ? std::cout : std::cerr;
 
-    void Info(const std::string &arMsg) override {
-        std::cout << arMsg << std::endl;
+        if (!arColor.empty()) {
+            out << arColor;
+        }
+        if (!arChannel.empty()) {
+            out << arChannel << ": ";
+        }
+        out << aMsg;
+        if (!arContext.IsNull()) {
+            out << " " << rsp::json::JsonEncoder().Encode(arContext);
+        }
+        if (!arColor.empty()) {
+            out << std::string(AnsiEscapeCodes::ec::ConsoleDefault);
+        }
+        out << std::endl;
     }
 };
 
@@ -48,41 +59,12 @@ ConsoleLogWriter::~ConsoleLogWriter()
     delete mpConsole;
 }
 
-void ConsoleLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
+void ConsoleLogWriter::Write(std::string_view aMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
 {
-    if (arMsg.empty() || (mAcceptLevel < aCurrentLevel)) {
+    if (aMsg.empty() || (mAcceptLevel < aCurrentLevel)) {
         return;
     }
-
-    std::string context;
-    if (!arContext.IsNull()) {
-        context = rsp::json::JsonEncoder().Encode(arContext);
-    }
-
-    std::string s;
-    s.reserve(arMsg.size() + context.size() + 20);
-    if (mpColors) {
-        s += (*mpColors)[std::size_t(aCurrentLevel)];
-    }
-    if (!arChannel.empty()) {
-        s += arChannel;
-        s += ": ";
-    }
-    s += arMsg;
-    if (!context.empty()) {
-        s += " ";
-        s += context;
-    }
-    if (mpColors) {
-        s += std::string(AnsiEscapeCodes::ec::ConsoleDefault);
-    }
-
-    if (aCurrentLevel < LogLevel::Warning) {
-        mpConsole->Error(s); // Write to std::cerr
-    }
-    else {
-        mpConsole->Info(s);
-    }
+    mpConsole->Write(aMsg, aCurrentLevel, arChannel, arContext, (mpColors ? (*mpColors)[std::size_t(aCurrentLevel)] : std::string()));
 }
 
 } /* namespace logging */

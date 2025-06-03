@@ -93,17 +93,17 @@ size_t Logger::GetWritersCount() const
     return mWriters.size();
 }
 
-void Logger::write(const LogStream &arStream, const std::string &arMsg, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
+void Logger::write(const LogStream &arStream, std::string_view aMsg, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
 {
     LogLevel current_level = arStream.GetLevel();
     std::lock_guard<std::recursive_mutex> lock(mMutex);
 
-    std::erase_if(mWriters, [](auto ptr) noexcept { return ptr.expired(); });
+    std::erase_if(mWriters, [](auto& ptr) noexcept { return ptr.expired(); });
 
     for (const auto& weak_ptr : mWriters) {
         auto writer = weak_ptr.lock();
         if (writer) {
-            writer->Write(arMsg, current_level, arChannel, arContext);
+            writer->Write(aMsg, current_level, arChannel, arContext);
         }
     }
 }
