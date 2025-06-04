@@ -9,6 +9,7 @@
  */
 
 #include <doctest.h>
+#include <chrono>
 #include <network/WLan.h>
 #include <posix/NetworkInterfaces.h>
 #include <posix/FileSystem.h>
@@ -17,12 +18,13 @@
 
 using namespace rsp::network;
 using namespace rsp::posix;
+using namespace std::chrono_literals;
 
 TEST_SUITE_BEGIN("Network");
 
 static void FetchMonitorEvents(WLan &arWlan)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(50ms);
     int retries = 2;
     rsp::network::WpaEvents event;
     do {
@@ -31,7 +33,7 @@ static void FetchMonitorEvents(WLan &arWlan)
         MESSAGE("Monitor: (" << int(event) << ") " << msg);
         if (event == rsp::network::WpaEvents::None) {
             retries--;
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(100ms);
         }
     }
     while (retries);
@@ -179,7 +181,7 @@ TEST_CASE("WLAN") // * doctest::skip(wpa_supplicant_not_available()))
         if (std::string("MyWLan").compare(0, 6, cSSID) != 0) {
             WLan wlan;
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::this_thread::sleep_for(500ms);
             FetchMonitorEvents(wlan);
 
             APInfo status;
@@ -187,14 +189,14 @@ TEST_CASE("WLAN") // * doctest::skip(wpa_supplicant_not_available()))
             CHECK_EQ(status.mStatus, WpaStatus::Completed);
 
             CHECK_NOTHROW(wlan.Disconnect());
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::this_thread::sleep_for(500ms);
             FetchMonitorEvents(wlan);
 
             CHECK_NOTHROW(status = wlan.GetStatus());
             CHECK_NE(status.mStatus, WpaStatus::Completed);
 
             CHECK_NOTHROW(wlan.Reconnect());
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::this_thread::sleep_for(500ms);
             FetchMonitorEvents(wlan);
 
             CHECK_NOTHROW(status = wlan.GetStatus());

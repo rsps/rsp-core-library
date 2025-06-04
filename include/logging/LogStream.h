@@ -74,7 +74,7 @@ public:
      * \return self
      */
     LogStream& SetContext(const rsp::utils::DynamicData &arContext);
-    const rsp::utils::DynamicData GetContext() const { return mContext; }
+    [[nodiscard]] const rsp::utils::DynamicData& GetContext() const { return mContext; }
 
     /**
      * \brief Get a view to the contents
