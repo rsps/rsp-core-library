@@ -49,7 +49,7 @@ public:
      *
      * \return string
      */
-    const std::string& GetFileName() { return mFileName; }
+    [[nodiscard]] const std::string& GetFileName() const { return mFileName; }
 
     /**
      * Opens the given file or create it if aPermissions are given.

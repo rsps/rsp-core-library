@@ -48,4 +48,18 @@ FileBody& FileBody::Rewind()
     return *this;
 }
 
+std::ostream& FileBody::PrintContent(std::ostream& o) const
+{
+    auto self = const_cast<FileBody*>(this);
+    auto is_open = mrFile.IsOpen();
+    if (!is_open) {
+        self->mrFile.Open(mrFile.GetFileName(), std::ios_base::in);
+    }
+    IStreamDataProvider::PrintContent(o);
+    if (!is_open) {
+        self->mrFile.Close();
+    }
+    return o;
+}
+
 } // rsp::network

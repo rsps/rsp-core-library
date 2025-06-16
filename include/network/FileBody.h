@@ -29,6 +29,8 @@ public:
 
     posix::FileIO& Get() { return mrFile; }
 
+    std::ostream& PrintContent(std::ostream& o) const override;
+
 protected:
     std::unique_ptr<posix::FileIO> mpFile{};
     posix::FileIO& mrFile;
