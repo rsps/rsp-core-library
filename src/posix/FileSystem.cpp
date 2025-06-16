@@ -453,7 +453,9 @@ DateTime GetFileModifiedTime(const std::filesystem::path &arFileName)
 
 void SetFileModifiedTime(const std::filesystem::path &arFileName, const DateTime &arTime)
 {
+#ifndef NO_SET_FILE_MTIME
     std::filesystem::last_write_time(arFileName, arTime);
+#endif
 }
 
 uint32_t GetUserId()
