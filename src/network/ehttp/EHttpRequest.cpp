@@ -154,33 +154,46 @@ IStreamDataProvider& EHttpRequest::getRequestBody()
 
 IHttpResponse& EHttpRequest::execute()
 {
-    // Get connection
-    auto &connection = getConnection().Connect();
+    size_t retries = 1;
+    for (;;) {
+        try {
+            // Get connection
+            auto &connection = getConnection().Connect();
 
-    AutoHeaders headers;
-    prepareRequest(headers);
-    connection.Write(formatHeaders(headers));
+            AutoHeaders headers;
+            prepareRequest(headers);
+            connection.Write(formatHeaders(headers));
 
-    // Send body
-    if (mOptions.RequestBody) {
-        while (auto sz = mOptions.RequestBody->Read(mWorkBuffer)) {
-            connection.Write({mWorkBuffer.data(), sz});
+            // Send body
+            if (mOptions.RequestBody) {
+                while (auto sz = mOptions.RequestBody->Read(mWorkBuffer)) {
+                    connection.Write({mWorkBuffer.data(), sz});
+                }
+            }
+
+            // Read response...
+            {
+                ResponseParser parser(mResponse);
+                while (true) {
+                    auto sz = connection.Read(mWorkBuffer);
+                    if (sz == 0) {
+                        break;
+                    }
+                    if (parser.ParseNewData({mWorkBuffer.data(), sz})) {
+                        // mResponse is now filled.
+                        mResponse.mCompleted = true;
+                        break;
+                    }
+                }
+            }
+            break;
         }
-    }
-
-    // Read response...
-    {
-        ResponseParser parser(mResponse);
-        while (true) {
-            auto sz = connection.Read(mWorkBuffer);
-            if (sz == 0) {
-                break;
+        catch (const network::ENetReconnect& e) {
+            mResponse.Clear();
+            if (retries--) {
+                continue;
             }
-            if (parser.ParseNewData({mWorkBuffer.data(), sz})) {
-                // mResponse is now filled.
-                mResponse.mCompleted = true;
-                break;
-            }
+            throw;
         }
     }
 

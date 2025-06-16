@@ -34,19 +34,20 @@ void EHttpSession::ProcessRequests()
     size_t i = 0;
     try {
         for (auto r: mPending) {
-            size_t retries = 1;
-            for (;;) {
-                try {
-                    r->Execute();
-                    break;
-                }
-                catch (const network::ENetReconnect& e) {
-                    if (retries--) {
-                        continue;
-                    }
-                    throw;
-                }
-            }
+            r->Execute();
+//            size_t retries = 1;
+//            for (;;) {
+//                try {
+//                    r->Execute();
+//                    break;
+//                }
+//                catch (const network::ENetReconnect& e) {
+//                    if (retries--) {
+//                        continue;
+//                    }
+//                    throw;
+//                }
+//            }
             mPool.Put(*r);
             ++i;
         }
