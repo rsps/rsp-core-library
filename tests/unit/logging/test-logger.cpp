@@ -106,6 +106,7 @@ TEST_CASE("Logging") {
     logging::LoggerInterface::Handle_t file;
     logging::LoggerInterface::Handle_t console;
 
+    CHECK_EQ(log.GetChannelName(), "Test Channel");
     CHECK_NOTHROW(file = log.MakeLogWriter<logging::FileLogWriter>(cFileName, logging::LogLevel::Info));
     CHECK_NOTHROW(console = log.MakeLogWriter<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors));
 
