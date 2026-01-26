@@ -33,7 +33,7 @@ find_package(Git REQUIRED)
 
 # Install "CMake Scripts" dependency
 include(FetchContent)
-FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.3.0")
+FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.4.0")
 FetchContent_MakeAvailable("rsp-cmake-scripts")
 
 # Abort if building in-source

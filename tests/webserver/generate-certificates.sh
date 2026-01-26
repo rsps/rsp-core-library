@@ -2,7 +2,7 @@
 #
 # Based on info from: https://blog.devolutions.net/2020/07/tutorial-how-to-generate-secure-self-signed-server-and-client-certificates-with-openssl/
 #
-ROOT_DIR=ssl
+ROOT_DIR="$1/ssl"
 
 if [ ! -f /usr/bin/openssl ]; then
     sudo apt install openssl
