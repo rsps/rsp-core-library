@@ -12,7 +12,7 @@
 #include <iomanip>
 #include <logging/Logger.h>
 #include <utils/StrUtils.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 using namespace rsp::logging;
 using namespace rsp::utils;

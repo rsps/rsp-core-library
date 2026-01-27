@@ -17,7 +17,7 @@
 #include <security/SecureBuffer.h>
 #include <security/Sha.h>
 #include <utils/DataContainer.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace rsp::security {
 

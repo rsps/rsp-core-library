@@ -20,7 +20,7 @@
 #include <utils/StopWatch.h>
 #include <TestHelpers.h>
 #include <utils/Random.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #ifdef USE_GFX_SW
 #include <posix/FileSystem.h>
 #endif

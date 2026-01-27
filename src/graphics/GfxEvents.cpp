@@ -10,7 +10,7 @@
 
 #include <chrono>
 #include <graphics/GfxEvents.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace rsp::graphics {
 

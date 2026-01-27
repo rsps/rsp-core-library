@@ -9,7 +9,7 @@
  */
 
 #include <exceptions/SignalHandler.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <logging/LogChannel.h>
 
 namespace rsp::exceptions {

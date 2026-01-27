@@ -13,7 +13,7 @@
 #include "ConstTypeInfo.h"
 #include "Nullable.h"
 #include "BinaryStream.h"
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 #ifndef RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
 #define RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H

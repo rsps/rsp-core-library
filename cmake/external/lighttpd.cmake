@@ -10,7 +10,7 @@ message(VERBOSE "Installing Lighttpd")
 
 # -------------------------------------------------------------------------------------------------------------- #
 
-set(LIGHTTPD_VERSION "1.4.75")
+set(LIGHTTPD_VERSION "1.4.82")
 
 # Include external project lighttpd from github.
 # Uses QUIET FetchContent_Populate mode to avoid deprecation warning.
