@@ -12,12 +12,9 @@
 
 #include <system_error>
 #include <exception>
-#include <stdexcept>
 
 #include <string>
-#include <iostream>
 #include <sstream>
-#include <type_traits>
 #include "BackTrace.h"
 
 namespace rsp::exceptions {
@@ -33,7 +30,7 @@ private:
 
 public:
     template<typename... Args>
-    BackTracedException(const char *aFilename, int aLineNum, Args &&... args)
+    BackTracedException(const char *aFilename, const int aLineNum, Args &&... args)
             : BaseException(std::forward<Args>(args)...)
     {
         BackTrace bt(2);
@@ -44,10 +41,10 @@ public:
         mWhat = ss.str();
     }
 
-    BackTracedException(const std::exception &e, const char *aFilename, int aLineNum)
+    BackTracedException(const std::exception &e, const char *aFilename, const int aLineNum)
             : BaseException(static_cast<const BaseException&>(e))
     {
-        BackTrace bt(2);
+        const BackTrace bt(2);
         std::stringstream ss;
         ss << "From '" << aFilename << ":" << aLineNum << "'->\n"
                 << e.what() << "\n" << bt;

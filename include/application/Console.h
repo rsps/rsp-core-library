@@ -10,13 +10,10 @@
 #ifndef RSP_CORE_LIB_APPLICATION_CONSOLE_H
 #define RSP_CORE_LIB_APPLICATION_CONSOLE_H
 
-#include <iostream>
-//#include <fstream>
 #include <ostream>
 #include <sstream>
 #include <string>
 #include <string_view>
-#include <utils/AnsiEscapeCodes.h>
 #include <logging/ConsoleLogWriter.h>
 
 namespace rsp::application {
@@ -52,7 +49,7 @@ public:
     /**
      * \brief Template to declare streaming operators for individual types
      *
-     * \tparam type
+     * \tparam T type of value to stream
      * \param arValue
      * \return self
      */
@@ -75,13 +72,13 @@ protected:
  * \class Console
  * \brief Class intended for console output.
  *
- * It always writes to std::cout and std::cerr, but when enabled it will also output to a given character device, like a separate LCD screen.
+ * It always writes to std::cout and std::cerr, but when enabled, it will also output to a given character device, like a separate LCD screen.
  *
  */
 class Console : public rsp::logging::ConsoleLogStreamsInterface
 {
 public:
-    ~Console();
+    ~Console() override;
 
     static Console& Get();
 
@@ -90,7 +87,7 @@ public:
     static ConsoleStream HighLightInfo()  { return {&Get(), TextColor::InfoHighLight}; }
     static ConsoleStream Info()  { return {&Get(), TextColor::Info}; }
 
-    static void SetUseColors(bool aEnable) { mUseColors = aEnable; }
+    static void SetUseColors(const bool aEnable) { mUseColors = aEnable; }
     static bool GetUseColors() { return mUseColors; }
 
     static void SetTtyDevice(const std::string &arTtyDevice);

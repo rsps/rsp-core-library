@@ -13,9 +13,6 @@
 
 #include <exceptions/CoreException.h>
 #include <graphics/PixelData.h>
-#include <cstring>
-#include <iostream>
-#include <vector>
 #include <memory>
 
 namespace rsp::graphics
@@ -58,7 +55,7 @@ class ImgLoader
     virtual ~ImgLoader() = default;
 
     /**
-     * \brief Abstract methos for loading an image into memory as a bitmap
+     * \brief Abstract method for loading an image into memory as a bitmap
      * \param aImgName The relative path to the image
      */
     virtual void LoadImg(const std::string &aImgName) = 0;

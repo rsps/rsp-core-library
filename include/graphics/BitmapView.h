@@ -40,10 +40,10 @@ public:
     BitmapView& SetPixelColor(const Color &arColor);
     [[nodiscard]] const Color& GetPixelColor() const { return mPixelColor; }
 
-    GuiUnit_t GetWidth();
-    GuiUnit_t GetHeight();
+    [[nodiscard]] GuiUnit_t GetWidth() const;
+    [[nodiscard]] GuiUnit_t GetHeight() const;
 
-    Rect GetBoundingRect(Point aPoint = {0,0}) { return {aPoint, GetWidth(), GetHeight()}; }
+    [[nodiscard]] Rect GetBoundingRect(Point aPoint = {0,0}) const { return {aPoint, GetWidth(), GetHeight()}; }
 
 protected:
     Color mPixelColor = Color::White;

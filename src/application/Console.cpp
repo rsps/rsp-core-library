@@ -9,7 +9,7 @@
  */
 
 #include <application/Console.h>
-#include <ostream>
+#include <iostream>
 #include <string>
 #include <json/Json.h>
 #include <utils/AnsiEscapeCodes.h>
@@ -21,7 +21,7 @@ namespace rsp::application {
 std::string Console::mTtyDeviceFile = "/dev/tty1";
 bool Console::mUseColors = false;
 
-static std::string textColorToEscapeString(TextColor aColor)
+static std::string textColorToEscapeString(const TextColor aColor)
 {
     std::string result;
     if (!Console::GetUseColors()) {
@@ -54,14 +54,14 @@ static std::string textColorToEscapeString(TextColor aColor)
     return result;
 }
 
-std::ostream& operator <<(std::ostream &os, TextColor aLogColor)
+std::ostream& operator <<(std::ostream &os, const TextColor aLogColor)
 {
     os << textColorToEscapeString(aLogColor);
     return os;
 }
 
 
-ConsoleStream::ConsoleStream(Console *apConsole, TextColor aColor)
+ConsoleStream::ConsoleStream(Console *apConsole, const TextColor aColor)
     : mpConsole(apConsole),
       mColor(aColor)
 {
@@ -121,7 +121,7 @@ Console::~Console()
     }
 }
 
-void Console::write(std::string_view aMsg, TextColor aColor)
+void Console::write(const std::string_view aMsg, const TextColor aColor)
 {
     if (aColor == TextColor::Error) {
         std::cerr << aMsg << std::flush;
@@ -141,12 +141,12 @@ void Console::SetTtyDevice(const std::string &arTtyDevice)
     Get().updatePrintToDisplay(arTtyDevice, Get().mPrintToDisplay);
 }
 
-void Console::SetPrintToDisplay(bool aEnable)
+void Console::SetPrintToDisplay(const bool aEnable)
 {
     Get().updatePrintToDisplay(mTtyDeviceFile, aEnable);
 }
 
-void Console::updatePrintToDisplay(const std::string &arTtyDevice, bool aEnable)
+void Console::updatePrintToDisplay(const std::string &arTtyDevice, const bool aEnable)
 {
     mTtyDeviceFile = arTtyDevice;
     mPrintToDisplay = aEnable;

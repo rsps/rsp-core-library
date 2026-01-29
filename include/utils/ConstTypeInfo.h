@@ -89,31 +89,55 @@ constexpr uint32_t ID()
     return crc32::HashOf<T>();
 }
 
+
+/**
+ * \class TypeInfo
+ *
+ * \brief Represents metadata about a specific runtime object in a system.
+ *
+ * This class adds simple runtime information to class types, such as their name and ID.
+ * The attributes can be changed, with a simple helper for constant compile time initialization.
+ */
 class TypeInfo
 {
 public:
     virtual ~TypeInfo() = default;
 
     /**
-     * \brief Get the name of the specific scene.
-     *
-     * \return string with name of scene
+     * Get the name of this object.
+     * \return string with the name
      */
     [[nodiscard]] const std::string& GetName() const
     {
         return mName;
     }
 
+    /**
+     * Set the name of this object
+     * \param arName string with name
+     */
     void SetName(const std::string &arName) { setName(arName); }
     void SetName(const char *apName) { setName(std::string(apName)); }
 
+    /**
+     * Get the ID of this object
+     * \return unsigned numeric ID
+     */
     [[nodiscard]] uint32_t GetId() const { return mId; }
 
-    void SetId(uint32_t aId) { setId(aId); }
-    void SetId(int aId) { setId(static_cast<uint32_t>(aId)); }
-    void SetId(char aId) { setId(static_cast<uint32_t>(aId)); }
+    /**
+     * Set the ID of this object
+     * \param aId numeric ID
+     */
+    void SetId(const uint32_t aId) { setId(aId); }
+    void SetId(const int aId) { setId(static_cast<uint32_t>(aId)); }
+    void SetId(const char aId) { setId(static_cast<uint32_t>(aId)); }
 
 protected:
+    /**
+     * Helper method for static initialization of descendants
+     * \tparam T Descendant class type, used for constant naming
+     */
     template <class T>
     void initTypeInfo()
     {
@@ -121,7 +145,7 @@ protected:
         mId = ID<T>();
     }
 
-    virtual void setId(uint32_t aId)
+    virtual void setId(const uint32_t aId)
     {
         mId = aId;
     }

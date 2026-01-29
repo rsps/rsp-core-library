@@ -33,8 +33,8 @@ public:
     Label& operator<<(const std::string &arCaption) { return SetCaption(arCaption); }
     Label& operator<<(const std::string_view aCaption) { return SetCaption(std::string(aCaption)); }
     Label& operator<<(const char *apCaption) { return SetCaption(std::string(apCaption)); }
-    Label& operator<<(Text::VAlign aVAlign) { return SetVAlignment(aVAlign); }
-    Label& operator<<(Text::HAlign aHAlign) { return SetHAlignment(aHAlign); }
+    Label& operator<<(const Text::VAlign aVAlign) { return SetVAlignment(aVAlign); }
+    Label& operator<<(const Text::HAlign aHAlign) { return SetHAlignment(aHAlign); }
 
     Label& SetCaption(const std::string &arCaption);
     Label& SetVAlignment(Text::VAlign aVAlign);

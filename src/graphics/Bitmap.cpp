@@ -8,7 +8,6 @@
  * \author      Simon Glashoff
  */
 
-#include <exceptions/CoreException.h>
 #include <graphics/Bitmap.h>
 #include <filesystem>
 #include <utils/Crc32.h>
@@ -30,10 +29,10 @@ Bitmap::Bitmap(const std::string &arImgName)
     Load(arImgName);
 }
 
-Bitmap::Bitmap(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, ColorDepth aDepth)
+Bitmap::Bitmap(const uint32_t *apPixels, const GuiUnit_t aHeight, const GuiUnit_t aWidth, const ColorDepth aDepth)
     : Canvas(aWidth, aHeight, aDepth)
 {
-    Init(uint32_t(uintptr_t(this)), aWidth, aHeight, aDepth, reinterpret_cast<const uint8_t*>(apPixels));
+    Init(reinterpret_cast<uintptr_t>(this), aWidth, aHeight, aDepth, reinterpret_cast<const uint8_t*>(apPixels));
 }
 
 Bitmap::Bitmap(const PixelData &arPixelData)
@@ -43,9 +42,9 @@ Bitmap::Bitmap(const PixelData &arPixelData)
 
 Bitmap& Bitmap::Load(const std::string &arImgName)
 {
-    std::filesystem::path filename(arImgName);
+    const std::filesystem::path filename(arImgName);
 
-    auto loader = ImgLoader::GetRasterLoader(filename.extension());
+    const auto loader = ImgLoader::GetRasterLoader(filename.extension());
     // Get raw data
     loader->LoadImg(filename);
     Assign(loader->GetPixelData());
@@ -53,9 +52,9 @@ Bitmap& Bitmap::Load(const std::string &arImgName)
     return *this;
 }
 
-Bitmap& Bitmap::Assign(const uint32_t *apPixels, GuiUnit_t aHeight, GuiUnit_t aWidth, ColorDepth aDepth)
+Bitmap& Bitmap::Assign(const uint32_t *apPixels, const GuiUnit_t aHeight, const GuiUnit_t aWidth, const ColorDepth aDepth)
 {
-    Init(uint32_t(uintptr_t(this)), aWidth, aHeight, aDepth, reinterpret_cast<const uint8_t*>(apPixels));
+    Init(reinterpret_cast<uintptr_t>(this), aWidth, aHeight, aDepth, reinterpret_cast<const uint8_t*>(apPixels));
 
     return *this;
 }

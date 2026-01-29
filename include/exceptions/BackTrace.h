@@ -25,7 +25,7 @@ namespace rsp::exceptions {
 class StackEntry
 {
 public:
-    StackEntry(std::string aFile, std::string aFunc, unsigned long aLine) noexcept
+    StackEntry(std::string aFile, std::string aFunc, const unsigned long aLine) noexcept
         : mFileName(std::move(aFile)),
           mFunction(std::move(aFunc)),
           mLineNumber(aLine)

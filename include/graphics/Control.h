@@ -11,11 +11,10 @@
 #ifndef RSP_CORE_LIB_GRAPHICS_CONTROL_H
 #define RSP_CORE_LIB_GRAPHICS_CONTROL_H
 
-#include <map>
-#include <functional>
 #include <string_view>
 #include <vector>
 #include <magic_enum/magic_enum.hpp>
+#include <magic_enum/magic_enum_containers.hpp>
 #include <exceptions/CoreException.h>
 #include <graphics/GfxInputEvents.h>
 #include <logging/LogChannel.h>
@@ -46,18 +45,19 @@ public:
     using TouchCallback_t = rsp::messaging::Notifier<const TouchEvent&, uint32_t>;
 
     /**
-     * \brief Enum type defining the available states
-     * Not class scoped on purpose, they are used as array indexes
+     * \brief Enum type defining the available states of a GUI object.
+     *
+     * Not enum class scoped on purpose, they are used as array indexes.
      */
     enum States {
         Disabled,
         Normal,
         Pressed,
         Dragged,
-        CheckedDisabled,// Read only
-        CheckedNormal,  // Read only
-        CheckedPressed, // Read only
-        CheckedDragged  // Read only
+        CheckedDisabled,// Read-only
+        CheckedNormal,  // Read-only
+        CheckedPressed, // Read-only
+        CheckedDragged  // Read-only
     };
 
     Control() : mLogger("Gfx") { initTypeInfo<Control>(); }
@@ -79,7 +79,7 @@ public:
     /**
      * \brief Gets the state of the object
      */
-    [[nodiscard]] Control::States GetState() const;
+    [[nodiscard]] States GetState() const;
 
     /**
      * \brief Set the object as invalidated marking it to be re-rendered
@@ -136,7 +136,7 @@ public:
 
     /**
      * \brief Virtual method for rendering the object
-     * \param aCanvas The canvas the object is rendered on
+     * \param arRenderer The Renderer interface this object is rendered to
      */
     void Render(Renderer &arRenderer) const;
 
@@ -262,8 +262,8 @@ public:
 protected:
     Rect mArea{}; // Area of Control in screen coordinates
     Rect mTouchArea{}; // Touch area of Control in screen coordinates
-//    magic_enum::containers::array<States, Style> mStyles;
-    Style mStyles[magic_enum::enum_count<States>()]{};
+    magic_enum::containers::array<States, Style> mStyles{};
+    // Style mStyles[magic_enum::enum_count<States>()]{};
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};
     bool mTransparent = false;

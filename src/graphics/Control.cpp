@@ -9,7 +9,6 @@
  */
 
 #include <graphics/Control.h>
-#include <logging/Logger.h>
 #include <graphics/GfxEvents.h>
 
 using namespace rsp::logging;
@@ -254,6 +253,7 @@ void Control::Render(Renderer &arRenderer) const // NOLINT
         return;
     }
 
+//opt/clion-2023.2.2/bin/clang/linux/x64/bin/clang-tidy -checks='cppcoreguidelines-*' src/graphics/Control.cpp -- -Iinclude/ -Ibuild/_deps/magic_enum-src/include -I/usr/include -I/usr/lib/gcc/x86_64-linux-gnu/14/include -I/usr/local/include -std=c++23
     auto &style = mStyles[GetState()];
 
     if (!mTransparent) {
