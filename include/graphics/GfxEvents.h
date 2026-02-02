@@ -29,7 +29,7 @@ enum class TouchTypes : uint32_t {
 /**
  * \brief Object tracking touch interface events
  */
-struct TouchEvent: public rsp::messaging::EventBase<TouchEvent>
+struct TouchEvent: public messaging::EventBase<TouchEvent>
 {
     TouchTypes mType = TouchTypes::None;
     std::chrono::steady_clock::time_point mTime{};
@@ -40,24 +40,29 @@ struct TouchEvent: public rsp::messaging::EventBase<TouchEvent>
     TouchEvent() = default;
     TouchEvent(int aOffset, TouchTypes aType, const Point &arPoint);
     TouchEvent(const TouchEvent&);
-//    TouchEvent(TouchEvent&&);
+    TouchEvent(TouchEvent&&) = delete;
     TouchEvent& operator=(const TouchEvent&);
-//    TouchEvent& operator=(TouchEvent&&);
+    TouchEvent& operator=(TouchEvent&&) = delete;
 
     void Assign(const TouchEvent &arOther);
+
+    void ToStream(std::ostream &os) const override
+    {
+        const auto int_msec = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - mTime);
+        os << int_msec.count() << " "
+            << std::string(magic_enum::enum_name<TouchTypes>(mType)) << "(" << mCurrent << ")";
+    }
 };
 
-std::ostream &operator<<(std::ostream &os, const TouchEvent &arEvent);
-
-class RefreshEvent : public rsp::messaging::EventBase<RefreshEvent>
+class RefreshEvent : public messaging::EventBase<RefreshEvent>
 {
 };
 
-class QuitEvent : public rsp::messaging::EventBase<QuitEvent>
+class QuitEvent : public messaging::EventBase<QuitEvent>
 {
 };
 
-using GfxEvent = rsp::messaging::EventPtr_t;
+using GfxEvent = messaging::EventPtr_t;
 
 enum class GfxEvents : size_t {
     Touch = TouchEvent::ClassType,

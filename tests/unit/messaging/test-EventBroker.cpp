@@ -17,19 +17,21 @@ using namespace rsp::messaging;
 
 TEST_SUITE_BEGIN("Messaging");
 
-static int event1_count = 0;
-static int event2_count = 0;
-
-class TestEvent1 : public EventBase<TestEvent1>
+struct TestEvent1 : public EventBase<TestEvent1>
 {
+    static int event_count;
 };
 
 class TestEvent2 : public EventBase<TestEvent2>
 {
 public:
-    explicit TestEvent2(int aValue = 1) : mValue(aValue) {}
+    static int event_count;
+    explicit TestEvent2(const int aValue = 1) : mValue(aValue) {}
     int mValue;
 };
+
+int TestEvent1::event_count = 0;
+int TestEvent2::event_count = 0;
 
 class NotAnEvent_ShouldNotCompile
 {
@@ -38,15 +40,15 @@ class NotAnEvent_ShouldNotCompile
 class Subscriber : public SubscriberInterface
 {
 public:
-    bool ProcessEvent(rsp::messaging::Event &arEvent) override
+    bool ProcessEvent(Event &arEvent) override
     {
         switch (arEvent.Type) {
             case TestEvent1::ClassType:
-                event1_count++;
+                TestEvent1::event_count++;
                 break;
 
             case TestEvent2::ClassType:
-                event2_count += arEvent.CastTo<TestEvent2>().mValue;
+                TestEvent2::event_count += arEvent.CastTo<TestEvent2>().mValue;
                 break;
 
             default:
@@ -62,10 +64,10 @@ TEST_CASE("EventBroker")
 
     CHECK_THROWS_AS(EventBroker::GetInstance(), rsp::exceptions::ENoInstance);
     CHECK_NOTHROW(
-        EventBroker dummy; // Create first instance, which is automatically registered as default instance
-        EventBroker::GetInstance(); // Check for default instance
+        EventBroker dummy; // Create the first instance, which is automatically registered as the default instance
+        EventBroker::GetInstance(); // Check for the default instance
     );
-    CHECK_THROWS_AS(EventBroker::GetInstance(), rsp::exceptions::ENoInstance); // Check that default instance has disappeared.
+    CHECK_THROWS_AS(EventBroker::GetInstance(), rsp::exceptions::ENoInstance); // Check that the default instance has disappeared.
 
     EventBroker broker;
     BrokerInterface &eb = broker;
@@ -73,7 +75,7 @@ TEST_CASE("EventBroker")
     Subscriber sub1;
     Subscriber sub2;
 
-//    eb.Publish<NotAnEvent_ShouldNotCompile>();
+    // eb.Publish<NotAnEvent_ShouldNotCompile>(); // NOSONAR
 
     CHECK_NOTHROW(eb.Publish<TestEvent1>()); // event1_count +0
     CHECK_NOTHROW(eb.ProcessEvents());
@@ -95,8 +97,8 @@ TEST_CASE("EventBroker")
     CHECK_NOTHROW(eb.Publish<TestEvent2>(40)); // event2_count +40
     CHECK_NOTHROW(eb.ProcessEvents());
 
-    CHECK_EQ(event1_count, 4);
-    CHECK_EQ(event2_count, 42);
+    CHECK_EQ(TestEvent1::event_count, 4);
+    CHECK_EQ(TestEvent2::event_count, 42);
 }
 
 TEST_SUITE_END();

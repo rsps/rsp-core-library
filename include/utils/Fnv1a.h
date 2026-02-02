@@ -20,13 +20,13 @@ namespace rsp::utils {
 class Fnv1a
 {
 public:
-    static uint32_t Hash32(const void *apData, uint32_t aLen);
-    static uint32_t Hash32(std::string_view aStr) { return Hash32(aStr.data(), aStr.size()); }
+    static uint32_t Hash32(const void *apData, std::string_view::size_type aLen);
+    static uint32_t Hash32(const std::string_view aStr) { return Hash32(aStr.data(), aStr.size()); }
     static uint32_t Hash32(const char *apCStr) { return Hash32(std::string_view(apCStr)); }
     static uint32_t Hash32(const std::string &arStr) { return Hash32(arStr.data(), arStr.size()); }
 
     static uint64_t Hash64(const void *apData, uint64_t aLen);
-    static uint64_t Hash64(std::string_view aStr) { return Hash64(aStr.data(), aStr.size()); }
+    static uint64_t Hash64(const std::string_view aStr) { return Hash64(aStr.data(), aStr.size()); }
     static uint64_t Hash64(const char *apCStr) { return Hash64(std::string_view(apCStr)); }
     static uint64_t Hash64(const std::string &arStr) { return Hash64(arStr.data(), arStr.size()); }
 };
@@ -39,20 +39,20 @@ namespace fnv1a {
     constexpr uint64_t cOffsetBasis64 = 14695981039346656037UL;
     constexpr uint64_t cPrime64 = 1099511628211UL;
 
-    inline constexpr uint32_t Hash32Const(const char* const str, const uint32_t value = cOffsetBasis32) noexcept // NOLINT, recursive call chain
+    inline constexpr uint32_t Hash32Const(const std::string_view str, const unsigned index = 0, const uint32_t value = cOffsetBasis32) noexcept
     {
-        return (*str == '\0') ? value : Hash32Const(str + 1, (value ^ static_cast<uint8_t>(*str)) * cPrime32);
+        return str.size() == index ? value : Hash32Const(str, index + 1, (value ^ static_cast<uint8_t>(str[index])) * cPrime32);
     }
 
-    inline constexpr uint64_t Hash64Const(const char* const str, const uint64_t value = cOffsetBasis64) noexcept // NOLINT, recursive call chain
+    inline constexpr uint64_t Hash64Const(const std::string_view str, const unsigned index = 0, const uint64_t value = cOffsetBasis64) noexcept
     {
-        return (*str == '\0') ? value : Hash64Const(str + 1, (value ^ static_cast<uint8_t>(*str)) * cPrime64);
+        return str.size() == index ? value : Hash64Const(str, index + 1, (value ^ static_cast<uint8_t>(str[index])) * cPrime64);
     }
 } /* namespace fnv1a */
 
-size_t constexpr operator "" _fnv1a( const char* str, size_t /*len*/ )
+constexpr size_t operator ""_fnv1a( const char* str, const size_t len)
 {
-    return fnv1a::Hash32Const(str);
+    return fnv1a::Hash32Const(std::string_view{str, len});
 }
 
 } /* namespace rsp::utils */

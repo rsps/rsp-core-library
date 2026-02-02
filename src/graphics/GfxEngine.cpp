@@ -10,7 +10,6 @@
 
 #include <graphics/GfxEngine.h>
 #include <graphics/Renderer.h>
-#include <logging/Logger.h>
 #include <chrono>
 #include <thread>
 
@@ -18,13 +17,13 @@ using namespace rsp::logging;
 
 namespace rsp::graphics {
 
-GfxEngineBase::GfxEngineBase(int aMaxFPS)
+GfxEngineBase::GfxEngineBase(const int aMaxFPS)
     : mFrameTime(1000 / aMaxFPS),
       mLogger("Gfx")
 {
 }
 
-GfxEngineBase& GfxEngineBase::SetNextScene(uint32_t aId)
+GfxEngineBase& GfxEngineBase::SetNextScene(const uint32_t aId)
 {
     if (!GetSceneMap().HasActiveScene() || (GetSceneMap().ActiveScene().GetId() != aId)) {
         GfxInputEvents::GetInstance().Flush();
@@ -35,13 +34,10 @@ GfxEngineBase& GfxEngineBase::SetNextScene(uint32_t aId)
 
 bool GfxEngineBase::Iterate()
 {
-//    mLogger.Debug() << "Iteration: " << mIterations++;
-
     iterateTimers();
     iterateEvents();
 
-    bool changed = updateData();
-    if (changed) {
+    if (updateData()) {
         render();
     }
 
@@ -104,7 +100,7 @@ void GfxEngineBase::render()
     auto &renderer = Renderer::Get();
     GetSceneMap().ActiveScene().Render(renderer);
 
-    for (Control* ctrl : mOverlays) {
+    for (const Control* ctrl : mOverlays) {
         ctrl->Render(renderer);
     }
 
@@ -113,9 +109,9 @@ void GfxEngineBase::render()
 
 void GfxEngineBase::updateFPS()
 {
-    int delay = std::max(int64_t(0), mFrameTime - mStopWatch.Elapsed<std::chrono::milliseconds>());
+    const auto delay = std::max(static_cast<int64_t>(0), mFrameTime - mStopWatch.Elapsed<std::chrono::milliseconds>());
     std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-    mFps = 1000 / std::max(int64_t(1), mStopWatch.Elapsed<std::chrono::milliseconds>());
+    mFps = 1000 / std::max(static_cast<int64_t>(1), mStopWatch.Elapsed<std::chrono::milliseconds>());
     mStopWatch.Reset();
 }
 

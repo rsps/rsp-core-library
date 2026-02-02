@@ -8,7 +8,6 @@
  * \author      Steffen Brummer
  */
 
-
 #ifndef RSP_CORE_LIB_GRAPHICS_GFX_CACHE_H
 #define RSP_CORE_LIB_GRAPHICS_GFX_CACHE_H
 
@@ -34,7 +33,7 @@ public:
 };
 
 
-class GfxCache : public rsp::utils::Singleton<GfxCache>
+class GfxCache : public utils::Singleton<GfxCache>
 {
 public:
     PixelData& MakePixelData(const GfxResource &arResource);

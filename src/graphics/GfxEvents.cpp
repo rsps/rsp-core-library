@@ -10,19 +10,11 @@
 
 #include <chrono>
 #include <graphics/GfxEvents.h>
-#include <magic_enum/magic_enum.hpp>
 
 namespace rsp::graphics {
 
-std::ostream &operator<<(std::ostream &os, const TouchEvent &arEvent)
-{
-    auto int_msec = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - arEvent.mTime);
-    os << int_msec.count() << " "
-        << std::string(magic_enum::enum_name<TouchTypes>(TouchTypes(arEvent.mType))) << "(" << arEvent.mCurrent << ")";
-    return os;
-}
 
-TouchEvent::TouchEvent(int aOffset, TouchTypes aType, const Point &arPoint)
+TouchEvent::TouchEvent(const int aOffset, const TouchTypes aType, const Point &arPoint)
     : mType(aType),
       mTime(std::chrono::steady_clock::now()),
       mCurrent(arPoint)
@@ -33,17 +25,6 @@ TouchEvent::TouchEvent(int aOffset, TouchTypes aType, const Point &arPoint)
         mPressTime = mTime;
     }
 }
-
-//TouchEvent::TouchEvent(std::chrono::steady_clock::time_point aTime, EventTypes aType, const Point &arPoint)
-//    : mTime(aTime),
-//      mType(aType),
-//      mCurrent(arPoint)
-//{
-//    if (mType == EventTypes::Press) {
-//        mPress = arPoint;
-//        mPressTime = mTime;
-//    }
-//}
 
 TouchEvent::TouchEvent(const TouchEvent& arOther)
     : messaging::EventBase<TouchEvent>(arOther.Type, arOther.Name)

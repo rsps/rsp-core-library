@@ -15,54 +15,73 @@
 #include <string_view>
 #include "Crc32.h"
 #include "Fnv1a.h"
+#include <array>
+#include <utility>
 
 namespace rsp::utils {
 
 
-// https://stackoverflow.com/questions/35941045/can-i-obtain-c-type-names-in-a-constexpr-way/35943472#35943472
-template<typename T>
-constexpr std::string_view NameOf() noexcept
+template <std::size_t...Index>
+constexpr auto substring_as_array(std::string_view str, std::index_sequence<Index...>)
 {
-    #ifdef _MSC_VER
-        #define __PRETTY_FUNCTION__ __FUNCSIG__
-    #endif
-    char const *p = __PRETTY_FUNCTION__;
-    while (*p++ != '=')
-        ;
-    for (; *p == ' ' ; ++p)
-        ;
-    char const *p2 = p;
-    char const *delim = p;
-    int count = 1;
-    for (; ; ++p2) {
-        switch (*p2) {
-            case ';':
-                delim = p2;
-                break;
-            case '[':
-                ++count;
-                break;
-            case ']':
-                --count;
-                if (!count) {
-                    if (delim != p) {
-                        return {p, std::size_t(delim - p)};
-                    }
-                    return {p, std::size_t(p2 - p)};
-                }
-                break;
-            default:
-                break;
-        }
-    }
+    return std::array{str[Index]...};
 }
+
+template <typename T>
+constexpr auto type_name_array()
+{
+#if defined(__clang__)
+    constexpr auto prefix   = std::string_view{"[T = "};
+    constexpr auto suffix   = std::string_view{"]"};
+    constexpr auto function = std::string_view{__PRETTY_FUNCTION__};
+#elif defined(__GNUC__)
+    constexpr auto prefix   = std::string_view{"with T = "};
+    constexpr auto suffix   = std::string_view{"]"};
+    constexpr auto function = std::string_view{__PRETTY_FUNCTION__};
+#elif defined(_MSC_VER)
+    constexpr auto prefix   = std::string_view{"type_name_array<"};
+    constexpr auto suffix   = std::string_view{">(void)"};
+    constexpr auto function = std::string_view{__FUNCSIG__};
+#else
+# error Unsupported compiler
+#endif
+
+    constexpr auto start = function.find(prefix) + prefix.size();
+    constexpr auto end = function.rfind(suffix);
+
+    static_assert(start < end);
+
+    constexpr auto name = function.substr(start, (end - start));
+    return substring_as_array(name, std::make_index_sequence<name.size()>{});
+}
+
+template <typename T>
+struct type_name_holder {
+    static inline constexpr auto value = type_name_array<T>();
+};
+
+/**
+ * \brief Template type to string helper.
+ *
+ * \see https://rodusek.com/posts/2021/03/09/getting-an-unmangled-type-name-at-compile-time/
+ *
+ * @tparam T Type to get the name of
+ * @return string_view pointing to name
+ */
+template <typename T>
+constexpr auto NameOf() -> std::string_view
+{
+    constexpr auto& value = type_name_holder<T>::value;
+    return std::string_view{value.data(), value.size()};
+}
+
 
 namespace fnv1a {
 
 template<typename T>
 constexpr uint32_t HashOf() noexcept
 {
-    return fnv1a::Hash32Const(NameOf<T>().data());
+    return fnv1a::Hash32Const(NameOf<T>());
 }
 
 }
@@ -72,12 +91,12 @@ namespace crc32 {
 template<typename T>
 constexpr uint32_t HashOf() noexcept
 {
-    return crc32::HashConst(NameOf<T>().data());
+    return crc32::HashConst(NameOf<T>());
 }
 
 constexpr uint32_t HashOf(const char *apName) noexcept
 {
-    return crc32::HashConst(apName);
+    return crc32::HashConst(std::string_view(apName));
 }
 
 } /* namespace crc32 */
@@ -136,13 +155,13 @@ public:
 protected:
     /**
      * Helper method for static initialization of descendants
-     * \tparam T Descendant class type, used for constant naming
+     * \tparam C Descendant class type, used for constant naming
      */
-    template <class T>
+    template <class C>
     void initTypeInfo()
     {
-        mName = std::string(NameOf<T>());
-        mId = ID<T>();
+        mName = std::string(NameOf<C>());
+        mId = ID<C>();
     }
 
     virtual void setId(const uint32_t aId)
@@ -157,7 +176,7 @@ protected:
 
 private:
     std::string mName{};
-    uint32_t mId = 0;
+    uint32_t mId{0};
 };
 
 

@@ -75,14 +75,14 @@ public:
     /**
      * \brief Copy constructor.
      *
-     * \param aColor
+     * \param arColor
      */
     Color(const Color &arColor) = default;
 
     /**
      * \brief Move constructor.
      *
-     * \param aColor
+     * \param arColor
      */
     Color(Color &&arColor) noexcept = default;
 

@@ -12,8 +12,6 @@
 
 #include <memory>
 #include <string_view>
-#include <type_traits>
-#include <typeinfo>
 #include <exceptions/CoreException.h>
 #include <utils/ConstTypeInfo.h>
 
@@ -26,7 +24,7 @@ class Event
     size_t Type;
     std::string_view Name;
 
-    explicit Event(size_t aType = 0, std::string_view aName = "") : Type(aType), Name(aName) {}
+    explicit Event(const size_t aType = 0, const std::string_view aName = "") : Type(aType), Name(aName) {}
     virtual ~Event() = default;
 
     Event(const Event& arOther) = default;
@@ -60,22 +58,30 @@ class Event
         return dynamic_cast<const T&>(*this);
     }
 
+    virtual void ToStream(std::ostream &os) const
+    {
+        os << "Event (" << Type << ") " << Name;
+    }
+
+    friend std::ostream& operator<<(std::ostream &os, const Event &arEvent)
+    {
+        arEvent.ToStream(os);
+        return os;
+    }
+
 };
 
-std::ostream& operator<<(std::ostream &os, const rsp::messaging::Event &arEvent);
-
-using EventPtr_t = std::shared_ptr<rsp::messaging::Event>;
-
+using EventPtr_t = std::shared_ptr<Event>;
 
 template <class T>
 class EventBase : public Event
 {
   public:
-    static constexpr size_t ClassType = rsp::utils::ID<T>();
-    static constexpr std::string_view ClassName = rsp::utils::NameOf<T>();
+    static constexpr size_t ClassType = utils::ID<T>();
+    static constexpr std::string_view ClassName = utils::NameOf<T>();
 
     EventBase() : Event(ClassType, ClassName) {}
-    EventBase(size_t aType, std::string_view aName) : Event(aType, aName) {}
+    EventBase(const size_t aType, const std::string_view aName) : Event(aType, aName) {}
 };
 
 
