@@ -10,16 +10,34 @@
 
 #include <doctest.h>
 #include <magic_enum/magic_enum.hpp>
+#include <string_view>
 
+using namespace std::string_view_literals;
 
 TEST_SUITE_BEGIN("Utils");
 
-enum States //NOSONAR
+enum class States
 {
     One = 1,
     Two,
     Three
 };
+
+/* Compile with clang:
+ *
+ * clang++ -std=c++23 \
+ *   -I/home/steffen/Projects/tgm/rsp-core-library/build/_deps/doctest-src/doctest \
+ *   -I/home/steffen/Projects/tgm/rsp-core-library/build/_deps/magic_enum-src/include \
+ *   -I/home/steffen/Projects/tgm/rsp-core-library/include \
+ *   -I/home/steffen/Projects/tgm/rsp-core-library/src \
+ *   -I/home/steffen/Projects/tgm/rsp-core-library/tests/helpers \
+ *   -pedantic -Wall -Wextra \
+ *   -o test-magic_enum \
+ *   tests/unit/utils/test-magic_enum.cpp \
+ *   tests/test-main.cpp tests/helpers/TestHelpers.cpp \
+ *   tests/helpers/TestLogger.cpp \
+ *   build/librsp-core-lib.a -lstdc++exp
+ */
 
 TEST_CASE("magic_enum")
 {
@@ -27,12 +45,21 @@ TEST_CASE("magic_enum")
     {
         constexpr auto count = magic_enum::enum_count<States>();
 
+        // This will only compile if 'count' is truly constexpr
+        static_assert(count == 3);
+
+        // Array sized by constexpr - proves it works at compile time
+        std::array<int, count> arr{};
         CHECK_EQ(count, 3);
+        CHECK_EQ(arr.size(), 3);
 
         constexpr auto value = States::One;
         constexpr auto name = magic_enum::enum_name(value);
 
         CHECK_EQ(name, "One");
+
+        enum class Foo  { SPAM, HAM };
+        static_assert(magic_enum::enum_name(Foo::SPAM) == "SPAM"sv);
     }
 }
 

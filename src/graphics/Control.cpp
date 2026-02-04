@@ -388,7 +388,7 @@ bool Control::handleTouchEvent(messaging::Event &arEvent)
     return false;
 }
 
-bool Control::ProcessEvent(rsp::messaging::Event &arEvent) // NOLINT
+bool Control::ProcessEvent(rsp::messaging::Event &arEvent)
 {
     switch (static_cast<GfxEvents>(arEvent.Type)) {
         case GfxEvents::Touch:
