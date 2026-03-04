@@ -253,8 +253,7 @@ public:
     /**
      * \brief A design helper function, it will paint a rectangle indicating
      *        the touch area of Control objects in the given color.
-     * \param aValue
-     * \return Self
+     * \param aValue The color to set for the touch area
      */
     static void SetTouchAreaColor(Color aValue = Color::None) { mTouchAreaColor = std::move(aValue); }
 
@@ -298,7 +297,7 @@ protected:
      * \brief Override this to perform custom rendering.
      *
      * \param arRenderer
-     * \result Boolean true if children are already rendered
+     * \return Boolean true if children are already rendered
      */
     virtual bool render([[maybe_unused]] Renderer &arRenderer) const { return false; }
 
