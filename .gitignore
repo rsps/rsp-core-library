@@ -12,6 +12,9 @@ _deps
 /ext-libs/*
 !/ext-libs/.gitkeep
 
+# User-specific CMake configure options
+CMakeUserPresets.json
+
 /build/
 !build/.gitkeep
 
