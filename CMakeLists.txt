@@ -141,6 +141,8 @@ add_subdirectory(src)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 if (BUILD_TESTING)
+    enable_testing()
+
     # Define "test binary" such that dev-dependencies can include or link
     # resources for it...
     set(TEST_BINARY "rsp-core-lib-test")
