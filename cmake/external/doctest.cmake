@@ -8,11 +8,7 @@ include_guard(GLOBAL)
 # Debug
 message(VERBOSE "Installing Doctest")
 
-set(DOCTEST_VERSION "2.4.11")
-
-# NOTE: This can yield a strange DEPRECATION WARNING, which has yet to be resolved by the provider!
-# @see https://github.com/doctest/doctest/issues/893
-# @see https://github.com/doctest/doctest/issues/854
+set(DOCTEST_VERSION "2.4.12")
 
 CPMAddPackage(
     NAME "DocTest"
