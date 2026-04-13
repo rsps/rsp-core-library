@@ -81,7 +81,7 @@ target_link_libraries (${TEST_BINARY}
 )
 
 # Add "test binary" as a CTest test...
-add_test("tests" ${TEST_BINARY})
+add_test(NAME "tests" COMMAND ${TEST_BINARY} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 # Test files...
 file(GLOB_RECURSE SRC_FILES *.cpp)
