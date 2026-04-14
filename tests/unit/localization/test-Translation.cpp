@@ -8,10 +8,12 @@
  * \author      Steffen Brummer
  */
 
-#include <doctest.h>
 #include <rsp/localization/Translation.h>
-#include <string>
+#include <doctest.h>
+#include <locale>
+#include <stdexcept>
 #include <string_view>
+#include <string>
 
 using namespace rsp::localization;
 
@@ -20,6 +22,14 @@ TEST_SUITE_BEGIN("Localization");
 TEST_CASE("Translation")
 {
     CHECK_NOTHROW(Translation tmp;);
+
+    try {
+        std::locale{"da_DK.utf8"};
+    }
+    catch (const std::runtime_error&) {
+        MESSAGE("Skipping, locale da_DK not installed");
+        return;
+    }
 
     Translation tr("da_DK.utf8");
 
