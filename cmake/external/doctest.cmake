@@ -5,28 +5,19 @@
 
 include_guard(GLOBAL)
 
-# Debug
-message(VERBOSE "Installing Doctest")
-
-set(DOCTEST_VERSION "2.4.12")
-
 CPMAddPackage(
-    NAME "DocTest"
-    GITHUB_REPOSITORY "onqtam/doctest"
-    GIT_TAG "v${DOCTEST_VERSION}"
-    # VERSION "${DOCTEST_VERSION}"
+    NAME doctest
+    GITHUB_REPOSITORY doctest/doctest
+    VERSION 2.4.12
 )
 
-# Debug
-message(STATUS "Using Doctest v${DOCTEST_VERSION}")
+if(doctest_ADDED)
+    # Set include dir property because doctest::doctest doesn't export it?
+    target_include_directories(doctest
+        INTERFACE
+            $<BUILD_INTERFACE:${doctest_SOURCE_DIR}/doctest>
+    )
 
-# Include & link...
-target_include_directories(${TEST_BINARY}
-    PUBLIC
-        ${doctest_SOURCE_DIR}/doctest
-)
-
-# -------------------------------------------------------------------------------------------------------------- #
-
-# Configure build options
-# N/A
+    # For doctest_discover_tests()
+    include("${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake")
+endif()
