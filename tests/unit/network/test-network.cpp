@@ -148,10 +148,12 @@ TEST_CASE("Network")
 
         logger.Info() << "Request:\n" << request << std::endl;
 
-        IHttpResponse *resp;
+        IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
 
-        logger.Info() << "Response:\n" << *resp << std::endl;
+        if (resp) {
+            logger.Info() << "Response:\n" << *resp << std::endl;
+        }
 
 //        MESSAGE("Request:\n" << resp->GetRequest());
 //        MESSAGE("Response:\n" << *resp);
@@ -325,14 +327,14 @@ TEST_CASE("Network")
         HttpRequest request;
         request.SetOptions(opt);
 
-        IHttpResponse *resp;
+        IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
+        if (resp) {
+            MESSAGE("Body: " << resp->GetBody());
 
-        MESSAGE("Body: " << resp->GetBody());
-
-        CHECK_EQ(resp->GetBody().GetStreamSize(), 70);
-        CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
-
+            CHECK_EQ(resp->GetBody().GetStreamSize(), 70);
+            CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
+        }
         CHECK(FileSystem::FileExists(cUploadedFile));
         FileIO file2(cUploadedFile, std::ios_base::in);
         auto s2 = file2.GetContents();
@@ -361,9 +363,11 @@ TEST_CASE("Network")
         form->Add("filename", "uploaded.png");
         form->Add("filedata", file);
 
-        IHttpResponse *resp;
+        IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
-
+        if (!resp) {
+            return;
+        }
         auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
 
         size_t request_size = 25455;
@@ -383,8 +387,10 @@ TEST_CASE("Network")
         CHECK_EQ(body, expected);
 
         CHECK_EQ(body.size(), 147);
-        CHECK_EQ(resp->GetBody().GetStreamSize(), 147);
-        CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
+        if (resp) {
+            CHECK_EQ(resp->GetBody().GetStreamSize(), 147);
+            CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
+        }
 
         CHECK(FileSystem::FileExists(cUploadedFile));
         FileIO file2(cUploadedFile, std::ios_base::in);
@@ -435,17 +441,18 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
         request.SetOptions(opt);
         request.SetBody(std::make_shared<StringBody>(json));
 
-        IHttpResponse *resp;
+        IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
 
-        auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
-//        MESSAGE(body);
-
-        std::string expected = R"(Content length: 41
+        if (resp) {
+            auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
+  //        MESSAGE(body);
+            std::string expected = R"(Content length: 41
 Request Method: POST
 Body: )" + json + "\n";
 
-        CHECK_EQ(body, expected);
+            CHECK_EQ(body, expected);
+        }
     }
 
     SUBCASE("Http Session") {
@@ -592,9 +599,11 @@ Body: )" + json + "\n";
         HttpRequest request;
         request.SetOptions(opt);
 
-        IHttpResponse *resp;
+        IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
-
+        if (!resp) {
+            return;
+        }
         auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
         MESSAGE(body);
         CHECK(TestHelpers::ValidateJson(body));
