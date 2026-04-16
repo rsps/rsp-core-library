@@ -8,6 +8,10 @@ enable_testing()
 # -------------------------------------------------------------------------------------------------------------- #
 # Test Configuration(s), Assets and other resources...
 # -------------------------------------------------------------------------------------------------------------- #
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+include("external/doctest")
+include("external/lighttpd")
 
 configure_file (
     "${CMAKE_CURRENT_SOURCE_DIR}/webserver/lighttpd.conf.in"
@@ -53,15 +57,14 @@ file(
 # -------------------------------------------------------------------------------------------------------------- #
 # Targets & Compile Options
 # -------------------------------------------------------------------------------------------------------------- #
+set(TEST_BINARY "rsp-core-lib-test")
 
-add_dependencies(${TEST_BINARY} doctest lighttpd)
+add_executable(${TEST_BINARY})
+add_dependencies(${TEST_BINARY} lighttpd)
 
 target_include_directories(${TEST_BINARY}
-    PUBLIC
-        "${PROJECT_SOURCE_DIR}/include"
     PRIVATE
         "${PROJECT_SOURCE_DIR}/src"
-        "${PROJECT_BINARY_DIR}/src"
         "${CMAKE_CURRENT_SOURCE_DIR}/helpers"
 )
 
@@ -76,12 +79,11 @@ if (NOT RELEASE_BUILD)
 endif()
 
 target_link_libraries (${TEST_BINARY}
-    rsp-core-lib
-    Threads::Threads
+    PUBLIC
+        rsp-core-lib
+        Threads::Threads
+        doctest::doctest
 )
-
-# Add "test binary" as a CTest test...
-add_test(NAME "tests" COMMAND ${TEST_BINARY} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 # Test files...
 file(GLOB_RECURSE SRC_FILES *.cpp)
@@ -89,6 +91,8 @@ target_sources(${TEST_BINARY}
     PRIVATE
         ${SRC_FILES}
 )
+
+doctest_discover_tests(${TEST_BINARY} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 # -------------------------------------------------------------------------------------------------------------- #
 # Install / Export

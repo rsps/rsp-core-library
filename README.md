@@ -33,15 +33,14 @@ sudo update-alternatives --config gcc
 
 ## Build and tests
 
-To build the library and accompanied test, simply go into the build directory and run `cmake ..`:
+To build the library (and possibly accompanying tests), simply run `cmake` as follows:
 
 ```sh
-cd build
-cmake ..
-make
+cmake --preset debug|release|debug-with-tests|release-with-tests
+cmake --build --preset debug|release|debug-with-tests|release-with-tests
 ```
 
-Tests can now be executed with `./rsp-core-lib-test` or simply `ctest`
+Tests can now be executed with `./rsp-core-lib-test` or simply `ctest --preset debug-with-tests|release-with-tests`
 
 ## Versioning
 
