@@ -63,7 +63,7 @@ TEST_CASE("Socket")
         std::string socket_path("localhost:46555");
 
         AddressInfo info(socket_path, true, Domain::Unspecified, Type::Stream);
-        CHECK_GE(info.GetCount(), 1);
+        CHECK_GE(info.GetCount(), 1u);
 
         Socket server(Domain::Inet, Type::Stream);
         CHECK_NOTHROW(server.SetOptions(SockOptions::ReUseAddress, 1));
@@ -102,7 +102,7 @@ TEST_CASE("Socket")
         std::string socket_path("localhost:46555");
 
         AddressInfo info(socket_path, true, Domain::Unspecified, Type::Stream);
-        CHECK_GE(info.GetCount(), 1);
+        CHECK_GE(info.GetCount(), 1u);
 
         Socket server(Domain::Inet, Type::Datagram);
         CHECK_NOTHROW(server.SetOptions(SockOptions::ReUseAddress, 1));

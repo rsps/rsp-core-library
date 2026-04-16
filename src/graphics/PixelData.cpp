@@ -16,7 +16,7 @@
 
 namespace rsp::graphics {
 
-std::ostream& operator<<(std::ostream& os, ColorDepth aDepth)
+std::ostream& operator<<(std::ostream& os, const ColorDepth aDepth)
 {
     switch (aDepth) {
         case ColorDepth::Monochrome:
@@ -50,7 +50,7 @@ PixelData::PixelData(const GfxResource &arResource)
 }
 
 
-PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const uint8_t *apData, size_t aDataSize, bool aCompressed)
+PixelData::PixelData(const GuiUnit_t aWidth, const GuiUnit_t aHeight, const ColorDepth aDepth, const uint8_t *apData, const size_t aDataSize, const bool aCompressed)
     : mColorDepth(aDepth),
       mRect(0, 0, aWidth, aHeight),
       mpData(apData)
@@ -58,16 +58,16 @@ PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, con
     if (aCompressed) {
         Decompress(getCompressionType(aCompressed), mpData, aDataSize);
     }
-    mId = uint32_t(uintptr_t(mpData));
+    mId = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(mpData));
 }
 
-PixelData::PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
+PixelData::PixelData(const GuiUnit_t aWidth, const GuiUnit_t aHeight, const ColorDepth aDepth)
     : mColorDepth(aDepth),
       mRect(0, 0, aWidth, aHeight)
 {
     mData.resize(GetDataSize());
     mpData = mData.data();
-    mId = uint32_t(uintptr_t(mpData));
+    mId = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(mpData));
 }
 
 PixelData::PixelData(const PixelData &arOther)
@@ -125,7 +125,7 @@ void PixelData::move(PixelData &&arOther)
 }
 
 
-PixelData& PixelData::Init(uint32_t aId, GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const uint8_t *apData)
+PixelData& PixelData::Init(const uint32_t aId, const GuiUnit_t aWidth, const GuiUnit_t aHeight, const ColorDepth aDepth, const uint8_t *apData)
 {
     mId = aId;
     mColorDepth = aDepth;
@@ -166,10 +166,10 @@ size_t PixelData::GetDataSize() const
             THROW_WITH_BACKTRACE(EIllegalColorDepth);
     }
 
-    return size_t(result);
+    return static_cast<size_t>(result);
 }
 
-Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) const
+Color PixelData::GetPixelAt(const GuiUnit_t aX, const GuiUnit_t aY, const Color &arColor) const
 {
     if (!GetRect().IsHit(aX, aY)) {
         return Color::None;
@@ -197,7 +197,7 @@ Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) co
 
         case ColorDepth::RGBA:
             offset = ((aY * GetWidth()) + aX) * 4;
-            result.FromRaw(*reinterpret_cast<const uint32_t*>(uintptr_t(mpData + offset)));
+            result.FromRaw(*reinterpret_cast<const uint32_t*>(reinterpret_cast<uintptr_t>(mpData + offset)));
             break;
 
         default:
@@ -207,7 +207,7 @@ Color PixelData::GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color &arColor) co
     return result;
 }
 
-PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
+PixelData& PixelData::SetPixelAt(const GuiUnit_t aX, const GuiUnit_t aY, const Color& arColor)
 {
     if (!GetRect().IsHit(aX, aY)) {
         return *this;
@@ -230,7 +230,7 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
     switch (mColorDepth) {
         case ColorDepth::Monochrome:
             offset = (((GetWidth() + 7) >> 3) * aY) + (aX >> 3);
-            if (aColor.GetAlpha() > 0) {
+            if (arColor.GetAlpha() > 0) {
                 p_data[offset] |= (1 << (aX % 8));
             }
             else {
@@ -240,25 +240,25 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
 
         case ColorDepth::Alpha:
             offset = (aY * GetWidth()) + aX;
-            p_data[offset] = aColor.GetAlpha();
+            p_data[offset] = arColor.GetAlpha();
             break;
 
         case ColorDepth::RGB:
             offset = ((aY * GetWidth()) + aX) * 3;
-            p_data[offset + 0] = aColor.GetRed();
-            p_data[offset + 1] = aColor.GetGreen();
-            p_data[offset + 2] = aColor.GetBlue();
+            p_data[offset + 0] = arColor.GetRed();
+            p_data[offset + 1] = arColor.GetGreen();
+            p_data[offset + 2] = arColor.GetBlue();
             break;
 
         case ColorDepth::RGBA:
             offset = ((aY * GetWidth()) + aX) * 4;
-            if (!mBlend || aColor.GetAlpha() == 255) {
-                *reinterpret_cast<uint32_t*>(uintptr_t(p_data + offset)) = aColor.AsRaw();
+            if (!mBlend || arColor.GetAlpha() == 255) {
+                *reinterpret_cast<uint32_t*>(p_data + offset) = arColor.AsRaw();
             }
             else {
                 Color bg;
-                bg.FromRaw(*reinterpret_cast<uint32_t*>(uintptr_t(p_data + offset)));
-                *reinterpret_cast<uint32_t*>(uintptr_t(p_data + offset)) = Color::Blend(bg, aColor).AsRaw();
+                bg.FromRaw(*reinterpret_cast<uint32_t*>(p_data + offset));
+                *reinterpret_cast<uint32_t*>(p_data + offset) = Color::Blend(bg, arColor).AsRaw();
             }
             break;
 
@@ -269,7 +269,7 @@ PixelData& PixelData::SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor)
     return *this;
 }
 
-void PixelData::initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth)
+void PixelData::initAfterLoad(const GuiUnit_t aWidth, const GuiUnit_t aHeight, const ColorDepth aDepth)
 {
     mColorDepth = aDepth;
     mRect = Rect(0, 0, aWidth, aHeight);
@@ -280,7 +280,7 @@ void PixelData::initAfterLoad(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aD
     mpData = mData.data();
 }
 
-GfxCompressor::CompressionType PixelData::getCompressionType(bool aCompress) const
+GfxCompressor::CompressionType PixelData::getCompressionType(const bool aCompress) const
 {
     if (!aCompress) {
         return GfxCompressor::CompressionType::None;
@@ -302,7 +302,7 @@ GfxCompressor::CompressionType PixelData::getCompressionType(bool aCompress) con
     }
 }
 
-GfxCompressor::CompressedData PixelData::Compress(bool aCompress) const
+GfxCompressor::CompressedData PixelData::Compress(const bool aCompress) const
 {
     return GfxCompressor::Compress(getCompressionType(aCompress), mpData, GetDataSize());
 }
@@ -314,7 +314,7 @@ PixelData& PixelData::Decompress(const GfxCompressor::CompressedData &arCompress
     return *this;
 }
 
-PixelData& PixelData::Decompress(GfxCompressor::CompressionType aType, const uint8_t* apData, size_t aSize)
+PixelData& PixelData::Decompress(const GfxCompressor::CompressionType aType, const uint8_t* apData, const size_t aSize)
 {
     mData = GfxCompressor::Decompress(aType, apData, aSize);
     mpData = mData.data();
@@ -331,16 +331,16 @@ void PixelData::SaveToCFile(const std::filesystem::path &arFileName, bool aCompr
     fo << "#include \"" << (apHeaderFile ? apHeaderFile : obj_name + ".h") << "\"\n\n"
         << "using namespace rsp::graphics;\n" << std::endl;
 
-    auto result = Compress(aCompress);
+    const auto [c_type, c_data] = Compress(aCompress);
 
-    fo << "static const uint8_t pixdata[" << result.mData.size() << "]{\n";
-    fo.Hex(result.mData.data(), result.mData.size());
+    fo << "static const uint8_t pix_data[" << c_data.size() << "]{\n";
+    fo.Hex(c_data.data(), c_data.size());
     fo << "};\n\n";
 
-    fo << "const GfxResource c" << obj_name << "{" << utils::crc32::HashConst(obj_name.c_str()) << "u, "
+    fo << "const GfxResource c" << obj_name << "{" << utils::crc32::HashConst(obj_name) << "u, "
         << GetWidth() << "u, " << GetHeight() << "u, ColorDepth::"
         << mColorDepth << ", " << (aCompress ? "true" : "false")
-        << ", " << result.mData.size() << ", pixdata};" << std::endl;
+        << ", " << c_data.size() << ", pix_data};" << std::endl;
 
     std::ios_base::openmode mode = std::ios_base::out | (apHeaderFile ? std::ios_base::app : std::ios_base::trunc);
     std::filesystem::path hfile = arFileName;
@@ -356,17 +356,17 @@ void PixelData::SaveToCFile(const std::filesystem::path &arFileName, bool aCompr
 }
 
 
-PixelData PixelData::ChangeColorDepth(ColorDepth aDepth, Color aColor) const
+PixelData PixelData::ChangeColorDepth(const ColorDepth aDepth, const Color& arColor) const
 {
     if (aDepth == mColorDepth) {
         return {*this};
     }
     PixelData result(GetWidth(), GetHeight(), aDepth);
-    result.CopyFrom(Point(0,0), *this, GetRect(), aColor);
+    result.CopyFrom(Point(0,0), *this, GetRect(), arColor);
     return result;
 }
 
-PixelData& PixelData::CopyFrom(const Point &arDestination, const PixelData &arOther, const Rect &arSourceRect, Color aColor)
+PixelData& PixelData::CopyFrom(const Point &arDestination, const PixelData &arOther, const Rect &arSourceRect, const Color& arColor)
 {
     Rect r = arSourceRect & arOther.GetRect();
     if (arDestination.GetX() < 0 || arDestination.GetY() < 0) {
@@ -377,7 +377,7 @@ PixelData& PixelData::CopyFrom(const Point &arDestination, const PixelData &arOt
     for (int y = r.GetTop(); y < r.GetHeight(); y++) {
         auto ox = arDestination.GetX();
         for (int x = r.GetLeft(); x < (r.GetLeft() + r.GetWidth()); x++) {
-            SetPixelAt(ox, oy, arOther.GetPixelAt(x, y, aColor));
+            SetPixelAt(ox, oy, arOther.GetPixelAt(x, y, arColor));
             ox++;
         }
         oy++;
@@ -385,7 +385,7 @@ PixelData& PixelData::CopyFrom(const Point &arDestination, const PixelData &arOt
     return *this;
 }
 
-void PixelData::Fill(Color aColor)
+void PixelData::Fill(const Color& arColor)
 {
     if (mData.empty()) {
         return;
@@ -393,12 +393,12 @@ void PixelData::Fill(Color aColor)
     switch (mColorDepth) {
         case ColorDepth::RGBA: {
             auto *p = reinterpret_cast<uint32_t*>(mData.data());
-            std::fill_n(p, mData.size() / sizeof(uint32_t), aColor.AsRaw());
+            std::fill_n(p, mData.size() / sizeof(uint32_t), arColor.AsRaw());
             break;
         }
 
         case ColorDepth::Alpha:
-            std::memset(mData.data(), int(aColor.GetAlpha()), mData.size());
+            std::memset(mData.data(), static_cast<int>(arColor.GetAlpha()), mData.size());
             break;
 
         case ColorDepth::Monochrome:
@@ -406,14 +406,14 @@ void PixelData::Fill(Color aColor)
         default:
             for (GuiUnit_t y=0 ; y < GetHeight() ; ++y) {
                 for (GuiUnit_t x = 0 ; x < GetWidth() ; ++x) {
-                    SetPixelAt(x, y, aColor);
+                    SetPixelAt(x, y, arColor);
                 }
             }
             break;
     }
 }
 
-PixelData& PixelData::Fade(int aAlphaInc, bool aFixed)
+PixelData& PixelData::Fade(const int aAlphaInc, const bool aFixed)
 {
     if (mColorDepth != ColorDepth::RGBA) {
         return *this;
@@ -432,13 +432,13 @@ PixelData& PixelData::Fade(int aAlphaInc, bool aFixed)
 
     for (GuiUnit_t y = 0 ; y < GetHeight() ; y++) {
         for (GuiUnit_t x = 0 ; x < GetWidth() ; x++) {
-            int offset = ((y * GetWidth()) + x) * 4;
+            const int offset = ((y * GetWidth()) + x) * 4;
             Color col;
-            col.FromRaw(*reinterpret_cast<const uint32_t*>(uintptr_t(p_data + offset)));
+            col.FromRaw(*reinterpret_cast<const uint32_t*>(p_data + offset));
             if (col == Color::None) {
                 continue;
             }
-            int alpha = int(col.GetAlpha());
+            int alpha = static_cast<int>(col.GetAlpha());
 
             if (aFixed) {
                 alpha = aAlphaInc;
@@ -449,16 +449,16 @@ PixelData& PixelData::Fade(int aAlphaInc, bool aFixed)
             else {
                 alpha = std::max(alpha + aAlphaInc, 0);
             }
-            col.SetAlpha(uint8_t(alpha));
-            *reinterpret_cast<uint32_t*>(uintptr_t(p_data + offset)) = col.AsRaw();
+            col.SetAlpha(static_cast<uint8_t>(alpha));
+            *reinterpret_cast<uint32_t*>(p_data + offset) = col.AsRaw();
         }
     }
     return *this;
 }
 
-bool PixelData::SetBlend(bool aValue)
+bool PixelData::SetBlend(const bool aValue)
 {
-    bool result = mBlend;
+    const bool result = mBlend;
     mBlend = aValue;
     return result;
 }

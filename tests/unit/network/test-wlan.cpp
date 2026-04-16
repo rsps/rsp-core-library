@@ -50,7 +50,7 @@ static const char* GetEnv(const char *apName, const char *apDefault)
 static bool wpa_supplicant_not_available()
 {
     if ( access( "/etc/wpa_supplicant/wpa_supplicant.conf", F_OK ) == -1 ) {
-        return false;
+        return true;
     }
     const std::string wpa_dir("/var/run/wpa_supplicant/");
     const NetworkInterfaces ifs;

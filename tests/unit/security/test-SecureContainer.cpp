@@ -27,9 +27,9 @@ struct MyData
 
 TEST_CASE("Secure Container")
 {
-    const char* cFileName = "SecureContainer.bin";
-    const char* cPlainText = "The big red fox, jumped over the fence.";
-    const char* cShaSeed = "Seed for hash";
+    auto cFileName = "SecureContainer.bin";
+    auto cPlainText = "The big red fox, jumped over the fence.";
+    auto cShaSeed = "Seed for hash";
 
     TestLogger logger;
 
@@ -38,7 +38,7 @@ TEST_CASE("Secure Container")
     SUBCASE("Init")
     {
         CHECK_EQ(sizeof(sc.Get()), sizeof(MyData));
-        CHECK_EQ(sc.Get().Integer, 42);
+        CHECK_EQ(sc.Get().Integer, 42u);
         CHECK_EQ(sc.Get().String, "");
     }
 
@@ -69,7 +69,7 @@ TEST_CASE("Secure Container")
         MESSAGE("Integer: " << dcl.Get().Integer);
         MESSAGE("String: " << std::string(dcl.Get().String));
 
-        CHECK_EQ(dcl.Get().Integer, 44);
+        CHECK_EQ(dcl.Get().Integer, 44u);
         CHECK_EQ(dcl.Get().String, cPlainText);
     }
 
@@ -93,7 +93,7 @@ TEST_CASE("Secure Container")
 
     SUBCASE("Signature Integrity") {
         /*
-         * Tamper with container file: Cryptation takes precedence, so invalidate signature directly
+         * Tamper with container file: Encryption takes precedence, so invalidate signature directly
          */
         auto old = TestHelpers::TamperWithFile(cFileName, 0x03, 0x58);
         SecureContainer<MyData> dcl(cFileName, cShaSeed, CryptBase::KeyGen("InitVector"), CryptBase::KeyGen("username:password"));

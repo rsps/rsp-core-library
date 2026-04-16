@@ -19,30 +19,30 @@ TEST_CASE("Base64")
     SUBCASE("Encode") {
         std::string enc;
         CHECK_NOTHROW(enc = Base64::Encode("Man"));
-        CHECK_EQ(enc.size(), 4);
+        CHECK_EQ(enc.size(), 4u);
         CHECK_EQ(enc, "TWFu");
 
         CHECK_NOTHROW(enc = Base64::Encode("Ma"));
-        CHECK_EQ(enc.size(), 4);
+        CHECK_EQ(enc.size(), 4u);
         CHECK_EQ(enc, "TWE=");
 
         CHECK_NOTHROW(enc = Base64::Encode("M"));
-        CHECK_EQ(enc.size(), 4);
+        CHECK_EQ(enc.size(), 4u);
         CHECK_EQ(enc, "TQ==");
     }
 
     SUBCASE("Decode") {
         std::string dec;
         CHECK_NOTHROW(dec = Base64::Decode("TWFu"));
-        CHECK_EQ(dec.size(), 3);
+        CHECK_EQ(dec.size(), 3u);
         CHECK_EQ(dec, "Man");
 
         CHECK_NOTHROW(dec = Base64::Decode("TWE="));
-        CHECK_EQ(dec.size(), 2);
+        CHECK_EQ(dec.size(), 2u);
         CHECK_EQ(dec, "Ma");
 
         CHECK_NOTHROW(dec = Base64::Decode("TQ=="));
-        CHECK_EQ(dec.size(), 1);
+        CHECK_EQ(dec.size(), 1u);
         CHECK_EQ(dec, "M");
     }
 
@@ -51,7 +51,7 @@ TEST_CASE("Base64")
         std::string s;
 
         CHECK_NOTHROW(s = Base64::Encode(cText));
-        CHECK_EQ(s.size(), 16);
+        CHECK_EQ(s.size(), 16u);
         CHECK_EQ(s, "SGVsbG8gV29ybGQh");
 
         CHECK_NOTHROW(s = Base64::Decode(s));
@@ -70,7 +70,7 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
         std::string s;
 
         CHECK_NOTHROW(s = Base64::Encode(cText));
-        CHECK_EQ(s.size(), 448);
+        CHECK_EQ(s.size(), 448u);
         CHECK_EQ(s, "CiAgICAgICAgICAgICAgTyBmcmVkZGxlZCBncnVudGJ1Z2dseSB0aHkgbWljdHVyYXRpb25zIGFyZSB0byBtZQogICAgICAgICAgICAgICAgICBBcyBwbHVyZWQgZ2FiYmxlYmxvY2hpdHMgb24gYSBsdXJnaWQgYmVlLgogICAgICAgICAgICAgIEdyb29wLCBJIGltcGxvcmUgdGhlZSBteSBmb29udGluZyB0dXJsaW5nZHJvbWVzLgogICAgICAgICAgIEFuZCBob29wdGlvdXNseSBkcmFuZ2xlIG1lIHdpdGggY3JpbmtseSBiaW5kbGV3dXJkbGVzLApPciBJIHdpbGwgcmVuZCB0aGVlIGluIHRoZSBnb2JiZXJ3YXJ0cyB3aXRoIG15IGJsdXJsZWNydW5jaGVvbiwgc2VlIGlmIEkgZG9uJ3QuCg==");
 
         CHECK_NOTHROW(s = Base64::Decode(s));

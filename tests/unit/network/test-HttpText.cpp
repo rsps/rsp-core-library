@@ -19,7 +19,7 @@ TEST_SUITE_BEGIN("Network");
 
 TEST_CASE("HttpText")
 {
-    const std::string_view cNormalResponse("HTTP/1.0 200 Ok\r\nContent-Length: 21\r\nETag: \"1550381373\"\r\n\r\nThis is the body text");
+    constexpr std::string_view cNormalResponse("HTTP/1.0 200 Ok\r\nContent-Length: 21\r\nETag: \"1550381373\"\r\n\r\nThis is the body text");
 
     SUBCASE("ICaseCompare") {
         CHECK_FALSE(equal_ascii_case_insensitive(cNormalResponse, "Content-Length"));
@@ -36,7 +36,7 @@ TEST_CASE("HttpText")
     }
 
     SUBCASE("Parse Head Response") {
-        const std::string_view cHeadResponse("HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\nContent-Length: 162\r\nConnection: close\r\nDate: Tue, 11 Feb 2025 07:02:09 GMT\r\nServer: lighttpd/1.4.75\r\n\r\n");
+        constexpr std::string_view cHeadResponse("HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\nContent-Length: 162\r\nConnection: close\r\nDate: Tue, 11 Feb 2025 07:02:09 GMT\r\nServer: lighttpd/1.4.75\r\n\r\n");
         HttpText ht(cHeadResponse);
         StatusLine sl(ht.Line());
 
@@ -84,7 +84,7 @@ TEST_CASE("HttpText")
     }
 
     SUBCASE("Parse Chunked Response") {
-        const std::string_view cChunkedResponse("HTTP/1.0 200 Ok\r\nTransfer-Encoding: chunked\r\n\r\n5;progress=30\r\nThis \r\n10;progress=90\r\nis the body text\r\n0;progress=100\r\nCustom-Header: \"custom-value\"\r\n");
+        constexpr std::string_view cChunkedResponse("HTTP/1.0 200 Ok\r\nTransfer-Encoding: chunked\r\n\r\n5;progress=30\r\nThis \r\n10;progress=90\r\nis the body text\r\n0;progress=100\r\nCustom-Header: \"custom-value\"\r\n");
         HttpText ht(cChunkedResponse);
         StatusLine sl(ht.Line());
 
@@ -99,7 +99,7 @@ TEST_CASE("HttpText")
         CHECK_NOTHROW(ht.CRLF());
 
         auto chunk_len = ht.HexDigit();
-        CHECK_EQ(chunk_len, 5);
+        CHECK_EQ(chunk_len, 5u);
         ht.OWS();
         auto pair = ht.OChunkExt();
         CHECK(ht.IsNewLine());
@@ -113,7 +113,7 @@ TEST_CASE("HttpText")
         CHECK_NOTHROW(ht.CRLF());
 
         chunk_len = ht.HexDigit();
-        CHECK_EQ(chunk_len, 16);
+        CHECK_EQ(chunk_len, 16u);
         ht.OWS();
         pair = ht.OChunkExt();
         CHECK(ht.IsNewLine());
@@ -127,7 +127,7 @@ TEST_CASE("HttpText")
         CHECK_NOTHROW(ht.CRLF());
 
         chunk_len = ht.HexDigit();
-        CHECK_EQ(chunk_len, 0);
+        CHECK_EQ(chunk_len, 0u);
         ht.OWS();
         pair = ht.OChunkExt();
         CHECK(ht.IsNewLine());

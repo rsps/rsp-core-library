@@ -20,7 +20,7 @@ namespace rsp::graphics
 /**
  * \class Color
  *
- * A color consist of tree base colors: Red, green and blue,
+ * A Color consists of tree base colors: Red, green, and blue,
  * and an optional alpha channel that determines transparency.
  *
  * Note: Not all hardware supports alpha channel transparency.
@@ -156,19 +156,19 @@ public:
      */
 
     [[nodiscard]] uint32_t AsRaw() const { return mValue.rgba; }
-    Color& FromRaw(uint32_t aValue) { mValue.rgba = aValue; return *this; }
+    Color& FromRaw(const uint32_t aValue) { mValue.rgba = aValue; return *this; }
 
     /**
      * \brief Assignment operator.
      *
-     * \param aValue
+     * \param arColor
      */
     Color& operator=(const Color &arColor);
 
     /**
      * \brief Move operator.
      *
-     * \param aValue
+     * \param arColor
      */
     Color& operator=(Color &&arColor) noexcept;
 

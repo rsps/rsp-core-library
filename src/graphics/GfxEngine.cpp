@@ -111,7 +111,7 @@ void GfxEngineBase::updateFPS()
 {
     const auto delay = std::max(static_cast<int64_t>(0), mFrameTime - mStopWatch.Elapsed<std::chrono::milliseconds>());
     std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-    mFps = 1000 / std::max(static_cast<int64_t>(1), mStopWatch.Elapsed<std::chrono::milliseconds>());
+    mFps = static_cast<int>(1000 / std::max(static_cast<int64_t>(1), mStopWatch.Elapsed<std::chrono::milliseconds>()));
     mStopWatch.Reset();
 }
 

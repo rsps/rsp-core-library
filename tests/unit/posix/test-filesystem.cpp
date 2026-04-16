@@ -81,13 +81,13 @@ TEST_CASE("FileSystem") {
 
         MESSAGE(("Current IP: " + ip));
 
-        CHECK_GE(ip.length(), 7);
+        CHECK_GE(ip.length(), 7u);
         CHECK(!StrUtils::Contains(ip, "127.0.0.1"));
     }
 
     SUBCASE("List Directory") {
         std::vector<std::filesystem::path> list = FileSystem::Glob(std::filesystem::path{"/etc/hostn*"});
-        CHECK(list[0].string() == "/etc/hostname");
+        CHECK_EQ(list[0].string(), "/etc/hostname");
     }
 
     SUBCASE("Get Framebuffer Device By Driver Name") {

@@ -46,8 +46,8 @@ TEST_CASE("Bitmap")
     {
         // Arrange
         std::string filepath = "testImages/testImage.bmp";
-        uint32_t height = 194;
-        uint32_t width = 259;
+        GuiUnit_t height = 194;
+        GuiUnit_t width = 259;
 
         // Act
         CHECK_NOTHROW(Bitmap bmp(filepath));
@@ -57,7 +57,7 @@ TEST_CASE("Bitmap")
         // Assert
         CHECK_EQ(bitmap.GetHeight(), height);
         CHECK_EQ(bitmap.GetWidth(), width);
-        CHECK_EQ(bitmap.GetPixelData().GetDataSize(), (width * height * 3));
+        CHECK_EQ(bitmap.GetPixelData().GetDataSize(), static_cast<size_t>(width * height * 3));
         CHECK_HEX(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White).AsUint(), 0xFF020A8F);
         CHECK_HEX(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White).AsUint(), 0xFF020A8F);
         CHECK_HEX(bitmap.GetPixelData().GetPixelAt(55, 111, Color::White).AsUint(), 0xFFEAEFE8);
@@ -79,8 +79,8 @@ TEST_CASE("Bitmap")
     {
         // Arrange
         std::string filepath = "testImages/Asset3.bmp";
-        uint32_t height = 800;
-        uint32_t width = 480;
+        GuiUnit_t height = 800;
+        GuiUnit_t width = 480;
 
         // Act
         CHECK_NOTHROW(Bitmap bmp2(filepath));
@@ -92,7 +92,7 @@ TEST_CASE("Bitmap")
         // Assert
         CHECK_EQ(bitmap2.GetHeight(), height);
         CHECK_EQ(bitmap2.GetWidth(), width);
-        CHECK_EQ(bitmap2.GetPixelData().GetDataSize(), (width * height * 3));
+        CHECK_EQ(bitmap2.GetPixelData().GetDataSize(), static_cast<size_t>(width * height * 3));
         CHECK_EQ(col2, bitmap2.GetPixelData().GetPixelAt(0,0,Color::White));
     }
 
@@ -100,8 +100,8 @@ TEST_CASE("Bitmap")
     {
         // Arrange
         std::string filepath = "testImages/monochrome/Monochrome.bmp";
-        uint32_t height = 100;
-        uint32_t width = 100;
+        GuiUnit_t height = 100;
+        GuiUnit_t width = 100;
 
         // Act
         CHECK_NOTHROW(Bitmap bmp3(filepath));
@@ -112,7 +112,7 @@ TEST_CASE("Bitmap")
         // Assert
         CHECK_EQ(bitmap3.GetHeight(), height);
         CHECK_EQ(bitmap3.GetWidth(), width);
-        CHECK_EQ(bitmap3.GetPixelData().GetDataSize(), (((width + 7) >> 3) * height));
+        CHECK_EQ(bitmap3.GetPixelData().GetDataSize(), static_cast<size_t>(((width + 7) >> 3) * height));
         CHECK_EQ(bitmap3.GetPixelData().GetPixelAt(0,0,Color::White), Color(0x00FFFFFF));
         CHECK_EQ(bitmap3.GetPixelData().GetPixelAt(32,50,Color::White), Color(Color::White));
     }

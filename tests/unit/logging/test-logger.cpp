@@ -162,8 +162,8 @@ TEST_CASE("Logging") {
     std::getline(fin, line);
     CHECK_MESSAGE(StrUtils::Contains(line, "Test of logger"), line);
 
-    CHECK_EQ(mConsoleErrorBuffer.size(), 3);
-    CHECK_EQ(mConsoleInfoBuffer.size(), 0);
+    CHECK_EQ(mConsoleErrorBuffer.size(), 3u);
+    CHECK_EQ(mConsoleInfoBuffer.size(), 0u);
 
     std::getline(fin, line);
     CHECK_MESSAGE(StrUtils::EndsWith(line, "] Test Channel.ALERT: Alert [\"Test Context\",42]"), line);

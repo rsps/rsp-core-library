@@ -17,7 +17,6 @@
 #include <graphics/Rect.h>
 #include <graphics/GfxCompressor.h>
 #include <graphics/GfxResource.h>
-#include <cstdint>
 #include <cstddef>
 #include <filesystem>
 #include <vector>
@@ -31,13 +30,17 @@ public:
     EIllegalColorDepth() : CoreException("Unsupported Color Depth") {}
 };
 
-
+/**
+ * \brief Represents the raw pixel data for an image or texture.
+ *
+ * Provides access and manipulation capabilities for individual pixel values.
+ */
 class PixelData
 {
 public:
     PixelData() = default;
     PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth = ColorDepth::RGBA);
-    PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const uint8_t *aData, size_t aDataSize, bool aCompressed = false);
+    PixelData(GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const uint8_t *apData, size_t aDataSize, bool aCompressed = false);
     explicit PixelData(const GfxResource &arResource);
 
     PixelData(const PixelData& arOther);
@@ -45,16 +48,16 @@ public:
     PixelData& operator=(const PixelData& arOther);
     PixelData& operator=(PixelData&& arOther) noexcept;
 
-    PixelData& CopyFrom(const Point &arDestination, const PixelData &arOther, const Rect &arSourceRect, Color aColor);
+    PixelData& CopyFrom(const Point &arDestination, const PixelData &arOther, const Rect &arSourceRect, const Color& arColor);
 
-    [[nodiscard]] PixelData ChangeColorDepth(ColorDepth aDepth, Color aColor = Color::Black) const;
+    [[nodiscard]] PixelData ChangeColorDepth(ColorDepth aDepth, const Color& arColor = Color::Black) const;
 
     PixelData& Init(uint32_t aId, GuiUnit_t aWidth, GuiUnit_t aHeight, ColorDepth aDepth, const uint8_t *apData);
 
-    void Fill(Color aColor);
+    void Fill(const Color& arColor);
 
     /**
-     * \brief Adjust alpha channel on all pixels with the given value.
+     * \brief Adjust the alpha channel on all pixels with the given value.
      * \param aAlphaInc
      * \param aFixed Set to set the alpha values to the given value, clear to add.
      * \return self
@@ -78,21 +81,21 @@ public:
     [[nodiscard]] bool IsHit(const Point &arPoint) const { return mRect.IsHit(arPoint); }
 
     /**
-     * \brief Get the color value for the pixel at given position
+     * \brief Get the color value for the pixel at the given position
      *
      * Monochrome and Alpha depths change the alpha channel on the given color.
      * RGB depth uses the alpha channel from the given color.
      *
      * \param aX
      * \param aY
-     * \param aColor
+     * \param arColor
      * \return Color
      */
     [[nodiscard]] Color GetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color& arColor = Color::Black) const;
-    [[nodiscard]] Color GetPixel(const Point &arPoint, Color aColor = Color::Black) const { return GetPixelAt(arPoint.mX, arPoint.mY, aColor); }
+    [[nodiscard]] Color GetPixel(const Point &arPoint, const Color& arColor = Color::Black) const { return GetPixelAt(arPoint.mX, arPoint.mY, arColor); }
 
-    PixelData& SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, Color aColor);
-    PixelData& SetPixel(const Point &arPoint, Color aColor) { return SetPixelAt(arPoint.mX, arPoint.mY, aColor); }
+    PixelData& SetPixelAt(GuiUnit_t aX, GuiUnit_t aY, const Color& arColor);
+    PixelData& SetPixel(const Point &arPoint, const Color& arColor) { return SetPixelAt(arPoint.mX, arPoint.mY, arColor); }
 
     void SaveToCFile(const std::filesystem::path &arFileName, bool aCompress = false, const char *apHeaderFile = nullptr) const;
 

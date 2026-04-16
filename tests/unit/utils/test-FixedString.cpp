@@ -20,11 +20,11 @@ TEST_CASE("Fixed String")
     const char *p = "Hello World";
     FixedString<10> fs;
 
-    CHECK_EQ(sizeof(fs), 10 + 1);
-    CHECK_EQ(fs.size(), 0);
+    CHECK_EQ(sizeof(fs), 10u + 1u);
+    CHECK_EQ(fs.size(), 0u);
 
     fs = p;
-    CHECK_EQ(fs.size(), 10);
+    CHECK_EQ(fs.size(), 10u);
     CHECK_EQ(fs, "Hello Worl");
 
     CHECK_NE(fs, std::string(p));

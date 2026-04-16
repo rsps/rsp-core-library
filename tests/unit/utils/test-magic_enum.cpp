@@ -46,12 +46,12 @@ TEST_CASE("magic_enum")
         constexpr auto count = magic_enum::enum_count<States>();
 
         // This will only compile if 'count' is truly constexpr
-        static_assert(count == 3);
+        static_assert(count == 3u);
 
         // Array sized by constexpr - proves it works at compile time
         std::array<int, count> arr{};
-        CHECK_EQ(count, 3);
-        CHECK_EQ(arr.size(), 3);
+        CHECK_EQ(count, 3u);
+        CHECK_EQ(arr.size(), 3u);
 
         constexpr auto value = States::One;
         constexpr auto name = magic_enum::enum_name(value);

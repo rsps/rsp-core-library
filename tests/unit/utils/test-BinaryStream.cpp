@@ -41,7 +41,7 @@ TEST_CASE("BinaryStream") {
         StructElement<DateTime> se_dt(now);
         StructElement<int> se_null;
         StructElement<float> f1 = 1.234567f;
-        CHECK_NOTHROW(ss << s1 << uint16_t(46222) << true << false << s2 << sz << se_str << se_dt << se_null << f1);
+        CHECK_NOTHROW(ss << s1 << static_cast<uint16_t>(46222) << true << false << s2 << sz << se_str << se_dt << se_null << f1);
     }
 
     SUBCASE("Read") {
@@ -58,11 +58,11 @@ TEST_CASE("BinaryStream") {
         StructElement<float> f1;
         CHECK_NOTHROW(ss >> s1 >> u16 >> b1 >> b2 >> s2 >> sz >> se_str >> se_dt >> se_null >> f1);
         CHECK_EQ(s1, std::string("This is a string."));
-        CHECK_EQ(u16, uint16_t(46222));
+        CHECK_EQ(u16, 46222u);
         CHECK(b1);
         CHECK_FALSE(b2);
-        CHECK_EQ(s2.size(), 128);
-        CHECK_EQ(sz, 46922);
+        CHECK_EQ(s2.size(), 128u);
+        CHECK_EQ(sz, 46922u);
         CHECK_FALSE(se_str.IsNull());
         CHECK_FALSE(se_dt.IsNull());
         CHECK(se_null.IsNull());
@@ -97,7 +97,7 @@ TEST_CASE("BinaryStream") {
         CHECK_EQ(dt, now);
         CHECK_EQ(ms.count(), 113);
         CHECK_EQ(s1, s2);
-        CHECK_EQ(bs.Get().str().size(), 305);
+        CHECK_EQ(bs.Get().str().size(), 305u);
     }
 }
 

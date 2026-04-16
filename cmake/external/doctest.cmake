@@ -8,7 +8,7 @@ include_guard(GLOBAL)
 # Debug
 message(VERBOSE "Installing Doctest")
 
-set(DOCTEST_VERSION "2.4.11")
+set(DOCTEST_VERSION "2.5.2")
 
 # NOTE: This can yield a strange DEPRECATION WARNING, which has yet to be resolved by the provider!
 # @see https://github.com/doctest/doctest/issues/893
@@ -16,7 +16,7 @@ set(DOCTEST_VERSION "2.4.11")
 
 CPMAddPackage(
     NAME "DocTest"
-    GITHUB_REPOSITORY "onqtam/doctest"
+    GITHUB_REPOSITORY "doctest/doctest"
     GIT_TAG "v${DOCTEST_VERSION}"
     # VERSION "${DOCTEST_VERSION}"
 )
