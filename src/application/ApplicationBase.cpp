@@ -98,7 +98,7 @@ void ApplicationBase::showHelp()
 
 void ApplicationBase::showVersion()
 {
-    Console::Info() << "Library version: " << get_library_version();
+    Console::Info() << "Library version: " << get_library_version().ToString();
 }
 
 void ApplicationBase::installLogWriters()
