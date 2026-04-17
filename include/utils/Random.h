@@ -18,19 +18,20 @@ namespace rsp::utils {
 class Random
 {
 public:
-    static void Seed(unsigned int aSeed)
+    template<typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
+    static void Seed(const T aSeed)
     {
-        Generator().seed(aSeed);
+        Generator().seed(static_cast<std::default_random_engine::result_type>(aSeed));
     }
 
-    template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+    template<typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
     static T Roll(T aMin, T aMax)
     {
         std::uniform_int_distribution<T> distribution(aMin, aMax);
         return distribution(Generator());
     }
 
-    template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
     static T Roll(T aMin, T aMax)
     {
         std::uniform_real_distribution<T> distribution(aMin, aMax);
