@@ -12,11 +12,10 @@
 
 namespace rsp {
 
-utils::VersionNumber get_library_version()
+utils::semver::Version get_library_version()
 {
-    static constexpr auto version = utils::VersionNumber::Parse(LIB_VERSION);
+    static constexpr auto version = utils::semver::Version::Parse(LIB_VERSION);
     return version;
 }
 
-}
-
+} // namespace rsp

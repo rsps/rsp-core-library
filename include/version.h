@@ -10,13 +10,13 @@
 #ifndef RSP_CORE_LIB_VERSION_H
 #define RSP_CORE_LIB_VERSION_H
 
-#include <utils/VersionNumber.h>
+#include <utils/SemVer.h>
 
 #define LIB_VERSION "0.1.0"
 
 namespace rsp {
 
-utils::VersionNumber get_library_version();
+utils::semver::Version get_library_version();
 
 }
 
