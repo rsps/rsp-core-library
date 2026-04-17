@@ -1,0 +1,86 @@
+---
+Language: Cpp
+BasedOnStyle: LLVM
+
+# --- Indentation ---
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+AccessModifierOffset: -4
+IndentCaseLabels: true
+NamespaceIndentation: None
+ContinuationIndentWidth: 8
+
+# --- Column limit ---
+ColumnLimit: 0
+
+# --- Braces ---
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: false
+  AfterClass: true
+  AfterControlStatement: Never
+  AfterEnum: false
+  AfterFunction: true
+  AfterNamespace: false
+  AfterStruct: true
+  AfterUnion: true
+  AfterExternBlock: false
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: false
+  BeforeWhile: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+# --- Pointer/Reference alignment ---
+PointerAlignment: Left
+DerivePointerAlignment: false
+
+# --- Short forms ---
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortBlocksOnASingleLine: Empty
+AllowShortEnumsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: false
+AllowShortLambdasOnASingleLine: All
+AllowShortCaseLabelsOnASingleLine: false
+
+# --- Constructor initializers ---
+BreakConstructorInitializers: BeforeComma #BeforeColon
+ConstructorInitializerIndentWidth: 4
+PackConstructorInitializers: NextLine
+
+# --- Arguments/Parameters ---
+AlignAfterOpenBracket: false
+BinPackArguments: true
+BinPackParameters: true
+
+# --- Spaces ---
+SpaceBeforeParens: ControlStatements
+SpaceAfterCStyleCast: false
+SpaceAfterTemplateKeyword: true
+Cpp11BracedListStyle: true
+SpaceAfterLogicalNot: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+
+# --- Includes ---
+SortIncludes: Never
+
+# --- Line breaks ---
+InsertNewlineAtEOF: true
+MaxEmptyLinesToKeep: 2
+
+# --- Misc ---
+BreakBeforeBinaryOperators: NonAssignment
+FixNamespaceComments: true
+EmptyLineBeforeAccessModifier: LogicalBlock
+EmptyLineAfterAccessModifier: Never
+Standard: c++20
+
+AttributeMacros:
+  - SUBCASE
