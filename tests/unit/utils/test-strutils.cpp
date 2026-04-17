@@ -13,15 +13,16 @@
 #include <utils/StrUtils.h>
 
 using namespace rsp::utils;
+using namespace std::string_literals;
 
 TEST_SUITE_BEGIN("Utils");
 
 TEST_CASE("StrUtils") {
-    CHECK(StrUtils::GetHomeDir() != "");
+    CHECK_NE(StrUtils::GetHomeDir(), ""s);
 
-    CHECK(StrUtils::GetConfigDir() != "");
+    CHECK_NE(StrUtils::GetConfigDir(), ""s);
 
-    CHECK(StrUtils::EndsWith("[2020-02-23 09:33:48] (6) Test of logger", "Test of logger"));
+    CHECK(StrUtils::EndsWith("[2020-02-23 09:33:48] (6) Test of logger", "Test of logger"s));
 
     CHECK(StrUtils::StartsWith("Hello World", "Hello"));
 
@@ -32,18 +33,10 @@ TEST_CASE("StrUtils") {
     StrUtils::ReplaceAll(s, "llo", "ll of a");
     CHECK_EQ(s, "Hell of a World");
 
-//    std::chrono::system_clock::time_point tp;
-//    CHECK(StrUtils::TimeStamp(tp) == "1970-01-01 00:00:00.000");
-//
-//    // The following should fail if time was set since startup
-//    CHECK(StrUtils::TimeStamp(std::chrono::steady_clock::now()) == StrUtils::TimeStamp(std::chrono::system_clock::now()));
-//
-//    CHECK(StrUtils::TimeStamp(std::chrono::milliseconds(0)) == "1970-01-01 00:00:00.000");
-
-    CHECK(StrUtils::Format("%02d-%4.4s", 8, "Long Sentence") == "08-Long");
+    CHECK_EQ(StrUtils::Format("%02d-%4.4s", 8, "Long Sentence"), "08-Long");
 
     std::string str("From String");
-    CHECK(StrUtils::Format("%02d-%8.8s", 10, str.c_str()) == "10-From Str");
+    CHECK_EQ(StrUtils::Format("%02d-%8.8s", 10, str.c_str()), "10-From Str");
 
     CHECK_EQ(StrUtils::ToDouble("123.123456789"), 123.123456789);
     CHECK_THROWS_AS(StrUtils::ToDouble("banana123.123456789"), const rsp::exceptions::DecimalConversionError&);
