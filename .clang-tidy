@@ -131,6 +131,7 @@ readability-inconsistent-declaration-parameter-name,
 readability-make-member-function-const,
 readability-misleading-indentation,
 readability-misplaced-array-index,
+readability-named-parameter,
 readability-non-const-parameter,
 readability-redundant-control-flow,
 readability-redundant-declaration,
@@ -162,3 +163,7 @@ CheckOptions:
   - { key: readability-identifier-naming.GlobalVariablePrefix,   value: g         }
   - { key: readability-identifier-naming.GlobalConstantPrefix,   value: gc        }
   - { key: readability-identifier-naming.ConstantPrefix,         value: c         }
+  - { key: readability-identifier-naming.ParameterPrefix,        value: a         }
+  - { key: readability-identifier-naming.PointerParameterPrefix, value: ap        }
+  - { key: readability-identifier-naming.ConstantParameterPrefix,value: a         }
+  - { key: readability-identifier-naming.ConstantPointerParameterPrefix, value: ap }
