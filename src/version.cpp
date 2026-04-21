@@ -14,7 +14,7 @@ namespace rsp {
 
 utils::semver::Version get_library_version()
 {
-    static constexpr auto version = utils::semver::Version::Parse(LIB_VERSION);
+    static constexpr auto version = utils::semver::Version{LIB_VERSION};
     return version;
 }
 
