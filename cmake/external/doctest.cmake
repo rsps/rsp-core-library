@@ -12,12 +12,6 @@ CPMAddPackage(
 )
 
 if(doctest_ADDED)
-    # Set include dir property because doctest::doctest doesn't export it?
-    target_include_directories(doctest
-        INTERFACE
-            $<BUILD_INTERFACE:${doctest_SOURCE_DIR}/doctest>
-    )
-
     # For doctest_discover_tests()
     include("${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake")
 endif()
