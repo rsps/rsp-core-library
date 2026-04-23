@@ -15,6 +15,7 @@
 #include <memory>
 #include <vector>
 #include <codecvt>
+#include <locale>
 
 namespace rsp::graphics {
 
