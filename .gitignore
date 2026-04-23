@@ -12,20 +12,11 @@ _deps
 /ext-libs/*
 !/ext-libs/.gitkeep
 
+# User-specific CMake configure options
+CMakeUserPresets.json
+
 /build/
 !build/.gitkeep
-
-#Vs Code project files
-.vscode/*
-#Following can be shared if other people also work in vs code
-.vscode/settings.json
-.vscode/tasks.json
-.vscode/launch.json
-.vscode/extensions.json
-*.code-workspace
-
-# Local History for Visual Studio Code
-.history/
 
 # Eclipse project files
 /.settings/

@@ -33,15 +33,14 @@ sudo update-alternatives --config gcc
 
 ## Build and tests
 
-To build the library and accompanied test, go into the build directory and run `cmake ..`:
+To build the library (and possibly accompanying tests), simply run `cmake` as follows:
 
 ```sh
-cd build
-cmake ..
-make
+cmake --preset debug|release|debug-with-tests|release-with-tests
+cmake --build --preset debug|release|debug-with-tests|release-with-tests
 ```
 
-Tests can now be executed with `./rsp-core-lib-test` or just `ctest`
+Tests can now be executed with `./rsp-core-lib-test` or `ctest --preset debug-with-tests|release-with-tests`
 
 ## wpa_supplicant tests
 To run the wpa_supplicant tests, the /etc/wpa_supplicant/wpa_supplicant.conf file must be present and contain the following:
