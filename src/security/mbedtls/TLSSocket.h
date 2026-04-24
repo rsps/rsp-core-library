@@ -12,11 +12,8 @@
 
 #include "exceptions.h"
 #include <logging/LogChannel.h>
-#include <optional>
-#include <posix/Socket.h>
 #include <security/ITLSSocket.h>
 #include <span>
-#include <string_view>
 
 #ifdef __GNUC__
     #pragma GCC diagnostic push
@@ -75,7 +72,6 @@ protected:
         ~tlsRandom() { mbedtls_ctr_drbg_free(this); }
    };
 
-    std::optional<std::reference_wrapper<posix::Socket>> mrSocket{};
     tlsNet mNet{};
     tlsEntropy mEntropy{};
     tlsSSL mSsl{};

@@ -13,11 +13,6 @@
 
 namespace rsp::security {
 
-std::shared_ptr<ITLSSocket> ITLSSocket::Create(const network::ConnectionOptions& arOptions)
-{
-    return std::make_shared<TLSSocket>(arOptions);
-}
-
 TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
     : mrOptions(arOptions)
 {
