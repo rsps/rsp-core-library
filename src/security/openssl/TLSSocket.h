@@ -28,7 +28,7 @@ namespace rsp::security {
 class TLSSocket : public ITLSSocket
 {
 public:
-    explicit TLSSocket(network::ConnectionOptions& arOptions);
+    explicit TLSSocket(const network::ConnectionOptions& arOptions);
     ~TLSSocket() override;
 
     TLSSocket& SetSocket(posix::Socket &arSocket) override;
@@ -48,7 +48,7 @@ protected:
     using TLS_Context = std::unique_ptr<SSL_CTX, ContextDeleter>;
     using TLS_Connection = std::unique_ptr<SSL, ConnectionDeleter>;
 
-    network::ConnectionOptions& mrOptions;
+    network::ConnectionOptions mrOptions;
     TLS_Context mpContext{};
     TLS_Connection mpSSL{};
     int mFd = -1;

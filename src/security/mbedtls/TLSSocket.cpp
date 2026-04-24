@@ -16,7 +16,7 @@ using namespace rsp::network;
 
 namespace rsp::security {
 
-std::shared_ptr<ITLSSocket> ITLSSocket::Create(network::ConnectionOptions& arOptions)
+std::shared_ptr<ITLSSocket> ITLSSocket::Create(const network::ConnectionOptions& arOptions)
 {
     return std::make_shared<TLSSocket>(arOptions);
 }
@@ -28,7 +28,7 @@ TLSSocket::tlsRandom::tlsRandom(tlsEntropy& arEntropy, const security::SecureBuf
     CHK_0(mbedtls_ctr_drbg_seed(this, mbedtls_entropy_func, &arEntropy, arNonce.data(), arNonce.size()))
 }
 
-TLSSocket::TLSSocket(network::ConnectionOptions& arOptions)
+TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
     : NamedLogChannel("MbedTLS-TLSSocket"),
       mRandom(mEntropy, arOptions.Nonce)
 {

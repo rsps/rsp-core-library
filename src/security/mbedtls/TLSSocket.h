@@ -37,7 +37,7 @@ namespace rsp::security {
 class TLSSocket : public ITLSSocket, public logging::NamedLogChannel
 {
 public:
-    explicit TLSSocket(network::ConnectionOptions& arOptions);
+    explicit TLSSocket(const network::ConnectionOptions& arOptions);
 
     TLSSocket& SetSocket(posix::Socket &arSocket) override;
     TLSSocket& Close() override;

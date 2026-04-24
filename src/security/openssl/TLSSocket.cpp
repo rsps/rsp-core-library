@@ -13,12 +13,12 @@
 
 namespace rsp::security {
 
-std::shared_ptr<ITLSSocket> ITLSSocket::Create(network::ConnectionOptions& arOptions)
+std::shared_ptr<ITLSSocket> ITLSSocket::Create(const network::ConnectionOptions& arOptions)
 {
     return std::make_shared<TLSSocket>(arOptions);
 }
 
-TLSSocket::TLSSocket(network::ConnectionOptions& arOptions)
+TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
     : mrOptions(arOptions)
 {
     OpenSSL_add_all_algorithms();
