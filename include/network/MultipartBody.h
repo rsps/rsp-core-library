@@ -76,12 +76,12 @@ protected:
         std::string mHeaders{};
         HttpBody_t mpBody{};
 
-        size_t mReadIndex = 0;
+        mutable size_t mReadIndex = 0;
     };
 
     std::vector<MultipartPart_t> mParts{};
     MultipartBoundary mBoundary{};
-    size_t mReadPartIndex = 0;
+    mutable size_t mReadPartIndex = 0;
 };
 
 } // rsp::network

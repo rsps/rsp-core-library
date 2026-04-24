@@ -31,7 +31,7 @@ size_t MultipartBody::Read(std::span<std::byte> aBuffer) const
 
     size_t result = 0;
     while (result == 0 && mReadPartIndex < mParts.size()) {
-        auto& [mHeaders, mpBody, mReadIndex] = const_cast<MultipartPart_t&>(mParts.at(mReadPartIndex));
+        auto&& [mHeaders, mpBody, mReadIndex] = mParts.at(mReadPartIndex);
         if (mReadIndex < mHeaders.size()) {
             result = std::min(mHeaders.size(), aBuffer.size());
             std::memcpy(aBuffer.data(), mHeaders.data() + mReadIndex, result);
@@ -40,11 +40,11 @@ size_t MultipartBody::Read(std::span<std::byte> aBuffer) const
         else if (mpBody) {
             result = mpBody->Read(aBuffer);
             if (result == 0) {
-                const_cast<MultipartBody*>(this)->mReadPartIndex++;
+                mReadPartIndex++;
             }
         }
         else {
-            const_cast<MultipartBody*>(this)->mReadPartIndex++;
+            mReadPartIndex++;
         }
     }
 
@@ -54,7 +54,7 @@ size_t MultipartBody::Read(std::span<std::byte> aBuffer) const
         ASSERT(end.size() <= aBuffer.size());
         result = end.size();
         std::memcpy(aBuffer.data(), end.data(), result);
-        const_cast<MultipartBody*>(this)->mReadPartIndex++;
+        mReadPartIndex++;
     }
 
     return result;
