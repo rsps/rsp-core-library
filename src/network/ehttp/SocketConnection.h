@@ -35,8 +35,6 @@ protected:
     ConnectionOptions mOptions{};
     posix::Socket mSocket{};
     std::shared_ptr<security::ITLSSocket> mpTls{};
-
-    void destroy();
 };
 
 } // rsp::network::ehttp
