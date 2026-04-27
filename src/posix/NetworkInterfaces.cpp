@@ -16,7 +16,6 @@
     #include <unistd.h>
     #include <ifaddrs.h>
     #include <linux/wireless.h>
-    // #include <sys/ioctl.h>
     #include <sys/socket.h>
 #elif defined(ESP_PLATFORM)
     #include <esp_netif.h>
