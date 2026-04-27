@@ -191,7 +191,7 @@ public:
      *
      * \return True if glyphs need to be reloaded.
      */
-    [[nodiscard]] bool IsDirty() const { return mDirty | mFont.IsDirty(); }
+    [[nodiscard]] bool IsDirty() const { return mDirty || mFont.IsDirty(); }
 
     /**
      * Get the minimum bounding rectangle containing all the glyphs.
