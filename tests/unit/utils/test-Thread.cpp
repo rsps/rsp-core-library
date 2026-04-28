@@ -14,6 +14,10 @@
 #include <rsp/utils/ThreadList.h>
 #include <TestHelpers.h>
 
+#include <atomic>
+#include <format>
+#include <thread>
+
 using namespace rsp::utils;
 
 TEST_SUITE_BEGIN("Utils");
@@ -33,13 +37,15 @@ TEST_CASE("Threads")
     CHECK_EQ(ThreadList::GetInstance().GetThreadNames()[0], "MyThread");
     CHECK_NOTHROW(thread_list.GetThreadByName("MyThread"));
 
-    SUBCASE("Idle Run") {
+    SUBCASE("Idle Run")
+    {
         CHECK_NOTHROW(t.Start());
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
         CHECK_NOTHROW(t.Stop());
     }
 
-    SUBCASE("Execute") {
+    SUBCASE("Execute")
+    {
         int count = 0;
         t.SetExecute([&]() noexcept {
             count++;
@@ -51,7 +57,8 @@ TEST_CASE("Threads")
         CHECK_GT(count, 10);
     }
 
-    SUBCASE("Throw") {
+    SUBCASE("Throw")
+    {
         t.SetExecute([&]() {
             throw std::runtime_error("Oh no!");
         });
@@ -60,7 +67,8 @@ TEST_CASE("Threads")
         CHECK_THROWS_AS(t.Stop(), std::runtime_error);
     }
 
-    SUBCASE("Throw NoName") {
+    SUBCASE("Throw NoName")
+    {
         CHECK_NE(t.GetName(), "");
 
         t.SetExecute([&]() {
@@ -73,12 +81,48 @@ TEST_CASE("Threads")
             t.Stop();
             FAIL("No exception was thrown");
         }
-        catch(const std::runtime_error &e) {
+        catch (const std::runtime_error& e) {
             CHECK(StrUtils::StartsWith(e.what(), "Exception thrown in thread '"));
         }
-        catch(...) {
+        catch (...) {
             FAIL("Wrong exception was thrown");
         }
+    }
+
+    SUBCASE("Many Threads")
+    {
+        std::size_t num_threads_initial = ThreadList::GetInstance().GetThreadNames().size();
+
+        // Stress-test Thread/ThreadList by concurrently adding and removing
+        // threads from multiple threads.
+        constexpr std::size_t num_workers = 8;
+        constexpr std::size_t num_iterations = 100;
+        std::atomic<bool> go{false};
+        std::vector<std::jthread> workers;
+
+        for (std::size_t i = 0; i < num_workers; ++i) {
+            workers.emplace_back([&, i]() {
+                // Spin until all workers until "go" so they start ~simultaneously
+                while (!go.load(std::memory_order_acquire)) {
+                    ;
+                }
+
+                for (std::size_t j = 0; j < num_iterations; ++j) {
+                    Thread thrd{std::format("Thread #{}.{}", i, j)};                          // ctor adds thrd to ThreadList
+                    [[maybe_unused]] auto names = ThreadList::GetInstance().GetThreadNames(); // force a read
+                    // thrd's dtor removes it from ThreadList
+                }
+            });
+        }
+
+        // Unleash all workers
+        go.store(true, std::memory_order_release);
+
+        for (auto& w : workers) {
+            w.join();
+        }
+
+        CHECK_EQ(ThreadList::GetInstance().GetThreadNames().size(), num_threads_initial);
     }
 }
 
