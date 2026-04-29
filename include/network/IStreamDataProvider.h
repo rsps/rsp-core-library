@@ -90,9 +90,9 @@ public:
     }
 };
 
-inline std::ostream& operator<<(std::ostream& o, IStreamDataProvider &arStream)
+inline std::ostream& operator<<(std::ostream& o, const IStreamDataProvider &arStream)
 {
-    arStream.Rewind();
+    const_cast<IStreamDataProvider&>(arStream).Rewind();
     return arStream.PrintContent(o);
 }
 
