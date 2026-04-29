@@ -8,17 +8,14 @@
  * \author      Steffen Brummer
  */
 
-#include <sstream>
 #include <version.h>
-
-using namespace std;
 
 namespace rsp {
 
-string get_library_version()
+utils::semver::Version get_library_version()
 {
-    return LIB_VERSION;
+    static constexpr auto version = utils::semver::Version{LIB_VERSION};
+    return version;
 }
 
-}
-
+} // namespace rsp
