@@ -77,30 +77,6 @@ bool NetworkInterfaces::isWireless(const std::string& arInterfaceName)
 #ifdef __linux__
     const auto path = std::format("/sys/class/net/{}/wireless", arInterfaceName);
     return ( access( path.c_str(), F_OK ) != -1 );
-
-//     bool result = false;
-//     int sock;
-//     struct iwreq ptr_wrq{};
-//     std::memset(&ptr_wrq, 0, sizeof(ptr_wrq));
-//     std::strncpy(ptr_wrq.ifr_name, arInterfaceName.c_str(), IFNAMSIZ);
-//
-//     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-//         THROW_SYSTEM("socket failed");
-//     }
-//
-//     const auto ret = ioctl(sock, SIOCGIWNAME, &ptr_wrq);
-//     if (ret != -1) {
-// //        char protocol[IFNAMSIZ] = { 0 };
-// //        std::strncpy(protocol, pwrq.u.name, IFNAMSIZ);
-// //        mLogger.Debug() << "Interface " << arInterfaceName << " is wireless, protocol " << std::string(protocol);
-//         result = true;
-//     }
-//     else {
-//         mLogger.Debug() << "Interface " << arInterfaceName << " is not wireless: " << strerror(errno);
-//     }
-//
-//     close(sock);
-//     return result;
 #endif
 }
 
