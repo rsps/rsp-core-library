@@ -9,7 +9,6 @@
  */
 
 #include <graphics/Control.h>
-#include <logging/Logger.h>
 #include <graphics/GfxEvents.h>
 
 using namespace rsp::logging;
@@ -19,12 +18,12 @@ namespace rsp::graphics
 
 Color Control::mTouchAreaColor = Color::None;
 
-std::string to_string(Control::States aState)
+std::string to_string(const Control::States aState)
 {
     return std::string(magic_enum::enum_name<Control::States>(aState));
 }
 
-std::ostream& operator <<(std::ostream &os, Control::States aState)
+std::ostream& operator <<(std::ostream &os, const Control::States aState)
 {
     os << to_string(aState);
     return os;
@@ -43,7 +42,7 @@ void Control::setName(const std::string &arName)
     Invalidate();
 }
 
-void Control::setId(uint32_t aId)
+void Control::setId(const uint32_t aId)
 {
     TypeInfo::setId(aId);
     Invalidate();
@@ -63,13 +62,13 @@ Control::States Control::GetState() const
         }
     }
     if (mChecked) {
-        result = States(uint32_t(result) + uint32_t(States::CheckedDisabled));
+        result = static_cast<States>(static_cast<uint32_t>(result) + static_cast<uint32_t>(States::CheckedDisabled));
     }
 
     return result;
 }
 
-void Control::Invalidate() // NOLINT
+void Control::Invalidate()
 {
     if (!mDirty) {
         mDirty = true;
@@ -84,33 +83,30 @@ Control& Control::SetArea(Rect aRect)
     if (mpParent) {
         aRect.MoveTo(aRect.GetTopLeft() + mpParent->GetOrigin());
     }
-    if (mArea != aRect) {
-        Point difference = aRect.GetTopLeft() - mArea.GetTopLeft();
-        if (difference != Point()) {
-            for (auto &style : mStyles) {
-                for (TexturePtr_t &texture : style.mTextures) {
-                    texture->SetDestination(texture->GetDestination() + difference);
-                }
+    if (mArea == aRect) {
+        return *this;
+    }
+    const Point difference = aRect.GetTopLeft() - mArea.GetTopLeft();
+    if (difference != Point()) {
+        for (const auto &style : mStyles) {
+            for (const TexturePtr_t &texture : style.mTextures) {
+                texture->SetDestination(texture->GetDestination() + difference);
             }
         }
-        for (Control *child : mChildren) {
-            child->SetOrigin((child->GetOrigin() - mArea.GetTopLeft()) + aRect.GetTopLeft());
-        }
-        mArea = aRect;
-        if (mpParent) {
-            // Force repaint of parent, this is resizing
-            mpParent->Invalidate();
-        }
-        else {
-            Invalidate();
-        }
-        doSetArea(aRect, difference);
     }
+    for (Control *child : mChildren) {
+        child->SetOrigin((child->GetOrigin() - mArea.GetTopLeft()) + aRect.GetTopLeft());
+    }
+    mArea = aRect;
+    if (mpParent) {
+        // Force repaint of parent, this is resizing
+        mpParent->Invalidate();
+    }
+    else {
+        Invalidate();
+    }
+    doSetArea(aRect, difference);
     return *this;
-}
-
-void Control::doSetArea(const Rect &/*arRect*/, const Point &/*arOriginDifference*/)
-{
 }
 
 Rect Control::GetArea() const
@@ -146,7 +142,7 @@ Control& Control::ExpandToParent()
     return *this;
 }
 
-Control& Control::SetOrigin(const Point &arPoint) // NOLINT
+Control& Control::SetOrigin(const Point &arPoint)
 {
     Point difference = arPoint - mArea.GetTopLeft();
     if (difference == Point()) {
@@ -155,8 +151,8 @@ Control& Control::SetOrigin(const Point &arPoint) // NOLINT
 
     mArea.MoveTo(arPoint);
     mTouchArea.MoveTo(mTouchArea.GetTopLeft() + difference);
-    for (auto &style : mStyles) {
-        for (TexturePtr_t &texture : style.mTextures) {
+    for (const auto &style : mStyles) {
+        for (const TexturePtr_t &texture : style.mTextures) {
             texture->SetDestination(texture->GetDestination() + difference);
         }
     }
@@ -196,7 +192,7 @@ Control& Control::AddChild(Control *apChild)
         return *this;
     }
     if (apChild->mpParent) {
-        apChild->mpParent->RemoveChild(apChild); // Remove from other parent
+        apChild->mpParent->RemoveChild(apChild); // Remove the child from its old parent
     }
 
     mChildren.push_back(apChild);
@@ -210,8 +206,7 @@ Control& Control::AddChild(Control *apChild)
 Control& Control::RemoveChild(Control *apChild)
 {
     if (apChild) {
-        auto it = std::find(mChildren.begin(), mChildren.end(), apChild);
-        if (it != mChildren.end()) {
+        if (const auto it = std::ranges::find(mChildren, apChild) ; it != mChildren.end()) {
             apChild->mpParent = nullptr;
             mChildren.erase(it);
             Invalidate();
@@ -222,8 +217,8 @@ Control& Control::RemoveChild(Control *apChild)
 
 Control& Control::SetTexturePosition(const Point &arPoint)
 {
-    for (auto &style : mStyles) {
-        for (TexturePtr_t &texture : style.mTextures) {
+    for (const auto &style : mStyles) {
+        for (const TexturePtr_t &texture : style.mTextures) {
             texture->SetDestination(arPoint);
         }
     }
@@ -231,7 +226,7 @@ Control& Control::SetTexturePosition(const Point &arPoint)
     return *this;
 }
 
-bool Control::UpdateData()// NOLINT
+bool Control::UpdateData()
 {
     bool result = false;
     refresh();
@@ -248,12 +243,13 @@ bool Control::UpdateData()// NOLINT
     return result;
 }
 
-void Control::Render(Renderer &arRenderer) const // NOLINT
+void Control::Render(Renderer &arRenderer) const
 {
     if (!mVisible) {
         return;
     }
 
+//opt/clion-2023.2.2/bin/clang/linux/x64/bin/clang-tidy -checks='cppcoreguidelines-*' src/graphics/Control.cpp -- -Iinclude/ -Ibuild/_deps/magic_enum-src/include -I/usr/include -I/usr/lib/gcc/x86_64-linux-gnu/14/include -I/usr/local/include -std=c++23
     auto &style = mStyles[GetState()];
 
     if (!mTransparent) {
@@ -266,11 +262,9 @@ void Control::Render(Renderer &arRenderer) const // NOLINT
         arRenderer.Blit(*texture);
     }
 
-    if (!render(arRenderer)) {
-        if (!mChildren.empty()) {
-            for (Control *child : mChildren) {
-                child->Render(arRenderer);
-            }
+    if (!render(arRenderer) && !mChildren.empty()) {
+        for (const Control *child : mChildren) {
+            child->Render(arRenderer);
         }
     }
 
@@ -283,7 +277,7 @@ void Control::Render(Renderer &arRenderer) const // NOLINT
     }
 }
 
-Control& Control::SetDraggable(bool aValue)
+Control& Control::SetDraggable(const bool aValue)
 {
     if (mDraggable != aValue) {
         mDraggable = aValue;
@@ -292,7 +286,7 @@ Control& Control::SetDraggable(bool aValue)
     return *this;
 }
 
-Control& Control::SetCheckable(bool aValue)
+Control& Control::SetCheckable(const bool aValue)
 {
     if (mCheckable != aValue) {
         mCheckable = aValue;
@@ -301,7 +295,7 @@ Control& Control::SetCheckable(bool aValue)
     return *this;
 }
 
-Control& Control::SetChecked(bool aValue)
+Control& Control::SetChecked(const bool aValue)
 {
     if (mChecked != aValue) {
         mChecked = aValue;
@@ -310,7 +304,7 @@ Control& Control::SetChecked(bool aValue)
     return *this;
 }
 
-Control& Control::SetVisible(bool aVisible)
+Control& Control::SetVisible(const bool aVisible)
 {
     if (mVisible != aVisible) {
         mVisible = aVisible;
@@ -319,7 +313,7 @@ Control& Control::SetVisible(bool aVisible)
     return *this;
 }
 
-Control& Control::SetEnable(bool aEnable) // NOLINT
+Control& Control::SetEnable(const bool aEnable)
 {
     if (mEnabled != aEnable) {
         mEnabled = aEnable;
@@ -331,7 +325,7 @@ Control& Control::SetEnable(bool aEnable) // NOLINT
     return *this;
 }
 
-Control& Control::SetTransparent(bool aValue)
+Control& Control::SetTransparent(const bool aValue)
 {
     if (mTransparent != aValue) {
         mTransparent = aValue;
@@ -340,18 +334,22 @@ Control& Control::SetTransparent(bool aValue)
     return *this;
 }
 
-bool Control::handleTouchEvent(rsp::messaging::Event &arEvent) // NOLINT
+bool Control::processChildren(messaging::Event &arEvent) const
 {
-    auto &touch = arEvent.CastTo<TouchEvent>();
+    for (Control *child : mChildren) {
+        if (child->ProcessEvent(arEvent)) {
+            return true;
+        }
+    }
+    return false;
+}
 
-    switch (touch.mType) {
+bool Control::handleTouchEvent(messaging::Event &arEvent)
+{
+    switch (auto &touch = arEvent.CastTo<TouchEvent>() ; touch.mType) {
         case TouchTypes::Press:
-            if (mArea.IsHit(touch.mCurrent)) {
-                for (Control *child : mChildren) {
-                    if (child->ProcessEvent(arEvent)) {
-                        return true;
-                    }
-                }
+            if (mArea.IsHit(touch.mCurrent) && processChildren(arEvent)) {
+                return true;
             }
             if (mTouchArea.IsHit(touch.mCurrent)) {
                 return doPress(touch);
@@ -359,19 +357,12 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent) // NOLINT
             break;
 
         case TouchTypes::Lift:
-            if (mArea.IsHit(touch.mPress)) {
-                for (Control *child : mChildren) {
-                    if (child->ProcessEvent(arEvent)) {
-                        return true;
-                    }
-                }
+            if (mArea.IsHit(touch.mPress) && processChildren(arEvent)) {
+                return true;
             }
             if (mTouchArea.IsHit(touch.mPress)) {
-                bool result = doLift(touch);
+                const bool result = doLift(touch);
                 if (mTouchArea.IsHit(touch.mCurrent)) {
-                    if (IsCheckable()) {
-                        SetChecked(!IsChecked());
-                    }
                     mLogger.Debug() << GetName() << " was clicked by " << touch;
                     doClick(touch);
                 }
@@ -380,12 +371,8 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent) // NOLINT
             break;
 
         case TouchTypes::Drag:
-            if (mArea.IsHit(touch.mPress)) {
-                for (Control *child : mChildren) {
-                    if (child->ProcessEvent(arEvent)) {
-                        return true;
-                    }
-                }
+            if (mArea.IsHit(touch.mPress) && processChildren(arEvent)) {
+                return true;
             }
             if (mTouchArea.IsHit(touch.mPress)) {
                 if (IsDraggable()) {
@@ -401,9 +388,9 @@ bool Control::handleTouchEvent(rsp::messaging::Event &arEvent) // NOLINT
     return false;
 }
 
-bool Control::ProcessEvent(rsp::messaging::Event &arEvent) // NOLINT
+bool Control::ProcessEvent(rsp::messaging::Event &arEvent)
 {
-    switch (GfxEvents(arEvent.Type)) {
+    switch (static_cast<GfxEvents>(arEvent.Type)) {
         case GfxEvents::Touch:
             if (!IsVisible()) {
                 break;
@@ -424,7 +411,7 @@ bool Control::ProcessEvent(rsp::messaging::Event &arEvent) // NOLINT
     return false;
 }
 
-Control& Control::SetPressed(bool aValue) // NOLINT
+Control& Control::SetPressed(const bool aValue)
 {
     if (mPressed != aValue) {
         mPressed = aValue;
@@ -436,7 +423,7 @@ Control& Control::SetPressed(bool aValue) // NOLINT
     return *this;
 }
 
-Control& Control::SetDragged(bool aValue) // NOLINT
+Control& Control::SetDragged(const bool aValue)
 {
     if (mDragged != aValue) {
         mDragged = aValue;
@@ -472,6 +459,9 @@ bool Control::doLift(const TouchEvent &arEvent)
 
 bool Control::doClick(const TouchEvent &arEvent)
 {
+    if (IsCheckable()) {
+        SetChecked(!IsChecked());
+    }
     mOnClick(arEvent, GetId());
     return true;
 }

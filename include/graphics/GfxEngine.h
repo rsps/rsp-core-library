@@ -12,7 +12,6 @@
 #define RSP_CORE_LIB_GRAPHICS_GFX_ENGINE_H
 
 #include <vector>
-#include "Renderer.h"
 #include "SceneMap.h"
 #include <logging/LogChannel.h>
 #include <messaging/EventBroker.h>
@@ -34,8 +33,8 @@ public:
      */
     GfxEngineBase& SetNextScene(uint32_t aId);
 
-    template <class E, typename = typename std::enable_if<std::is_enum<E>::value, E>::type>
-    GfxEngineBase& SetNextScene(E e) { return SetNextScene(uint32_t(e)); }
+    template <class E, typename = std::enable_if_t<std::is_enum_v<E>, E>>
+    GfxEngineBase& SetNextScene(E e) { return SetNextScene(static_cast<uint32_t>(e)); }
 
     bool Iterate();
 
@@ -45,20 +44,23 @@ public:
     GfxEngineBase& ClearOverlays();
 
     [[nodiscard]] virtual SceneMap& GetSceneMap() = 0;
-    [[nodiscard]] virtual rsp::messaging::BrokerInterface& GetEventBroker() = 0;
+    [[nodiscard]] virtual messaging::BrokerInterface& GetEventBroker() = 0;
 
 protected:
     int mFrameTime;
     int mFps = 0;
     uint32_t mIterations = 0;
-    rsp::utils::StopWatch mStopWatch{};
+    utils::StopWatch mStopWatch{};
     uint32_t mNextScene = 0;
     std::vector<Control*> mOverlays{};
     SceneMap::SceneNotify::Listener_t mListeners[2];
-    rsp::logging::LogChannel mLogger;
+    logging::LogChannel mLogger;
 
     virtual void iterateTimers();
     virtual void iterateEvents();
+    /**
+     * @return True if data was changed
+     */
     virtual bool updateData();
     virtual void render();
     virtual void updateFPS();
@@ -68,23 +70,23 @@ protected:
 };
 
 
-template <class TSceneMap, class TBroker = rsp::messaging::EventBroker>
+template <class TSceneMap, class TBroker = messaging::EventBroker>
 class GfxEngine : public GfxEngineBase
 {
 public:
-    explicit GfxEngine(int aMaxFPS = 1000)
+    explicit GfxEngine(const int aMaxFPS = 1000)
         : GfxEngineBase(aMaxFPS)
     {
         mListeners[0] = mSceneMap.GetAfterCreate().Listen(std::bind(&GfxEngine::afterSceneCreated, this, std::placeholders::_1));
         mListeners[1] = mSceneMap.GetBeforeDestroy().Listen(std::bind(&GfxEngine::beforeSceneDestroyed, this, std::placeholders::_1));
     }
 
-    rsp::messaging::BrokerInterface& GetEventBroker() override
+    messaging::BrokerInterface& GetEventBroker() override
     {
         return mBroker;
     }
 
-    rsp::graphics::SceneMap& GetSceneMap() override
+    SceneMap& GetSceneMap() override
     {
         return mSceneMap;
     }

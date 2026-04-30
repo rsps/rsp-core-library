@@ -25,7 +25,7 @@ public:
     StringBody& Set(const std::string &arContent);
     [[nodiscard]] const std::string& Get() const;
     StringBody& operator=(const std::string &arContent);
-    StringBody& Rewind();
+    StringBody& Rewind() override;
 
     [[nodiscard]] size_t Write(std::span<const std::byte> aData) override;
     [[nodiscard]] size_t Read(std::span<std::byte> aBuffer) const override;

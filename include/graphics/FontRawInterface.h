@@ -14,13 +14,15 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <codecvt>
+#include <locale>
 
 namespace rsp::graphics {
 
 
 /**
- * \class GlyphInterface
- * \brief A data class holding all the pixel data of a unicode glyph.
+ * \class Glyph
+ * \brief A data class holding all the pixel data of a Unicode glyph.
  */
 class Glyph
 {
@@ -42,6 +44,29 @@ public:
      * \return Pointer to alpha values
      */
     [[nodiscard]] virtual const uint8_t* GetPixelRow(size_t aY) const = 0;
+
+    /**
+     * \brief Streaming operator for debugging.
+     *
+     * Uses "Hidden friend pattern".
+     *
+     * @param os Output stream
+     * @param arGlyph The glyph to dump
+     * @return output stream
+     */
+    friend std::ostream& operator<<(std::ostream &os, const Glyph &arGlyph)
+    {
+        os << "Symbol: '";
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
+        os << convert.to_bytes(&arGlyph.mSymbolUnicode, &arGlyph.mSymbolUnicode + 1);
+        os << "' "
+            << "Top: " << arGlyph.mTop << ", "
+            << "Left: " << arGlyph.mLeft << ", "
+            << "Height: " << arGlyph.mHeight << ", "
+            << "Width: " << arGlyph.mWidth << ", "
+            << "Advance: (" << arGlyph.mAdvanceX << "," << arGlyph.mAdvanceY << ")";
+        return os;
+    }
 };
 
 class Glyphs
@@ -58,6 +83,30 @@ public:
     long mBaseLine = 0;
     Rect mBoundingRect{};
     std::vector<long> mLineWidths{};
+
+    friend std::ostream& operator <<(std::ostream &os, const Glyphs &arGlyphs)
+    {
+        os << "Glyphs (" << arGlyphs.GetCount() << ")\n"
+           << "  Underline Center: " << arGlyphs.mUnderlineYCenter << "\n"
+           << "  Underline Thickness: " << arGlyphs.mUnderlineThickness << "\n"
+           << "  Line height: " << arGlyphs.mLineHeight << "\n"
+           << "  Baseline: " << arGlyphs.mBaseLine << "\n"
+           << "  BRect: " << arGlyphs.mBoundingRect << "\n"
+           << "  Line Widths: [";
+
+        std::string d;
+        for (const auto &w : arGlyphs.mLineWidths) {
+            os << d << w;
+            d = ",";
+        }
+        os << "]";
+
+        for (unsigned i=0 ; i < arGlyphs.GetCount() ; ++i) {
+            os << "\n  " << arGlyphs.GetGlyph(i);
+        }
+        return os;
+    }
+
 };
 
 /**

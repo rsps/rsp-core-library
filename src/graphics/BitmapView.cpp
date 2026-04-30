@@ -68,12 +68,12 @@ BitmapView& BitmapView::SetPixelColor(const Color &arColor)
     return *this;
 }
 
-GuiUnit_t BitmapView::GetWidth()
+GuiUnit_t BitmapView::GetWidth() const
 {
     return (!mpPixelData) ? 0 : mpPixelData->GetWidth();
 }
 
-GuiUnit_t BitmapView::GetHeight()
+GuiUnit_t BitmapView::GetHeight() const
 {
     return (!mpPixelData) ? 0 : mpPixelData->GetHeight();
 }

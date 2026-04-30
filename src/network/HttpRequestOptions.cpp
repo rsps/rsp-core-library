@@ -10,7 +10,7 @@
 
 #include <network/HttpRequestOptions.h>
 #include <utils/StrUtils.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace rsp::network {
 
@@ -42,6 +42,10 @@ std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)
 
     if (arOptions.RequestBody) {
         o << "RequestBody:\n" << *(arOptions.RequestBody);
+    }
+
+    if (arOptions.ResponseBody) {
+        o << "ResponseBody:\n" << *(arOptions.ResponseBody);
     }
 
     return o;

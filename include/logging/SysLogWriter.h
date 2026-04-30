@@ -76,7 +76,7 @@ public:
     SysLogWriter(std::string aIdentifier, LogLevel aAcceptLevel, LogFacility aType = LogFacility::Local0);
     ~SysLogWriter() override;
 
-    void Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
+    void Write(std::string_view aMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
 
 protected:
     std::string mIdent;

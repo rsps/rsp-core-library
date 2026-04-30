@@ -11,11 +11,9 @@
 #ifndef RSP_CORE_LIB_GRAPHICS_CONTROL_H
 #define RSP_CORE_LIB_GRAPHICS_CONTROL_H
 
-#include <map>
-#include <functional>
 #include <string_view>
 #include <vector>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <exceptions/CoreException.h>
 #include <graphics/GfxInputEvents.h>
 #include <logging/LogChannel.h>
@@ -39,25 +37,25 @@ public:
     EControlCast(const std::string &arName, const std::string &arType) : CoreException(arName + " is not of type " + arType) {};
 };
 
-
-class Control : public rsp::utils::TypeInfo, public messaging::SubscriberInterface
+class Control : public utils::TypeInfo, public messaging::SubscriberInterface
 {
 public:
-    using TouchCallback_t = rsp::messaging::Notifier<const TouchEvent&, uint32_t>;
+    using TouchCallback_t = messaging::Notifier<const TouchEvent&, uint32_t>;
 
     /**
-     * \brief Enum type defining the available states
-     * Not class scoped on purpose, they are used as array indexes
+     * \brief Enum type defining the available states of a GUI object.
+     *
+     * Not enum class scoped on purpose, they are used as array indexes.
      */
-    enum States {
+    enum States { //NOSONAR
         Disabled,
         Normal,
         Pressed,
         Dragged,
-        CheckedDisabled,// Read only
-        CheckedNormal,  // Read only
-        CheckedPressed, // Read only
-        CheckedDragged  // Read only
+        CheckedDisabled,// Read-only
+        CheckedNormal,  // Read-only
+        CheckedPressed, // Read-only
+        CheckedDragged  // Read-only
     };
 
     Control() : mLogger("Gfx") { initTypeInfo<Control>(); }
@@ -72,22 +70,22 @@ public:
     {
         return dynamic_cast<T&>(*this);
     }
-    catch(const std::bad_cast &e) {
+    catch(const std::bad_cast&) {
         THROW_WITH_BACKTRACE2(EControlCast, GetName(), std::string(rsp::utils::NameOf<T>()));
     }
 
     /**
      * \brief Gets the state of the object
      */
-    [[nodiscard]] Control::States GetState() const;
+    [[nodiscard]] States GetState() const;
 
     /**
-     * \brief Set the object as invalidated marking it to be re-rendered
+     * \brief Set the object as invalidated, marking it to be re-rendered
      */
     void Invalidate();
 
     /**
-     * \brief Get whether or not the object is currently marked invalid
+     * \brief Get whether the object is currently marked invalid
      * \return True if the object is currently marked as invalid
      */
     [[nodiscard]] bool IsInvalid() const { return mDirty; }
@@ -128,7 +126,7 @@ public:
 
     /**
      * \brief Virtual method for traversing all GUI elements before rendering.
-     *        Useful if GUI elements depends on external data, that
+     *        Useful if GUI elements depend on external data that
      *        needs to be shown in sync with the GUI rendering.
      *        The method calls the refresh method on all elements.
      */
@@ -136,7 +134,7 @@ public:
 
     /**
      * \brief Virtual method for rendering the object
-     * \param aCanvas The canvas the object is rendered on
+     * \param arRenderer The Renderer interface this object is rendered to
      */
     void Render(Renderer &arRenderer) const;
 
@@ -153,7 +151,7 @@ public:
     [[nodiscard]] Rect GetArea() const;
 
     /**
-     * \brief Expand this area to fit to the size of the parent, if it is smaller.
+     * \brief Expand this area to fit to the size of the parent if it is smaller.
      *
      * \return self
      */
@@ -212,7 +210,7 @@ public:
      * \param aState The state for which the style is requested
      * \return A reference to a Style object
      */
-    Style& GetStyle(States aState) { return mStyles[aState]; }
+    Style& GetStyle(const States aState) { return mStyles[aState]; }
 
     Control& SetTexturePosition(const Point &arPoint);
 
@@ -226,43 +224,42 @@ public:
     /**
      * \brief OnPress callback reference
      *
-     * \return Reference to callback object
+     * \return Reference to the callback object
      */
     TouchCallback_t& OnPress() { return mOnPress; }
 
     /**
      * \brief OnMove callback reference
      *
-     * \return Reference to callback object
+     * \return Reference to the callback object
      */
     TouchCallback_t& OnMove() { return mOnMove; }
 
     /**
      * \brief OnLift callback reference
      *
-     * \return Reference to callback object
+     * \return Reference to the callback object
      */
     TouchCallback_t& OnLift() { return mOnLift; }
 
     /**
      * \brief OnClick callback reference
      *
-     * \return Reference to callback object
+     * \return Reference to the callback object
      */
     TouchCallback_t& OnClick() { return mOnClick; }
 
     /**
      * \brief A design helper function, it will paint a rectangle indicating
      *        the touch area of Control objects in the given color.
-     * \param aValue
-     * \return Self
+     * \param aValue The color to set for the touch area
      */
-    static void SetTouchAreaColor(Color aValue = Color::None) { mTouchAreaColor = aValue; }
+    static void SetTouchAreaColor(Color aValue = Color::None) { mTouchAreaColor = std::move(aValue); }
 
 protected:
     Rect mArea{}; // Area of Control in screen coordinates
     Rect mTouchArea{}; // Touch area of Control in screen coordinates
-//    magic_enum::containers::array<States, Style> mStyles;
+    // magic_enum::containers::array<States, Style> mStyles{};
     Style mStyles[magic_enum::enum_count<States>()]{};
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};
@@ -291,7 +288,7 @@ protected:
     virtual void refresh() {}
 
     /**
-     * \brief Override this to update this objects textures after it is invalidated
+     * \brief Override this to update this object textures after it is invalidated
      */
     virtual void update() {}
 
@@ -299,23 +296,25 @@ protected:
      * \brief Override this to perform custom rendering.
      *
      * \param arRenderer
-     * \result Boolean true if children is already rendered
+     * \return Boolean true if children are already rendered
      */
-    virtual bool render(Renderer &/*arRenderer*/) const { return false; }
+    virtual bool render([[maybe_unused]] Renderer &arRenderer) const { return false; }
 
     /**
-     * \brief Override this to handle resizing events
+     * \brief Override this to add functionality control is resized
+     *
      * \param arRect
-     * \param arPoint
+     * \param arOriginDifference
      */
-    virtual void doSetArea(const Rect &arRect, const Point &arOriginDifference);
+    virtual void doSetArea([[maybe_unused]] const Rect &arRect, [[maybe_unused]]const Point &arOriginDifference) {}
 
     virtual bool doPress(const TouchEvent &arEvent);
     virtual bool doMove(const TouchEvent &arEvent);
     virtual bool doLift(const TouchEvent &arEvent);
     virtual bool doClick(const TouchEvent &arEvent);
 
-    bool handleTouchEvent(rsp::messaging::Event &arEvent);
+    bool processChildren(messaging::Event &arEvent) const;
+    bool handleTouchEvent(messaging::Event &arEvent);
 
 private:
     static Color mTouchAreaColor;

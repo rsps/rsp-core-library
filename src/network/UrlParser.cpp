@@ -7,7 +7,7 @@
 * \license     Mozilla Public License 2.0
 * \author      steffen
 */
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <network/parser-helpers.h>
 #include <network/UrlParser.h>
 

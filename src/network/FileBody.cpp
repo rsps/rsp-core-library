@@ -11,6 +11,12 @@
 
 namespace rsp::network {
 
+FileBody::FileBody(const std::string& arFileName)
+    : mpFile(std::make_unique<posix::FileIO>(arFileName, std::ios::in | std::ios::out | std::ios::ate, 0640)),
+      mrFile(*mpFile)
+{
+}
+
 FileBody::FileBody(posix::FileIO& arFile)
     : mrFile(arFile)
 {
@@ -32,6 +38,28 @@ size_t FileBody::GetStreamSize() const
         return mrFile.GetSize();
     }
     return 0;
+}
+
+FileBody& FileBody::Rewind()
+{
+    if (mrFile.IsOpen()) {
+        mrFile.Seek(0);
+    }
+    return *this;
+}
+
+std::ostream& FileBody::PrintContent(std::ostream& o) const
+{
+    auto self = const_cast<FileBody*>(this);
+    auto is_open = mrFile.IsOpen();
+    if (!is_open) {
+        self->mrFile.Open(mrFile.GetFileName(), std::ios_base::in);
+    }
+    IStreamDataProvider::PrintContent(o);
+    if (!is_open) {
+        self->mrFile.Close();
+    }
+    return o;
 }
 
 } // rsp::network

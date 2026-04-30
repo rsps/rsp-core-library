@@ -65,6 +65,7 @@ public:
      * \return self
      */
     LogStream& SetChannel(const std::string &arChannel);
+    const std::string& GetChannel() const { return mChannel; }
 
     /**
      * \brief Set the current stream context
@@ -73,6 +74,13 @@ public:
      * \return self
      */
     LogStream& SetContext(const rsp::utils::DynamicData &arContext);
+    [[nodiscard]] const rsp::utils::DynamicData& GetContext() const { return mContext; }
+
+    /**
+     * \brief Get a view to the contents
+     * \return string_view
+     */
+    std::string_view GetView() const { return mBuffer.view(); }
 
     /**
      * \brief Template to declare streaming operators for individual types
@@ -130,7 +138,7 @@ protected:
     std::stringstream mBuffer{};
 
     void flush();
-    void writeToLogger(const std::string &arMsg);
+    void writeToLogger(std::string_view aMsg);
 };
 
 } /* namespace rsp::logging */

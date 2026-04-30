@@ -31,10 +31,35 @@ void EHttpSession::ProcessRequests()
  * \see https://os.mbed.com/docs/mbed-os/v6.16/apis/tls-tutorial.html
  */
 
-    for (auto r : mPending) {
-        r->Execute();
-        mPool.Put(*r);
+    size_t i = 0;
+    try {
+        for (auto r: mPending) {
+            r->Execute();
+//            size_t retries = 1;
+//            for (;;) {
+//                try {
+//                    r->Execute();
+//                    break;
+//                }
+//                catch (const network::ENetReconnect& e) {
+//                    if (retries--) {
+//                        continue;
+//                    }
+//                    throw;
+//                }
+//            }
+            mPool.Put(*r);
+            ++i;
+        }
     }
+    catch (...) {
+        for (; i < mPending.size(); ++i) {
+            mPool.Put(*mPending[i]);
+        }
+        mPending.clear();
+        throw;
+    }
+
     mPending.clear();
 }
 

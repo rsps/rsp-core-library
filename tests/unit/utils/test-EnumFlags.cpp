@@ -40,10 +40,10 @@ TEST_CASE("EnumFlags")
 {
     EnumFlags<TestFlags> flags;
 
-    CHECK_EQ(sizeof(flags), 4);
+    CHECK_EQ(sizeof(flags), 4u);
 
     CHECK_EQ(flags, TestFlags::None);
-    CHECK_EQ(int(flags), 0);
+    CHECK_EQ(static_cast<int>(flags), 0);
 
     flags |= TestFlags::F3;
     CHECK_EQ(flags, TestFlags::F3);

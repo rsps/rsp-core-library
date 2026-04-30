@@ -40,7 +40,19 @@ cmake --preset debug|release|debug-with-tests|release-with-tests
 cmake --build --preset debug|release|debug-with-tests|release-with-tests
 ```
 
-Tests can now be executed with `./rsp-core-lib-test` or simply `ctest --preset debug-with-tests|release-with-tests`
+Tests can now be executed with `./rsp-core-lib-test` or `ctest --preset debug-with-tests|release-with-tests`
+
+## wpa_supplicant tests
+To run the wpa_supplicant tests, the /etc/wpa_supplicant/wpa_supplicant.conf file must be present and contain the following:
+```
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+```
+On newer Debian-based systems, systemd controls wpa_supplicant, which is started without reading the config file.
+During the test, stop the service with `sudo systemctl stop wpa_supplicant`, and start wpa_suuplicant manually with
+```sh
+sudo wpa_supplicant -B -i <wireless device> -c /etc/wpa_supplicant/wpa_supplicant.conf
+```
 
 ## Versioning
 

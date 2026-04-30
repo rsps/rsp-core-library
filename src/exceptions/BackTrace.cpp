@@ -9,14 +9,14 @@
  */
 
 #include <exceptions/BackTrace.h>
-#if defined(_GLIBCXX_HAVE_STACKTRACE)
+#if defined(BACKTRACE_IN_EXCEPTIONS)
     #include <stacktrace>
 #elif defined(__x86_64__)
     #include <execinfo.h>
     #include <cxxabi.h>
     #include <cstdlib>
     #include <filesystem>
-#endif // _GLIBCXX_HAVE_STACKTRACE, __x86_64__
+#endif // BACKTRACE_IN_EXCEPTIONS, __x86_64__
 
 #define MAX_DEPTH 32
 
@@ -40,7 +40,7 @@ std::ostream& operator <<(std::ostream &o, const BackTrace &arBackTrace)
 
 BackTrace::BackTrace(size_t aEntriesToDiscard)
 {
-#if defined(_GLIBCXX_HAVE_STACKTRACE)
+#if defined(BACKTRACE_IN_EXCEPTIONS)
     for (auto &st : std::stacktrace::current()) {
         if (aEntriesToDiscard > 0) {
             aEntriesToDiscard--;
@@ -83,10 +83,10 @@ BackTrace::BackTrace(size_t aEntriesToDiscard)
     }
 
     free(strings);
-#endif // _GLIBCXX_HAVE_STACKTRACE, __x86_64__
+#endif // BACKTRACE_IN_EXCEPTIONS, __x86_64__
 }
 
-#if !defined(_GLIBCXX_HAVE_STACKTRACE) && defined(__x86_64__)
+#if !defined(BACKTRACE_IN_EXCEPTIONS) && defined(__x86_64__)
 std::string BackTrace::demangle(const std::string &arMangled)
 {
     std::string result;
@@ -103,7 +103,7 @@ std::string BackTrace::demangle(const std::string &arMangled)
     }
     return result;
 }
-#endif // !_GLIBCXX_HAVE_STACKTRACE, __x86_64__
+#endif // !BACKTRACE_IN_EXCEPTIONS, __x86_64__
 
 } /* namespace rsp::exceptions */
 

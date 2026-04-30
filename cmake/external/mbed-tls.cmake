@@ -9,7 +9,8 @@ include_guard(GLOBAL)
 # Debug
 message(VERBOSE "Installing MBed TLS")
 
-set(MBED_TLS_VERSION "3.6.0")
+# TODO: Version 4.0 is available
+set(MBED_TLS_VERSION "3.6.5")
 CPMAddPackage(
     NAME "mbedtls"
     GITHUB_REPOSITORY "Mbed-TLS/mbedtls"

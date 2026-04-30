@@ -19,25 +19,25 @@ Label& Label::SetCaption(const std::string &arCaption)
     return *this;
 }
 
-Label& Label::SetVAlignment(Text::VAlign aVAlign)
+Label& Label::SetVAlignment(const Text::VAlign aVAlign)
 {
     mText.SetVAlignment(aVAlign);
     return *this;
 }
 
-Label& Label::SetHAlignment(Text::HAlign aHAlign)
+Label& Label::SetHAlignment(const Text::HAlign aHAlign)
 {
     mText.SetHAlignment(aHAlign);
     return *this;
 }
 
-Label& Label::SetFontSize(int aSizePx)
+Label& Label::SetFontSize(const int aSizePx)
 {
     mText.SetFontSize(aSizePx);
     return *this;
 }
 
-Label& Label::ScaleToFit(bool aValue)
+Label& Label::ScaleToFit(const bool aValue)
 {
     if (mScaleToFit != aValue) {
         mScaleToFit = aValue;
@@ -61,7 +61,7 @@ void Label::refresh()
 
 void Label::update()
 {
-    auto tr = mText.GetRect();
+    const auto tr = mText.GetRect();
     if (tr.empty()) {
         mpTexture = nullptr;
         return;
@@ -72,15 +72,15 @@ void Label::update()
         mpTexture->SetBlendOperation(Texture::BlendOperation::SourceAlpha);
     }
 
-    Color &color = GetStyle(GetState()).mForegroundColor;
+    const Color &color = GetStyle(GetState()).mForegroundColor;
 
     mpTexture->Fill(Color::None).Update(mText.GetPixelData(), (color == Color::None) ? mText.GetFont().GetColor() : color);
 
-    Point pos = mText.GetPosition(mArea);
+    const Point pos = mText.GetPosition(mArea);
     mpTexture->SetDestination(pos);
 
     if (tr.GetWidth() > mArea.GetWidth()) {
-        Rect sr(tr.GetWidth() - mArea.GetWidth(), 0, mArea.GetWidth(), mArea.GetHeight());
+        const Rect sr(tr.GetWidth() - mArea.GetWidth(), 0, mArea.GetWidth(), mArea.GetHeight());
         mpTexture->SetSourceRect(sr);
     }
 }

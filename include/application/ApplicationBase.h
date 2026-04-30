@@ -11,7 +11,6 @@
 #ifndef RSP_CORE_LIB_APPLICATION_APPLICATION_BASE_H
 #define RSP_CORE_LIB_APPLICATION_APPLICATION_BASE_H
 
-#include <string_view>
 #include <logging/LogChannel.h>
 #include <application/CommandLine.h>
 #include <exceptions/CoreException.h>
@@ -21,7 +20,7 @@ namespace rsp::application {
 
 /**
  * \class ApplicationBase
- * \brief Easy to use base class for applications using this framework.
+ * \brief Base class with common boilerplate code for applications using this framework.
  */
 class ApplicationBase
 {
@@ -36,7 +35,7 @@ public:
      *
      * \param argc Number of arguments
      * \param argv Pointer to arguments
-     * \param apAppName Optional name of application. If null, stem from first argument, if any, is used as name.
+     * \param apAppName Optional name of application. If null, the stem from the first argument, if any, is used as the name.
      */
     explicit ApplicationBase(int argc = 0, const char **argv = nullptr, const char *apAppName = nullptr);
     virtual ~ApplicationBase();
@@ -72,10 +71,10 @@ public:
     /**
      * Static getter with cast to any overridden application object.
      *
-     * \throws ENoInstance if no application have been created.
+     * \throws ENoInstance if no application has been created.
      *
      * \tparam T Type to cast the application reference into.
-     * \return Reference to T type application object.
+     * \return Reference to a T type application object.
      */
     template<class T>
     static T& Get() {
@@ -129,7 +128,7 @@ protected:
     void installLogWriters();
 
     /**
-     * Virtual helpers, override these to add functionality during the run loop.
+     * Virtual helpers override these to add functionality during the run loop.
      */
     virtual void beforeExecute(); // Return false to terminate
     virtual void execute() {};

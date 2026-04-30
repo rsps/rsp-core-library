@@ -22,6 +22,8 @@ public:
     [[nodiscard]] size_t Read(std::span<std::byte> aBuffer) const override;
     [[nodiscard]] size_t GetStreamSize() const override;
 
+    BinaryBody& Rewind() override;
+
     utils::BinaryStringStream& Get() { return mContent; }
 
 protected:

@@ -15,18 +15,13 @@ namespace rsp::logging {
 
 std::ostream& SetLevel::operator ()(std::ostream &o) const
 {
-    auto *stream = dynamic_cast<OutStreamBuffer*>(o.rdbuf());
-
-    if (stream) {
+    if (auto *stream = dynamic_cast<OutStreamBuffer*>(o.rdbuf())) {
         stream->Lock();
         DEBUG("Locked by " << std::this_thread::get_id())
         stream->SetLevel(mValue);
     }
-    else {
-        auto *ls = dynamic_cast<LogStream*>(&o);
-        if (ls) {
-            ls->SetLevel(mValue);
-        }
+    else if (auto *ls = dynamic_cast<LogStream*>(&o)) {
+        ls->SetLevel(mValue);
     }
 
     return o;

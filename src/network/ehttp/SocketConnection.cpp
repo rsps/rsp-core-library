@@ -8,10 +8,15 @@
 * \author      steffen
 */
 #include "SocketConnection.h"
+#include <network/NetworkException.h>
 #include <network/UrlParser.h>
 
 namespace rsp::network::ehttp {
 
+SocketConnection::SocketConnection()
+    : NamedLogChannel("SocketConnection")
+{
+}
 
 SocketConnection& SocketConnection::SetOptions(const ConnectionOptions& arOptions)
 {
@@ -30,6 +35,7 @@ SocketConnection& SocketConnection::Connect()
     UrlParser up(mOptions.BaseUrl);
 
     auto urn = std::string(up.GetHost()) + ":" + std::to_string(static_cast<unsigned int>(up.GetPort()));
+    mLogger.Info() << "Connecting to " << urn;
     AddressInfo ai(urn);
 
     mSocket = Socket(Domain::Inet, Type::Stream, Protocol::Unspecified);
@@ -47,8 +53,16 @@ SocketConnection& SocketConnection::Connect()
 
 SocketConnection& SocketConnection::Close()
 {
-    mSocket.Close();
-    mpTls = nullptr;
+    if (mpTls) {
+        mpTls->Close();
+        mpTls = nullptr;
+    }
+    try {
+        mSocket.Close();
+    }
+    catch(...) {
+    }
+    mSocket = posix::Socket();
     return *this;
 }
 
@@ -64,19 +78,30 @@ bool SocketConnection::IsClosed() const
 
 size_t SocketConnection::Write(const std::span<const std::byte> aData)
 {
-    if (mpTls) {
-        return mpTls->Write(aData);
+    try {
+        if (mpTls) {
+            return mpTls->Write(aData);
+        }
+        return mSocket.Send(aData);
     }
-    return mSocket.Send(aData);
+    catch (const network::ENetReconnect &e) {
+        Close();
+        throw;
+    }
 }
 
 size_t SocketConnection::Read(const std::span<std::byte> aBuffer)
 {
-    ASSERT(mSocket.IsConnected());
-    if (mpTls) {
-        return mpTls->Read(aBuffer);
+    try {
+        if (mpTls) {
+            return mpTls->Read(aBuffer);
+        }
+        return mSocket.Receive(aBuffer);
     }
-    return mSocket.Receive(aBuffer);
+    catch (const network::ENetReconnect &e) {
+        Close();
+        throw;
+    }
 }
 
 } // rsp::network::ehttp

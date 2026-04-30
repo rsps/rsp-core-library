@@ -35,15 +35,15 @@ FileLogWriter::~FileLogWriter()
     mOutput.close();
 }
 
-void FileLogWriter::Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
+void FileLogWriter::Write(std::string_view aMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext)
 {
-    if (arMsg.length() && (mAcceptLevel >= aCurrentLevel)) {
+    if (!aMsg.empty() && (mAcceptLevel >= aCurrentLevel)) {
         DateTime dt;
         mOutput << "[" << dt.ToLogging() << "] ";
-        if (arChannel.length()) {
+        if (!arChannel.empty()) {
             mOutput << arChannel;
         }
-        mOutput << "." << StrUtils::ToUpper(ToString(aCurrentLevel)) << ": " << arMsg;
+        mOutput << "." << StrUtils::ToUpper(ToString(aCurrentLevel)) << ": " << aMsg;
         if (!arContext.IsNull()) {
             mOutput << " " << rsp::json::JsonEncoder().Encode(arContext);
         }

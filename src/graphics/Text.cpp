@@ -48,13 +48,13 @@ Text& Text::SetValue(std::string aValue)
         utils::StrUtils::ToUpper(aValue);
     }
     if (mValue != aValue) {
-        mValue = aValue;
+        mValue = std::move(aValue);
         mDirty = true;
     }
     return *this;
 }
 
-Text& Text::ForceUpperCase(bool aUpperCase)
+Text& Text::ForceUpperCase(const bool aUpperCase)
 {
     if (mUpperCase != aUpperCase) {
         mUpperCase = aUpperCase;
@@ -63,7 +63,7 @@ Text& Text::ForceUpperCase(bool aUpperCase)
     return *this;
 }
 
-Text& Text::Reload(utils::OptionalPtr<const Rect> aRect)
+Text& Text::Reload(const utils::OptionalPtr<const Rect> aRect)
 {
     if (!mDirty && !mFont.IsDirty() && !aRect) {
         return *this;
@@ -75,7 +75,7 @@ Text& Text::Reload(utils::OptionalPtr<const Rect> aRect)
     mLineMaxChar = 1; // Avoid division by zero
     int count = 0;
 
-    for (auto &value : mValue) {
+    for (const auto &value : mValue) {
         if (value == '\n') {
             mLineCount++;
             count = 0;
@@ -86,7 +86,7 @@ Text& Text::Reload(utils::OptionalPtr<const Rect> aRect)
     }
 
     if (aRect) {
-        scaleToFit(int(aRect.Get().GetWidth()), int(aRect.Get().GetHeight()));
+        scaleToFit(static_cast<int>(aRect.Get().GetWidth()), static_cast<int>(aRect.Get().GetHeight()));
     }
     else {
         loadGlyphs();
@@ -97,14 +97,14 @@ Text& Text::Reload(utils::OptionalPtr<const Rect> aRect)
     return *this;
 }
 
-void Text::scaleToFit(int aWidth, int aHeight)
+void Text::scaleToFit(const int aWidth, const int aHeight)
 {
-    int width = aWidth / mLineMaxChar; // Texts seems to be about 1/3 of desired width
+    int width = aWidth / mLineMaxChar; // Texts seem to be about 1/3 of the desired width
     int height = aHeight / mLineCount;
     int done;
     int attempts = 5;
-    int w_limit = aWidth * 90 / 100; // >90%
-    int h_limit = aHeight * 90 / 100; // > 90%
+    const int w_limit = aWidth * 90 / 100; // >90%
+    const int h_limit = aHeight * 90 / 100; // > 90%
     DEBUG("scaleToFit(" << aWidth << ", " << aHeight << "), line count: " << mLineCount)
 
     do {
@@ -181,7 +181,7 @@ Point Text::GetPosition(const Rect &arArea) const
 
 void Text::draw()
 {
-    auto &glyphs = mpGlyphs;
+    const auto &glyphs = mpGlyphs;
     if (!glyphs) {
         std::cout << "No glyphs to paint!!" << std::endl;
         return;
@@ -190,10 +190,10 @@ void Text::draw()
     Fill(aColor);
     for (unsigned i=0; i < glyphs->GetCount() ; ++i) {
         Glyph &glyph = glyphs->GetGlyph(i);
-        auto py = GuiUnit_t(glyph.mTop);
+        auto py = static_cast<GuiUnit_t>(glyph.mTop);
         for (int y = 0; y < glyph.mHeight; y++) {
-            const uint8_t* p_row = glyph.GetPixelRow(size_t(y));
-            auto px = GuiUnit_t(glyph.mLeft);
+            const uint8_t* p_row = glyph.GetPixelRow(static_cast<size_t>(y));
+            auto px = static_cast<GuiUnit_t>(glyph.mLeft);
             for (int x = 0; x < glyph.mWidth; x++) {
                 auto c = *p_row++;
                 if (!c) {

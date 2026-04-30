@@ -12,14 +12,14 @@
 #include "doctest.h"
 #include <TestHelpers.h>
 
-int main(int argc, const char** argv)
+int main(const int argc, const char** argv)
 {
     TestHelpers::ParseArguments(argv);
     doctest::Context context(argc, argv);
-    int test_result = context.run(); // run queries, or run tests unless --no-run
+    const int test_result = context.run(); // run the queries, or run tests unless --no-run
 
-    if(context.shouldExit()) // honor query flags and --exit
-        return test_result;
+    // if(context.shouldExit()) // honor query flags and --exit
+    //     return test_result;
 
     return test_result;
 }

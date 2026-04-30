@@ -12,7 +12,6 @@
 #define RSP_CORE_LIB_GRAPHICS_GFX_COMPRESSOR_H
 
 #include <cstdint>
-#include <cstddef>
 #include <vector>
 
 namespace rsp::graphics {

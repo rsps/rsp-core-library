@@ -14,6 +14,7 @@
 #include <ostream>
 #include <string>
 #include <security/SecureBuffer.h>
+#include <security/SecureString.h>
 
 namespace rsp::network {
 
@@ -27,10 +28,13 @@ public:
     std::string BaseUrl{};
     long ConnectionTimeout = 5L; // In seconds
     long ResponseTimeout = 10L;  // In seconds
-    std::string CertCaPath{};
-    std::string CertPath{};
-    std::string KeyPath{};
-    std::string KeyPasswd{};
+    std::string CertCaPath{};    // Path to CA chain PEM file
+    std::string CertPath{};      // Path to client cert PEM file
+    std::string KeyPath{};       // Path to client private key PEM file
+    std::string KeyPasswd{};     // Password to unlock private key file
+    security::SecureString CaChainPem{};    // Set directly or clear to force reload from CertCaPath
+    security::SecureString ClientCertPem{}; // Set directly or clear to force reload from CertPath
+    security::SecureString ClientKeyPem{};  // Set directly or clear to force reload from KeyPath
     security::SecureBuffer Nonce{};
     int Verbose = 0;
 };

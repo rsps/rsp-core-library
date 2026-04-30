@@ -11,7 +11,7 @@
 #ifndef RSP_CORE_LIB_LOGGING_LOG_WRITER_INTERFACE_H
 #define RSP_CORE_LIB_LOGGING_LOG_WRITER_INTERFACE_H
 
-#include <string>
+#include <string_view>
 #include <utils/DynamicData.h>
 #include "LogTypes.h"
 
@@ -32,7 +32,7 @@ public:
      * \param arMsg
      * \param aCurrentLevel
      */
-    virtual void Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) = 0;
+    virtual void Write(std::string_view aMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) = 0;
 
     /**
      * Set the log acceptance level of this writer.

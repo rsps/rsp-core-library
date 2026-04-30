@@ -10,6 +10,7 @@
 #ifndef RSP_CORE_LIB_INCLUDE_NETWORK_FILE_BODY_H
 #define RSP_CORE_LIB_INCLUDE_NETWORK_FILE_BODY_H
 
+#include <memory>
 #include "IStreamDataProvider.h"
 #include <posix/FileIO.h>
 
@@ -18,14 +19,20 @@ namespace rsp::network {
 class FileBody : public IStreamDataProvider
 {
 public:
+    explicit FileBody(const std::string& arFileName);
     explicit FileBody(rsp::posix::FileIO& arFile);
     size_t Write(std::span<const std::byte> aData) override;
     [[nodiscard]] size_t Read(std::span<std::byte> aBuffer) const override;
     [[nodiscard]] size_t GetStreamSize() const override;
 
+    FileBody& Rewind() override;
+
     posix::FileIO& Get() { return mrFile; }
 
+    std::ostream& PrintContent(std::ostream& o) const override;
+
 protected:
+    std::unique_ptr<posix::FileIO> mpFile{};
     posix::FileIO& mrFile;
 };
 

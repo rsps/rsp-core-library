@@ -27,73 +27,73 @@ TEST_CASE("FifoBuffer")
     auto data = std::span(c_data);
 
     CHECK(mFifo.IsEmpty());
-    CHECK_EQ(mFifo.Used(), 0);
-    CHECK_EQ(mFifo.Free(), 10);
+    CHECK_EQ(mFifo.Used(), 0u);
+    CHECK_EQ(mFifo.Free(), 10u);
 
     CHECK_EQ(mFifo.Write(data), sizeof(c_data));
 
     CHECK_FALSE(mFifo.IsEmpty());
-    CHECK_EQ(mFifo.Used(), 5);
-    CHECK_EQ(mFifo.Free(), 5);
+    CHECK_EQ(mFifo.Used(), 5u);
+    CHECK_EQ(mFifo.Free(), 5u);
 
     CHECK_EQ(mFifo.Write(data), sizeof(c_data));
 
     CHECK_FALSE(mFifo.IsEmpty());
-    CHECK_EQ(mFifo.Used(), 10);
-    CHECK_EQ(mFifo.Free(), 0);
+    CHECK_EQ(mFifo.Used(), 10u);
+    CHECK_EQ(mFifo.Free(), 0u);
 
-    CHECK_EQ(mFifo.Write(data), 0);
+    CHECK_EQ(mFifo.Write(data), 0u);
 
     char c_out[4]{};
     auto out = std::span(c_out);
     CHECK_EQ(mFifo.Read(out), sizeof(c_out));
     CHECK_FALSE(mFifo.IsEmpty());
-    CHECK_EQ(mFifo.Used(), 6);
-    CHECK_EQ(mFifo.Free(), 4);
+    CHECK_EQ(mFifo.Used(), 6u);
+    CHECK_EQ(mFifo.Free(), 4u);
     CHECK(Compare(out, {1, 2, 3, 4}));
 
-    CHECK_EQ(mFifo.Write(data), 4);
+    CHECK_EQ(mFifo.Write(data), 4u);
     CHECK_FALSE(mFifo.IsEmpty());
-    CHECK_EQ(mFifo.Used(), 10);
-    CHECK_EQ(mFifo.Free(), 0);
+    CHECK_EQ(mFifo.Used(), 10u);
+    CHECK_EQ(mFifo.Free(), 0u);
 
     CHECK_EQ(mFifo.Read(out), sizeof(c_out));
     CHECK_FALSE(mFifo.IsEmpty());
-    CHECK_EQ(mFifo.Used(), 6);
-    CHECK_EQ(mFifo.Free(), 4);
+    CHECK_EQ(mFifo.Used(), 6u);
+    CHECK_EQ(mFifo.Free(), 4u);
     CHECK(Compare(out, {5, 1, 2, 3}));
 
-    CHECK_EQ(mFifo.Read(out), 4);
+    CHECK_EQ(mFifo.Read(out), 4u);
     CHECK_FALSE(mFifo.IsEmpty());
-    CHECK_EQ(mFifo.Used(), 2);
-    CHECK_EQ(mFifo.Free(), 8);
+    CHECK_EQ(mFifo.Used(), 2u);
+    CHECK_EQ(mFifo.Free(), 8u);
     CHECK(Compare(out, {4, 5, 1, 2}));
 
     std::memset(c_out, 0, sizeof(c_out));
-    CHECK_EQ(mFifo.Read(out), 2);
+    CHECK_EQ(mFifo.Read(out), 2u);
     CHECK(Compare(out, {3, 4, 0, 0}));
     CHECK(mFifo.IsEmpty());
-    CHECK_EQ(mFifo.Used(), 0);
-    CHECK_EQ(mFifo.Free(), 10);
+    CHECK_EQ(mFifo.Used(), 0u);
+    CHECK_EQ(mFifo.Free(), 10u);
 
     CHECK_NOTHROW(mFifo.Push('A'));
     CHECK_FALSE(mFifo.IsEmpty());
-    CHECK_EQ(mFifo.Used(), 1);
-    CHECK_EQ(mFifo.Free(), 9);
+    CHECK_EQ(mFifo.Used(), 1u);
+    CHECK_EQ(mFifo.Free(), 9u);
 
     CHECK_EQ(mFifo.Pop(), 'A');
     CHECK(mFifo.IsEmpty());
-    CHECK_EQ(mFifo.Used(), 0);
-    CHECK_EQ(mFifo.Free(), 10);
+    CHECK_EQ(mFifo.Used(), 0u);
+    CHECK_EQ(mFifo.Free(), 10u);
 
-    CHECK_EQ(mFifo.Write({&data[1], 4}), 4);
+    CHECK_EQ(mFifo.Write({&data[1], 4}), 4u);
 
     CHECK_FALSE(mFifo.IsEmpty());
-    CHECK_EQ(mFifo.Used(), 4);
-    CHECK_EQ(mFifo.Free(), 6);
+    CHECK_EQ(mFifo.Used(), 4u);
+    CHECK_EQ(mFifo.Free(), 6u);
 
     std::memset(c_out, 0, sizeof(c_out));
-    CHECK_EQ(mFifo.Read(out), 4);
+    CHECK_EQ(mFifo.Read(out), 4u);
 
     CHECK(Compare(out, {2, 3, 4, 5}));
 }

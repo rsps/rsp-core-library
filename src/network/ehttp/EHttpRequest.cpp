@@ -50,6 +50,17 @@ const IStreamDataProvider& EHttpRequest::GetBody() const
     return *(mOptions.RequestBody);
 }
 
+IHttpRequest& EHttpRequest::SetResponseBody(HttpBody_t apBody)
+{
+    mOptions.ResponseBody = apBody;
+    return *this;
+}
+
+const IStreamDataProvider& EHttpRequest::GetResponseBody() const
+{
+    return *(mOptions.ResponseBody);
+}
+
 void EHttpRequest::prepareRequest(AutoHeaders& arHeaders)
 {
     if (!mOptions.BasicAuthUsername.empty()) {
@@ -71,40 +82,13 @@ void EHttpRequest::prepareRequest(AutoHeaders& arHeaders)
 
 IHttpResponse& EHttpRequest::Execute()
 {
-    // Get connection
-    auto &connection = getConnection().Connect();
-
-    AutoHeaders headers;
-    prepareRequest(headers);
-    connection.Write(formatHeaders(headers));
-
-    // Send body
-    if (mOptions.RequestBody) {
-        while (auto sz = mOptions.RequestBody->Read(mWorkBuffer)) {
-            connection.Write({mWorkBuffer.data(), sz});
-        }
-    }
-
-    // Read response...
-    {
-        ResponseParser parser(mResponse);
-        while (true) {
-            auto sz = connection.Read(mWorkBuffer);
-            if (sz == 0) {
-                break;
-            }
-            if (parser.ParseNewData({mWorkBuffer.data(), sz})) {
-                // mResponse is now filled.
-                break;
-            }
-        }
-    }
+    auto &response = defaultExecute();
 
     if (mResponseCallback) {
-        mResponseCallback(mResponse);
+        mResponseCallback(response);
     }
 
-    return mResponse;
+    return response;
 }
 
 uintptr_t EHttpRequest::GetHandle() const
@@ -139,9 +123,14 @@ std::string EHttpRequest::formatHeaders(AutoHeaders& arHeaders)
     if (!up.GetQuery().empty()) {
         ss << '?' << up.GetQuery();
     }
-    if (!up.GetFragment().empty()) {
-        ss << '#' << up.GetFragment();
-    }
+/**
+ * The Fragment part should not be send to the server.
+ * \see https://en.wikipedia.org/wiki/URI_fragment
+ * Quote: "its processing is exclusively client-sided with no participation from the web server,"
+ *    if (!up.GetFragment().empty()) {
+ *         ss << '#' << up.GetFragment();
+ *    }
+ */
     ss  << " HTTP/1.1\r\nHost: "sv
         << up.GetHost()
         << cNewLine;
@@ -161,6 +150,54 @@ IStreamDataProvider& EHttpRequest::getRequestBody()
         mOptions.RequestBody = std::make_shared<StringBody>();
     }
     return *mOptions.RequestBody;
+}
+
+IHttpResponse& EHttpRequest::execute()
+{
+    size_t retries = 1;
+    for (;;) {
+        try {
+            // Get connection
+            auto &connection = getConnection().Connect();
+
+            AutoHeaders headers;
+            prepareRequest(headers);
+            connection.Write(formatHeaders(headers));
+
+            // Send body
+            if (mOptions.RequestBody) {
+                while (auto sz = mOptions.RequestBody->Read(mWorkBuffer)) {
+                    connection.Write({mWorkBuffer.data(), sz});
+                }
+            }
+
+            // Read response...
+            {
+                ResponseParser parser(mResponse);
+                while (true) {
+                    auto sz = connection.Read(mWorkBuffer);
+                    if (sz == 0) {
+                        break;
+                    }
+                    if (parser.ParseNewData({mWorkBuffer.data(), sz})) {
+                        // mResponse is now filled.
+                        mResponse.mCompleted = true;
+                        break;
+                    }
+                }
+            }
+            break;
+        }
+        catch (const network::ENetReconnect& e) {
+            mResponse.Clear();
+            if (retries--) {
+                continue;
+            }
+            throw;
+        }
+    }
+
+    return mResponse;
 }
 
 } // rsp::network::ehttp

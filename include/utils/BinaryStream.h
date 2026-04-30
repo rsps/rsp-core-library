@@ -22,9 +22,9 @@ namespace rsp::utils {
 struct BinaryStream
 {
     explicit BinaryStream(std::streambuf *apStreamBuf) : mpStreamBuf(apStreamBuf) {}
-    explicit BinaryStream(std::iostream &arStream) : mpStreamBuf(arStream.rdbuf()) {}
-    explicit BinaryStream(std::ostream &arStream) : mpStreamBuf(arStream.rdbuf()) {}
-    explicit BinaryStream(std::istream &arStream) : mpStreamBuf(arStream.rdbuf()) {}
+    explicit BinaryStream(const std::iostream &arStream) : mpStreamBuf(arStream.rdbuf()) {}
+    explicit BinaryStream(const std::ostream &arStream) : mpStreamBuf(arStream.rdbuf()) {}
+    explicit BinaryStream(const std::istream &arStream) : mpStreamBuf(arStream.rdbuf()) {}
 
     void Reset() const
     {
@@ -68,12 +68,12 @@ struct BinaryStream
 
     std::streamsize GetN(void* apBuffer, std::streamsize aSize) const
     {
-        return mpStreamBuf->sgetn(reinterpret_cast<char *>(apBuffer), aSize);
+        return mpStreamBuf->sgetn(static_cast<char *>(apBuffer), aSize);
     }
 
     std::streamsize PutN(const void* apBuffer, std::streamsize aSize) const
     {
-        return mpStreamBuf->sputn(reinterpret_cast<const char *>(apBuffer), aSize);
+        return mpStreamBuf->sputn(static_cast<const char *>(apBuffer), aSize);
     }
 
     [[nodiscard]] std::optional<size_t> GetStreamSize() const
@@ -82,7 +82,7 @@ struct BinaryStream
         auto out = mpStreamBuf->pubseekoff(0, std::ios_base::cur, std::ios_base::out);
         auto result = std::max(in, out);
         if (result >= 0) {
-            return { size_t(result) };
+            return { static_cast<size_t>(result) };
         }
         return {};
     }
@@ -147,8 +147,8 @@ BinaryStream& operator>>(BinaryStream &i, ContainerT<ValueT>& arContainer)
 {
     using size_type = decltype(arContainer.size());
     auto sz = i.ReadSize<size_type>();
-    arContainer.resize(size_t(sz));
-    i.GetN(arContainer.data(), std::streamsize(sz * sizeof(ValueT)));
+    arContainer.resize(static_cast<size_t>(sz));
+    i.GetN(arContainer.data(), static_cast<std::streamsize>(sz * sizeof(ValueT)));
     return i;
 }
 
@@ -176,7 +176,7 @@ template <template <typename> class ContainerT,
 BinaryStream& operator<<(BinaryStream &o, const ContainerT<ValueT>& arContainer)
 {
     o.WriteSize(arContainer.size());
-    o.PutN(arContainer.data(), std::streamsize(arContainer.size() * sizeof(ValueT)));
+    o.PutN(arContainer.data(), static_cast<std::streamsize>(arContainer.size() * sizeof(ValueT)));
     return o;
 }
 
@@ -207,7 +207,7 @@ public:
         mpStreamBuf = mStringStream.rdbuf();
     }
 
-    BinaryStringStream(char *apBuffer, std::streamsize aSize)
+    BinaryStringStream(char *apBuffer, const std::streamsize aSize)
     {
         mpStreamBuf = mStringStream.rdbuf();
         mpStreamBuf->pubsetbuf(apBuffer, aSize);

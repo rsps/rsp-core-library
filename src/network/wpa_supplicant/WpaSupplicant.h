@@ -11,7 +11,6 @@
 #ifndef RSP_CORE_LIB_SRC_NETWORK_WPA_SUPPLICANT_WPA_SUPPLICANT_H
 #define RSP_CORE_LIB_SRC_NETWORK_WPA_SUPPLICANT_WPA_SUPPLICANT_H
 
-#include <list>
 #include <string>
 #include <logging/LogChannel.h>
 #include <network/IWlanInterface.h>

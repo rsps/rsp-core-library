@@ -12,7 +12,7 @@
 
 #include <filesystem>
 #include <memory>
-#include <network/IHttpRequest.h>
+#include <network/HttpRequestBase.h>
 #include <network/IHttpSession.h>
 #include <network/MultipartBoundary.h>
 #include "EHttpResponse.h"
@@ -20,20 +20,24 @@
 
 namespace rsp::network::ehttp {
 
+#ifndef EHTTP_REQUEST_BUFFER_SIZE
+    #define EHTTP_REQUEST_BUFFER_SIZE 512
+#endif
+
 class EHttpResponse;
 class EHttpSession;
 
-class EHttpRequest : public rsp::network::IHttpRequest
+class EHttpRequest : public rsp::network::HttpRequestBase
 {
 public:
-    typedef std::function<void(EHttpResponse&)> ResponseCallback_t;
-
     EHttpRequest();
 
     [[nodiscard]] const HttpRequestOptions& GetOptions() const override;
     IHttpRequest& SetOptions(const HttpRequestOptions& arOptions) override;
     IHttpRequest& SetBody(HttpBody_t apBody) override;
     [[nodiscard]] const IStreamDataProvider& GetBody() const override;
+    IHttpRequest& SetResponseBody(HttpBody_t apBody) override;
+    [[nodiscard]] const IStreamDataProvider& GetResponseBody() const override;
     IHttpResponse& Execute() override;
     [[nodiscard]] uintptr_t GetHandle() const override;
 
@@ -42,12 +46,13 @@ protected:
 
     HttpRequestOptions mOptions{};
     EHttpResponse mResponse;
-    std::array<std::byte, 256> mWorkBuffer{};
+    std::array<std::byte, EHTTP_REQUEST_BUFFER_SIZE> mWorkBuffer{};
 
     friend class EHttpSession;
-    ResponseCallback_t mResponseCallback{};
     std::optional<std::reference_wrapper<IHttpSession>> mrSession{};
     std::unique_ptr<SocketConnection> mpConnection{};
+
+    IHttpResponse& execute() override;
 
     void prepareRequest(AutoHeaders& arHeaders);
     SocketConnection& getConnection();

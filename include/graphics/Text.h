@@ -16,7 +16,6 @@
 #include "Canvas.h"
 #include "Font.h"
 #include "Rect.h"
-#include "Style.h"
 #include <utils/OptionalPtr.h>
 
 namespace rsp::graphics {
@@ -74,7 +73,7 @@ public:
     Text& operator=(Text&&) = default;
 
     /**
-     * \brief Load Text and font attributes from given Typography
+     * \brief Load Text and font attributes from the given Typography
      *
      * \param arTypography
      * \return self
@@ -98,7 +97,7 @@ public:
     Text& SetValue(std::string aValue);
 
     /**
-     * \brief Force all text to upper case, useful for headings.
+     * \brief Force all text to the upper case, useful for headings.
      *
      * \param aUpperCase
      * \return self
@@ -117,8 +116,7 @@ public:
     /**
      * Get the current value of the line spacing.
      *
-     * \param aSpacing
-     * \return
+     * \return The current spacing number in pixels
      */
     [[nodiscard]] int GetLineSpacing() const { return mLineSpacing; }
     /**
@@ -127,7 +125,7 @@ public:
      * \param aSpacing
      * \return Reference to this for fluent calls.
      */
-    Text& SetLineSpacing(int aSpacing) { mLineSpacing = aSpacing; mDirty = true; return *this; }
+    Text& SetLineSpacing(const int aSpacing) { mLineSpacing = aSpacing; mDirty = true; return *this; }
 
     /**
      * Get the number of lines in the text content.
@@ -149,7 +147,7 @@ public:
      * \param aVAlign
      * \return Reference to this for fluent calls.
      */
-    Text& SetVAlignment(VAlign aVAlign) { mVAlign = aVAlign; mDirty = true; return *this; }
+    Text& SetVAlignment(const VAlign aVAlign) { mVAlign = aVAlign; mDirty = true; return *this; }
 
     /**
      * Get the current horizontal alignment setting.
@@ -163,7 +161,7 @@ public:
      * \param aHAlign
      * \return Reference to this for fluent calls.
      */
-    Text& SetHAlignment(HAlign aHAlign) { mHAlign = aHAlign; mDirty = true; return *this; }
+    Text& SetHAlignment(const HAlign aHAlign) { mHAlign = aHAlign; mDirty = true; return *this; }
 
     /**
      * \brief Get the position of this text inside the given area, respecting alignments settings.
@@ -177,7 +175,7 @@ public:
      * \param aSizePx
      * \return self
      */
-    Text& SetFontSize(int aSizePx) { mFont.SetSize(aSizePx); return *this; }
+    Text& SetFontSize(const int aSizePx) { mFont.SetSize(aSizePx); return *this; }
 
     /**
      * Reload all glyphs based on the current settings.
@@ -191,9 +189,9 @@ public:
     /**
      * \brief Check if the text object has changed and needs glyph reloading
      *
-     * \return True if glyphs needs to be reloaded.
+     * \return True if glyphs need to be reloaded.
      */
-    [[nodiscard]] bool IsDirty() const { return mDirty | mFont.IsDirty(); }
+    [[nodiscard]] bool IsDirty() const { return mDirty || mFont.IsDirty(); }
 
     /**
      * Get the minimum bounding rectangle containing all the glyphs.

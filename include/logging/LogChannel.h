@@ -39,9 +39,11 @@ public:
 
     [[nodiscard]] size_t GetWritersCount() const override;
 
+    [[nodiscard]] const std::string& GetChannelName() const { return mChannel; }
+
 protected:
     Handle_t addLogWriter(std::shared_ptr<LogWriterInterface> aWriter) override;
-    void write(const LogStream &arStream, const std::string &arMsg, const std::string &arChannel, const utils::DynamicData &arContext) override;
+    void write(const LogStream &arStream, std::string_view aMsg, const std::string &arChannel, const utils::DynamicData &arContext) override;
 
 protected:
     std::string mChannel;

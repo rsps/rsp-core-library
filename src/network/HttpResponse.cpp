@@ -35,8 +35,7 @@ std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse)
 
     o <<
         "StatusCode: " << int(arResponse.GetStatusCode()) << "\n"
-        "Body: ";
-    arResponse.GetBody().PrintContent(o);
+        "Body: " << arResponse.GetBody();
     o << "\n";
 
     return o;
@@ -60,7 +59,7 @@ std::string_view HttpResponse::GetHeader(std::string_view aName) const
 IHttpResponse& HttpResponse::MakeBody()
 {
     if (mpBody) {
-        return *this;
+        mpBody.reset();
     }
 
     if (mrRequest.GetOptions().ResponseBody) {
@@ -94,13 +93,13 @@ size_t HttpResponse::GetContentLength() const
 
 IHttpResponse& HttpResponse::Clear()
 {
+    mCompleted = false;
     mStatusLine = {};
     mHeaders.clear();
     mHeaderData.clear();
     mContentLength.reset();
-    mpBody.reset();
+    MakeBody();
     return *this;
 }
-
 
 }

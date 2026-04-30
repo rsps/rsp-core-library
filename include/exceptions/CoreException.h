@@ -14,7 +14,6 @@
 
 #include <string_view>
 #include <exceptions/ExceptionHelper.h>
-#include <system_error>
 
 namespace rsp::exceptions {
 
@@ -101,7 +100,7 @@ public:
 class ESingletonViolation: public ApplicationException
 {
 public:
-    explicit ESingletonViolation(std::string_view aClass)
+    explicit ESingletonViolation(const std::string_view aClass)
         : ApplicationException(std::string("Singleton<") + std::string(aClass) + std::string(">() object already exist"))
     {
     }
@@ -110,7 +109,7 @@ public:
 class ENoInstance: public ApplicationException
 {
 public:
-    explicit ENoInstance(std::string_view aClass)
+    explicit ENoInstance(const std::string_view aClass)
         : ApplicationException(std::string("Singleton<") + std::string(aClass) + std::string(">() object has not been created"))
     {
     }
@@ -119,7 +118,7 @@ public:
 class ETerminate: public ApplicationException
 {
 public:
-    explicit ETerminate(int aExitCode)
+    explicit ETerminate(const int aExitCode)
         : ApplicationException(std::string("Terminating with code: ") + std::to_string(aExitCode)),
           mCode(aExitCode)
     {
@@ -143,7 +142,7 @@ public:
 class EBadCast: public CoreException
 {
 public:
-    explicit EBadCast(std::string_view aFrom, std::string_view aTo)
+    explicit EBadCast(const std::string_view aFrom, const std::string_view aTo)
         : EBadCast(std::string(aFrom), std::string(aTo))
     {
     }

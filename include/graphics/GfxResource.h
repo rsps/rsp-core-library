@@ -20,6 +20,10 @@ enum class ColorDepth : uint16_t { Monochrome = 1, Alpha = 8, RGB = 24, RGBA = 3
 
 std::ostream& operator<<(std::ostream& os, ColorDepth aDepth);
 
+/**
+ * \class GfxResource
+ * \brief Data bearer for graphics resource
+ */
 struct GfxResource
 {
     uint32_t Id;

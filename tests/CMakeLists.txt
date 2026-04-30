@@ -2,6 +2,8 @@
 # RSP Core Library Tests
 # -------------------------------------------------------------------------------------------------------------- #
 
+include("rsp/logging")
+
 # Enable testing
 enable_testing()
 
@@ -42,10 +44,6 @@ file(
     DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/"
 )
 file(
-    COPY "${CMAKE_CURRENT_SOURCE_DIR}/webserver/ssl"
-    DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/"
-)
-file(
     COPY "${CMAKE_CURRENT_SOURCE_DIR}/webserver/cgi"
     DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/"
 )
@@ -53,6 +51,10 @@ file(
     COPY "${CMAKE_CURRENT_SOURCE_DIR}/webserver/users.plain"
     DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/"
 )
+if (NOT EXISTS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/ssl/ca")
+    message("${COLOR_GREEN}${TEXT_BOLD}Generating TLS certificates${TEXT_BOLD_RESTORE}${COLOR_DEFAULT}")
+    execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/webserver/generate-certificates.sh" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver")
+endif()
 
 # -------------------------------------------------------------------------------------------------------------- #
 # Targets & Compile Options

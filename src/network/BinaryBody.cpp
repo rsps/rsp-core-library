@@ -30,4 +30,10 @@ size_t BinaryBody::GetStreamSize() const
     return 0;
 }
 
+BinaryBody& BinaryBody::Rewind()
+{
+    mContent.Reset();
+    return *this;
+}
+
 } // rsp::network

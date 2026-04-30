@@ -37,7 +37,7 @@ TEST_CASE("Application")
         CommandLine cmd(4, arguments);
 
         CHECK_EQ(cmd.GetAppName(), "MyApplication");
-        CHECK_EQ(cmd.GetOptions().size(), 3);
+        CHECK_EQ(cmd.GetOptions().size(), 3u);
         CHECK(cmd.HasOption("-c"));
         CHECK(cmd.HasOption("--version"));
         CHECK(cmd.HasOption("--help"));
@@ -47,8 +47,8 @@ TEST_CASE("Application")
         ApplicationBase app(1, arguments);
 
         CHECK_EQ(app.GetAppName(), "MyApplication");
-        CHECK_EQ(app.GetCommandLine().GetOptions().size(), 0);
-        CHECK_EQ(app.GetCommandLine().GetCommands().size(), 0);
+        CHECK_EQ(app.GetCommandLine().GetOptions().size(), 0u);
+        CHECK_EQ(app.GetCommandLine().GetCommands().size(), 0u);
     }
 
     SUBCASE("Instantiate TestApplication") {

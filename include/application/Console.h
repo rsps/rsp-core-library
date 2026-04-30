@@ -10,11 +10,10 @@
 #ifndef RSP_CORE_LIB_APPLICATION_CONSOLE_H
 #define RSP_CORE_LIB_APPLICATION_CONSOLE_H
 
-#include <string>
-#include <iostream>
-#include <fstream>
+#include <ostream>
 #include <sstream>
-#include <utils/AnsiEscapeCodes.h>
+#include <string>
+#include <string_view>
 #include <logging/ConsoleLogWriter.h>
 
 namespace rsp::application {
@@ -35,32 +34,37 @@ class Console;
  * \class ConsoleStream
  * \brief Internal stream used to output console text with colors.
  */
-class ConsoleStream : public std::stringstream
+class ConsoleStream
 {
 public:
     ConsoleStream(Console *apConsole, TextColor aColor);
-    ConsoleStream(ConsoleStream &&aFrom) noexcept;
-    ConsoleStream(const ConsoleStream &) = delete;
+    ConsoleStream(ConsoleStream&& arOther) noexcept;
+    ConsoleStream& operator=(ConsoleStream&& arOther) noexcept;
 
-    ConsoleStream& operator=(const ConsoleStream &) = delete;
+    ConsoleStream(const ConsoleStream&) = delete;
+    ConsoleStream& operator=(const ConsoleStream&) = delete;
 
-    friend class Console;
-    ~ConsoleStream() override;
+    ~ConsoleStream();
+
+    /**
+     * \brief Template to declare streaming operators for individual types
+     *
+     * \tparam T type of value to stream
+     * \param arValue
+     * \return self
+     */
+    template< class T>
+    ConsoleStream& operator<<(const T& arValue) {
+        mBuffer << arValue;
+        return *this;
+    }
+
+    ConsoleStream& operator<<(std::ostream&(*apFunc)(std::ostream&));
 
 protected:
-    Console *mpConsole = nullptr;
-    TextColor mColor{};
-};
-
-/**
- * \class ConsoleLogStreams
- * \brief Helper log writer class to direct log messages to a console
- */
-class ConsoleLogStreams : public rsp::logging::ConsoleLogStreamsInterface
-{
-public:
-    void Error(const std::string &arMsg) override;
-    void Info(const std::string &arMsg) override;
+    Console *mpConsole;
+    TextColor mColor;
+    std::stringstream mBuffer{};
 };
 
 
@@ -68,13 +72,13 @@ public:
  * \class Console
  * \brief Class intended for console output.
  *
- * It always writes to std::cout and std::cerr, but when enabled it will also output to a given character device, like a separate LCD screen.
+ * It always writes to std::cout and std::cerr, but when enabled, it will also output to a given character device, like a separate LCD screen.
  *
  */
-class Console
+class Console : public rsp::logging::ConsoleLogStreamsInterface
 {
 public:
-    ~Console();
+    ~Console() override;
 
     static Console& Get();
 
@@ -83,7 +87,7 @@ public:
     static ConsoleStream HighLightInfo()  { return {&Get(), TextColor::InfoHighLight}; }
     static ConsoleStream Info()  { return {&Get(), TextColor::Info}; }
 
-    static void SetUseColors(bool aEnable) { mUseColors = aEnable; }
+    static void SetUseColors(const bool aEnable) { mUseColors = aEnable; }
     static bool GetUseColors() { return mUseColors; }
 
     static void SetTtyDevice(const std::string &arTtyDevice);
@@ -91,6 +95,8 @@ public:
 
     static void SetPrintToDisplay(bool aEnable);
     static bool PrintToDisplay() { return Get().mPrintToDisplay; }
+
+    void Write(std::string_view aMsg, logging::LogLevel aCurrentLevel, const std::string& arChannel, const utils::DynamicData& arContext, const std::string& arColor) override;
 
 protected:
     bool mPrintToDisplay;
@@ -103,7 +109,7 @@ protected:
     void updatePrintToDisplay(const std::string &arTtyDevice, bool aEnable);
 
     friend class ConsoleStream;
-    void write(const std::string &arMsg, TextColor aColor);
+    void write(std::string_view aMsg, TextColor aColor);
 };
 
 

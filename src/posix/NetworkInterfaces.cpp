@@ -8,6 +8,7 @@
  * \author      Steffen Brummer
  */
 
+#include <format>
 #include <posix/NetworkInterfaces.h>
 #include <exceptions/CoreException.h>
 #ifdef __linux__
@@ -15,18 +16,12 @@
     #include <unistd.h>
     #include <ifaddrs.h>
     #include <linux/wireless.h>
-    #include <sys/ioctl.h>
     #include <sys/socket.h>
 #elif defined(ESP_PLATFORM)
     #include <esp_netif.h>
 #endif
 
 namespace rsp::posix {
-
-#ifdef __linux__
-static bool isWireless(const std::string &arInterfaceName);
-#endif /* __linux__ */
-
 
 NetworkInterfaces::NetworkInterfaces()
     : mLogger("posix")
@@ -38,7 +33,7 @@ NetworkInterfaces::NetworkInterfaces()
         THROW_SYSTEM("getifaddrs failed");
     }
 
-    // Walk through linked list of interfaces
+    // Walk through the linked list of interfaces
     for (struct ifaddrs *ifa = interface_addresses ; ifa != nullptr ; ifa = ifa->ifa_next) {
 
         if ((ifa->ifa_addr == nullptr) || (ifa->ifa_addr->sa_family != AF_PACKET)) {
@@ -77,29 +72,12 @@ const std::vector<std::string>& NetworkInterfaces::GetCabled() const
     return mCabled;
 }
 
-#ifdef __linux__
-bool isWireless(const std::string &arInterfaceName)
+bool NetworkInterfaces::isWireless(const std::string& arInterfaceName)
 {
-    bool result = false;
-    int sock;
-    struct iwreq ptr_wrq{};
-    std::memset(&ptr_wrq, 0, sizeof(ptr_wrq));
-    std::strncpy(ptr_wrq.ifr_name, arInterfaceName.c_str(), IFNAMSIZ);
-
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        THROW_SYSTEM("socket failed");
-    }
-
-    if (ioctl(sock, SIOCGIWNAME, &ptr_wrq) != -1) {
-//        char protocol[IFNAMSIZ] = { 0 };
-//        std::strncpy(protocol, pwrq.u.name, IFNAMSIZ);
-//        mLogger.Debug() << "Interface " << arInterfaceName << " is wireless, protocol " << std::string(protocol);
-        result = true;
-    }
-
-    close(sock);
-    return result;
-}
+#ifdef __linux__
+    const auto path = std::format("/sys/class/net/{}/wireless", arInterfaceName);
+    return ( access( path.c_str(), F_OK ) != -1 );
 #endif
+}
 
 } /* namespace rsp::posix */

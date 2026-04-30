@@ -11,8 +11,6 @@
 #include <graphics/Font.h>
 #include <graphics/FontRawInterface.h>
 #include <string>
-#include <locale>
-#include <codecvt>
 #include <logging/Logger.h>
 
 namespace rsp::graphics {
@@ -20,73 +18,31 @@ namespace rsp::graphics {
 std::string Font::mDefaultFontName("Exo 2");
 
 
-std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph)
-{
-    os << "Symbol: '";
-    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
-    os << convert.to_bytes(&arGlyph.mSymbolUnicode, &arGlyph.mSymbolUnicode + 1);
-    os << "' "
-        << "Top: " << arGlyph.mTop << ", "
-        << "Left: " << arGlyph.mLeft << ", "
-        << "Height: " << arGlyph.mHeight << ", "
-        << "Width: " << arGlyph.mWidth << ", "
-        << "Advance: (" << arGlyph.mAdvanceX << "," << arGlyph.mAdvanceY << ")";
-    return os;
-}
-
-std::ostream& operator <<(std::ostream &os, const Glyphs &arGlyphs)
-{
-    os << "Glyphs (" << arGlyphs.GetCount() << ")\n"
-       << "  Underline Center: " << arGlyphs.mUnderlineYCenter << "\n"
-       << "  Underline Thickness: " << arGlyphs.mUnderlineThickness << "\n"
-       << "  Line height: " << arGlyphs.mLineHeight << "\n"
-       << "  Baseline: " << arGlyphs.mBaseLine << "\n"
-       << "  BRect: " << arGlyphs.mBoundingRect << "\n"
-       << "  Line Widths: [";
-
-    std::string d;
-    for (const auto &w : arGlyphs.mLineWidths) {
-        os << d << w;
-        d = ",";
-    }
-    os << "]";
-
-    for (unsigned i=0 ; i < arGlyphs.GetCount() ; ++i) {
-        os << "\n  " << arGlyphs.GetGlyph(i);
-    }
-    return os;
-}
-
 void Font::RegisterFont(const char *apFileName)
 {
     FontRawInterface::RegisterFont(apFileName);
 }
 
 
-Font::Font(FontStyles aStyle)
-    : mpImpl(MakePimpl(mDefaultFontName))
+Font::Font(const FontStyles aStyle)
+    : Font(mDefaultFontName, aStyle)
 {
-    SetStyle(aStyle);
-    SetSize(16);
 }
 
-Font::Font(const std::string &arFontName, FontStyles aStyle)
+Font::Font(const std::string &arFontName, const FontStyles aStyle)
     : mpImpl(MakePimpl(arFontName))
 {
     SetStyle(aStyle);
-    SetSize(16);
+    mpImpl->SetSize(16, 16);
+    mDirty = true;
 }
 
-Font::~Font()
-{
-}
-
-Font& Font::SetSize(int aSizePx)
+Font& Font::SetSize(const int aSizePx)
 {
     return SetSize(aSizePx, aSizePx);
 }
 
-Font& Font::SetSize(int aWidthPx, int aHeightPx)
+Font& Font::SetSize(const int aWidthPx, const int aHeightPx)
 {
     mpImpl->SetSize(aWidthPx, aHeightPx);
     mDirty = true;
@@ -107,13 +63,7 @@ Font& Font::SetColor(const Color &arColor)
     return *this;
 }
 
-//Font& Font::SetBackgroundColor(const Color &arColor)
-//{
-//    mBackgroundColor = arColor;
-//    return *this;
-//}
-
-Font& Font::SetStyle(FontStyles aStyle)
+Font& Font::SetStyle(const FontStyles aStyle)
 {
     mpImpl->SetStyle(aStyle);
     mDirty = true;
@@ -126,7 +76,7 @@ FontStyles Font::GetStyle() const
 }
 
 
-std::shared_ptr<Glyphs> Font::MakeGlyphs(const std::string &arText, int aLineSpacing, int aHAlignment)
+std::shared_ptr<Glyphs> Font::MakeGlyphs(const std::string &arText, const int aLineSpacing, const int aHAlignment)
 {
     mDirty = false;
     return mpImpl->MakeGlyphs(arText, aLineSpacing, aHAlignment);

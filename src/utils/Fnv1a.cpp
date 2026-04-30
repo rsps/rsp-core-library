@@ -12,12 +12,12 @@
 
 namespace rsp::utils {
 
-uint32_t Fnv1a::Hash32(const void *apData, uint32_t aLen)
+uint32_t Fnv1a::Hash32(const void *apData, const std::string_view::size_type aLen)
 {
     uint32_t hash = fnv1a::cOffsetBasis32;
-    uint32_t prime = fnv1a::cPrime32;
+    constexpr uint32_t prime = fnv1a::cPrime32;
 
-    const auto *data = reinterpret_cast<const uint8_t *>(apData);
+    const auto *data = static_cast<const uint8_t *>(apData);
 
     for(uint32_t i = 0; i < aLen; ++i) {
         hash = (hash ^ data[i]) * prime;
@@ -26,12 +26,12 @@ uint32_t Fnv1a::Hash32(const void *apData, uint32_t aLen)
     return hash;
 }
 
-uint64_t Fnv1a::Hash64(const void *apData, uint64_t aLen)
+uint64_t Fnv1a::Hash64(const void *apData, const uint64_t aLen)
 {
     uint64_t hash = fnv1a::cOffsetBasis64;
-    uint64_t prime = fnv1a::cPrime64;
+    constexpr uint64_t prime = fnv1a::cPrime64;
 
-    const auto *data = reinterpret_cast<const uint8_t *>(apData);
+    const auto *data = static_cast<const uint8_t *>(apData);
 
     for(uint32_t i = 0; i < aLen; ++i) {
         hash = (hash ^ data[i]) * prime;

@@ -14,6 +14,7 @@
 #include <iostream>
 #include <doctest.h>
 #include <exceptions/CoreException.h>
+#include <json/Json.h>
 #include <logging/BufferToStream.h>
 #include <logging/Logger.h>
 #include <logging/LogChannel.h>
@@ -25,6 +26,7 @@
 using namespace rsp;
 using namespace rsp::utils;
 using namespace rsp::logging;
+using namespace std::chrono;
 
 TEST_SUITE_BEGIN("Logging");
 
@@ -48,12 +50,30 @@ static std::vector<std::string> mConsoleErrorBuffer;
 class TestConsoleStream : public ConsoleLogStreamsInterface
 {
 public:
-    void Error(const std::string &arMsg) override {
-        mConsoleErrorBuffer.emplace_back(arMsg);
-    }
+    void Write(std::string_view aMsg, LogLevel aCurrentLevel, const std::string& arChannel, const DynamicData& arContext, const std::string& arColor) override
+    {
+        std::stringstream out;
+        if (!arColor.empty()) {
+            out << arColor;
+        }
+        if (!arChannel.empty()) {
+            out << arChannel << ": ";
+        }
+        out << aMsg;
+        if (!arContext.IsNull()) {
+            out << " " << rsp::json::JsonEncoder().Encode(arContext);
+        }
+        if (!arColor.empty()) {
+            out << std::string(utils::AnsiEscapeCodes::ec::ConsoleDefault);
+        }
+        out << std::endl;
 
-    void Info(const std::string &arMsg) override {
-        mConsoleInfoBuffer.emplace_back(arMsg);
+        if (aCurrentLevel < logging::LogLevel::Warning) {
+            mConsoleErrorBuffer.emplace_back(out.str());
+        }
+        else {
+            mConsoleInfoBuffer.emplace_back(out.str());
+        }
     }
 };
 
@@ -86,19 +106,20 @@ TEST_CASE("Logging") {
     logging::LoggerInterface::Handle_t file;
     logging::LoggerInterface::Handle_t console;
 
+    CHECK_EQ(log.GetChannelName(), "Test Channel");
     CHECK_NOTHROW(file = log.MakeLogWriter<logging::FileLogWriter>(cFileName, logging::LogLevel::Info));
     CHECK_NOTHROW(console = log.MakeLogWriter<logging::ConsoleLogWriter>(logging::LogLevel::Critical, new TestConsoleStream(), &cConsoleColors));
 
     CHECK_NOTHROW(log.Info() << "Test of logger");
-    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(7)));
+    CHECK_NOTHROW(std::this_thread::sleep_for(7ms));
     CHECK_NOTHROW(log.Alert() << SetContext(DynamicData().Add("Test Context").Add(42)) << "Alert");
-    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(2)));
+    CHECK_NOTHROW(std::this_thread::sleep_for(2ms));
     CHECK_NOTHROW(log.Error() << "Error");
-    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(3)));
+    CHECK_NOTHROW(std::this_thread::sleep_for(3ms));
     CHECK_NOTHROW(log.Warning() << "Warning");
-    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(5)));
+    CHECK_NOTHROW(std::this_thread::sleep_for(5ms));
     CHECK_NOTHROW(log.Info() << "Info");
-    CHECK_NOTHROW(std::this_thread::sleep_for(std::chrono::milliseconds(4)));
+    CHECK_NOTHROW(std::this_thread::sleep_for(4ms));
     CHECK_NOTHROW(log.Debug() << "Debug");
     CHECK_NOTHROW(log.Debug() << SetLevel(LogLevel::Info) << "Dbg-Info");
 
@@ -108,23 +129,23 @@ TEST_CASE("Logging") {
     CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Critical) << "Critical to std::clog" << SetChannel("Main") << std::endl);
 
     CHECK_NOTHROW(log.Emergency() << "Sleeping for 1 second");
-    auto end = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
+    auto end = std::chrono::high_resolution_clock::now() + 1s;
 
     std::thread t([&]() {
         for (int i=0; i < 12 ; i++) {
             CHECK_NOTHROW(std::clog << SetLevel(LogLevel::Info) << SetChannel("Main") << "Writing from thread " << i << std::endl);
-            std::this_thread::sleep_for(std::chrono::milliseconds(90));
+            std::this_thread::sleep_for(90ms);
         }
     });
 
     do {
         CHECK_NOTHROW(std::clog << SetChannel("Main") << SetLevel(LogLevel::Info) << "Writing from main" << std::endl);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(100ms);
     }
     while (std::chrono::high_resolution_clock::now() < end);
     CHECK_NOTHROW(std::clog << "Wakeup..." << std::endl);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(100ms);
     t.join();
 
     std::vector<uint8_t> vec = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
@@ -141,8 +162,8 @@ TEST_CASE("Logging") {
     std::getline(fin, line);
     CHECK_MESSAGE(StrUtils::Contains(line, "Test of logger"), line);
 
-    CHECK_EQ(mConsoleErrorBuffer.size(), 3);
-    CHECK_EQ(mConsoleInfoBuffer.size(), 0);
+    CHECK_EQ(mConsoleErrorBuffer.size(), 3u);
+    CHECK_EQ(mConsoleInfoBuffer.size(), 0u);
 
     std::getline(fin, line);
     CHECK_MESSAGE(StrUtils::EndsWith(line, "] Test Channel.ALERT: Alert [\"Test Context\",42]"), line);

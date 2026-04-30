@@ -22,8 +22,8 @@ TEST_CASE("Font")
 {
     TestLogger logger;
 
-    const char* cFontFile = "fonts/Exo 2/Exo2-VariableFont_wght.ttf";
-    const char* cFontName = "Exo 2";
+    auto cFontFile = "fonts/Exo 2/Exo2-VariableFont_wght.ttf";
+    auto cFontName = "Exo 2";
 
     SUBCASE("Load Font") {
         CHECK_NOTHROW(Font::RegisterFont(cFontFile));
@@ -35,7 +35,7 @@ TEST_CASE("Font")
         font.SetSize(16);
 
         auto glyphs = font.MakeGlyphs("A");
-        CHECK_EQ(glyphs->GetCount(), 1);
+        CHECK_EQ(glyphs->GetCount(), 1u);
         CHECK_GT(glyphs->GetGlyph(0).mHeight, 0);
         CHECK_LT(glyphs->GetGlyph(0).mHeight, 16);
         CHECK_GT(glyphs->GetGlyph(0).mWidth, 0);
@@ -45,14 +45,14 @@ TEST_CASE("Font")
     SUBCASE("Get Text Mask") {
         CHECK_NOTHROW(Font::RegisterFont(cFontFile));
         Text text(cFontName, "qwertyuiopasdfghjklzxcvbnm1234567890-_:;()&@\".,?!'/* []{}#%+~ =¤\\=<>£€$.,?!'/*");
-        const int size = 16;
+        constexpr int size = 16;
 
         text.GetFont().SetSize(size);
 
         Rect r = text.Reload().GetBoundingRect();
 
-        CHECK_LT(r.GetHeight(), size+4);
-        CHECK_LT(r.GetWidth(), (size * text.GetValue().size()));
+        CHECK_LT(r.GetHeight(), static_cast<GuiUnit_t>(size+4));
+        CHECK_LT(r.GetWidth(), static_cast<GuiUnit_t>(size * text.GetValue().size()));
     }
 
     SUBCASE("Scale To fit") {

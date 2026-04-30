@@ -8,7 +8,6 @@
  * \author      Steffen Brummer
  */
 #include <algorithm>
-#include <list>
 #include <string>
 #include <string_view>
 #include <network/WLan.h>
@@ -29,9 +28,12 @@ namespace rsp::network {
 WpaSupplicant::WpaSupplicant()
     : mLogger("WpaSupplicant")
 {
-    NetworkInterfaces ifs;
+    const NetworkInterfaces ifs;
+    if (ifs.GetWireless().empty()) {
+        return;
+    }
     mInterfaceName = ifs.GetWireless()[0];
-    std::string socket = std::string("/var/run/wpa_supplicant/") + mInterfaceName;
+    const std::string socket = std::string("/var/run/wpa_supplicant/") + mInterfaceName;
 
     mpWpaCtrl = wpa_ctrl_open(socket.c_str());
     if (!mpWpaCtrl) {
@@ -49,9 +51,6 @@ WpaSupplicant::WpaSupplicant()
     if (wpa_ctrl_attach(mpMonitorCtrl) < 0) {
         THROW_WITH_BACKTRACE1(EWlanException, "Could not attach monitor to wpa_supplicant");
     }
-
-//    std::cout << "ctrl fd is " << wpa_ctrl_get_fd(mpWpaCtrl) << std::endl;
-//    std::cout << "monitor fd is " << wpa_ctrl_get_fd(mpMonitorCtrl) << std::endl;
 }
 
 WpaSupplicant::~WpaSupplicant()
@@ -187,7 +186,7 @@ APInfo WpaSupplicant::GetStatus()
 std::vector<NetworkInfo> WpaSupplicant::GetKnownNetworks()
 {
     std::vector<NetworkInfo> result;
-    std::string reply = request("LIST_NETWORKS");
+    const std::string reply = request("LIST_NETWORKS");
 
     const std::string header("network id / ssid / bssid / flags\n");
     if (!StrUtils::StartsWith(reply, header)) {
@@ -215,7 +214,7 @@ NetworkInfo WpaSupplicant::AddNetwork(const std::string &arSSID, const SecureStr
             RemoveNetwork(network);
         }
     }
-    catch(const EWlanException &e) {
+    catch(const EWlanException &) {
         // Do nothing, we are out of while loop.
     }
 
@@ -239,7 +238,7 @@ NetworkInfo WpaSupplicant::AddNetwork(const std::string &arSSID, const SecureStr
 
 IWlanInterface& WpaSupplicant::SelectNetwork(const NetworkInfo &arNetwork)
 {
-    std::string reply = request("SELECT_NETWORK " + std::to_string(arNetwork.mId));
+    const std::string reply = request("SELECT_NETWORK " + std::to_string(arNetwork.mId));
     if (!StrUtils::StartsWith(reply, "OK")) {
         THROW_WITH_BACKTRACE1(EWlanException, "Failed select network " + arNetwork.mSSID);
     }
@@ -249,7 +248,7 @@ IWlanInterface& WpaSupplicant::SelectNetwork(const NetworkInfo &arNetwork)
 
 IWlanInterface& WpaSupplicant::RemoveNetwork(const NetworkInfo &arNetwork)
 {
-    std::string reply = request("REMOVE_NETWORK " + std::to_string(arNetwork.mId));
+    const std::string reply = request("REMOVE_NETWORK " + std::to_string(arNetwork.mId));
     if (!StrUtils::StartsWith(reply, "OK")) {
         THROW_WITH_BACKTRACE1(EWlanException, "Failed select network " + arNetwork.mSSID);
     }
@@ -260,7 +259,7 @@ IWlanInterface& WpaSupplicant::RemoveNetwork(const NetworkInfo &arNetwork)
 NetworkInfo WpaSupplicant::FindNetwork(const std::string &arSSID)
 {
     auto networks = GetKnownNetworks();
-    auto it = std::find_if(networks.begin(), networks.end(), [&arSSID](const NetworkInfo &arInfo) {
+    const auto it = std::ranges::find_if(networks, [&arSSID](const NetworkInfo &arInfo) noexcept {
         return arInfo.mSSID == arSSID;
     });
 
@@ -274,7 +273,7 @@ NetworkInfo WpaSupplicant::FindNetwork(const std::string &arSSID)
 
 rsp::network::IWlanInterface& WpaSupplicant::Reconnect()
 {
-    std::string reply = request("RECONNECT");
+    const std::string reply = request("RECONNECT");
     if (!StrUtils::StartsWith(reply, "OK")) {
         THROW_WITH_BACKTRACE1(EWlanException, "Failed network reconnect");
     }
@@ -283,7 +282,7 @@ rsp::network::IWlanInterface& WpaSupplicant::Reconnect()
 
 rsp::network::IWlanInterface& WpaSupplicant::Disconnect()
 {
-    std::string reply = request("DISCONNECT");
+    const std::string reply = request("DISCONNECT");
     if (!StrUtils::StartsWith(reply, "OK")) {
         THROW_WITH_BACKTRACE1(EWlanException, "Failed network reconnect");
     }
@@ -299,7 +298,7 @@ rsp::network::IWlanInterface& WpaSupplicant::ReleaseIP()
 
 std::string WpaSupplicant::AcquireIp()
 {
-    std::string command("dhclient " + mInterfaceName);
+    const std::string command("dhclient " + mInterfaceName);
     runCommand(command);
 
     APInfo info = GetStatus();
@@ -308,6 +307,9 @@ std::string WpaSupplicant::AcquireIp()
 
 WpaEvents WpaSupplicant::GetMonitorEvent(std::string &arMessage)
 {
+    if (!mpMonitorCtrl) {
+        return WpaEvents::None;
+    }
     int res = wpa_ctrl_pending(mpMonitorCtrl);
     if (res == -1) {
         THROW_WITH_BACKTRACE1(EWlanException, "Failed check for WPA monitor events");
@@ -364,9 +366,13 @@ std::string WpaSupplicant::request(std::string_view aCmd)
     size_t reply_len = sizeof(mReplyBuffer);
 
     mLogger.Debug() << "Request " << aCmd;
-    int res = wpa_ctrl_request(mpWpaCtrl, aCmd.data(), aCmd.size(), mReplyBuffer, &reply_len, nullptr);
-    if (res < 0) {
-        THROW_WITH_BACKTRACE1(EWlanException, "wpa_ctrl_request failed: " + std::to_string(res));
+    if (mpWpaCtrl) {
+        if (const int res = wpa_ctrl_request(mpWpaCtrl, aCmd.data(), aCmd.size(), mReplyBuffer, &reply_len, nullptr); res < 0) {
+            THROW_WITH_BACKTRACE1(EWlanException, "wpa_ctrl_request failed: " + std::to_string(res));
+        }
+    }
+    else {
+        reply_len = 0;
     }
 
     std::string result(mReplyBuffer, reply_len);
@@ -383,7 +389,7 @@ bool WpaSupplicant::ping()
 
 void WpaSupplicant::save(const std::string &arSSID)
 {
-    std::string reply = request(std::string("SAVE_CONFIG"));
+    const std::string reply = request(std::string("SAVE_CONFIG"));
     if (!StrUtils::StartsWith(reply, "OK")) {
         THROW_WITH_BACKTRACE1(EWlanException, "Failed to save network configuration for " + arSSID);
     }

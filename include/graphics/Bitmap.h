@@ -16,9 +16,7 @@
 #include <memory>
 
 #include <functional>
-#include <map>
 #include <string>
-#include <vector>
 
 namespace rsp::graphics
 {

@@ -33,14 +33,14 @@ int OutStreamBuffer::overflow(int c)
 
 int OutStreamBuffer::sync()
 {
-    if (mLock.IsLocked()) {
+    if (!mLock.IsLocked()) {
         DEBUG("OutStreamBuffer mutex was not locked!!! " << std::this_thread::get_id())
     }
 
-    std::string result = mBuffer.str();
+    auto result = mBuffer.view();
     // Remove one ending newline, writeToLogger enforces a newline on every write
     if (!result.empty() && (result[result.length()-1] == '\n')) {
-        result.pop_back();
+        result = result.substr(0, result.length()-1);
     }
 
     if (!result.empty()) {
@@ -48,6 +48,7 @@ int OutStreamBuffer::sync()
         writeToLogger(result);
     }
     mBuffer.str(std::string());
+    mBuffer.clear();
 
     mLock.Unlock();
     DEBUG("Unlocked by " << std::this_thread::get_id())

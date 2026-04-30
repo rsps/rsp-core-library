@@ -9,8 +9,9 @@
  */
 
 #include <application/Console.h>
+#include <iostream>
 #include <string>
-#include <sstream>
+#include <json/Json.h>
 #include <utils/AnsiEscapeCodes.h>
 
 using namespace rsp::utils::AnsiEscapeCodes;
@@ -20,7 +21,7 @@ namespace rsp::application {
 std::string Console::mTtyDeviceFile = "/dev/tty1";
 bool Console::mUseColors = false;
 
-static std::string textColorToEscapeString(TextColor aColor)
+static std::string textColorToEscapeString(const TextColor aColor)
 {
     std::string result;
     if (!Console::GetUseColors()) {
@@ -53,34 +54,48 @@ static std::string textColorToEscapeString(TextColor aColor)
     return result;
 }
 
-std::ostream& operator <<(std::ostream &os, TextColor aLogColor)
+std::ostream& operator <<(std::ostream &os, const TextColor aLogColor)
 {
     os << textColorToEscapeString(aLogColor);
-
     return os;
 }
 
 
-ConsoleStream::ConsoleStream(Console *apConsole, TextColor aColor)
-    : mpConsole(apConsole)
+ConsoleStream::ConsoleStream(Console *apConsole, const TextColor aColor)
+    : mpConsole(apConsole),
+      mColor(aColor)
 {
-    *this << textColorToEscapeString(aColor);
-
-    mColor = aColor;
+    mBuffer << textColorToEscapeString(aColor);
 }
 
-ConsoleStream::ConsoleStream(ConsoleStream &&aFrom) noexcept
-    : std::stringstream(static_cast<std::stringstream&&>(aFrom))
+ConsoleStream::ConsoleStream(ConsoleStream &&arOther) noexcept
+    : mpConsole(arOther.mpConsole),
+      mColor(arOther.mColor),
+      mBuffer(std::move(arOther.mBuffer))
 {
-    mpConsole = aFrom.mpConsole;
-    mColor = aFrom.mColor;
 }
 
 ConsoleStream::~ConsoleStream()
 {
-    if (rdbuf()->in_avail() > 0) {
-        mpConsole->write(str(), mColor);
+    if (mBuffer.rdbuf()->in_avail() > 0) {
+        mpConsole->write(mBuffer.view(), mColor);
     }
+}
+
+ConsoleStream& ConsoleStream::operator=(ConsoleStream&& arOther) noexcept
+{
+    if (this != &arOther) {
+        mpConsole = arOther.mpConsole;
+        mColor = arOther.mColor;
+        mBuffer = std::move(arOther.mBuffer);
+    }
+    return *this;
+}
+
+ConsoleStream& ConsoleStream::operator<<(std::ostream& (* apFunc)(std::ostream&))
+{
+    mBuffer << apFunc;
+    return *this;
 }
 
 
@@ -106,32 +121,32 @@ Console::~Console()
     }
 }
 
-void Console::write(const std::string &arMsg, TextColor aColor)
+void Console::write(const std::string_view aMsg, const TextColor aColor)
 {
     if (aColor == TextColor::Error) {
-        std::cerr << arMsg << std::flush;
+        std::cerr << aMsg << std::flush;
     }
     else {
-        std::cout << arMsg << std::flush;
+        std::cout << aMsg << std::flush;
     }
 
     if (mPrintToDisplay) {
-        mLcdDisplay << arMsg;
+        mLcdDisplay << aMsg;
         mLcdDisplay.flush();
     }
 }
 
 void Console::SetTtyDevice(const std::string &arTtyDevice)
 {
-    Get().updatePrintToDisplay(mTtyDeviceFile, Get().mPrintToDisplay);
+    Get().updatePrintToDisplay(arTtyDevice, Get().mPrintToDisplay);
 }
 
-void Console::SetPrintToDisplay(bool aEnable)
+void Console::SetPrintToDisplay(const bool aEnable)
 {
     Get().updatePrintToDisplay(mTtyDeviceFile, aEnable);
 }
 
-void Console::updatePrintToDisplay(const std::string &arTtyDevice, bool aEnable)
+void Console::updatePrintToDisplay(const std::string &arTtyDevice, const bool aEnable)
 {
     mTtyDeviceFile = arTtyDevice;
     mPrintToDisplay = aEnable;
@@ -150,15 +165,24 @@ void Console::updatePrintToDisplay(const std::string &arTtyDevice, bool aEnable)
     }
 }
 
-void ConsoleLogStreams::Error(const std::string &arMsg)
+void Console::Write(std::string_view aMsg, logging::LogLevel aCurrentLevel, const std::string& arChannel, const utils::DynamicData& arContext, const std::string& arColor)
 {
-    Console::Error() << arMsg;
-}
+    ConsoleStream out(this, (aCurrentLevel < logging::LogLevel::Warning) ? TextColor::Error : TextColor::Info);
 
-void ConsoleLogStreams::Info(const std::string &arMsg)
-{
-    Console::Info() << arMsg;
+    if (!arColor.empty()) {
+        out << arColor;
+    }
+    if (!arChannel.empty()) {
+        out << arChannel << ": ";
+    }
+    out << aMsg;
+    if (!arContext.IsNull()) {
+        out << " " << rsp::json::JsonEncoder().Encode(arContext);
+    }
+    if (!arColor.empty()) {
+        out << std::string(utils::AnsiEscapeCodes::ec::ConsoleDefault);
+    }
+    out << std::endl;
 }
-
 
 } /* namespace rsp::application */

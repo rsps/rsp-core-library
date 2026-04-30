@@ -11,6 +11,7 @@
 #ifndef RSP_CORE_LIB_UTILS_RANDOM_H
 #define RSP_CORE_LIB_UTILS_RANDOM_H
 
+#include <concepts>
 #include <random>
 
 namespace rsp::utils {
@@ -18,29 +19,31 @@ namespace rsp::utils {
 class Random
 {
 public:
-    static void Seed(unsigned int aSeed)
+    using Engine = std::default_random_engine;
+
+    static void Seed(const Engine::result_type aSeed)
     {
         Generator().seed(aSeed);
     }
 
-    template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+    template <std::integral T>
     static T Roll(T aMin, T aMax)
     {
         std::uniform_int_distribution<T> distribution(aMin, aMax);
         return distribution(Generator());
     }
 
-    template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+    template <std::floating_point T>
     static T Roll(T aMin, T aMax)
     {
         std::uniform_real_distribution<T> distribution(aMin, aMax);
         return distribution(Generator());
     }
 
-    static std::default_random_engine& Generator()
+    static Engine& Generator()
     {
         std::random_device r;
-        static std::default_random_engine generator(r());
+        static Engine generator(r());
         return generator;
     }
 };

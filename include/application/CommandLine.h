@@ -39,9 +39,9 @@ public:
     std::vector<std::string>& GetOptions() { return mOptions; }
 
     /**
-     * Check if a given option exist on the command line.
+     * Check if a given option exists on the command line.
      *
-     * \param aStr
+     * \param arStr Option name
      * \return True if the option exists
      */
     bool HasOption(const std::string &arStr);
@@ -50,7 +50,7 @@ public:
     /**
      * Get the value assigned to an extended option, e.g. '--name=value'
      *
-     * \param aOption Name of option
+     * \param arOption Name of the option
      * \param arValue Reference to string that is loaded with value.
      * \return bool True if the option exists
      */

@@ -8,7 +8,7 @@ include_guard(GLOBAL)
 # Debug
 message(VERBOSE "Installing Magic Enum C++")
 
-set(MAGIC_ENUM_VERSION "0.8.2")
+set(MAGIC_ENUM_VERSION "0.9.7")
 CPMAddPackage(
     NAME "magic_enum"
     GITHUB_REPOSITORY "Neargye/magic_enum"

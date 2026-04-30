@@ -31,30 +31,30 @@ size_t MultipartBody::Read(std::span<std::byte> aBuffer) const
 
     size_t result = 0;
     while (result == 0 && mReadPartIndex < mParts.size()) {
-        auto& part = const_cast<MultipartPart_t&>(mParts.at(mReadPartIndex));
-        if (part.mReadIndex < part.mHeaders.size()) {
-            result = std::min(part.mHeaders.size(), aBuffer.size());
-            std::memcpy(aBuffer.data(), part.mHeaders.data() + part.mReadIndex, result);
-            part.mReadIndex += result;
+        auto&& [mHeaders, mpBody, mReadIndex] = mParts.at(mReadPartIndex);
+        if (mReadIndex < mHeaders.size()) {
+            result = std::min(mHeaders.size(), aBuffer.size());
+            std::memcpy(aBuffer.data(), mHeaders.data() + mReadIndex, result);
+            mReadIndex += result;
         }
-        else if (part.mpBody) {
-            result = part.mpBody->Read(aBuffer);
+        else if (mpBody) {
+            result = mpBody->Read(aBuffer);
             if (result == 0) {
-                const_cast<MultipartBody*>(this)->mReadPartIndex++;
+                mReadPartIndex++;
             }
         }
         else {
-            const_cast<MultipartBody*>(this)->mReadPartIndex++;
+            mReadPartIndex++;
         }
     }
 
     if (mReadPartIndex == mParts.size()) {
-        // Here we expect end boundary to fit in buffer...
-        auto end = mBoundary.GetEndBoundary();
-        ASSERT(end.size() < aBuffer.size());
+        // Here we expect the end boundary to fit in the buffer...
+        const auto end = mBoundary.GetEndBoundary();
+        ASSERT(end.size() <= aBuffer.size());
         result = end.size();
         std::memcpy(aBuffer.data(), end.data(), result);
-        const_cast<MultipartBody*>(this)->mReadPartIndex++;
+        mReadPartIndex++;
     }
 
     return result;
@@ -71,6 +71,15 @@ size_t MultipartBody::GetStreamSize() const
     }
     result += mBoundary.GetEndBoundary().size();
     return result;
+}
+
+MultipartBody& MultipartBody::Rewind()
+{
+    mReadPartIndex = 0;
+    for (auto &part : mParts) {
+        part.mReadIndex = 0;
+    }
+    return *this;
 }
 
 MultipartBody& MultipartBody::Add(const std::string& arName, posix::FileIO& arFile, const std::string& arContentType)

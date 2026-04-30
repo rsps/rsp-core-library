@@ -13,7 +13,7 @@
 
 #include <logging/LogWriterInterface.h>
 #include <array>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace rsp::logging {
 
@@ -26,8 +26,7 @@ class ConsoleLogStreamsInterface
 public:
     virtual ~ConsoleLogStreamsInterface() = default;
 
-    virtual void Info(const std::string &arMsg) = 0;
-    virtual void Error(const std::string &arMsg) = 0;
+    virtual void Write(std::string_view aMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext, const std::string& arColor) = 0;
 };
 
 
@@ -46,7 +45,7 @@ public:
     ConsoleLogWriter(const ConsoleLogWriter&) = delete;
     ~ConsoleLogWriter() override;
 
-    void Write(const std::string &arMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
+    void Write(std::string_view aMsg, LogLevel aCurrentLevel, const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
 
     ConsoleLogWriter& operator= (const ConsoleLogWriter&) = delete;
 

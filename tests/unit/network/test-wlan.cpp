@@ -9,6 +9,7 @@
  */
 
 #include <doctest.h>
+#include <chrono>
 #include <network/WLan.h>
 #include <posix/NetworkInterfaces.h>
 #include <posix/FileSystem.h>
@@ -17,21 +18,22 @@
 
 using namespace rsp::network;
 using namespace rsp::posix;
+using namespace std::chrono_literals;
 
 TEST_SUITE_BEGIN("Network");
 
 static void FetchMonitorEvents(WLan &arWlan)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(50ms);
     int retries = 2;
     rsp::network::WpaEvents event;
     do {
         std::string msg;
         CHECK_NOTHROW(event = arWlan.GetMonitorEvent(msg));
-        MESSAGE("Monitor: (" << int(event) << ") " << msg);
+        MESSAGE("Monitor: (" << static_cast<int>(event) << ") " << msg);
         if (event == rsp::network::WpaEvents::None) {
             retries--;
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(100ms);
         }
     }
     while (retries);
@@ -39,8 +41,7 @@ static void FetchMonitorEvents(WLan &arWlan)
 
 static const char* GetEnv(const char *apName, const char *apDefault)
 {
-    const char *p = std::getenv(apName);
-    if (p) {
+    if (const char *p = std::getenv(apName)) {
         return p;
     }
     return apDefault;
@@ -48,9 +49,15 @@ static const char* GetEnv(const char *apName, const char *apDefault)
 
 static bool wpa_supplicant_not_available()
 {
-    std::string wpa_dir("/var/run/wpa_supplicant/");
-    NetworkInterfaces ifs;
-    std::string wifi_if(ifs.GetWireless()[0]);
+    if ( access( "/etc/wpa_supplicant/wpa_supplicant.conf", F_OK ) == -1 ) {
+        return true;
+    }
+    const std::string wpa_dir("/var/run/wpa_supplicant/");
+    const NetworkInterfaces ifs;
+    if (ifs.GetWireless().empty()) {
+        return false;
+    }
+    const std::string wifi_if(ifs.GetWireless()[0]);
     if (!FileSystem::FileExists(wpa_dir + wifi_if)) {
         std::cerr << "SKIPPING WLAN test. The wpa_supplicant directory " << wpa_dir << wifi_if << " is not accessible by this program/user";
         return true;
@@ -64,7 +71,7 @@ TEST_CASE("WLAN") // * doctest::skip(wpa_supplicant_not_available()))
     const char* cPSK = GetEnv("PSK", "VerySecurePW");
 
     if (wpa_supplicant_not_available()) {
-        return; // This exits the test case without signalling error.
+        return; // This exits the test case without signaling an error.
     }
 
     TestLogger logger;
@@ -90,7 +97,9 @@ TEST_CASE("WLAN") // * doctest::skip(wpa_supplicant_not_available()))
 
     SUBCASE("Constructors") {
         NetworkInterfaces ifs;
-        MESSAGE("Using interface " << ifs.GetWireless()[0] << " with ssid=" << std::string(cSSID) << " and psk=" << std::string(cPSK));
+        if (!ifs.GetWireless().empty()) {
+            MESSAGE("Using interface " << ifs.GetWireless()[0] << " with ssid=" << std::string(cSSID) << " and psk=" << std::string(cPSK));
+        }
         CHECK_NOTHROW(WLan());
     }
 
@@ -125,7 +134,7 @@ TEST_CASE("WLAN") // * doctest::skip(wpa_supplicant_not_available()))
         );
         MESSAGE("Network: " << network.mId << ", " << network.mSSID);
         CHECK_EQ(network.mSSID, std::string(cSSID));
-        CHECK_NE(network.mId, uint32_t(-1));
+        CHECK_NE(network.mId, static_cast<uint32_t>(-1));
     }
 
     SUBCASE("ListNetworks")
@@ -179,7 +188,7 @@ TEST_CASE("WLAN") // * doctest::skip(wpa_supplicant_not_available()))
         if (std::string("MyWLan").compare(0, 6, cSSID) != 0) {
             WLan wlan;
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::this_thread::sleep_for(500ms);
             FetchMonitorEvents(wlan);
 
             APInfo status;
@@ -187,14 +196,14 @@ TEST_CASE("WLAN") // * doctest::skip(wpa_supplicant_not_available()))
             CHECK_EQ(status.mStatus, WpaStatus::Completed);
 
             CHECK_NOTHROW(wlan.Disconnect());
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::this_thread::sleep_for(500ms);
             FetchMonitorEvents(wlan);
 
             CHECK_NOTHROW(status = wlan.GetStatus());
             CHECK_NE(status.mStatus, WpaStatus::Completed);
 
             CHECK_NOTHROW(wlan.Reconnect());
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::this_thread::sleep_for(500ms);
             FetchMonitorEvents(wlan);
 
             CHECK_NOTHROW(status = wlan.GetStatus());
@@ -227,7 +236,7 @@ TEST_CASE("WLAN") // * doctest::skip(wpa_supplicant_not_available()))
             do {
                 std::string msg;
                 CHECK_NOTHROW(event = wlan.GetMonitorEvent(msg));
-                MESSAGE("Monitor: (" << int(event) << ") " << msg);
+                MESSAGE("Monitor: (" << static_cast<int>(event) << ") " << msg);
             }
             while (event != rsp::network::WpaEvents::None);
         }

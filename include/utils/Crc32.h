@@ -114,21 +114,21 @@ namespace crc32 {
             0xb3667a2eL, 0xc4614ab8L, 0x5d681b02L, 0x2a6f2b94L, 0xb40bbe37L, 0xc30c8ea1L, 0x5a05df1bL, 0x2d02ef8dL
         };
 
-        constexpr uint32_t crc32_add( const char *apU, uint32_t aC=0xFFFFFFFF ) // NOLINT
+        constexpr uint32_t crc32_add(const std::string_view aU, const unsigned index, const uint32_t aC=0xFFFFFFFF ) noexcept
         {
-            return (*apU == '\0') ? aC : crc32_add(apU + 1, (aC >> 8) ^ crc_table[(aC ^ static_cast<uint8_t>(*apU)) & 0x000000FF]);
+            return aU.size() == index ? aC : crc32_add(aU, index +1, (aC >> 8) ^ crc_table[(aC ^ static_cast<uint8_t>(aU[index])) & 0x000000FF]);
         }
     } /* namespace detail */
 
-    constexpr uint32_t HashConst(const char *apStr)
+    constexpr uint32_t HashConst(const std::string_view aStr)
     {
-        return detail::crc32_add(apStr) ^ 0xFFFFFFFF;
+        return detail::crc32_add(aStr, 0) ^ 0xFFFFFFFF;
     }
 } /* namespace crc32 */
 
-size_t constexpr operator "" _crc32( const char* str, size_t /*len*/ )
+constexpr size_t operator ""_crc32( const char* str, const size_t len)
 {
-    return crc32::HashConst(str);
+    return crc32::HashConst(std::string_view{str, len});
 }
 
 } /* namespace rsp */

@@ -18,7 +18,7 @@
 
 namespace rsp::messaging {
 
-class BrokerInterface : public rsp::utils::Singleton<BrokerInterface>
+class BrokerInterface : public utils::Singleton<BrokerInterface>
 {
 public:
     BrokerInterface()
@@ -38,16 +38,16 @@ public:
 
     virtual BrokerInterface& Publish(EventPtr_t apEvent) = 0;
 
-    template<class T, std::enable_if_t<std::is_base_of<rsp::messaging::Event, T>::value, bool> = true>
+    template<class T, std::enable_if_t<std::is_base_of_v<Event, T>, bool> = true>
     BrokerInterface& Publish(const T& arEvent)
     {
-        return Publish(std::make_shared<T>(arEvent)); // Copy given event
+        return Publish(std::make_shared<T>(arEvent)); // Copy the given event
     }
 
-    template<class T, typename ... Args, std::enable_if_t<std::is_base_of<rsp::messaging::Event, T>::value, bool> = true>
+    template<class T, typename ... Args, std::enable_if_t<std::is_base_of_v<Event, T>, bool> = true>
     BrokerInterface& Publish(Args... args)
     {
-        return Publish(std::make_shared<T>(args...)); // Create given event
+        return Publish(std::make_shared<T>(args...)); // Create the given event
     }
 
     virtual BrokerInterface& Subscribe(SubscriberInterface &arSubscriber) = 0;

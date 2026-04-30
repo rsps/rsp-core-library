@@ -17,9 +17,9 @@ OPTION(SDL2 "Use SDL2 for graphic acceleration." ON)
 OPTION(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON) # Enabled by default.
 OPTION(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON) # Enabled by default.
 OPTION(MBEDTLS_CRYPTO "Build with Mbed TLS encryption engine." OFF) # Disabled by default.
-OPTION(NET_LIBCURL "Build with LibCurl network library." OFF) # Disabled by default.
-OPTION(NET_EMBED_HTTP "Build with Embed HTTP network library." ON) # Enabled by default.
-OPTION(BUILD_TESTING "Set to build test binaries" OFF) # Enabled by default.
+OPTION(NET_LIBCURL "Build with LibCurl network library." ON) # Disabled by default.
+OPTION(NET_EMBED_HTTP "Build with Embed HTTP network library." OFF) # Enabled by default.
+OPTION(BUILD_TESTING "Set to build test binaries" ON) # Enabled by default.
 OPTION(ZLIB "Build with ZLib Inflate/Deflate compression." OFF)
 OPTION(NET_WPA_SUPPLICANT "Build with libwpa-client wpa_supplicant library." ON) # Enabled by default.
 OPTION(STD_THREAD "Thread architecture to use." ON) # C++ std::thread
@@ -33,7 +33,7 @@ find_package(Git REQUIRED)
 
 # Install "CMake Scripts" dependency
 include(FetchContent)
-FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.3.0")
+FetchContent_Declare("rsp-cmake-scripts" GIT_REPOSITORY "https://github.com/rsps/cmake-scripts" GIT_TAG "v0.4.0")
 FetchContent_MakeAvailable("rsp-cmake-scripts")
 
 # Abort if building in-source
@@ -131,6 +131,13 @@ else()
         -O3
     )
 endif()
+
+if (EHTTP_REQUEST_BUFFER_SIZE)
+    message(STATUS "Compiling eHttp with request buffer size: ${EHTTP_REQUEST_BUFFER_SIZE}")
+    target_compile_options("${PROJECT_NAME}" PRIVATE
+        -DEHTTP_REQUEST_BUFFER_SIZE=${EHTTP_REQUEST_BUFFER_SIZE}
+    )
+endif ()
 
 add_subdirectory(src)
 

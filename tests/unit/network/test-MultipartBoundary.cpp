@@ -17,7 +17,7 @@ TEST_SUITE_BEGIN("Network");
 TEST_CASE("MultipartBoundary")
 {
     MultipartBoundary mb1;
-    CHECK_EQ(mb1.GetBoundary().size(), 32);
+    CHECK_EQ(mb1.GetBoundary().size(), 32u);
     MESSAGE("Random boundary: " << mb1.GetBoundary());
     for (auto c: mb1.GetBoundary()) {
         CHECK(std::isprint(c));

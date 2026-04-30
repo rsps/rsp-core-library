@@ -13,8 +13,6 @@
 #include <exceptions/CoreException.h>
 #include <graphics/Color.h>
 #include <graphics/FontRawInterface.h>
-#include <graphics/Rect.h>
-#include <vector>
 #include <string>
 #include <memory>
 
@@ -72,7 +70,7 @@ public:
     /**
      * Destructor
      */
-    virtual ~Font();
+    virtual ~Font() = default;
 
     /**
      * Generate a set of glyphs for the given string.
@@ -127,18 +125,6 @@ public:
     [[nodiscard]] Color GetColor() const { return mColor; }
 
     /**
-     * \brief Set the background color for the characters in the font
-     * \param arColor
-     * \return self
-     */
-//    Font& SetBackgroundColor(const Color &arColor);
-    /**
-     * \brief Get the current background color for the characters in the font.
-     * \return Color
-     */
-//    Color GetBackgroundColor() const { return mBackgroundColor; }
-
-    /**
      * Set the style of the font.
      *
      * \param aStyle
@@ -162,7 +148,6 @@ public:
 protected:
     static std::string mDefaultFontName;
     Color mColor = Color::Black;
-//    Color mBackgroundColor = Color::None;
     bool mDirty = false;
     std::shared_ptr<FontRawInterface> mpImpl;
 

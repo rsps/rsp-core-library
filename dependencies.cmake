@@ -27,7 +27,7 @@ macro(install_dependencies)
         message(STATUS "Using stdc++_libbacktrace")
 
         target_link_libraries("${PROJECT_NAME}" "-lstdc++_libbacktrace")
-    endif()
+    endif ()
 
     # -------------------------------------------------------------------------------------------------------------- #
 
@@ -36,14 +36,14 @@ macro(install_dependencies)
 
         if (SDL2)
             include("external/sdl2")
-        else()
+        else ()
             list(APPEND BUILD_OPTIONS "-DUSE_GFX_SW")
-        endif()
+        endif ()
 
         if (FREETYPE_FONTS)
             include("external/freetype")
-        endif()
-    endif()
+        endif ()
+    endif ()
 
     # -------------------------------------------------------------------------------------------------------------- #
 
@@ -59,13 +59,13 @@ macro(install_dependencies)
 
     if (NET_LIBCURL)
         include("external/curl")
-    endif()
+    endif ()
 
     # -------------------------------------------------------------------------------------------------------------- #
 
     if (NET_WPA_SUPPLICANT)
         include("external/wpa-supplicant")
-    endif()
+    endif ()
 
     # -------------------------------------------------------------------------------------------------------------- #
 
@@ -83,16 +83,16 @@ macro(install_dependencies)
 
         if (NOT ESP_PLATFORM)
             include("external/mbed-tls")
-        endif()
+        endif ()
 
         list(APPEND BUILD_OPTIONS "-DUSE_MBEDTLS")
-    endif()
+    endif ()
 
     # -------------------------------------------------------------------------------------------------------------- #
 
     if (ZLIB)
         include("external/zlib")
-    endif()
+    endif ()
 
     # -------------------------------------------------------------------------------------------------------------- #
 

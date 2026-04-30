@@ -17,10 +17,14 @@
 #include <network/HttpRequestOptions.h>
 #include <network/IHttpResponse.h>
 #include <posix/FileIO.h>
+#include <type_traits>
 
 namespace rsp::network {
 
 class IHttpResponse;
+
+template <typename T>
+concept OfTypeIStreamDataProvider = std::is_base_of<IStreamDataProvider, T>::value;
 
 /**
  * \class IHttpRequest
@@ -57,16 +61,42 @@ public:
     /**
      * \brief Set the body content on the request.
      *
-     * \param apBody Shared pointer to interface of IHttpBodyStream
+     * \param apBody Shared pointer to interface of IStreamDataProvider
      * \return self
      */
     virtual IHttpRequest& SetBody(HttpBody_t apBody) = 0;
+
+    template <OfTypeIStreamDataProvider C, typename... aArgs>
+    IHttpRequest& MakeBody(aArgs&&... args)
+    {
+        return SetBody(std::make_shared<C>(std::forward<aArgs>(args)...));
+    }
 
     /**
      * \brief Get the body content of this request
      * \return Reference to body stream
      */
     [[nodiscard]] virtual const IStreamDataProvider& GetBody() const = 0;
+
+    /**
+     * \brief Set the body container for the response.
+     *
+     * \param apBody Shared pointer to interface of IStreamDataProvider
+     * \return self
+     */
+    virtual IHttpRequest& SetResponseBody(HttpBody_t apBody) = 0;
+
+    template <OfTypeIStreamDataProvider C, typename... aArgs>
+    IHttpRequest& MakeResponseBody(aArgs&&... args)
+    {
+        return SetResponseBody(std::make_shared<C>(std::forward<aArgs>(args)...));
+    }
+
+    /**
+     * \brief Get the response body container
+     * \return Reference to body stream
+     */
+    [[nodiscard]] virtual const IStreamDataProvider& GetResponseBody() const = 0;
 
     /**
      * \fn IHttpResponse Execute&()=0

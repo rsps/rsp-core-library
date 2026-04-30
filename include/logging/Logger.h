@@ -85,7 +85,7 @@ protected:
     std::shared_ptr<std::streambuf> makeCLogStream(bool aCaptureLog);
 
     Handle_t addLogWriter(std::shared_ptr<LogWriterInterface> aWriter) override;
-    void write(const LogStream &arStream, const std::string &arMsg,
+    void write(const LogStream &arStream, std::string_view aMsg,
                        const std::string &arChannel, const rsp::utils::DynamicData &arContext) override;
 };
 

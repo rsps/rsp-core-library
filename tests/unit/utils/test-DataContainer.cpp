@@ -36,9 +36,9 @@ TEST_CASE("Data Container")
 
     SUBCASE("Init")
     {
-        CHECK_EQ(sizeof(MyData), 19);
-        CHECK_EQ(sizeof(MyData::String), 11);
-        CHECK_EQ(dc.GetSize(), 19);
+        CHECK_EQ(sizeof(MyData), 19u);
+        CHECK_EQ(sizeof(MyData::String), 11u);
+        CHECK_EQ(dc.GetSize(), 19u);
         CHECK_EQ(sizeof(dc.Get()), sizeof(MyData));
 
         MESSAGE(dc.Get().Integer);
@@ -51,7 +51,7 @@ TEST_CASE("Data Container")
 
     SUBCASE("Save")
     {
-        const char *p = "Hello World";
+        auto p = "Hello World";
 
         dc.Get().String = p;
         dc.Get().Integer = 44;

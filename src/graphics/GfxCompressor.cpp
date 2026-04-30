@@ -10,7 +10,7 @@
 
 #include <cstring>
 #include <graphics/GfxCompressor.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <iostream>
 
 namespace rsp::graphics {

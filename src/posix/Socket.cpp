@@ -60,6 +60,7 @@ Socket::Socket(Socket &&arOther) noexcept
 Socket& Socket::operator=(Socket &&arOther) noexcept
 {
     if (this != &arOther) {
+        mHandle.Close();
         mHandle = std::move(arOther.mHandle);
         mLocalAddress = arOther.mLocalAddress;
         mPeerAddress = arOther.mPeerAddress;
@@ -70,7 +71,7 @@ Socket& Socket::operator=(Socket &&arOther) noexcept
 
 bool Socket::IsConnected() const
 {
-    return !mPeerAddress.IsEmpty();
+    return !mPeerAddress.IsEmpty() && bool(mHandle);
 }
 
 bool Socket::IsListening() const
@@ -378,7 +379,7 @@ void Socket::setTimeoutOption(SockOptions aOption, std::chrono::system_clock::du
 Socket& Socket::Shutdown(ShutdownFlags aFlag)
 {
     int res = shutdown(mHandle.Get(), int(aFlag));
-    if (res < 0) {
+    if ((res < 0) && (errno != ENOTCONN)) {
         THROW_SYSTEM("shutdown() failed.");
     }
     return *this;
@@ -388,6 +389,7 @@ Socket& Socket::Close()
 {
     if (IsConnected()) {
         Shutdown(ShutdownFlags::ReadWrite);
+        mPeerAddress.SetDomain(Domain::Unspecified); // Mark as unconnected
     }
     return *this;
 }

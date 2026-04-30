@@ -13,7 +13,7 @@
 #include <security/Sha.h>
 #include <mbedtls/md.h>
 #include <mbedtls/version.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace rsp::security {
 

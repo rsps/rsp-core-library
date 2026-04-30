@@ -19,6 +19,7 @@
 namespace rsp::network {
 
 class ResponseParser;
+class EHttpRequest;
 
 /**
  * \class HttpResponse
@@ -32,6 +33,12 @@ public:
     explicit HttpResponse(IHttpRequest &arRequest)
         : mrRequest(arRequest)
     {
+        MakeBody();
+    }
+
+    [[nodiscard]] bool IsComplete() const override
+    {
+        return mCompleted;
     }
 
     [[nodiscard]] const StatusLine& GetStatusLine() const override
@@ -74,6 +81,9 @@ protected:
     HeaderList mHeaders{};
     std::optional<size_t> mContentLength{};
     HttpBody_t mpBody{};
+
+    friend class EHttpRequest;
+    bool mCompleted = false;
 };
 
 }// namespace rsp::network
