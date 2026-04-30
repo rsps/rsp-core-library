@@ -67,9 +67,7 @@ TEST_CASE("Framebuffer")
 
     auto ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
-    std::random_device rd;
-
-    Random::Seed(ms.count()); // generates random seed val
+    Random::Seed(static_cast<Random::Engine::result_type>(ms.count())); // generates random seed val
     Color col(Random::Roll<uint8_t>(56u, 200u), Random::Roll<uint8_t>(56u, 200u), Random::Roll<uint8_t>(56u, 200u),
               0xff);
     MESSAGE("Color: " << TestHelpers::ToHex(col.AsUint()));

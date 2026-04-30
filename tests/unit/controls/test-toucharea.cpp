@@ -22,7 +22,7 @@ static void Randomize()
     std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
 
-    Random::Seed(ms.count());
+    Random::Seed(static_cast<Random::Engine::result_type>(ms.count()));
 }
 
 class TestControl : public Control
