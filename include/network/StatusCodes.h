@@ -12,7 +12,7 @@
 
 namespace rsp::network {
 
-enum class StatusCodes
+enum class StatusCodes : int32_t
 {
     Continue = 100,
     SwitchingProtocols = 101,

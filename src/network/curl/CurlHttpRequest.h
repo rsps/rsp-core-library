@@ -57,10 +57,10 @@ protected:
     void requestDone() override;
 
 private:
-    static size_t writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *data);
-    static size_t streamReadFunction(void *ptr, size_t size, size_t nmemb, IStreamDataProvider *apDataProvider);
-    static size_t headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse);
-    static size_t progressFunction(CurlHttpRequest *aRequest, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
+    static size_t writeFunction(void *apPtr, size_t aSize, size_t aMemberCount, const CurlHttpResponse *data);
+    static size_t streamReadFunction(void *apPtr, size_t aSize, size_t aMemberCount, const IStreamDataProvider *apDataProvider);
+    static size_t headerFunction(const char *apData, size_t aSize, size_t aMemberCount, CurlHttpResponse *apResponse);
+    static size_t progressFunction(CurlHttpRequest *apRequest, curl_off_t aDlTotal, curl_off_t aDlNow, curl_off_t aUlTotal, curl_off_t aUlNow);
 
     static void checkRequestOptions(const HttpRequestOptions &arOpts);
     void populateOptions();

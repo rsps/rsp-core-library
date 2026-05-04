@@ -12,7 +12,6 @@
 #include <string>
 #include <network/ResponseParser.h>
 #include <network/MultipartBody.h>
-#include <network/StringBody.h>
 #include <posix/FileIO.h>
 #include "CurlHttpRequest.h"
 #include "CurlSession.h"
@@ -44,7 +43,7 @@ void CurlHttpRequest::readFromStream(const HttpBody_t& arBody)
         return;
     }
     if (dynamic_cast<MultipartBody*>(arBody.get())) {
-        mRequestOptions.Headers.emplace("Content-Type", dynamic_cast<MultipartBody&>(*arBody).GetBoundary().GetContentTypeHeader()); // Add header with boundary
+        mRequestOptions.Headers.try_emplace("Content-Type", dynamic_cast<MultipartBody&>(*arBody).GetBoundary().GetContentTypeHeader()); // Add header with boundary
     }
 
     setCurlOption(CURLOPT_UPLOAD, 1L);
@@ -53,15 +52,15 @@ void CurlHttpRequest::readFromStream(const HttpBody_t& arBody)
     setCurlOption(CURLOPT_INFILESIZE_LARGE, arBody->GetStreamSize());
 }
 
-size_t CurlHttpRequest::writeFunction(void *ptr, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
+size_t CurlHttpRequest::writeFunction(void *apPtr, const size_t aSize, const size_t aMemberCount, const CurlHttpResponse *apResponse)
 {
-    apResponse->mpBody->Write({ static_cast<std::byte*>(ptr), size * nmemb });
-    return size * nmemb;
+    apResponse->mpBody->Write({ static_cast<std::byte*>(apPtr), aSize * aMemberCount });
+    return aSize * aMemberCount;
 }
 
-size_t CurlHttpRequest::streamReadFunction(void *ptr, size_t size, size_t nmemb, IStreamDataProvider *apDataProvider)
+size_t CurlHttpRequest::streamReadFunction(void *apPtr, const size_t aSize, const size_t aMemberCount, const IStreamDataProvider *apDataProvider)
 {
-    size_t written = apDataProvider->Read(std::span(static_cast<std::byte*>(ptr), size * nmemb));
+    size_t written = apDataProvider->Read(std::span(static_cast<std::byte*>(apPtr), aSize * aMemberCount));
 #ifdef LOG_OUTPUT
     auto o = rsp::logging::LoggerInterface::GetDefault()->Info();
     o << "Request chunk (" << written << ") " << BufferToStream(static_cast<char*>(ptr), written, true);
@@ -69,15 +68,15 @@ size_t CurlHttpRequest::streamReadFunction(void *ptr, size_t size, size_t nmemb,
     return written;
 }
 
-size_t CurlHttpRequest::headerFunction(char *data, size_t size, size_t nmemb, CurlHttpResponse *apResponse)
+size_t CurlHttpRequest::headerFunction(const char *apData, const size_t aSize, const size_t aMemberCount, CurlHttpResponse *apResponse)
 {
-    apResponse->mHeaderData += std::string(data, size * nmemb);
+    apResponse->mHeaderData += std::string(apData, aSize * aMemberCount);
     if (apResponse->mHeaderData.ends_with(cHeaderEnd)) {
         ResponseParser parser(*apResponse);
         parser.ParseNewData({ reinterpret_cast<const std::byte*>(apResponse->mHeaderData.data()), apResponse->mHeaderData.size() });
     }
 
-    return (size * nmemb);
+    return (aSize * aMemberCount);
 }
 
 size_t CurlHttpRequest::progressFunction(CurlHttpRequest */*aRequest*/, curl_off_t /*dltotal*/, curl_off_t /*dlnow*/, curl_off_t /*ultotal*/, curl_off_t /*ulnow*/)
@@ -161,7 +160,7 @@ void CurlHttpRequest::prepareRequest()
 
 void CurlHttpRequest::requestDone()
 {
-    mLogger.Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << int(mResponse.GetStatusCode());
+    mLogger.Debug() << "Request to " << mRequestOptions.BaseUrl << mRequestOptions.Uri << " is finished with code " << std::to_underlying(mResponse.GetStatusCode());
     EasyCurl::requestDone();
 }
 
@@ -200,7 +199,7 @@ void CurlHttpRequest::populateOptions()
             break;
 
         case HttpRequestType::PUT:
-            // setCurlOption(CURLOPT_PUT, 1L); // Seems to put files only
+            // set Curl Option(CURLOPT_PUT, 1L); // Seems to put files only
             setCurlOption(CURLOPT_CUSTOMREQUEST, "PUT");
             readFromStream(mRequestOptions.RequestBody);
             break;
@@ -213,7 +212,7 @@ void CurlHttpRequest::populateOptions()
             break;
     }
 
-    setCurlOption(CURLOPT_VERBOSE, mRequestOptions.Verbose);
+    setCurlOption(CURLOPT_VERBOSE, mRequestOptions.Verbose ? 1L : 0L);
 
     //Redirect configuration
     setCurlOption(CURLOPT_FOLLOWLOCATION, _followRedirects);
@@ -226,7 +225,7 @@ void CurlHttpRequest::populateOptions()
     setCurlOption(CURLOPT_CONNECTTIMEOUT, mRequestOptions.ConnectionTimeout);
     setCurlOption(CURLOPT_SERVER_RESPONSE_TIMEOUT, mRequestOptions.ResponseTimeout);
 
-//    setCurlOption(CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
+//    setCurlOption(CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0)
     setCurlOption(CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
 
 //    CURLMOPT_PIPELINING to CURLPIPE_MULTIPLEX
@@ -234,6 +233,10 @@ void CurlHttpRequest::populateOptions()
 
     if (!mRequestOptions.CertCaPath.empty()) {
         setCurlOption(CURLOPT_CAINFO, mRequestOptions.CertCaPath.c_str());
+        setCurlOption(CURLOPT_SSL_VERIFYPEER, 1L);
+    }
+    else {
+        setCurlOption(CURLOPT_SSL_VERIFYPEER, mRequestOptions.mVerifyPeer ? 1L : 0L);
     }
 
     if (!mRequestOptions.CertPath.empty()) {
@@ -249,8 +252,8 @@ void CurlHttpRequest::populateOptions()
         curl_slist_free_all(mpHeaders);
         mpHeaders = nullptr;
     }
-    for (auto const& tuple : mRequestOptions.Headers) {
-        std::string header = tuple.first + ": " + tuple.second;
+    for (auto const& [first, second] : mRequestOptions.Headers) {
+        std::string header = std::format("{}: {}", first, second);
         mLogger.Debug() << "Add header: " << header;
         auto *temp = curl_slist_append(mpHeaders, header.c_str());
         if (temp == nullptr) {

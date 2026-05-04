@@ -10,50 +10,27 @@
 
 #include <network/HttpResponse.h>
 #include <network/parser-helpers.h>
-#include <iostream>
 #include <stdexcept>
 #include <utils/StrUtils.h>
 #include <network/StringBody.h>
 #include <network/BinaryBody.h>
-#include <network/FileBody.h>
 
 namespace rsp::network {
 
-std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse)
-{
-    o <<
-        "Headers:\n";
-
-    for(auto &tuple : arResponse.GetHeaders()) {
-        if (tuple.first == std::string_view("authorization")) {
-            o << "  " << tuple.first << ": " << std::string(tuple.second.size(), 'X') << "\n";
-        }
-        else {
-            o << "  " << tuple.first << ": " << tuple.second << "\n";
-        }
-    }
-
-    o <<
-        "StatusCode: " << int(arResponse.GetStatusCode()) << "\n"
-        "Body: " << arResponse.GetBody();
-    o << "\n";
-
-    return o;
-}
 
 std::string_view HttpResponse::GetHeader(std::string_view aName) const
 {
     try {
         return mHeaders.at(aName);
     }
-    catch (const std::out_of_range &e) {
+    catch (const std::out_of_range &) {
+        THROW_WITH_BACKTRACE1(EHeaderNotFound, rsp::utils::StrUtils::Format("No response header named %s was found", aName.data()));
     }
-    THROW_WITH_BACKTRACE1(EHeaderNotFound, rsp::utils::StrUtils::Format("No response header named %s was found", aName.data()));
 }
 
 [[nodiscard]] StatusCodes HttpResponse::GetStatusCode() const
 {
-    return StatusCodes(mStatusLine.GetStatusCode());
+    return static_cast<StatusCodes>(mStatusLine.GetStatusCode());
 }
 
 IHttpResponse& HttpResponse::MakeBody()
@@ -77,7 +54,7 @@ IHttpResponse& HttpResponse::MakeBody()
 
 size_t HttpResponse::GetContentLength() const
 {
-    if (!mContentLength) {
+    if (!mContentLength.has_value()) {
         if (GetStatusCode() == StatusCodes::NoContent) {
             const_cast<HttpResponse*>(this)->mContentLength = 0;
         }
@@ -85,7 +62,7 @@ size_t HttpResponse::GetContentLength() const
             const_cast<HttpResponse*>(this)->mContentLength = string_to_integral<size_t>(mHeaders.at("content-length"));
         }
     }
-    if (mContentLength) {
+    if (mContentLength.has_value()) {
         return *mContentLength;
     }
     return 0;

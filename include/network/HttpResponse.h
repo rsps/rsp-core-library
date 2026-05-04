@@ -33,7 +33,7 @@ public:
     explicit HttpResponse(IHttpRequest &arRequest)
         : mrRequest(arRequest)
     {
-        MakeBody();
+        HttpResponse::MakeBody();
     }
 
     [[nodiscard]] bool IsComplete() const override

@@ -36,7 +36,8 @@ public:
     security::SecureString ClientCertPem{}; // Set directly or clear to force reload from CertPath
     security::SecureString ClientKeyPem{};  // Set directly or clear to force reload from KeyPath
     security::SecureBuffer Nonce{};
-    int Verbose = 0;
+    bool mVerifyPeer = true;
+    bool Verbose = false;
 };
 
 std::ostream& operator<<(std::ostream &o, const ConnectionOptions &arOptions);
