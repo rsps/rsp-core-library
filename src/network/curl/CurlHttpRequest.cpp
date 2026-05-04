@@ -233,11 +233,8 @@ void CurlHttpRequest::populateOptions()
 
     if (!mRequestOptions.CertCaPath.empty()) {
         setCurlOption(CURLOPT_CAINFO, mRequestOptions.CertCaPath.c_str());
-        setCurlOption(CURLOPT_SSL_VERIFYPEER, 1L);
     }
-    else {
-        setCurlOption(CURLOPT_SSL_VERIFYPEER, mRequestOptions.mVerifyPeer ? 1L : 0L);
-    }
+    setCurlOption(CURLOPT_SSL_VERIFYPEER, mRequestOptions.mVerifyPeer ? 1L : 0L);
 
     if (!mRequestOptions.CertPath.empty()) {
         setCurlOption(CURLOPT_SSLCERT, mRequestOptions.CertPath.c_str());
