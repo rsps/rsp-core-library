@@ -170,7 +170,7 @@ TEST_CASE("Data Providers")
         size_t max_size = 7;
         while (auto sz = cs.Read({reinterpret_cast<std::byte*>(buffer.data()), max_size})) {
             result += std::string(buffer.data(), sz);
-            max_size = rsp::utils::Random::Roll(1ul, buffer.size());
+            max_size = rsp::utils::Random::Roll(std::size_t{1}, buffer.size());
         }
 
         CHECK_EQ(result.size(), cPayload.size());

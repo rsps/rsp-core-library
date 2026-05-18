@@ -94,7 +94,9 @@ target_sources(${TEST_BINARY}
         ${SRC_FILES}
 )
 
-doctest_discover_tests(${TEST_BINARY} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+if(NOT CMAKE_CROSSCOMPILING)
+    doctest_discover_tests(${TEST_BINARY} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+endif()
 
 # -------------------------------------------------------------------------------------------------------------- #
 # Install / Export

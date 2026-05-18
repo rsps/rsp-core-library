@@ -8,11 +8,28 @@
  * \author      Steffen Brummer
  */
 
+#include <cassert>
 #include <cstring>
 #include <graphics/PixelData.h>
 #include <utils/Crc32.h>
 #include <utils/CppObjectFile.h>
 #include <utils/StrUtils.h>
+
+namespace {
+
+constexpr uint32_t* assume_aligned_u32(uint8_t* p)
+{
+    assert((reinterpret_cast<uintptr_t>(p) % alignof(uint32_t)) == 0);
+    return static_cast<uint32_t*>(static_cast<void*>(p));
+}
+
+constexpr const uint32_t* assume_aligned_u32(const uint8_t* p)
+{
+    assert((reinterpret_cast<uintptr_t>(p) % alignof(uint32_t)) == 0);
+    return static_cast<const uint32_t*>(static_cast<const void*>(p));
+}
+
+} // namespace
 
 namespace rsp::graphics {
 
@@ -197,7 +214,7 @@ Color PixelData::GetPixelAt(const GuiUnit_t aX, const GuiUnit_t aY, const Color 
 
         case ColorDepth::RGBA:
             offset = ((aY * GetWidth()) + aX) * 4;
-            result.FromRaw(*reinterpret_cast<const uint32_t*>(reinterpret_cast<uintptr_t>(mpData + offset)));
+            result.FromRaw(*assume_aligned_u32(mpData + offset));
             break;
 
         default:
@@ -253,12 +270,12 @@ PixelData& PixelData::SetPixelAt(const GuiUnit_t aX, const GuiUnit_t aY, const C
         case ColorDepth::RGBA:
             offset = ((aY * GetWidth()) + aX) * 4;
             if (!mBlend || arColor.GetAlpha() == 255) {
-                *reinterpret_cast<uint32_t*>(p_data + offset) = arColor.AsRaw();
+                *assume_aligned_u32(p_data + offset) = arColor.AsRaw();
             }
             else {
                 Color bg;
-                bg.FromRaw(*reinterpret_cast<uint32_t*>(p_data + offset));
-                *reinterpret_cast<uint32_t*>(p_data + offset) = Color::Blend(bg, arColor).AsRaw();
+                bg.FromRaw(*assume_aligned_u32(p_data + offset));
+                *assume_aligned_u32(p_data + offset) = Color::Blend(bg, arColor).AsRaw();
             }
             break;
 
@@ -392,8 +409,7 @@ void PixelData::Fill(const Color& arColor)
     }
     switch (mColorDepth) {
         case ColorDepth::RGBA: {
-            auto *p = reinterpret_cast<uint32_t*>(mData.data());
-            std::fill_n(p, mData.size() / sizeof(uint32_t), arColor.AsRaw());
+            std::fill_n(assume_aligned_u32(mData.data()), mData.size() / sizeof(uint32_t), arColor.AsRaw());
             break;
         }
 
@@ -434,7 +450,7 @@ PixelData& PixelData::Fade(const int aAlphaInc, const bool aFixed)
         for (GuiUnit_t x = 0 ; x < GetWidth() ; x++) {
             const int offset = ((y * GetWidth()) + x) * 4;
             Color col;
-            col.FromRaw(*reinterpret_cast<const uint32_t*>(p_data + offset));
+            col.FromRaw(*assume_aligned_u32(p_data + offset));
             if (col == Color::None) {
                 continue;
             }
@@ -450,7 +466,7 @@ PixelData& PixelData::Fade(const int aAlphaInc, const bool aFixed)
                 alpha = std::max(alpha + aAlphaInc, 0);
             }
             col.SetAlpha(static_cast<uint8_t>(alpha));
-            *reinterpret_cast<uint32_t*>(p_data + offset) = col.AsRaw();
+            *assume_aligned_u32(p_data + offset) = col.AsRaw();
         }
     }
     return *this;

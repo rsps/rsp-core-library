@@ -22,7 +22,7 @@ public:
     explicit StatusLine(HttpText aStatusLine)
     {
         mHttpVersion = aStatusLine.HttpVersion();
-        mStatusCode = aStatusLine.Digit(3);
+        mStatusCode = static_cast<int>(aStatusLine.Digit(3));
         aStatusLine.SP();
         mReasonPhrase = aStatusLine.AsciiText();
     }

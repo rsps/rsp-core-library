@@ -49,6 +49,44 @@
             "cacheVariables": {
                 "BUILD_TESTING": "ON"
             }
+        },
+        {
+            "name": "arm-common",
+            "hidden": true,
+            "inherits": "common",
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64",
+                "CMAKE_CXX_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64",
+                "CMAKE_TOOLCHAIN_FILE": "/opt/arm-buildroot-linux-gnueabihf_sdk-buildroot/share/buildroot/toolchainfile.cmake"
+            }
+        },
+        {
+            "name": "arm-debug",
+            "displayName": "ARM Debug",
+            "inherits": [
+                "arm-common",
+                "debug"
+            ],
+            "binaryDir": "${sourceDir}/build/arm-debug"
+        },
+        {
+            "name": "arm-debug-with-tests",
+            "displayName": "ARM Debug + Tests",
+            "inherits": "arm-debug"
+        },
+        {
+            "name": "arm-release",
+            "displayName": "ARM Release",
+            "inherits": [
+                "arm-common",
+                "release"
+            ],
+            "binaryDir": "${sourceDir}/build/arm-release"
+        },
+        {
+            "name": "arm-release-with-tests",
+            "displayName": "ARM Release + Tests",
+            "inherits": "arm-release"
         }
     ],
     "buildPresets": [
@@ -67,6 +105,22 @@
         {
             "name": "release-with-tests",
             "configurePreset": "release-with-tests"
+        },
+        {
+            "name": "arm-debug",
+            "configurePreset": "arm-debug"
+        },
+        {
+            "name": "arm-debug-with-tests",
+            "configurePreset": "arm-debug-with-tests"
+        },
+        {
+            "name": "arm-release",
+            "configurePreset": "arm-release"
+        },
+        {
+            "name": "arm-release-with-tests",
+            "configurePreset": "arm-release-with-tests"
         }
     ],
     "testPresets": [

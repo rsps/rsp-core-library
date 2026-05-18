@@ -107,7 +107,7 @@ public:
         params[0] = OSSL_PARAM_construct_utf8_string("digest", algo.data(), 0);
         params[1] = OSSL_PARAM_construct_end();
 
-        EVP_MAC_init(mpCtx, arSecret.data(), static_cast<unsigned long int>(arSecret.size()), params);
+        EVP_MAC_init(mpCtx, arSecret.data(), arSecret.size(), params);
     }
 
     ~OpenSSLHMac() override
@@ -121,13 +121,13 @@ public:
 
     void Update(const uint8_t *apBuffer, std::size_t aSize) override
     {
-        EVP_MAC_update(mpCtx, apBuffer, static_cast<unsigned long int>(aSize));
+        EVP_MAC_update(mpCtx, apBuffer, aSize);
     }
 
     SecureBuffer Finalize() override
     {
         SecureBuffer result;
-        unsigned long int len;
+        std::size_t len;
 
         EVP_MAC_final(mpCtx, nullptr, &len, 0);
         result.resize(len);
@@ -183,7 +183,7 @@ public:
 
     void Update(const uint8_t *apBuffer, std::size_t aSize) override
     {
-        EVP_DigestUpdate(mpMdctx, apBuffer, static_cast<unsigned long int>(aSize));
+        EVP_DigestUpdate(mpMdctx, apBuffer, aSize);
     }
 
     SecureBuffer Finalize() override
