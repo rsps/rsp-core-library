@@ -81,13 +81,8 @@ message(STATUS "Using GCC ${GCC_TOOL_VERSION} (${COLOR_WHITE}${TEXT_ITALIC}${GCC
 # Dependencies
 # -------------------------------------------------------------------------------------------------------------- #
 
-# List of build options that dependencies can append to.
-set(BUILD_OPTIONS "")
-
 include("dependencies.cmake")
-
-# Debug
-# dump(BUILD_OPTIONS)
+rsp_core_add_dependencies(${PROJECT_NAME})
 
 # -------------------------------------------------------------------------------------------------------------- #
 # Targets & Compile Options
@@ -114,10 +109,7 @@ if (NOT RELEASE_BUILD)
     add_compile_options("${RSP_CORE_LIB_COMPILE_OPTIONS}")
 endif()
 
-target_compile_options("${PROJECT_NAME}" PUBLIC
-    -Wshadow
-    ${BUILD_OPTIONS}
-)
+target_compile_options("${PROJECT_NAME}" PUBLIC -Wshadow)
 
 if (NOT RELEASE_BUILD)
     target_compile_options("${PROJECT_NAME}" PRIVATE

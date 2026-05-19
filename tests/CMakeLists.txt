@@ -12,8 +12,40 @@ enable_testing()
 # -------------------------------------------------------------------------------------------------------------- #
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-include("external/doctest")
-include("external/lighttpd")
+include(FetchContent)
+
+FetchContent_Declare(doctest
+    GIT_REPOSITORY https://github.com/doctest/doctest
+    GIT_TAG        v2.5.2
+    GIT_SHALLOW    TRUE
+)
+FetchContent_MakeAvailable(doctest)
+include("${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake")
+
+# Include external project lighttpd from github.
+# Uses QUIET FetchContent_Populate mode to avoid deprecation warning.
+# This is build using custom target for use during local unit tests
+FetchContent_Populate(lighttpd_src
+    QUIET
+    GIT_REPOSITORY "https://github.com/lighttpd/lighttpd1.4"
+    # GIT_REPOSITORY "https://git.lighttpd.net/lighttpd/lighttpd1.4.git" # Original git repo
+    GIT_TAG "lighttpd-1.4.82"
+
+    SOURCE_DIR "${FETCHCONTENT_BASE_DIR}/lighttpd_src-src"
+    BINARY_DIR "${FETCHCONTENT_BASE_DIR}/lighttpd_src-build"
+    SUBBUILD_DIR "${FETCHCONTENT_BASE_DIR}/lighttpd_src-subbuild"
+)
+
+# Include & link...
+add_custom_target(lighttpd
+    COMMENT "Building lighttpd..."
+
+    BYPRODUCTS "${lighttpd_src_BINARY_DIR}/build/lighttpd"
+    COMMAND cmake -G${CMAKE_GENERATOR} -DWITH_OPENSSL=ON ${lighttpd_src_SOURCE_DIR} && cmake --build .
+    WORKING_DIRECTORY "${lighttpd_src_BINARY_DIR}"
+    SOURCES "${lighttpd_src_SOURCE_DIR}/src/lemon.c"
+    VERBATIM
+)
 
 configure_file (
     "${CMAKE_CURRENT_SOURCE_DIR}/webserver/lighttpd.conf.in"
