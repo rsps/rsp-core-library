@@ -35,18 +35,18 @@ elseif (MBEDTLS_CRYPTO)
 endif ()
 
 set(LIBRARY_SOURCES
-        ${CMAKE_CURRENT_LIST_DIR}/version.cpp
-        ${APPLICATION_FILES}
-        ${COMPRESSION_FILES}
-        ${EXCEPTIONS_FILES}
-        ${JSON_FILES}
-        ${LOCALIZATION_FILES}
-        ${LOGGING_FILES}
-        ${MESSAGING_FILES}
-        ${POSIX_FILES}
-        ${SECURITY_FILES}
-        ${UTILS_FILES}
-        ${NETWORK_FILES}
-        ${GRAPHICS_FILES}
+    ${CMAKE_CURRENT_LIST_DIR}/version.cpp
+    ${APPLICATION_FILES}
+    ${COMPRESSION_FILES}
+    ${EXCEPTIONS_FILES}
+    ${JSON_FILES}
+    ${LOCALIZATION_FILES}
+    ${LOGGING_FILES}
+    ${MESSAGING_FILES}
+    ${POSIX_FILES}
+    ${SECURITY_FILES}
+    ${UTILS_FILES}
+    ${NETWORK_FILES}
+    ${GRAPHICS_FILES}
 )
 mark_as_advanced(LIBRARY_SOURCES)

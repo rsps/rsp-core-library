@@ -11,7 +11,6 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_CXX_STANDARD": "23",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }
         },
@@ -25,68 +24,31 @@
             }
         },
         {
-            "name": "debug-with-tests",
-            "displayName": "Debug + Tests",
-            "inherits": "debug",
-            "cacheVariables": {
-                "BUILD_TESTING": "ON"
-            }
-        },
-        {
             "name": "release",
             "displayName": "Release",
             "inherits": "common",
             "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "RELEASE_BUILD": "ON"
-            }
-        },
-        {
-            "name": "release-with-tests",
-            "displayName": "Release + Tests",
-            "inherits": "release",
-            "cacheVariables": {
-                "BUILD_TESTING": "ON"
-            }
-        },
-        {
-            "name": "arm-common",
-            "hidden": true,
-            "inherits": "common",
-            "cacheVariables": {
-                "CMAKE_C_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64",
-                "CMAKE_CXX_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64",
-                "CMAKE_TOOLCHAIN_FILE": "/opt/arm-buildroot-linux-gnueabihf_sdk-buildroot/share/buildroot/toolchainfile.cmake"
+                "CMAKE_BUILD_TYPE": "Release"
             }
         },
         {
             "name": "arm-debug",
             "displayName": "ARM Debug",
-            "inherits": [
-                "arm-common",
-                "debug"
-            ],
-            "binaryDir": "${sourceDir}/build/arm-debug"
-        },
-        {
-            "name": "arm-debug-with-tests",
-            "displayName": "ARM Debug + Tests",
-            "inherits": "arm-debug"
+            "inherits": "debug",
+            "binaryDir": "${sourceDir}/build/arm-debug",
+            "cacheVariables": {
+                "ARCH_ARM": "ON"
+            }
         },
         {
             "name": "arm-release",
             "displayName": "ARM Release",
-            "inherits": [
-                "arm-common",
-                "release"
-            ],
-            "binaryDir": "${sourceDir}/build/arm-release"
-        },
-        {
-            "name": "arm-release-with-tests",
-            "displayName": "ARM Release + Tests",
-            "inherits": "arm-release"
+            "inherits": "release",
+            "binaryDir": "${sourceDir}/build/arm-release",
+            "cacheVariables": {
+                "ARCH_ARM": "ON"
+            }
         }
     ],
     "buildPresets": [
@@ -95,38 +57,22 @@
             "configurePreset": "debug"
         },
         {
-            "name": "debug-with-tests",
-            "configurePreset": "debug-with-tests"
-        },
-        {
             "name": "release",
             "configurePreset": "release"
-        },
-        {
-            "name": "release-with-tests",
-            "configurePreset": "release-with-tests"
         },
         {
             "name": "arm-debug",
             "configurePreset": "arm-debug"
         },
         {
-            "name": "arm-debug-with-tests",
-            "configurePreset": "arm-debug-with-tests"
-        },
-        {
             "name": "arm-release",
             "configurePreset": "arm-release"
-        },
-        {
-            "name": "arm-release-with-tests",
-            "configurePreset": "arm-release-with-tests"
         }
     ],
     "testPresets": [
         {
-            "name": "release-with-tests",
-            "configurePreset": "release-with-tests",
+            "name": "release",
+            "configurePreset": "release",
             "output": {
                 "outputOnFailure": true
             },
@@ -136,8 +82,8 @@
             }
         },
         {
-            "name": "debug-with-tests",
-            "configurePreset": "debug-with-tests",
+            "name": "debug",
+            "configurePreset": "debug",
             "output": {
                 "outputOnFailure": true
             },

@@ -2,8 +2,6 @@
 # RSP Core Library Tests
 # -------------------------------------------------------------------------------------------------------------- #
 
-include("rsp/logging")
-
 # Enable testing
 enable_testing()
 
@@ -84,7 +82,7 @@ file(
     DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/"
 )
 if (NOT EXISTS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/ssl/ca")
-    message("${COLOR_GREEN}${TEXT_BOLD}Generating TLS certificates${TEXT_BOLD_RESTORE}${COLOR_DEFAULT}")
+    message("Generating TLS certificates")
     execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/webserver/generate-certificates.sh" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver")
 endif()
 
@@ -102,20 +100,12 @@ target_include_directories(${TEST_BINARY}
         "${CMAKE_CURRENT_SOURCE_DIR}/helpers"
 )
 
-if (NOT RELEASE_BUILD)
-    target_compile_options(${TEST_BINARY}
-        PRIVATE
-            -DGFX_FPS=20
-            -DDEBUG_LOG
-            -g
-            -O0
-    )
-endif()
+# Set -DGFX_FPS=20 and -DDEBUG_LOG if debug build
+target_compile_definitions(${TEST_BINARY} PRIVATE "$<$<CONFIG:DEBUG>:GFX_FPS=20;DEBUG_LOG>")
 
 target_link_libraries (${TEST_BINARY}
     PUBLIC
         rsp-core-lib
-        Threads::Threads
         doctest::doctest
 )
 
