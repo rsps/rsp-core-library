@@ -1,4 +1,4 @@
-var.basedir = "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@/webserver"
+var.basedir = "@CMAKE_BINARY_DIR@/webserver"
 
 server.modules += (
     "mod_openssl",
@@ -74,7 +74,7 @@ $SERVER["socket"] == ":44300" {
     ssl.engine  = "enable"
     ssl.pemfile = basedir + "/ssl/certs/server.pem"
     ssl.ca-file = basedir + "/ssl/ca/ca.pem"
-    
+
     ssl.verifyclient.exportcert = "enable"
     ssl.verifyclient.activate   = "enable"
     ssl.verifyclient.username   = "SSL_CLIENT_S_DN_CN"
