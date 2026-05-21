@@ -1,12 +1,12 @@
 /**
-* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at https://mozilla.org/MPL/2.0/.
-*
-* \copyright   Copyright 2025 RSP Systems A/S. All rights reserved.
-* \license     Mozilla Public License 2.0
-* \author      steffen
-*/
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2025 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      steffen
+ */
 #include <utils/Base64.h>
 #include <cinttypes>
 
@@ -19,12 +19,12 @@ std::string Base64::Encode(std::span<const std::byte> aData)
     std::string result;
     result.reserve(aData.size() * 4 / 3);
 
-    for (size_t i = 0; i < aData.size() ; i += 3) {
-        uint32_t work = (uint32_t(aData[i+0]) << 16)
-             | (uint32_t(aData[i+1]) << 8)
-             | (uint32_t(aData[i+2]));
+    for (size_t i = 0; i < aData.size(); i += 3) {
+        uint32_t work = (uint32_t(aData[i + 0]) << 16)
+                        | (uint32_t(aData[i + 1]) << 8)
+                        | (uint32_t(aData[i + 2]));
 
-        for (size_t b = 0 ; b < 4 ; ++b) {
+        for (size_t b = 0; b < 4; ++b) {
             size_t sextet = (work >> 18) & 0x3F;
             if (sextet < 26) {
                 result += char('A' + sextet);
@@ -111,11 +111,11 @@ std::string Base64::Decode(std::string_view aBase64)
     return result;
 }
 
-//std::array<char, 64> Base64::mMap64{
-//    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-//    'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
-//    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-//    'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
-//};
+// std::array<char, 64> Base64::mMap64{
+//     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+//     'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+//     'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+//     'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
+// };
 
-} // rsp::utils
+} // namespace rsp::utils
