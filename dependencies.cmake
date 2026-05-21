@@ -88,7 +88,7 @@ function(rsp_core_add_dependencies ATARGET)
             FetchContent_Declare(
                 mbedtls
                 GIT_REPOSITORY https://github.com/Mbed-TLS/mbedtls
-                GIT_TAG v3.6.5
+                GIT_TAG v3.6.6
                 GIT_SHALLOW TRUE
             )
             set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)  # Disable building Mbed-TLS's own tests
