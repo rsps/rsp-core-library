@@ -71,7 +71,6 @@ set_target_properties(${TEST_BINARY}
 # Set -DGFX_FPS=20 and -DDEBUG_LOG if debug build
 target_compile_definitions(${TEST_BINARY} PRIVATE "$<$<CONFIG:DEBUG>:GFX_FPS=20;DEBUG_LOG>")
 
-
 # Test files...
 file(GLOB_RECURSE SRC_FILES *.cpp)
 target_sources(${TEST_BINARY}

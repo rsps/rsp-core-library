@@ -1,9 +1,20 @@
 cmake_minimum_required(VERSION 3.23...3.30)
 
+# Get project's version from Git
+include("cmake/git.cmake")
+git_find_version_tag(
+    OUTPUT RSP_CORE_LIB_VERSION
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    DEFAULT "0.0.0"
+)
+
 project(rsp-core-lib
     DESCRIPTION "Open-source library for medical device software."
     HOMEPAGE_URL "https://github.com/rsps/rsp-core-library"
+    VERSION ${RSP_CORE_LIB_VERSION}
 )
+
+message(STATUS "Project version: ${RSP_CORE_LIB_VERSION}")
 
 option(ARCH_ARM "Set to cross-compile for ARM CPU" OFF)
 option(GFX "Include graphic components." ON)
@@ -22,6 +33,12 @@ option(SYSLOG "Include syslog interface" ON)
 # Append this project's local module paths.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+# Set default build type if none was specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    message(STATUS "Setting build type to 'Release' as none was specified.")
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 # Set toolchain file, if needed.
 if(ARCH_ARM)
     # Set CMAKE_<LANG>_FLAGS to prevent toolchain file from overriding these flags when it is included.
@@ -29,21 +46,6 @@ if(ARCH_ARM)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64")
     set(CMAKE_TOOLCHAIN_FILE "/opt/arm-buildroot-linux-gnueabihf_sdk-buildroot/share/buildroot/toolchainfile.cmake")
 endif()
-
-# Set default build type if none was specified
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    message(STATUS "Setting build type to 'Release' as none was specified.")
-    set(CMAKE_BUILD_TYPE "Release")
-endif()
-
-# Get project's version from Git
-include("cmake/git.cmake")
-git_find_version_tag(
-    OUTPUT RSP_CORE_LIB_VERSION
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    DEFAULT "0.0.0"
-)
-message(STATUS "Project version: ${RSP_CORE_LIB_VERSION}")
 
 set(CMAKE_CXX_STANDARD 23)
 
