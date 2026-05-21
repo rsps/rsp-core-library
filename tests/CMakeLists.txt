@@ -2,90 +2,74 @@
 # RSP Core Library Tests
 # -------------------------------------------------------------------------------------------------------------- #
 
-include("rsp/logging")
-
-# Enable testing
 enable_testing()
 
 # -------------------------------------------------------------------------------------------------------------- #
 # Test Configuration(s), Assets and other resources...
 # -------------------------------------------------------------------------------------------------------------- #
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-
-include("external/doctest")
-include("external/lighttpd")
-
-configure_file (
+configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/webserver/lighttpd.conf.in"
-    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/lighttpd.conf"
+    "${CMAKE_BINARY_DIR}/webserver/lighttpd.conf"
 )
 
 # Images
 file(
     COPY "${CMAKE_CURRENT_SOURCE_DIR}/helpers/testImages"
-    DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/"
+    DESTINATION "${CMAKE_BINARY_DIR}/"
 )
 
 # Fonts
 file(
     COPY "${CMAKE_CURRENT_SOURCE_DIR}/helpers/fonts"
-    DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/"
+    DESTINATION "${CMAKE_BINARY_DIR}/"
 )
 
 # Helper scripts
 file(
     COPY "${CMAKE_CURRENT_SOURCE_DIR}/helpers/scripts"
-    DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/"
+    DESTINATION "${CMAKE_BINARY_DIR}/"
 )
 
 # Webserver
 file(
     COPY "${CMAKE_CURRENT_SOURCE_DIR}/webserver/public"
-    DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/"
+    DESTINATION "${CMAKE_BINARY_DIR}/webserver/"
 )
 file(
     COPY "${CMAKE_CURRENT_SOURCE_DIR}/webserver/cgi"
-    DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/"
+    DESTINATION "${CMAKE_BINARY_DIR}/webserver/"
 )
 file(
     COPY "${CMAKE_CURRENT_SOURCE_DIR}/webserver/users.plain"
-    DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/"
+    DESTINATION "${CMAKE_BINARY_DIR}/webserver/"
 )
-if (NOT EXISTS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver/ssl/ca")
-    message("${COLOR_GREEN}${TEXT_BOLD}Generating TLS certificates${TEXT_BOLD_RESTORE}${COLOR_DEFAULT}")
-    execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/webserver/generate-certificates.sh" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webserver")
+if (NOT EXISTS "${CMAKE_BINARY_DIR}/webserver/ssl/ca")
+    message("Generating TLS certificates")
+    execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/webserver/generate-certificates.sh" "${CMAKE_BINARY_DIR}/webserver")
 endif()
 
 # -------------------------------------------------------------------------------------------------------------- #
 # Targets & Compile Options
 # -------------------------------------------------------------------------------------------------------------- #
-set(TEST_BINARY "rsp-core-lib-test")
 
+set(TEST_BINARY "rsp-core-lib-test")
 add_executable(${TEST_BINARY})
-add_dependencies(${TEST_BINARY} lighttpd)
+
+include("dependencies.cmake")
+rsp_core_test_add_dependencies(${TEST_BINARY})
 
 target_include_directories(${TEST_BINARY}
     PRIVATE
         "${PROJECT_SOURCE_DIR}/src"
         "${CMAKE_CURRENT_SOURCE_DIR}/helpers"
 )
-
-if (NOT RELEASE_BUILD)
-    target_compile_options(${TEST_BINARY}
-        PRIVATE
-            -DGFX_FPS=20
-            -DDEBUG_LOG
-            -g
-            -O0
-    )
-endif()
-
-target_link_libraries (${TEST_BINARY}
-    PUBLIC
-        rsp-core-lib
-        Threads::Threads
-        doctest::doctest
+set_target_properties(${TEST_BINARY}
+    PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 )
+
+# Set -DGFX_FPS=20 and -DDEBUG_LOG if debug build
+target_compile_definitions(${TEST_BINARY} PRIVATE "$<$<CONFIG:DEBUG>:GFX_FPS=20;DEBUG_LOG>")
 
 # Test files...
 file(GLOB_RECURSE SRC_FILES *.cpp)
@@ -101,7 +85,6 @@ endif()
 # -------------------------------------------------------------------------------------------------------------- #
 # Install / Export
 # -------------------------------------------------------------------------------------------------------------- #
-
 install(
     TARGETS ${TEST_BINARY}
     DESTINATION tgm/
