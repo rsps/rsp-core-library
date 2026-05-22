@@ -8,7 +8,7 @@
  * \author      steffen
  */
 #include <utils/Base64.h>
-#include <cinttypes>
+#include <cstdint>
 
 namespace rsp::utils {
 
@@ -17,12 +17,17 @@ constexpr char cPadding = '=';
 std::string Base64::Encode(std::span<const std::byte> aData)
 {
     std::string result;
-    result.reserve(aData.size() * 4 / 3);
+    result.reserve((aData.size() + 2) / 3 * 4);
 
     for (size_t i = 0; i < aData.size(); i += 3) {
-        uint32_t work = (uint32_t(aData[i + 0]) << 16)
-                        | (uint32_t(aData[i + 1]) << 8)
-                        | (uint32_t(aData[i + 2]));
+        size_t remaining = aData.size() - i;
+        uint32_t work = (uint32_t(aData[i]) << 16);
+        if (remaining > 1) {
+            work |= (uint32_t(aData[i + 1]) << 8);
+        }
+        if (remaining > 2) {
+            work |= uint32_t(aData[i + 2]);
+        }
 
         for (size_t b = 0; b < 4; ++b) {
             size_t sextet = (work >> 18) & 0x3F;
