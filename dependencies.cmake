@@ -91,6 +91,8 @@ function(rsp_core_add_dependencies ATARGET)
                 GIT_TAG v3.6.5
                 GIT_SHALLOW TRUE
             )
+            set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)  # Disable building Mbed-TLS's own tests
+            set(ENABLE_PROGRAMS OFF CACHE BOOL "" FORCE)
             FetchContent_MakeAvailable(mbedtls)
             target_link_libraries(${ATARGET} PUBLIC MbedTLS::mbedtls MbedTLS::mbedcrypto MbedTLS::mbedx509)
         endif()
