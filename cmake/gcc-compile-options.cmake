@@ -103,7 +103,7 @@ if (NOT DEFINED RSP_GCC_STRICT_COMPILE_OPTIONS)
         #
         # @see https://gcc.gnu.org/onlinedocs/gcc-14.2.0/gcc/Warning-Options.html#index-Wredundant-decls
         #
-        -Wredundant-decls
+        # -Wredundant-decls
 
         # Warn for implicit conversions that may change the sign of an integer value, like assigning
         # a signed integer expression to an unsigned integer variable.
