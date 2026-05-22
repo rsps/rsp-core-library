@@ -160,10 +160,8 @@ std::string SocketAddress::GetCanonicalName() const
 
         default:
         case Domain::Unspecified:
-            result.resize(sizeof(mAddress.Unspecified.sa_data) + 1);
-            result.back() = '\0';
-            std::strncpy(result.data(), mAddress.Unspecified.sa_data, sizeof(mAddress) - sizeof(uint16_t));
-            result.shrink_to_fit();
+            result.assign(mAddress.Unspecified.sa_data,
+                          strnlen(mAddress.Unspecified.sa_data, sizeof(mAddress.Unspecified.sa_data)));
             break;
     }
     return result;

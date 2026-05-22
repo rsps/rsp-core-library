@@ -188,4 +188,23 @@ if (NOT DEFINED RSP_GCC_STRICT_COMPILE_OPTIONS)
         #
         #-dD
     )
+
+    if(NOT DEFINED RSP_GCC_STRICT_COMPILE_DEFINITIONS)
+        set(RSP_GCC_STRICT_COMPILE_DEFINITIONS
+            # Lightweight checks to detect some buffer overflow errors when
+            # employing various string and memory manipulation functions.
+            #
+            # @see https://man7.org/linux/man-pages/man7/feature_test_macros.7.html
+            # @see https://developers.redhat.com/articles/2023/07/04/developers-guide-secure-coding-fortifysource
+            #
+            -D_FORTIFY_SOURCE=3
+
+            # Lightweight assertions that do not catch as many problems, but
+            # which are ABI compatible with normal mode.
+            #
+            # @see https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_macros.html
+            #
+            -D_GLIBCXX_ASSERTIONS
+        )
+    endif()
 endif()
