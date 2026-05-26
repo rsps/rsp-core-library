@@ -8,11 +8,6 @@
  * \author      Steffen Brummer
  */
 
-#include <doctest.h>
 #include <version.h>
 
-TEST_CASE("Testing Version String")
-{
-    CHECK(rsp::get_library_version() == rsp::utils::semver::Version(0, 1, 0));
-    CHECK(rsp::get_library_version() != rsp::utils::semver::Version(2, 1, 7));
-}
+static_assert(rsp::get_library_version() >= rsp::utils::semver::Version(0, 0, 0));

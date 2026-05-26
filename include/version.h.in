@@ -12,12 +12,13 @@
 
 #include <utils/SemVer.h>
 
-#define LIB_VERSION "0.1.0"
-
 namespace rsp {
 
-utils::semver::Version get_library_version();
-
+constexpr utils::semver::Version get_library_version()
+{
+    return utils::semver::Version{"@RSP_CORE_LIB_SEMVER@"};
 }
+
+} // namespace rsp
 
 #endif // RSP_CORE_LIB_VERSION_H

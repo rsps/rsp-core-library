@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.23...3.30)
 
-# Get project's version from Git
+# Get project's semver from Git tag/sha/dirty state
 include("cmake/git.cmake")
-git_find_version_tag(
-    OUTPUT RSP_CORE_LIB_VERSION
+git_get_semver(
+    OUTPUT RSP_CORE_LIB_SEMVER
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    DEFAULT "0.0.0"
 )
+
+# Extract CMake-friendly MAJOR.MINOR.PATCH version
+string(REGEX MATCH "^[0-9]+\\.[0-9]+\\.[0-9]+" RSP_CORE_LIB_VERSION "${RSP_CORE_LIB_SEMVER}")
 
 project(rsp-core-lib
     DESCRIPTION "Open-source library for medical device software."
@@ -14,7 +16,7 @@ project(rsp-core-lib
     VERSION ${RSP_CORE_LIB_VERSION}
 )
 
-message(STATUS "Project version: ${RSP_CORE_LIB_VERSION}")
+message(STATUS "Configuring ${PROJECT_NAME} version ${PROJECT_VERSION}")
 
 option(ARCH_ARM "Set to cross-compile for ARM CPU" OFF)
 option(GFX "Include graphic components." ON)
@@ -52,17 +54,29 @@ set(CMAKE_CXX_STANDARD 23)
 # Keep symbol information for exception stack traces
 set(CMAKE_ENABLE_EXPORTS TRUE)
 
+# Add a custom target to generate version header at build time
+add_custom_target(generate_version_header
+    COMMAND ${CMAKE_COMMAND}
+        -DSOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+        -DVERSION_H_IN="${CMAKE_CURRENT_SOURCE_DIR}/include/version.h.in"
+        -DVERSION_H_OUT="${CMAKE_CURRENT_BINARY_DIR}/include/version.h"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/generate-version-header.cmake"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    COMMENT "Writing version.h"
+)
+
 # Core library target
 add_library(${PROJECT_NAME} STATIC)
 
 # Dependencies
 include("dependencies.cmake")
 rsp_core_add_dependencies(${PROJECT_NAME})
+add_dependencies(${PROJECT_NAME} generate_version_header)
 
 # Include directories
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>;${CMAKE_CURRENT_BINARY_DIR}/include
         $<INSTALL_INTERFACE:include>
 )
 
