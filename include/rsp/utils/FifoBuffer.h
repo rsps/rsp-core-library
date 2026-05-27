@@ -22,7 +22,7 @@ namespace rsp::utils {
  * \brief Adds FIFO capability to the given data buffer.
  * \tparam T Type of fifo elements
  */
-template<class T>
+template <class T>
 class FifoBufferBase
 {
 public:
@@ -30,7 +30,8 @@ public:
      * \brief Construct a fifo on the given buffer
      * \param aBuffer
      */
-    explicit FifoBufferBase(std::span<T> aBuffer) : mBuffer(aBuffer) {}
+    explicit FifoBufferBase(std::span<T> aBuffer)
+        : mBuffer(aBuffer) {}
 
     /**
      * \brief Get a span of the currently filled buffer.
@@ -39,7 +40,7 @@ public:
     std::span<T> GetBuffer()
     {
         ASSERT(mHead == 0)
-        return { mBuffer.data(), mTail };
+        return {mBuffer.data(), mTail};
     }
 
     /**
@@ -211,11 +212,12 @@ private:
  * \tparam T Type of fifo elements
  * \tparam N Number of elements in fifo
  */
-template<class T, size_t N>
+template <class T, size_t N>
 class FifoBuffer : public FifoBufferBase<T>
 {
 public:
-    FifoBuffer() : FifoBufferBase<T>(mArrayBuffer) {}
+    FifoBuffer()
+        : FifoBufferBase<T>(mArrayBuffer) {}
 
 protected:
     std::array<T, N> mArrayBuffer{};
@@ -223,4 +225,4 @@ protected:
 
 } // namespace rsp::utils
 
-#endif //RSP_CORE_LIB_FIFO_BUFFER_H
+#endif // RSP_CORE_LIB_FIFO_BUFFER_H

@@ -23,7 +23,7 @@ TEST_CASE("FifoBuffer")
 {
     FifoBuffer<char, 10> mFifo;
 
-    char c_data[] = {1,2,3,4,5};
+    char c_data[] = {1, 2, 3, 4, 5};
     auto data = std::span(c_data);
 
     CHECK(mFifo.IsEmpty());
