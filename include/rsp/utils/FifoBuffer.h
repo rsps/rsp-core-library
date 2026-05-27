@@ -14,6 +14,7 @@
 #include <cstring>
 #include <rsp/exceptions/CoreException.h>
 #include <span>
+#include <type_traits>
 
 namespace rsp::utils {
 
@@ -23,6 +24,7 @@ namespace rsp::utils {
  * \tparam T Type of fifo elements
  */
 template <class T>
+    requires(std::is_trivially_copyable_v<T>)
 class FifoBufferBase
 {
 public:
