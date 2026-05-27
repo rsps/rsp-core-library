@@ -1,22 +1,23 @@
 /**
-* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at https://mozilla.org/MPL/2.0/.
-*
-* \copyright   Copyright 2025 RSP Systems A/S. All rights reserved.
-* \license     Mozilla Public License 2.0
-* \author      steffen
-*/
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2025 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      steffen
+ */
 #ifndef RSP_CORE_LIB_INCLUDE_UTILS_BASE64_H
 #define RSP_CORE_LIB_INCLUDE_UTILS_BASE64_H
 
 #include <span>
 #include <string>
+#include <string_view>
 #include <exceptions/CoreException.h>
 
 namespace rsp::utils {
 
-class EBase64FormatError: public exceptions::CoreException
+class EBase64FormatError : public exceptions::CoreException
 {
 public:
     using rsp::exceptions::CoreException::CoreException;
@@ -30,14 +31,15 @@ class Base64
 {
 public:
     static std::string Encode(std::span<const std::byte> aData);
+
     static std::string Encode(std::string_view aText)
     {
-        return Encode({ reinterpret_cast<const std::byte*>(aText.data()), aText.size() });
+        return Encode(std::as_bytes(std::span{aText}));
     }
 
     static std::string Decode(std::string_view aBase64);
 };
 
-} // rsp::utils
+} // namespace rsp::utils
 
-#endif //RSP_CORE_LIB_INCLUDE_UTILS_BASE64_H
+#endif // RSP_CORE_LIB_INCLUDE_UTILS_BASE64_H

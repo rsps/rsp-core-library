@@ -28,58 +28,58 @@ TLSSocket::tlsRandom::tlsRandom(tlsEntropy& arEntropy, const security::SecureBuf
     CHK_0(mbedtls_ctr_drbg_seed(this, mbedtls_entropy_func, &arEntropy, arNonce.data(), arNonce.size()))
 }
 
-TLSSocket::TLSSocket(const network::ConnectionOptions& arOptions)
+TLSSocket::TLSSocket(network::ConnectionOptions aOptions)
     : NamedLogChannel("MbedTLS-TLSSocket"),
-      mRandom(mEntropy, arOptions.Nonce)
+      mRandom(mEntropy, aOptions.Nonce)
 {
     CHK_0(mbedtls_ssl_config_defaults(&mConfig, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT))
     mbedtls_ssl_conf_authmode( &mConfig, MBEDTLS_SSL_VERIFY_REQUIRED);
     mbedtls_ssl_conf_rng( &mConfig, mbedtls_ctr_drbg_random, &mRandom );
-    if (arOptions.Verbose) {
+    if (aOptions.Verbose) {
         mbedtls_ssl_conf_dbg(&mConfig, debugLog, &mLogger);
         mbedtls_debug_set_threshold(4);
     }
 
-    if (!arOptions.CertCaPath.empty() && arOptions.CaChainPem.empty()) {
-        posix::FileIO file(arOptions.CertCaPath, std::ios_base::in);
-        arOptions.CaChainPem = file.GetContents();
+    if (!aOptions.CertCaPath.empty() && aOptions.CaChainPem.empty()) {
+        posix::FileIO file(aOptions.CertCaPath, std::ios_base::in);
+        aOptions.CaChainPem = file.GetContents();
     }
-    if (!arOptions.CaChainPem.empty()) {
-        CHK_0(mbedtls_x509_crt_parse(&mCaChain, reinterpret_cast<const uint8_t*>(arOptions.CaChainPem.data()), arOptions.CaChainPem.size() + 1))
+    if (!aOptions.CaChainPem.empty()) {
+        CHK_0(mbedtls_x509_crt_parse(&mCaChain, reinterpret_cast<const uint8_t*>(aOptions.CaChainPem.data()), aOptions.CaChainPem.size() + 1))
         mbedtls_ssl_conf_ca_chain(&mConfig, &mCaChain, nullptr);
     }
     else {
         THROW_WITH_BACKTRACE1(EmbedTLSCaChainMissing, "A server CA certificate chain MUST be provided for TLS-1.3");
     }
 
-    if (!arOptions.CertPath.empty() && arOptions.ClientCertPem.empty()) {
-        posix::FileIO file(arOptions.CertPath, std::ios_base::in);
-        arOptions.ClientCertPem = file.GetContents();
+    if (!aOptions.CertPath.empty() && aOptions.ClientCertPem.empty()) {
+        posix::FileIO file(aOptions.CertPath, std::ios_base::in);
+        aOptions.ClientCertPem = file.GetContents();
 
-        posix::FileIO key_file(arOptions.KeyPath, std::ios_base::in);
-        arOptions.ClientKeyPem = key_file.GetContents();
+        posix::FileIO key_file(aOptions.KeyPath, std::ios_base::in);
+        aOptions.ClientKeyPem = key_file.GetContents();
     }
-    if (!arOptions.ClientCertPem.empty()) {
-        CHK_0(mbedtls_x509_crt_parse(&mClientCert, reinterpret_cast<const uint8_t*>(arOptions.ClientCertPem.data()), arOptions.ClientCertPem.size() + 1))
+    if (!aOptions.ClientCertPem.empty()) {
+        CHK_0(mbedtls_x509_crt_parse(&mClientCert, reinterpret_cast<const uint8_t*>(aOptions.ClientCertPem.data()), aOptions.ClientCertPem.size() + 1))
 
         const uint8_t* pw = nullptr;
         size_t pw_len = 0;
-        if (!arOptions.KeyPasswd.empty()) {
-            pw = reinterpret_cast<const uint8_t*>(arOptions.KeyPasswd.data());
-            pw_len = arOptions.KeyPasswd.size() + 1;
+        if (!aOptions.KeyPasswd.empty()) {
+            pw = reinterpret_cast<const uint8_t*>(aOptions.KeyPasswd.data());
+            pw_len = aOptions.KeyPasswd.size() + 1;
         }
-        CHK_0(mbedtls_pk_parse_key(&mPrivateKey, reinterpret_cast<const uint8_t*>(arOptions.ClientKeyPem.data()), arOptions.ClientKeyPem.size() + 1, pw, pw_len, &rng_get, &mRandom))
+        CHK_0(mbedtls_pk_parse_key(&mPrivateKey, reinterpret_cast<const uint8_t*>(aOptions.ClientKeyPem.data()), aOptions.ClientKeyPem.size() + 1, pw, pw_len, &rng_get, &mRandom))
 
         CHK_0(mbedtls_ssl_conf_own_cert(&mConfig, &mClientCert, &mPrivateKey))
     }
 
-    mbedtls_ssl_conf_read_timeout(&mConfig, arOptions.ResponseTimeout * 1000);
+    mbedtls_ssl_conf_read_timeout(&mConfig, aOptions.ResponseTimeout * 1000);
 
     CHK_0(mbedtls_ssl_setup(&mSsl, &mConfig))
 
 //    mbedtls_ssl_set_timer_cb(&mSsl, mbedtls_timing_set_delay, mbedtls_timing_get_delay);
 
-    UrlParser up(arOptions.BaseUrl);
+    UrlParser up(aOptions.BaseUrl);
     CHK_0(mbedtls_ssl_set_hostname(&mSsl, std::string(up.GetHost()).c_str()))
 
     CHK_0(psa_crypto_init())

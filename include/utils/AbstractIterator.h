@@ -31,12 +31,18 @@ struct AbstractIterator
     using reference         = value_type &;
     using size_type         = size_t;
 
-    constexpr auto cAdd(pointer aPtr, difference_type aOffset) {
+    constexpr auto cAdd(pointer aPtr, difference_type aOffset)
+    {
+        // This two-step cast through void* suppresses -Wcast-align: casting
+        // from uint8_t* (1-byte alignment) to IElement* (higher alignment).
+        // This is OK because the offset is always a multiple of mElementSize.
         if constexpr (std::is_const_v<value_type>) {
-            return reinterpret_cast<pointer>(reinterpret_cast<const uint8_t *>(aPtr) + (aOffset * difference_type(mElementSize)));
+            auto* byte_ptr = reinterpret_cast<const uint8_t*>(aPtr) + (aOffset * difference_type(mElementSize));
+            return static_cast<pointer>(static_cast<const void*>(byte_ptr));
         }
         else {
-            return reinterpret_cast<pointer>(reinterpret_cast<uint8_t *>(aPtr) + (aOffset * difference_type(mElementSize)));
+            auto* byte_ptr = reinterpret_cast<uint8_t*>(aPtr) + (aOffset * difference_type(mElementSize));
+            return static_cast<pointer>(static_cast<void*>(byte_ptr));
         }
     }
 
@@ -70,7 +76,7 @@ public:
     AbstractIterator& operator+=(const difference_type offset) { mPtr = cAdd(mPtr, offset); return *this; }
 
     // Prefix increment
-    AbstractIterator& operator++() { mPtr = cAdd(mPtr, 1);; return *this; }
+    AbstractIterator& operator++() { mPtr = cAdd(mPtr, 1); return *this; }
 
     // Postfix increment
     AbstractIterator operator++(int) { auto tmp = *this; ++(*this); return tmp; }

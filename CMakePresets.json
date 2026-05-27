@@ -11,7 +11,6 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_CXX_STANDARD": "23",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }
         },
@@ -25,29 +24,30 @@
             }
         },
         {
-            "name": "debug-with-tests",
-            "displayName": "Debug + Tests",
-            "inherits": "debug",
-            "cacheVariables": {
-                "BUILD_TESTING": "ON"
-            }
-        },
-        {
             "name": "release",
             "displayName": "Release",
             "inherits": "common",
             "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "RELEASE_BUILD": "ON"
+                "CMAKE_BUILD_TYPE": "Release"
             }
         },
         {
-            "name": "release-with-tests",
-            "displayName": "Release + Tests",
-            "inherits": "release",
+            "name": "arm-debug",
+            "displayName": "ARM Debug",
+            "inherits": "debug",
+            "binaryDir": "${sourceDir}/build/arm-debug",
             "cacheVariables": {
-                "BUILD_TESTING": "ON"
+                "ARCH_ARM": "ON"
+            }
+        },
+        {
+            "name": "arm-release",
+            "displayName": "ARM Release",
+            "inherits": "release",
+            "binaryDir": "${sourceDir}/build/arm-release",
+            "cacheVariables": {
+                "ARCH_ARM": "ON"
             }
         }
     ],
@@ -57,22 +57,22 @@
             "configurePreset": "debug"
         },
         {
-            "name": "debug-with-tests",
-            "configurePreset": "debug-with-tests"
-        },
-        {
             "name": "release",
             "configurePreset": "release"
         },
         {
-            "name": "release-with-tests",
-            "configurePreset": "release-with-tests"
+            "name": "arm-debug",
+            "configurePreset": "arm-debug"
+        },
+        {
+            "name": "arm-release",
+            "configurePreset": "arm-release"
         }
     ],
     "testPresets": [
         {
-            "name": "release-with-tests",
-            "configurePreset": "release-with-tests",
+            "name": "release",
+            "configurePreset": "release",
             "output": {
                 "outputOnFailure": true
             },
@@ -82,8 +82,8 @@
             }
         },
         {
-            "name": "debug-with-tests",
-            "configurePreset": "debug-with-tests",
+            "name": "debug",
+            "configurePreset": "debug",
             "output": {
                 "outputOnFailure": true
             },

@@ -1,0 +1,16 @@
+file(STRINGS ${CMAKE_SOURCE_DIR}/.env ENV_FILE)
+foreach(entry ${ENV_FILE})
+    if (entry MATCHES "^([^=\\s]+)='(.*)'$")
+        set(${CMAKE_MATCH_1} "${CMAKE_MATCH_2}")
+        # message(STATUS ${CMAKE_MATCH_1}=${CMAKE_MATCH_2})
+    elseif (entry MATCHES "^([^=\\s]+)=(.*)$")
+        set(${CMAKE_MATCH_1} "${CMAKE_MATCH_2}")
+        # message(STATUS ${CMAKE_MATCH_1}=${CMAKE_MATCH_2})
+    elseif (entry MATCHES "^\\s*#.*$")
+        continue() # ignore comments
+    elseif (entry MATCHES "^\\s*$")
+        continue() # ignore blank and whitespace only lines
+    else ()
+        message(FATAL_ERROR "Syntax error in .env entry: ${entry}")
+    endif ()
+endforeach()
