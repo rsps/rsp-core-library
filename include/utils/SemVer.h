@@ -16,6 +16,7 @@
 #include <concepts>
 #include <initializer_list>
 #include <limits>
+#include <ostream>
 #include <ranges>
 #include <string_view>
 #include <string>
@@ -92,16 +93,16 @@ public:
                 result += '.';
 
             std::visit(
-                [&](auto&& arg) {
-                    using T = std::decay_t<decltype(arg)>;
-                    if constexpr (std::is_same_v<T, unsigned>)
-                        result += detail::ToString(arg);
-                    else if constexpr (std::is_same_v<T, std::string>)
-                        result += arg;
-                    else
-                        static_assert(false, "Non-exhaustive visitor");
-                },
-                part);
+                    [&](auto&& arg) {
+                        using T = std::decay_t<decltype(arg)>;
+                        if constexpr (std::is_same_v<T, unsigned>)
+                            result += detail::ToString(arg);
+                        else if constexpr (std::is_same_v<T, std::string>)
+                            result += arg;
+                        else
+                            static_assert(false, "Non-exhaustive visitor");
+                    },
+                    part);
         }
 
         return result;
@@ -255,6 +256,12 @@ private:
     PreRelease _prerelease{}; // pre-release identifiers
     std::string _build{};     // dot-separated build identifiers
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Version& v)
+{
+    os << v.ToString();
+    return os;
+}
 
 } // namespace rsp::utils::semver
 
