@@ -14,9 +14,9 @@
 
 namespace rsp {
 
-constexpr utils::semver::Version get_library_version()
+constexpr utils::Version get_library_version()
 {
-    return utils::semver::Version{"@RSP_CORE_LIB_SEMVER@"};
+    return utils::Version{"@RSP_CORE_LIB_SEMVER@"};
 }
 
 } // namespace rsp

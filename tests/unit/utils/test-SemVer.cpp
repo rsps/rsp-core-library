@@ -24,13 +24,12 @@ TEST_SUITE_BEGIN("Utils");
 
 TEST_CASE("SemVer")
 {
-    using rsp::utils::semver::PreRelease;
-    using rsp::utils::semver::Version;
+    using rsp::utils::Version;
 
     SUBCASE("Ctors-Getters-ToString") {
-        static_assert(PreRelease{""}.ToString() == ""s);
-        static_assert(PreRelease{"1.alpha"}.ToString() == "1.alpha"s);
-        static_assert(PreRelease{"beta.2.rc"}.ToString() == "beta.2.rc"s);
+        static_assert(Version::PreRelease{""}.ToString() == ""s);
+        static_assert(Version::PreRelease{"1.alpha"}.ToString() == "1.alpha"s);
+        static_assert(Version::PreRelease{"beta.2.rc"}.ToString() == "beta.2.rc"s);
 
         static_assert(Version{}.GetMajor() == 0);
         static_assert(Version{}.GetMinor() == 0);
@@ -75,11 +74,11 @@ TEST_CASE("SemVer")
         unsigned umax = std::numeric_limits<unsigned>::max();
         CHECK_EQ(Version{umax, umax, umax}.ToString(), std::format("{0}.{0}.{0}", umax));
 
-        CHECK_THROWS(static_cast<void>(PreRelease{"."}));
-        CHECK_THROWS(static_cast<void>(PreRelease{".."}));
-        CHECK_THROWS(static_cast<void>(PreRelease{"alpha..1"}));
-        CHECK_THROWS(static_cast<void>(PreRelease{"alpha.1."}));
-        CHECK_THROWS(static_cast<void>(PreRelease{".alpha.1"}));
+        CHECK_THROWS(static_cast<void>(Version::PreRelease{"."}));
+        CHECK_THROWS(static_cast<void>(Version::PreRelease{".."}));
+        CHECK_THROWS(static_cast<void>(Version::PreRelease{"alpha..1"}));
+        CHECK_THROWS(static_cast<void>(Version::PreRelease{"alpha.1."}));
+        CHECK_THROWS(static_cast<void>(Version::PreRelease{".alpha.1"}));
         CHECK_THROWS(static_cast<void>(Version{""}));
         CHECK_THROWS(static_cast<void>(Version{"1"sv}));
         CHECK_THROWS(static_cast<void>(Version{"-1"s}));
@@ -129,7 +128,7 @@ TEST_CASE("SemVer")
         static_assert(Version{"1.0.0-rc.1"} < Version{"1.0.0"});
 
         //  Non-numeric pre-release identifiers take precedence over numeric ones
-        static_assert(PreRelease::Part{0u} < PreRelease::Part{"0"});
+        static_assert(Version::PreRelease::Part{0u} < Version::PreRelease::Part{"0"});
         static_assert(Version{"1.0.0-alpha"} > Version{"1.0.0-1"});
 
         // build metadata is ignored for precedence
