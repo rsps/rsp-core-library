@@ -13,14 +13,15 @@
 #include <sstream>
 #include <iostream>
 #include <cstdarg>
+#include <ranges>
 #include <unistd.h>
 #include <pwd.h>
-#include <rsp/utils/ClockCast.h>
+#include <rsp/exceptions/CoreException.h>
 #include <rsp/utils/StrUtils.h>
 
 namespace rsp::utils::StrUtils {
 
-size_t Split(const std::string& arTxt, std::vector<std::string>& aList, char aDelimiter, bool aKeepEmpty)
+size_t Split(const std::string& arTxt, std::vector<std::string>& aList, const char aDelimiter, const bool aKeepEmpty)
 {
     size_t pos = arTxt.find(aDelimiter);
     size_t initialPos = 0;
@@ -54,15 +55,15 @@ std::string TrimCopy(std::string const& aStr)
 
 std::string& ToLower(std::string& arStr)
 {
-    std::transform(arStr.begin(), arStr.end(), arStr.begin(),
-            [](unsigned char c) { return std::tolower(c); });
+    std::ranges::transform(arStr, arStr.begin(),
+            [](const unsigned char c) noexcept { return std::tolower(c); });
     return arStr;
 }
 
 std::string& ToUpper(std::string& arStr)
 {
-    std::transform(arStr.begin(), arStr.end(), arStr.begin(),
-            [](unsigned char c) { return std::toupper(c); });
+    std::ranges::transform(arStr, arStr.begin(),
+            [](const unsigned char c) noexcept { return std::toupper(c); });
     return arStr;
 }
 
@@ -86,7 +87,7 @@ std::string GetHomeDir()
     const char* home_dir;
 
     if ((home_dir = getenv("HOME")) == nullptr) {
-        struct passwd* pwd = getpwuid(getuid());
+        const passwd* pwd = getpwuid(getuid());
         home_dir = pwd->pw_dir;
     }
 
@@ -95,9 +96,7 @@ std::string GetHomeDir()
 
 std::string GetConfigDir()
 {
-    const char* config_dir;
-
-    if ((config_dir = getenv("XDG_CONFIG_HOME")) != nullptr) {
+    if (const char* config_dir = getenv("XDG_CONFIG_HOME"); config_dir != nullptr) {
         return config_dir;
     }
 
@@ -173,19 +172,17 @@ std::string Format(const char* apFormat, ...)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
     // Pass on the varargs on to 'vfprintf'.
-    va_list arglist;
-
-    va_start(arglist, apFormat);
-    std::size_t size = static_cast<std::size_t>(vsnprintf(nullptr, 0, apFormat, arglist)) + 1; // Extra space for '\0'
+    va_list arg_list;
+    va_start(arg_list, apFormat);
+    const std::size_t size = static_cast<std::size_t>(vsnprintf(nullptr, 0, apFormat, arg_list)) + 1; // Extra space for '\0'
 
     std::string result;
     result.reserve(size);
     result.resize(size);
 
-    va_start(arglist, apFormat); // Reset arglist ptr.
-    vsnprintf(&result.front(), 255, apFormat, arglist);
-
-    va_end(arglist);
+    va_start(arg_list, apFormat); // Reset arg_list ptr.
+    vsnprintf(&result.front(), 255, apFormat, arg_list);
+    va_end(arg_list);
 #pragma GCC diagnostic pop
     result.resize(size - 1); // We don't want the '\0' inside
     return result;
@@ -204,7 +201,7 @@ double ToDouble(const std::string& arString)
     return d;
 }
 
-std::string ToString(double aValue, int aDigits, bool aFixed)
+std::string ToString(const double aValue, int aDigits, const bool aFixed)
 {
     if (aDigits == -1) {
         aDigits = std::numeric_limits<double>::max_digits10;
@@ -221,7 +218,7 @@ std::string ToString(double aValue, int aDigits, bool aFixed)
     return out.str();
 }
 
-std::string ToString(float aValue, int aDigits, bool aFixed)
+std::string ToString(const float aValue, int aDigits, const bool aFixed)
 {
     if (aDigits == -1) {
         aDigits = std::numeric_limits<float>::max_digits10;

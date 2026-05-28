@@ -1,7 +1,7 @@
 # Generated from CLion Inspection settings
 ---
 Checks: '-*,
-no-c2y-extensions,
+c2y-extensions,
 bugprone-argument-comment,
 bugprone-assert-side-effect,
 bugprone-bad-signal-to-kill-thread,

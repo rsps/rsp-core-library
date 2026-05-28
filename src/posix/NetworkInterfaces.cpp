@@ -77,6 +77,8 @@ bool NetworkInterfaces::isWireless(const std::string& arInterfaceName)
 #ifdef __linux__
     const auto path = std::format("/sys/class/net/{}/wireless", arInterfaceName);
     return ( access( path.c_str(), F_OK ) != -1 );
+#else
+    return false;
 #endif
 }
 
