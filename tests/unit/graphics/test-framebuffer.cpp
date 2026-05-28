@@ -31,13 +31,13 @@ using namespace rsp::graphics;
 using namespace rsp::utils;
 using namespace rsp::exceptions;
 
-static void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer& fb)
+static void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer& arFb)
 {
-    if (Rect(0, 0, fb.GetWidth(), fb.GetHeight()).IsHit(aX, aY)) {
-        CHECK_HEX(fb.GetPixel(aX, aY).ToARGB(), aColor.ToARGB());
+    if (Rect(0, 0, arFb.GetWidth(), arFb.GetHeight()).IsHit(aX, aY)) {
+        CHECK_HEX(arFb.GetPixel(aX, aY).ToARGB(), aColor.ToARGB());
     }
     else {
-        CHECK_HEX(fb.GetPixel(aX, aY).ToARGB(), 0);
+        CHECK_HEX(arFb.GetPixel(aX, aY).ToARGB(), 0);
     }
 }
 

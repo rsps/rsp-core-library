@@ -10,6 +10,7 @@
 
 #include <rsp/graphics/GfxEngine.h>
 #include <rsp/graphics/Renderer.h>
+#include <rsp/utils/Timer.h>
 #include <chrono>
 #include <thread>
 

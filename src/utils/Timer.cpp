@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <rsp/utils/Timer.h>
+#include <iostream>
 
 //#define TLOG(a) DLOG(__FUNCTION__ << ": " << a)
 #define TLOG(a)
@@ -17,20 +18,23 @@
 namespace rsp::utils {
 
 Timer::~Timer()
-{
+try {
     Enable(false);
 }
+catch(...) {
+    std::cerr << "Exception in ~Timer()" << std::endl;
+}
 
-Timer& Timer::SetTimeout(std::chrono::milliseconds aTimeout)
+Timer& Timer::SetTimeout(const std::chrono::milliseconds aTimeout)
 {
-    bool enabled = IsEnabled();
+    const bool enabled = IsEnabled();
     Enable(false);
     mTimeout = aTimeout;
     Enable(enabled);
     return *this;
 }
 
-Timer& Timer::Enable(bool aOn)
+Timer& Timer::Enable(const bool aOn)
 {
     if (mEnabled == aOn) {
         return *this;
@@ -66,10 +70,13 @@ TimerQueue::TimerQueue()
 }
 
 TimerQueue::~TimerQueue()
-{
+try {
     if (&GetInstance() == this) {
         SetInstance(nullptr);
     }
+}
+catch (...) {
+    std::cerr << "Exception in ~TimerQueue()" << std::endl;
 }
 
 
@@ -77,15 +84,11 @@ void TimerQueue::Poll()
 {
     std::vector<Timer*> expired;
 
-    for(;;) {
-        if (mQueue.empty()) {
-            TLOG("No timers exists.")
-            break;
-        }
+    while(!mQueue.empty()) {
         auto it = mQueue.begin();
 
         RunTime now;
-            TLOG("Timer " << (*it)->GetId()
+        TLOG("Timer " << (*it)->GetId()
             << " expires at " << (*it)->mTimeoutAt
             << ". Now: "
             << now)
