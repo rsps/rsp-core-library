@@ -48,7 +48,7 @@ function(rsp_core_add_dependencies ATARGET)
     FetchContent_Declare(
         magic_enum
         GIT_REPOSITORY https://github.com/Neargye/magic_enum
-        GIT_TAG v0.9.7
+        GIT_TAG v0.9.8
         GIT_SHALLOW TRUE
     )
     FetchContent_MakeAvailable(magic_enum)
@@ -88,7 +88,7 @@ function(rsp_core_add_dependencies ATARGET)
             FetchContent_Declare(
                 mbedtls
                 GIT_REPOSITORY https://github.com/Mbed-TLS/mbedtls
-                GIT_TAG v3.6.5
+                GIT_TAG v3.6.6
                 GIT_SHALLOW TRUE
             )
             set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)  # Disable building Mbed-TLS's own tests
