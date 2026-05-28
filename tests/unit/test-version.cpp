@@ -10,4 +10,4 @@
 
 #include <version.h>
 
-static_assert(rsp::get_library_version() >= rsp::utils::Version(0, 0, 0));
+static_assert(rsp::get_library_version() >= rsp::utils::Version{0, 0, 0});

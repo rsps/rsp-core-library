@@ -7,6 +7,60 @@ include_guard(GLOBAL)
 # Ensure that git is available or this module will not work
 find_package(Git REQUIRED)
 
+if(NOT COMMAND "git_get_version")
+
+    #! git_get_version : Get version number from nearest git tag that matches a version pattern
+    #
+    # @see https://git-scm.com/docs/git-describe
+    #
+    # @example
+    #       git_get_version(OUTPUT version WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    #       message("${version}") # 1.5.22
+    #
+    # @param OUTPUT <variable>          The output variable to assign the found version tag
+    # @param WORKING_DIRECTORY <string> Directory from where the git command must be executed from
+    #
+    # @return
+    #     [OUTPUT]                      The resulting version, parsed from a tag, e.g. "1.5.22"
+    #
+    function(git_get_version)
+        set(options "")
+        set(oneValueArgs OUTPUT WORKING_DIRECTORY)
+        set(multiValueArgs "")
+
+        cmake_parse_arguments(INPUT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+        # Run git command
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} describe --tags --match "*[0-9].*[0-9].*[0-9]*" --abbrev=0
+            WORKING_DIRECTORY "${INPUT_WORKING_DIRECTORY}"
+            RESULT_VARIABLE status
+            OUTPUT_VARIABLE result
+            ERROR_VARIABLE error
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            TIMEOUT 3
+        )
+
+        if(status EQUAL 0)
+            string(REGEX MATCH "([0-9]+\\.[0-9]+\\.[0-9]+)" _ "${result}")
+            set(version "${CMAKE_MATCH_1}")
+        else()
+            set(version "")
+        endif()
+
+        if(NOT version)
+            message(VERBOSE "${CMAKE_CURRENT_FUNCTION}():\n"
+                            "No valid version tag found, using default: 0.0.0\n"
+                            "Git returned ${status} with error: ${error}")
+            set(version "0.0.0")
+        endif()
+
+        set("${INPUT_OUTPUT}" "${version}")
+
+        return(PROPAGATE "${INPUT_OUTPUT}")
+    endfunction()
+endif()
+
 if(NOT COMMAND "git_get_semver")
 
     #! git_get_semver : Gets a semver 2.0.0 version string from git describe
@@ -43,7 +97,8 @@ if(NOT COMMAND "git_get_semver")
         )
 
         if(status EQUAL 0)
-            # Parse: <tag>-<N>-g<sha>[-dirty] Regex: the tag can contain hyphens (e.g. "v1.2.3-rc1"), so we anchor from the right
+            # Parse: <tag>-<N>-g<sha>[-dirty]. The tag can contain hyphens (e.g.
+            # "v1.2.3-rc1") so we anchor from the right
             string(REGEX MATCH "^(.*)-([0-9]+)-g([0-9a-f]+)(-dirty)?$" _ "${result}")
             set(tag "${CMAKE_MATCH_1}")
             set(num_commits "${CMAKE_MATCH_2}")
