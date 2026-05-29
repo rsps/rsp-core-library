@@ -24,10 +24,8 @@ TEST_SUITE_BEGIN("Graphics");
 
 TEST_CASE("Color")
 {
-    SUBCASE("Color Constructors")
-    {
-        SUBCASE("Separate values constructor")
-        {
+    SUBCASE("Color Constructors") {
+        SUBCASE("Separate values constructor") {
             // Arrange & Act
             Color col(cRed, cGreen, cBlue, cAlpha);
 
@@ -43,8 +41,7 @@ TEST_CASE("Color")
             CHECK_HEX(col.AsRaw(), cColorVal);
 #endif
         }
-        SUBCASE("Single value constructor")
-        {
+        SUBCASE("Single value constructor") {
             // Arrange & Act
             Color col(cColorVal);
 
@@ -55,8 +52,7 @@ TEST_CASE("Color")
             CHECK_EQ(col.GetBlue(), cBlue);
             CHECK_HEX(col.AsUint(), cColorVal);
         }
-        SUBCASE("Copy constructor")
-        {
+        SUBCASE("Copy constructor") {
             // Arrange & Act
             Color testCol(cColorVal);
             Color col(testCol);
@@ -69,13 +65,12 @@ TEST_CASE("Color")
         }
     }
 
-    SUBCASE("Color Sets")
-    {
+    SUBCASE("Color Sets") {
         // Arrange
         Color testCol(cColorVal);
         uint8_t newCol = 0x55;
-        SUBCASE("Set Alpha")
-        {
+
+        SUBCASE("Set Alpha") {
             // Act
             testCol.SetAlpha(newCol);
 
@@ -85,8 +80,8 @@ TEST_CASE("Color")
             CHECK_EQ(testCol.GetGreen(), cGreen);
             CHECK_EQ(testCol.GetBlue(), cBlue);
         }
-        SUBCASE("Set Red")
-        {
+
+        SUBCASE("Set Red") {
             // Act
             testCol.SetRed(newCol);
 
@@ -96,8 +91,8 @@ TEST_CASE("Color")
             CHECK_EQ(testCol.GetBlue(), cBlue);
             CHECK_EQ(testCol.GetAlpha(), cAlpha);
         }
-        SUBCASE("Set Green")
-        {
+
+        SUBCASE("Set Green") {
             // Act
             testCol.SetGreen(newCol);
 
@@ -107,8 +102,8 @@ TEST_CASE("Color")
             CHECK_EQ(testCol.GetBlue(), cBlue);
             CHECK_EQ(testCol.GetAlpha(), cAlpha);
         }
-        SUBCASE("Set Blue")
-        {
+
+        SUBCASE("Set Blue") {
             // Act
             testCol.SetBlue(newCol);
 
@@ -120,28 +115,27 @@ TEST_CASE("Color")
         }
     }
 
-    SUBCASE("Color Operators")
-    {
+    SUBCASE("Color Operators") {
         // Arrange
         Color testCol(cColorVal);
-        SUBCASE("uint32 Conversion")
-        {
+
+        SUBCASE("uint32 Conversion") {
             // Act
             uint32_t newUint32 = testCol;
 
             // Assert
             CHECK_EQ(newUint32, cColorVal);
         }
-        SUBCASE("= Operator")
-        {
+
+        SUBCASE("= Operator") {
             // Act
             Color newColour = testCol;
 
             // Assert
             CHECK_EQ(static_cast<uint32_t>(newColour), static_cast<uint32_t>(testCol));
         }
-        SUBCASE("Blend")
-        {
+
+        SUBCASE("Blend") {
             Color c1(Color::Red);
             Color c2(Color::Blue);
             CHECK_EQ(Color::Blend(c1, c2), Color(Color::Blue));
@@ -154,8 +148,7 @@ TEST_CASE("Color")
         }
     }
 
-    SUBCASE("Color Constants")
-    {
+    SUBCASE("Color Constants") {
         SUBCASE("Red") {
             Color cl(Color::Red);
             CHECK_EQ(cl.GetAlpha(), 0xFF);
@@ -181,8 +174,7 @@ TEST_CASE("Color")
         }
     }
 
-    SUBCASE("Raw Values")
-    {
+    SUBCASE("Raw Values") {
         SUBCASE("Red") {
             Color cl(Color::Red);
             CHECK_HEX(cl.AsRaw(), Color(Color::Red).AsRaw());

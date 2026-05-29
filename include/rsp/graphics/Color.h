@@ -8,14 +8,14 @@
  * \author      Simon Glashoff
  * \author      Steffen Brummer
  */
+
 #ifndef RSP_CORE_LIB_GRAPHICS_COLOR_H
 #define RSP_CORE_LIB_GRAPHICS_COLOR_H
 
 #include <rsp/exceptions/CoreException.h>
 #include <cstdint>
 
-namespace rsp::graphics
-{
+namespace rsp::graphics {
 
 /**
  * \class Color
@@ -30,30 +30,31 @@ class Color
 public:
     using ARGB_t = uint32_t;
 
-/**
- * \brief Predefined basic colors
- */
+    /**
+     * \brief Predefined basic colors
+     */
     enum BasicColors : uint32_t {
-        None    = 0,
-        White   = 0xFFFFFFFF,
-        Silver  = 0xFFC0C0C0,
-        Grey    = 0xFF808080,
-        Black   = 0xFF000000,
-        Red     = 0xFFFF0000,
-        Maroon  = 0xFF800000,
-        Yellow  = 0xFFFFFF00,
-        Olive   = 0xFF808000,
-        Lime    = 0xFF00FF00,
-        Green   = 0xFF008000,
-        Aqua    = 0xFF00FFFF,
-        Teal    = 0xFF008080,
-        Blue    = 0xFF0000FF,
-        Navy    = 0xFF000080,
+        None = 0,
+        White = 0xFFFFFFFF,
+        Silver = 0xFFC0C0C0,
+        Grey = 0xFF808080,
+        Black = 0xFF000000,
+        Red = 0xFFFF0000,
+        Maroon = 0xFF800000,
+        Yellow = 0xFFFFFF00,
+        Olive = 0xFF808000,
+        Lime = 0xFF00FF00,
+        Green = 0xFF008000,
+        Aqua = 0xFF00FFFF,
+        Teal = 0xFF008080,
+        Blue = 0xFF0000FF,
+        Navy = 0xFF000080,
         Fuchsia = 0xFFFF00FF,
-        Purple  = 0xFF800080,
+        Purple = 0xFF800080,
     };
 
-    Color() noexcept : mValue{} {}
+    Color() noexcept
+        : mValue{} {}
 
     /**
      * \brief Construct with given base colors.
@@ -77,14 +78,14 @@ public:
      *
      * \param arColor
      */
-    Color(const Color &arColor) = default;
+    Color(const Color& arColor) = default;
 
     /**
      * \brief Move constructor.
      *
      * \param arColor
      */
-    Color(Color &&arColor) noexcept = default;
+    Color(Color&& arColor) noexcept = default;
 
     /**
      * \brief Get the red base color value.
@@ -92,6 +93,7 @@ public:
      * \return Red value
      */
     [[nodiscard]] uint8_t GetRed() const;
+
     /**
      * \brief Set the red base color value.
      *
@@ -106,6 +108,7 @@ public:
      * \return Green value
      */
     [[nodiscard]] uint8_t GetGreen() const;
+
     /**
      * \brief Set the green base color value.
      *
@@ -120,6 +123,7 @@ public:
      * \return Blue value
      */
     [[nodiscard]] uint8_t GetBlue() const;
+
     /**
      * \brief Set the blue base color value.
      *
@@ -134,6 +138,7 @@ public:
      * \return Alpha value
      */
     [[nodiscard]] uint8_t GetAlpha() const;
+
     /**
      * \brief Set the alpha channel value.
      *
@@ -147,6 +152,7 @@ public:
      * \return ARGB
      */
     operator uint32_t() const; // NOLINT
+
     [[nodiscard]] uint32_t AsUint() const { return static_cast<ARGB_t>(*this); }
 
     /**
@@ -156,29 +162,34 @@ public:
      */
 
     [[nodiscard]] uint32_t AsRaw() const { return mValue.rgba; }
-    Color& FromRaw(const uint32_t aValue) { mValue.rgba = aValue; return *this; }
+
+    Color& FromRaw(const uint32_t aValue)
+    {
+        mValue.rgba = aValue;
+        return *this;
+    }
 
     /**
      * \brief Assignment operator.
      *
      * \param arColor
      */
-    Color& operator=(const Color &arColor);
+    Color& operator=(const Color& arColor);
 
     /**
      * \brief Move operator.
      *
      * \param arColor
      */
-    Color& operator=(Color &&arColor) noexcept;
+    Color& operator=(Color&& arColor) noexcept;
 
     Color& operator=(ARGB_t aValue);
 
     bool operator!=(ARGB_t aValue) const;
-    bool operator!=(const Color &arOther) const;
+    bool operator!=(const Color& arOther) const;
 
     bool operator==(ARGB_t aValue) const;
-    bool operator==(const Color &arOther) const;
+    bool operator==(const Color& arOther) const;
 
 
     /**
@@ -189,10 +200,11 @@ public:
      * \param b
      * \return Combined color
      */
-    static Color Blend(const Color &a, const Color &b);
+    static Color Blend(const Color& a, const Color& b);
 
-  protected:
-    struct color_components {
+protected:
+    struct color_components
+    {
         uint32_t red : 8;
         uint32_t green : 8;
         uint32_t blue : 8;
@@ -202,7 +214,8 @@ public:
     /**
      * \brief Color value type
      */
-    union ColorValue_t {
+    union ColorValue_t
+    {
         uint32_t rgba;
         color_components item;
     };
@@ -211,4 +224,5 @@ public:
 };
 
 } // namespace rsp::graphics
+
 #endif // RSP_CORE_LIB_GRAPHICS_COLOR_H
