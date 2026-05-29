@@ -10,8 +10,8 @@
 
 #include <sstream>
 #include <cstdio>
-#include <utils/Variant.h>
-#include <utils/StrUtils.h>
+#include <rsp/utils/Variant.h>
+#include <rsp/utils/StrUtils.h>
 
 //#include <logging/Logger.h>
 //#define JLOG(a) DLOG(a);

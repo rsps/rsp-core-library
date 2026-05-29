@@ -9,8 +9,8 @@
  * \author      Steffen Brummer
  */
 
-#include <security/CryptBase.h>
-#include <security/Sha.h>
+#include <rsp/security/CryptBase.h>
+#include <rsp/security/Sha.h>
 #include <mbedtls/md.h>
 #include <mbedtls/version.h>
 #include <magic_enum/magic_enum.hpp>

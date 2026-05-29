@@ -9,7 +9,7 @@
  */
 
 #include <doctest.h>
-#include <utils/FixedString.h>
+#include <rsp/utils/FixedString.h>
 
 using namespace rsp::utils;
 

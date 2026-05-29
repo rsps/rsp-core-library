@@ -9,7 +9,7 @@
  */
 
 #include "BmpLoader.h"
-#include <graphics/raster/ImgLoader.h>
+#include <rsp/graphics/raster/ImgLoader.h>
 #include <memory>
 
 namespace rsp::graphics {

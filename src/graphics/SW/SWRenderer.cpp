@@ -10,7 +10,7 @@
 
 #ifdef USE_GFX_SW
 
-#include <posix/FileSystem.h>
+#include <rsp/posix/FileSystem.h>
 #include "SWRenderer.h"
 #include "SWTexture.h"
 #include "GfxHal.h"

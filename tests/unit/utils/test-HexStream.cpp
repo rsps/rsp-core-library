@@ -9,7 +9,7 @@
  */
 
 #include "doctest.h"
-#include <utils/HexStream.h>
+#include <rsp/utils/HexStream.h>
 
 using namespace rsp::utils;
 

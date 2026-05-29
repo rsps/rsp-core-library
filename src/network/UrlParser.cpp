@@ -8,8 +8,8 @@
 * \author      steffen
 */
 #include <magic_enum/magic_enum.hpp>
-#include <network/parser-helpers.h>
-#include <network/UrlParser.h>
+#include <rsp/network/parser-helpers.h>
+#include <rsp/network/UrlParser.h>
 
 using namespace std::string_view_literals;
 

@@ -13,9 +13,9 @@
 
 #include <chrono>
 #include <memory>
-#include <messaging/Event.h>
-#include <graphics/GfxInputEvents.h>
-#include <logging/LogChannel.h>
+#include <rsp/messaging/Event.h>
+#include <rsp/graphics/GfxInputEvents.h>
+#include <rsp/logging/LogChannel.h>
 
 struct TestEventItem_t {
     std::chrono::steady_clock::time_point Time{};

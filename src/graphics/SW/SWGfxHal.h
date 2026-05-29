@@ -13,7 +13,7 @@
 
 #ifdef USE_GFX_SW
 
-#include <utils/Singleton.h>
+#include <rsp/utils/Singleton.h>
 #include "GfxHal.h"
 
 namespace rsp::graphics::sw {

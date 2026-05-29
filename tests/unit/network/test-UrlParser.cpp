@@ -8,7 +8,7 @@
 * \author      steffen
 */
 #include <doctest.h>
-#include <network/UrlParser.h>
+#include <rsp/network/UrlParser.h>
 
 using namespace rsp::network;
 

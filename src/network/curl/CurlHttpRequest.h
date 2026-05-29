@@ -11,7 +11,7 @@
 #ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
 #define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
 
-#include <network/HttpRequestBase.h>
+#include <rsp/network/HttpRequestBase.h>
 // #include <iostream>
 // #include <string>
 // #include <cstring>

@@ -12,7 +12,7 @@
 #ifndef TESTS_HELPERS_TESTPIXMAP_H_
 #define TESTS_HELPERS_TESTPIXMAP_H_
 
-#include <graphics/GfxCache.h>
+#include <rsp/graphics/GfxCache.h>
 
 class TestPixmap: public rsp::graphics::GfxCache
 {

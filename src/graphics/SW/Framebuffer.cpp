@@ -10,7 +10,7 @@
 
 #ifdef USE_GFX_SW
 
-#include <exceptions/ExceptionHelper.h>
+#include <rsp/exceptions/ExceptionHelper.h>
 #include <cstring>
 #include <fcntl.h>
 #include <iostream>

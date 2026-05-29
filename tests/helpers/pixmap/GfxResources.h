@@ -1,4 +1,4 @@
-#include <graphics/GfxResource.h>
+#include <rsp/graphics/GfxResource.h>
 
 extern const rsp::graphics::GfxResource cKey;
 extern const rsp::graphics::GfxResource cBigSpecial;

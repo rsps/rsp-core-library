@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <logging/LogChannel.h>
-#include <exceptions/CoreException.h>
+#include <rsp/logging/LogChannel.h>
+#include <rsp/exceptions/CoreException.h>
 
 namespace rsp::logging {
 

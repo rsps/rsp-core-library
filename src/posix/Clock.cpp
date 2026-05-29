@@ -7,8 +7,8 @@
  * \author      Steffen Brummer
  */
 
-#include <exceptions/CoreException.h>
-#include <posix/Clock.h>
+#include <rsp/exceptions/CoreException.h>
+#include <rsp/posix/Clock.h>
 
 using namespace rsp::utils;
 

@@ -10,7 +10,7 @@
 
 #include <string>
 #include <doctest.h>
-#include <messaging/Notifier.h>
+#include <rsp/messaging/Notifier.h>
 
 using namespace rsp::messaging;
 

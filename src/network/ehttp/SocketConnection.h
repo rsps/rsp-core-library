@@ -10,10 +10,10 @@
 #ifndef RSP_CORE_LIB_SRC_NETWORK_EHTTP_SOCKET_CONNECTION_H
 #define RSP_CORE_LIB_SRC_NETWORK_EHTTP_SOCKET_CONNECTION_H
 
-#include <logging/LogChannel.h>
-#include <network/IConnection.h>
-#include <posix/Socket.h>
-#include <security/ITLSSocket.h>
+#include <rsp/logging/LogChannel.h>
+#include <rsp/network/IConnection.h>
+#include <rsp/posix/Socket.h>
+#include <rsp/security/ITLSSocket.h>
 
 namespace rsp::network::ehttp {
 

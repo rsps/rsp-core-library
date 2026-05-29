@@ -8,7 +8,7 @@
  * \author      steffen
  */
 #include <doctest.h>
-#include <utils/Base64.h>
+#include <rsp/utils/Base64.h>
 
 using namespace rsp::utils;
 

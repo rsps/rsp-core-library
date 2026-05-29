@@ -10,8 +10,8 @@
 
 #include <chrono>
 #include <doctest.h>
-#include <graphics/Control.h>
-#include <utils/Random.h>
+#include <rsp/graphics/Control.h>
+#include <rsp/utils/Random.h>
 #include <TestHelpers.h>
 
 using namespace rsp::graphics;

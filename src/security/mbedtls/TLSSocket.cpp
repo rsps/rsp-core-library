@@ -8,9 +8,9 @@
 * \author      steffen
 */
 #include "TLSSocket.h"
-#include <network/UrlParser.h>
-#include <posix/FileIO.h>
-#include <utils/DateTime.h>
+#include <rsp/network/UrlParser.h>
+#include <rsp/posix/FileIO.h>
+#include <rsp/utils/DateTime.h>
 
 using namespace rsp::network;
 

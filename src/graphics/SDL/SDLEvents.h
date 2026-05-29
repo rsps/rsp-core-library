@@ -14,7 +14,7 @@
 #ifdef USE_GFX_SDL
 
 #include <SDL2/SDL.h>
-#include <graphics/GfxInputEvents.h>
+#include <rsp/graphics/GfxInputEvents.h>
 
 namespace rsp::graphics::sdl {
 

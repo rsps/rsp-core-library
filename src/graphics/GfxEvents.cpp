@@ -9,7 +9,7 @@
  */
 
 #include <chrono>
-#include <graphics/GfxEvents.h>
+#include <rsp/graphics/GfxEvents.h>
 
 namespace rsp::graphics {
 

@@ -9,8 +9,8 @@
  */
 
 #include "TestApplication.h"
-#include <logging/FileLogWriter.h>
-#include <application/Console.h>
+#include <rsp/logging/FileLogWriter.h>
+#include <rsp/application/Console.h>
 
 using namespace rsp::application;
 using namespace rsp::logging;

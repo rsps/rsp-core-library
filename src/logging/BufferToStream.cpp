@@ -8,7 +8,7 @@
 * \author      steffen
 */
 #include <cctype>
-#include <logging/BufferToStream.h>
+#include <rsp/logging/BufferToStream.h>
 
 namespace rsp::logging {
 

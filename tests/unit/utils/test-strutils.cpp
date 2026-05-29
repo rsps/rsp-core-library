@@ -9,8 +9,8 @@
  */
 
 #include <doctest.h>
-#include <exceptions/CoreException.h>
-#include <utils/StrUtils.h>
+#include <rsp/exceptions/CoreException.h>
+#include <rsp/utils/StrUtils.h>
 
 using namespace rsp::utils;
 using namespace std::string_literals;

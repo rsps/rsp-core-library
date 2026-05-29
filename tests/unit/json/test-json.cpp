@@ -8,13 +8,13 @@
  * \author      Steffen Brummer
  */
 
-#include <json/Json.h>
-#include <json/JsonDecoder.h>
+#include <rsp/json/Json.h>
+#include <rsp/json/JsonDecoder.h>
 #include "doctest.h"
 #include <iostream>
-#include <utils/StrUtils.h>
-#include <utils/StructElement.h>
-#include <utils/InRange.h>
+#include <rsp/utils/StrUtils.h>
+#include <rsp/utils/StructElement.h>
+#include <rsp/utils/InRange.h>
 #include <TestHelpers.h>
 #include <optional>
 

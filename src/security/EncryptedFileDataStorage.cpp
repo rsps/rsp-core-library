@@ -8,9 +8,9 @@
  * \author      Steffen Brummer
  */
 
-#include <security/EncryptedFileDataStorage.h>
-#include <security/Decrypt.h>
-#include <security/Encrypt.h>
+#include <rsp/security/EncryptedFileDataStorage.h>
+#include <rsp/security/Decrypt.h>
+#include <rsp/security/Encrypt.h>
 
 using namespace rsp::logging;
 

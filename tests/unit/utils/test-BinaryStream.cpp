@@ -8,12 +8,12 @@
 * \author      steffen
 */
 #include <doctest.h>
-#include <utils/BinaryStream.h>
+#include <rsp/utils/BinaryStream.h>
 #include <fstream>
 #include <vector>
-#include <utils/DateTime.h>
-#include <utils/HexStream.h>
-#include <utils/StructElement.h>
+#include <rsp/utils/DateTime.h>
+#include <rsp/utils/HexStream.h>
+#include <rsp/utils/StructElement.h>
 
 using namespace rsp::utils;
 

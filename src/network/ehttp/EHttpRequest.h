@@ -12,9 +12,9 @@
 
 #include <filesystem>
 #include <memory>
-#include <network/HttpRequestBase.h>
-#include <network/IHttpSession.h>
-#include <network/MultipartBoundary.h>
+#include <rsp/network/HttpRequestBase.h>
+#include <rsp/network/IHttpSession.h>
+#include <rsp/network/MultipartBoundary.h>
 #include "EHttpResponse.h"
 #include "SocketConnection.h"
 

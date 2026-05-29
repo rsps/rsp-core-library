@@ -7,8 +7,8 @@
 * \license     Mozilla Public License 2.0
 * \author      steffen
 */
-#include <exceptions/CoreException.h>
-#include <utils/ThreadList.h>
+#include <rsp/exceptions/CoreException.h>
+#include <rsp/utils/ThreadList.h>
 
 namespace rsp::utils {
 

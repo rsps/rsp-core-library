@@ -7,7 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <security/Decrypt.h>
+#include <rsp/security/Decrypt.h>
 
 #include "common.h"
 

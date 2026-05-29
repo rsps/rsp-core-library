@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/SceneMap.h>
-#include <logging/Logger.h>
+#include <rsp/graphics/SceneMap.h>
+#include <rsp/logging/Logger.h>
 
 using namespace rsp::logging;
 

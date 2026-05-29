@@ -13,7 +13,7 @@
 
 #ifdef USE_GFX_SW
 
-#include <graphics/Rect.h>
+#include <rsp/graphics/Rect.h>
 #include <linux/fb.h>
 #include "GfxHal.h"
 

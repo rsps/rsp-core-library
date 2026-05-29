@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/BitmapView.h>
-#include <exceptions/CoreException.h>
+#include <rsp/graphics/BitmapView.h>
+#include <rsp/exceptions/CoreException.h>
 
 namespace rsp::graphics {
 

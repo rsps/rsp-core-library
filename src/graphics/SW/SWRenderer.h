@@ -15,9 +15,9 @@
 
 #include <string>
 #include <vector>
-#include <graphics/Renderer.h>
+#include <rsp/graphics/Renderer.h>
 #include "TouchParser.h"
-#include <utils/Singleton.h>
+#include <rsp/utils/Singleton.h>
 #include "Framebuffer.h"
 
 namespace rsp::graphics::sw {

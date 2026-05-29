@@ -8,12 +8,12 @@
  * \author      Steffen Brummer
  */
 #include <cstring>
-#include <exceptions/CoreException.h>
+#include <rsp/exceptions/CoreException.h>
 #include <filesystem>
-#include <network/FileBody.h>
-#include <network/MimeTypes.h>
-#include <network/MultipartBody.h>
-#include <network/StringBody.h>
+#include <rsp/network/FileBody.h>
+#include <rsp/network/MimeTypes.h>
+#include <rsp/network/MultipartBody.h>
+#include <rsp/network/StringBody.h>
 
 namespace rsp::network {
 

@@ -7,7 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      steffen
  */
-#include <utils/Base64.h>
+#include <rsp/utils/Base64.h>
 #include <cstdint>
 
 namespace rsp::utils {

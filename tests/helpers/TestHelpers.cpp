@@ -12,9 +12,9 @@
 #include <cstring>
 #include <filesystem>
 #include <string>
-#include <posix/FileIO.h>
-#include <posix/FileSystem.h>
-#include <utils/HexStream.h>
+#include <rsp/posix/FileIO.h>
+#include <rsp/posix/FileSystem.h>
+#include <rsp/utils/HexStream.h>
 #include "TestHelpers.h"
 
 uint8_t TestHelpers::TamperWithFile(const std::string &arFileName, uint32_t aOffset, uint8_t aValue)

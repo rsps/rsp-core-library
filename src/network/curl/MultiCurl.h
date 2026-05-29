@@ -15,7 +15,7 @@
 #include <curl/curl.h>
 #include "Exceptions.h"
 #include "CurlSessionHttpRequest.h"
-#include <logging/LogChannel.h>
+#include <rsp/logging/LogChannel.h>
 
 namespace rsp::network::curl {
 

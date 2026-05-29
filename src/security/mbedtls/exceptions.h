@@ -10,8 +10,8 @@
 #ifndef RSP_CORE_LIB_SRC_SECURITY_OPENSSL_EXCEPTIONS_H
 #define RSP_CORE_LIB_SRC_SECURITY_OPENSSL_EXCEPTIONS_H
 
-#include <network/NetworkException.h>
-#include <utils/HexStream.h>
+#include <rsp/network/NetworkException.h>
+#include <rsp/utils/HexStream.h>
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push

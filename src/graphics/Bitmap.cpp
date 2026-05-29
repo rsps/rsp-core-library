@@ -8,9 +8,9 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/Bitmap.h>
+#include <rsp/graphics/Bitmap.h>
 #include <filesystem>
-#include <utils/Crc32.h>
+#include <rsp/utils/Crc32.h>
 
 using namespace rsp::utils;
 

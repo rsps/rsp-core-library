@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <logging/OutStreamBuffer.h>
+#include <rsp/logging/OutStreamBuffer.h>
 
 namespace rsp::logging {
 

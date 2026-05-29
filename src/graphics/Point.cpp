@@ -9,7 +9,7 @@
  */
 
 #include <cmath>
-#include <graphics/Point.h>
+#include <rsp/graphics/Point.h>
 
 namespace rsp::graphics
 {

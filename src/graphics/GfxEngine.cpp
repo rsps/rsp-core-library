@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/GfxEngine.h>
-#include <graphics/Renderer.h>
+#include <rsp/graphics/GfxEngine.h>
+#include <rsp/graphics/Renderer.h>
 #include <chrono>
 #include <thread>
 

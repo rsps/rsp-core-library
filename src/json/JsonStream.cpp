@@ -10,8 +10,8 @@
 
 #include <cstring>
 #include <string>
-#include <json/JsonExceptions.h>
-#include <json/JsonStream.h>
+#include <rsp/json/JsonExceptions.h>
+#include <rsp/json/JsonStream.h>
 
 namespace rsp::json {
 

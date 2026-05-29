@@ -7,7 +7,7 @@
 * \license     Mozilla Public License 2.0
 * \author      steffen
 */
-#include <network/BinaryBody.h>
+#include <rsp/network/BinaryBody.h>
 
 namespace rsp::network {
 

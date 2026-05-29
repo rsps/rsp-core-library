@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <compression/ZLib.h>
+#include <rsp/compression/ZLib.h>
 
 #ifdef USE_ZLIB
 

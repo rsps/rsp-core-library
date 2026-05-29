@@ -8,11 +8,11 @@
  * \author      Steffen Brummer
  */
 
-#include <application/Console.h>
+#include <rsp/application/Console.h>
 #include <iostream>
 #include <string>
-#include <json/Json.h>
-#include <utils/AnsiEscapeCodes.h>
+#include <rsp/json/Json.h>
+#include <rsp/utils/AnsiEscapeCodes.h>
 
 using namespace rsp::utils::AnsiEscapeCodes;
 

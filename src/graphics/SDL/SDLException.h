@@ -11,7 +11,7 @@
 #ifndef RSP_CORE_LIB_SRC_GRAPHICS_SDL_SDL_EXCEPTION_H
 #define RSP_CORE_LIB_SRC_GRAPHICS_SDL_SDL_EXCEPTION_H
 
-#include <exceptions/CoreException.h>
+#include <rsp/exceptions/CoreException.h>
 
 namespace rsp::graphics::sdl {
 

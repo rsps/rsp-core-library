@@ -11,8 +11,8 @@
 #ifdef USE_FREETYPE
 
 #include "FreeTypeLibrary.h"
-#include <utils/StrUtils.h>
-#include <graphics/FontRawInterface.h>
+#include <rsp/utils/StrUtils.h>
+#include <rsp/graphics/FontRawInterface.h>
 
 using namespace rsp::utils;
 using namespace rsp::logging;

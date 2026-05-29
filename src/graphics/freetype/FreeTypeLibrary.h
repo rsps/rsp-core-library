@@ -15,8 +15,8 @@
 
 #include <string>
 #include <map>
-#include <graphics/Font.h>
-#include <logging/LogChannel.h>
+#include <rsp/graphics/Font.h>
+#include <rsp/logging/LogChannel.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H

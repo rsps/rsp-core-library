@@ -11,11 +11,11 @@
 #include <fstream>
 #include <filesystem>
 #include <doctest.h>
-#include <application/CommandLine.h>
-#include <application/Console.h>
-#include <exceptions/CoreException.h>
-#include <utils/StrUtils.h>
-#include <utils/Function.h>
+#include <rsp/application/CommandLine.h>
+#include <rsp/application/Console.h>
+#include <rsp/exceptions/CoreException.h>
+#include <rsp/utils/StrUtils.h>
+#include <rsp/utils/Function.h>
 #include "../../helpers/TestApplication.h"
 
 using namespace rsp::application;

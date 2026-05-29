@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <utils/FourCC.h>
+#include <rsp/utils/FourCC.h>
 
 namespace rsp::utils {
 

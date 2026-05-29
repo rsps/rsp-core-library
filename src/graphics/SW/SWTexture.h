@@ -13,8 +13,8 @@
 
 #ifdef USE_GFX_SW
 
-#include <graphics/PixelData.h>
-#include <graphics/Texture.h>
+#include <rsp/graphics/PixelData.h>
+#include <rsp/graphics/Texture.h>
 #include "GfxHal.h"
 
 namespace rsp::graphics::sw {

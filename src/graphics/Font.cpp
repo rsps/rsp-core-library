@@ -8,10 +8,10 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/Font.h>
-#include <graphics/FontRawInterface.h>
+#include <rsp/graphics/Font.h>
+#include <rsp/graphics/FontRawInterface.h>
 #include <string>
-#include <logging/Logger.h>
+#include <rsp/logging/Logger.h>
 
 namespace rsp::graphics {
 

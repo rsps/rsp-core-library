@@ -9,8 +9,8 @@
  */
 
 #include <doctest.h>
-#include <messaging/Event.h>
-#include <messaging/EventBroker.h>
+#include <rsp/messaging/Event.h>
+#include <rsp/messaging/EventBroker.h>
 #include <TestHelpers.h>
 
 using namespace rsp::messaging;

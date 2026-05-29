@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#include <logging/SetLevel.h>
-#include <logging/OutStreamBuffer.h>
+#include <rsp/logging/SetLevel.h>
+#include <rsp/logging/OutStreamBuffer.h>
 
 namespace rsp::logging {
 

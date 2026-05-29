@@ -12,10 +12,10 @@
 
 #ifdef USE_GFX_SW
 
-#include <graphics/GfxInputEvents.h>
+#include <rsp/graphics/GfxInputEvents.h>
 #include <fstream>
 #include <iostream>
-#include <posix/FileIO.h>
+#include <rsp/posix/FileIO.h>
 
 namespace rsp::graphics::sw {
 

@@ -10,8 +10,8 @@
 
 #include <doctest.h>
 #include <string>
-#include <security/Sha.h>
-#include <security/SecureString.h>
+#include <rsp/security/Sha.h>
+#include <rsp/security/SecureString.h>
 
 using namespace rsp::security;
 

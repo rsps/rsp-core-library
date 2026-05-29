@@ -11,7 +11,7 @@
 #define TESTS_HELPERS_TEST_HELPERS_H_
 
 #include <string>
-#include <utils/StrUtils.h>
+#include <rsp/utils/StrUtils.h>
 #include "TestLogger.h"
 
 #define CHECK_HEX(a, b) CHECK_MESSAGE(((a) == (b)), rsp::utils::StrUtils::Format( "%8.8X != %8.8X" , a, b))

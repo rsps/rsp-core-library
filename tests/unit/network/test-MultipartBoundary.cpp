@@ -8,7 +8,7 @@
 * \author      steffen
 */
 #include <doctest.h>
-#include <network/MultipartBoundary.h>
+#include <rsp/network/MultipartBoundary.h>
 
 using namespace rsp::network;
 

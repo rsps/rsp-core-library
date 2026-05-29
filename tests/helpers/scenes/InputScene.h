@@ -14,14 +14,14 @@
 #define KB_Y 400
 
 #include <array>
-#include <graphics/Button.h>
-#include <graphics/Keyboard.h>
-#include <graphics/Label.h>
-#include <graphics/Scene.h>
-#include <graphics/GfxInputEvents.h>
-#include <graphics/Bitmap.h>
+#include <rsp/graphics/Button.h>
+#include <rsp/graphics/Keyboard.h>
+#include <rsp/graphics/Label.h>
+#include <rsp/graphics/Scene.h>
+#include <rsp/graphics/GfxInputEvents.h>
+#include <rsp/graphics/Bitmap.h>
 #include <TestTouchParser.h>
-#include <utils/Function.h>
+#include <rsp/utils/Function.h>
 
 namespace rsp::graphics {
 

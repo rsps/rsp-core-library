@@ -10,14 +10,14 @@
 #include <filesystem>
 #include "EHttpRequest.h"
 #include "EHttpSession.h"
-#include <network/ResponseParser.h>
-#include <network/parser-helpers.h>
-#include <network/NetworkLibrary.h>
-#include <network/MimeTypes.h>
-#include <network/MultipartBody.h>
-#include <network/StringBody.h>
-#include <network/UrlParser.h>
-#include <utils/Base64.h>
+#include <rsp/network/ResponseParser.h>
+#include <rsp/network/parser-helpers.h>
+#include <rsp/network/NetworkLibrary.h>
+#include <rsp/network/MimeTypes.h>
+#include <rsp/network/MultipartBody.h>
+#include <rsp/network/StringBody.h>
+#include <rsp/network/UrlParser.h>
+#include <rsp/utils/Base64.h>
 
 namespace rsp::network::ehttp {
 

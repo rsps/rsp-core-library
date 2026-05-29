@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <network/WLan.h>
+#include <rsp/network/WLan.h>
 
 namespace rsp::network {
 

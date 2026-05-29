@@ -10,7 +10,7 @@
 #ifndef RSP_CORE_LIB_SRC_SECURITY_OPENSSL_EXCEPTIONS_H
 #define RSP_CORE_LIB_SRC_SECURITY_OPENSSL_EXCEPTIONS_H
 
-#include <network/NetworkException.h>
+#include <rsp/network/NetworkException.h>
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>

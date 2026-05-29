@@ -15,9 +15,9 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <graphics/FontRawInterface.h>
+#include <rsp/graphics/FontRawInterface.h>
 #include "FreeTypeLibrary.h"
-#include <logging/LogChannel.h>
+#include <rsp/logging/LogChannel.h>
 
 namespace rsp::graphics {
 

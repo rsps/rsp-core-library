@@ -9,9 +9,9 @@
  */
 
 #include <doctest.h>
-#include <graphics/Font.h>
-#include <graphics/Rect.h>
-#include <graphics/Text.h>
+#include <rsp/graphics/Font.h>
+#include <rsp/graphics/Rect.h>
+#include <rsp/graphics/Text.h>
 #include <TestHelpers.h>
 
 using namespace rsp::graphics;

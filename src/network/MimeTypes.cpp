@@ -7,7 +7,7 @@
 * \license     Mozilla Public License 2.0
 * \author      steffen
 */
-#include <network/MimeTypes.h>
+#include <rsp/network/MimeTypes.h>
 
 namespace rsp::network {
 

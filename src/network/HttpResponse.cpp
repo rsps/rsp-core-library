@@ -8,12 +8,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include <network/HttpResponse.h>
-#include <network/parser-helpers.h>
+#include <rsp/network/HttpResponse.h>
+#include <rsp/network/parser-helpers.h>
 #include <stdexcept>
-#include <utils/StrUtils.h>
-#include <network/StringBody.h>
-#include <network/BinaryBody.h>
+#include <rsp/utils/StrUtils.h>
+#include <rsp/network/StringBody.h>
+#include <rsp/network/BinaryBody.h>
 
 namespace rsp::network {
 

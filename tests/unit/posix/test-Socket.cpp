@@ -8,10 +8,10 @@
 * \author      steffen
 */
 #include <doctest.h>
-#include <posix/Socket.h>
-#include <posix/SocketAddress.h>
-#include <logging/LoggerInterface.h>
-#include <logging/ConsoleLogWriter.h>
+#include <rsp/posix/Socket.h>
+#include <rsp/posix/SocketAddress.h>
+#include <rsp/logging/LoggerInterface.h>
+#include <rsp/logging/ConsoleLogWriter.h>
 
 using namespace rsp::posix;
 

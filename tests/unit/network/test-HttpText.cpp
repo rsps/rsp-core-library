@@ -9,9 +9,9 @@
 */
 
 #include <doctest.h>
-#include <network/HttpText.h>
-#include <network/StatusLine.h>
-#include <network/parser-helpers.h>
+#include <rsp/network/HttpText.h>
+#include <rsp/network/StatusLine.h>
+#include <rsp/network/parser-helpers.h>
 
 using namespace rsp::network;
 

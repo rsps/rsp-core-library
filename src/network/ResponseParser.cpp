@@ -8,10 +8,10 @@
  * \author      Steffen Brummer
  */
 
-#include <network/StringBody.h>
-#include <network/HttpText.h>
-#include <network/parser-helpers.h>
-#include <network/ResponseParser.h>
+#include <rsp/network/StringBody.h>
+#include <rsp/network/HttpText.h>
+#include <rsp/network/parser-helpers.h>
+#include <rsp/network/ResponseParser.h>
 
 using namespace std::string_view_literals;
 using namespace rsp::utils;

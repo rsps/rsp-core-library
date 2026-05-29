@@ -12,9 +12,9 @@
 #define RSP_CORE_LIB_SRC_NETWORK_WPA_SUPPLICANT_WPA_SUPPLICANT_H
 
 #include <string>
-#include <logging/LogChannel.h>
-#include <network/IWlanInterface.h>
-#include <security/SecureString.h>
+#include <rsp/logging/LogChannel.h>
+#include <rsp/network/IWlanInterface.h>
+#include <rsp/security/SecureString.h>
 
 namespace rsp::network {
 

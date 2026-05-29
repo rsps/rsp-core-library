@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#include <security/Sha256DataSignature.h>
-#include <security/Sha.h>
+#include <rsp/security/Sha256DataSignature.h>
+#include <rsp/security/Sha.h>
 
 namespace rsp::security {
 

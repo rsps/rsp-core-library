@@ -10,9 +10,9 @@
 
 #include <sstream>
 #include <doctest.h>
-#include <utils/InRange.h>
-#include <utils/Variant.h>
-#include <utils/StructElement.h>
+#include <rsp/utils/InRange.h>
+#include <rsp/utils/Variant.h>
+#include <rsp/utils/StructElement.h>
 
 using namespace rsp::utils;
 

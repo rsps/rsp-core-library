@@ -9,9 +9,9 @@
  */
 
 #include <doctest.h>
-#include <graphics/PixelData.h>
+#include <rsp/graphics/PixelData.h>
 #include <TestHelpers.h>
-#include <posix/FileSystem.h>
+#include <rsp/posix/FileSystem.h>
 
 using namespace rsp::graphics;
 

@@ -10,10 +10,10 @@
 
 #include <cassert>
 #include <cstring>
-#include <graphics/PixelData.h>
-#include <utils/Crc32.h>
-#include <utils/CppObjectFile.h>
-#include <utils/StrUtils.h>
+#include <rsp/graphics/PixelData.h>
+#include <rsp/utils/Crc32.h>
+#include <rsp/utils/CppObjectFile.h>
+#include <rsp/utils/StrUtils.h>
 
 namespace {
 

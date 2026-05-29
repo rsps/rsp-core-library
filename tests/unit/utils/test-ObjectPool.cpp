@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 #include "doctest.h"
-#include <utils/ObjectPool.h>
+#include <rsp/utils/ObjectPool.h>
 
 using namespace rsp::utils;
 

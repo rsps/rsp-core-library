@@ -11,9 +11,9 @@
 #ifndef TESTS_HELPERS_OVERLAY_H_
 #define TESTS_HELPERS_OVERLAY_H_
 
-#include <graphics/GfxEngine.h>
-#include <graphics/Label.h>
-#include <graphics/Rect.h>
+#include <rsp/graphics/GfxEngine.h>
+#include <rsp/graphics/Label.h>
+#include <rsp/graphics/Rect.h>
 
 class Overlay : public rsp::graphics::Label
 {

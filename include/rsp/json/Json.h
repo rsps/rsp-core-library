@@ -1,0 +1,74 @@
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2022 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      Steffen Brummer
+ */
+
+#ifndef RSP_CORE_LIB_JSON_JSON_H
+#define RSP_CORE_LIB_JSON_JSON_H
+
+#include <rsp/json/JsonExceptions.h>
+#include <rsp/json/JsonDecoder.h>
+#include <rsp/json/JsonEncoder.h>
+#include <rsp/json/JsonStream.h>
+
+namespace rsp::json {
+
+class Json : public rsp::utils::DynamicData
+{
+public:
+    enum class Types : unsigned int { Null, Bool, Number, String, Object, Array };
+
+    Json() : DynamicData() {}
+    Json(const Json &arOther) = default;
+    Json(Json &&arOther) = default;
+    explicit Json(std::string_view aJson);
+    explicit Json(const std::string &arJson) : Json(std::string_view(arJson)) {}
+    explicit Json(const rsp::utils::DynamicData &arData);
+    explicit Json(rsp::utils::DynamicData&& arData);
+
+    Json& operator=(const Json&) = default;
+    Json& operator=(Json&&) noexcept = default;
+
+    /**
+     * \brief Encode a DynamicData object to a JSON formatted string
+     * \param aPrettyPrint Set to make the string human readable
+     * \param aForceToUCS2 Set to use UCS2 codepoints for all characters above ASCII.
+     * \return JSON formatted string
+     */
+    static std::string Encode(const rsp::utils::DynamicData &arData, bool aPrettyPrint = false, bool aForceToUCS2 = false, unsigned int aArrayLineLength = 0);
+    [[nodiscard]] std::string Encode(bool aPrettyPrint = false, bool aForceToUCS2 = false, unsigned int aArrayLineLength = 0) const;
+
+    /**
+     * \brief Decode a string into a DynamicData object
+     * \param aJson JSON formatted string
+     * \return JsonValue object
+     */
+    static Json Decode(std::string_view aJson);
+
+    /**
+     * \brief Get the type of the value content
+     * \return JsonTypes
+     */
+    static Types GetJsonType(const rsp::utils::DynamicData &arData);
+    Types GetJsonType();
+
+    /**
+     * \brief Get the type as a string. Useful for error logging.
+     * \return string
+     */
+    static std::string GetJsonTypeAsString(Types aType);
+    std::string GetJsonTypeAsString();
+};
+
+std::ostream& operator<<(std::ostream& os, Json::Types aType);
+std::ostream& operator<<(std::ostream& os, const Json &arJson);
+
+
+} /* namespace rsp::json */
+
+#endif // RSP_CORE_LIB_JSON_JSON_H

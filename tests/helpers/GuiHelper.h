@@ -14,7 +14,7 @@
 #include "TestHelpers.h"
 #include "TestPixmap.h"
 #include "TestTouchParser.h"
-#include <utils/Timer.h>
+#include <rsp/utils/Timer.h>
 
 class GuiHelper
 {

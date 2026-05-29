@@ -9,7 +9,7 @@
  */
 
 #include <cstring>
-#include <graphics/GfxCompressor.h>
+#include <rsp/graphics/GfxCompressor.h>
 #include <magic_enum/magic_enum.hpp>
 #include <iostream>
 

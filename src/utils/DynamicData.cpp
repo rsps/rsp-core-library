@@ -4,8 +4,8 @@
  */
 
 #include <algorithm>
-#include <utils/DynamicData.h>
-#include <json/JsonEncoder.h>
+#include <rsp/utils/DynamicData.h>
+#include <rsp/json/JsonEncoder.h>
 
 //#define DDLOG(a) DLOG(a)
 #define DDLOG(a)

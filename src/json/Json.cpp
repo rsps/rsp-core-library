@@ -8,10 +8,10 @@
  * \author      Steffen Brummer
  */
 
-#include <json/Json.h>
+#include <rsp/json/Json.h>
 #include <iomanip>
-#include <logging/Logger.h>
-#include <utils/StrUtils.h>
+#include <rsp/logging/Logger.h>
+#include <rsp/utils/StrUtils.h>
 #include <magic_enum/magic_enum.hpp>
 
 using namespace rsp::logging;

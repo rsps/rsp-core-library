@@ -9,8 +9,8 @@
  */
 
 #include "doctest.h"
-#include <utils/Crc32.h>
-#include <utils/Fnv1a.h>
+#include <rsp/utils/Crc32.h>
+#include <rsp/utils/Fnv1a.h>
 
 using namespace rsp::utils;
 

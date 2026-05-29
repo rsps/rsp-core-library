@@ -8,8 +8,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <security/Sha.h>
-#include <exceptions/CoreException.h>
+#include <rsp/security/Sha.h>
+#include <rsp/exceptions/CoreException.h>
 
 #include <openssl/evp.h>
 #include <openssl/sha.h>

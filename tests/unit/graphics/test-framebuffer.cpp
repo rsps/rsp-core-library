@@ -10,20 +10,20 @@
 
 #include <chrono>
 #include <doctest.h>
-#include <exceptions/SignalHandler.h>
-#include <graphics/Bitmap.h>
-#include <graphics/Font.h>
-#include <graphics/Text.h>
-#include <graphics/Renderer.h>
+#include <rsp/exceptions/SignalHandler.h>
+#include <rsp/graphics/Bitmap.h>
+#include <rsp/graphics/Font.h>
+#include <rsp/graphics/Text.h>
+#include <rsp/graphics/Renderer.h>
 #include <random>
 #include <thread>
 #include <filesystem>
-#include <utils/StopWatch.h>
+#include <rsp/utils/StopWatch.h>
 #include <TestHelpers.h>
-#include <utils/Random.h>
+#include <rsp/utils/Random.h>
 #include <magic_enum/magic_enum.hpp>
 #ifdef USE_GFX_SW
-    #include <posix/FileSystem.h>
+    #include <rsp/posix/FileSystem.h>
 #endif
 
 using namespace rsp::graphics;

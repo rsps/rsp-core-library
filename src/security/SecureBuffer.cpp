@@ -9,8 +9,8 @@
  */
 
 #include <iomanip>
-#include <security/SecureBuffer.h>
-#include <security/SecureString.h>
+#include <rsp/security/SecureBuffer.h>
+#include <rsp/security/SecureString.h>
 
 namespace rsp::security {
 

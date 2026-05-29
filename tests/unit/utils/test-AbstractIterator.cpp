@@ -10,7 +10,7 @@
 
 #include "doctest.h"
 #include <algorithm>
-#include <utils/AbstractIterator.h>
+#include <rsp/utils/AbstractIterator.h>
 #include <vector>
 
 using namespace rsp::utils;

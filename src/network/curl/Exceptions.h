@@ -13,7 +13,7 @@
 
 #include <string_view>
 #include <curl/curl.h>
-#include <network/NetworkException.h>
+#include <rsp/network/NetworkException.h>
 
 
 namespace rsp::network::curl {

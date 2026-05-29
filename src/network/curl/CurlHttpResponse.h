@@ -12,7 +12,7 @@
 #ifndef RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_RESPONSE_H
 #define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_RESPONSE_H
 
-#include <network/HttpResponse.h>
+#include <rsp/network/HttpResponse.h>
 
 namespace rsp::network::curl {
 

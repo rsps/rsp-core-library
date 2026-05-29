@@ -10,8 +10,8 @@
 
 #include <string>
 #include <doctest.h>
-#include <utils/StructElement.h>
-#include <utils/DynamicData.h>
+#include <rsp/utils/StructElement.h>
+#include <rsp/utils/DynamicData.h>
 
 using namespace rsp::utils;
 

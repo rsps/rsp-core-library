@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 #include <doctest.h>
-#include <utils/EnumFlags.h>
+#include <rsp/utils/EnumFlags.h>
 
 using namespace rsp::utils;
 

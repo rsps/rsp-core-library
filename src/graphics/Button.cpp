@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/Button.h>
-#include <graphics/Texture.h>
+#include <rsp/graphics/Button.h>
+#include <rsp/graphics/Texture.h>
 
 namespace rsp::graphics {
 

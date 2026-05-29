@@ -8,9 +8,9 @@
  * \author      Steffen Brummer
  */
 
-#include <exceptions/SignalHandler.h>
+#include <rsp/exceptions/SignalHandler.h>
 #include <magic_enum/magic_enum.hpp>
-#include <logging/LogChannel.h>
+#include <rsp/logging/LogChannel.h>
 
 namespace rsp::exceptions {
 

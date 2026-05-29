@@ -8,7 +8,7 @@
  * \author      Kim Lindberg Schwaner
  */
 
-#include <utils/SemVer.h>
+#include <rsp/utils/SemVer.h>
 
 #include <doctest.h>
 
