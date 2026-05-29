@@ -10,6 +10,8 @@
 
 #include <rsp/compression/ZLib.h>
 
+#include <iostream>
+
 #ifdef USE_ZLIB
 
 namespace rsp::compression {

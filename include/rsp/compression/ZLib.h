@@ -13,6 +13,7 @@
 
 #ifdef USE_ZLIB
 
+#include <cstdint>
 #include <string>
 #include <sstream>
 #include <vector>
