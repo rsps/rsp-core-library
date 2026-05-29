@@ -36,7 +36,7 @@ IHttpSession& CurlSession::SetDefaultOptions(const HttpRequestOptions &arOptions
     return *this;
 }
 
-IHttpRequest& CurlSession::Request(HttpRequestType aType, std::string_view aUri, ResponseCallback_t aCallback)
+IHttpRequest& CurlSession::Request(const HttpRequestType aType, const std::string_view aUri, const ResponseCallback_t aCallback)
 {
     HttpRequestOptions opt = mDefaultOptions;
     opt.RequestType = aType;

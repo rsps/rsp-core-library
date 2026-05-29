@@ -12,14 +12,13 @@
 #define RSP_CORE_LIB_NETWORK_I_HTTP_RESPONSE_H
 
 #include <exceptions/CoreException.h>
-#include <functional>
 #include <map>
 #include <memory>
 #include <ostream>
 #include "parser-helpers.h"
 #include <string>
+#include <utility>
 #include <utils/string_view_ci.h>
-#include "IHttpRequest.h"
 #include "IStreamDataProvider.h"
 #include "StatusCodes.h"
 #include "StatusLine.h"
@@ -68,7 +67,7 @@ public:
 
     /**
      * \brief Get a const reference to the specific header value.
-     * \param arName
+     * \param aName
      * \return Reference to header value
      */
     [[nodiscard]] virtual std::string_view GetHeader(std::string_view aName) const = 0;
@@ -115,9 +114,35 @@ public:
      * \return self
      */
     virtual IHttpResponse& Clear() = 0;
-};
 
-std::ostream& operator<<(std::ostream &o, const IHttpResponse &arResponse);
+    /**
+     * \brief Hidden friend streaming operator
+     * @param aOs
+     * @param arResponse
+     * @return std::ostream&
+     */
+    friend std::ostream& operator<<(std::ostream &aOs, const IHttpResponse &arResponse)
+    {
+        aOs <<
+            "Headers:\n";
+
+        for(const auto & [first, second] : arResponse.GetHeaders()) {
+            if (first == std::string_view("authorization")) {
+                aOs << "  " << first << ": " << std::string(second.size(), 'X') << "\n";
+            }
+            else {
+                aOs << "  " << first << ": " << second << "\n";
+            }
+        }
+
+        aOs <<
+            "StatusCode: " << std::to_underlying(arResponse.GetStatusCode()) << "\n"
+            "Body: " << arResponse.GetBody();
+        aOs << "\n";
+
+        return aOs;
+    }
+};
 
 } // rsp::network
 
