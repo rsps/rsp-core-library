@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.23...3.30)
 
+# Set toolchain file before project() so CMake uses it during compiler detection
+option(ARCH_ARM "Set to cross-compile for ARM CPU" OFF)
+if(ARCH_ARM)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64")
+    set(CMAKE_TOOLCHAIN_FILE "/opt/arm-buildroot-linux-gnueabihf_sdk-buildroot/share/buildroot/toolchainfile.cmake")
+endif()
+
 # Get CMake-friendly version from Git tag
 include("cmake/git.cmake")
 git_get_version(OUTPUT RSP_CORE_LIB_VERSION WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -10,7 +18,6 @@ project(rsp-core-lib
     VERSION ${RSP_CORE_LIB_VERSION}
 )
 
-option(ARCH_ARM "Set to cross-compile for ARM CPU" OFF)
 option(GFX "Include graphic components." ON)
 option(SDL2 "Use SDL2 for graphic acceleration." ON)
 option(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON)
@@ -31,14 +38,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Release' as none was specified.")
     set(CMAKE_BUILD_TYPE "Release")
-endif()
-
-# Set toolchain file, if needed.
-if(ARCH_ARM)
-    # Set CMAKE_<LANG>_FLAGS to prevent toolchain file from overriding these flags when it is included.
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64")
-    set(CMAKE_TOOLCHAIN_FILE "/opt/arm-buildroot-linux-gnueabihf_sdk-buildroot/share/buildroot/toolchainfile.cmake")
 endif()
 
 set(CMAKE_CXX_STANDARD 23)
