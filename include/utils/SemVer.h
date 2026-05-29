@@ -16,6 +16,7 @@
 #include <concepts>
 #include <initializer_list>
 #include <limits>
+#include <ostream>
 #include <ranges>
 #include <string_view>
 #include <string>
@@ -25,22 +26,21 @@
 #include <variant>
 #include <vector>
 
-namespace rsp::utils::semver {
+namespace rsp::utils {
+namespace semver_detail {
 
-namespace detail {
 template <typename T>
 concept numeric = std::is_arithmetic_v<T> && !std::is_same_v<T, bool>;
 
 // TODO: Move to StrUtils?
-[[nodiscard]] inline constexpr std::string ToString(numeric auto value)
+[[nodiscard]] inline constexpr std::string ToString(numeric auto aValue)
 {
-    std::array<char, std::numeric_limits<decltype(value)>::digits10 + 1> buf{};
-    auto [ptr, ec] = std::to_chars(buf.begin(), buf.end(), value);
+    std::array<char, std::numeric_limits<decltype(aValue)>::digits10 + 1> buf{};
+    auto [ptr, ec] = std::to_chars(buf.begin(), buf.end(), aValue);
     if (ec != std::errc{})
         throw std::runtime_error{std::make_error_code(ec).message()};
     return std::string{buf.data(), static_cast<std::size_t>(ptr - buf.data())};
 }
-} // namespace detail
 
 class PreRelease
 {
@@ -60,9 +60,9 @@ public:
     /**
      * \brief Construct from a dot-separated string of identifiers.
      */
-    constexpr PreRelease(std::string_view str)
+    constexpr PreRelease(std::string_view aStr)
     {
-        for (auto rg : std::views::split(str, '.')) {
+        for (auto rg : std::views::split(aStr, '.')) {
             std::string_view part{rg};
 
             if (part.empty())
@@ -92,38 +92,38 @@ public:
                 result += '.';
 
             std::visit(
-                [&](auto&& arg) {
-                    using T = std::decay_t<decltype(arg)>;
-                    if constexpr (std::is_same_v<T, unsigned>)
-                        result += detail::ToString(arg);
-                    else if constexpr (std::is_same_v<T, std::string>)
-                        result += arg;
-                    else
-                        static_assert(false, "Non-exhaustive visitor");
-                },
-                part);
+                    [&](auto&& arg) {
+                        using T = std::decay_t<decltype(arg)>;
+                        if constexpr (std::is_same_v<T, unsigned>)
+                            result += semver_detail::ToString(arg);
+                        else if constexpr (std::is_same_v<T, std::string>)
+                            result += arg;
+                        else
+                            static_assert(false, "Non-exhaustive visitor");
+                    },
+                    part);
         }
 
         return result;
     }
 
-    [[nodiscard]] constexpr bool operator==(const PreRelease& other) const noexcept
+    [[nodiscard]] constexpr bool operator==(const PreRelease& aOther) const noexcept
     {
-        return (_parts == other._parts);
+        return (_parts == aOther._parts);
     }
 
-    [[nodiscard]] constexpr std::strong_ordering operator<=>(const PreRelease& other) const noexcept
+    [[nodiscard]] constexpr std::strong_ordering operator<=>(const PreRelease& aOther) const noexcept
     {
         // Compare pre-release identifiers from left to right until a difference
         // is found
-        for (auto&& [a, b] : std::views::zip(_parts, other._parts)) {
+        for (auto&& [a, b] : std::views::zip(_parts, aOther._parts)) {
             if (auto cmp = a <=> b; cmp != 0)
                 return cmp;
         }
 
         // If the preceding identifiers are equal, then the one with more
         // identifiers has higher precedence
-        return _parts.size() <=> other._parts.size();
+        return _parts.size() <=> aOther._parts.size();
     }
 
 private:
@@ -131,6 +131,8 @@ private:
     // the original string)
     std::vector<Part> _parts{};
 };
+
+} // namespace semver_detail
 
 /**
  * \brief Utility class representing a SemVer 2.0.0 version number.
@@ -143,6 +145,8 @@ private:
 class Version
 {
 public:
+    using PreRelease = semver_detail::PreRelease;
+
     /**
      * \brief Construct 0.0.0 (default).
      */
@@ -151,12 +155,16 @@ public:
     /**
      * \brief Construct from components, with optional pre-release and build metadata.
      */
-    constexpr Version(unsigned major, unsigned minor, unsigned patch, std::string_view preRelease = {}, std::string_view build = {})
-        : _major{major}
-        , _minor{minor}
-        , _patch{patch}
-        , _prerelease{preRelease}
-        , _build{build}
+    constexpr Version(unsigned aMajor,
+            unsigned aMinor,
+            unsigned aPatch,
+            std::string_view aPreRelease = {},
+            std::string_view aBuild = {})
+        : _major{aMajor}
+        , _minor{aMinor}
+        , _patch{aPatch}
+        , _prerelease{aPreRelease}
+        , _build{aBuild}
     {
     }
 
@@ -165,10 +173,10 @@ public:
      *
      * Example: "1.2.3-alpha.1+build.321".
      */
-    constexpr Version(std::string_view str)
+    constexpr Version(std::string_view aStr)
     {
         // Use std::from_chars() to keep it constexpr
-        auto parseUnsigned = [](std::string_view s) -> std::tuple<unsigned, std::string_view> {
+        auto parse_unsigned = [](std::string_view s) -> std::tuple<unsigned, std::string_view> {
             unsigned value = 0;
             auto [ptr, ec] = std::from_chars(s.begin(), s.end(), value);
             if (ec != std::errc{})
@@ -177,23 +185,23 @@ public:
         };
 
         // Parse major.minor.patch
-        std::tie(_major, str) = parseUnsigned(str);
-        if (str.empty() || str.front() != '.')
+        std::tie(_major, aStr) = parse_unsigned(aStr);
+        if (aStr.empty() || aStr.front() != '.')
             throw std::invalid_argument{"Invalid version string: missing minor version"};
-        std::tie(_minor, str) = parseUnsigned(str.substr(1));
-        if (str.empty() || str.front() != '.')
+        std::tie(_minor, aStr) = parse_unsigned(aStr.substr(1));
+        if (aStr.empty() || aStr.front() != '.')
             throw std::invalid_argument{"Invalid version string: missing patch version"};
-        std::tie(_patch, str) = parseUnsigned(str.substr(1));
+        std::tie(_patch, aStr) = parse_unsigned(aStr.substr(1));
 
         // Find pre-release and build metadata (optional)
-        std::size_t pos_hyphen = str.find_first_of('-');
-        std::size_t pos_plus = str.find_first_of('+');
+        std::size_t pos_hyphen = aStr.find_first_of('-');
+        std::size_t pos_plus = aStr.find_first_of('+');
 
         if ((pos_hyphen != std::string_view::npos) && (pos_hyphen < pos_plus))
-            _prerelease = str.substr(pos_hyphen + 1, pos_plus - pos_hyphen - 1);
+            _prerelease = aStr.substr(pos_hyphen + 1, pos_plus - pos_hyphen - 1);
 
         if (pos_plus != std::string_view::npos)
-            _build = str.substr(pos_plus + 1);
+            _build = aStr.substr(pos_plus + 1);
     }
 
     [[nodiscard]] constexpr unsigned GetMajor() const noexcept { return _major; }
@@ -207,7 +215,7 @@ public:
      */
     [[nodiscard]] constexpr std::string ToString() const
     {
-        auto result = detail::ToString(_major) + "." + detail::ToString(_minor) + "." + detail::ToString(_patch);
+        auto result = semver_detail::ToString(_major) + "." + semver_detail::ToString(_minor) + "." + semver_detail::ToString(_patch);
 
         if (!_prerelease.Empty())
             result += '-' + _prerelease.ToString();
@@ -221,29 +229,32 @@ public:
     /**
      * \brief Compare version numbers for equality as per SemVer 2.0.0 rules.
      */
-    [[nodiscard]] constexpr bool operator==(const Version& other) const noexcept
+    [[nodiscard]] constexpr bool operator==(const Version& aOther) const noexcept
     {
-        return (_major == other._major) && (_minor == other._minor) && (_patch == other._patch) && (_prerelease == other._prerelease);
+        return (_major == aOther._major)
+               && (_minor == aOther._minor)
+               && (_patch == aOther._patch)
+               && (_prerelease == aOther._prerelease);
         // Build metadata is ignored for equality
     }
 
     /**
      * \brief Compare version numbers as per SemVer 2.0.0 rules.
      */
-    [[nodiscard]] constexpr std::strong_ordering operator<=>(const Version& other) const noexcept
+    [[nodiscard]] constexpr std::strong_ordering operator<=>(const Version& aOther) const noexcept
     {
-        if (auto cmp = _major <=> other._major; cmp != 0) return cmp;
-        if (auto cmp = _minor <=> other._minor; cmp != 0) return cmp;
-        if (auto cmp = _patch <=> other._patch; cmp != 0) return cmp;
+        if (auto cmp = _major <=> aOther._major; cmp != 0) return cmp;
+        if (auto cmp = _minor <=> aOther._minor; cmp != 0) return cmp;
+        if (auto cmp = _patch <=> aOther._patch; cmp != 0) return cmp;
 
-        if (_prerelease.Empty() && other._prerelease.Empty())
+        if (_prerelease.Empty() && aOther._prerelease.Empty())
             return std::strong_ordering::equal; // Both are normal versions
         else if (_prerelease.Empty())
             return std::strong_ordering::greater; // Normal version has higher precedence than pre-release
-        else if (other._prerelease.Empty())
+        else if (aOther._prerelease.Empty())
             return std::strong_ordering::less; // -||-
         else
-            return _prerelease <=> other._prerelease; // Compare pre-release identifiers
+            return _prerelease <=> aOther._prerelease; // Compare pre-release identifiers
 
         // Build metadata is ignored for precedence
     }
@@ -256,6 +267,12 @@ private:
     std::string _build{};     // dot-separated build identifiers
 };
 
-} // namespace rsp::utils::semver
+inline std::ostream& operator<<(std::ostream& os, const Version& aVersion)
+{
+    os << aVersion.ToString();
+    return os;
+}
+
+} // namespace rsp::utils
 
 #endif // RSP_CORE_LIB_UTILS_SEMVER_H

@@ -1,94 +1,151 @@
-# -------------------------------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------------------------------------
 # Git utilities
-# -------------------------------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------------------------------------
+
+include_guard(GLOBAL)
 
 # Ensure that git is available or this module will not work
 find_package(Git REQUIRED)
 
-if (NOT COMMAND "git_find_version_tag")
+if(NOT COMMAND "git_get_version")
 
-    #! git_find_version_tag : Finds the nearest git tag that matches a version pattern
+    #! git_get_version : Get version number from nearest git tag that matches a version pattern
     #
     # @see https://git-scm.com/docs/git-describe
     #
     # @example
-    #       git_find_version_tag(OUTPUT version WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-    #       message("${version}") # 3.22.3
+    #       git_get_version(OUTPUT version WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    #       message("${version}") # 1.5.22
     #
     # @param OUTPUT <variable>          The output variable to assign the found version tag
     # @param WORKING_DIRECTORY <string> Directory from where the git command must be executed from
-    # @param [MATCH_PATTERN <string>]   Optional glob match pattern for tag. Defaults to "*[0-9].*[0-9].*[0-9]*"
-    #                                   when none is specified.
-    # @param [DEFAULT <string>]         Optional default version string to return, when no version tag
-    #                                   could be found. Defaults to "0.0.0"
-    # @param [EXIT_ON_FAILURE]          OPTION: Throws fatal error if unable to find version tag, regardless
-    #                                   of the [DEFAULT] argument.
     #
     # @return
-    #     [OUTPUT]                      The resulting version tag, e.g. "v1.5.22"
+    #     [OUTPUT]                      The resulting version, parsed from a tag, e.g. "1.5.22"
     #
-    # @throws If [EXIT_ON_FAILURE] option is specified and unable to find version tag
-    #
-    function(git_find_version_tag)
-        set(options EXIT_ON_FAILURE) # N/A
-        set(oneValueArgs OUTPUT WORKING_DIRECTORY MATCH_PATTERN DEFAULT)
-        set(multiValueArgs "") # N/A
+    function(git_get_version)
+        set(options "")
+        set(oneValueArgs OUTPUT WORKING_DIRECTORY)
+        set(multiValueArgs "")
 
         cmake_parse_arguments(INPUT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-        # requires_arguments("OUTPUT;WORKING_DIRECTORY" INPUT)
-
-        # Resolve optional arguments
-        if (NOT DEFINED INPUT_MATCH_PATTERN)
-            set(INPUT_MATCH_PATTERN "*[0-9].*[0-9].*[0-9]*")
-        endif ()
-        if (NOT DEFINED INPUT_DEFAULT)
-            set(INPUT_DEFAULT "0.0.0")
-        endif ()
 
         # Run git command
         execute_process(
-            # Use "git describe --tags" to obtain the nearest tag, which matches the glob pattern.
-            # And alternative could be "git tag --list --sort=-version:refname". Yet, a list of tags
-            # would then have to be processed...
-            COMMAND ${GIT_EXECUTABLE} describe --tags --match "${INPUT_MATCH_PATTERN}" --abbrev=0
+            COMMAND ${GIT_EXECUTABLE} describe --tags --match "*[0-9].*[0-9].*[0-9]*" --abbrev=0
             WORKING_DIRECTORY "${INPUT_WORKING_DIRECTORY}"
             RESULT_VARIABLE status
             OUTPUT_VARIABLE result
             ERROR_VARIABLE error
             OUTPUT_STRIP_TRAILING_WHITESPACE
-            TIMEOUT 1
+            TIMEOUT 3
         )
 
-        # Use fallback version if none could be found
-        if (NOT status EQUAL 0)
-            # Abort if requested to exit on failure
-            if (INPUT_EXIT_ON_FAILURE)
-                message(FATAL_ERROR
-                    "No version tag found\n"
-                    "Git exit code: ${status}\n"
-                    "Git error message: ${error}"
-                )
-            endif ()
+        if(status EQUAL 0)
+            string(REGEX MATCH "([0-9]+\\.[0-9]+\\.[0-9]+)" _ "${result}")
+            set(version "${CMAKE_MATCH_1}")
+        else()
+            set(version "")
+        endif()
 
-            # Debug
-            message(VERBOSE
-                "${CMAKE_CURRENT_FUNCTION}():\n"
-                "No version tag found, using default version: ${INPUT_DEFAULT}\n"
-                "Git exit code: ${status}\n"
-                "Git error message: ${error}"
-                " - called from ${CMAKE_CURRENT_LIST_FILE}\n"
+        if(NOT version)
+            message(VERBOSE "${CMAKE_CURRENT_FUNCTION}():\n"
+                            "No valid version tag found, using default: 0.0.0\n"
+                            "Git returned ${status} with error: ${error}")
+            set(version "0.0.0")
+        endif()
+
+        set("${INPUT_OUTPUT}" "${version}")
+
+        return(PROPAGATE "${INPUT_OUTPUT}")
+    endfunction()
+endif()
+
+if(NOT COMMAND "git_get_semver")
+
+    #! git_get_semver : Gets a semver 2.0.0 version string from git describe
+    #
+    # Combines version tag, SHA1, and dirty state into a single semver string
+    # with build metadata: <version>[+<N>.<sha>[.dirty]]
+    #
+    # @example
+    #       git_get_semver(OUTPUT version WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    #       message("${version}")    # e.g. "1.2.3-rc1+0.5e6a7de766aeb2a75eaad246e18229afaa7d5046.dirty"
+    #
+    # @param OUTPUT <variable>              The output variable for the full semver string
+    # @param WORKING_DIRECTORY <string>     Directory from where the git command must be executed
+    #
+    # @return
+    #     [OUTPUT]                          Semver string, e.g. "1.2.3-rc1+0.5e6a7de766aeb2a75eaad246e18229afaa7d5046.dirty"
+    #
+    function(git_get_semver)
+        set(options "")
+        set(oneValueArgs OUTPUT WORKING_DIRECTORY)
+        set(multiValueArgs "")
+
+        cmake_parse_arguments(INPUT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+        # Single git call to get tag, distance, SHA, and dirty state
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} describe --tags --long --dirty --abbrev=40 --match "*[0-9].*[0-9].*[0-9]*"
+            WORKING_DIRECTORY "${INPUT_WORKING_DIRECTORY}"
+            RESULT_VARIABLE status
+            OUTPUT_VARIABLE result
+            ERROR_VARIABLE error
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            TIMEOUT 3
+        )
+
+        if(status EQUAL 0)
+            # Parse: <tag>-<N>-g<sha>[-dirty]. The tag can contain hyphens (e.g.
+            # "v1.2.3-rc1") so we anchor from the right
+            string(REGEX MATCH "^(.*)-([0-9]+)-g([0-9a-f]+)(-dirty)?$" _ "${result}")
+            set(tag "${CMAKE_MATCH_1}")
+            set(num_commits "${CMAKE_MATCH_2}")
+            set(sha "${CMAKE_MATCH_3}")
+            set(dirty "${CMAKE_MATCH_4}")
+
+            # Strip 'v' prefix from tag
+            string(REGEX REPLACE "^[vV]" "" version "${tag}")
+        else()
+            # No matching tag found - fall back to 0.0.0 with SHA and dirty
+            message(VERBOSE "${CMAKE_CURRENT_FUNCTION}():\n"
+                            "No matching version tag found, using default: 0.0.0\n"
+                            "Git error: ${error}")
+            set(version "0.0.0")
+            set(num_commits "0")
+
+            # Get SHA separately
+            execute_process(
+                COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+                WORKING_DIRECTORY "${INPUT_WORKING_DIRECTORY}"
+                OUTPUT_VARIABLE sha
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                TIMEOUT 3
             )
 
-            # Use default version...
-            set(result "${INPUT_DEFAULT}")
-        endif ()
+            # Get dirty state separately
+            execute_process(
+                COMMAND ${GIT_EXECUTABLE} diff --quiet
+                WORKING_DIRECTORY "${INPUT_WORKING_DIRECTORY}"
+                RESULT_VARIABLE dirty_status
+                TIMEOUT 3
+            )
+            if(dirty_status EQUAL 1)
+                set(dirty "-dirty")
+            else()
+                set(dirty "")
+            endif()
+        endif()
 
-        # Set the resulting version
-        set("${INPUT_OUTPUT}" "${result}")
+        # Build semver with metadata: <version>+<sha>[.dirty]
+        set(full_version "${version}+${num_commits}.${sha}")
+        if(dirty)
+            set(full_version "${full_version}.dirty")
+        endif()
 
-        return(
-            PROPAGATE
-            "${INPUT_OUTPUT}"
-        )
+        set("${INPUT_OUTPUT}" "${full_version}")
+
+        return(PROPAGATE "${INPUT_OUTPUT}")
     endfunction()
-endif ()
+endif()

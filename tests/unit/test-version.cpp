@@ -11,8 +11,9 @@
 #include <doctest.h>
 #include <version.h>
 
+static_assert(rsp::get_library_version() >= rsp::utils::Version{0, 0, 0});
+
 TEST_CASE("Testing Version String")
 {
-    CHECK(rsp::get_library_version() == rsp::utils::semver::Version(0, 1, 0));
-    CHECK(rsp::get_library_version() != rsp::utils::semver::Version(2, 1, 7));
+    REQUIRE(rsp::get_library_version() >= rsp::utils::Version{0, 0, 0});
 }

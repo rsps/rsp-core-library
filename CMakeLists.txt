@@ -1,20 +1,14 @@
 cmake_minimum_required(VERSION 3.23...3.30)
 
-# Get project's version from Git
+# Get CMake-friendly version from Git tag
 include("cmake/git.cmake")
-git_find_version_tag(
-    OUTPUT RSP_CORE_LIB_VERSION
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    DEFAULT "0.0.0"
-)
+git_get_version(OUTPUT RSP_CORE_LIB_VERSION WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
 project(rsp-core-lib
     DESCRIPTION "Open-source library for medical device software."
     HOMEPAGE_URL "https://github.com/rsps/rsp-core-library"
     VERSION ${RSP_CORE_LIB_VERSION}
 )
-
-message(STATUS "Project version: ${RSP_CORE_LIB_VERSION}")
 
 option(ARCH_ARM "Set to cross-compile for ARM CPU" OFF)
 option(GFX "Include graphic components." ON)
@@ -59,10 +53,13 @@ add_library(${PROJECT_NAME} STATIC)
 include("dependencies.cmake")
 rsp_core_add_dependencies(${PROJECT_NAME})
 
+include("cmake/generate-version-header.cmake")
+add_dependencies(${PROJECT_NAME} generate_version_header)
+
 # Include directories
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>;${CMAKE_CURRENT_BINARY_DIR}/include
         $<INSTALL_INTERFACE:include>
 )
 
