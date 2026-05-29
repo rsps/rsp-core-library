@@ -150,20 +150,23 @@ readability-identifier-naming'
 WarningsAsErrors: "*"
 
 CheckOptions:
-  - { key: readability-identifier-naming.ClassCase,              value: CamelCase }
-  - { key: readability-identifier-naming.PublicMethodCase,       value: CamelCase }
-  - { key: readability-identifier-naming.PublicMemberCase,       value: CamelCase }
-  - { key: readability-identifier-naming.PublicMemberPrefix,     value: m         }
-  - { key: readability-identifier-naming.ProtectedMethodCase,    value: camelBack }
-  - { key: readability-identifier-naming.ProtectedMemberCase,    value: CamelCase }
-  - { key: readability-identifier-naming.ProtectedMemberPrefix,  value: m         }
-  - { key: readability-identifier-naming.PrivateMethodCase,      value: camelBack }
-  - { key: readability-identifier-naming.PrivateMemberCase,      value: CamelCase }
-  - { key: readability-identifier-naming.PrivateMemberPrefix,    value: _         }
-  - { key: readability-identifier-naming.GlobalVariablePrefix,   value: g         }
-  - { key: readability-identifier-naming.GlobalConstantPrefix,   value: gc        }
-  - { key: readability-identifier-naming.ConstantPrefix,         value: c         }
-  - { key: readability-identifier-naming.ParameterPrefix,        value: a         }
-  - { key: readability-identifier-naming.PointerParameterPrefix, value: ap        }
-  - { key: readability-identifier-naming.ConstantParameterPrefix,value: a         }
-  - { key: readability-identifier-naming.ConstantPointerParameterPrefix, value: ap }
+  - { key: readability-identifier-naming.ClassCase,                      value: CamelCase  }
+  - { key: readability-identifier-naming.PublicMethodCase,               value: CamelCase  }
+  - { key: readability-identifier-naming.PublicMemberCase,               value: CamelCase  }
+  - { key: readability-identifier-naming.PublicMemberPrefix,             value: m          }
+  - { key: readability-identifier-naming.ProtectedMethodCase,            value: camelBack  }
+  - { key: readability-identifier-naming.ProtectedMemberCase,            value: CamelCase  }
+  - { key: readability-identifier-naming.ProtectedMemberPrefix,          value: m          }
+  - { key: readability-identifier-naming.PrivateMethodCase,              value: camelBack  }
+  - { key: readability-identifier-naming.PrivateMemberCase,              value: CamelCase  }
+  - { key: readability-identifier-naming.PrivateMemberPrefix,            value: _          }
+  - { key: readability-identifier-naming.GlobalVariablePrefix,           value: g          }
+  - { key: readability-identifier-naming.GlobalConstantPrefix,           value: gc         }
+  - { key: readability-identifier-naming.ConstantPrefix,                 value: c          }
+  - { key: readability-identifier-naming.ParameterPrefix,                value: a          }
+  - { key: readability-identifier-naming.PointerParameterPrefix,         value: ap         }
+  - { key: readability-identifier-naming.ConstantParameterPrefix,        value: a          }
+  - { key: readability-identifier-naming.ConstantPointerParameterPrefix, value: ap         }
+  - { key: readability-identifier-naming.LocalConstantPrefix,            value:            }
+  - { key: readability-identifier-naming.LocalConstantCase,              value: lower_case }
+  - { key: readability-identifier-naming.LocalVariableCase,              value: lower_case }
