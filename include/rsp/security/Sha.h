@@ -12,6 +12,7 @@
 #define RSP_CORE_LIB_SECURITY_SHA_H
 
 #include <rsp/security/SecureBuffer.h>
+#include <rsp/utils/SemVer.h>
 #include <cstdint>
 #include <vector>
 #include <memory>
@@ -37,7 +38,7 @@ struct DigestImpl
     virtual ~DigestImpl() = default;
     virtual void Update(const uint8_t* apBuffer, std::size_t aSize) = 0;
     virtual SecureBuffer Finalize() = 0;
-    [[nodiscard]] virtual std::string GetLibraryVersion() const = 0;
+    [[nodiscard]] virtual utils::Version GetLibraryVersion() const = 0;
     [[nodiscard]] virtual std::string GetLibraryName() const = 0;
 };
 
@@ -79,7 +80,7 @@ public:
      *
      * \return string
      */
-    [[nodiscard]] std::string GetLibraryVersion() const { return mPimpl->GetLibraryVersion(); }
+    [[nodiscard]] utils::Version GetLibraryVersion() const { return mPimpl->GetLibraryVersion(); }
 
     /**
      * \brief Get name of encryption library

@@ -53,11 +53,11 @@ public:
         mbedtls_md_free(&mDigestCtx);
     }
 
-    [[nodiscard]] std::string GetLibraryVersion() const override
+    [[nodiscard]] utils::Version GetLibraryVersion() const override
     {
         char result[9];
         mbedtls_version_get_string(result);
-        return result;
+        return utils::Version{result};
     }
 
     [[nodiscard]] std::string GetLibraryName() const override

@@ -137,9 +137,9 @@ public:
         return result;
     }
 
-    [[nodiscard]] std::string GetLibraryVersion() const override
+    [[nodiscard]] utils::Version GetLibraryVersion() const override
     {
-        return OPENSSL_FULL_VERSION_STR;
+        return utils::Version{OPENSSL_FULL_VERSION_STR};
     }
 
     [[nodiscard]] std::string GetLibraryName() const override
@@ -198,9 +198,9 @@ public:
         return result;
     }
 
-    [[nodiscard]] std::string GetLibraryVersion() const override
+    [[nodiscard]] utils::Version GetLibraryVersion() const override
     {
-        return OPENSSL_FULL_VERSION_STR;
+        return utils::Version{OPENSSL_FULL_VERSION_STR};
     }
 
     [[nodiscard]] std::string GetLibraryName() const override
