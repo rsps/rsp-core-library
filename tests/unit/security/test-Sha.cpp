@@ -27,8 +27,7 @@ TEST_CASE("SHA")
 {
     const std::string test_str("How much wood would a woodchuck chuck, if a woodchuck would chuck wood.");
 
-    SUBCASE("Library Version")
-    {
+    SUBCASE("Library Version") {
         Sha sha(HashAlgorithms::Sha3);
 #ifdef USE_OPENSSL
         CHECK_EQ(sha.GetLibraryName(), std::string("openssl"));
@@ -39,8 +38,7 @@ TEST_CASE("SHA")
 #endif
     }
 
-    SUBCASE("SHA1-HMAC")
-    {
+    SUBCASE("SHA1-HMAC") {
         Sha sha("MySecret", HashAlgorithms::Sha1);
         sha.Update(reinterpret_cast<const uint8_t*>(test_str.data()), test_str.size());
         SecureString md = sha.Get().GetHex();
@@ -48,8 +46,7 @@ TEST_CASE("SHA")
         CHECK_EQ(md, "78bb1131dcdfe96b4a0eb2de9cb0d8ed75dec97f");
     }
 
-    SUBCASE("SHA256-HMAC")
-    {
+    SUBCASE("SHA256-HMAC") {
         Sha sha("MySecret", HashAlgorithms::Sha256);
         sha.Update(reinterpret_cast<const uint8_t*>(test_str.data()), test_str.size());
         SecureString md = sha.Get().GetHex();
@@ -57,8 +54,7 @@ TEST_CASE("SHA")
         CHECK_EQ(md, "3937baa5432706e916264cb43ce87c02bd4939ee2588bfbe2cec19b978ccf48d");
     }
 
-    SUBCASE("SHA3-HMAC")
-    {
+    SUBCASE("SHA3-HMAC") {
         Sha sha("MySecret", HashAlgorithms::Sha3);
         sha.Update(reinterpret_cast<const uint8_t*>(test_str.data()), test_str.size());
         SecureString md = sha.Get().GetHex();
@@ -70,8 +66,7 @@ TEST_CASE("SHA")
         CHECK_EQ(md, "3ee16249305308e171910e27e1eb66803db4389696b49b2cd08b38e3cc2114dd");
     }
 
-    SUBCASE("SHA1")
-    {
+    SUBCASE("SHA1") {
         Sha sha(HashAlgorithms::Sha1);
         sha.Update(reinterpret_cast<const uint8_t*>(test_str.data()), test_str.size());
         SecureString md = sha.Get().GetHex();
@@ -79,8 +74,7 @@ TEST_CASE("SHA")
         CHECK_EQ(md, "56e581dcc416215b41474b7d269f11bcbe7ab3e2");
     }
 
-    SUBCASE("SHA256")
-    {
+    SUBCASE("SHA256") {
         Sha sha(HashAlgorithms::Sha256);
         sha.Update(reinterpret_cast<const uint8_t*>(test_str.data()), test_str.size());
         SecureString md = sha.Get().GetHex();
@@ -88,15 +82,13 @@ TEST_CASE("SHA")
         CHECK_EQ(md, "242fdbb7f8993f14f6fdad9098ca4d0f102760debbee49c76aae404073e84ed3");
     }
 
-    SUBCASE("SHA3")
-    {
+    SUBCASE("SHA3") {
         Sha sha(HashAlgorithms::Sha3);
         sha.Update(reinterpret_cast<const uint8_t*>(test_str.data()), test_str.size());
         SecureString md = sha.Get().GetHex();
 
         CHECK_EQ(md, "ea90f6707eaa4444a9ef4828fd67e31b43f591a487d77a5ad207399da387faea");
     }
-
 }
 
 TEST_SUITE_END();

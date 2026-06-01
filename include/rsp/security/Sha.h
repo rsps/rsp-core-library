@@ -23,18 +23,19 @@ namespace rsp::security {
  * \brief Supported hash algorithms
  */
 enum class HashAlgorithms {
-    Sha1,  /**< Sha1 */
-    Sha256,/**< Sha256 */
-    Sha3   /**< Sha3 */
+    Sha1,   /**< Sha1 */
+    Sha256, /**< Sha256 */
+    Sha3    /**< Sha3 */
 };
 
 /**
  * \brief Interface class for pimpl design pattern.
  */
-struct DigestImpl {
+struct DigestImpl
+{
     static DigestImpl* Create(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm);
     virtual ~DigestImpl() = default;
-    virtual void Update(const uint8_t *apBuffer, std::size_t aSize) = 0;
+    virtual void Update(const uint8_t* apBuffer, std::size_t aSize) = 0;
     virtual SecureBuffer Finalize() = 0;
     [[nodiscard]] virtual std::string GetLibraryVersion() const = 0;
     [[nodiscard]] virtual std::string GetLibraryName() const = 0;
@@ -65,7 +66,7 @@ public:
      * \param apBuffer Pointer to data
      * \param aSize Size of data
      */
-    void Update(const uint8_t *apBuffer, std::size_t aSize) { mPimpl->Update(apBuffer, aSize); }
+    void Update(const uint8_t* apBuffer, std::size_t aSize) { mPimpl->Update(apBuffer, aSize); }
 
     /**
      * \brief Get the final result of the hash calculation. The object should not longer be used after this call.
@@ -91,6 +92,6 @@ protected:
     std::unique_ptr<DigestImpl> mPimpl;
 };
 
-} /* namespace rsp::utils */
+} // namespace rsp::security
 
 #endif // RSP_CORE_LIB_SECURITY_SHA_H

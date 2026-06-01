@@ -42,7 +42,7 @@ public:
         if (!mpDigestInfo) {
             THROW_WITH_BACKTRACE2(CryptException, "The requested algorithm is not supported: ", magic_enum::enum_name(aAlgorithm).data());
         }
-        auto rc= mbedtls_md_setup(&mDigestCtx, mpDigestInfo, aHMac);
+        auto rc = mbedtls_md_setup(&mDigestCtx, mpDigestInfo, aHMac);
         if (rc) {
             THROW_WITH_BACKTRACE2(CryptException, "mbedtls_md_setup failed", rc);
         }
@@ -70,7 +70,7 @@ public:
 
 protected:
     mbedtls_md_context_t mDigestCtx{};
-    const mbedtls_md_info_t *mpDigestInfo = nullptr;
+    const mbedtls_md_info_t* mpDigestInfo = nullptr;
 };
 
 
@@ -86,7 +86,7 @@ public:
         }
     }
 
-    void Update(const uint8_t *apBuffer, std::size_t aSize) override
+    void Update(const uint8_t* apBuffer, std::size_t aSize) override
     {
         auto rc = mbedtls_md_hmac_update(&mDigestCtx, apBuffer, aSize);
         if (rc) {
@@ -99,7 +99,7 @@ public:
         SecureBuffer result;
         result.resize(size_t(mbedtls_md_get_size(mpDigestInfo)));
 
-        auto rc= mbedtls_md_hmac_finish(&mDigestCtx, result.data());
+        auto rc = mbedtls_md_hmac_finish(&mDigestCtx, result.data());
         if (rc) {
             THROW_WITH_BACKTRACE2(CryptException, "mbedtls_md_hmac_finish failed", rc);
         }
@@ -108,11 +108,11 @@ public:
     }
 };
 
-class MbedTLSSha: public MbedTLSHDigestBase
+class MbedTLSSha : public MbedTLSHDigestBase
 {
 public:
     explicit MbedTLSSha(HashAlgorithms aAlgorithm)
-            : MbedTLSHDigestBase(aAlgorithm, 0)
+        : MbedTLSHDigestBase(aAlgorithm, 0)
     {
         auto rc = mbedtls_md_starts(&mDigestCtx);
         if (rc) {
@@ -120,7 +120,7 @@ public:
         }
     }
 
-    void Update(const uint8_t *apBuffer, std::size_t aSize) override
+    void Update(const uint8_t* apBuffer, std::size_t aSize) override
     {
         auto rc = mbedtls_md_update(&mDigestCtx, apBuffer, aSize);
         if (rc) {
@@ -133,7 +133,7 @@ public:
         SecureBuffer result;
         result.resize(size_t(mbedtls_md_get_size(mpDigestInfo)));
 
-        auto rc= mbedtls_md_finish(&mDigestCtx, result.data());
+        auto rc = mbedtls_md_finish(&mDigestCtx, result.data());
         if (rc) {
             THROW_WITH_BACKTRACE2(CryptException, "mbedtls_md_finish failed", rc);
         }
