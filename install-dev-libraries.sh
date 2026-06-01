@@ -10,7 +10,7 @@ set -o pipefail # don't hide errors within pipes
 # Runtime dependencies
 # -------------------------------------------------------------------------------------------------------------- #
 
-apt install -y libssl-dev \
+apt-get install -y libssl-dev \
         libcurl4 \
         libcurl4-openssl-dev \
         libwpa-client-dev \
@@ -22,6 +22,6 @@ apt install -y libssl-dev \
 # Runtime dependencies for tests
 # -------------------------------------------------------------------------------------------------------------- #
 
-apt install -y libpcre2-dev \
+apt-get install -y libpcre2-dev \
         pkg-config \
         jsonlint
