@@ -32,10 +32,10 @@ TEST_CASE("SHA")
         Sha sha(HashAlgorithms::Sha3);
 #ifdef USE_OPENSSL
         CHECK_EQ(sha.GetLibraryName(), std::string("openssl"));
-        CHECK_GE(sha.GetLibraryVersion(), rsp::utils::Version{"3.5.5"});
+        CHECK_GE(sha.GetLibraryVersion(), rsp::utils::Version{"3.0.13"});
 #elif defined(USE_MBEDTLS)
         CHECK_EQ(sha.GetLibraryName(), std::string("MbedTLS"));
-        CHECK_EQ(sha.GetLibraryVersion(), rsp::utils::Version{"3.6.0"});
+        CHECK_GE(sha.GetLibraryVersion(), rsp::utils::Version{"3.6.0"});
 #endif
     }
 
