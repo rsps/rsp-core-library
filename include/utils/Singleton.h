@@ -11,9 +11,6 @@
 #ifndef RSP_CORE_LIB_UTILS_SINGLETON_H
 #define RSP_CORE_LIB_UTILS_SINGLETON_H
 
-#ifdef MT
-#include <mutex>
-#endif
 #include <exceptions/CoreException.h>
 #include "ConstTypeInfo.h"
 
@@ -22,6 +19,8 @@ namespace rsp::utils {
 /**
  * \class Singleton
  * \brief Testable singleton pattern implemented as template class.
+ *
+ * \warning This class is not thread safe during creation and destruction of the instance.
  *
  * Usage:
  *   class MyClass : public Singleton<MyClass> {}
@@ -85,9 +84,6 @@ public:
     template <typename... Args>
     static void CreateInstance(Args&&... args)
     {
-#ifdef MT
-        std::lock_guard<std::mutex> lock(mMutex);
-#endif
         if (mpInstance) {
             THROW_WITH_BACKTRACE1(exceptions::ESingletonViolation, NameOf<T>());
         }
@@ -106,9 +102,6 @@ public:
      */
     static void SetInstance(T* apObject)
     {
-#ifdef MT
-        std::lock_guard<std::mutex> lock(mMutex);
-#endif
         if (mpInstance && mOwnsInstance) {
             THROW_WITH_BACKTRACE1(exceptions::ESingletonViolation, NameOf<T>());
         }
@@ -135,9 +128,6 @@ public:
      */
     static void DestroyInstance()
     {
-#ifdef MT
-        std::lock_guard<std::mutex> lock(mMutex);
-#endif
         if (mpInstance && mOwnsInstance) {
             mOwnsInstance = false;
             delete mpInstance;
@@ -146,18 +136,9 @@ public:
     }
 
 private:
-#ifdef MT
-    static std::mutex mMutex;
-#endif
-    static T* mpInstance;
-    static bool mOwnsInstance;
+    static inline T* mpInstance = nullptr;
+    static inline bool mOwnsInstance = false;
 };
-
-template <class T>
-T* Singleton<T>::mpInstance = nullptr;
-
-template <class T>
-bool Singleton<T>::mOwnsInstance = false;
 
 } /* namespace rsp::utils */
 
