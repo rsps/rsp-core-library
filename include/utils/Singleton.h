@@ -32,32 +32,15 @@ class Singleton
 {
 public:
     /**
-     * \brief Construct a Singleton
+     * \brief Construct an empty and non-owning Singleton
      */
     Singleton() = default;
 
-    /**
-     * \brief Prohibit copy of Singleton
-     */
-    Singleton(const Singleton<T>&) = delete;
-
-    /**
-     * \brief Move constructor
-     * \param other
-     */
-    Singleton(Singleton<T>&&) = default;
-
     virtual ~Singleton() = default;
 
-    /**
-     * \brief Prohibit singleton assignment.
-     */
+    // Prohibit copy/move operations
+    Singleton(const Singleton&) = delete;
     Singleton& operator=(const Singleton&) = delete;
-
-    /**
-     * \brief Move assignment
-     */
-    Singleton& operator=(Singleton&&) = default;
 
     /**
      * \brief Check if this singleton is instantiated
@@ -65,7 +48,7 @@ public:
      */
     static bool HasInstance()
     {
-        return (mpInstance);
+        return (mpInstance != nullptr);
     }
 
     /**
