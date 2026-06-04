@@ -8,7 +8,6 @@
  * \author      Steffen Brummer
  */
 
-
 #ifndef RSP_CORE_LIB_UTILS_SINGLETON_H
 #define RSP_CORE_LIB_UTILS_SINGLETON_H
 
@@ -20,7 +19,6 @@
 
 namespace rsp::utils {
 
-
 /**
  * \class Singleton
  * \brief Testable singleton pattern implemented as template class.
@@ -30,7 +28,7 @@ namespace rsp::utils {
  *
  * \tparam T
  */
-template<class T>
+template <class T>
 class Singleton
 {
 public:
@@ -42,31 +40,32 @@ public:
     /**
      * \brief Prohibit copy of Singleton
      */
-    Singleton(const Singleton<T> &) = delete;
+    Singleton(const Singleton<T>&) = delete;
 
     /**
      * \brief Move constructor
      * \param other
      */
-    Singleton(Singleton<T> &&) = default;
+    Singleton(Singleton<T>&&) = default;
 
     virtual ~Singleton() = default;
 
     /**
      * \brief Prohibit singleton assignment.
      */
-    Singleton& operator=(const Singleton &) = delete;
+    Singleton& operator=(const Singleton&) = delete;
 
     /**
      * \brief Move assignment
      */
-    Singleton& operator=(Singleton &&) = default;
+    Singleton& operator=(Singleton&&) = default;
 
     /**
      * \brief Check if this singleton is instantiated
      * \return bool
      */
-    static bool HasInstance() {
+    static bool HasInstance()
+    {
         return (mpInstance);
     }
 
@@ -74,7 +73,8 @@ public:
      * \brief Check is this singleton instance is self owned
      * \return bool
      */
-    static bool OwnsInstance() {
+    static bool OwnsInstance()
+    {
         return mOwnsInstance;
     }
 
@@ -82,8 +82,9 @@ public:
      * \fn void Create(...)
      * \brief Generic factory method.
      */
-    template<typename... Args>
-    static void CreateInstance(Args &&... args) {
+    template <typename... Args>
+    static void CreateInstance(Args&&... args)
+    {
 #ifdef MT
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
@@ -103,7 +104,8 @@ public:
      *
      * \param aObject
      */
-    static void SetInstance(T* apObject) {
+    static void SetInstance(T* apObject)
+    {
 #ifdef MT
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
@@ -119,7 +121,8 @@ public:
      *
      * \return
      */
-    static T& GetInstance() {
+    static T& GetInstance()
+    {
         if (!mpInstance) {
             THROW_WITH_BACKTRACE1(exceptions::ENoInstance, NameOf<T>());
         }
@@ -130,7 +133,8 @@ public:
      * \fn void Destroy()
      * \brief Call this to destroy a self owned instance. Useful during unit testing.
      */
-    static void DestroyInstance() {
+    static void DestroyInstance()
+    {
 #ifdef MT
         std::lock_guard<std::mutex> lock(mMutex);
 #endif
@@ -149,10 +153,10 @@ private:
     static bool mOwnsInstance;
 };
 
-template<class T>
+template <class T>
 T* Singleton<T>::mpInstance = nullptr;
 
-template<class T>
+template <class T>
 bool Singleton<T>::mOwnsInstance = false;
 
 } /* namespace rsp::utils */
