@@ -11,7 +11,13 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_C_FLAGS": "-D_GLIBCXX_ASSERTIONS",
+                "CMAKE_CXX_FLAGS": "-D_GLIBCXX_ASSERTIONS",
+                "CMAKE_C_FLAGS_DEBUG": "-g",
+                "CMAKE_CXX_FLAGS_DEBUG": "-g",
+                "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG -D_FORTIFY_SOURCE=2",
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG -D_FORTIFY_SOURCE=2"
             }
         },
         {
@@ -33,21 +39,36 @@
             }
         },
         {
-            "name": "arm-debug",
-            "displayName": "ARM Debug",
-            "inherits": "debug",
-            "binaryDir": "${sourceDir}/build/arm-debug",
+            "name": "arm-buildroot-common",
+            "hidden": true,
+            "generator": "Ninja",
             "cacheVariables": {
-                "ARCH_ARM": "ON"
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_TOOLCHAIN_FILE": "/opt/arm-buildroot-linux-gnueabihf_sdk-buildroot/share/buildroot/toolchainfile.cmake",
+                "CMAKE_C_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GLIBCXX_ASSERTIONS",
+                "CMAKE_CXX_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GLIBCXX_ASSERTIONS",
+                "CMAKE_C_FLAGS_DEBUG": "-g",
+                "CMAKE_CXX_FLAGS_DEBUG": "-g",
+                "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG -D_FORTIFY_SOURCE=2",
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG -D_FORTIFY_SOURCE=2"
             }
         },
         {
-            "name": "arm-release",
-            "displayName": "ARM Release",
-            "inherits": "release",
-            "binaryDir": "${sourceDir}/build/arm-release",
+            "name": "arm-buildroot-debug",
+            "displayName": "ARM Buildroot Debug",
+            "inherits": "arm-buildroot-common",
+            "binaryDir": "${sourceDir}/build/arm-buildroot-debug",
             "cacheVariables": {
-                "ARCH_ARM": "ON"
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "arm-buildroot-release",
+            "displayName": "ARM Buildroot Release",
+            "inherits": "arm-buildroot-common",
+            "binaryDir": "${sourceDir}/build/arm-buildroot-release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
             }
         }
     ],
@@ -61,12 +82,12 @@
             "configurePreset": "release"
         },
         {
-            "name": "arm-debug",
-            "configurePreset": "arm-debug"
+            "name": "arm-buildroot-debug",
+            "configurePreset": "arm-buildroot-debug"
         },
         {
-            "name": "arm-release",
-            "configurePreset": "arm-release"
+            "name": "arm-buildroot-release",
+            "configurePreset": "arm-buildroot-release"
         }
     ],
     "testPresets": [

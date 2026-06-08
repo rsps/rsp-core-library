@@ -1,13 +1,5 @@
 cmake_minimum_required(VERSION 3.23...3.30)
 
-# Set toolchain file before project() so CMake uses it during compiler detection
-option(ARCH_ARM "Set to cross-compile for ARM CPU" OFF)
-if(ARCH_ARM)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64")
-    set(CMAKE_TOOLCHAIN_FILE "/opt/arm-buildroot-linux-gnueabihf_sdk-buildroot/share/buildroot/toolchainfile.cmake")
-endif()
-
 # Get CMake-friendly version from Git tag
 include("cmake/git.cmake")
 git_get_version(OUTPUT RSP_CORE_LIB_VERSION WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -65,7 +57,6 @@ target_include_directories(${PROJECT_NAME}
 # Compile options
 include("cmake/gcc-compile-options.cmake")
 target_compile_options(${PROJECT_NAME} PRIVATE "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
-target_compile_definitions(${PROJECT_NAME} PRIVATE ${RSP_GCC_STRICT_COMPILE_DEFINITIONS})
 
 # Macro definitions per build configuration
 target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:DEBUG_LOG>")
