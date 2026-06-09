@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include "doctest.h"
+#include <doctest.h>
 #include <utils/Singleton.h>
 
 using namespace rsp::utils;
@@ -16,11 +16,20 @@ using namespace rsp::exceptions;
 
 TEST_SUITE_BEGIN("Utils");
 
-TEST_CASE("Singleton") {
+TEST_CASE("Singleton")
+{
+    struct MyClass : Singleton<MyClass>
+    {
+        int Value{0};
 
-    struct MyClass : Singleton<MyClass> {
-        [[nodiscard]] bool Compare(int a, int b) const { // NOLINT, Not static since we are testing singleton
-            return a == b;
+        MyClass() = default;
+
+        explicit MyClass(int aValue)
+            : Value{aValue} {}
+
+        [[nodiscard]] bool Compare(int aValue) const
+        {
+            return Value == aValue;
         }
     };
 
@@ -29,28 +38,30 @@ TEST_CASE("Singleton") {
 
         CHECK_NOTHROW(MyClass::CreateInstance());
         CHECK_NOTHROW(MyClass::GetInstance());
-        CHECK(MyClass::GetInstance().Compare(0, 0));
+        CHECK(MyClass::GetInstance().Compare(0));
 
         CHECK_THROWS_AS(MyClass::CreateInstance(), const ESingletonViolation&);
-        CHECK_THROWS_AS(MyClass::SetInstance(static_cast<MyClass*>(nullptr)), const ESingletonViolation&);
+        CHECK_THROWS_AS(MyClass::SetInstance(nullptr), const ESingletonViolation&);
 
         CHECK_NOTHROW(MyClass::DestroyInstance());
         CHECK_THROWS_AS(MyClass::GetInstance(), const ENoInstance&);
+
+        CHECK_NOTHROW(MyClass::DestroyInstance());
     }
 
     SUBCASE("External Owned") {
         CHECK_THROWS_AS(MyClass::GetInstance(), const ENoInstance&);
 
-        MyClass o;
+        MyClass o(1);
         CHECK_NOTHROW(MyClass::SetInstance(&o));
         CHECK_NOTHROW(MyClass::GetInstance());
-        CHECK(MyClass::GetInstance().Compare(1, 1));
+        CHECK(MyClass::GetInstance().Compare(1));
 
         CHECK_THROWS_AS(MyClass::CreateInstance(), const ESingletonViolation&);
         CHECK_NOTHROW(MyClass::DestroyInstance());
         CHECK_THROWS_AS(MyClass::CreateInstance(), const ESingletonViolation&);
 
-        CHECK_NOTHROW(MyClass::SetInstance(static_cast<MyClass*>(nullptr)));
+        CHECK_NOTHROW(MyClass::SetInstance(nullptr));
         CHECK_THROWS_AS(MyClass::GetInstance(), const ENoInstance&);
     }
 }
