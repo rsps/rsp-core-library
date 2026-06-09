@@ -80,7 +80,7 @@ bool TestHelpers::ValidateJsonFile(const std::string &arJsonFile)
 
 int TestHelpers::StartWebServer()
 {
-    std::system("killall lighttpd -q"); // Make sure it is not running
+    [[maybe_unused]] int rc = std::system("killall lighttpd -q"); // Make sure it is not running
     std::string cwd = std::filesystem::current_path();
     std::string command = cwd + "/_deps/lighttpd-build/build/lighttpd -f " + cwd + "/webserver/lighttpd.conf -m " + cwd + "/_deps/lighttpd-build/build";
     return std::system(command.c_str());

@@ -26,7 +26,7 @@ static void FetchMonitorEvents(WLan &arWlan)
 {
     std::this_thread::sleep_for(50ms);
     int retries = 2;
-    rsp::network::WpaEvents event;
+    rsp::network::WpaEvents event = rsp::network::WpaEvents::None;
     do {
         std::string msg;
         CHECK_NOTHROW(event = arWlan.GetMonitorEvent(msg));
@@ -232,7 +232,7 @@ TEST_CASE("WLAN") // * doctest::skip(wpa_supplicant_not_available()))
             CHECK_EQ(info.mSSID, std::string(cSSID));
             CHECK(info.mIpAddress.empty());
 
-            rsp::network::WpaEvents event;
+            rsp::network::WpaEvents event = rsp::network::WpaEvents::None;
             do {
                 std::string msg;
                 CHECK_NOTHROW(event = wlan.GetMonitorEvent(msg));

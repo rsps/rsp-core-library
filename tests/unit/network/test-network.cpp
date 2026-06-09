@@ -87,7 +87,7 @@ TEST_CASE("Network")
 
         logger.Info() << "Request:\n" << request << std::endl;
 
-        IHttpResponse *resp;
+        IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
 
         logger.Info() << "Response:\n" << *resp << std::endl;
@@ -116,7 +116,7 @@ TEST_CASE("Network")
         opt.RequestType = HttpRequestType::HEAD;
         request.SetOptions(opt);
 
-        const IHttpResponse *resp;
+        const IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
 
         CHECK_EQ(resp->GetHeader("content-type"), "text/html");
@@ -195,7 +195,7 @@ TEST_CASE("Network")
 
         request.SetOptions(opt);
 
-        const IHttpResponse *resp;
+        const IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
 
         if constexpr (IsVerbose()) {
@@ -215,7 +215,7 @@ TEST_CASE("Network")
         opt.RequestType = HttpRequestType::HEAD;
         request.SetOptions(opt);
 
-        const IHttpResponse *resp;
+        const IHttpResponse *resp = nullptr;
         CHECK_NOTHROW(resp = &request.Execute());
 
         CHECK_EQ(resp->GetHeader("content-type"), "text/html");

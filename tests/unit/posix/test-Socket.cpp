@@ -50,7 +50,7 @@ TEST_CASE("Socket")
         CHECK(client.IsDataReady());
 
         std::string result(20, 'A');
-        size_t len;
+        size_t len = 0;
         CHECK_NOTHROW(len = client.Receive(result));
         CHECK_NOTHROW(result.resize(len));
         MESSAGE(result);
@@ -79,7 +79,7 @@ TEST_CASE("Socket")
         CHECK(client.IsDataReady());
 
         std::string result(32, 'A');
-        size_t len;
+        size_t len = 0;
         CHECK_NOTHROW(len = client.Receive(result));
         CHECK_NOTHROW(result.resize(len));
         MESSAGE(result);
@@ -115,7 +115,7 @@ TEST_CASE("Socket")
         CHECK_EQ(client.Send(hello_server), hello_server.size());
 
         std::string result(32, 'A');
-        size_t len;
+        size_t len = 0;
         Socket peer;
         CHECK(server.IsDataReady());
         CHECK_NOTHROW(len = server.ReceiveFrom(peer, result));

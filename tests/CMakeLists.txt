@@ -58,6 +58,9 @@ add_executable(${TEST_BINARY})
 include("dependencies.cmake")
 rsp_core_test_add_dependencies(${TEST_BINARY})
 
+include("gcc-compile-options")
+target_compile_options(${TEST_BINARY} PRIVATE "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
+
 target_include_directories(${TEST_BINARY}
     PRIVATE
         "${PROJECT_SOURCE_DIR}/src"
