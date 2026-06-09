@@ -12,12 +12,12 @@
             "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_C_FLAGS": "-D_GLIBCXX_ASSERTIONS",
-                "CMAKE_CXX_FLAGS": "-D_GLIBCXX_ASSERTIONS",
-                "CMAKE_C_FLAGS_DEBUG": "-g",
-                "CMAKE_CXX_FLAGS_DEBUG": "-g",
-                "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG -D_FORTIFY_SOURCE=2",
-                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG -D_FORTIFY_SOURCE=2"
+                "CMAKE_C_FLAGS": "-D_GLIBCXX_ASSERTIONS -D_FORTIFY_SOURCE=2",
+                "CMAKE_CXX_FLAGS": "-D_GLIBCXX_ASSERTIONS -D_FORTIFY_SOURCE=2",
+                "CMAKE_C_FLAGS_DEBUG": "-Og -g",
+                "CMAKE_CXX_FLAGS_DEBUG": "-Og -g",
+                "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG",
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG"
             }
         },
         {
@@ -45,12 +45,12 @@
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_TOOLCHAIN_FILE": "/opt/arm-buildroot-linux-gnueabihf_sdk-buildroot/share/buildroot/toolchainfile.cmake",
-                "CMAKE_C_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GLIBCXX_ASSERTIONS",
-                "CMAKE_CXX_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GLIBCXX_ASSERTIONS",
-                "CMAKE_C_FLAGS_DEBUG": "-g",
-                "CMAKE_CXX_FLAGS_DEBUG": "-g",
-                "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG -D_FORTIFY_SOURCE=2",
-                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG -D_FORTIFY_SOURCE=2"
+                "CMAKE_C_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GLIBCXX_ASSERTIONS -D_FORTIFY_SOURCE=2",
+                "CMAKE_CXX_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GLIBCXX_ASSERTIONS -D_FORTIFY_SOURCE=2",
+                "CMAKE_C_FLAGS_DEBUG": "-Og -g",
+                "CMAKE_CXX_FLAGS_DEBUG": "-Og -g",
+                "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG",
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG"
             }
         },
         {
