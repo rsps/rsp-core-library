@@ -162,7 +162,7 @@ TEST_CASE("DateTime")
 
             DateTime dt(tm);
             std::stringstream ss;
-            ss << std::asctime(&tm);
+            ss << std::put_time(&tm, "%c");
             DMESG("DateTime(" << ss.str() << ") = " << dt)
             DMESG("DateTime(" << cISO8601UTC << ") = " << dt.ToISO8601UTC())
             CHECK_EQ(dt.ToISO8601UTC(), cISO8601UTC);
