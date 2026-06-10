@@ -10,9 +10,9 @@
 
 #include <iostream>
 #include <string>
-#include <utils/AnsiEscapeCodes.h>
-#include <logging/ConsoleLogWriter.h>
-#include <json/JsonEncoder.h>
+#include <rsp/utils/AnsiEscapeCodes.h>
+#include <rsp/logging/ConsoleLogWriter.h>
+#include <rsp/json/JsonEncoder.h>
 
 using namespace rsp::utils;
 

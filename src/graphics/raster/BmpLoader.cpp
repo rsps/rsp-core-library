@@ -8,11 +8,11 @@
  * \author      Simon Glashoff
  */
 
-#include <exceptions/CoreException.h>
+#include <rsp/exceptions/CoreException.h>
 #include "BmpLoader.h"
 #include <iostream>
 #include <string>
-#include <utils/FourCC.h>
+#include <rsp/utils/FourCC.h>
 
 using namespace rsp::logging;
 

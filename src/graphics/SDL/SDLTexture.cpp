@@ -13,7 +13,7 @@
 #include "SDLTexture.h"
 #include "SDLRenderer.h"
 #include "SDLRect.h"
-#include <logging/Logger.h>
+#include <rsp/logging/Logger.h>
 
 namespace rsp::graphics {
 

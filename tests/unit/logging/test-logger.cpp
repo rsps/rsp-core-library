@@ -13,15 +13,15 @@
 #include <fstream>
 #include <iostream>
 #include <doctest.h>
-#include <exceptions/CoreException.h>
-#include <json/Json.h>
-#include <logging/BufferToStream.h>
-#include <logging/Logger.h>
-#include <logging/LogChannel.h>
-#include <logging/ConsoleLogWriter.h>
-#include <logging/FileLogWriter.h>
-#include <utils/StrUtils.h>
-#include <utils/AnsiEscapeCodes.h>
+#include <rsp/exceptions/CoreException.h>
+#include <rsp/json/Json.h>
+#include <rsp/logging/BufferToStream.h>
+#include <rsp/logging/Logger.h>
+#include <rsp/logging/LogChannel.h>
+#include <rsp/logging/ConsoleLogWriter.h>
+#include <rsp/logging/FileLogWriter.h>
+#include <rsp/utils/StrUtils.h>
+#include <rsp/utils/AnsiEscapeCodes.h>
 
 using namespace rsp;
 using namespace rsp::utils;

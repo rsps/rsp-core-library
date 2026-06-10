@@ -8,8 +8,8 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/Control.h>
-#include <graphics/GfxEvents.h>
+#include <rsp/graphics/Control.h>
+#include <rsp/graphics/GfxEvents.h>
 
 using namespace rsp::logging;
 

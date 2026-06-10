@@ -11,9 +11,9 @@
 #ifndef SECONDSCENE_H
 #define SECONDSCENE_H
 
-#include <graphics/Button.h>
-#include <graphics/GfxInputEvents.h>
-#include <graphics/Scene.h>
+#include <rsp/graphics/Button.h>
+#include <rsp/graphics/GfxInputEvents.h>
+#include <rsp/graphics/Scene.h>
 #include <TestTouchParser.h>
 
 namespace rsp::graphics {

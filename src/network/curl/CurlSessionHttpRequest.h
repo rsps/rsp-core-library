@@ -12,7 +12,7 @@
 #define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_SESSION_HTTP_REQUEST_H
 
 #include "CurlHttpRequest.h"
-#include <network/IHttpSession.h>
+#include <rsp/network/IHttpSession.h>
 
 namespace rsp::network::curl {
 

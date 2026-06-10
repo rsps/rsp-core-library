@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <application/CommandLine.h>
+#include <rsp/application/CommandLine.h>
 #include <algorithm>
 #include <filesystem>
 

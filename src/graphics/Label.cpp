@@ -9,7 +9,7 @@
  */
 
 #include <string>
-#include <graphics/Label.h>
+#include <rsp/graphics/Label.h>
 
 namespace rsp::graphics {
 

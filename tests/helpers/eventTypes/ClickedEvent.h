@@ -11,7 +11,7 @@
 #ifndef CLICKEDEVENT_H
 #define CLICKEDEVENT_H
 
-#include "messaging/Event.h"
+#include <rsp/messaging/Event.h>
 #include <string>
 
 namespace rsp::messaging

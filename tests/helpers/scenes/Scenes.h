@@ -11,7 +11,7 @@
 #ifndef TESTS_HELPERS_SCENES_SCENES_H_
 #define TESTS_HELPERS_SCENES_SCENES_H_
 
-#include <graphics/SceneMap.h>
+#include <rsp/graphics/SceneMap.h>
 
 #include "FirstScene.h"
 #include "SecondScene.h"

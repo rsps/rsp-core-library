@@ -10,10 +10,10 @@
 
 #include "doctest.h"
 #include <sstream>
-#include <utils/StrUtils.h>
+#include <rsp/utils/StrUtils.h>
 #undef NDEBUG
-#include <exceptions/CoreException.h>
-#include <exceptions/BackTrace.h>
+#include <rsp/exceptions/CoreException.h>
+#include <rsp/exceptions/BackTrace.h>
 
 using namespace rsp::utils;
 using namespace rsp::exceptions;

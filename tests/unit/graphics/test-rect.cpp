@@ -9,8 +9,8 @@
  */
 
 #include <doctest.h>
-#include <graphics/Point.h>
-#include <graphics/Rect.h>
+#include <rsp/graphics/Point.h>
+#include <rsp/graphics/Rect.h>
 #include <iostream>
 
 using namespace rsp::graphics;

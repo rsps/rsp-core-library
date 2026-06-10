@@ -9,7 +9,7 @@
 */
 
 #include "doctest.h"
-#include <utils/CsvEncoder.h>
+#include <rsp/utils/CsvEncoder.h>
 
 using namespace rsp::utils;
 

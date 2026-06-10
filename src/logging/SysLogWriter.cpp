@@ -11,7 +11,7 @@
 #ifdef SYSLOG
 
 #include <syslog.h>
-#include <logging/SysLogWriter.h>
+#include <rsp/logging/SysLogWriter.h>
 
 namespace rsp::logging {
 

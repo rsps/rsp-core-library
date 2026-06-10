@@ -9,11 +9,11 @@
  */
 #include <doctest.h>
 #include <string_view>
-#include <network/BinaryBody.h>
-#include <network/FileBody.h>
-#include <network/StringBody.h>
-#include <network/ChunkStreamer.h>
-#include <utils/Random.h>
+#include <rsp/network/BinaryBody.h>
+#include <rsp/network/FileBody.h>
+#include <rsp/network/StringBody.h>
+#include <rsp/network/ChunkStreamer.h>
+#include <rsp/utils/Random.h>
 
 using namespace rsp::network;
 

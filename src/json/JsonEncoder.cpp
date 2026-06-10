@@ -4,9 +4,9 @@
  */
 
 #include <iomanip>
-#include <json/JsonEncoder.h>
-#include <json/JsonStream.h>
-#include <logging/Logger.h>
+#include <rsp/json/JsonEncoder.h>
+#include <rsp/json/JsonStream.h>
+#include <rsp/logging/Logger.h>
 
 using namespace rsp::utils;
 

@@ -8,10 +8,10 @@
  * \author      Steffen Brummer
  */
 
-#include <json/JsonDecoder.h>
-#include <json/JsonExceptions.h>
+#include <rsp/json/JsonDecoder.h>
+#include <rsp/json/JsonExceptions.h>
 #include <sstream>
-#include <utils/StrUtils.h>
+#include <rsp/utils/StrUtils.h>
 
 using namespace rsp::json;
 using namespace rsp::utils;

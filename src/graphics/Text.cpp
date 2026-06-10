@@ -8,9 +8,9 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/Text.h>
-#include <logging/Logger.h>
-#include <utils/StrUtils.h>
+#include <rsp/graphics/Text.h>
+#include <rsp/logging/Logger.h>
+#include <rsp/utils/StrUtils.h>
 
 //#define DEBUG(a) { Logger::GetDefault().Debug() << a; }
 #define DEBUG(a)

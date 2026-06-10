@@ -11,8 +11,8 @@
 #include "doctest.h"
 #include <chrono>
 #include <thread>
-#include <utils/Timer.h>
-#include <utils/Random.h>
+#include <rsp/utils/Timer.h>
+#include <rsp/utils/Random.h>
 
 using namespace rsp::utils;
 using namespace std::literals::chrono_literals;

@@ -9,7 +9,7 @@
  */
 
 #include <doctest.h>
-#include <utils/Singleton.h>
+#include <rsp/utils/Singleton.h>
 
 using namespace rsp::utils;
 using namespace rsp::exceptions;

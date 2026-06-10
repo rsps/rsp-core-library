@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/Color.h>
+#include <rsp/graphics/Color.h>
 
 namespace rsp::graphics {
 

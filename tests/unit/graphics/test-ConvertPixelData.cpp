@@ -9,10 +9,10 @@
  */
 
 #include <doctest.h>
-#include <graphics/Bitmap.h>
-#include <graphics/Color.h>
-#include <posix/FileSystem.h>
-#include <utils/StrUtils.h>
+#include <rsp/graphics/Bitmap.h>
+#include <rsp/graphics/Color.h>
+#include <rsp/posix/FileSystem.h>
+#include <rsp/utils/StrUtils.h>
 #include <TestHelpers.h>
 
 using namespace rsp::utils;

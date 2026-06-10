@@ -11,8 +11,8 @@
 #include <chrono>
 #include <thread>
 #include <doctest.h>
-#include <utils/InRange.h>
-#include <utils/StopWatch.h>
+#include <rsp/utils/InRange.h>
+#include <rsp/utils/StopWatch.h>
 
 using namespace rsp::utils;
 

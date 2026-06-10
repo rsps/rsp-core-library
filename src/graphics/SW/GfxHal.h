@@ -16,12 +16,12 @@
 #include <cstdint>
 #include <memory>
 #include <functional>
-#include <utils/OptionalPtr.h>
-#include <graphics/Color.h>
-#include <graphics/GuiUnit.h>
-#include <graphics/Rect.h>
-#include <graphics/PixelData.h>
-#include <graphics/Texture.h>
+#include <rsp/utils/OptionalPtr.h>
+#include <rsp/graphics/Color.h>
+#include <rsp/graphics/GuiUnit.h>
+#include <rsp/graphics/Rect.h>
+#include <rsp/graphics/PixelData.h>
+#include <rsp/graphics/Texture.h>
 
 namespace rsp::graphics::sw {
 

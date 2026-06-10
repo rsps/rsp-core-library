@@ -11,7 +11,7 @@
 
 #include <TestPixmap.h>
 #include "pixmap/GfxResources.h"
-#include <graphics/Keyboard.h>
+#include <rsp/graphics/Keyboard.h>
 
 TestPixmap::TestPixmap()
 {

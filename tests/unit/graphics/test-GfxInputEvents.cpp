@@ -11,7 +11,7 @@
 #ifndef USE_GFX_SDL
 
 #include <doctest.h>
-#include <graphics/GfxInputEvents.h>
+#include <rsp/graphics/GfxInputEvents.h>
 #include <graphics/SW/TouchParser.h>
 #include <vector>
 

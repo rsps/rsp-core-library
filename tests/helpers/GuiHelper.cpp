@@ -9,10 +9,10 @@
  */
 
 #include <doctest.h>
-#include <graphics/Renderer.h>
-#include <posix/FileSystem.h>
+#include <rsp/graphics/Renderer.h>
+#include <rsp/posix/FileSystem.h>
 #include <scenes/Scenes.h>
-#include <utils/Timer.h>
+#include <rsp/utils/Timer.h>
 #include "TestHelpers.h"
 #include "GuiHelper.h"
 

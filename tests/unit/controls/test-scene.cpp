@@ -8,14 +8,14 @@
  * \author      Simon Glashoff
  */
 
-#include <graphics/Font.h>
-#include <graphics/Scene.h>
-#include <utils/Random.h>
+#include <rsp/graphics/Font.h>
+#include <rsp/graphics/Scene.h>
+#include <rsp/utils/Random.h>
 #include <doctest.h>
 #include <scenes/Scenes.h>
 #include <TestHelpers.h>
 #ifdef USE_GFX_SW
-#include <posix/FileSystem.h>
+#include <rsp/posix/FileSystem.h>
 #endif
 
 using namespace rsp::graphics;

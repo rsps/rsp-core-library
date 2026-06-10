@@ -10,10 +10,10 @@
 
 #include <doctest.h>
 #include <string>
-#include <security/Encrypt.h>
-#include <security/Decrypt.h>
-#include <security/SecureString.h>
-#include <security/SecureBuffer.h>
+#include <rsp/security/Encrypt.h>
+#include <rsp/security/Decrypt.h>
+#include <rsp/security/SecureString.h>
+#include <rsp/security/SecureBuffer.h>
 
 using namespace rsp::security;
 

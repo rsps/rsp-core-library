@@ -9,8 +9,8 @@
 */
 
 #include <doctest.h>
-#include <network/HttpRequest.h>
-#include <network/ResponseParser.h>
+#include <rsp/network/HttpRequest.h>
+#include <rsp/network/ResponseParser.h>
 
 using namespace rsp::network;
 

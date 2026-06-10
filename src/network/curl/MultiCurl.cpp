@@ -9,7 +9,7 @@
  */
 
 #include "MultiCurl.h"
-#include <network/HttpRequest.h>
+#include <rsp/network/HttpRequest.h>
 
 using namespace rsp::logging;
 

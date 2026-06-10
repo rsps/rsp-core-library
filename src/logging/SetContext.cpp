@@ -6,8 +6,8 @@
 // \license     Mozilla Public License 2.0
 // \author      Steffen Brummer
 
-#include <logging/SetContext.h>
-#include <logging/OutStreamBuffer.h>
+#include <rsp/logging/SetContext.h>
+#include <rsp/logging/OutStreamBuffer.h>
 
 namespace rsp::logging {
 

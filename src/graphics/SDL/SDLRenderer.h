@@ -17,9 +17,9 @@
 #include <memory>
 #include <vector>
 #include <SDL2/SDL.h>
-#include <graphics/Rect.h>
-#include <graphics/Renderer.h>
-#include <utils/Singleton.h>
+#include <rsp/graphics/Rect.h>
+#include <rsp/graphics/Renderer.h>
+#include <rsp/utils/Singleton.h>
 #include "SDLException.h"
 #include "SDLEvents.h"
 

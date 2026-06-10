@@ -20,8 +20,8 @@
     #include <sys/resource.h>
 #endif
 #include <netinet/in.h>
-#include <exceptions/ExceptionHelper.h>
-#include <posix/FileSystem.h>
+#include <rsp/exceptions/ExceptionHelper.h>
+#include <rsp/posix/FileSystem.h>
 #include <system_error>
 #include <cstdio>
 #include <cstdlib>
@@ -30,7 +30,7 @@
 #include <iostream>
 #include <cstring>
 #include <regex>
-#include <utils/StrUtils.h>
+#include <rsp/utils/StrUtils.h>
 
 
 using namespace rsp::utils;

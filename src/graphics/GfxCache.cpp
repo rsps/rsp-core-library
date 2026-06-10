@@ -9,7 +9,7 @@
  */
 
 
-#include <graphics/GfxCache.h>
+#include <rsp/graphics/GfxCache.h>
 
 namespace rsp::graphics {
 

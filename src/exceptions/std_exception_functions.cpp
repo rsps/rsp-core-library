@@ -10,7 +10,7 @@
 
 #ifdef __linux__
 
-#include <exceptions/ExceptionHelper.h>
+#include <rsp/exceptions/ExceptionHelper.h>
 #include <new>
 #include <typeinfo>
 #include <functional>

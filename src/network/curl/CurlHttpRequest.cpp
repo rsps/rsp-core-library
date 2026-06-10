@@ -10,16 +10,16 @@
 
 #include <map>
 #include <string>
-#include <network/ResponseParser.h>
-#include <network/MultipartBody.h>
-#include <posix/FileIO.h>
+#include <rsp/network/ResponseParser.h>
+#include <rsp/network/MultipartBody.h>
+#include <rsp/posix/FileIO.h>
 #include "CurlHttpRequest.h"
 #include "CurlSession.h"
 #include "Exceptions.h"
 
 //#define LOG_OUTPUT 1
 #ifdef LOG_OUTPUT
-    #include <logging/BufferToStream.h>
+    #include <rsp/logging/BufferToStream.h>
 #endif
 
 using namespace rsp::logging;

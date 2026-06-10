@@ -10,8 +10,8 @@
 
 #include <iomanip>
 #include <string>
-#include <utils/HexStream.h>
-#include <utils/StrUtils.h>
+#include <rsp/utils/HexStream.h>
+#include <rsp/utils/StrUtils.h>
 
 namespace rsp::utils {
 

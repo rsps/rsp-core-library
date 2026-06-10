@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#include <logging/LoggerInterface.h>
-#include <logging/Logger.h>
+#include <rsp/logging/LoggerInterface.h>
+#include <rsp/logging/Logger.h>
 
 namespace rsp::logging {
 

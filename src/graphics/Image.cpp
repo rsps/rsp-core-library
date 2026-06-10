@@ -9,7 +9,7 @@
  */
 
 #include <string>
-#include <graphics/Image.h>
+#include <rsp/graphics/Image.h>
 
 namespace rsp::graphics
 {

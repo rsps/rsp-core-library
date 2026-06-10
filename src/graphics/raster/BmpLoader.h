@@ -10,14 +10,14 @@
 #ifndef RSP_CORE_LIB_SRC_GRAPHICS_RASTER_BMP_LOADER_H
 #define RSP_CORE_LIB_SRC_GRAPHICS_RASTER_BMP_LOADER_H
 
-#include <graphics/Color.h>
-#include <graphics/raster/ImgLoader.h>
-#include <logging/LogChannel.h>
+#include <rsp/graphics/Color.h>
+#include <rsp/graphics/raster/ImgLoader.h>
+#include <rsp/logging/LogChannel.h>
 #include <cstring>
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <posix/FileIO.h>
+#include <rsp/posix/FileIO.h>
 
 namespace rsp::graphics
 {

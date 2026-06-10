@@ -8,10 +8,10 @@
  * \author      Steffen Brummer
  */
 
-#include <messaging/EventBroker.h>
-#include <logging/Logger.h>
+#include <rsp/messaging/EventBroker.h>
+#include <rsp/logging/Logger.h>
 #ifdef USE_GFX
-    #include <graphics/Control.h>
+    #include <rsp/graphics/Control.h>
 #endif
 
 using namespace std::ranges;

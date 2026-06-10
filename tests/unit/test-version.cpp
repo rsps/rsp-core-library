@@ -9,7 +9,7 @@
  */
 
 #include <doctest.h>
-#include <version.h>
+#include <rsp/version.h>
 
 static_assert(rsp::get_library_version() >= rsp::utils::Version{0, 0, 0});
 

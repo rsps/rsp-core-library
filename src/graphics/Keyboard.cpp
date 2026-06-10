@@ -12,8 +12,8 @@
 #include <string>
 #include <locale>
 #include <codecvt>
-#include <graphics/GfxCache.h>
-#include <graphics/Keyboard.h>
+#include <rsp/graphics/GfxCache.h>
+#include <rsp/graphics/Keyboard.h>
 
 using namespace rsp::utils;
 

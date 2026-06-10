@@ -7,7 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <security/Encrypt.h>
+#include <rsp/security/Encrypt.h>
 #include "common.h"
 
 namespace rsp::security {

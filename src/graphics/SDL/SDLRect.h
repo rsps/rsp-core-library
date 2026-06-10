@@ -14,7 +14,7 @@
 #ifdef USE_GFX_SDL
 
 #include <SDL2/SDL.h>
-#include <graphics/Rect.h>
+#include <rsp/graphics/Rect.h>
 
 namespace rsp::graphics::sdl {
 

@@ -10,7 +10,7 @@
 
 #ifdef USE_GFX_SW
 
-#include <exceptions/CoreException.h>
+#include <rsp/exceptions/CoreException.h>
 #include "TouchParser.h"
 #include <linux/input.h>
 

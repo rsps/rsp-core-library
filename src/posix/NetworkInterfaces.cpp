@@ -9,8 +9,8 @@
  */
 
 #include <format>
-#include <posix/NetworkInterfaces.h>
-#include <exceptions/CoreException.h>
+#include <rsp/posix/NetworkInterfaces.h>
+#include <rsp/exceptions/CoreException.h>
 #ifdef __linux__
     #include <cstring>
     #include <unistd.h>

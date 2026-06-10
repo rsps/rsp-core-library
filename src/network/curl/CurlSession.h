@@ -12,8 +12,8 @@
 #define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_SESSION_H
 
 #include <vector>
-#include <network/IHttpSession.h>
-#include <utils/ObjectPool.h>
+#include <rsp/network/IHttpSession.h>
+#include <rsp/utils/ObjectPool.h>
 #include "MultiCurl.h"
 #include "CurlSessionHttpRequest.h"
 

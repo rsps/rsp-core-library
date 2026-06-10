@@ -13,8 +13,8 @@
 #include <doctest.h>
 #include <graphics/SW/GfxHal.h>
 #include <cstring>
-#include <utils/Crc32.h>
-#include <utils/StopWatch.h>
+#include <rsp/utils/Crc32.h>
+#include <rsp/utils/StopWatch.h>
 #include <TestHelpers.h>
 
 using namespace rsp::graphics;

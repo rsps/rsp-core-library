@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#include <network/HttpRequestOptions.h>
-#include <utils/StrUtils.h>
+#include <rsp/network/HttpRequestOptions.h>
+#include <rsp/utils/StrUtils.h>
 #include <magic_enum/magic_enum.hpp>
 
 namespace rsp::network {

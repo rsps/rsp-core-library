@@ -10,8 +10,8 @@
 
 #include <map>
 #include <string>
-#include <logging/LogTypes.h>
-#include <logging/OutStreamBuffer.h>
+#include <rsp/logging/LogTypes.h>
+#include <rsp/logging/OutStreamBuffer.h>
 #include <magic_enum/magic_enum.hpp>
 
 namespace rsp::logging {

@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <exceptions/BackTrace.h>
+#include <rsp/exceptions/BackTrace.h>
 #if defined(BACKTRACE_IN_EXCEPTIONS)
     #include <stacktrace>
 #elif defined(__x86_64__)

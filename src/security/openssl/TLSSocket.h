@@ -11,8 +11,8 @@
 #define RSP_CORE_LIB_INCLUDE_SECURITY_TLS_SOCKET_H
 
 #include "exceptions.h"
-#include <posix/Socket.h>
-#include <security/ITLSSocket.h>
+#include <rsp/posix/Socket.h>
+#include <rsp/security/ITLSSocket.h>
 #include <span>
 #include <string_view>
 

@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#include <utils/Thread.h>
-#include <utils/ThreadList.h>
+#include <rsp/utils/Thread.h>
+#include <rsp/utils/ThreadList.h>
 #ifdef ESP_PLATFORM
     #include <esp_pthread.h>
 #endif

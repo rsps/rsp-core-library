@@ -9,7 +9,7 @@
  */
 
 #include <cstdio>
-#include <utils/AnsiEscapeCodes.h>
+#include <rsp/utils/AnsiEscapeCodes.h>
 
 namespace rsp::utils::AnsiEscapeCodes {
 

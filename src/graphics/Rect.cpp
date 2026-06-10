@@ -9,7 +9,7 @@
  */
 
 #include <sstream>
-#include <graphics/Rect.h>
+#include <rsp/graphics/Rect.h>
 
 namespace rsp::graphics
 {

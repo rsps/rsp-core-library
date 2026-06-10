@@ -11,7 +11,7 @@
 #ifndef TESTS_HELPERS_TESTLOGGER_H_
 #define TESTS_HELPERS_TESTLOGGER_H_
 
-#include <logging/LogChannel.h>
+#include <rsp/logging/LogChannel.h>
 
 
 class TestLogger : public rsp::logging::LogChannel

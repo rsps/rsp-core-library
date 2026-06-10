@@ -8,7 +8,7 @@
  * \author      steffen
  */
 #include <doctest.h>
-#include <utils/ConstTypeInfo.h>
+#include <rsp/utils/ConstTypeInfo.h>
 
 using namespace rsp::utils;
 

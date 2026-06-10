@@ -10,8 +10,8 @@
 #ifndef RSP_CORE_LIB_SRC_NETWORK_EHTTP_E_HTTP_SESSION_H
 #define RSP_CORE_LIB_SRC_NETWORK_EHTTP_E_HTTP_SESSION_H
 
-#include <network/IHttpSession.h>
-#include <utils/ObjectPool.h>
+#include <rsp/network/IHttpSession.h>
+#include <rsp/utils/ObjectPool.h>
 #include "EHttpRequest.h"
 #include "SocketConnection.h"
 

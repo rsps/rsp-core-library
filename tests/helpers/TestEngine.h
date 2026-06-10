@@ -11,9 +11,9 @@
 #ifndef TESTS_HELPERS_TESTENGINE_H_
 #define TESTS_HELPERS_TESTENGINE_H_
 
-#include <graphics/GfxEngine.h>
-#include <graphics/GfxEvents.h>
-#include <messaging/EventBroker.h>
+#include <rsp/graphics/GfxEngine.h>
+#include <rsp/graphics/GfxEvents.h>
+#include <rsp/messaging/EventBroker.h>
 #include <scenes/Scenes.h>
 
 class TestEngine : public rsp::graphics::GfxEngine<Scenes>, public rsp::messaging::SubscriberInterface

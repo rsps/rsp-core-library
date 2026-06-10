@@ -9,9 +9,9 @@
  */
 #include <cstring>
 #include <arpa/inet.h>
-#include <posix/Socket.h>
-#include <exceptions/ExceptionHelper.h>
-#include <posix/SocketAddress.h>
+#include <rsp/posix/Socket.h>
+#include <rsp/exceptions/ExceptionHelper.h>
+#include <rsp/posix/SocketAddress.h>
 
 namespace rsp::posix {
 

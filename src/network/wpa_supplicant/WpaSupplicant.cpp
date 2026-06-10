@@ -10,11 +10,11 @@
 #include <algorithm>
 #include <string>
 #include <string_view>
-#include <network/WLan.h>
-#include <posix/FileSystem.h>
-#include <posix/NetworkInterfaces.h>
-#include <utils/HexStream.h>
-#include <utils/StrUtils.h>
+#include <rsp/network/WLan.h>
+#include <rsp/posix/FileSystem.h>
+#include <rsp/posix/NetworkInterfaces.h>
+#include <rsp/utils/HexStream.h>
+#include <rsp/utils/StrUtils.h>
 #include <wpa_ctrl.h>
 #include "WpaSupplicant.h"
 

@@ -7,10 +7,10 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <network/FileBody.h>
-#include <network/HttpRequestBase.h>
-#include <posix/FileSystem.h>
-#include <utils/DateTime.h>
+#include <rsp/network/FileBody.h>
+#include <rsp/network/HttpRequestBase.h>
+#include <rsp/posix/FileSystem.h>
+#include <rsp/utils/DateTime.h>
 
 namespace rsp::network {
 

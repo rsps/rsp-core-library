@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <utils/Crc32.h>
+#include <rsp/utils/Crc32.h>
 
 namespace rsp::utils {
 

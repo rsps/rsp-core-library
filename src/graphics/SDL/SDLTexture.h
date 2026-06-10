@@ -15,7 +15,7 @@
 
 #include <memory>
 #include <SDL2/SDL.h>
-#include <graphics/Texture.h>
+#include <rsp/graphics/Texture.h>
 
 namespace rsp::graphics::sdl {
 

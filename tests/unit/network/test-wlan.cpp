@@ -10,9 +10,9 @@
 
 #include <doctest.h>
 #include <chrono>
-#include <network/WLan.h>
-#include <posix/NetworkInterfaces.h>
-#include <posix/FileSystem.h>
+#include <rsp/network/WLan.h>
+#include <rsp/posix/NetworkInterfaces.h>
+#include <rsp/posix/FileSystem.h>
 #include <TestHelpers.h>
 #include <cstdlib>
 

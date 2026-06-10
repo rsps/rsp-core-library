@@ -9,7 +9,7 @@
  */
 
 #include <algorithm>
-#include <utils/CppObjectFile.h>
+#include <rsp/utils/CppObjectFile.h>
 
 namespace rsp::utils {
 

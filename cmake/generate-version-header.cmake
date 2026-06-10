@@ -10,8 +10,9 @@ if(CMAKE_SCRIPT_MODE_FILE)
     configure_file("${VERSION_H_IN}" "${VERSION_H_OUT}" @ONLY)
 else()
     # Configure-time: define the build target
-    set(_version_h "${CMAKE_CURRENT_BINARY_DIR}/include/version.h")
-    set(_version_h_tmp "${CMAKE_CURRENT_BINARY_DIR}/include/version.h.tmp")
+    set(_version_h_in "${CMAKE_CURRENT_SOURCE_DIR}/include/rsp/version.h.in")
+    set(_version_h_tmp "${CMAKE_CURRENT_BINARY_DIR}/include/rsp/version.h.tmp")
+    set(_version_h_out "${CMAKE_CURRENT_BINARY_DIR}/include/rsp/version.h")
 
     # Add a custom target to generate version header. Use an intermediate temp
     # file to avoid unnecessary rebuilds when the version hasn't changed.
@@ -19,10 +20,10 @@ else()
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/include"
         COMMAND ${CMAKE_COMMAND}
             -DPROJECT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
-            -DVERSION_H_IN="${CMAKE_CURRENT_SOURCE_DIR}/include/version.h.in"
+            -DVERSION_H_IN="${_version_h_in}"
             -DVERSION_H_OUT="${_version_h_tmp}"
             -P "${CMAKE_CURRENT_LIST_FILE}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_version_h_tmp}" "${_version_h}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_version_h_tmp}" "${_version_h_out}"
         COMMAND ${CMAKE_COMMAND} -E rm -f "${_version_h_tmp}"
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         COMMENT "Writing version.h"

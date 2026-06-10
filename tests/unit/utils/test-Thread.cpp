@@ -9,9 +9,9 @@
  */
 
 #include <doctest.h>
-#include <utils/StrUtils.h>
-#include <utils/Thread.h>
-#include <utils/ThreadList.h>
+#include <rsp/utils/StrUtils.h>
+#include <rsp/utils/Thread.h>
+#include <rsp/utils/ThreadList.h>
 #include <TestHelpers.h>
 
 using namespace rsp::utils;

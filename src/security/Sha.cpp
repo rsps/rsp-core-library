@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <security/Sha.h>
+#include <rsp/security/Sha.h>
 
 namespace rsp::security {
 

@@ -14,9 +14,9 @@
 #endif
 
 #include <doctest.h>
-#include <graphics/Renderer.h>
+#include <rsp/graphics/Renderer.h>
 #include <GuiHelper.h>
-#include <utils/Timer.h>
+#include <rsp/utils/Timer.h>
 #include <scenes/Scenes.h>
 #include <TestEngine.h>
 

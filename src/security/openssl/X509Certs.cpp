@@ -10,7 +10,7 @@
 #include "BioBuffer.h"
 #include <memory>
 #include "X509Certs.h"
-#include <posix/FileSystem.h>
+#include <rsp/posix/FileSystem.h>
 
 namespace rsp::security {
 

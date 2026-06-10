@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <graphics/Canvas.h>
+#include <rsp/graphics/Canvas.h>
 
 namespace rsp::graphics
 {

@@ -7,15 +7,15 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <application/Console.h>
-#include <posix/TerminalIO.h>
+#include <rsp/application/Console.h>
+#include <rsp/posix/TerminalIO.h>
 #include <cstdio>
 #include <string>
 #include <iostream>
 #include <cstring>
 #include <ostream>
-#include <utils/AnsiEscapeCodes.h>
-#include <utils/StrUtils.h>
+#include <rsp/utils/AnsiEscapeCodes.h>
+#include <rsp/utils/StrUtils.h>
 
 using namespace rsp::utils;
 using namespace rsp::application;

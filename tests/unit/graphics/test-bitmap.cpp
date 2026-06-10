@@ -9,10 +9,10 @@
  */
 
 #include <doctest.h>
-#include <exceptions/CoreException.h>
-#include <graphics/Bitmap.h>
-#include <graphics/Color.h>
-#include <utils/Random.h>
+#include <rsp/exceptions/CoreException.h>
+#include <rsp/graphics/Bitmap.h>
+#include <rsp/graphics/Color.h>
+#include <rsp/utils/Random.h>
 #include <TestHelpers.h>
 
 using namespace rsp::utils;

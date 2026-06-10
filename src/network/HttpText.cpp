@@ -7,8 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <network/HttpText.h>
-#include <network/parser-helpers.h>
+#include <rsp/network/HttpText.h>
+#include <rsp/network/parser-helpers.h>
 #include <cctype>
 
 using namespace std::string_view_literals;

@@ -11,8 +11,8 @@
 #define RSP_CORE_LIB_INCLUDE_SECURITY_MBEDTLS_TLS_SOCKET_H
 
 #include "exceptions.h"
-#include <logging/LogChannel.h>
-#include <security/ITLSSocket.h>
+#include <rsp/logging/LogChannel.h>
+#include <rsp/security/ITLSSocket.h>
 #include <span>
 
 #ifdef __GNUC__

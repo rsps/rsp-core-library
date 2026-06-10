@@ -9,7 +9,7 @@
  */
 
 #include <memory>
-#include <logging/ConsoleLogWriter.h>
+#include <rsp/logging/ConsoleLogWriter.h>
 #include "TestLogger.h"
 
 

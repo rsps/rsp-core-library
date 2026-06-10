@@ -11,8 +11,8 @@
 #include "doctest.h"
 #include <string>
 #include <sstream>
-#include <utils/StrUtils.h>
-#include <utils/InsertOrderedMap.h>
+#include <rsp/utils/StrUtils.h>
+#include <rsp/utils/InsertOrderedMap.h>
 
 using namespace rsp::utils;
 

@@ -14,10 +14,10 @@
 #include <openssl/evp.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
-#include <security/CryptBase.h>
-#include <security/SecureBuffer.h>
-#include <security/Sha.h>
-#include <utils/DataContainer.h>
+#include <rsp/security/CryptBase.h>
+#include <rsp/security/SecureBuffer.h>
+#include <rsp/security/Sha.h>
+#include <rsp/utils/DataContainer.h>
 
 namespace rsp::security {
 

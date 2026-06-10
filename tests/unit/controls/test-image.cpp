@@ -9,10 +9,10 @@
  */
 
 #include <doctest.h>
-#include <graphics/Image.h>
-#include <graphics/Renderer.h>
-#include <posix/FileSystem.h>
-#include <utils/Random.h>
+#include <rsp/graphics/Image.h>
+#include <rsp/graphics/Renderer.h>
+#include <rsp/posix/FileSystem.h>
+#include <rsp/utils/Random.h>
 #include <TestHelpers.h>
 #include <pixmap/GfxResources.h>
 #ifdef USE_GFX_SW

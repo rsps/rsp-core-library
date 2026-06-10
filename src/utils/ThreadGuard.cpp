@@ -7,7 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <utils/ThreadGuard.h>
+#include <rsp/utils/ThreadGuard.h>
 
 namespace rsp::utils {
 

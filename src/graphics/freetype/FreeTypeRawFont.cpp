@@ -11,7 +11,7 @@
 #ifdef USE_FREETYPE
 
 #include "FreeTypeRawFont.h"
-#include <graphics/Font.h>
+#include <rsp/graphics/Font.h>
 
 #include <freetype2/ft2build.h>
 #include FT_FREETYPE_H

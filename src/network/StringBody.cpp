@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 #include <cstring>
-#include <network/StringBody.h>
+#include <rsp/network/StringBody.h>
 
 namespace rsp::network {
 

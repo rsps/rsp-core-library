@@ -9,7 +9,7 @@
  */
 
 #include "doctest.h"
-#include <utils/Average.h>
+#include <rsp/utils/Average.h>
 
 TEST_SUITE_BEGIN("Utils");
 

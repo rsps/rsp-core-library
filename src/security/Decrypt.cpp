@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <security/Decrypt.h>
+#include <rsp/security/Decrypt.h>
 
 namespace rsp::security {
 

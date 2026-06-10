@@ -8,8 +8,8 @@
 * \author      steffen
 */
 #include "SocketConnection.h"
-#include <network/NetworkException.h>
-#include <network/UrlParser.h>
+#include <rsp/network/NetworkException.h>
+#include <rsp/network/UrlParser.h>
 
 namespace rsp::network::ehttp {
 

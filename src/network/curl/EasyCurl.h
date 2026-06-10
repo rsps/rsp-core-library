@@ -14,7 +14,7 @@
 #include <string>
 #include "CurlLibrary.h"
 #include "Exceptions.h"
-#include <logging/LogChannel.h>
+#include <rsp/logging/LogChannel.h>
 
 namespace rsp::network::curl {
 

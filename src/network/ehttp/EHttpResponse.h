@@ -11,7 +11,7 @@
 #define RSP_CORE_LIB_SRC_NETWORK_EHTTP_E_HTTP_RESPONSE_H
 
 #include <map>
-#include <network/HttpResponse.h>
+#include <rsp/network/HttpResponse.h>
 
 namespace rsp::network::ehttp {
 

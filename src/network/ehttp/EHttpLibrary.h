@@ -10,7 +10,7 @@
 #ifndef RSP_CORE_LIB_SRC_NETWORK_EHTTP_E_HTTP_LIBRARY_H
 #define RSP_CORE_LIB_SRC_NETWORK_EHTTP_E_HTTP_LIBRARY_H
 
-#include <network/NetworkLibrary.h>
+#include <rsp/network/NetworkLibrary.h>
 
 namespace rsp::network::ehttp {
 

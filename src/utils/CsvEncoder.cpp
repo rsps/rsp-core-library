@@ -7,9 +7,9 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
-#include <exceptions/CoreException.h>
-#include <utils/CsvEncoder.h>
-#include <utils/InRange.h>
+#include <rsp/exceptions/CoreException.h>
+#include <rsp/utils/CsvEncoder.h>
+#include <rsp/utils/InRange.h>
 
 namespace rsp::utils {
 

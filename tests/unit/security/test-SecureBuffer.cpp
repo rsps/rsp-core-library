@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 #include <doctest.h>
-#include <security/SecureBuffer.h>
-#include <security/SecureString.h>
+#include <rsp/security/SecureBuffer.h>
+#include <rsp/security/SecureString.h>
 
 using namespace rsp::security;
 

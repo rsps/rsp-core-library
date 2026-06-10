@@ -9,7 +9,7 @@
  */
 
 #include <doctest.h>
-#include <graphics/Color.h>
+#include <rsp/graphics/Color.h>
 #include <TestHelpers.h>
 
 using namespace rsp::graphics;

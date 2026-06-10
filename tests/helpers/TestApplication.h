@@ -9,8 +9,8 @@
  */
 
 #include <functional>
-#include <logging/Logger.h>
-#include <application/ApplicationBase.h>
+#include <rsp/logging/Logger.h>
+#include <rsp/application/ApplicationBase.h>
 
 #ifndef TESTS_TEST_APPLICATION_H_
 #define TESTS_TEST_APPLICATION_H_

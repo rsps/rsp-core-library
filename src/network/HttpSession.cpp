@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#include <network/HttpSession.h>
+#include <rsp/network/HttpSession.h>
 
 namespace rsp::network {
 

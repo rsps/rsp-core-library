@@ -8,12 +8,12 @@
  * \author      Steffen Brummer
  */
 
-#include <application/ApplicationBase.h>
-#include <application/Console.h>
-#include <logging/ConsoleLogWriter.h>
-#include <logging/FileLogWriter.h>
-#include <logging/SysLogWriter.h>
-#include <version.h>
+#include <rsp/application/ApplicationBase.h>
+#include <rsp/application/Console.h>
+#include <rsp/logging/ConsoleLogWriter.h>
+#include <rsp/logging/FileLogWriter.h>
+#include <rsp/logging/SysLogWriter.h>
+#include <rsp/version.h>
 
 using namespace rsp::exceptions;
 using namespace rsp::logging;

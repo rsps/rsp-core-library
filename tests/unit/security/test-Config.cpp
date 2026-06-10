@@ -9,9 +9,9 @@
  */
 
 #include <doctest.h>
-#include <utils/FixedString.h>
-#include <json/Json.h>
-#include <security/Config.h>
+#include <rsp/utils/FixedString.h>
+#include <rsp/json/Json.h>
+#include <rsp/security/Config.h>
 #include <TestHelpers.h>
 
 using namespace rsp::utils;

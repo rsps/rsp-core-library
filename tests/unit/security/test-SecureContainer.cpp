@@ -8,10 +8,10 @@
  * \author      Steffen Brummer
  */
 #include <doctest.h>
-#include <security/CryptBase.h>
-#include <security/SecureContainer.h>
-#include <utils/DataContainer.h>
-#include <utils/FixedString.h>
+#include <rsp/security/CryptBase.h>
+#include <rsp/security/SecureContainer.h>
+#include <rsp/utils/DataContainer.h>
+#include <rsp/utils/FixedString.h>
 #include <TestHelpers.h>
 
 using namespace rsp::utils;

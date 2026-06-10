@@ -9,7 +9,7 @@
  */
 
 #include <doctest.h>
-#include <posix/FileSystem.h>
+#include <rsp/posix/FileSystem.h>
 #include <graphics/SW/GfxHal.h>
 #include <GuiHelper.h>
 #include <Overlay.h>
@@ -18,7 +18,7 @@
 #include <TestTouchParser.h>
 #include <TestPixmap.h>
 #include <TestEngine.h>
-#include <utils/Timer.h>
+#include <rsp/utils/Timer.h>
 
 using namespace rsp::graphics;
 using namespace rsp::utils;

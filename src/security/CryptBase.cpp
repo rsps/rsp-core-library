@@ -8,8 +8,8 @@
  * \author      Steffen Brummer
  */
 
-#include <security/CryptBase.h>
-#include <security/Sha.h>
+#include <rsp/security/CryptBase.h>
+#include <rsp/security/Sha.h>
 
 namespace rsp::security {
 

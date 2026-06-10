@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 #include <doctest.h>
-#include <utils/FifoBuffer.h>
+#include <rsp/utils/FifoBuffer.h>
 
 using namespace rsp::utils;
 

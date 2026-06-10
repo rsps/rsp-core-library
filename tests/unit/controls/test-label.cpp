@@ -9,9 +9,9 @@
  */
 
 #include <doctest.h>
-#include <graphics/Label.h>
-#include <graphics/Renderer.h>
-#include <posix/FileSystem.h>
+#include <rsp/graphics/Label.h>
+#include <rsp/graphics/Renderer.h>
+#include <rsp/posix/FileSystem.h>
 #include <TestHelpers.h>
 
 using namespace rsp::graphics;

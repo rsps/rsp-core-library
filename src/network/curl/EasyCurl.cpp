@@ -9,7 +9,7 @@
  */
 
 #include "EasyCurl.h"
-#include <logging/Logger.h>
+#include <rsp/logging/Logger.h>
 
 namespace rsp::network::curl {
 

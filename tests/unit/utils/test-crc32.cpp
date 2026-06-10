@@ -9,7 +9,7 @@
  */
 
 #include "doctest.h"
-#include <utils/Crc32.h>
+#include <rsp/utils/Crc32.h>
 
 TEST_SUITE_BEGIN("Utils");
 

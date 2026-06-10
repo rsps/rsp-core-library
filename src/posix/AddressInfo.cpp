@@ -9,8 +9,8 @@
  */
 
 #include <netdb.h>
-#include "posix/AddressInfo.h"
-#include <posix/Socket.h>
+#include <rsp/posix/AddressInfo.h>
+#include <rsp/posix/Socket.h>
 
 namespace rsp::posix {
 
