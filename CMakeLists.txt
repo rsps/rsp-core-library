@@ -1,13 +1,15 @@
-cmake_minimum_required(VERSION 3.23...3.30)
+cmake_minimum_required(VERSION 3.23...4.33)
 
-# Get CMake-friendly version from Git tag
-include("cmake/git.cmake")
-git_get_version(OUTPUT RSP_CORE_LIB_VERSION WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+include("cmake/parse-version-file.cmake")
+parse_version_file(
+    FILE "${CMAKE_CURRENT_LIST_DIR}/VERSION"
+    PREFIX RSP_CORE_LIB
+)
 
 project(rsp-core-lib
     DESCRIPTION "Open-source library for medical device software."
     HOMEPAGE_URL "https://github.com/rsps/rsp-core-library"
-    VERSION ${RSP_CORE_LIB_VERSION}
+    VERSION ${RSP_CORE_LIB_VERSION_MAJOR}.${RSP_CORE_LIB_VERSION_MINOR}.${RSP_CORE_LIB_VERSION_PATCH}
 )
 
 option(GFX "Include graphic components." ON)
