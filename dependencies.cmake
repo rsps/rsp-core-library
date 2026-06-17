@@ -20,59 +20,59 @@ function(rsp_core_add_dependencies ATARGET)
         # For std::stacktrace: link against libstdc++exp for GCC/libstdc++ 14 or greater,
         # or libstdc++_libbacktrace for 12-13.
         if(_GLIBCXX_RELEASE GREATER_EQUAL 14)
-            target_link_libraries(${ATARGET} PUBLIC stdc++exp)
+            target_link_libraries(${ATARGET} PRIVATE stdc++exp)
         elseif(_GLIBCXX_RELEASE GREATER_EQUAL 12)
-            target_link_libraries(${ATARGET} PUBLIC stdc++_libbacktrace)
+            target_link_libraries(${ATARGET} PRIVATE stdc++_libbacktrace)
         endif()
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
 
     if(RSP_CORE_LIB_USE_GFX)
-        target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_GFX)
+        target_compile_definitions(${ATARGET} PRIVATE RSP_CORE_LIB_USE_GFX)
 
         if(RSP_CORE_LIB_USE_GFX_SDL2)
             find_package(SDL2 REQUIRED)
-            target_link_libraries(${ATARGET} PUBLIC SDL2::SDL2)
-            target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_GFX_SDL2)
+            target_link_libraries(${ATARGET} PRIVATE SDL2::SDL2)
+            target_compile_definitions(${ATARGET} PRIVATE RSP_CORE_LIB_USE_GFX_SDL2)
         else()
             set(RSP_CORE_LIB_USE_GFX_SW ON)
-            target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_GFX_SW)
+            target_compile_definitions(${ATARGET} PRIVATE RSP_CORE_LIB_USE_GFX_SW)
         endif()
 
         if(RSP_CORE_LIB_USE_FREETYPE)
             find_package(Freetype REQUIRED)
-            target_link_libraries(${ATARGET} PUBLIC Freetype::Freetype)
-            target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_FREETYPE FT_CONFIG_OPTION_ERROR_STRINGS)
+            target_link_libraries(${ATARGET} PRIVATE Freetype::Freetype)
+            target_compile_definitions(${ATARGET} PRIVATE RSP_CORE_LIB_USE_FREETYPE FT_CONFIG_OPTION_ERROR_STRINGS)
         endif()
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
 
     if(RSP_CORE_LIB_USE_SYSLOG)
-        target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_SYSLOG)
+        target_compile_definitions(${ATARGET} PRIVATE RSP_CORE_LIB_USE_SYSLOG)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
 
     if(RSP_CORE_LIB_USE_LIBCURL)
         find_package(CURL 7.33 REQUIRED)
-        target_link_libraries(${ATARGET} PUBLIC CURL::libcurl)
+        target_link_libraries(${ATARGET} PRIVATE CURL::libcurl)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
 
     if(RSP_CORE_LIB_USE_WPA_SUPPLICANT)
         find_package(wpa_supplicant REQUIRED)
-        target_link_libraries(${ATARGET} PUBLIC wpa_supplicant::wpa_supplicant)
+        target_link_libraries(${ATARGET} PRIVATE wpa_supplicant::wpa_supplicant)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
 
     if(RSP_CORE_LIB_USE_OPENSSL)
         find_package(OpenSSL REQUIRED)
-        target_link_libraries(${ATARGET} PUBLIC OpenSSL::SSL OpenSSL::Crypto)
-        target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_OPENSSL)
+        target_link_libraries(${ATARGET} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+        target_compile_definitions(${ATARGET} PRIVATE RSP_CORE_LIB_USE_OPENSSL)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
@@ -93,18 +93,18 @@ function(rsp_core_add_dependencies ATARGET)
             set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)  # Disable building Mbed-TLS's own tests
             set(ENABLE_PROGRAMS OFF CACHE BOOL "" FORCE)
             FetchContent_MakeAvailable(mbedtls)
-            target_link_libraries(${ATARGET} PUBLIC MbedTLS::mbedtls MbedTLS::mbedcrypto MbedTLS::mbedx509)
+            target_link_libraries(${ATARGET} PRIVATE MbedTLS::mbedtls MbedTLS::mbedcrypto MbedTLS::mbedx509)
         endif()
 
-        target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_MBEDTLS)
+        target_compile_definitions(${ATARGET} PRIVATE RSP_CORE_LIB_USE_MBEDTLS)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
 
     if(RSP_CORE_LIB_USE_ZLIB)
         find_package(ZLIB REQUIRED)
-        target_link_libraries(${ATARGET} PUBLIC ZLIB::ZLIB)
-        target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_ZLIB)
+        target_link_libraries(${ATARGET} PRIVATE ZLIB::ZLIB)
+        target_compile_definitions(${ATARGET} PRIVATE RSP_CORE_LIB_USE_ZLIB)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ function(rsp_core_add_dependencies ATARGET)
         set(THREADS_PREFER_PTHREAD_FLAG TRUE)
         find_package(Threads REQUIRED)
         target_link_libraries(${ATARGET} PUBLIC Threads::Threads)
-        target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_STD_THREAD)
+        target_compile_definitions(${ATARGET} PRIVATE RSP_CORE_LIB_USE_STD_THREAD)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
