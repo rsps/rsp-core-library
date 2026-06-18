@@ -8,6 +8,7 @@
  * \author      Simon Glashoff
  */
 
+#include <rsp/config.h>
 #include <rsp/graphics/Font.h>
 #include <rsp/graphics/Scene.h>
 #include <rsp/utils/Random.h>

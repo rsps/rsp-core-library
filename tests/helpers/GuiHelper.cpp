@@ -9,6 +9,7 @@
  */
 
 #include <doctest.h>
+#include <rsp/config.h>
 #include <rsp/graphics/Renderer.h>
 #include <rsp/posix/FileSystem.h>
 #include <scenes/Scenes.h>

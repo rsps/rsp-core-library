@@ -10,6 +10,7 @@
 
 #include <doctest.h>
 #include <string>
+#include <rsp/config.h>
 #include <rsp/security/Sha.h>
 #include <rsp/security/SecureString.h>
 #include <rsp/utils/SemVer.h>

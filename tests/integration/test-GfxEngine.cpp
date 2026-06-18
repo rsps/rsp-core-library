@@ -9,6 +9,7 @@
  */
 
 #include <doctest.h>
+#include <rsp/config.h>
 #include <rsp/posix/FileSystem.h>
 #include <graphics/SW/GfxHal.h>
 #include <GuiHelper.h>

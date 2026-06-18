@@ -8,6 +8,7 @@
  * \author      Simon Glashoff
  */
 
+#include <rsp/config.h>
 #ifndef RSP_CORE_LIB_USE_GFX_SDL2
 
 #include <doctest.h>

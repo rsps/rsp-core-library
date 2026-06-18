@@ -8,6 +8,7 @@
  * \author      Steffen Brummer
  */
 
+#include <rsp/config.h>
 #ifdef RSP_CORE_LIB_USE_GFX_SW
 
 #include <doctest.h>
