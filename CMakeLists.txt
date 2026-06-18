@@ -41,7 +41,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_ENABLE_EXPORTS TRUE)
 
 # Core library target
-add_library(${PROJECT_NAME} STATIC)
+add_library(${PROJECT_NAME})
 
 # Dependencies
 include("dependencies.cmake")
