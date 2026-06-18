@@ -31,7 +31,7 @@ public:
     OpenSSLHMac(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
         : mpCtx(HMAC_CTX_new())
     {
-        const EVP_MD *algo;
+        const EVP_MD* algo;
         switch (aAlgorithm) {
             case HashAlgorithms::Sha1:
                 algo = EVP_sha1();
@@ -58,7 +58,7 @@ public:
     OpenSSLHMac(const OpenSSLHMac&) = delete;
     OpenSSLHMac& operator=(const OpenSSLHMac&) = delete;
 
-    void Update(const uint8_t *apBuffer, std::size_t aSize) override
+    void Update(const uint8_t* apBuffer, std::size_t aSize) override
     {
         HMAC_Update(mpCtx, apBuffer, aSize);
     }
@@ -76,7 +76,7 @@ public:
     }
 
 protected:
-    HMAC_CTX *mpCtx;
+    HMAC_CTX* mpCtx;
 };
 
 #else // OPENSSL_VERSION_NUMBER < 0x30000000L
@@ -85,8 +85,8 @@ class OpenSSLHMac : public DigestImpl
 {
 public:
     OpenSSLHMac(const SecureBuffer& arSecret, HashAlgorithms aAlgorithm)
-        : mpMac(EVP_MAC_fetch(nullptr, "HMAC", nullptr)),
-          mpCtx(EVP_MAC_CTX_new(mpMac))
+        : mpMac(EVP_MAC_fetch(nullptr, "HMAC", nullptr))
+        , mpCtx(EVP_MAC_CTX_new(mpMac))
     {
         std::string algo;
         switch (aAlgorithm) {
@@ -119,7 +119,7 @@ public:
     OpenSSLHMac(const OpenSSLHMac&) = delete;
     OpenSSLHMac& operator=(const OpenSSLHMac&) = delete;
 
-    void Update(const uint8_t *apBuffer, std::size_t aSize) override
+    void Update(const uint8_t* apBuffer, std::size_t aSize) override
     {
         EVP_MAC_update(mpCtx, apBuffer, aSize);
     }
@@ -137,9 +137,9 @@ public:
         return result;
     }
 
-    [[nodiscard]] std::string GetLibraryVersion() const override
+    [[nodiscard]] utils::Version GetLibraryVersion() const override
     {
-        return OPENSSL_FULL_VERSION_STR;
+        return utils::Version{OPENSSL_FULL_VERSION_STR};
     }
 
     [[nodiscard]] std::string GetLibraryName() const override
@@ -148,13 +148,13 @@ public:
     }
 
 protected:
-    EVP_MAC * mpMac;
-    EVP_MAC_CTX *mpCtx;
+    EVP_MAC* mpMac;
+    EVP_MAC_CTX* mpCtx;
 };
 
 #endif
 
-class OpenSSLSha: public DigestImpl
+class OpenSSLSha : public DigestImpl
 {
 public:
     explicit OpenSSLSha(HashAlgorithms aAlgorithm)
@@ -178,10 +178,10 @@ public:
         }
 
         EVP_DigestInit_ex(mpMdctx, md, nullptr);
-//        EVP_DigestInit_ex2(mpMdctx, md, nullptr);
+        // EVP_DigestInit_ex2(mpMdctx, md, nullptr);
     }
 
-    void Update(const uint8_t *apBuffer, std::size_t aSize) override
+    void Update(const uint8_t* apBuffer, std::size_t aSize) override
     {
         EVP_DigestUpdate(mpMdctx, apBuffer, aSize);
     }
@@ -198,9 +198,9 @@ public:
         return result;
     }
 
-    [[nodiscard]] std::string GetLibraryVersion() const override
+    [[nodiscard]] utils::Version GetLibraryVersion() const override
     {
-        return OPENSSL_FULL_VERSION_STR;
+        return utils::Version{OPENSSL_FULL_VERSION_STR};
     }
 
     [[nodiscard]] std::string GetLibraryName() const override
