@@ -10,7 +10,7 @@
 
 #include <rsp/messaging/EventBroker.h>
 #include <rsp/logging/Logger.h>
-#ifdef USE_GFX
+#ifdef RSP_CORE_LIB_USE_GFX
     #include <rsp/graphics/Control.h>
 #endif
 
@@ -36,7 +36,7 @@ size_t EventBroker::ProcessEvents()
     }
     for (auto &event : q) {
         for (SubscriberInterface* &sub : mSubscribers) {
-#ifdef USE_GFX
+#ifdef RSP_CORE_LIB_USE_GFX
             auto *ctrl = dynamic_cast<rsp::graphics::Control*>(sub);
             mLogger.Debug() << "Propagating " << *event << " to " << (ctrl ? ctrl->GetName() : "Unknown");
 #endif

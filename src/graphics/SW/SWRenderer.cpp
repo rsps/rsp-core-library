@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
 
 #include <rsp/posix/FileSystem.h>
 #include "SWRenderer.h"
@@ -169,4 +169,4 @@ Color SWRenderer::GetPixel(GuiUnit_t aX, GuiUnit_t aY) const
 
 } /* namespace rsp::graphics::sw */
 
-#endif /* USE_GFX_SW */
+#endif /* RSP_CORE_LIB_USE_GFX_SW */

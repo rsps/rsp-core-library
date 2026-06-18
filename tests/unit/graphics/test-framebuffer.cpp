@@ -22,7 +22,7 @@
 #include <TestHelpers.h>
 #include <rsp/utils/Random.h>
 #include <magic_enum/magic_enum.hpp>
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
     #include <rsp/posix/FileSystem.h>
 #endif
 
@@ -52,7 +52,7 @@ TEST_CASE("Framebuffer")
 
     Random::Seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
 
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName(
         "vfb2", std::filesystem::path{"/dev/fb?"});
     Renderer::SetDevicePath(p.string());

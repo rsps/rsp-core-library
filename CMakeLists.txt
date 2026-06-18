@@ -12,18 +12,18 @@ project(rsp-core-lib
     VERSION ${RSP_CORE_LIB_VERSION_MAJOR}.${RSP_CORE_LIB_VERSION_MINOR}.${RSP_CORE_LIB_VERSION_PATCH}
 )
 
-option(GFX "Include graphic components." ON)
-option(SDL2 "Use SDL2 for graphic acceleration." ON)
-option(FREETYPE_FONTS "Build fonts driver for the FreeType engine." ON)
-option(OPENSSL_CRYPTO "Build with OpenSSL encryption engine." ON)
-option(MBEDTLS_CRYPTO "Build with Mbed TLS encryption engine." OFF)
-option(NET_LIBCURL "Build with LibCurl network library." ON)
-option(NET_EMBED_HTTP "Build with Embed HTTP network library." OFF)
-option(BUILD_TESTING "Set to build test binaries" ${PROJECT_IS_TOP_LEVEL}) # Enabled by default if this is the top-level project.
-option(ZLIB "Build with ZLib Inflate/Deflate compression." OFF)
-option(NET_WPA_SUPPLICANT "Build with libwpa-client wpa_supplicant library." ON)
-option(STD_THREAD "Thread architecture to use." ON) # C++ std::thread
-option(SYSLOG "Include syslog interface" ON)
+option(RSP_CORE_LIB_USE_GFX            "Include graphic components."                      ON)
+option(RSP_CORE_LIB_USE_GFX_SDL2       "Use SDL2 for graphic acceleration."               ON)
+option(RSP_CORE_LIB_USE_FREETYPE       "Build fonts driver for the FreeType engine."      ON)
+option(RSP_CORE_LIB_USE_OPENSSL        "Build with OpenSSL encryption engine."            ON)
+option(RSP_CORE_LIB_USE_MBEDTLS        "Build with Mbed TLS encryption engine."           OFF)
+option(RSP_CORE_LIB_USE_LIBCURL        "Build with LibCurl network library."              ON)
+option(RSP_CORE_LIB_USE_EMBED_HTTP     "Build with Embed HTTP network library."           OFF)
+option(RSP_CORE_LIB_USE_WPA_SUPPLICANT "Build with libwpa-client wpa_supplicant library." ON)
+option(RSP_CORE_LIB_USE_ZLIB           "Build with ZLib Inflate/Deflate compression."     OFF)
+option(RSP_CORE_LIB_USE_STD_THREAD     "Thread architecture to use."                      ON)
+option(RSP_CORE_LIB_USE_SYSLOG         "Include syslog interface"                         ON)
+option(RSP_CORE_LIB_BUILD_TESTS        "Set to build test binaries"                       ${PROJECT_IS_TOP_LEVEL})
 
 # Append this project's local module paths.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -64,7 +64,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 endif()
 
 # Macro definitions per build configuration
-target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:DEBUG_LOG>")
+target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:RSP_CORE_LIB_DEBUG_LOG>")
 
 if(EHTTP_REQUEST_BUFFER_SIZE)
     message(STATUS "Compiling eHttp with request buffer size: ${EHTTP_REQUEST_BUFFER_SIZE}")
@@ -75,7 +75,7 @@ endif()
 add_subdirectory(src)
 
 # Tests
-if(BUILD_TESTING)
+if(RSP_CORE_LIB_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()

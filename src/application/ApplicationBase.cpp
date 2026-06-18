@@ -117,7 +117,7 @@ void ApplicationBase::installLogWriters()
 
     std::string s;
     if (mCmd.GetOptionValue("--log=", s)) {
-#ifdef SYSLOG
+#ifdef RSP_CORE_LIB_USE_SYSLOG
         if (s == "syslog") {
             mLogWriter = mLogger.MakeLogWriter<SysLogWriter>(GetAppName(), level, LogFacility::User);
         }

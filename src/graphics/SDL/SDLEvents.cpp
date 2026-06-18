@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#ifdef USE_GFX_SDL
+#ifdef RSP_CORE_LIB_USE_GFX_SDL2
 
 #include "SDLEvents.h"
 #include "SDLException.h"
@@ -95,4 +95,4 @@ void SDLEvents::Flush()
 
 } /* namespace rsp::graphics::sdl */
 
-#endif /* USE_GFX_SDL */
+#endif /* RSP_CORE_LIB_USE_GFX_SDL2 */

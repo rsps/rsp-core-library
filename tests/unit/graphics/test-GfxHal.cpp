@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
 
 #include <doctest.h>
 #include <graphics/SW/GfxHal.h>
@@ -227,4 +227,4 @@ TEST_CASE("GfxHal")
 
 TEST_SUITE_END();
 
-#endif /* USE_GFX_SW */
+#endif /* RSP_CORE_LIB_USE_GFX_SW */

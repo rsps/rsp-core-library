@@ -11,7 +11,7 @@
 #ifndef RSP_CORE_LIB_SRC_GRAPHICS_SDL_SDL_EVENTS_H
 #define RSP_CORE_LIB_SRC_GRAPHICS_SDL_SDL_EVENTS_H
 
-#ifdef USE_GFX_SDL
+#ifdef RSP_CORE_LIB_USE_GFX_SDL2
 
 #include <SDL2/SDL.h>
 #include <rsp/graphics/GfxInputEvents.h>
@@ -37,5 +37,5 @@ protected:
 
 } /* namespace rsp::graphics::sdl */
 
-#endif /* USE_GFX_SDL */
+#endif /* RSP_CORE_LIB_USE_GFX_SDL2 */
 #endif // RSP_CORE_LIB_SRC_GRAPHICS_SDL_SDL_EVENTS_H

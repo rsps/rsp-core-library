@@ -28,28 +28,29 @@ function(rsp_core_add_dependencies ATARGET)
 
     # --------------------------------------------------------------------------------------------------------------
 
-    if(GFX)
-        target_compile_options(${ATARGET} PUBLIC -DUSE_GFX)
+    if(RSP_CORE_LIB_USE_GFX)
+        target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_GFX)
 
-        if(SDL2)
+        if(RSP_CORE_LIB_USE_GFX_SDL2)
             find_package(SDL2 REQUIRED)
             target_link_libraries(${ATARGET} PUBLIC SDL2::SDL2)
-            target_compile_options(${ATARGET} PUBLIC -DUSE_GFX_SDL)
+            target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_GFX_SDL2)
         else()
-            target_compile_options(${ATARGET} PUBLIC -DUSE_GFX_SW)
+            set(RSP_CORE_LIB_USE_GFX_SW ON)
+            target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_GFX_SW)
         endif()
 
-        if(FREETYPE_FONTS)
+        if(RSP_CORE_LIB_USE_FREETYPE)
             find_package(Freetype REQUIRED)
             target_link_libraries(${ATARGET} PUBLIC Freetype::Freetype)
-            target_compile_options(${ATARGET} PUBLIC -DUSE_FREETYPE -DFT_CONFIG_OPTION_ERROR_STRINGS)
+            target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_FREETYPE FT_CONFIG_OPTION_ERROR_STRINGS)
         endif()
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
 
-    if(SYSLOG)
-        target_compile_options(${ATARGET} PUBLIC -DSYSLOG)
+    if(RSP_CORE_LIB_USE_SYSLOG)
+        target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_SYSLOG)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
@@ -65,32 +66,32 @@ function(rsp_core_add_dependencies ATARGET)
 
     # --------------------------------------------------------------------------------------------------------------
 
-    if(NET_LIBCURL)
+    if(RSP_CORE_LIB_USE_LIBCURL)
         find_package(CURL 7.33 REQUIRED)
         target_link_libraries(${ATARGET} PUBLIC CURL::libcurl)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
 
-    if(NET_WPA_SUPPLICANT)
+    if(RSP_CORE_LIB_USE_WPA_SUPPLICANT)
         find_package(wpa_supplicant REQUIRED)
         target_link_libraries(${ATARGET} PUBLIC wpa_supplicant::wpa_supplicant)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
 
-    if(OPENSSL_CRYPTO)
+    if(RSP_CORE_LIB_USE_OPENSSL)
         find_package(OpenSSL REQUIRED)
         target_link_libraries(${ATARGET} PUBLIC OpenSSL::SSL OpenSSL::Crypto)
-        target_compile_options(${ATARGET} PUBLIC -DUSE_OPENSSL)
+        target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_OPENSSL)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
 
-    if(MBEDTLS_CRYPTO)
+    if(RSP_CORE_LIB_USE_MBEDTLS)
         # Abort if OpenSSL option is enabled.
-        if(OPENSSL_CRYPTO)
-            message(FATAL_ERROR "Unable to build using MBed TLS, because `OPENSSL_CRYPTO` option is enabled.")
+        if(RSP_CORE_LIB_USE_OPENSSL)
+            message(FATAL_ERROR "Unable to build using MBed TLS, because `RSP_CORE_LIB_USE_OPENSSL` option is enabled.")
         endif()
 
         if(NOT ESP_PLATFORM)
@@ -106,25 +107,25 @@ function(rsp_core_add_dependencies ATARGET)
             target_link_libraries(${ATARGET} PUBLIC MbedTLS::mbedtls MbedTLS::mbedcrypto MbedTLS::mbedx509)
         endif()
 
-        target_compile_options(${ATARGET} PUBLIC -DUSE_MBEDTLS)
+        target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_MBEDTLS)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
 
-    if(ZLIB)
+    if(RSP_CORE_LIB_USE_ZLIB)
         find_package(ZLIB REQUIRED)
         target_link_libraries(${ATARGET} PUBLIC ZLIB::ZLIB)
-        target_compile_options(${ATARGET} PUBLIC -DUSE_ZLIB)
+        target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_ZLIB)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------
 
-    if(STD_THREAD)
+    if(RSP_CORE_LIB_USE_STD_THREAD)
         set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
         set(THREADS_PREFER_PTHREAD_FLAG TRUE)
         find_package(Threads REQUIRED)
         target_link_libraries(${ATARGET} PUBLIC Threads::Threads)
-        target_compile_options(${ATARGET} PUBLIC -DUSE_STD_THREAD)
+        target_compile_definitions(${ATARGET} PUBLIC RSP_CORE_LIB_USE_STD_THREAD)
     endif()
 
     # --------------------------------------------------------------------------------------------------------------

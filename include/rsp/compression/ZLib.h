@@ -11,7 +11,7 @@
 #ifndef RSP_CORE_LIB_COMPRESSION_Z_LIB_H
 #define RSP_CORE_LIB_COMPRESSION_Z_LIB_H
 
-#ifdef USE_ZLIB
+#ifdef RSP_CORE_LIB_USE_ZLIB
 
 #include <cstdint>
 #include <string>
@@ -54,6 +54,6 @@ protected:
 
 } /* namespace rsp::compression */
 
-#endif /* USE_ZLIB */
+#endif /* RSP_CORE_LIB_USE_ZLIB */
 
 #endif // RSP_CORE_LIB_COMPRESSION_Z_LIB_H

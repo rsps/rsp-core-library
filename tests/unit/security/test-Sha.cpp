@@ -30,12 +30,14 @@ TEST_CASE("SHA")
 
     SUBCASE("Library Version") {
         Sha sha(HashAlgorithms::Sha3);
-#ifdef USE_OPENSSL
+#ifdef RSP_CORE_LIB_USE_OPENSSL
         CHECK_EQ(sha.GetLibraryName(), std::string("openssl"));
         CHECK_GE(sha.GetLibraryVersion(), rsp::utils::Version{"3.0.13"});
-#elif defined(USE_MBEDTLS)
+#elif defined(RSP_CORE_LIB_USE_MBEDTLS)
         CHECK_EQ(sha.GetLibraryName(), std::string("MbedTLS"));
         CHECK_GE(sha.GetLibraryVersion(), rsp::utils::Version{"3.6.0"});
+#else
+#error "No encryption library defined"
 #endif
     }
 

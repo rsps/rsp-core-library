@@ -73,8 +73,8 @@ set_target_properties(${TEST_BINARY}
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 )
 
-# Set -DGFX_FPS=20 and -DDEBUG_LOG if debug build
-target_compile_definitions(${TEST_BINARY} PRIVATE "$<$<CONFIG:DEBUG>:GFX_FPS=20;DEBUG_LOG>")
+# Set -DGFX_FPS=20 and -DRSP_CORE_LIB_DEBUG_LOG if debug build
+target_compile_definitions(${TEST_BINARY} PRIVATE "$<$<CONFIG:DEBUG>:GFX_FPS=20;RSP_CORE_LIB_DEBUG_LOG>")
 
 # Test files...
 file(GLOB_RECURSE SRC_FILES *.cpp)

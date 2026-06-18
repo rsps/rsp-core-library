@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
 
 #include <cstring>
 #include <algorithm>
@@ -350,4 +350,4 @@ void SWGfxHal::SetPixel(VideoSurface &arSurface, GuiUnit_t aX, GuiUnit_t aY, uin
 
 } /* namespace rsp::graphics */
 
-#endif /* USE_GFX_SW */
+#endif /* RSP_CORE_LIB_USE_GFX_SW */
