@@ -1,0 +1,26 @@
+/*!
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2026 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ */
+
+#ifndef RSP_CORE_LIB_CONFIG_H
+#define RSP_CORE_LIB_CONFIG_H
+
+#cmakedefine RSP_CORE_LIB_USE_GFX
+#cmakedefine RSP_CORE_LIB_USE_GFX_SDL2
+#cmakedefine RSP_CORE_LIB_USE_GFX_SW
+#cmakedefine RSP_CORE_LIB_USE_FREETYPE
+#cmakedefine RSP_CORE_LIB_USE_OPENSSL
+#cmakedefine RSP_CORE_LIB_USE_MBEDTLS
+#cmakedefine RSP_CORE_LIB_USE_LIBCURL
+#cmakedefine RSP_CORE_LIB_USE_EMBED_HTTP
+#cmakedefine RSP_CORE_LIB_USE_WPA_SUPPLICANT
+#cmakedefine RSP_CORE_LIB_USE_ZLIB
+#cmakedefine RSP_CORE_LIB_USE_STD_THREAD
+#cmakedefine RSP_CORE_LIB_USE_SYSLOG
+
+#endif // RSP_CORE_LIB_CONFIG_H

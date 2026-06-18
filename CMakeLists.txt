@@ -47,13 +47,22 @@ add_library(${PROJECT_NAME} STATIC)
 include("dependencies.cmake")
 rsp_core_add_dependencies(${PROJECT_NAME})
 
+# Write version header
 include("cmake/generate-version-header.cmake")
 add_dependencies(${PROJECT_NAME} generate_version_header)
+
+# Write config header (to let consumers know which features the library was
+# built with)
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/rsp/config.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/include/rsp/config.h"
+)
 
 # Include directories
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>;${CMAKE_CURRENT_BINARY_DIR}/include
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
 
