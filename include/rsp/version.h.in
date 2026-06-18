@@ -7,16 +7,28 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
 #ifndef RSP_CORE_LIB_VERSION_H
 #define RSP_CORE_LIB_VERSION_H
 
 #include <rsp/utils/SemVer.h>
 
+#define RSP_CORE_LIB_VERSION_MAJOR @RSP_CORE_LIB_VERSION_MAJOR@
+#define RSP_CORE_LIB_VERSION_MINOR @RSP_CORE_LIB_VERSION_MINOR@
+#define RSP_CORE_LIB_VERSION_PATCH @RSP_CORE_LIB_VERSION_PATCH@
+#define RSP_CORE_LIB_VERSION_PRERELEASE "@RSP_CORE_LIB_VERSION_PRERELEASE@"
+#define RSP_CORE_LIB_VERSION_BUILD "@RSP_CORE_LIB_VERSION_BUILD@"
+
 namespace rsp {
 
 constexpr utils::Version get_library_version()
 {
-    return utils::Version{"@RSP_CORE_LIB_SEMVER@"};
+    return utils::Version{
+            RSP_CORE_LIB_VERSION_MAJOR,
+            RSP_CORE_LIB_VERSION_MINOR,
+            RSP_CORE_LIB_VERSION_PATCH,
+            RSP_CORE_LIB_VERSION_PRERELEASE,
+            RSP_CORE_LIB_VERSION_BUILD};
 }
 
 } // namespace rsp
