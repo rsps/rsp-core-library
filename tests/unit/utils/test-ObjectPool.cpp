@@ -45,7 +45,7 @@ TEST_CASE("ObjectPool")
         CHECK_EQ(pool.Available(), 0u);
         CHECK_EQ(e3.member, 0);
 
-        CHECK_THROWS_AS(pool.Get(), EObjectPoolException);
+        CHECK_THROWS_AS((void)pool.Get(), EObjectPoolException);
         CHECK_EQ(pool.Available(), 0u);
 
         CHECK_NOTHROW(pool.Put(e1));

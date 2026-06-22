@@ -56,12 +56,11 @@ public:
     ObjectPool& operator=(const ObjectPool& arOther) = default;
     ObjectPool& operator=(ObjectPool&& arOther) = default;
 
-
     /**
      * Get the next available element from the pool.
      * \return Reference to element
      */
-    T& Get()
+    [[nodiscard]] T& Get()
     {
         if (!mpAvailable) {
             THROW_WITH_BACKTRACE1(EObjectPoolException, "ObjectPool is exhausted.");
