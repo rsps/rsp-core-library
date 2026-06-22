@@ -12,9 +12,8 @@
 #define RSP_CORE_LIB_UTILS_OBJECT_POOL_H
 
 #include <rsp/exceptions/CoreException.h>
+#include <type_traits>
 #include <vector>
-#include <algorithm>
-#include <iostream>
 
 namespace rsp::utils {
 
@@ -33,6 +32,7 @@ public:
  * \tparam T Default constructible type
  */
 template <class T>
+    requires(std::is_default_constructible_v<T>)
 class ObjectPool
 {
 public:
