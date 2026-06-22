@@ -17,7 +17,7 @@
 #include <rsp/utils/HexStream.h>
 #include "TestHelpers.h"
 
-uint8_t TestHelpers::TamperWithFile(const std::string &arFileName, uint32_t aOffset, uint8_t aValue)
+uint8_t TestHelpers::TamperWithFile(const std::string& arFileName, uint32_t aOffset, uint8_t aValue)
 {
     uint8_t result;
     rsp::posix::FileIO f(arFileName, std::ios_base::in | std::ios_base::out);
@@ -28,19 +28,19 @@ uint8_t TestHelpers::TamperWithFile(const std::string &arFileName, uint32_t aOff
     return result;
 }
 
-void TestHelpers::ParseArguments(const char **apArgv)
+void TestHelpers::ParseArguments(const char** apArgv)
 {
-    for(; *apArgv; ++apArgv) {
-        if(strncmp(*apArgv, "-vvv", strlen("-vvv")) == 0) {
+    for (; *apArgv; ++apArgv) {
+        if (strncmp(*apArgv, "-vvv", strlen("-vvv")) == 0) {
             TestLogger::mLogLevel = rsp::logging::LogLevel::Debug;
         }
-        else if(strncmp(*apArgv, "-vv", strlen("-vv")) == 0) {
+        else if (strncmp(*apArgv, "-vv", strlen("-vv")) == 0) {
             TestLogger::mLogLevel = rsp::logging::LogLevel::Info;
         }
     }
 }
 
-std::string TestHelpers::ToHex(const std::string &arString)
+std::string TestHelpers::ToHex(const std::string& arString)
 {
     return rsp::utils::ToHex(arString);
 }
@@ -50,12 +50,12 @@ std::string TestHelpers::ToHex(uint32_t aValue)
     return rsp::utils::ToHex(aValue);
 }
 
-std::string TestHelpers::ToHex(const uint8_t *apData, uint32_t aSize, uint32_t aSizeOf)
+std::string TestHelpers::ToHex(const uint8_t* apData, uint32_t aSize, uint32_t aSizeOf)
 {
     return rsp::utils::ToHex(apData, aSize, aSizeOf);
 }
 
-bool TestHelpers::ValidateJson(const std::string &arJson)
+bool TestHelpers::ValidateJson(const std::string& arJson)
 {
     std::ofstream fout("/tmp/ValidateJson.json");
     fout << arJson;
@@ -71,7 +71,7 @@ bool TestHelpers::ValidateJson(const std::string &arJson)
     return (result == 0);
 }
 
-bool TestHelpers::ValidateJsonFile(const std::string &arJsonFile)
+bool TestHelpers::ValidateJsonFile(const std::string& arJsonFile)
 {
     int result = std::system((std::string("/usr/bin/jsonlint-php --quiet ") + arJsonFile).c_str());
 
@@ -90,4 +90,3 @@ int TestHelpers::StopWebServer()
 {
     return std::system("killall lighttpd -q");
 }
-
