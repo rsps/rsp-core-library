@@ -80,12 +80,16 @@ public:
      */
     void Put(T& arElement)
     {
-        if (!mpUsed) {
-            THROW_WITH_BACKTRACE1(EObjectPoolException, "Element does not belong to ObjectPool.");
+        Node* node = mpUsed;
+        while (node) {
+            if (&node->mElement == &arElement) {
+                detachFrom(mpUsed, node);
+                pushTo(mpAvailable, node);
+                return;
+            }
+            node = node->mpPrevious;
         }
-        auto node = reinterpret_cast<NodePtr_t>(&arElement);
-        detachFrom(mpUsed, node);
-        pushTo(mpAvailable, node);
+        THROW_WITH_BACKTRACE1(EObjectPoolException, "Element does not belong to ObjectPool.");
     }
 
     [[nodiscard]] size_t Available() const
