@@ -109,7 +109,7 @@ private:
         NodePtr_t mpPrevious = nullptr;
         NodePtr_t mpNext = nullptr;
 
-        Node() noexcept = default;
+        Node() = default;
         Node(const Node& arOther) = default;
         Node(Node&& arOther) = default;
         Node& operator=(const Node& arOther) = default;

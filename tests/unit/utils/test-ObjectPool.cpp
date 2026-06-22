@@ -21,7 +21,7 @@ struct MyType
 {
     int member;
 
-    MyType()
+    MyType() noexcept
         : member(counter++)
     {}
 };
