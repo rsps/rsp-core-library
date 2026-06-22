@@ -18,10 +18,10 @@
 
 namespace rsp::utils {
 
-class EObjectPoolException: public exceptions::CoreException
+class EObjectPoolException : public exceptions::CoreException
 {
 public:
-    explicit EObjectPoolException(const char *aMsg)
+    explicit EObjectPoolException(const char* aMsg)
         : CoreException(aMsg)
     {
     }
@@ -32,14 +32,14 @@ public:
  * Simple double linked list of nodes with given element type.
  * \tparam T Default constructible type
  */
-template<class T>
+template <class T>
 class ObjectPool
 {
 public:
     explicit ObjectPool(size_t aSize)
     {
         mPool.resize(aSize);
-        for (auto &v : mPool) {
+        for (auto& v : mPool) {
             if (!mpAvailable) {
                 mpAvailable = &v;
             }
@@ -51,10 +51,10 @@ public:
         }
     }
 
-    ObjectPool(const ObjectPool &arOther) = default;
-    ObjectPool(ObjectPool &&arOther) = default;
-    ObjectPool& operator=(const ObjectPool &arOther) = default;
-    ObjectPool& operator=(ObjectPool &&arOther) = default;
+    ObjectPool(const ObjectPool& arOther) = default;
+    ObjectPool(ObjectPool&& arOther) = default;
+    ObjectPool& operator=(const ObjectPool& arOther) = default;
+    ObjectPool& operator=(ObjectPool&& arOther) = default;
 
 
     /**
@@ -99,18 +99,20 @@ public:
 private:
     struct Node;
     using NodePtr_t = Node*;
-    struct Node {
+    struct Node
+    {
         T mElement{};
         NodePtr_t mpPrevious = nullptr;
         NodePtr_t mpNext = nullptr;
 
         Node() noexcept = default;
-        Node(const Node &arOther) = default;
-        Node(Node &&arOther) = default;
-        Node& operator=(const Node &arOther) = default;
-        Node& operator=(Node &&arOther) = default;
+        Node(const Node& arOther) = default;
+        Node(Node&& arOther) = default;
+        Node& operator=(const Node& arOther) = default;
+        Node& operator=(Node&& arOther) = default;
 
-        size_t GetIndex() {
+        size_t GetIndex()
+        {
             size_t result = 0;
             auto p = this;
             while (p->mpPrevious) {
@@ -130,7 +132,7 @@ private:
         if (arList == aNode) {
             arList = aNode->mpPrevious;
         }
-        if (!aNode->mpNext) { // Last in list
+        if (!aNode->mpNext) {        // Last in list
             if (aNode->mpPrevious) { // Not alone in list
                 aNode->mpPrevious->mpNext = aNode->mpNext;
             }

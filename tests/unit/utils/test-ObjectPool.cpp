@@ -7,6 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
 #include "doctest.h"
 #include <rsp/utils/ObjectPool.h>
 
@@ -16,9 +17,13 @@ TEST_SUITE_BEGIN("Utils");
 
 static int counter = 0;
 
-struct MyType {
+struct MyType
+{
     int member;
-    MyType() : member(counter++) {}
+
+    MyType()
+        : member(counter++)
+    {}
 };
 
 TEST_CASE("ObjectPool")
@@ -27,15 +32,15 @@ TEST_CASE("ObjectPool")
 
     CHECK_EQ(pool.Available(), 3u);
 
-    auto &e1 = pool.Get();
+    auto& e1 = pool.Get();
     CHECK_EQ(pool.Available(), 2u);
     CHECK_EQ(e1.member, 2);
 
-    auto &e2 = pool.Get();
+    auto& e2 = pool.Get();
     CHECK_EQ(pool.Available(), 1u);
     CHECK_EQ(e2.member, 1);
 
-    auto &e3 = pool.Get();
+    auto& e3 = pool.Get();
     CHECK_EQ(pool.Available(), 0u);
     CHECK_EQ(e3.member, 0);
 
@@ -54,7 +59,7 @@ TEST_CASE("ObjectPool")
     MyType local;
     CHECK_THROWS_AS(pool.Put(local), EObjectPoolException);
 
-    auto &e4 = pool.Get();
+    auto& e4 = pool.Get();
     CHECK_EQ(pool.Available(), 2u);
     CHECK_EQ(e4.member, 1);
 }
