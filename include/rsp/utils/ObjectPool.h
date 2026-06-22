@@ -114,7 +114,7 @@ private:
         Node& operator=(const Node& arOther) = default;
         Node& operator=(Node&& arOther) = default;
 
-        size_t GetIndex()
+        size_t GetIndex() const
         {
             size_t result = 0;
             auto p = this;
