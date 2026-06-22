@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
+#include <format>
 #include <string>
 #include <rsp/posix/FileIO.h>
 #include <rsp/posix/FileSystem.h>
@@ -80,9 +81,28 @@ bool TestHelpers::ValidateJsonFile(const std::string& arJsonFile)
 
 int TestHelpers::StartWebServer()
 {
+    // Find lighttpd executable
+    static constexpr std::string_view PATHS[] = {
+            "/usr/sbin/lighttpd", "/usr/bin/lighttpd",
+            "/usr/local/sbin/lighttpd", "/usr/local/bin/lighttpd"};
+
+    std::string_view exe = [] {
+        for (const auto& p : PATHS) {
+            if (std::filesystem::exists(p)) {
+                return p;
+            }
+        }
+        return std::string_view{};
+    }();
+
+    // Fall back to searching PATH
+    if (exe.empty()) {
+        exe = "lighttpd";
+    }
+
     [[maybe_unused]] int rc = std::system("killall lighttpd -q"); // Make sure it is not running
     std::string cwd = std::filesystem::current_path();
-    std::string command = cwd + "/_deps/lighttpd-build/build/lighttpd -f " + cwd + "/webserver/lighttpd.conf -m " + cwd + "/_deps/lighttpd-build/build";
+    std::string command = std::format("{} -f '{}/webserver/lighttpd.conf'", exe, cwd);
     return std::system(command.c_str());
 }
 

@@ -51,8 +51,7 @@ TEST_CASE("Network")
     opt.CertPath = "webserver/ssl/certs/SN1234.crt";
     opt.KeyPath = "webserver/ssl/private/SN1234.key";
 
-    // Run lighttpd directly from build directory, no need to install it.
-    CHECK_EQ(TestHelpers::StartWebServer(), 0);
+    REQUIRE_EQ(TestHelpers::StartWebServer(), 0);
     std::this_thread::sleep_for(50ms);
 
     SUBCASE("Library Version"){
