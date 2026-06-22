@@ -1,0 +1,32 @@
+POST http://127.0.0.1:8080/v1/chat/completions
+Content-Type: application/json
+
+{
+  "model": "Qwen2.5-Coder-14B-Instruct",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Please tell me what time it is in Denmark?"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_current_time",
+        "description": "Get the current time for a timezone",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "timezone": {
+              "type": "string",
+              "description": "The timezone, e.g. Europe/Copenhagen"
+            }
+          },
+          "required": ["timezone"]
+        }
+      }
+    }
+  ],
+  "tool_choice": "auto"
+}

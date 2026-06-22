@@ -1,0 +1,15 @@
+POST https://redmine.rspamw.dk/ai/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 6,
+  "method": "tools/call",
+  "params": {
+    "name": "get_redmine_issue",
+    "arguments": {
+      "issue_id": 8726
+    }
+  }
+}
