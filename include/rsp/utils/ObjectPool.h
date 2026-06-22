@@ -51,9 +51,10 @@ public:
         }
     }
 
-    ObjectPool(const ObjectPool& arOther) = default;
+    ObjectPool(const ObjectPool&) = delete;
+    ObjectPool& operator=(const ObjectPool&) = delete;
+
     ObjectPool(ObjectPool&& arOther) = default;
-    ObjectPool& operator=(const ObjectPool& arOther) = default;
     ObjectPool& operator=(ObjectPool&& arOther) = default;
 
     /**
