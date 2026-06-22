@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.25...4.33)
+
 include_guard(GLOBAL)
 
 if(NOT COMMAND "parse_version_file")

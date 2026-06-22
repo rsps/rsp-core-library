@@ -86,11 +86,3 @@ target_sources(${TEST_BINARY}
 if(NOT CMAKE_CROSSCOMPILING)
     doctest_discover_tests(${TEST_BINARY} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 endif()
-
-# -------------------------------------------------------------------------------------------------------------- #
-# Install / Export
-# -------------------------------------------------------------------------------------------------------------- #
-install(
-    TARGETS ${TEST_BINARY}
-    DESTINATION tgm/
-)
