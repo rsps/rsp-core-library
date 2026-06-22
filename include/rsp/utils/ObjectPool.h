@@ -12,6 +12,7 @@
 #define RSP_CORE_LIB_UTILS_OBJECT_POOL_H
 
 #include <rsp/exceptions/CoreException.h>
+#include <mutex>
 #include <type_traits>
 #include <vector>
 
@@ -63,6 +64,8 @@ public:
      */
     [[nodiscard]] T& Get()
     {
+        std::lock_guard lock{mMutex};
+
         if (!mpAvailable) {
             THROW_WITH_BACKTRACE1(EObjectPoolException, "ObjectPool is exhausted.");
         }
@@ -80,6 +83,7 @@ public:
      */
     void Put(T& arElement)
     {
+        std::lock_guard lock{mMutex};
         Node* node = mpUsed;
         while (node) {
             if (&node->mElement == &arElement) {
@@ -94,6 +98,7 @@ public:
 
     [[nodiscard]] size_t Available() const
     {
+        std::lock_guard lock{mMutex};
         if (mpAvailable) {
             return mpAvailable->GetIndex() + 1u;
         }
@@ -127,6 +132,7 @@ private:
         }
     };
 
+    mutable std::mutex mMutex{};
     std::vector<Node> mPool{};
     NodePtr_t mpAvailable = nullptr; // Pointer to last element in available list
     NodePtr_t mpUsed = nullptr;      // Pointer to last element in used list
