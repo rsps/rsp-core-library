@@ -12,16 +12,16 @@
 #define RSP_CORE_LIB_UTILS_OBJECT_POOL_H
 
 #include <rsp/exceptions/CoreException.h>
+#include <mutex>
+#include <type_traits>
 #include <vector>
-#include <algorithm>
-#include <iostream>
 
 namespace rsp::utils {
 
-class EObjectPoolException: public exceptions::CoreException
+class EObjectPoolException : public exceptions::CoreException
 {
 public:
-    explicit EObjectPoolException(const char *aMsg)
+    explicit EObjectPoolException(const char* aMsg)
         : CoreException(aMsg)
     {
     }
@@ -32,14 +32,15 @@ public:
  * Simple double linked list of nodes with given element type.
  * \tparam T Default constructible type
  */
-template<class T>
+template <class T>
+    requires(std::is_default_constructible_v<T>)
 class ObjectPool
 {
 public:
     explicit ObjectPool(size_t aSize)
     {
         mPool.resize(aSize);
-        for (auto &v : mPool) {
+        for (auto& v : mPool) {
             if (!mpAvailable) {
                 mpAvailable = &v;
             }
@@ -51,18 +52,20 @@ public:
         }
     }
 
-    ObjectPool(const ObjectPool &arOther) = default;
-    ObjectPool(ObjectPool &&arOther) = default;
-    ObjectPool& operator=(const ObjectPool &arOther) = default;
-    ObjectPool& operator=(ObjectPool &&arOther) = default;
+    ObjectPool(const ObjectPool&) = delete;
+    ObjectPool& operator=(const ObjectPool&) = delete;
 
+    ObjectPool(ObjectPool&& arOther) = default;
+    ObjectPool& operator=(ObjectPool&& arOther) = default;
 
     /**
      * Get the next available element from the pool.
      * \return Reference to element
      */
-    T& Get()
+    [[nodiscard]] T& Get()
     {
+        std::lock_guard lock{mMutex};
+
         if (!mpAvailable) {
             THROW_WITH_BACKTRACE1(EObjectPoolException, "ObjectPool is exhausted.");
         }
@@ -80,16 +83,22 @@ public:
      */
     void Put(T& arElement)
     {
-        if (!mpUsed) {
-            THROW_WITH_BACKTRACE1(EObjectPoolException, "Element does not belong to ObjectPool.");
+        std::lock_guard lock{mMutex};
+        Node* node = mpUsed;
+        while (node) {
+            if (&node->mElement == &arElement) {
+                detachFrom(mpUsed, node);
+                pushTo(mpAvailable, node);
+                return;
+            }
+            node = node->mpPrevious;
         }
-        auto node = reinterpret_cast<NodePtr_t>(&arElement);
-        detachFrom(mpUsed, node);
-        pushTo(mpAvailable, node);
+        THROW_WITH_BACKTRACE1(EObjectPoolException, "Element does not belong to ObjectPool.");
     }
 
     [[nodiscard]] size_t Available() const
     {
+        std::lock_guard lock{mMutex};
         if (mpAvailable) {
             return mpAvailable->GetIndex() + 1u;
         }
@@ -99,18 +108,20 @@ public:
 private:
     struct Node;
     using NodePtr_t = Node*;
-    struct Node {
+    struct Node
+    {
         T mElement{};
         NodePtr_t mpPrevious = nullptr;
         NodePtr_t mpNext = nullptr;
 
-        Node() noexcept = default;
-        Node(const Node &arOther) = default;
-        Node(Node &&arOther) = default;
-        Node& operator=(const Node &arOther) = default;
-        Node& operator=(Node &&arOther) = default;
+        Node() = default;
+        Node(const Node& arOther) = default;
+        Node(Node&& arOther) = default;
+        Node& operator=(const Node& arOther) = default;
+        Node& operator=(Node&& arOther) = default;
 
-        size_t GetIndex() {
+        size_t GetIndex() const
+        {
             size_t result = 0;
             auto p = this;
             while (p->mpPrevious) {
@@ -121,6 +132,7 @@ private:
         }
     };
 
+    mutable std::mutex mMutex{};
     std::vector<Node> mPool{};
     NodePtr_t mpAvailable = nullptr; // Pointer to last element in available list
     NodePtr_t mpUsed = nullptr;      // Pointer to last element in used list
@@ -130,7 +142,7 @@ private:
         if (arList == aNode) {
             arList = aNode->mpPrevious;
         }
-        if (!aNode->mpNext) { // Last in list
+        if (!aNode->mpNext) {        // Last in list
             if (aNode->mpPrevious) { // Not alone in list
                 aNode->mpPrevious->mpNext = aNode->mpNext;
             }
