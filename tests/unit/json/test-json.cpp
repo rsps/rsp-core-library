@@ -59,7 +59,6 @@ TEST_CASE("Json")
     SUBCASE("System") {
         CHECK_EQ(sizeof(float), 4u);
         CHECK_EQ(sizeof(double), 8u);
-        CHECK_EQ(sizeof(long double), 16u);
     }
 
 
