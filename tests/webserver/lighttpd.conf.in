@@ -1,4 +1,4 @@
-var.basedir = "@CMAKE_BINARY_DIR@/webserver"
+var.basedir = env.LIGHTTPD_BASEDIR
 
 server.modules += (
     "mod_openssl",

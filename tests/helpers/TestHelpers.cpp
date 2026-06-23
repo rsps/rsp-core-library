@@ -102,7 +102,7 @@ int TestHelpers::StartWebServer()
 
     [[maybe_unused]] int rc = std::system("killall lighttpd -q"); // Make sure it is not running
     std::string cwd = std::filesystem::current_path();
-    std::string command = std::format("{} -f '{}/webserver/lighttpd.conf'", exe, cwd);
+    std::string command = std::format("LIGHTTPD_BASEDIR='{}/webserver' {} -f '{}/webserver/lighttpd.conf'", cwd, exe, cwd);
     return std::system(command.c_str());
 }
 
