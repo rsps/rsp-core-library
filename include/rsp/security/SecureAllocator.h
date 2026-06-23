@@ -15,9 +15,9 @@
 #include <limits>
 
 #ifdef _WIN32
-    #include <windows.h> // for SecureZeroMemory()
+#include <windows.h> // for SecureZeroMemory()
 #else
-    #include <string.h> // for explicit_bzero()
+#include <string.h> // for explicit_bzero()
 #endif
 
 namespace rsp::security {
@@ -35,28 +35,31 @@ template <class T>
 class SecureAllocator
 {
 public:
-    using value_type    = T;
+    using value_type = T;
 
-     using pointer       = value_type*;
-     using const_pointer = typename std::pointer_traits<pointer>::template rebind<value_type const>;
-     using void_pointer       = typename std::pointer_traits<pointer>::template rebind<void>;
-     using const_void_pointer = typename std::pointer_traits<pointer>::template rebind<const void>;
-     using difference_type = typename std::pointer_traits<pointer>::difference_type;
-     using size_type       = std::make_unsigned_t<difference_type>;
-
-     template <class U> struct rebind {typedef SecureAllocator<U> other;};
-
-
-    SecureAllocator() noexcept = default;  // not required, unless used
+    using pointer = value_type*;
+    using const_pointer = typename std::pointer_traits<pointer>::template rebind<const value_type>;
+    using void_pointer = typename std::pointer_traits<pointer>::template rebind<void>;
+    using const_void_pointer = typename std::pointer_traits<pointer>::template rebind<const void>;
+    using difference_type = typename std::pointer_traits<pointer>::difference_type;
+    using size_type = std::make_unsigned_t<difference_type>;
 
     template <class U>
-    explicit SecureAllocator(SecureAllocator<U> const&) noexcept
+    struct rebind
+    {
+        typedef SecureAllocator<U> other;
+    };
+
+    SecureAllocator() noexcept = default; // not required, unless used
+
+    template <class U>
+    explicit SecureAllocator(const SecureAllocator<U>&) noexcept
     {
     }
 
     pointer allocate(std::size_t n)
     {
-        return static_cast<value_type*>(::operator new (n * sizeof(value_type)));
+        return static_cast<value_type*>(::operator new(n * sizeof(value_type)));
     }
 
     void deallocate(pointer p, std::size_t sz) noexcept
@@ -80,20 +83,20 @@ public:
 #endif
     }
 
-     [[nodiscard]] std::size_t max_size() const noexcept
-     {
-         return std::numeric_limits<size_type>::max() / sizeof(value_type);
-     }
+    [[nodiscard]] std::size_t max_size() const noexcept
+    {
+        return std::numeric_limits<size_type>::max() / sizeof(value_type);
+    }
 };
 
 template <class T, class U>
-bool operator==(SecureAllocator<T> const&, SecureAllocator<U> const&) noexcept
+bool operator==(const SecureAllocator<T>&, const SecureAllocator<U>&) noexcept
 {
     return true;
 }
 
 template <class T, class U>
-bool operator!=(SecureAllocator<T> const& x, SecureAllocator<U> const& y) noexcept
+bool operator!=(const SecureAllocator<T>& x, const SecureAllocator<U>& y) noexcept
 {
     return !(x == y);
 }
