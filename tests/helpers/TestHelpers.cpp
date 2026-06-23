@@ -8,13 +8,13 @@
  * \author      Steffen Brummer
  */
 
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <format>
 #include <string>
 #include <rsp/posix/FileIO.h>
-#include <rsp/posix/FileSystem.h>
 #include <rsp/utils/HexStream.h>
 #include "TestHelpers.h"
 
@@ -58,24 +58,19 @@ std::string TestHelpers::ToHex(const uint8_t* apData, uint32_t aSize, uint32_t a
 
 bool TestHelpers::ValidateJson(const std::string& arJson)
 {
-    std::ofstream fout("/tmp/ValidateJson.json");
-    fout << arJson;
-    fout.close();
-
-    int result = 1;
-    if (rsp::posix::FileSystem::FileExists("/usr/bin/jsonlint-php")) {
-        result = std::system("/usr/bin/jsonlint-php --quiet /tmp/ValidateJson.json");
+    FILE* pipe = popen("jq -e . > /dev/null 2>&1", "w"); // pipe JSON to jq for validation
+    if (!pipe) {
+        return false;
     }
-
-    std::remove("/tmp/ValidateJson.json");
-
-    return (result == 0);
+    std::size_t written = std::fwrite(arJson.data(), 1, arJson.size(), pipe);
+    int rc = pclose(pipe);
+    return (rc == 0) && (written == arJson.size());
 }
 
 bool TestHelpers::ValidateJsonFile(const std::string& arJsonFile)
 {
-    int result = std::system((std::string("/usr/bin/jsonlint-php --quiet ") + arJsonFile).c_str());
-
+    std::string command = std::format("jq -e . {} > /dev/null 2>&1", arJsonFile);
+    int result = std::system(command.c_str());
     return (result == 0);
 }
 
