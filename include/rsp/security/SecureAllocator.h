@@ -13,8 +13,12 @@
 
 #include <memory>
 #include <limits>
-#include <cstring>
-#include <iostream>
+
+#ifdef _WIN32
+    #include <windows.h> // for SecureZeroMemory()
+#else
+    #include <string.h> // for explicit_bzero()
+#endif
 
 namespace rsp::security {
 
@@ -68,7 +72,12 @@ public:
      */
     void cleanse(pointer p, std::size_t n)
     {
-        std::memset(p, 0, n * sizeof(T));
+        // no memset() here because it might be optimized out by the compiler
+#ifdef _WIN32
+        SecureZeroMemory(p, n * sizeof(T));
+#else
+        explicit_bzero(p, n * sizeof(T));
+#endif
     }
 
      [[nodiscard]] std::size_t max_size() const noexcept
