@@ -51,8 +51,7 @@ TEST_CASE("Network")
     opt.CertPath = "webserver/ssl/certs/SN1234.crt";
     opt.KeyPath = "webserver/ssl/private/SN1234.key";
 
-    // Run lighttpd directly from build directory, no need to install it.
-    CHECK_EQ(TestHelpers::StartWebServer(), 0);
+    REQUIRE_EQ(TestHelpers::StartWebServer(), 0);
     std::this_thread::sleep_for(50ms);
 
     SUBCASE("Library Version"){
@@ -88,7 +87,7 @@ TEST_CASE("Network")
         logger.Info() << "Request:\n" << request << std::endl;
 
         IHttpResponse *resp = nullptr;
-        CHECK_NOTHROW(resp = &request.Execute());
+        REQUIRE_NOTHROW(resp = &request.Execute());
 
         logger.Info() << "Response:\n" << *resp << std::endl;
 
@@ -117,7 +116,7 @@ TEST_CASE("Network")
         request.SetOptions(opt);
 
         const IHttpResponse *resp = nullptr;
-        CHECK_NOTHROW(resp = &request.Execute());
+        REQUIRE_NOTHROW(resp = &request.Execute());
 
         CHECK_EQ(resp->GetHeader("content-type"), "text/html");
         CHECK_EQ(resp->GetHeader("content-length"), "120");
@@ -155,7 +154,7 @@ TEST_CASE("Network")
         logger.Info() << "Request:\n" << request << std::endl;
 
         IHttpResponse *resp = nullptr;
-        CHECK_NOTHROW(resp = &request.Execute());
+        REQUIRE_NOTHROW(resp = &request.Execute());
 
         if (resp) {
             logger.Info() << "Response:\n" << *resp << std::endl;
@@ -186,7 +185,7 @@ TEST_CASE("Network")
 
         request.SetOptions(opt);
 
-        CHECK_THROWS_AS(auto *resp = &request.Execute(), NetworkException);
+        REQUIRE_THROWS_AS(auto *resp = &request.Execute(), NetworkException);
     }
 
     SUBCASE("Validated Client") {
@@ -196,7 +195,7 @@ TEST_CASE("Network")
         request.SetOptions(opt);
 
         const IHttpResponse *resp = nullptr;
-        CHECK_NOTHROW(resp = &request.Execute());
+        REQUIRE_NOTHROW(resp = &request.Execute());
 
         if constexpr (IsVerbose()) {
             MESSAGE("Request:\n" << resp->GetRequest());
@@ -216,7 +215,7 @@ TEST_CASE("Network")
         request.SetOptions(opt);
 
         const IHttpResponse *resp = nullptr;
-        CHECK_NOTHROW(resp = &request.Execute());
+        REQUIRE_NOTHROW(resp = &request.Execute());
 
         CHECK_EQ(resp->GetHeader("content-type"), "text/html");
         CHECK_EQ(resp->GetHeader("content-length"), "120");
@@ -226,7 +225,7 @@ TEST_CASE("Network")
         opt.RequestType = HttpRequestType::GET;
         request.SetOptions(opt);
 
-        CHECK_NOTHROW(resp = &request.Execute());
+        REQUIRE_NOTHROW(resp = &request.Execute());
         CHECK_EQ(resp->GetHeader("content-type"), "text/html");
         CHECK_EQ(resp->GetHeader("content-length"), "120");
         CHECK_EQ(resp->GetBody().GetStreamSize(), 120u);
@@ -257,7 +256,7 @@ TEST_CASE("Network")
             FileSystem::DeleteFile(cFile);
             request.SetResponseBody(nullptr); // Omit destination file to download to memory
 
-            CHECK_NOTHROW(resp = &request.Execute());
+            REQUIRE_NOTHROW(resp = &request.Execute());
 
             CHECK_EQ(resp->GetBody().GetStreamSize(), source.size());
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
@@ -272,7 +271,7 @@ TEST_CASE("Network")
             FileSystem::DeleteFile(cFile);
             request.MakeResponseBody<FileBody>(cFile); // Reload after removing file
 
-            CHECK_NOTHROW(resp = &request.Execute());
+            REQUIRE_NOTHROW(resp = &request.Execute());
 
             CHECK_EQ(resp->GetContentLength(), 25138u);
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
@@ -281,7 +280,7 @@ TEST_CASE("Network")
         SUBCASE("Partial To File") {
             CHECK_EQ(0, truncate(cFile.c_str(), 20*1024)); // This changes mtime
 
-            CHECK_NOTHROW(resp = &request.Execute());
+            REQUIRE_NOTHROW(resp = &request.Execute());
 
             CHECK_EQ(resp->GetContentLength(), 25138u - (20u*1024));
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
@@ -293,7 +292,7 @@ TEST_CASE("Network")
             // This line will work, as the result is the partial data from an unmodified file.
             FileSystem::SetFileModifiedTime(cFile, mtime);
 
-            CHECK_NOTHROW(resp = &request.Execute());
+            REQUIRE_NOTHROW(resp = &request.Execute());
 
             CHECK_EQ(resp->GetBody().GetStreamSize(), 0u);
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::PartialContent);
@@ -302,7 +301,7 @@ TEST_CASE("Network")
         SUBCASE("Existing To File") {
             using namespace std::literals::chrono_literals;
 
-            CHECK_NOTHROW(resp = &request.Execute());
+            REQUIRE_NOTHROW(resp = &request.Execute());
 
             CHECK_EQ(resp->GetBody().GetStreamSize(), 0u);
             CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
@@ -342,7 +341,7 @@ TEST_CASE("Network")
         request.SetOptions(opt);
 
         const IHttpResponse *resp = nullptr;
-        CHECK_NOTHROW(resp = &request.Execute());
+        REQUIRE_NOTHROW(resp = &request.Execute());
         if (resp) {
             MESSAGE("Body: " << resp->GetBody());
 
@@ -378,10 +377,8 @@ TEST_CASE("Network")
         form->Add("filedata", file);
 
         const IHttpResponse *resp = nullptr;
-        CHECK_NOTHROW(resp = &request.Execute());
-        if (!resp) {
-            return;
-        }
+        REQUIRE_NOTHROW(resp = &request.Execute());
+
         auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
 
         size_t request_size = 25455;
@@ -398,10 +395,9 @@ TEST_CASE("Network")
         CHECK_EQ(body, expected);
 
         CHECK_EQ(body.size(), 147u);
-        if (resp) {
-            CHECK_EQ(resp->GetBody().GetStreamSize(), 147u);
-            CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
-        }
+        REQUIRE(resp != nullptr);
+        CHECK_EQ(resp->GetBody().GetStreamSize(), 147u);
+        CHECK_EQ(resp->GetStatusCode(), StatusCodes::Ok);
 
         CHECK(FileSystem::FileExists(cUploadedFile));
         FileIO file2(cUploadedFile, std::ios_base::in);
@@ -451,7 +447,7 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
         request.SetBody(std::make_shared<StringBody>(json));
 
         const IHttpResponse *resp = nullptr;
-        CHECK_NOTHROW(resp = &request.Execute());
+        REQUIRE_NOTHROW(resp = &request.Execute());
 
         if (resp) {
             auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
@@ -627,10 +623,8 @@ Body: )" + json + "\n";
         request.SetOptions(opt);
 
         const IHttpResponse *resp = nullptr;
-        CHECK_NOTHROW(resp = &request.Execute());
-        if (!resp) {
-            return;
-        }
+        REQUIRE_NOTHROW(resp = &request.Execute());
+
         auto body = dynamic_cast<StringBody&>(resp->GetBody()).Get();
         MESSAGE(body);
         CHECK(TestHelpers::ValidateJson(body));

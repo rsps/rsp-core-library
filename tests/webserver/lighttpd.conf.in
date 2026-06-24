@@ -1,4 +1,4 @@
-var.basedir = "@CMAKE_BINARY_DIR@/webserver"
+var.basedir = env.LIGHTTPD_BASEDIR
 
 server.modules += (
     "mod_openssl",
@@ -18,9 +18,6 @@ ssl.ca-file = basedir + "/ssl/ca/ca.pem"
 
 ssl.openssl.ssl-conf-cmd = ("MinProtocol" => "TLSv1.3",
                             "Options" => "-ServerPreference")
-
-server.username = "www-data"
-server.groupname = "www-data"
 
 mimetype.assign = (
     ".html" => "text/html",

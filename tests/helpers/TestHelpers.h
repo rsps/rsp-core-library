@@ -7,6 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
 #ifndef TESTS_HELPERS_TEST_HELPERS_H_
 #define TESTS_HELPERS_TEST_HELPERS_H_
 
@@ -14,22 +15,22 @@
 #include <rsp/utils/StrUtils.h>
 #include "TestLogger.h"
 
-#define CHECK_HEX(a, b) CHECK_MESSAGE(((a) == (b)), rsp::utils::StrUtils::Format( "%8.8X != %8.8X" , a, b))
+#define CHECK_HEX(a, b) CHECK_MESSAGE(((a) == (b)), rsp::utils::StrUtils::Format("%8.8X != %8.8X", a, b))
 
 class TestHelpers
 {
 public:
     static uint8_t TamperWithFile(const std::string& arFileName, uint32_t aOffset, uint8_t aValue);
 
-    static void ParseArguments(const char ** apArgv);
+    static void ParseArguments(const char** apArgv);
 
-    static std::string ToHex(const std::string &arString);
+    static std::string ToHex(const std::string& arString);
     static std::string ToHex(uint32_t aValue);
-//    static std::string ToHex(const uint8_t *apData, uint32_t aSize);
-    static std::string ToHex(const uint8_t *apData, uint32_t aSize, uint32_t aSizeOf);
+    // static std::string ToHex(const uint8_t *apData, uint32_t aSize);
+    static std::string ToHex(const uint8_t* apData, uint32_t aSize, uint32_t aSizeOf);
 
-    static bool ValidateJson(const std::string &arJson);
-    static bool ValidateJsonFile(const std::string &arJsonFile);
+    static bool ValidateJson(const std::string& arJson);
+    static bool ValidateJsonFile(const std::string& arJsonFile);
 
     static int StartWebServer();
     static int StopWebServer();
