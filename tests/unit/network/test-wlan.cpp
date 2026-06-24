@@ -15,6 +15,7 @@
 #include <rsp/posix/FileSystem.h>
 #include <TestHelpers.h>
 #include <cstdlib>
+#include <iostream>
 
 using namespace rsp::network;
 using namespace rsp::posix;
