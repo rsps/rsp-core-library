@@ -17,7 +17,8 @@ using namespace std::string_literals;
 
 TEST_SUITE_BEGIN("Utils");
 
-TEST_CASE("StrUtils") {
+TEST_CASE("StrUtils")
+{
     CHECK_NE(StrUtils::GetHomeDir(), ""s);
 
     CHECK_NE(StrUtils::GetConfigDir(), ""s);
@@ -49,11 +50,23 @@ TEST_CASE("StrUtils") {
     CHECK_EQ(StrUtils::ToString(123.123f, 5, true), "123.12300");
 
     CHECK_EQ(StrUtils::ToString(4.4783619199999997e-06, 12), "4.47836192e-06");
+}
 
-    std::locale::global(std::locale("da_DK.UTF8"));
+TEST_CASE("StrUtils: Localization da_DK")
+{
+    try {
+        std::locale{"da_DK.utf8"};
+    }
+    catch (const std::runtime_error&) {
+        MESSAGE("Skipping, locale da_DK not installed");
+        return;
+    }
+
+    std::locale daDK{"da_DK.utf8"};
+    std::locale prevLocale = std::locale::global(daDK);
     CHECK_EQ(StrUtils::ToDouble("123,123456789"), 123.0);
     CHECK_EQ(StrUtils::ToString(4.4783619199999997e-06, 12, true), "0.000004478362");
-    std::locale::global(std::locale::classic());
+    std::locale::global(prevLocale);
 }
 
 TEST_SUITE_END();
