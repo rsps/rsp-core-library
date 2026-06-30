@@ -14,13 +14,13 @@
 // Test that TestHelpers::ValidateJson() actually validates JSON correctness
 TEST_CASE("TestHelpers::ValidateJson")
 {
-    std::string valid_json = R"({"key":"value"})";
+    std::string_view valid_json = R"({"key":"value"})";
     CHECK(TestHelpers::ValidateJson(valid_json));
 
     valid_json = R"({"key":"value", "array":[1,2,3]})";
     CHECK(TestHelpers::ValidateJson(valid_json));
 
-    std::string invalid_json = R"({"key":"value")"; // missing }
+    std::string_view invalid_json = R"({"key":"value")"; // missing }
     CHECK_FALSE(TestHelpers::ValidateJson(invalid_json));
 
     invalid_json = R"({"key":value})"; // value not in quotes

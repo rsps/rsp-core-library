@@ -56,7 +56,7 @@ std::string TestHelpers::ToHex(const uint8_t* apData, uint32_t aSize, uint32_t a
     return rsp::utils::ToHex(apData, aSize, aSizeOf);
 }
 
-bool TestHelpers::ValidateJson(const std::string& arJson)
+bool TestHelpers::ValidateJson(std::string_view arJson)
 {
     FILE* pipe = popen("jq -e . > /dev/null 2>&1", "w"); // pipe JSON to jq for validation
     if (!pipe) {
@@ -67,7 +67,7 @@ bool TestHelpers::ValidateJson(const std::string& arJson)
     return (rc == 0) && (written == arJson.size());
 }
 
-bool TestHelpers::ValidateJsonFile(const std::string& arJsonFile)
+bool TestHelpers::ValidateJsonFile(std::string_view arJsonFile)
 {
     std::string command = std::format("jq -e . {} > /dev/null 2>&1", arJsonFile);
     int result = std::system(command.c_str());
