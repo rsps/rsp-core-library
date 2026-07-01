@@ -24,9 +24,6 @@ class SDLEvents: public GfxInputEvents
 public:
     SDLEvents();
 
-    SDLEvents(SDLEvents&&) = default;
-    SDLEvents& operator=(SDLEvents&&) = default;
-
     bool Poll(GfxEvent &arEvent) override;
     void Flush() override;
 

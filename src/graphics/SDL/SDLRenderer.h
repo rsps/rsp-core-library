@@ -31,10 +31,9 @@ class SDLRenderer: public rsp::graphics::Renderer, public rsp::utils::Singleton<
 public:
     SDLRenderer(GuiUnit_t aWidth, GuiUnit_t aHeight);
     ~SDLRenderer() override;
+
     SDLRenderer(const SDLRenderer&) = delete;
-    SDLRenderer(SDLRenderer&&) = default;
     SDLRenderer& operator=(const SDLRenderer&) = delete;
-    SDLRenderer& operator=(SDLRenderer&&) = default;
 
     Renderer& Blit(const Texture &arTexture) override;
     Renderer& ClearClipRect() override;
