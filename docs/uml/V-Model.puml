@@ -5,7 +5,7 @@ skinparam rectangle {
     BorderColor<<Spec>> #0288D1
     BackgroundColor<<Test>> #E8F5E9
     BorderColor<<Test>> #388E3C
-    BackgroundColor<<Start>> #F9F
+    BackgroundColor<<Start>> #FFF
     BackgroundColor<<End>> #BBF
     BackgroundColor<<Code>> #FF9
 }
@@ -33,7 +33,6 @@ rectangle "PEMS Requirements Verification\n(In: Full PEMS + PEMS Spec)\n(Out: Sy
 rectangle "Validation\n(In: Final Device + User Req)\n(Out: Validation Report / Release)" as VAL <<End>>
 
 ' --- PROCESS FLOW (The downwards and upwards flow) ---
-
 UN -down-> PR
 PR -down-> PA
 PA -down-> SA_SUB
@@ -50,22 +49,13 @@ SUB_V -up-> PV
 PV -up-> PRV
 PRV -up-> VAL
 
-' --- STRUKTUREL BREDDE (Tvinger toppen ud som et V vha. skjulte links) ---
-'UN -[hidden]right-------> VAL
-'PR -[hidden]right------> PRV
-'PA -[hidden]right-----> PV
-'SA_SUB -[hidden]right----> SUB_V
-'SRS -[hidden]right---> SST
-'SWA -[hidden]right--> SIT
-'SDD -[hidden]right--> SUT
-
-' --- VERIFIKATIONSLINJER (De faktiske synlige pile på tværs) ---
-UN .[#purple]right.......> VAL : Validation
-PR .[#blue]right......> PRV : Verification
-PA .[#blue]right.....> PV : Verification
-SA_SUB .[#blue]right....> SUB_V : Verification
-SRS .[#blue]right...> SST : Verification
-SWA .[#blue]right..> SIT : Verification
+' --- VERIFICATION LINES ---
+UN .[#purple]right......> VAL : Validation
+PR .[#blue]right.....> PRV : Verification
+PA .[#blue]right....> PV : Verification
+SA_SUB .[#blue]right...> SUB_V : Verification
+SRS .[#blue]right..> SST : Verification
+SWA .[#blue]right.> SIT : Verification
 SDD .[#blue]right.> SUT : Verification
 
 @enduml
