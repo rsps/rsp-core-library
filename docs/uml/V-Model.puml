@@ -1,0 +1,71 @@
+@startuml
+top to bottom direction
+skinparam rectangle {
+    BackgroundColor<<Spec>> #E1F5FE
+    BorderColor<<Spec>> #0288D1
+    BackgroundColor<<Test>> #E8F5E9
+    BorderColor<<Test>> #388E3C
+    BackgroundColor<<Start>> #F9F
+    BackgroundColor<<End>> #BBF
+    BackgroundColor<<Code>> #FF9
+}
+skinparam LineType ortho
+
+' --- LEFT SIDE (Design & Specifications) ---
+rectangle "User Needs\n(In: Market/Clinical Input)\n(Out: User Requirements)" as UN <<Start>>
+rectangle "PEMS Requirements\n(In: User Req + Risk Analysis)\n(Out: System/PEMS Spec)" as PR <<Spec>>
+rectangle "PEMS Architecture\n(In: PEMS Spec)\n(Out: System Arch + Risk Control)" as PA <<Spec>>
+rectangle "Subsystem (PESS) Architecture\n(In: PEMS Arch)\n(Out: Subsystem Allocation)" as SA_SUB <<Spec>>
+rectangle "Software Requirement Spec - SRS\n(In: PESS Arch + Risk Controls)\n(Out: SW Requirements)" as SRS <<Spec>>
+rectangle "Software Architecture\n(In: SRS)\n(Out: SW Arch Design + Interfaces)" as SWA <<Spec>>
+rectangle "Software Detailed Design\n(In: SW Arch)\n(Out: Detailed Design Spec)" as SDD <<Spec>>
+
+' --- BOTTOM (Implementation) ---
+rectangle "Software Coding & Integration\n(In: SDD)\n(Out: Source Code & SW Units)" as COD <<Code>>
+
+' --- RIGHT SIDE (Verification & Validation) ---
+rectangle "Software Unit Testing\n(In: Code + SDD)\n(Out: SW Unit Test Reports)" as SUT <<Test>>
+rectangle "Software Integration Testing\n(In: SW Units + SW Arch)\n(Out: SW Integration Test Reports)" as SIT <<Test>>
+rectangle "Software System Testing\n(In: Ready SW + SRS)\n(Out: SW System Test Reports)" as SST <<Test>>
+rectangle "Subsystem Verification\n(In: Integrated Subsystems)\n(Out: PESS Verification Reports)" as SUB_V <<Test>>
+rectangle "PEMS Verification\n(In: Subsystems + PEMS Arch)\n(Out: PEMS Verification Reports)" as PV <<Test>>
+rectangle "PEMS Requirements Verification\n(In: Full PEMS + PEMS Spec)\n(Out: System Test Reports)" as PRV <<Test>>
+rectangle "Validation\n(In: Final Device + User Req)\n(Out: Validation Report / Release)" as VAL <<End>>
+
+' --- PROCESS FLOW (The downwards and upwards flow) ---
+
+UN -down-> PR
+PR -down-> PA
+PA -down-> SA_SUB
+SA_SUB -down-> SRS
+SRS -down-> SWA
+SWA -down-> SDD
+SDD -down-> COD
+
+COD -up-> SUT
+SUT -up-> SIT
+SIT -up-> SST
+SST -up-> SUB_V
+SUB_V -up-> PV
+PV -up-> PRV
+PRV -up-> VAL
+
+' --- STRUKTUREL BREDDE (Tvinger toppen ud som et V vha. skjulte links) ---
+'UN -[hidden]right-------> VAL
+'PR -[hidden]right------> PRV
+'PA -[hidden]right-----> PV
+'SA_SUB -[hidden]right----> SUB_V
+'SRS -[hidden]right---> SST
+'SWA -[hidden]right--> SIT
+'SDD -[hidden]right--> SUT
+
+' --- VERIFIKATIONSLINJER (De faktiske synlige pile på tværs) ---
+UN .[#purple]right.......> VAL : Validation
+PR .[#blue]right......> PRV : Verification
+PA .[#blue]right.....> PV : Verification
+SA_SUB .[#blue]right....> SUB_V : Verification
+SRS .[#blue]right...> SST : Verification
+SWA .[#blue]right..> SIT : Verification
+SDD .[#blue]right.> SUT : Verification
+
+@enduml
