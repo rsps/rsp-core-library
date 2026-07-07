@@ -9,7 +9,8 @@ skinparam rectangle {
     BackgroundColor<<End>> #BBF
     BackgroundColor<<Code>> #FF9
 }
-skinparam LineType ortho
+' skinparam LineType ortho
+skinparam lineType polyline
 
 ' --- LEFT SIDE (Design & Specifications) ---
 rectangle "User Needs\n(In: Market/Clinical Input)\n(Out: User Requirements)" as UN <<Start>>
