@@ -7,12 +7,21 @@ function(rsp_core_add_dependencies ATARGET)
 
     # --------------------------------------------------------------------------------------------------------------
 
-    if(CMAKE_COMPILER_IS_GNUCC)
-        # For std::stacktrace: link against libstdc++exp for GCC 14 or greater,
-        # or libstdc++_libbacktrace for GCC 12-13.
-        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        # Query the libstdc++ version in use (not the GCC/Clang version)
+        execute_process(
+            COMMAND echo "#include <version>"
+            COMMAND ${CMAKE_CXX_COMPILER} -dM -E -x c++ -
+            OUTPUT_VARIABLE _CXX_DEFS
+        )
+        string(REGEX MATCH "#define _GLIBCXX_RELEASE ([0-9]+)" _ "${_CXX_DEFS}")
+        set(_GLIBCXX_RELEASE "${CMAKE_MATCH_1}")
+
+        # For std::stacktrace: link against libstdc++exp for GCC/libstdc++ 14 or greater,
+        # or libstdc++_libbacktrace for 12-13.
+        if(_GLIBCXX_RELEASE GREATER_EQUAL 14)
             target_link_libraries(${ATARGET} PUBLIC stdc++exp)
-        elseif(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 12)
+        elseif(_GLIBCXX_RELEASE GREATER_EQUAL 12)
             target_link_libraries(${ATARGET} PUBLIC stdc++_libbacktrace)
         endif()
     endif()

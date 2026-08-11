@@ -7,11 +7,21 @@
     },
     "configurePresets": [
         {
-            "name": "common",
+            "name": "base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "gcc-base",
+            "inherits": "base",
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_C_FLAGS": "-D_GLIBCXX_ASSERTIONS -D_FORTIFY_SOURCE=2",
                 "CMAKE_CXX_FLAGS": "-D_GLIBCXX_ASSERTIONS -D_FORTIFY_SOURCE=2",
                 "CMAKE_C_FLAGS_DEBUG": "-Og -g",
@@ -21,29 +31,27 @@
             }
         },
         {
-            "name": "debug",
-            "displayName": "Debug",
-            "inherits": "common",
-            "binaryDir": "${sourceDir}/build/debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "release",
-            "displayName": "Release",
-            "inherits": "common",
-            "binaryDir": "${sourceDir}/build/release",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "arm-buildroot-common",
+            "name": "clang-base",
+            "inherits": "base",
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_C_FLAGS": "-Wall -Wextra -D_FORTIFY_SOURCE=2",
+                "CMAKE_CXX_FLAGS": "-Wall -Wextra -stdlib=libc++ -D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_EXTENSIVE -D_FORTIFY_SOURCE=2",
+                "CMAKE_C_FLAGS_DEBUG": "-Og -g",
+                "CMAKE_CXX_FLAGS_DEBUG": "-Og -g",
+                "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG",
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG"
+            }
+        },
+        {
+            "name": "gcc-arm-buildroot-base",
+            "inherits": "base",
+            "hidden": true,
+            "generator": "Ninja",
+            "cacheVariables": {
                 "CMAKE_TOOLCHAIN_FILE": "/opt/arm-buildroot-linux-gnueabihf_sdk-buildroot/share/buildroot/toolchainfile.cmake",
                 "CMAKE_C_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GLIBCXX_ASSERTIONS -D_FORTIFY_SOURCE=2",
                 "CMAKE_CXX_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GLIBCXX_ASSERTIONS -D_FORTIFY_SOURCE=2",
@@ -54,19 +62,49 @@
             }
         },
         {
-            "name": "arm-buildroot-debug",
-            "displayName": "ARM Buildroot Debug",
-            "inherits": "arm-buildroot-common",
-            "binaryDir": "${sourceDir}/build/arm-buildroot-debug",
+            "name": "gcc-debug",
+            "displayName": "GCC Debug",
+            "inherits": "gcc-base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
-            "name": "arm-buildroot-release",
-            "displayName": "ARM Buildroot Release",
-            "inherits": "arm-buildroot-common",
-            "binaryDir": "${sourceDir}/build/arm-buildroot-release",
+            "name": "gcc-release",
+            "displayName": "GCC Release",
+            "inherits": "gcc-base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "clang-debug",
+            "displayName": "Clang Debug",
+            "inherits": "clang-base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "clang-release",
+            "displayName": "Clang Release",
+            "inherits": "clang-base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "gcc-arm-buildroot-debug",
+            "displayName": "GCC ARM Buildroot Debug",
+            "inherits": "gcc-arm-buildroot-base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "gcc-arm-buildroot-release",
+            "displayName": "GCC ARM Buildroot Release",
+            "inherits": "gcc-arm-buildroot-base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
@@ -74,26 +112,34 @@
     ],
     "buildPresets": [
         {
-            "name": "debug",
-            "configurePreset": "debug"
+            "name": "gcc-debug",
+            "configurePreset": "gcc-debug"
         },
         {
-            "name": "release",
-            "configurePreset": "release"
+            "name": "gcc-release",
+            "configurePreset": "gcc-release"
         },
         {
-            "name": "arm-buildroot-debug",
-            "configurePreset": "arm-buildroot-debug"
+            "name": "clang-debug",
+            "configurePreset": "clang-debug"
         },
         {
-            "name": "arm-buildroot-release",
-            "configurePreset": "arm-buildroot-release"
+            "name": "clang-release",
+            "configurePreset": "clang-release"
+        },
+        {
+            "name": "gcc-arm-buildroot-debug",
+            "configurePreset": "gcc-arm-buildroot-debug"
+        },
+        {
+            "name": "gcc-arm-buildroot-release",
+            "configurePreset": "gcc-arm-buildroot-release"
         }
     ],
     "testPresets": [
         {
-            "name": "release",
-            "configurePreset": "release",
+            "name": "gcc-release",
+            "configurePreset": "gcc-release",
             "output": {
                 "outputOnFailure": true
             },
@@ -103,8 +149,8 @@
             }
         },
         {
-            "name": "debug",
-            "configurePreset": "debug",
+            "name": "gcc-debug",
+            "configurePreset": "gcc-debug",
             "output": {
                 "outputOnFailure": true
             },

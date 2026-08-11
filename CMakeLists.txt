@@ -57,8 +57,10 @@ target_include_directories(${PROJECT_NAME}
 )
 
 # Compile options
-include("cmake/gcc-compile-options.cmake")
-target_compile_options(${PROJECT_NAME} PRIVATE "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    include("gcc-compile-options")
+    target_compile_options(${PROJECT_NAME} PRIVATE "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
+endif()
 
 # Macro definitions per build configuration
 target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:DEBUG_LOG>")
