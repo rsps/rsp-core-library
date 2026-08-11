@@ -10,17 +10,23 @@
 #ifndef RSP_CORE_LIB_INCLUDE_POSIX_SOCKET_H
 #define RSP_CORE_LIB_INCLUDE_POSIX_SOCKET_H
 
-#include <chrono>
-#include <string>
-#include <netinet/in.h>
-#include <sys/un.h>
-#include <rsp/exceptions/CoreException.h>
-#include <rsp/exceptions/ExceptionHelper.h>
+#include "AddressInfo.h"
 #include "SocketAddress.h"
 #include "SocketTypes.h"
-#include "AddressInfo.h"
+
+#include <rsp/exceptions/CoreException.h>
+#include <rsp/exceptions/ExceptionHelper.h>
 #include <rsp/logging/LogChannel.h>
 #include <rsp/utils/SystemHandle.h>
+
+#include <chrono>
+#include <span>
+#include <string>
+
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
 
 namespace rsp::posix {
 

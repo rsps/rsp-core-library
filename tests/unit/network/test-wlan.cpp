@@ -9,6 +9,7 @@
  */
 
 #include <doctest.h>
+#include <unistd.h>
 #include <chrono>
 #include <rsp/network/WLan.h>
 #include <rsp/posix/NetworkInterfaces.h>
