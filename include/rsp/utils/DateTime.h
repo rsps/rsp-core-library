@@ -91,10 +91,14 @@ public:
      */
     explicit DateTime(std::chrono::system_clock::duration aDuration);
     /**
-     * \brief Construct from af system_clock time_point.
+     * \brief Construct from a system_clock time_point of any resolution.
      * \param aTimePoint
      */
-    explicit DateTime(std::chrono::system_clock::time_point aTimePoint);
+    template <typename Duration>
+    explicit DateTime(std::chrono::time_point<std::chrono::system_clock, Duration> aTimePoint)
+        : mTp(aTimePoint)
+    {
+    }
     /**
      * \brief Construct from a file_time_type (file_clock)
      * \param aFileTime
@@ -254,10 +258,12 @@ public:
      */
     [[nodiscard]] bool empty() const { return mTp.time_since_epoch().count() == 0; }
 protected:
-    std::chrono::system_clock::time_point mTp{};
+    // Stored at nanosecond precision regardless of the platform's native system_clock resolution.
+    using TimePoint = std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds>;
+    TimePoint mTp{};
 
-    [[nodiscard]] static std::chrono::system_clock::duration decodeFractions(uint64_t aFractions) ;
-    static std::ostream& encodeFractions(std::ostream& os, std::chrono::system_clock::time_point aTp) ;
+    [[nodiscard]] static std::chrono::nanoseconds decodeFractions(uint64_t aFractions) ;
+    static std::ostream& encodeFractions(std::ostream& os, TimePoint aTp) ;
 
 private:
     static std::chrono::seconds getTimezoneOffset(std::tm &arTm) ;

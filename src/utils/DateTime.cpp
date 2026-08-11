@@ -38,11 +38,6 @@ DateTime::DateTime(std::chrono::system_clock::duration aDuration)
 {
 }
 
-DateTime::DateTime(std::chrono::system_clock::time_point aTimePoint)
-    : mTp(aTimePoint)
-{
-}
-
 DateTime::DateTime(std::filesystem::file_time_type aFileTime)
     : mTp(std::chrono::file_clock::to_sys(aFileTime))
 {
@@ -105,36 +100,32 @@ DateTime::DateTime(timespec &arTimeSpec)
 
 int64_t DateTime::SecondsBetween(const DateTime &arOther) const
 {
-    system_clock::time_point tp = arOther;
-    return duration_cast<seconds>(tp - mTp).count();
+    return duration_cast<seconds>(arOther.mTp - mTp).count();
 }
 
 int64_t DateTime::MilliSecondsBetween(const DateTime &arOther) const
 {
-    system_clock::time_point tp = arOther;
-    return duration_cast<milliseconds>(tp - mTp).count();
+    return duration_cast<milliseconds>(arOther.mTp - mTp).count();
 }
 
 int64_t DateTime::MicroSecondsBetween(const DateTime &arOther) const
 {
-    system_clock::time_point tp = arOther;
-    return duration_cast<microseconds>(tp - mTp).count();
+    return duration_cast<microseconds>(arOther.mTp - mTp).count();
 }
 
 int64_t DateTime::NanoSecondsBetween(const DateTime &arOther) const
 {
-    system_clock::time_point tp = arOther;
-    return duration_cast<nanoseconds>(tp - mTp).count();
+    return duration_cast<nanoseconds>(arOther.mTp - mTp).count();
 }
 
 DateTime::operator std::chrono::system_clock::duration() const
 {
-    return mTp.time_since_epoch();
+    return duration_cast<system_clock::duration>(mTp.time_since_epoch());
 }
 
 DateTime::operator std::chrono::system_clock::time_point() const
 {
-    return mTp;
+    return time_point_cast<system_clock::duration>(mTp);
 }
 
 DateTime::operator std::filesystem::file_time_type() const
@@ -144,13 +135,13 @@ DateTime::operator std::filesystem::file_time_type() const
 
 DateTime::operator std::time_t() const
 {
-    return system_clock::to_time_t(mTp);
+    return system_clock::to_time_t(time_point_cast<system_clock::duration>(mTp));
 }
 
 DateTime::operator std::tm() const
 {
     std::tm result{};
-    auto t = system_clock::to_time_t(mTp );
+    auto t = system_clock::to_time_t(time_point_cast<system_clock::duration>(mTp));
     gmtime_r(&t, &result);
 //    t -= getTimezoneOffset(result).count();
 //    gmtime_r(&t, &result);
@@ -245,12 +236,16 @@ DateTime& DateTime::FromString(const std::string &arTimeString, const char *apFo
 
 DateTime DateTime::operator +(const DateTime &arOther) const
 {
-    return DateTime(mTp.time_since_epoch() + arOther.mTp.time_since_epoch());
+    DateTime result;
+    result.mTp = TimePoint(mTp.time_since_epoch() + arOther.mTp.time_since_epoch());
+    return result;
 }
 
 DateTime DateTime::operator -(const DateTime &arOther) const
 {
-    return DateTime(mTp - arOther.mTp);
+    DateTime result;
+    result.mTp = TimePoint(mTp - arOther.mTp);
+    return result;
 }
 
 DateTime& DateTime::operator +=(const DateTime &arOther)
@@ -267,12 +262,16 @@ DateTime& DateTime::operator -=(const DateTime &arOther)
 
 DateTime DateTime::operator+(const std::chrono::system_clock::duration &arDuration) const
 {
-    return DateTime(mTp + arDuration);
+    DateTime result;
+    result.mTp = mTp + arDuration;
+    return result;
 }
 
 DateTime DateTime::operator-(const std::chrono::system_clock::duration &arDuration) const
 {
-    return DateTime(mTp - arDuration);
+    DateTime result;
+    result.mTp = mTp - arDuration;
+    return result;
 }
 
 DateTime& DateTime::operator +=(const std::chrono::system_clock::duration &arDuration)
@@ -365,7 +364,7 @@ std::ostream& operator <<(std::ostream &os, const DateTime &arDateTime)
     return os;
 }
 
-std::chrono::system_clock::duration DateTime::decodeFractions(uint64_t aFractions)
+std::chrono::nanoseconds DateTime::decodeFractions(uint64_t aFractions)
 {
     if (aFractions >= 1000000) {
         return nanoseconds(aFractions);
@@ -376,7 +375,7 @@ std::chrono::system_clock::duration DateTime::decodeFractions(uint64_t aFraction
     return milliseconds(aFractions);
 }
 
-std::ostream& DateTime::encodeFractions(std::ostream& os, std::chrono::system_clock::time_point aTp)
+std::ostream& DateTime::encodeFractions(std::ostream& os, DateTime::TimePoint aTp)
 {
     time_point<system_clock, milliseconds> msd = time_point_cast<milliseconds>(aTp);
     long msecs = msd.time_since_epoch().count() % 1000;
