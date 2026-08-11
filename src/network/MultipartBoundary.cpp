@@ -20,11 +20,11 @@ MultipartBoundary::MultipartBoundary()
     for (size_t i = 0 ; i < 32 ; ++i) {
         switch (utils::Random::Roll(0u, 2u)) {
             case 0:
-                mBoundary += utils::Random::Roll('A', 'Z');
+                mBoundary += static_cast<char>(utils::Random::Roll<int>('A', 'Z'));
                 break;
 
             case 1:
-                mBoundary += utils::Random::Roll('a', 'z');
+                mBoundary += static_cast<char>(utils::Random::Roll<int>('a', 'z'));
                 break;
 
             default:
