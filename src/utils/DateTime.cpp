@@ -43,12 +43,12 @@ DateTime::DateTime(std::filesystem::file_time_type aFileTime)
 {
 }
 
-DateTime::DateTime(const std::string &arTimeString, const char *apFormat)
+DateTime::DateTime(const std::string& arTimeString, const char* apFormat)
 {
     FromString(arTimeString, apFormat);
 }
 
-DateTime::DateTime(const std::string &arTimeString, Formats aFormat)
+DateTime::DateTime(const std::string& arTimeString, Formats aFormat)
 {
     switch (aFormat) {
         case Formats::RFC3339:
@@ -85,35 +85,35 @@ DateTime::DateTime(std::time_t aSeconds)
 {
 }
 
-DateTime::DateTime(std::tm &arTm)
+DateTime::DateTime(std::tm& arTm)
     : mTp(system_clock::from_time_t(std::mktime(&arTm)))
 {
     mTp -= getTimezoneOffset(arTm);
 }
 
-DateTime::DateTime(timespec &arTimeSpec)
+DateTime::DateTime(timespec& arTimeSpec)
     : mTp(seconds(arTimeSpec.tv_sec))
 {
     mTp += nanoseconds(arTimeSpec.tv_nsec);
 }
 
 
-int64_t DateTime::SecondsBetween(const DateTime &arOther) const
+int64_t DateTime::SecondsBetween(const DateTime& arOther) const
 {
     return duration_cast<seconds>(arOther.mTp - mTp).count();
 }
 
-int64_t DateTime::MilliSecondsBetween(const DateTime &arOther) const
+int64_t DateTime::MilliSecondsBetween(const DateTime& arOther) const
 {
     return duration_cast<milliseconds>(arOther.mTp - mTp).count();
 }
 
-int64_t DateTime::MicroSecondsBetween(const DateTime &arOther) const
+int64_t DateTime::MicroSecondsBetween(const DateTime& arOther) const
 {
     return duration_cast<microseconds>(arOther.mTp - mTp).count();
 }
 
-int64_t DateTime::NanoSecondsBetween(const DateTime &arOther) const
+int64_t DateTime::NanoSecondsBetween(const DateTime& arOther) const
 {
     return duration_cast<nanoseconds>(arOther.mTp - mTp).count();
 }
@@ -143,8 +143,8 @@ DateTime::operator std::tm() const
     std::tm result{};
     auto t = system_clock::to_time_t(time_point_cast<system_clock::duration>(mTp));
     gmtime_r(&t, &result);
-//    t -= getTimezoneOffset(result).count();
-//    gmtime_r(&t, &result);
+    // t -= getTimezoneOffset(result).count();
+    // gmtime_r(&t, &result);
     return result;
 }
 
@@ -153,7 +153,7 @@ timespec DateTime::GetTimeSpec() const
     return timePointToTimespec(mTp);
 }
 
-std::string DateTime::ToString(const char *apFormat) const
+std::string DateTime::ToString(const char* apFormat) const
 {
     std::tm tm = *this;
     std::stringstream ss;
@@ -217,7 +217,7 @@ std::string DateTime::ToHTTP() const
     return ToString("%a, %d %b %Y %H:%M:%S GMT");
 }
 
-DateTime& DateTime::FromString(const std::string &arTimeString, const char *apFormat)
+DateTime& DateTime::FromString(const std::string& arTimeString, const char* apFormat)
 {
     std::tm tm = {};
     unsigned int msecs = 0;
@@ -234,90 +234,90 @@ DateTime& DateTime::FromString(const std::string &arTimeString, const char *apFo
     return *this;
 }
 
-DateTime DateTime::operator +(const DateTime &arOther) const
+DateTime DateTime::operator+(const DateTime& arOther) const
 {
     DateTime result;
     result.mTp = TimePoint(mTp.time_since_epoch() + arOther.mTp.time_since_epoch());
     return result;
 }
 
-DateTime DateTime::operator -(const DateTime &arOther) const
+DateTime DateTime::operator-(const DateTime& arOther) const
 {
     DateTime result;
     result.mTp = TimePoint(mTp - arOther.mTp);
     return result;
 }
 
-DateTime& DateTime::operator +=(const DateTime &arOther)
+DateTime& DateTime::operator+=(const DateTime& arOther)
 {
     mTp += arOther.mTp.time_since_epoch();
     return *this;
 }
 
-DateTime& DateTime::operator -=(const DateTime &arOther)
+DateTime& DateTime::operator-=(const DateTime& arOther)
 {
     mTp -= arOther.mTp.time_since_epoch();
     return *this;
 }
 
-DateTime DateTime::operator+(const std::chrono::system_clock::duration &arDuration) const
+DateTime DateTime::operator+(const std::chrono::system_clock::duration& arDuration) const
 {
     DateTime result;
     result.mTp = mTp + arDuration;
     return result;
 }
 
-DateTime DateTime::operator-(const std::chrono::system_clock::duration &arDuration) const
+DateTime DateTime::operator-(const std::chrono::system_clock::duration& arDuration) const
 {
     DateTime result;
     result.mTp = mTp - arDuration;
     return result;
 }
 
-DateTime& DateTime::operator +=(const std::chrono::system_clock::duration &arDuration)
+DateTime& DateTime::operator+=(const std::chrono::system_clock::duration& arDuration)
 {
     mTp += arDuration;
     return *this;
 }
 
-DateTime& DateTime::operator -=(const std::chrono::system_clock::duration &arDuration)
+DateTime& DateTime::operator-=(const std::chrono::system_clock::duration& arDuration)
 {
     mTp -= arDuration;
     return *this;
 }
 
 
-bool DateTime::operator <(const DateTime &arOther) const
+bool DateTime::operator<(const DateTime& arOther) const
 {
     return mTp < arOther.mTp;
 }
 
-bool DateTime::operator >(const DateTime &arOther) const
+bool DateTime::operator>(const DateTime& arOther) const
 {
     return mTp > arOther.mTp;
 }
 
-bool DateTime::operator <=(const DateTime &arOther) const
+bool DateTime::operator<=(const DateTime& arOther) const
 {
     return mTp <= arOther.mTp;
 }
 
-bool DateTime::operator >=(const DateTime &arOther) const
+bool DateTime::operator>=(const DateTime& arOther) const
 {
     return mTp >= arOther.mTp;
 }
 
-bool DateTime::operator ==(const DateTime &arOther) const
+bool DateTime::operator==(const DateTime& arOther) const
 {
     return mTp == arOther.mTp;
 }
 
-bool DateTime::operator !=(const DateTime &arOther) const
+bool DateTime::operator!=(const DateTime& arOther) const
 {
     return mTp != arOther.mTp;
 }
 
-std::chrono::seconds DateTime::getTimezoneOffset(std::tm &arTm)
+std::chrono::seconds DateTime::getTimezoneOffset(std::tm& arTm)
 {
     std::time_t t = std::mktime(&arTm);
     std::tm gm_tm{};
@@ -339,26 +339,26 @@ DateTime::Time DateTime::GetTime() const
     return Time(milliseconds(ms));
 }
 
-std::ostream& operator <<(std::ostream &os, const DateTime::Date &arDate)
+std::ostream& operator<<(std::ostream& os, const DateTime::Date& arDate)
 {
     os << std::setfill('0') << std::setw(4) << static_cast<int>(arDate.year()) << "-"
-        << std::setw(2) << static_cast<unsigned>(arDate.month()) << "-"
-        << std::setw(2) << static_cast<unsigned>(arDate.day());
+       << std::setw(2) << static_cast<unsigned>(arDate.month()) << "-"
+       << std::setw(2) << static_cast<unsigned>(arDate.day());
     return os;
 }
 
-std::ostream& operator <<(std::ostream &os, const DateTime::Time &arTime)
+std::ostream& operator<<(std::ostream& os, const DateTime::Time& arTime)
 {
     milliseconds msecs = duration_cast<milliseconds>(arTime.subseconds());
 
     os << std::setfill('0') << std::setw(2) << arTime.hours().count() << ":"
-        << std::setw(2) << arTime.minutes().count() << ":"
-        << std::setw(2) << arTime.seconds().count() << "."
-        << std::setw(3) << msecs.count();
+       << std::setw(2) << arTime.minutes().count() << ":"
+       << std::setw(2) << arTime.seconds().count() << "."
+       << std::setw(3) << msecs.count();
     return os;
 }
 
-std::ostream& operator <<(std::ostream &os, const DateTime &arDateTime)
+std::ostream& operator<<(std::ostream& os, const DateTime& arDateTime)
 {
     os << arDateTime.GetDate() << " " << arDateTime.GetTime();
     return os;
