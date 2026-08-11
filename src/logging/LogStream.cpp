@@ -49,7 +49,7 @@ LogStream::~LogStream()
 
 void LogStream::flush()
 {
-    if (mBuffer.rdbuf()->in_avail() > 0) {
+    if (!mBuffer.view().empty()) {
         writeToLogger(mBuffer.view());
         mBuffer.str(std::string());
         mBuffer.clear();
