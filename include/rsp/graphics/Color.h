@@ -178,11 +178,6 @@ public:
         return uint32_t{_rgba.alpha} << 24 | uint32_t{_rgba.red} << 16 | uint32_t{_rgba.green} << 8 | uint32_t{_rgba.blue};
     }
 
-    [[nodiscard]] constexpr operator ARGB_t() const noexcept
-    {
-        return AsUint();
-    }
-
     /**
      * \brief For fast color value in native 32-bit RGBA format
      *

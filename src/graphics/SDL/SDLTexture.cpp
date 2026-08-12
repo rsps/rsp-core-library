@@ -178,7 +178,7 @@ Texture& SDLTexture::Fill(const Color &arColor, OptionalRect arRect) // NOLINT
 Texture& SDLTexture::SetBlendOperation(Texture::BlendOperation aOp, const Color &arColorKey) // NOLINT
 {
     mBlendOperation = aOp;
-    mColorKey = arColorKey;
+    mColorKey = arColorKey.AsUint();
 
     if (mBlendOperation == Texture::BlendOperation::Copy) {
         if (SDL_SetTextureBlendMode(mpTexture->Get(), SDL_BLENDMODE_NONE)) {

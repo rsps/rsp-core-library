@@ -121,7 +121,7 @@ TEST_CASE("Color")
 
         SUBCASE("uint32 Conversion") {
             // Act
-            uint32_t newUint32 = testCol;
+            uint32_t newUint32 = testCol.AsUint();
 
             // Assert
             CHECK_EQ(newUint32, cColorVal);
@@ -132,7 +132,7 @@ TEST_CASE("Color")
             Color newColour = testCol;
 
             // Assert
-            CHECK_EQ(static_cast<uint32_t>(newColour), static_cast<uint32_t>(testCol));
+            CHECK_EQ(newColour.AsUint(), testCol.AsUint());
         }
 
         SUBCASE("Blend") {
