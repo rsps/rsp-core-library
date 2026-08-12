@@ -79,8 +79,8 @@ TEST_CASE("GfxEngine")
 //        const uint32_t cRedColor = 0xFFC41616;
         Point top_point = gfx.GetSceneMap().ActiveSceneAs<SecondScene>().GetTopRect().GetTopLeft() + Point(1, 1);
         Point bottom_point = gfx.GetSceneMap().ActiveSceneAs<SecondScene>().GetBotRect().GetTopLeft() + Point(1, 1);
-        CHECK_HEX(renderer.GetPixel(top_point).AsUint(), cGreenColor);
-        CHECK_HEX(renderer.GetPixel(bottom_point).AsUint(), cGreenColor);
+        CHECK_HEX(renderer.GetPixel(top_point).ToARGB(), cGreenColor);
+        CHECK_HEX(renderer.GetPixel(bottom_point).ToARGB(), cGreenColor);
         CHECK_EQ(topBtnClicked, 2);
         CHECK_EQ(bottomBtnLift, 1);
 //        std::this_thread::sleep_for(std::chrono::milliseconds(3000));

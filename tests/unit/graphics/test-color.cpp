@@ -34,7 +34,7 @@ TEST_CASE("Color")
             CHECK_EQ(col.GetRed(), cRed);
             CHECK_EQ(col.GetGreen(), cGreen);
             CHECK_EQ(col.GetBlue(), cBlue);
-            CHECK_HEX(col.AsUint(), cColorVal);
+            CHECK_HEX(col.ToARGB(), cColorVal);
 #if __BYTE_ORDER == __LITTLE_ENDIAN
             CHECK_HEX(col.AsRaw(), 0x12785634);
 #else
@@ -50,7 +50,7 @@ TEST_CASE("Color")
             CHECK_EQ(col.GetRed(), cRed);
             CHECK_EQ(col.GetGreen(), cGreen);
             CHECK_EQ(col.GetBlue(), cBlue);
-            CHECK_HEX(col.AsUint(), cColorVal);
+            CHECK_HEX(col.ToARGB(), cColorVal);
         }
         SUBCASE("Copy constructor") {
             // Arrange & Act
@@ -121,7 +121,7 @@ TEST_CASE("Color")
 
         SUBCASE("uint32 Conversion") {
             // Act
-            uint32_t newUint32 = testCol.AsUint();
+            uint32_t newUint32 = testCol.ToARGB();
 
             // Assert
             CHECK_EQ(newUint32, cColorVal);
@@ -132,7 +132,7 @@ TEST_CASE("Color")
             Color newColour = testCol;
 
             // Assert
-            CHECK_EQ(newColour.AsUint(), testCol.AsUint());
+            CHECK_EQ(newColour.ToARGB(), testCol.ToARGB());
         }
 
         SUBCASE("Blend") {

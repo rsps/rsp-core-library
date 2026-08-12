@@ -173,7 +173,7 @@ public:
      * \brief Get the ARGB value. This is a conversion function.
      * \return ARGB
      */
-    [[nodiscard]] constexpr ARGB_t AsUint() const noexcept
+    [[nodiscard]] constexpr ARGB_t ToARGB() const noexcept
     {
         return uint32_t{_rgba.alpha} << 24 | uint32_t{_rgba.red} << 16 | uint32_t{_rgba.green} << 8 | uint32_t{_rgba.blue};
     }
@@ -208,7 +208,7 @@ public:
 
     [[nodiscard]] constexpr bool operator==(const ARGB_t& aARGB) const noexcept
     {
-        return AsUint() == aARGB;
+        return ToARGB() == aARGB;
     }
 
     /**
@@ -221,8 +221,8 @@ public:
      */
     [[nodiscard]] static constexpr Color Blend(const Color& arBg, const Color& arFg) noexcept
     {
-        uint32_t fg = arFg.AsUint();
-        uint32_t bg = arBg.AsUint();
+        uint32_t fg = arFg.ToARGB();
+        uint32_t bg = arBg.ToARGB();
         uint32_t a = fg >> 24;
 
         // If source pixel is fully transparent, just return the background

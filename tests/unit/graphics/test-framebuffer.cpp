@@ -33,10 +33,10 @@ using namespace rsp::exceptions;
 static void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer& fb)
 {
     if (Rect(0, 0, fb.GetWidth(), fb.GetHeight()).IsHit(aX, aY)) {
-        CHECK_HEX(fb.GetPixel(aX, aY).AsUint(), aColor.AsUint());
+        CHECK_HEX(fb.GetPixel(aX, aY).ToARGB(), aColor.ToARGB());
     }
     else {
-        CHECK_HEX(fb.GetPixel(aX, aY).AsUint(), 0);
+        CHECK_HEX(fb.GetPixel(aX, aY).ToARGB(), 0);
     }
 }
 
@@ -70,7 +70,7 @@ TEST_CASE("Framebuffer")
     Random::Seed(static_cast<Random::Engine::result_type>(ms.count())); // generates random seed val
     Color col(Random::Roll<uint8_t>(56u, 200u), Random::Roll<uint8_t>(56u, 200u), Random::Roll<uint8_t>(56u, 200u),
               0xff);
-    MESSAGE("Color: " << TestHelpers::ToHex(col.AsUint()));
+    MESSAGE("Color: " << TestHelpers::ToHex(col.ToARGB()));
 
     SUBCASE("Fill") {
         std::array<Color, 3> colors{Color::Red, Color::Blue, Color::Green};
@@ -79,10 +79,10 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(renderer.Fill(color));
             CHECK_NOTHROW(renderer.Flush());
 
-            uint32_t fb_value = renderer.GetPixel(0, 0).AsUint();
-            CHECK_HEX(fb_value, color.AsUint());
-            fb_value = renderer.GetPixel(479, 799).AsUint();
-            CHECK_HEX(fb_value, color.AsUint());
+            uint32_t fb_value = renderer.GetPixel(0, 0).ToARGB();
+            CHECK_HEX(fb_value, color.ToARGB());
+            fb_value = renderer.GetPixel(479, 799).ToARGB();
+            CHECK_HEX(fb_value, color.ToARGB());
             renderer.Present();
             std::this_thread::sleep_for(500ms);
         }
@@ -127,8 +127,8 @@ TEST_CASE("Framebuffer")
                     py += signumY;
                 }
                 px += signumX;
-                CHECK_HEX(canvas.GetPixelAt(px, py).AsUint(), col.AsUint());
-                CHECK_HEX(renderer.GetPixel(px, py).AsUint(), col.AsUint());
+                CHECK_HEX(canvas.GetPixelAt(px, py).ToARGB(), col.ToARGB());
+                CHECK_HEX(renderer.GetPixel(px, py).ToARGB(), col.ToARGB());
             }
         }
         else {
@@ -139,14 +139,14 @@ TEST_CASE("Framebuffer")
                     px += signumX;
                 }
                 py += signumY;
-                CHECK_HEX(canvas.GetPixelAt(px, py).AsUint(), col.AsUint());
-                CHECK_HEX(renderer.GetPixel(px, py).AsUint(), col.AsUint());
+                CHECK_HEX(canvas.GetPixelAt(px, py).ToARGB(), col.ToARGB());
+                CHECK_HEX(renderer.GetPixel(px, py).ToARGB(), col.ToARGB());
             }
         }
 
         SUBCASE("Lines are Inclusive") {
-            CHECK_HEX(renderer.GetPixel(pointA.GetX(), pointA.GetY()).AsUint(), col.AsUint());
-            CHECK_HEX(renderer.GetPixel(pointB.GetX(), pointB.GetY()).AsUint(), col.AsUint());
+            CHECK_HEX(renderer.GetPixel(pointA.GetX(), pointA.GetY()).ToARGB(), col.ToARGB());
+            CHECK_HEX(renderer.GetPixel(pointB.GetX(), pointB.GetY()).ToARGB(), col.ToARGB());
         }
 
         CHECK_NOTHROW(renderer.Present());
@@ -172,17 +172,17 @@ TEST_CASE("Framebuffer")
         // Expect all four side to hold values
         for (GuiUnit_t i = 0 ; i < rect.GetWidth() ; i++) {
             // Check top side
-            CHECK_HEX(canvas.GetPixelAt(rect.GetLeft() + i, rect.GetTop()).AsUint(), col.AsUint());
-            CHECK_HEX(renderer.GetPixel(leftTop.GetX() + i, leftTop.GetY()).AsUint(), col.AsUint());
+            CHECK_HEX(canvas.GetPixelAt(rect.GetLeft() + i, rect.GetTop()).ToARGB(), col.ToARGB());
+            CHECK_HEX(renderer.GetPixel(leftTop.GetX() + i, leftTop.GetY()).ToARGB(), col.ToARGB());
             // Check bottom side
-            CHECK_HEX(canvas.GetPixelAt(rect.GetLeft() + i, rect.GetBottom() - 1).AsUint(), col.AsUint());
-            CHECK_HEX(renderer.GetPixel(leftTop.GetX() + i, rightBottom.GetY()-1).AsUint(), col.AsUint());
+            CHECK_HEX(canvas.GetPixelAt(rect.GetLeft() + i, rect.GetBottom() - 1).ToARGB(), col.ToARGB());
+            CHECK_HEX(renderer.GetPixel(leftTop.GetX() + i, rightBottom.GetY()-1).ToARGB(), col.ToARGB());
         }
         for (GuiUnit_t i = 0 ; i < rect.GetHeight() ; i++) {
             // Check left side
-            CHECK_HEX(renderer.GetPixel(leftTop.GetX(), rightBottom.GetY()-1 - i).AsUint(), col.AsUint());
+            CHECK_HEX(renderer.GetPixel(leftTop.GetX(), rightBottom.GetY()-1 - i).ToARGB(), col.ToARGB());
             // Check right side
-            CHECK_HEX(renderer.GetPixel(rightBottom.GetX()-1, rightBottom.GetY()-1 - i).AsUint(), col.AsUint());
+            CHECK_HEX(renderer.GetPixel(rightBottom.GetX()-1, rightBottom.GetY()-1 - i).ToARGB(), col.ToARGB());
         }
         CHECK_NOTHROW(renderer.Present());
 
@@ -192,10 +192,10 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(texture.Update(canvas, white));
         CHECK_NOTHROW(renderer.Blit(texture));
         CHECK_NOTHROW(renderer.Flush());
-        CHECK_EQ(renderer.GetPixel(10, 10).AsUint(), white.AsUint());
-        CHECK_NE(renderer.GetPixel(11, 10).AsUint(), white.AsUint());
-        CHECK_NE(renderer.GetPixel(10, 11).AsUint(), white.AsUint());
-        CHECK_NE(renderer.GetPixel(11, 11).AsUint(), white.AsUint());
+        CHECK_EQ(renderer.GetPixel(10, 10).ToARGB(), white.ToARGB());
+        CHECK_NE(renderer.GetPixel(11, 10).ToARGB(), white.ToARGB());
+        CHECK_NE(renderer.GetPixel(10, 11).ToARGB(), white.ToARGB());
+        CHECK_NE(renderer.GetPixel(11, 11).ToARGB(), white.ToARGB());
         CHECK_NOTHROW(renderer.Present());
 
         Rect medium(20, 20, 10, 10);
@@ -203,13 +203,13 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(texture.Update(canvas, white));
         CHECK_NOTHROW(renderer.Blit(texture));
         CHECK_NOTHROW(renderer.Flush());
-        CHECK_EQ(renderer.GetPixel(20, 20).AsUint(), white.AsUint());
-        CHECK_EQ(renderer.GetPixel(20, 29).AsUint(), white.AsUint());
-        CHECK_NE(renderer.GetPixel(20, 30).AsUint(), white.AsUint());
-        CHECK_EQ(renderer.GetPixel(29, 20).AsUint(), white.AsUint());
-        CHECK_NE(renderer.GetPixel(30, 20).AsUint(), white.AsUint());
-        CHECK_EQ(renderer.GetPixel(29, 29).AsUint(), white.AsUint());
-        CHECK_NE(renderer.GetPixel(30, 30).AsUint(), white.AsUint());
+        CHECK_EQ(renderer.GetPixel(20, 20).ToARGB(), white.ToARGB());
+        CHECK_EQ(renderer.GetPixel(20, 29).ToARGB(), white.ToARGB());
+        CHECK_NE(renderer.GetPixel(20, 30).ToARGB(), white.ToARGB());
+        CHECK_EQ(renderer.GetPixel(29, 20).ToARGB(), white.ToARGB());
+        CHECK_NE(renderer.GetPixel(30, 20).ToARGB(), white.ToARGB());
+        CHECK_EQ(renderer.GetPixel(29, 29).ToARGB(), white.ToARGB());
+        CHECK_NE(renderer.GetPixel(30, 30).ToARGB(), white.ToARGB());
         CHECK_NOTHROW(renderer.Present());
     }
 
@@ -260,8 +260,8 @@ TEST_CASE("Framebuffer")
         CHECK_NOTHROW(renderer.Flush());
 
         // Assert
-        CHECK_HEX(renderer.GetPixel(outSideXAxis.GetX(), outSideXAxis.GetY()).AsUint(), 0);
-        CHECK_HEX(renderer.GetPixel(outSideYAxis.GetX(), outSideYAxis.GetY()).AsUint(), 0);
+        CHECK_HEX(renderer.GetPixel(outSideXAxis.GetX(), outSideXAxis.GetY()).ToARGB(), 0);
+        CHECK_HEX(renderer.GetPixel(outSideYAxis.GetX(), outSideYAxis.GetY()).ToARGB(), 0);
     }
 
     SUBCASE("Drawing Images") {
@@ -286,7 +286,7 @@ TEST_CASE("Framebuffer")
         CHECK_EQ(testImgMap.GetHeight(), height);
         CHECK_EQ(testImgMap.GetWidth(), width);
         CHECK_EQ(testImgMap.GetPixelData().GetDataSize(), static_cast<size_t>(width * height * 3));
-        CHECK_HEX(testImgMap.GetPixelAt(50, 50).AsUint(), 0xFF031b95);
+        CHECK_HEX(testImgMap.GetPixelAt(50, 50).ToARGB(), 0xFF031b95);
 
         SUBCASE("Draw image from file") {
             // Act
@@ -296,7 +296,7 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(renderer.Flush());
 
             // Assert
-            CHECK_HEX(renderer.GetPixel(topLeftImgCorner.GetX() + 4, topLeftImgCorner.GetY() + 4).AsUint(), 0xFF020F92);
+            CHECK_HEX(renderer.GetPixel(topLeftImgCorner.GetX() + 4, topLeftImgCorner.GetY() + 4).ToARGB(), 0xFF020F92);
 
             CHECK_NOTHROW(renderer.Present());
         }
@@ -320,20 +320,20 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(renderer.Flush());
 
             // Assert
-            CHECK_HEX(testImgMap.GetPixelAt(width / 2, 0).AsUint(), 0xFF777777);
-            CHECK_HEX(testImgMap.GetPixelAt(0, height / 2).AsUint(), 0xFF777777);
-            CHECK_HEX(testImgMap.GetPixelAt(width - 12, height / 2).AsUint(), 0xFFCFCFCF);
-            CHECK_HEX(testImgMap.GetPixelAt(width / 2, height - 4).AsUint(), 0xFF8F8F8F);
+            CHECK_HEX(testImgMap.GetPixelAt(width / 2, 0).ToARGB(), 0xFF777777);
+            CHECK_HEX(testImgMap.GetPixelAt(0, height / 2).ToARGB(), 0xFF777777);
+            CHECK_HEX(testImgMap.GetPixelAt(width - 12, height / 2).ToARGB(), 0xFFCFCFCF);
+            CHECK_HEX(testImgMap.GetPixelAt(width / 2, height - 4).ToARGB(), 0xFF8F8F8F);
 
-            CHECK_HEX(renderer.GetPixel(topLeftImgCorner.GetX() + width / 2 , topLeftImgCorner.GetY() + 0).AsUint(),
+            CHECK_HEX(renderer.GetPixel(topLeftImgCorner.GetX() + width / 2 , topLeftImgCorner.GetY() + 0).ToARGB(),
                       0xFF777777);
-            CHECK_HEX(renderer.GetPixel(topLeftImgCorner.GetX() + 0 , topLeftImgCorner.GetY() + height / 2).AsUint(),
+            CHECK_HEX(renderer.GetPixel(topLeftImgCorner.GetX() + 0 , topLeftImgCorner.GetY() + height / 2).ToARGB(),
                       0xFF777777);
             CHECK_HEX(
-                renderer.GetPixel(topLeftImgCorner.GetX() + width - 12, topLeftImgCorner.GetY() + height / 2).AsUint(),
+                renderer.GetPixel(topLeftImgCorner.GetX() + width - 12, topLeftImgCorner.GetY() + height / 2).ToARGB(),
                 0xFFCFCFCF);
             CHECK_HEX(
-                renderer.GetPixel(topLeftImgCorner.GetX() + width / 2 , topLeftImgCorner.GetY() + height - 4).AsUint(),
+                renderer.GetPixel(topLeftImgCorner.GetX() + width / 2 , topLeftImgCorner.GetY() + height - 4).ToARGB(),
                 0xFF8F8F8F);
             CHECK_NOTHROW(renderer.Present());
         }
@@ -354,16 +354,16 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(renderer.Flush());
 
             // Assert
-            CHECK_HEX(emptyMap.GetPixel({0,0}).AsUint(), col.AsUint());
-            CHECK_HEX(emptyMap.GetPixel({1,1}).AsUint(), col.AsUint());
+            CHECK_HEX(emptyMap.GetPixel({0,0}).ToARGB(), col.ToARGB());
+            CHECK_HEX(emptyMap.GetPixel({1,1}).ToARGB(), col.ToARGB());
 
-            CHECK_HEX(canvas.GetPixel(topLeftImgCorner).AsUint(), col.AsUint());
-            CHECK_HEX(canvas.GetPixel(topLeftImgCorner + Point(width-1, height-1)).AsUint(), col.AsUint());
-            CHECK_HEX(canvas.GetPixel(topLeftImgCorner + randomPoint).AsUint(), Color::White);
+            CHECK_HEX(canvas.GetPixel(topLeftImgCorner).ToARGB(), col.ToARGB());
+            CHECK_HEX(canvas.GetPixel(topLeftImgCorner + Point(width-1, height-1)).ToARGB(), col.ToARGB());
+            CHECK_HEX(canvas.GetPixel(topLeftImgCorner + randomPoint).ToARGB(), Color::White);
 
-            CHECK_HEX(renderer.GetPixel(topLeftImgCorner).AsUint(), col.AsUint());
-            CHECK_HEX(renderer.GetPixel(topLeftImgCorner + Point(width-1, height-1)).AsUint(), col.AsUint());
-            CHECK_HEX(renderer.GetPixel(topLeftImgCorner + randomPoint).AsUint(), Color::White);
+            CHECK_HEX(renderer.GetPixel(topLeftImgCorner).ToARGB(), col.ToARGB());
+            CHECK_HEX(renderer.GetPixel(topLeftImgCorner + Point(width-1, height-1)).ToARGB(), col.ToARGB());
+            CHECK_HEX(renderer.GetPixel(topLeftImgCorner + randomPoint).ToARGB(), Color::White);
             CHECK_NOTHROW(renderer.Present());
         }
     }
@@ -385,8 +385,8 @@ TEST_CASE("Framebuffer")
         // Assert
         CHECK_GT(largeImgMap.GetHeight(), renderer.GetHeight());
         CHECK_GT(largeImgMap.GetWidth(), renderer.GetWidth());
-        CHECK_NE(largeImgMap.GetPixel(randomPoint).AsUint(), 0u);
-        CHECK_NE(renderer.GetPixel(randomPoint).AsUint(), 0u);
+        CHECK_NE(largeImgMap.GetPixel(randomPoint).ToARGB(), 0u);
+        CHECK_NE(renderer.GetPixel(randomPoint).ToARGB(), 0u);
         CHECK_NOTHROW(renderer.Present());
 
         SUBCASE("Pan screen over large image") {
@@ -427,9 +427,9 @@ TEST_CASE("Framebuffer")
             CHECK_NOTHROW(renderer.Flush());
 
             // Assert
-            CHECK_HEX(renderer.GetPixel(43, 171).AsUint(), 0xFF000000);
-            CHECK_HEX(renderer.GetPixel(44, 172).AsUint(), 0xFF121C2D);
-            CHECK_HEX(renderer.GetPixel(79, 201).AsUint(), 0xFF3583C5);
+            CHECK_HEX(renderer.GetPixel(43, 171).ToARGB(), 0xFF000000);
+            CHECK_HEX(renderer.GetPixel(44, 172).ToARGB(), 0xFF121C2D);
+            CHECK_HEX(renderer.GetPixel(79, 201).ToARGB(), 0xFF3583C5);
         }
     }
 
@@ -695,7 +695,7 @@ TEST_CASE("Framebuffer")
         }
         CHECK_NOTHROW(renderer.Blit(texture));
         CHECK_NOTHROW(renderer.Flush());
-        CHECK_HEX(renderer.GetPixel(Point(180, 180)).AsUint(), 0xFF007A0A);
+        CHECK_HEX(renderer.GetPixel(Point(180, 180)).ToARGB(), 0xFF007A0A);
     }
 }
 

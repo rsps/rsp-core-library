@@ -91,17 +91,17 @@ TEST_CASE("Label")
 
     // Don't know good method to test that text is rendered correctly, but a least we can test that nothing paint outside background
     for (int y = r.GetTop(); y < r.GetBottom() ; ++y) {
-        CHECK_HEX(renderer.GetPixel( 49, y).AsUint(), Color::Grey);
-        CHECK_HEX(renderer.GetPixel(430, y).AsUint(), Color::Grey);
-        CHECK_HEX(renderer.GetPixel( 50, y).AsUint(), Color::Yellow);
-        CHECK_HEX(renderer.GetPixel(429, y).AsUint(), Color::Yellow);
+        CHECK_HEX(renderer.GetPixel( 49, y).ToARGB(), Color::Grey);
+        CHECK_HEX(renderer.GetPixel(430, y).ToARGB(), Color::Grey);
+        CHECK_HEX(renderer.GetPixel( 50, y).ToARGB(), Color::Yellow);
+        CHECK_HEX(renderer.GetPixel(429, y).ToARGB(), Color::Yellow);
     }
 
     for (int x = r.GetLeft(); x < r.GetRight() ; ++x) {
-        CHECK_HEX(renderer.GetPixel(x,  99).AsUint(), Color::Grey);
-        CHECK_HEX(renderer.GetPixel(x, 300).AsUint(), Color::Grey);
-        CHECK_HEX(renderer.GetPixel(x, 100).AsUint(), Color::Yellow);
-        CHECK_HEX(renderer.GetPixel(x, 299).AsUint(), Color::Yellow);
+        CHECK_HEX(renderer.GetPixel(x,  99).ToARGB(), Color::Grey);
+        CHECK_HEX(renderer.GetPixel(x, 300).ToARGB(), Color::Grey);
+        CHECK_HEX(renderer.GetPixel(x, 100).ToARGB(), Color::Yellow);
+        CHECK_HEX(renderer.GetPixel(x, 299).ToARGB(), Color::Yellow);
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
