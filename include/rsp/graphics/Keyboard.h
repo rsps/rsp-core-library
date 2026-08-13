@@ -37,8 +37,9 @@ namespace rsp::graphics {
 #define KB_Y 0
 #endif
 
-#define KEY(x,y) {KB_X + x, KB_Y + y}
+#define KEY(x, y) {KB_X + x, KB_Y + y}
 
+// clang-format off
 #define K_SPACE   KEY( 98, 224)
 #define K_NUMBERS KEY(  0, 224)
 #define K_LETTERS KEY(  0, 224)
@@ -117,7 +118,7 @@ namespace rsp::graphics {
 #define K_POUND_SIGN K_J
 #define K_EURO_SIGN K_K
 #define K_DOLLAR_SIGN K_L
-
+// clang-format on
 
 class Key : public Button
 {
@@ -126,13 +127,13 @@ public:
     Key& Symbol(int aSymbol);
 };
 
-class KeyboardBase: public Control
+class KeyboardBase : public Control
 {
 public:
-    using KeyboardCallback_t = rsp::messaging::Notifier<const std::string &>;
+    using KeyboardCallback_t = rsp::messaging::Notifier<const std::string&>;
 
     [[nodiscard]] const std::string& GetInput() const { return mInput; }
-    KeyboardBase& SetInput(const std::string &arText);
+    KeyboardBase& SetInput(const std::string& arText);
 
     KeyboardCallback_t& OnKeyClick() { return mOnKeyClick; }
 
@@ -142,39 +143,51 @@ protected:
     std::string mInput{};
     std::vector<TouchCallback_t::Listener_t> mKeyClicks{};
 
-    void addBtn(Key &arBtn);
-    void setSymbols(const std::string &arSymbols, bool aUpperCase = false);
-    virtual void doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol) = 0;
+    void addBtn(Key& arBtn);
+    void setSymbols(const std::string& arSymbols, bool aUpperCase = false);
+    virtual void doKeyClick(const TouchEvent& arEvent, uint32_t aSymbol) = 0;
 };
 
 /**
  * \class Keyboard
  * \brief GUI widget with a complete keyboard in multiple layouts.
  */
-class Keyboard: public KeyboardBase
+class Keyboard : public KeyboardBase
 {
 public:
-    static constexpr int cKEY_SHIFT    = 1000000;
-    static constexpr int cKEY_LETTERS  = 1000001;
-    static constexpr int cKEY_NUMBERS  = 1000002;
+    static constexpr int cKEY_SHIFT = 1000000;
+    static constexpr int cKEY_LETTERS = 1000001;
+    static constexpr int cKEY_NUMBERS = 1000002;
     static constexpr int cKEY_SPECIALS = 1000003;
 
     const Rect cSpecialLeft = {0, 224, 98, 64};
     const Rect cSpecialRight = {356, 224, 98, 64};
 
-    enum class LayoutType { Letters, Numbers, Special };
+    enum class LayoutType {
+        Letters,
+        Numbers,
+        Special
+    };
 
-    enum class TextureId { BigSpecial = 1000, Erase, Key, LowerCase, SmallSpecial, Space, UpperCase };
+    enum class TextureId {
+        BigSpecial = 1000,
+        Erase,
+        Key,
+        LowerCase,
+        SmallSpecial,
+        Space,
+        UpperCase
+    };
 
     enum class Buttons {
-        None      = 0x00,
-        Shift     = 0x01,
-        Letters   = 0x02,
-        Numbers   = 0x04,
-        Specials  = 0x08,
+        None = 0x00,
+        Shift = 0x01,
+        Letters = 0x02,
+        Numbers = 0x04,
+        Specials = 0x08,
         Backspace = 0x10,
-        Space     = 0x20,
-        All       = 0x3F
+        Space = 0x20,
+        All = 0x3F
     };
 
     /**
@@ -206,6 +219,7 @@ public:
      * \return self
      */
     Keyboard& AllowedButtons(utils::EnumFlags<Buttons> aMask);
+
 protected:
     Key mBtnShift{};
     Key mBtnLettersLeft{};
@@ -218,10 +232,10 @@ protected:
     utils::EnumFlags<Buttons> mButtonMask = Buttons::All;
     LayoutType mLayout{};
 
-    void doKeyClick(const TouchEvent &arEvent, uint32_t aSymbol) override;
+    void doKeyClick(const TouchEvent& arEvent, uint32_t aSymbol) override;
     const PixelData& getPixelData(TextureId aId);
 };
 
-} /* namespace rsp::graphics */
+} // namespace rsp::graphics
 
 #endif // RSP_CORE_LIB_GRAPHICS_KEYBOARD_H

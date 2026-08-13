@@ -7,6 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
 #ifndef RSP_CORE_LIB_GRAPHICS_FONT_RAW_INTERFACE_H
 #define RSP_CORE_LIB_GRAPHICS_FONT_RAW_INTERFACE_H
 
@@ -18,7 +19,6 @@
 #include <locale>
 
 namespace rsp::graphics {
-
 
 /**
  * \class Glyph
@@ -54,17 +54,17 @@ public:
      * @param arGlyph The glyph to dump
      * @return output stream
      */
-    friend std::ostream& operator<<(std::ostream &os, const Glyph &arGlyph)
+    friend std::ostream& operator<<(std::ostream& os, const Glyph& arGlyph)
     {
         os << "Symbol: '";
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
         os << convert.to_bytes(&arGlyph.mSymbolUnicode, &arGlyph.mSymbolUnicode + 1);
         os << "' "
-            << "Top: " << arGlyph.mTop << ", "
-            << "Left: " << arGlyph.mLeft << ", "
-            << "Height: " << arGlyph.mHeight << ", "
-            << "Width: " << arGlyph.mWidth << ", "
-            << "Advance: (" << arGlyph.mAdvanceX << "," << arGlyph.mAdvanceY << ")";
+           << "Top: " << arGlyph.mTop << ", "
+           << "Left: " << arGlyph.mLeft << ", "
+           << "Height: " << arGlyph.mHeight << ", "
+           << "Width: " << arGlyph.mWidth << ", "
+           << "Advance: (" << arGlyph.mAdvanceX << "," << arGlyph.mAdvanceY << ")";
         return os;
     }
 };
@@ -84,7 +84,7 @@ public:
     Rect mBoundingRect{};
     std::vector<long> mLineWidths{};
 
-    friend std::ostream& operator <<(std::ostream &os, const Glyphs &arGlyphs)
+    friend std::ostream& operator<<(std::ostream& os, const Glyphs& arGlyphs)
     {
         os << "Glyphs (" << arGlyphs.GetCount() << ")\n"
            << "  Underline Center: " << arGlyphs.mUnderlineYCenter << "\n"
@@ -95,18 +95,17 @@ public:
            << "  Line Widths: [";
 
         std::string d;
-        for (const auto &w : arGlyphs.mLineWidths) {
+        for (const auto& w : arGlyphs.mLineWidths) {
             os << d << w;
             d = ",";
         }
         os << "]";
 
-        for (unsigned i=0 ; i < arGlyphs.GetCount() ; ++i) {
+        for (unsigned i = 0; i < arGlyphs.GetCount(); ++i) {
             os << "\n  " << arGlyphs.GetGlyph(i);
         }
         return os;
     }
-
 };
 
 /**
@@ -116,7 +115,7 @@ public:
  * \param arGlyph
  * \return
  */
-std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph);
+std::ostream& operator<<(std::ostream& os, const Glyph& arGlyph);
 
 /**
  * \brief Stream overloading for the Glyphs container. Can be used for debugging.
@@ -125,7 +124,7 @@ std::ostream& operator <<(std::ostream &os, const Glyph &arGlyph);
  * \param arGlyphs
  * \return
  */
-std::ostream& operator <<(std::ostream &os, const Glyphs &arGlyphs);
+std::ostream& operator<<(std::ostream& os, const Glyphs& arGlyphs);
 
 enum class FontStyles {
     Normal = 0,
@@ -145,7 +144,7 @@ public:
 
     virtual ~FontRawInterface() = default;
 
-    virtual std::shared_ptr<Glyphs> MakeGlyphs(const std::string &arText, int aLineSpacing, int aHAlignment) = 0;
+    virtual std::shared_ptr<Glyphs> MakeGlyphs(const std::string& arText, int aLineSpacing, int aHAlignment) = 0;
     [[nodiscard]] virtual std::string GetFamilyName() const = 0;
     virtual void SetSize(int aWidthPx, int aHeightPx) = 0;
 
@@ -159,6 +158,6 @@ protected:
     int mSizePx = 0;
 };
 
-}
+} // namespace rsp::graphics
 
 #endif // RSP_CORE_LIB_GRAPHICS_FONT_RAW_INTERFACE_H
