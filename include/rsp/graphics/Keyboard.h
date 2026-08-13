@@ -160,8 +160,8 @@ public:
     static constexpr int cKEY_NUMBERS = 1000002;
     static constexpr int cKEY_SPECIALS = 1000003;
 
-    const Rect cSpecialLeft = {0, 224, 98, 64};
-    const Rect cSpecialRight = {356, 224, 98, 64};
+    static inline const Rect cSpecialLeft = {0, 224, 98, 64};
+    static inline const Rect cSpecialRight = {356, 224, 98, 64};
 
     enum class LayoutType {
         Letters,
