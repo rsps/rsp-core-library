@@ -10,10 +10,9 @@
 
 #include <functional>
 #include <string>
-#include <locale>
-#include <codecvt>
 #include <rsp/graphics/GfxCache.h>
 #include <rsp/graphics/Keyboard.h>
+#include <rsp/utils/StrUtils.h>
 
 using namespace rsp::utils;
 
@@ -47,14 +46,13 @@ void KeyboardBase::addBtn(Key& arBtn)
 void KeyboardBase::setSymbols(const std::string& arSymbols, bool aUpperCase)
 {
     ASSERT(arSymbols.length() >= mKeys.size())
-    std::u32string utf32 = std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.from_bytes(arSymbols);
+    std::u32string utf32 = StrUtils::Utf8ToUtf32(arSymbols);
     unsigned int index = 0;
     for (char32_t symbol : utf32) {
         Button& btn = mKeys[index++];
         symbol = aUpperCase ? std::towupper(symbol) : std::towlower(symbol);
         btn.SetId(uint32_t(symbol));
-        std::wstring ws(1, wchar_t(symbol));
-        std::string utf8 = std::wstring_convert<std::codecvt_utf8<wchar_t>>{}.to_bytes(ws);
+        std::string utf8 = StrUtils::Utf32ToUtf8(symbol);
         btn.SetCaption(utf8).SetName(utf8);
     }
 }
@@ -260,9 +258,7 @@ void Keyboard::doKeyClick(const TouchEvent& /*arEvent*/, uint32_t aSymbol)
             break;
 
         default:
-            std::wstring ws(1, wchar_t(aSymbol));
-            std::string utf8 = std::wstring_convert<std::codecvt_utf8<wchar_t>>{}.to_bytes(ws);
-            mInput += utf8;
+            mInput += StrUtils::Utf32ToUtf8(aSymbol);
             mOnKeyClick(mInput);
             break;
     }

@@ -12,11 +12,13 @@
 #define RSP_CORE_LIB_GRAPHICS_FONT_RAW_INTERFACE_H
 
 #include <rsp/graphics/Rect.h>
-#include <string>
+#include <rsp/utils/StrUtils.h>
+
 #include <memory>
+#include <ostream>
+#include <string_view>
+#include <string>
 #include <vector>
-#include <codecvt>
-#include <locale>
 
 namespace rsp::graphics {
 
@@ -57,8 +59,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Glyph& arGlyph)
     {
         os << "Symbol: '";
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
-        os << convert.to_bytes(&arGlyph.mSymbolUnicode, &arGlyph.mSymbolUnicode + 1);
+        os << rsp::utils::StrUtils::Utf32ToUtf8(arGlyph.mSymbolUnicode);
         os << "' "
            << "Top: " << arGlyph.mTop << ", "
            << "Left: " << arGlyph.mLeft << ", "
