@@ -8,7 +8,13 @@
  * \author      Steffen Brummer
  */
 
-#ifdef __linux__
+#include <version>
+
+// The __throw_* functions overridden below are internal helpers of GNU libstdc++.
+// They do not exist in other standard library implementations (e.g. libc++ defines
+// some of them as inline functions in its headers, which would cause redefinitions).
+// Therefore only compile these overrides when building against libstdc++.
+#if defined(__GLIBCXX__)
 
 #include <rsp/exceptions/ExceptionHelper.h>
 #include <new>
@@ -162,4 +168,4 @@ __throw_bad_function_call()
 
 } /* namespace std */
 
-#endif /* __linux__ */
+#endif /* __GLIBCXX__ */

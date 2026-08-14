@@ -10,7 +10,7 @@
 #ifndef RSP_CORE_LIB_CHUNKED_DATA_PROVIDER_INTERFACE_H
 #define RSP_CORE_LIB_CHUNKED_DATA_PROVIDER_INTERFACE_H
 
-#include <spanstream>
+#include <span>
 #include <string>
 
 namespace rsp::network {

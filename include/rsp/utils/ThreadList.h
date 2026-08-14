@@ -26,12 +26,6 @@ public:
     ThreadList();
     ~ThreadList() override;
 
-    ThreadList(ThreadList &&arOther) = default;
-    ThreadList& operator=(ThreadList &&arOther) = default;
-
-    ThreadList(const ThreadList &arOther) = delete;
-    ThreadList& operator=(const ThreadList &arOther) = delete;
-
     ThreadList& AddThread(ThreadInterface& arThread);
     ThreadList& RemoveThread(ThreadInterface& arThread);
 

@@ -17,13 +17,13 @@
 
 namespace {
 
-constexpr uint32_t* assume_aligned_u32(uint8_t* p)
+uint32_t* assume_aligned_u32(uint8_t* p)
 {
     assert((reinterpret_cast<uintptr_t>(p) % alignof(uint32_t)) == 0);
     return static_cast<uint32_t*>(static_cast<void*>(p));
 }
 
-constexpr const uint32_t* assume_aligned_u32(const uint8_t* p)
+const uint32_t* assume_aligned_u32(const uint8_t* p)
 {
     assert((reinterpret_cast<uintptr_t>(p) % alignof(uint32_t)) == 0);
     return static_cast<const uint32_t*>(static_cast<const void*>(p));

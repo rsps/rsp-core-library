@@ -31,16 +31,12 @@ public:
         }
     }
 
-    GfxInputEvents(GfxInputEvents &&) = default;
-
     ~GfxInputEvents() override
     {
         if (&GetInstance() == this) {
             SetInstance(nullptr);
         }
     }
-
-    GfxInputEvents& operator=(GfxInputEvents &&) = default;
 
     /**
      * \brief Parse input from event driver

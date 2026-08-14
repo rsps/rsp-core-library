@@ -79,7 +79,7 @@ BackTrace::BackTrace(size_t aEntriesToDiscard)
             offset = s.substr(end, s.length());
         }
 
-        mStackEntries.emplace_back(file, function, std:stoul(offset));
+        mStackEntries.emplace_back(file, function, std::stoul(offset));
     }
 
     free(strings);

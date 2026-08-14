@@ -30,7 +30,10 @@ namespace rsp::posix
 class FileIO
 {
 public:
-    static constexpr std::ios_base::openmode cNonBlock = static_cast<std::ios_base::openmode>(static_cast<int>(std::_Ios_Openmode::_S_ios_openmode_end + 1));
+    // A custom openmode bit (check that it doesn't collide with the standard open modes)
+    static constexpr std::ios_base::openmode cNonBlock = static_cast<std::ios_base::openmode>(1 << 12);
+    static_assert((cNonBlock & (std::ios_base::app | std::ios_base::ate | std::ios_base::binary | std::ios_base::in | std::ios_base::out | std::ios_base::trunc)) == 0,
+            "cNonBlock collides with a standard std::ios_base::openmode flag");
 
     /**
      * Construct a FileIO object, open/create file if given as argument.

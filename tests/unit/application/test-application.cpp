@@ -33,6 +33,9 @@ TEST_CASE("Application")
         "--help"
     };
 
+    // Remove log file (if it exists) before each test case
+    std::remove(cLogFileName);
+
     SUBCASE("Instantiate CommandLine") {
         CommandLine cmd(4, arguments);
 
@@ -52,8 +55,6 @@ TEST_CASE("Application")
     }
 
     SUBCASE("Instantiate TestApplication") {
-        std::remove(cLogFileName);
-
         CHECK_THROWS_AS(ApplicationBase::Get<TestApplication>(), const rsp::exceptions::ENoInstance &);
 
         TestApplication app(2, arguments);
@@ -84,7 +85,6 @@ TEST_CASE("Application")
         CHECK_EQ(fin.is_open(), true);
         std::string line;
         std::getline(fin, line);
-        std::getline(fin, line);
         CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback."));
     }
 
@@ -109,13 +109,10 @@ TEST_CASE("Application")
         CHECK_EQ(fin.is_open(), true);
         std::string line;
         std::getline(fin, line);
-        std::getline(fin, line);
-        std::getline(fin, line);
         CHECK(rsp::utils::StrUtils::EndsWith(line, "Logged from callback to member function."));
     }
 
     SUBCASE("Console") {
-        std::remove(cLogFileName);
         Console::SetPrintToDisplay(true);
         TestApplication app(2, arguments);
 
