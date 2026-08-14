@@ -58,9 +58,9 @@ TEST_CASE("Bitmap")
         CHECK_EQ(bitmap.GetHeight(), height);
         CHECK_EQ(bitmap.GetWidth(), width);
         CHECK_EQ(bitmap.GetPixelData().GetDataSize(), static_cast<size_t>(width * height * 3));
-        CHECK_HEX(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White).AsUint(), 0xFF020A8F);
-        CHECK_HEX(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White).AsUint(), 0xFF020A8F);
-        CHECK_HEX(bitmap.GetPixelData().GetPixelAt(55, 111, Color::White).AsUint(), 0xFFEAEFE8);
+        CHECK_HEX(bitmap.GetPixelData().GetPixelAt(0, 0, Color::White).ToARGB(), 0xFF020A8F);
+        CHECK_HEX(bitmap.GetPixelData().GetPixelAt(1, 0, Color::White).ToARGB(), 0xFF020A8F);
+        CHECK_HEX(bitmap.GetPixelData().GetPixelAt(55, 111, Color::White).ToARGB(), 0xFFEAEFE8);
 
         SUBCASE("Drawing on loaded Img") {
             // Arrange
@@ -71,7 +71,7 @@ TEST_CASE("Bitmap")
             CHECK_NOTHROW(bitmap.SetPixel(pt, cl));
 
             // Assert
-            CHECK_HEX(bitmap.GetPixel(pt).AsUint(), cl.AsUint());
+            CHECK_HEX(bitmap.GetPixel(pt).ToARGB(), cl.ToARGB());
         }
     }
 

@@ -8,19 +8,19 @@
  * \author      Simon Glashoff
  * \author      Steffen Brummer
  */
+
 #ifndef RSP_CORE_LIB_GRAPHICS_COLOR_H
 #define RSP_CORE_LIB_GRAPHICS_COLOR_H
 
-#include <rsp/exceptions/CoreException.h>
+#include <bit>
 #include <cstdint>
 
-namespace rsp::graphics
-{
+namespace rsp::graphics {
 
 /**
  * \class Color
  *
- * A Color consists of tree base colors: Red, green, and blue,
+ * A Color consists of three base colors: Red, green, and blue,
  * and an optional alpha channel that determines transparency.
  *
  * Note: Not all hardware supports alpha channel transparency.
@@ -30,30 +30,30 @@ class Color
 public:
     using ARGB_t = uint32_t;
 
-/**
- * \brief Predefined basic colors
- */
-    enum BasicColors : uint32_t {
-        None    = 0,
-        White   = 0xFFFFFFFF,
-        Silver  = 0xFFC0C0C0,
-        Grey    = 0xFF808080,
-        Black   = 0xFF000000,
-        Red     = 0xFFFF0000,
-        Maroon  = 0xFF800000,
-        Yellow  = 0xFFFFFF00,
-        Olive   = 0xFF808000,
-        Lime    = 0xFF00FF00,
-        Green   = 0xFF008000,
-        Aqua    = 0xFF00FFFF,
-        Teal    = 0xFF008080,
-        Blue    = 0xFF0000FF,
-        Navy    = 0xFF000080,
+    /**
+     * \brief Predefined basic colors
+     */
+    enum BasicColors : ARGB_t {
+        None = 0,
+        White = 0xFFFFFFFF,
+        Silver = 0xFFC0C0C0,
+        Grey = 0xFF808080,
+        Black = 0xFF000000,
+        Red = 0xFFFF0000,
+        Maroon = 0xFF800000,
+        Yellow = 0xFFFFFF00,
+        Olive = 0xFF808000,
+        Lime = 0xFF00FF00,
+        Green = 0xFF008000,
+        Aqua = 0xFF00FFFF,
+        Teal = 0xFF008080,
+        Blue = 0xFF0000FF,
+        Navy = 0xFF000080,
         Fuchsia = 0xFFFF00FF,
-        Purple  = 0xFF800080,
+        Purple = 0xFF800080,
     };
 
-    Color() noexcept : mValue{} {}
+    constexpr Color() noexcept = default;
 
     /**
      * \brief Construct with given base colors.
@@ -63,123 +63,153 @@ public:
      * \param aBlue
      * \param aAlpha
      */
-    Color(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha);
+    constexpr Color(uint8_t aRed, uint8_t aGreen, uint8_t aBlue, uint8_t aAlpha) noexcept
+        : _rgba{aRed, aGreen, aBlue, aAlpha}
+    {
+    }
 
     /**
      * \brief Construct from ARGB value. This is a conversion constructor.
      *
      * \param aARGB
      */
-    Color(ARGB_t aARGB); // NOLINT
-
-    /**
-     * \brief Copy constructor.
-     *
-     * \param arColor
-     */
-    Color(const Color &arColor) = default;
-
-    /**
-     * \brief Move constructor.
-     *
-     * \param arColor
-     */
-    Color(Color &&arColor) noexcept = default;
+    constexpr Color(ARGB_t aARGB) noexcept
+        : _rgba{static_cast<uint8_t>((aARGB >> 16) & 0xFF),
+                  static_cast<uint8_t>((aARGB >> 8) & 0xFF),
+                  static_cast<uint8_t>(aARGB & 0xFF),
+                  static_cast<uint8_t>((aARGB >> 24) & 0xFF)}
+    {
+    }
 
     /**
      * \brief Get the red base color value.
      *
      * \return Red value
      */
-    [[nodiscard]] uint8_t GetRed() const;
+    [[nodiscard]] constexpr uint8_t GetRed() const noexcept
+    {
+        return _rgba.red;
+    }
+
     /**
      * \brief Set the red base color value.
      *
      * \param aValue
      * \return self
      */
-    Color& SetRed(uint8_t aValue);
+    constexpr Color& SetRed(uint8_t aValue)
+    {
+        _rgba.red = aValue;
+        return *this;
+    }
 
     /**
      * \brief Get the green base color value.
      *
      * \return Green value
      */
-    [[nodiscard]] uint8_t GetGreen() const;
+    [[nodiscard]] constexpr uint8_t GetGreen() const noexcept
+    {
+        return _rgba.green;
+    }
+
     /**
      * \brief Set the green base color value.
      *
      * \param aValue
      * \return self
      */
-    Color& SetGreen(uint8_t aValue);
+    constexpr Color& SetGreen(uint8_t aValue) noexcept
+    {
+        _rgba.green = aValue;
+        return *this;
+    }
 
     /**
      * \brief Get the blue base color value.
      *
      * \return Blue value
      */
-    [[nodiscard]] uint8_t GetBlue() const;
+    [[nodiscard]] constexpr uint8_t GetBlue() const noexcept
+    {
+        return _rgba.blue;
+    }
+
     /**
      * \brief Set the blue base color value.
      *
      * \param aValue
      * \return self
      */
-    Color& SetBlue(uint8_t aValue);
+    constexpr Color& SetBlue(uint8_t aValue) noexcept
+    {
+        _rgba.blue = aValue;
+        return *this;
+    }
 
     /**
      * \brief Get the alpha channel value.
      *
      * \return Alpha value
      */
-    [[nodiscard]] uint8_t GetAlpha() const;
+    [[nodiscard]] constexpr uint8_t GetAlpha() const noexcept
+    {
+        return _rgba.alpha;
+    }
+
     /**
      * \brief Set the alpha channel value.
      *
      * \param aValue
      * \return self
      */
-    Color& SetAlpha(uint8_t aValue);
+    constexpr Color& SetAlpha(uint8_t aValue) noexcept
+    {
+        _rgba.alpha = aValue;
+        return *this;
+    }
 
     /**
      * \brief Get the ARGB value. This is a conversion function.
      * \return ARGB
      */
-    operator uint32_t() const; // NOLINT
-    [[nodiscard]] uint32_t AsUint() const { return static_cast<ARGB_t>(*this); }
+    [[nodiscard]] constexpr ARGB_t ToARGB() const noexcept
+    {
+        return uint32_t{_rgba.alpha} << 24 | uint32_t{_rgba.red} << 16 | uint32_t{_rgba.green} << 8 | uint32_t{_rgba.blue};
+    }
 
     /**
-     * \brief For fast color value in native 32-bit format
+     * \brief For fast color value in native 32-bit RGBA format
      *
      * \return uint32
      */
 
-    [[nodiscard]] uint32_t AsRaw() const { return mValue.rgba; }
-    Color& FromRaw(const uint32_t aValue) { mValue.rgba = aValue; return *this; }
+    [[nodiscard]] constexpr uint32_t AsRaw() const noexcept
+    {
+        return std::bit_cast<uint32_t>(_rgba);
+    }
 
     /**
-     * \brief Assignment operator.
+     * @brief Set color from native 32-bit RGBA format
      *
-     * \param arColor
+     * @param aValue
+     * @return constexpr Color&
      */
-    Color& operator=(const Color &arColor);
+    constexpr Color& FromRaw(uint32_t aValue) noexcept
+    {
+        _rgba = std::bit_cast<Components>(aValue);
+        return *this;
+    }
 
-    /**
-     * \brief Move operator.
-     *
-     * \param arColor
-     */
-    Color& operator=(Color &&arColor) noexcept;
+    [[nodiscard]] constexpr bool operator==(const Color& aColor) const noexcept
+    {
+        return std::bit_cast<uint32_t>(_rgba) == std::bit_cast<uint32_t>(aColor._rgba);
+    }
 
-    Color& operator=(ARGB_t aValue);
-
-    bool operator!=(ARGB_t aValue) const;
-    bool operator!=(const Color &arOther) const;
-
-    bool operator==(ARGB_t aValue) const;
-    bool operator==(const Color &arOther) const;
-
+    [[nodiscard]] constexpr bool operator==(const ARGB_t& aARGB) const noexcept
+    {
+        return ToARGB() == aARGB;
+    }
 
     /**
      * \fn Color Blend(Color&, Color&)
@@ -189,26 +219,41 @@ public:
      * \param b
      * \return Combined color
      */
-    static Color Blend(const Color &a, const Color &b);
+    [[nodiscard]] static constexpr Color Blend(const Color& arBg, const Color& arFg) noexcept
+    {
+        uint32_t fg = arFg.ToARGB();
+        uint32_t bg = arBg.ToARGB();
+        uint32_t a = fg >> 24;
 
-  protected:
-    struct color_components {
-        uint32_t red : 8;
-        uint32_t green : 8;
-        uint32_t blue : 8;
-        uint32_t alpha : 8;
+        // If source pixel is fully transparent, just return the background
+        if (0 == a) {
+            return arBg;
+        }
+
+        // If source pixel is not transparent, just return the foreground
+        if (255 == a) {
+            return arFg;
+        }
+
+        uint32_t rb = ((((fg & 0x00ff00ff) * a) + 0x00007F007F) + ((bg & 0x00ff00ff) * (0xff - a))) & 0xff00ff00;
+        uint32_t g = ((((fg & 0x0000ff00) * a) + 0x00007f00) + ((bg & 0x0000ff00) * (0xff - a))) & 0x00ff0000;
+        uint32_t result = 0xff000000 | ((rb | g) >> 8);
+
+        return Color{result};
+    }
+
+private:
+    struct Components
+    {
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
+        uint8_t alpha;
     };
 
-    /**
-     * \brief Color value type
-     */
-    union ColorValue_t {
-        uint32_t rgba;
-        color_components item;
-    };
-
-    ColorValue_t mValue{};
+    Components _rgba{};
 };
 
 } // namespace rsp::graphics
+
 #endif // RSP_CORE_LIB_GRAPHICS_COLOR_H

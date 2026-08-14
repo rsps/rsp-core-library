@@ -154,14 +154,14 @@ TEST_CASE("Control")
         CHECK_NOTHROW(myControl.Render(renderer));
         CHECK_NOTHROW(renderer.Flush());
 
-        CHECK_HEX(renderer.GetPixel(200,  40).AsUint(), Color::Blue);
-        CHECK_HEX(renderer.GetPixel(299, 539).AsUint(), Color::Blue);
-        CHECK_HEX(renderer.GetPixel(300, 540).AsUint(), Color::Grey);
+        CHECK_HEX(renderer.GetPixel(200,  40).ToARGB(), Color::Blue);
+        CHECK_HEX(renderer.GetPixel(299, 539).ToARGB(), Color::Blue);
+        CHECK_HEX(renderer.GetPixel(300, 540).ToARGB(), Color::Grey);
 
-        CHECK_HEX(renderer.GetPixel(100, 300).AsUint(), Color::Grey);
-        CHECK_HEX(renderer.GetPixel(200, 300).AsUint(), Color::Yellow);
-        CHECK_HEX(renderer.GetPixel(249, 349).AsUint(), Color::Yellow);
-        CHECK_HEX(renderer.GetPixel(250, 350).AsUint(), Color::Blue);
+        CHECK_HEX(renderer.GetPixel(100, 300).ToARGB(), Color::Grey);
+        CHECK_HEX(renderer.GetPixel(200, 300).ToARGB(), Color::Yellow);
+        CHECK_HEX(renderer.GetPixel(249, 349).ToARGB(), Color::Yellow);
+        CHECK_HEX(renderer.GetPixel(250, 350).ToARGB(), Color::Blue);
 
 //        using namespace std::chrono_literals;
 //        std::this_thread::sleep_for(2500ms);
