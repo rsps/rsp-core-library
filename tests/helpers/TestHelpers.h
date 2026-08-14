@@ -12,6 +12,7 @@
 #define TESTS_HELPERS_TEST_HELPERS_H_
 
 #include <string>
+#include <string_view>
 #include <rsp/utils/StrUtils.h>
 #include "TestLogger.h"
 
@@ -29,8 +30,8 @@ public:
     // static std::string ToHex(const uint8_t *apData, uint32_t aSize);
     static std::string ToHex(const uint8_t* apData, uint32_t aSize, uint32_t aSizeOf);
 
-    static bool ValidateJson(const std::string& arJson);
-    static bool ValidateJsonFile(const std::string& arJsonFile);
+    static bool ValidateJson(std::string_view arJson);
+    static bool ValidateJsonFile(std::string_view arJsonFile);
 
     static int StartWebServer();
     static int StopWebServer();
