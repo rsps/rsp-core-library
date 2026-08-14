@@ -69,4 +69,25 @@ TEST_CASE("StrUtils: Localization da_DK")
     std::locale::global(prevLocale);
 }
 
+TEST_CASE("StrUtils::Utf32ToUtf8(char32_t)")
+{
+    CHECK_EQ(StrUtils::Utf32ToUtf8(char32_t('A')), "A"s);
+    CHECK_EQ(StrUtils::Utf32ToUtf8(char32_t(0x00E6)), "\xC3\xA6"s); // æ
+    CHECK_EQ(StrUtils::Utf32ToUtf8(char32_t(0x20AC)), "\xE2\x82\xAC"s); // €
+    CHECK_EQ(StrUtils::Utf32ToUtf8(char32_t(0x1F600)), "\xF0\x9F\x98\x80"s); // 😀
+}
+
+TEST_CASE("StrUtils::Utf32ToUtf8(std::u32string)")
+{
+    std::u32string utf32 = U"A\u00E6\u20AC\U0001F600";
+    CHECK_EQ(StrUtils::Utf32ToUtf8(utf32), "A\xC3\xA6\xE2\x82\xAC\xF0\x9F\x98\x80"s);
+}
+
+TEST_CASE("StrUtils::Utf8ToUtf32(std::string)")
+{
+    std::string utf8 = "A\xC3\xA6\xE2\x82\xAC\xF0\x9F\x98\x80"s;
+    std::u32string expected = U"A\u00E6\u20AC\U0001F600";
+    CHECK_EQ(StrUtils::Utf8ToUtf32(utf8), expected);
+}
+
 TEST_SUITE_END();

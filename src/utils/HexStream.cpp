@@ -10,6 +10,7 @@
 
 #include <iomanip>
 #include <string>
+#include <sstream>
 #include <rsp/utils/HexStream.h>
 #include <rsp/utils/StrUtils.h>
 
