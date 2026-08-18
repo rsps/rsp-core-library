@@ -75,6 +75,12 @@ TEST_CASE("ZLib")
 
             CHECK_THROWS_AS(zlib.Inflate(cGarbage), const ZlibException&);
         }
+
+        SUBCASE("ZLib version is at least 1.3.0")
+        {
+            ZLib zlib;
+            CHECK_GE(zlib.GetLibraryVersion(), rsp::utils::Version{1, 3, 0});
+        }
     }
     else {
         SUBCASE("Without ZLib support, construction throws")

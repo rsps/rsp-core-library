@@ -12,6 +12,7 @@
 #define RSP_CORE_LIB_COMPRESSION_Z_LIB_H
 
 #include <rsp/exceptions/CoreException.h>
+#include <rsp/utils/SemVer.h>
 
 #include <cstdint>
 #include <memory>
@@ -33,6 +34,7 @@ public:
     ~ZLib();
     void Inflate(std::span<const uint8_t> aData);
     [[nodiscard]] const std::vector<uint8_t>& GetResult() const;
+    [[nodiscard]] utils::Version GetLibraryVersion() const;
 
 private:
     class Impl;

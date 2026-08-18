@@ -115,6 +115,11 @@ public:
         }
     }
 
+    utils::Version GetLibraryVersion() const
+    {
+        return utils::Version{::zlibVersion()};
+    }
+
     const std::vector<uint8_t>& GetResult() const
     {
         return _result;
@@ -137,6 +142,7 @@ std::string formatError(const char* apMsg, int aErrorCode)
 
 } // namespace
 
+// Dummy implementation when ZLib support is not compiled in
 class ZLib::Impl
 {
 public:
@@ -145,17 +151,20 @@ public:
         THROW_WITH_BACKTRACE1(exceptions::NotImplementedException, "ZLib support is not compiled into this library (RSP_CORE_LIB_USE_ZLIB is OFF)");
     }
 
-    void Inflate(std::span<const uint8_t> aData)
+    void Inflate(std::span<const uint8_t>)
     {
+        THROW_WITH_BACKTRACE1(exceptions::NotImplementedException, "ZLib support is not compiled into this library (RSP_CORE_LIB_USE_ZLIB is OFF)");
     }
 
     const std::vector<uint8_t>& GetResult() const
     {
-        return _result;
+        THROW_WITH_BACKTRACE1(exceptions::NotImplementedException, "ZLib support is not compiled into this library (RSP_CORE_LIB_USE_ZLIB is OFF)");
     }
 
-private:
-    std::vector<uint8_t> _result{};
+    utils::Version GetLibraryVersion() const
+    {
+        THROW_WITH_BACKTRACE1(exceptions::NotImplementedException, "ZLib support is not compiled into this library (RSP_CORE_LIB_USE_ZLIB is OFF)");
+    }
 };
 
 #endif // RSP_CORE_LIB_USE_ZLIB
@@ -180,6 +189,11 @@ void ZLib::Inflate(std::span<const uint8_t> aData)
 const std::vector<uint8_t>& ZLib::GetResult() const
 {
     return _impl->GetResult();
+}
+
+utils::Version ZLib::GetLibraryVersion() const
+{
+    return _impl->GetLibraryVersion();
 }
 
 } // namespace rsp::compression
