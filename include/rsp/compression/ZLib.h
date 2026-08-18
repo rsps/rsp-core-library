@@ -11,49 +11,34 @@
 #ifndef RSP_CORE_LIB_COMPRESSION_Z_LIB_H
 #define RSP_CORE_LIB_COMPRESSION_Z_LIB_H
 
-#ifdef RSP_CORE_LIB_USE_ZLIB
-
-#include <cstdint>
-#include <string>
-#include <sstream>
-#include <vector>
 #include <rsp/exceptions/CoreException.h>
 
-#define ZLIB_CONST
-#include <zlib.h>
+#include <cstdint>
+#include <memory>
+#include <span>
+#include <vector>
 
 namespace rsp::compression {
 
-class ZlibException: public exceptions::CoreException
+class ZlibException : public exceptions::CoreException
 {
 public:
-    explicit ZlibException(const char *apMsg, int aErrorCode)
-    : CoreException(formatError(apMsg, aErrorCode))
-    {
-    }
-
-    std::string formatError(const char *apMsg, int aErrorCode);
+    ZlibException(const char* apMsg, int aErrorCode);
 };
-
 
 class ZLib
 {
 public:
-    ZLib(size_t aBufferSize = 8192);
+    explicit ZLib(size_t aBufferSize = 8192);
+    ~ZLib();
+    void Inflate(std::span<const uint8_t> aData);
+    [[nodiscard]] const std::vector<uint8_t>& GetResult() const;
 
-    void Inflate(const uint8_t *apData, size_t aSize);
-
-    const std::ostream& GetResult();
-
-protected:
-    z_stream mZStream{};
-    std::vector<uint8_t> mBuffer{};
-    std::stringstream mResult{};
+private:
+    class Impl;
+    std::unique_ptr<Impl> _impl;
 };
 
-
-} /* namespace rsp::compression */
-
-#endif /* RSP_CORE_LIB_USE_ZLIB */
+} // namespace rsp::compression
 
 #endif // RSP_CORE_LIB_COMPRESSION_Z_LIB_H

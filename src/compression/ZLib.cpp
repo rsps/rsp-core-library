@@ -10,13 +10,22 @@
 
 #include <rsp/compression/ZLib.h>
 
+#include <string>
+#include <vector>
 #include <iostream>
 
 #ifdef RSP_CORE_LIB_USE_ZLIB
+#define ZLIB_CONST
+#include <zlib.h>
+#endif // RSP_CORE_LIB_USE_ZLIB
 
 namespace rsp::compression {
 
-std::string ZlibException::formatError(const char *apMsg, int aErrorCode)
+#ifdef RSP_CORE_LIB_USE_ZLIB
+
+namespace {
+
+std::string formatError(const char* apMsg, int aErrorCode)
 {
     std::string result("Error in ZLib: ");
     result += std::string(apMsg) + " (" + std::to_string(aErrorCode) + "): ";
@@ -25,39 +34,30 @@ std::string ZlibException::formatError(const char *apMsg, int aErrorCode)
         case Z_OK:
             result += "OK";
             break;
-
         case Z_STREAM_END:
             result += "End of stream";
             break;
-
         case Z_NEED_DICT:
             result += "Need dictionary";
             break;
-
         case Z_ERRNO:
             result += "Errno: " + std::to_string(errno);
             break;
-
         case Z_STREAM_ERROR:
             result += "Stream error";
             break;
-
         case Z_DATA_ERROR:
             result += "Data error";
             break;
-
         case Z_MEM_ERROR:
             result += "Memory error";
             break;
-
         case Z_BUF_ERROR:
             result += "Buffer error";
             break;
-
         case Z_VERSION_ERROR:
             result += "Version error";
             break;
-
         default:
             result += "Unknown error!!";
             break;
@@ -65,63 +65,121 @@ std::string ZlibException::formatError(const char *apMsg, int aErrorCode)
     return result;
 }
 
+} // namespace
+
+class ZLib::Impl
+{
+public:
+    explicit Impl(size_t aBufferSize)
+        : _buffer(aBufferSize)
+    {
+        // init the decompression stream
+        _zstream.zalloc = Z_NULL;
+        _zstream.zfree = Z_NULL;
+        _zstream.opaque = Z_NULL;
+        _zstream.avail_in = 0;
+        _zstream.next_in = Z_NULL;
+
+        if (int ret = ::inflateInit(&_zstream); ret != Z_OK) {
+            THROW_WITH_BACKTRACE2(ZlibException, "inflateInit", ret);
+        }
+    }
+
+    void Inflate(std::span<const uint8_t> aData)
+    {
+        // Set the starting point and total data size to be read
+        _zstream.avail_in = aData.size();
+        _zstream.next_in = aData.data();
+
+        // Start decompressing
+        while (_zstream.avail_in != 0) {
+            _zstream.next_out = _buffer.data();
+            _zstream.avail_out = _buffer.size();
+
+            int ret = ::inflate(&_zstream, Z_NO_FLUSH);
+
+            size_t produced = _buffer.size() - _zstream.avail_out;
+            _result.insert(_result.end(), _buffer.begin(), _buffer.begin() + std::ptrdiff_t(produced));
+
+            if (ret == Z_STREAM_END) {
+                break;
+            }
+            else if (ret != Z_OK) {
+                std::cerr << "Available: " << _zstream.avail_in << ", buffer: " << _buffer.size() << std::endl;
+                THROW_WITH_BACKTRACE2(ZlibException, "inflate", ret);
+            }
+        }
+
+        if (int ret = ::inflateEnd(&_zstream); ret != Z_OK) {
+            THROW_WITH_BACKTRACE2(ZlibException, "inflateEnd", ret);
+        }
+    }
+
+    const std::vector<uint8_t>& GetResult() const
+    {
+        return _result;
+    }
+
+private:
+    z_stream _zstream{};
+    std::vector<uint8_t> _buffer{};
+    std::vector<uint8_t> _result{};
+};
+
+#else // !RSP_CORE_LIB_USE_ZLIB
+
+namespace {
+
+std::string formatError(const char* apMsg, int aErrorCode)
+{
+    return std::string("Error in ZLib: ") + apMsg + " (" + std::to_string(aErrorCode) + ")";
+}
+
+} // namespace
+
+class ZLib::Impl
+{
+public:
+    explicit Impl(size_t)
+    {
+        THROW_WITH_BACKTRACE1(exceptions::NotImplementedException, "ZLib support is not compiled into this library (RSP_CORE_LIB_USE_ZLIB is OFF)");
+    }
+
+    void Inflate(std::span<const uint8_t> aData)
+    {
+    }
+
+    const std::vector<uint8_t>& GetResult() const
+    {
+        return _result;
+    }
+
+private:
+    std::vector<uint8_t> _result{};
+};
+
+#endif // RSP_CORE_LIB_USE_ZLIB
+
+ZlibException::ZlibException(const char* apMsg, int aErrorCode)
+    : CoreException(formatError(apMsg, aErrorCode))
+{
+}
+
 ZLib::ZLib(size_t aBufferSize)
-    : mBuffer(aBufferSize)
+    : _impl(std::make_unique<Impl>(aBufferSize))
 {
-    // init the decompression stream
-    mZStream.zalloc = Z_NULL;
-    mZStream.zfree = Z_NULL;
-    mZStream.opaque = Z_NULL;
-    mZStream.avail_in = 0;
-    mZStream.next_in = Z_NULL;
-
-    //    int ret = inflateInit2_(&mZStream, -MAX_WBITS, ZLIB_VERSION, int(sizeof(z_stream)));
-    int ret = inflateInit(&mZStream);
-    if (ret != Z_OK) {
-        THROW_WITH_BACKTRACE2(ZlibException, "inflateInit", ret);
-    }
 }
 
-void ZLib::Inflate(const uint8_t *apData, size_t aSize)
+ZLib::~ZLib() = default;
+
+void ZLib::Inflate(std::span<const uint8_t> aData)
 {
-    int ret;
-
-    // Set the starting point and total data size to be read
-    mZStream.avail_in = aSize;
-    mZStream.next_in = apData;
-
-    // Start decompressing
-    while (mZStream.avail_in != 0) {
-        mZStream.next_out = mBuffer.data();
-        mZStream.avail_out = mBuffer.size();
-
-        ret = inflate(&mZStream, Z_NO_FLUSH);
-
-        if (ret == Z_STREAM_END) {
-            // only store the data we have left in the stream
-            mResult.write(reinterpret_cast<const char*>(mBuffer.data()), std::streamsize(mBuffer.size() - mZStream.avail_out));
-            break;
-        }
-        else if (ret == Z_OK) {
-            mResult.write(reinterpret_cast<const char*>(mBuffer.data()), static_cast<std::streamsize>(mBuffer.size()));
-        }
-        else {
-            std::cerr << "Available: " << mZStream.avail_in << ", buffer: " << mBuffer.size() << std::endl;
-            THROW_WITH_BACKTRACE2(ZlibException, "inflate", ret);
-        }
-    }
-
-    ret = inflateEnd(&mZStream);
-    if (ret != Z_OK) {
-        THROW_WITH_BACKTRACE2(ZlibException, "inflateEnd", ret);
-    }
+    _impl->Inflate(aData);
 }
 
-const std::ostream& ZLib::GetResult()
+const std::vector<uint8_t>& ZLib::GetResult() const
 {
-    return mResult;
+    return _impl->GetResult();
 }
 
-} /* namespace rsp::compression */
-
-#endif /* RSP_CORE_LIB_USE_ZLIB */
+} // namespace rsp::compression
