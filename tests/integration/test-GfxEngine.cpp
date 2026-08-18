@@ -186,7 +186,7 @@ TEST_CASE("GfxEngine")
     }
 
     MESSAGE("Finished with " << gfx.GetFPS() << " FPS and a maximum event delay of " << gh.mTouchParser.GetMaxDelay() << "ms");
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
     MESSAGE("Video Memory Usage: " << sw::GfxHal::Get().GetVideoMemoryUsage());
 #endif
     CHECK_NOTHROW(gfx.ClearOverlays());

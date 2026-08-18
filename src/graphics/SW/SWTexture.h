@@ -11,7 +11,7 @@
 #ifndef RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_TEXTURE_H
 #define RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_TEXTURE_H
 
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
 
 #include <rsp/graphics/PixelData.h>
 #include <rsp/graphics/Texture.h>
@@ -54,5 +54,5 @@ protected:
 
 } /* namespace rsp::graphics::sw */
 
-#endif /* USE_GFX_SW */
+#endif /* RSP_CORE_LIB_USE_GFX_SW */
 #endif // RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_TEXTURE_H

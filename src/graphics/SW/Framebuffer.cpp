@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
 
 #include <rsp/exceptions/ExceptionHelper.h>
 #include <cstring>
@@ -124,4 +124,4 @@ void Framebuffer::swapBuffer()
 
 } // namespace rsp::graphics::sw
 
-#endif /* USE_GFX_SW */
+#endif /* RSP_CORE_LIB_USE_GFX_SW */

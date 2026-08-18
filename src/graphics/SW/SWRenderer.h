@@ -11,7 +11,7 @@
 #ifndef RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_RENDERER_H
 #define RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_RENDERER_H
 
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
 
 #include <string>
 #include <vector>
@@ -51,5 +51,5 @@ protected:
 
 } /* namespace rsp::graphics::sw */
 
-#endif /* USE_GFX_SW */
+#endif /* RSP_CORE_LIB_USE_GFX_SW */
 #endif // RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_RENDERER_H

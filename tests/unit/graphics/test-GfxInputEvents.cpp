@@ -8,7 +8,7 @@
  * \author      Simon Glashoff
  */
 
-#ifndef USE_GFX_SDL
+#ifndef RSP_CORE_LIB_USE_GFX_SDL2
 
 #include <doctest.h>
 #include <rsp/graphics/GfxInputEvents.h>
@@ -68,4 +68,4 @@ TEST_CASE("GfxInputEvents")
 
 TEST_SUITE_END();
 
-#endif // USE_GFX_SDL
+#endif // RSP_CORE_LIB_USE_GFX_SDL2

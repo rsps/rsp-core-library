@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#ifdef SYSLOG
+#ifdef RSP_CORE_LIB_USE_SYSLOG
 
 #include <syslog.h>
 #include <rsp/logging/SysLogWriter.h>
@@ -49,4 +49,4 @@ void SysLogWriter::Write(std::string_view aMsg, LogLevel aCurrentLevel, const st
 
 } /* namespace logging */
 
-#endif /* SYSLOG */
+#endif /* RSP_CORE_LIB_USE_SYSLOG */

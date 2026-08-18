@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#ifdef USE_GFX_SDL
+#ifdef RSP_CORE_LIB_USE_GFX_SDL2
 
 #include "SDLTexture.h"
 #include "SDLRenderer.h"
@@ -246,4 +246,4 @@ TexturePtr_t SDLTexture::Clone() const
 
 } /* namespace rsp::graphics::sdl */
 
-#endif /* USE_GFX_SDL */
+#endif /* RSP_CORE_LIB_USE_GFX_SDL2 */

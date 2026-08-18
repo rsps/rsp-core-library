@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#ifdef USE_GFX_SDL
+#ifdef RSP_CORE_LIB_USE_GFX_SDL2
 
 #include <SDL2/SDL.h>
 #include "SDLRenderer.h"
@@ -257,4 +257,4 @@ ColorDepth SDLRenderer::GetColorDepth() const
 
 } /* namespace rsp::graphics::sdl */
 
-#endif /* USE_GFX_SDL */
+#endif /* RSP_CORE_LIB_USE_GFX_SDL2 */

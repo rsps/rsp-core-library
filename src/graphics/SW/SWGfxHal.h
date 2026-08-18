@@ -11,7 +11,7 @@
 #ifndef RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_GFX_HAL_H
 #define RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_GFX_HAL_H
 
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
 
 #include <rsp/utils/Singleton.h>
 #include "GfxHal.h"
@@ -36,6 +36,6 @@ public:
 
 } /* namespace rsp::graphics */
 
-#endif /* USE_GFX_SW */
+#endif /* RSP_CORE_LIB_USE_GFX_SW */
 
 #endif // RSP_CORE_LIB_SRC_GRAPHICS_SW_SW_GFX_HAL_H

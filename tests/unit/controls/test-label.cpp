@@ -24,7 +24,7 @@ TEST_CASE("Label")
     TestLogger logger;
     MESSAGE("Step 1");
 
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Renderer::SetDevicePath(p.string());
 #endif

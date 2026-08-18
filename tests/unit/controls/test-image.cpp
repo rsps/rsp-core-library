@@ -15,7 +15,7 @@
 #include <rsp/utils/Random.h>
 #include <TestHelpers.h>
 #include <pixmap/GfxResources.h>
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
 #include <graphics/SW/Framebuffer.h>
 #endif
 
@@ -29,7 +29,7 @@ TEST_CASE("Image")
     TestLogger logger;
 
     // Arrange
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     Renderer::SetDevicePath(p.string());
 #endif
@@ -91,7 +91,7 @@ TEST_CASE("TestImage")
     TestLogger logger;
 
     // Arrange
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
     std::filesystem::path p = rsp::posix::FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
     sw::Framebuffer::mDevicePath = p;
 #endif

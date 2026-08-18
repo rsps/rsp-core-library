@@ -12,7 +12,7 @@
 
 #include <iostream>
 
-#ifdef USE_ZLIB
+#ifdef RSP_CORE_LIB_USE_ZLIB
 
 namespace rsp::compression {
 
@@ -124,4 +124,4 @@ const std::ostream& ZLib::GetResult()
 
 } /* namespace rsp::compression */
 
-#endif /* USE_ZLIB */
+#endif /* RSP_CORE_LIB_USE_ZLIB */

@@ -11,7 +11,7 @@
 #ifndef RSP_CORE_LIB_SRC_GRAPHICS_SW_GFX_HAL_H
 #define RSP_CORE_LIB_SRC_GRAPHICS_SW_GFX_HAL_H
 
-#ifdef USE_GFX_SW
+#ifdef RSP_CORE_LIB_USE_GFX_SW
 
 #include <cstdint>
 #include <memory>
@@ -149,5 +149,5 @@ public:
 
 } /* namespace rsp::graphics::sw */
 
-#endif /* USE_GFX_SW */
+#endif /* RSP_CORE_LIB_USE_GFX_SW */
 #endif // RSP_CORE_LIB_SRC_GRAPHICS_SW_GFX_HAL_H

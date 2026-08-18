@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#ifdef USE_FREETYPE
+#ifdef RSP_CORE_LIB_USE_FREETYPE
 
 #include "FreeTypeLibrary.h"
 #include <rsp/utils/StrUtils.h>
@@ -156,4 +156,4 @@ void FreeTypeLibrary::RegisterFont(const std::string &arFileName)
 
 } // namespace rsp::graphics
 
-#endif /* USE_FREETYPE */
+#endif /* RSP_CORE_LIB_USE_FREETYPE */

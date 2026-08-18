@@ -24,21 +24,21 @@
 
 namespace rsp::logging {
 
-// Usage: make CXXFLAGS="-DDEBUG_LOG"
-// Usage: cmake -DCMAKE_CXX_FLAGS="-DDEBUG_LOG" ..
+// Usage: make CXXFLAGS="-DRSP_CORE_LIB_DEBUG_LOG"
+// Usage: cmake -DCMAKE_CXX_FLAGS="-DRSP_CORE_LIB_DEBUG_LOG" ..
 
-#ifdef DEBUG_LOG
+#ifdef RSP_CORE_LIB_DEBUG_LOG
 #include <iostream>
 
 #define LOG(a) { std::cout << a << std::endl; }
 #define DLOG(a) { std::cerr << a << std::endl; }
 
-#else /* DEBUG_LOG */
+#else /* RSP_CORE_LIB_DEBUG_LOG */
 
 #define LOG(a)
 #define DLOG(a)
 
-#endif /* DEBUG_LOG */
+#endif /* RSP_CORE_LIB_DEBUG_LOG */
 
 constexpr const char* stem(std::string_view path)
 {

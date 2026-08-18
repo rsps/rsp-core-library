@@ -8,7 +8,7 @@
 * \author      steffen
 */
 #include "EHttpLibrary.h"
-#ifdef USE_OPENSSL
+#ifdef RSP_CORE_LIB_USE_OPENSSL
     #include <openssl/ssl.h>
 #endif
 
@@ -29,7 +29,7 @@ EHttpLibrary& EHttpLibrary::Get()
 
 EHttpLibrary::EHttpLibrary()
 {
-#ifdef USE_OPENSSL
+#ifdef RSP_CORE_LIB_USE_OPENSSL
     SSL_library_init();
 #endif
 }

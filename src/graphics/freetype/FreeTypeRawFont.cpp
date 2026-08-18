@@ -8,7 +8,7 @@
  * \author      Steffen Brummer
  */
 
-#ifdef USE_FREETYPE
+#ifdef RSP_CORE_LIB_USE_FREETYPE
 
 #include "FreeTypeRawFont.h"
 #include <rsp/graphics/Font.h>
@@ -285,4 +285,4 @@ std::u32string FreeTypeRawFont::stringToU32(const std::string &arText)
 
 }
 
-#endif /* USE_FREETYPE */
+#endif /* RSP_CORE_LIB_USE_FREETYPE */
