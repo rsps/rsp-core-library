@@ -98,15 +98,15 @@ public:
 
             int ret = ::inflate(&_zstream, Z_NO_FLUSH);
 
+            if ((ret != Z_OK) && (ret != Z_STREAM_END)) {
+                THROW_WITH_BACKTRACE2(ZlibException, "inflate", ret);
+            }
+
             size_t produced = _buffer.size() - _zstream.avail_out;
             _result.insert(_result.end(), _buffer.begin(), _buffer.begin() + std::ptrdiff_t(produced));
 
             if (ret == Z_STREAM_END) {
                 break;
-            }
-            else if (ret != Z_OK) {
-                std::cerr << "Available: " << _zstream.avail_in << ", buffer: " << _buffer.size() << std::endl;
-                THROW_WITH_BACKTRACE2(ZlibException, "inflate", ret);
             }
         }
 
