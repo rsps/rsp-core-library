@@ -10,9 +10,9 @@
 
 #include <rsp/compression/ZLib.h>
 
+#include <format>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #ifdef RSP_CORE_LIB_USE_ZLIB
 #define ZLIB_CONST
@@ -27,42 +27,40 @@ namespace {
 
 std::string formatError(const char* apMsg, int aErrorCode)
 {
-    std::string result("Error in ZLib: ");
-    result += std::string(apMsg) + " (" + std::to_string(aErrorCode) + "): ";
-
+    std::string reason;
     switch (aErrorCode) {
         case Z_OK:
-            result += "OK";
+            reason = "OK";
             break;
         case Z_STREAM_END:
-            result += "End of stream";
+            reason = "End of stream";
             break;
         case Z_NEED_DICT:
-            result += "Need dictionary";
+            reason = "Need dictionary";
             break;
         case Z_ERRNO:
-            result += "Errno: " + std::to_string(errno);
+            reason = std::format("Errno: {}", errno);
             break;
         case Z_STREAM_ERROR:
-            result += "Stream error";
+            reason = "Stream error";
             break;
         case Z_DATA_ERROR:
-            result += "Data error";
+            reason = "Data error";
             break;
         case Z_MEM_ERROR:
-            result += "Memory error";
+            reason = "Memory error";
             break;
         case Z_BUF_ERROR:
-            result += "Buffer error";
+            reason = "Buffer error";
             break;
         case Z_VERSION_ERROR:
-            result += "Version error";
+            reason = "Version error";
             break;
         default:
-            result += "Unknown error!!";
+            reason = "Unknown error!!";
             break;
     }
-    return result;
+    return std::format("Error in ZLib: {} ({}): {}", apMsg, aErrorCode, reason);
 }
 
 } // namespace
@@ -137,7 +135,7 @@ namespace {
 
 std::string formatError(const char* apMsg, int aErrorCode)
 {
-    return std::string("Error in ZLib: ") + apMsg + " (" + std::to_string(aErrorCode) + ")";
+    return std::format("Error in ZLib: {} ({})", apMsg, aErrorCode);
 }
 
 } // namespace
