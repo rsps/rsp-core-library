@@ -36,7 +36,7 @@ function(rsp_core_add_dependencies ATARGET)
             target_link_libraries(${ATARGET} PRIVATE SDL2::SDL2)
             target_compile_definitions(${ATARGET} PRIVATE RSP_CORE_LIB_USE_GFX_SDL2)
         else()
-            set(RSP_CORE_LIB_USE_GFX_SW ON)
+            set(RSP_CORE_LIB_USE_GFX_SW ON PARENT_SCOPE)
             target_compile_definitions(${ATARGET} PRIVATE RSP_CORE_LIB_USE_GFX_SW)
         endif()
 
