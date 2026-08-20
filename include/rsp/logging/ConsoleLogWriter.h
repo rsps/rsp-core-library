@@ -13,7 +13,7 @@
 
 #include <rsp/logging/LogWriterInterface.h>
 #include <array>
-#include <magic_enum/magic_enum.hpp>
+#include <rsp/utils/EnumReflection.h>
 
 namespace rsp::logging {
 
@@ -38,7 +38,7 @@ public:
  */
 class ConsoleLogWriter: public LogWriterInterface {
 public:
-    using ConsoleColors_t = std::array<const std::string, std::size_t(magic_enum::enum_count<LogLevel>())>;
+    using ConsoleColors_t = std::array<const std::string, std::size_t(utils::EnumCount<LogLevel>())>;
 
     explicit ConsoleLogWriter(const std::string& arAcceptLevel, ConsoleLogStreamsInterface *apConsole = nullptr, const ConsoleColors_t *apColors = nullptr);
     explicit ConsoleLogWriter(LogLevel aAcceptLevel, ConsoleLogStreamsInterface *apConsole = nullptr, const ConsoleColors_t *apColors = nullptr);

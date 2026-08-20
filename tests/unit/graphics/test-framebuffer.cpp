@@ -21,7 +21,7 @@
 #include <rsp/utils/StopWatch.h>
 #include <TestHelpers.h>
 #include <rsp/utils/Random.h>
-#include <magic_enum/magic_enum.hpp>
+#include <rsp/utils/EnumReflection.h>
 #ifdef RSP_CORE_LIB_USE_GFX_SW
     #include <rsp/posix/FileSystem.h>
 #endif

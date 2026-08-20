@@ -13,13 +13,13 @@
 
 #include <string_view>
 #include <vector>
-#include <magic_enum/magic_enum.hpp>
 #include <rsp/exceptions/CoreException.h>
 #include <rsp/graphics/GfxInputEvents.h>
 #include <rsp/logging/LogChannel.h>
 #include <rsp/messaging/EventBroker.h>
 #include <rsp/messaging/Notifier.h>
 #include <rsp/utils/ConstTypeInfo.h>
+#include <rsp/utils/EnumReflection.h>
 #include "Canvas.h"
 #include "Color.h"
 #include "Rect.h"
@@ -260,7 +260,7 @@ protected:
     Rect mArea{}; // Area of Control in screen coordinates
     Rect mTouchArea{}; // Touch area of Control in screen coordinates
     // magic_enum::containers::array<States, Style> mStyles{};
-    Style mStyles[magic_enum::enum_count<States>()]{};
+    Style mStyles[utils::EnumCount<States>()]{};
     Control *mpParent = nullptr;
     std::vector<Control *> mChildren{};
     bool mTransparent = false;

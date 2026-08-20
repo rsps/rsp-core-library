@@ -7,9 +7,11 @@
 * \license     Mozilla Public License 2.0
 * \author      steffen
 */
-#include <magic_enum/magic_enum.hpp>
+#include <rsp/utils/EnumReflection.h>
 #include <rsp/network/parser-helpers.h>
 #include <rsp/network/UrlParser.h>
+
+#include <limits>
 
 using namespace std::string_view_literals;
 
@@ -18,7 +20,7 @@ namespace rsp::network {
 std::ostream& operator<<(std::ostream& o, const UrlParser& arParser)
 {
     o
-        << "Scheme:    " << magic_enum::enum_name(arParser.GetScheme()) << "\n"
+        << "Scheme:    " << utils::EnumName(arParser.GetScheme()) << "\n"
         << "TLS:       " << arParser.RequiresTLS() << "\n"
         << "Host:      " << arParser.GetHost() << "\n"
         << "Port:      " << arParser.GetPort() << "\n"

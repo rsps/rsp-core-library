@@ -15,6 +15,7 @@
 #include <string>
 #include <string_view>
 #include <rsp/utils/DateTime.h>
+#include <rsp/utils/EnumReflection.h>
 #include <rsp/utils/Variant.h>
 #include <rsp/utils/StructElement.h>
 
@@ -151,7 +152,7 @@ JsonStream& operator<<(JsonStream& o, const Value<T>& v) {
 // Default enum streaming
 template <class E> requires std::is_enum_v<E>
 JsonStream& operator<< (JsonStream &o, E value) {
-    return o << magic_enum::enum_name(value);
+    return o << utils::EnumName(value);
 }
 
 template <class T> requires (!std::is_enum_v<T>)

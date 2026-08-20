@@ -17,7 +17,7 @@
 #include <rsp/security/SecureBuffer.h>
 #include <rsp/security/Sha.h>
 #include <rsp/utils/DataContainer.h>
-#include <magic_enum/magic_enum.hpp>
+#include <rsp/utils/EnumReflection.h>
 
 namespace rsp::security {
 
@@ -105,7 +105,7 @@ protected:
         }
         auto *result = mbedtls_cipher_info_from_type(mbed_cipher_type);
         if (!result) {
-            THROW_WITH_BACKTRACE2(CryptException, "The requested cipher is not supported: ", magic_enum::enum_name(mbed_cipher_type).data());
+            THROW_WITH_BACKTRACE2(CryptException, "The requested cipher is not supported: ", utils::EnumName(mbed_cipher_type).data());
         }
         return result;
     }

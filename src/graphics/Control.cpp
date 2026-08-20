@@ -20,7 +20,7 @@ Color Control::mTouchAreaColor = Color::None;
 
 std::string to_string(const Control::States aState)
 {
-    return std::string(magic_enum::enum_name<Control::States>(aState));
+    return std::string(utils::EnumName<Control::States>(aState));
 }
 
 std::ostream& operator <<(std::ostream &os, const Control::States aState)
@@ -249,7 +249,6 @@ void Control::Render(Renderer &arRenderer) const
         return;
     }
 
-//opt/clion-2023.2.2/bin/clang/linux/x64/bin/clang-tidy -checks='cppcoreguidelines-*' src/graphics/Control.cpp -- -Iinclude/ -Ibuild/_deps/magic_enum-src/include -I/usr/include -I/usr/lib/gcc/x86_64-linux-gnu/14/include -I/usr/local/include -std=c++23
     auto &style = mStyles[GetState()];
 
     if (!mTransparent) {

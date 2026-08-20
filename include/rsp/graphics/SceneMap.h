@@ -19,7 +19,7 @@
 #include <rsp/graphics/Scene.h>
 #include <rsp/messaging/Notifier.h>
 #include <rsp/logging/LogChannel.h>
-#include <magic_enum/magic_enum.hpp>
+#include <rsp/utils/EnumReflection.h>
 
 namespace rsp::graphics {
 
@@ -56,7 +56,7 @@ public:
     template<typename T, typename E, typename = typename std::enable_if<std::is_enum<E>::value, E>::type>
     void AddFactory(E e)
     {
-        std::string_view sv = magic_enum::enum_name(e);
+        std::string_view sv = utils::EnumName(e);
         mLogger.Info() << "Adding scene factory: " << rsp::utils::NameOf<T>() << " with id: " << sv;
         mScenes[uint32_t(e)] = [id=uint32_t(e), sv, this]() {
             mLogger.Info() << "Creating scene: " << rsp::utils::NameOf<T>();

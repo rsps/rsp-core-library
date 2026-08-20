@@ -12,7 +12,7 @@
 #include <iomanip>
 #include <rsp/logging/Logger.h>
 #include <rsp/utils/StrUtils.h>
-#include <magic_enum/magic_enum.hpp>
+#include <rsp/utils/EnumReflection.h>
 
 using namespace rsp::logging;
 using namespace rsp::utils;
@@ -21,7 +21,7 @@ namespace rsp::json {
 
 std::ostream& operator<<(std::ostream& os, Json::Types aType)
 {
-    os << magic_enum::enum_name(aType);
+    os << utils::EnumName(aType);
     return os;
 }
 
@@ -65,7 +65,7 @@ Json Json::Decode(std::string_view aJson)
 
 std::string Json::GetJsonTypeAsString(Json::Types aType)
 {
-    return std::string(magic_enum::enum_name(aType));
+    return std::string(utils::EnumName(aType));
 }
 
 std::string Json::GetJsonTypeAsString()
