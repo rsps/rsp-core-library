@@ -10,7 +10,7 @@
 
 #include <cstring>
 #include <rsp/graphics/GfxCompressor.h>
-#include <magic_enum/magic_enum.hpp>
+#include <rsp/utils/EnumReflection.h>
 #include <iostream>
 
 namespace rsp::graphics {
@@ -18,7 +18,7 @@ namespace rsp::graphics {
 
 GfxCompressor::CompressedData GfxCompressor::Compress(CompressionType aType, const data_type *apData, size_type aSize)
 {
-    std::cout << "GfxCompress(" << magic_enum::enum_name(aType) << ")" << std::endl;
+    std::cout << "GfxCompress(" << utils::EnumName(aType) << ")" << std::endl;
 
     switch (aType) {
         default:
@@ -43,7 +43,7 @@ GfxCompressor::DecompressedData GfxCompressor::Decompress(const CompressedData &
 
 GfxCompressor::DecompressedData GfxCompressor::Decompress(CompressionType aType, const data_type *apData, size_type aSize)
 {
-    std::cout << "GfxDecompress(" << magic_enum::enum_name(aType) << ")" << std::endl;
+    std::cout << "GfxDecompress(" << utils::EnumName(aType) << ")" << std::endl;
 
     switch (aType) {
         default:

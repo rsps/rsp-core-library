@@ -12,7 +12,7 @@
 #include <string>
 #include <rsp/logging/LogTypes.h>
 #include <rsp/logging/OutStreamBuffer.h>
-#include <magic_enum/magic_enum.hpp>
+#include <rsp/utils/EnumReflection.h>
 
 namespace rsp::logging {
 
@@ -33,17 +33,17 @@ namespace rsp::logging {
 
 LogLevel ToLogLevel(const std::string& arLevelString)
 {
-    return magic_enum::enum_cast<LogLevel>(arLevelString).value();
+    return utils::EnumCast<LogLevel>(arLevelString).value();
 }
 
 std::string ToString(LogLevel aLevel)
 {
-    return std::string(magic_enum::enum_name<LogLevel>(aLevel));
+    return std::string(utils::EnumName<LogLevel>(aLevel));
 }
 
 std::ostream& operator<<(std::ostream &o, LogLevel aLevel)
 {
-    o << magic_enum::enum_name<LogLevel>(aLevel);
+    o << utils::EnumName<LogLevel>(aLevel);
     return o;
 }
 

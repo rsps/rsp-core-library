@@ -13,7 +13,7 @@
 #include <rsp/security/Sha.h>
 #include <mbedtls/md.h>
 #include <mbedtls/version.h>
-#include <magic_enum/magic_enum.hpp>
+#include <rsp/utils/EnumReflection.h>
 
 namespace rsp::security {
 
@@ -40,7 +40,7 @@ public:
         mbedtls_md_init(&mDigestCtx);
         mpDigestInfo = mbedtls_md_info_from_type(algo);
         if (!mpDigestInfo) {
-            THROW_WITH_BACKTRACE2(CryptException, "The requested algorithm is not supported: ", magic_enum::enum_name(aAlgorithm).data());
+            THROW_WITH_BACKTRACE2(CryptException, "The requested algorithm is not supported: ", utils::EnumName(aAlgorithm).data());
         }
         auto rc = mbedtls_md_setup(&mDigestCtx, mpDigestInfo, aHMac);
         if (rc) {

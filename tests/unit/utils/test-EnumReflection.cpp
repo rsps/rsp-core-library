@@ -9,7 +9,7 @@
  */
 
 #include <doctest.h>
-#include <magic_enum/magic_enum.hpp>
+#include <rsp/utils/EnumReflection.h>
 #include <string_view>
 
 using namespace std::string_view_literals;
@@ -23,27 +23,11 @@ enum class States
     Three
 };
 
-/* Compile with clang:
- *
- * clang++ -std=c++23 \
- *   -I/home/steffen/Projects/tgm/rsp-core-library/build/_deps/doctest-src/doctest \
- *   -I/home/steffen/Projects/tgm/rsp-core-library/build/_deps/magic_enum-src/include \
- *   -I/home/steffen/Projects/tgm/rsp-core-library/include \
- *   -I/home/steffen/Projects/tgm/rsp-core-library/src \
- *   -I/home/steffen/Projects/tgm/rsp-core-library/tests/helpers \
- *   -pedantic -Wall -Wextra \
- *   -o test-magic_enum \
- *   tests/unit/utils/test-magic_enum.cpp \
- *   tests/test-main.cpp tests/helpers/TestHelpers.cpp \
- *   tests/helpers/TestLogger.cpp \
- *   build/librsp-core-lib.a -lstdc++exp
- */
-
-TEST_CASE("magic_enum")
+TEST_CASE("EnumName")
 {
     SUBCASE("count")
     {
-        constexpr auto count = magic_enum::enum_count<States>();
+        constexpr auto count = rsp::utils::EnumCount<States>();
 
         // This will only compile if 'count' is truly constexpr
         static_assert(count == 3u);
@@ -54,12 +38,12 @@ TEST_CASE("magic_enum")
         CHECK_EQ(arr.size(), 3u);
 
         constexpr auto value = States::One;
-        constexpr auto name = magic_enum::enum_name(value);
+        constexpr auto name = rsp::utils::EnumName(value);
 
         CHECK_EQ(name, "One");
 
         enum class Foo  { SPAM, HAM };
-        static_assert(magic_enum::enum_name(Foo::SPAM) == "SPAM"sv);
+        static_assert(rsp::utils::EnumName(Foo::SPAM) == "SPAM"sv);
     }
 }
 

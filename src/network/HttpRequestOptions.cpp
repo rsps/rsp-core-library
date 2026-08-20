@@ -10,14 +10,14 @@
 
 #include <rsp/network/HttpRequestOptions.h>
 #include <rsp/utils/StrUtils.h>
-#include <magic_enum/magic_enum.hpp>
+#include <rsp/utils/EnumReflection.h>
 
 namespace rsp::network {
 
 
 std::ostream& operator<<(std::ostream &o, HttpRequestType aType)
 {
-    return o << magic_enum::enum_name<HttpRequestType>(aType);
+    return o << utils::EnumName<HttpRequestType>(aType);
 }
 
 std::ostream& operator<<(std::ostream &o, const HttpRequestOptions &arOptions)

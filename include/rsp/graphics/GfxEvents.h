@@ -15,6 +15,7 @@
 #include <memory>
 #include <rsp/messaging/Event.h>
 #include <rsp/logging/LogStream.h>
+#include <rsp/utils/EnumReflection.h>
 #include "Point.h"
 
 namespace rsp::graphics {
@@ -50,7 +51,7 @@ struct TouchEvent: public messaging::EventBase<TouchEvent>
     {
         const auto int_msec = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - mTime);
         os << int_msec.count() << " "
-            << std::string(magic_enum::enum_name<TouchTypes>(mType)) << "(" << mCurrent << ")";
+            << std::string(utils::EnumName<TouchTypes>(mType)) << "(" << mCurrent << ")";
     }
 };
 

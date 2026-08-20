@@ -13,7 +13,7 @@
 #include "ConstTypeInfo.h"
 #include "Nullable.h"
 #include "BinaryStream.h"
-#include <magic_enum/magic_enum.hpp>
+#include <rsp/utils/EnumReflection.h>
 
 #ifndef RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
 #define RSP_CORE_LIB_UTILS_STRUCT_ELEMENT_H
@@ -345,7 +345,7 @@ bool operator==(const StructElement<T>& /*aEl1*/, const StructElement<E>& /*aEl2
 // Default enum streaming
 template <class E> requires std::is_enum_v<E>
 std::ostream & operator<< (std::ostream &o, E value) {
-    o << magic_enum::enum_name(value);
+    o << utils::EnumName(value);
     return o;
 }
 

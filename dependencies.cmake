@@ -55,17 +55,6 @@ function(rsp_core_add_dependencies ATARGET)
 
     # --------------------------------------------------------------------------------------------------------------
 
-    FetchContent_Declare(
-        magic_enum
-        GIT_REPOSITORY https://github.com/Neargye/magic_enum
-        GIT_TAG v0.9.8
-        GIT_SHALLOW TRUE
-    )
-    FetchContent_MakeAvailable(magic_enum)
-    target_link_libraries(${ATARGET} PUBLIC magic_enum::magic_enum)
-
-    # --------------------------------------------------------------------------------------------------------------
-
     if(RSP_CORE_LIB_USE_LIBCURL)
         find_package(CURL 7.33 REQUIRED)
         target_link_libraries(${ATARGET} PUBLIC CURL::libcurl)
