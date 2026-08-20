@@ -11,6 +11,8 @@
 #include <rsp/network/parser-helpers.h>
 #include <rsp/network/UrlParser.h>
 
+#include <limits>
+
 using namespace std::string_view_literals;
 
 namespace rsp::network {
