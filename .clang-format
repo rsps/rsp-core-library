@@ -81,6 +81,3 @@ FixNamespaceComments: true
 EmptyLineBeforeAccessModifier: LogicalBlock
 EmptyLineAfterAccessModifier: Never
 Standard: c++20
-
-AttributeMacros:
-  - SUBCASE
