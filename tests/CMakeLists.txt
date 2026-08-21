@@ -86,3 +86,18 @@ target_sources(${TEST_BINARY}
 if(NOT CMAKE_CROSSCOMPILING)
     doctest_discover_tests(${TEST_BINARY} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 endif()
+
+# Install test binary and resources. Resources go under <prefix>/share/, so run the binary
+# with that directory as the working directory (paths are resolved relative to the cwd).
+if(RSP_CORE_LIB_INSTALL_TESTS)
+    include(GNUInstallDirs)
+    install(TARGETS ${TEST_BINARY} RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+    install(
+        DIRECTORY
+            "${CMAKE_BINARY_DIR}/testImages"
+            "${CMAKE_BINARY_DIR}/fonts"
+            "${CMAKE_BINARY_DIR}/scripts"
+            "${CMAKE_BINARY_DIR}/webserver"
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/${TEST_BINARY}"
+    )
+endif()

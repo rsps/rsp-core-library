@@ -26,6 +26,11 @@ option(RSP_CORE_LIB_USE_SYSLOG         "Include syslog interface"               
 option(RSP_CORE_LIB_BUILD_TESTS        "Set to build test binaries"                       ${PROJECT_IS_TOP_LEVEL})
 option(RSP_CORE_LIB_INSTALL            "Set to register install rules for the library"    ${PROJECT_IS_TOP_LEVEL})
 
+include(CMakeDependentOption)
+cmake_dependent_option(RSP_CORE_LIB_INSTALL_TESTS "Set to install the rsp-core-lib-test binary" OFF
+    "RSP_CORE_LIB_BUILD_TESTS;RSP_CORE_LIB_INSTALL" OFF
+)
+
 # Append this project's local module paths.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
