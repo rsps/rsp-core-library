@@ -51,6 +51,12 @@ set(CMAKE_ENABLE_EXPORTS TRUE)
 # ------------------------------------------------------------------------------
 add_library(${PROJECT_NAME})
 
+# Give shared builds a `.so.<major>` SONAME symlink chain.
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
+
 # Dependencies
 include("dependencies.cmake")
 rsp_core_add_dependencies(${PROJECT_NAME})
