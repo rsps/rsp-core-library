@@ -50,6 +50,7 @@ set(CMAKE_ENABLE_EXPORTS TRUE)
 # Core library target
 # ------------------------------------------------------------------------------
 add_library(${PROJECT_NAME})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 # Give shared builds a `.so.<major>` SONAME symlink chain.
 set_target_properties(${PROJECT_NAME} PROPERTIES

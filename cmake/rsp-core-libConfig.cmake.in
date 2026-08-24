@@ -2,8 +2,8 @@
 
 # CMake package configuration file for the rsp-core-lib library.
 #
-# Provides the imported target `rsp::rsp-core-lib` and re-discovers the
-# transitive dependencies the library was built against.
+# Provides the imported target `rsp-core-lib::rsp-core-lib` and re-discovers
+# the transitive dependencies the library was built against.
 
 include(CMakeFindDependencyMacro)
 
