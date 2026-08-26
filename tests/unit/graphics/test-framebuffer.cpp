@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <doctest.h>
+#include <rsp/config.h>
 #include <rsp/exceptions/SignalHandler.h>
 #include <rsp/graphics/Bitmap.h>
 #include <rsp/graphics/Font.h>

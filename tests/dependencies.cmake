@@ -14,7 +14,7 @@ function(rsp_core_test_add_dependencies ATARGET)
     include("${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake")  # for doctest_discover_tests()
 
     target_link_libraries(${ATARGET}
-        PUBLIC
+        PRIVATE
             rsp-core-lib
             doctest::doctest
     )
