@@ -1,0 +1,69 @@
+@PACKAGE_INIT@
+
+# CMake package configuration file for the rsp-core-lib library.
+#
+# Provides the imported target `rsp-core-lib::rsp-core-lib` and re-discovers
+# the transitive dependencies the library was built against.
+
+include(CMakeFindDependencyMacro)
+
+# Make Find*.cmake modules shipped with the package discoverable by
+# find_dependency() below.
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+
+# Feature flags the library was built with. These mirror the build-time
+# options, so consumers can introspect them and so the find_dependency()
+# calls below match the actual link requirements.
+set(RSP_CORE_LIB_USE_GFX            @RSP_CORE_LIB_USE_GFX@)
+set(RSP_CORE_LIB_USE_GFX_SDL2       @RSP_CORE_LIB_USE_GFX_SDL2@)
+set(RSP_CORE_LIB_USE_GFX_SW         @RSP_CORE_LIB_USE_GFX_SW@)
+set(RSP_CORE_LIB_USE_FREETYPE       @RSP_CORE_LIB_USE_FREETYPE@)
+set(RSP_CORE_LIB_USE_OPENSSL        @RSP_CORE_LIB_USE_OPENSSL@)
+set(RSP_CORE_LIB_USE_MBEDTLS        @RSP_CORE_LIB_USE_MBEDTLS@)
+set(RSP_CORE_LIB_USE_LIBCURL        @RSP_CORE_LIB_USE_LIBCURL@)
+set(RSP_CORE_LIB_USE_EMBED_HTTP     @RSP_CORE_LIB_USE_EMBED_HTTP@)
+set(RSP_CORE_LIB_USE_WPA_SUPPLICANT @RSP_CORE_LIB_USE_WPA_SUPPLICANT@)
+set(RSP_CORE_LIB_USE_ZLIB           @RSP_CORE_LIB_USE_ZLIB@)
+set(RSP_CORE_LIB_USE_STD_THREAD     @RSP_CORE_LIB_USE_STD_THREAD@)
+set(RSP_CORE_LIB_USE_SYSLOG         @RSP_CORE_LIB_USE_SYSLOG@)
+
+if(RSP_CORE_LIB_USE_STD_THREAD)
+    set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+    find_dependency(Threads)
+endif()
+
+if(RSP_CORE_LIB_USE_ZLIB)
+    find_dependency(ZLIB)
+endif()
+
+# PRIVATE dependencies are only required when consuming the library as a
+# static archive, but we re-find them unconditionally so both shared and
+# static usages work out of the box.
+if(RSP_CORE_LIB_USE_GFX)
+    if(RSP_CORE_LIB_USE_GFX_SDL2)
+        find_dependency(SDL2)
+    endif()
+    if(RSP_CORE_LIB_USE_FREETYPE)
+        find_dependency(Freetype)
+    endif()
+endif()
+
+if(RSP_CORE_LIB_USE_OPENSSL)
+    find_dependency(OpenSSL)
+endif()
+
+if(RSP_CORE_LIB_USE_MBEDTLS)
+    find_dependency(MbedTLS)
+endif()
+
+if(RSP_CORE_LIB_USE_LIBCURL)
+    find_dependency(CURL 7.33)
+endif()
+
+if(RSP_CORE_LIB_USE_WPA_SUPPLICANT)
+    find_dependency(wpa_supplicant)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+
+check_required_components("@PROJECT_NAME@")

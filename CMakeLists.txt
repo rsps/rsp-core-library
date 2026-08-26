@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23...4.33)
+cmake_minimum_required(VERSION 3.25...4.33)
 
 include("cmake/parse-version-file.cmake")
 parse_version_file(
@@ -24,6 +24,12 @@ option(RSP_CORE_LIB_USE_ZLIB           "Build with ZLib Inflate/Deflate compress
 option(RSP_CORE_LIB_USE_STD_THREAD     "Thread architecture to use."                      ON)
 option(RSP_CORE_LIB_USE_SYSLOG         "Include syslog interface"                         ON)
 option(RSP_CORE_LIB_BUILD_TESTS        "Set to build test binaries"                       ${PROJECT_IS_TOP_LEVEL})
+option(RSP_CORE_LIB_INSTALL            "Set to register install rules for the library"    ${PROJECT_IS_TOP_LEVEL})
+
+include(CMakeDependentOption)
+cmake_dependent_option(RSP_CORE_LIB_INSTALL_TESTS "Set to install the rsp-core-lib-test binary" OFF
+    "RSP_CORE_LIB_BUILD_TESTS;RSP_CORE_LIB_INSTALL" OFF
+)
 
 # Append this project's local module paths.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -40,8 +46,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Keep symbol information for exception stack traces
 set(CMAKE_ENABLE_EXPORTS TRUE)
 
+# ------------------------------------------------------------------------------
 # Core library target
-add_library(${PROJECT_NAME} STATIC)
+# ------------------------------------------------------------------------------
+add_library(${PROJECT_NAME})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
+# Give shared builds a `.so.<major>` SONAME symlink chain.
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
 
 # Dependencies
 include("dependencies.cmake")
@@ -83,8 +98,17 @@ endif()
 # Library sources
 add_subdirectory(src)
 
+# ------------------------------------------------------------------------------
 # Tests
+# ------------------------------------------------------------------------------
 if(RSP_CORE_LIB_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+# ------------------------------------------------------------------------------
+# Install / package
+# ------------------------------------------------------------------------------
+if(RSP_CORE_LIB_INSTALL)
+    include(cmake/install-rules.cmake)
 endif()

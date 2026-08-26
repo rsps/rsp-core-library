@@ -10,6 +10,7 @@ function(rsp_core_test_add_dependencies ATARGET)
         GIT_TAG        v2.5.2
         GIT_SHALLOW    TRUE
     )
+    set(DOCTEST_NO_INSTALL ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(doctest)
     include("${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake")  # for doctest_discover_tests()
 
