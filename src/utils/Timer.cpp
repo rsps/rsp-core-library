@@ -10,7 +10,6 @@
 
 #include <vector>
 #include <rsp/utils/Timer.h>
-#include <iostream>
 
 //#define TLOG(a) DLOG(__FUNCTION__ << ": " << a)
 #define TLOG(a)
@@ -18,11 +17,8 @@
 namespace rsp::utils {
 
 Timer::~Timer()
-try {
+{
     Enable(false);
-}
-catch(...) {
-    std::cerr << "Exception in ~Timer()" << std::endl;
 }
 
 Timer& Timer::SetTimeout(const std::chrono::milliseconds aTimeout)
@@ -70,13 +66,10 @@ TimerQueue::TimerQueue()
 }
 
 TimerQueue::~TimerQueue()
-try {
+{
     if (&GetInstance() == this) {
         SetInstance(nullptr);
     }
-}
-catch (...) {
-    std::cerr << "Exception in ~TimerQueue()" << std::endl;
 }
 
 

@@ -11,7 +11,6 @@
 #ifndef RSP_CORE_LIB_GRAPHICS_GFX_INPUT_EVENTS_H
 #define RSP_CORE_LIB_GRAPHICS_GFX_INPUT_EVENTS_H
 
-#include <iostream>
 #include <rsp/utils/Singleton.h>
 #include "GfxEvents.h"
 
@@ -31,13 +30,10 @@ public:
     }
 
     ~GfxInputEvents() override
-    try {
+    {
         if (&GetInstance() == this) {
             SetInstance(nullptr);
         }
-    }
-    catch (...) {
-        std::cerr << "Exception in ~GfxInputEvents()" << std::endl;
     }
 
     /**
