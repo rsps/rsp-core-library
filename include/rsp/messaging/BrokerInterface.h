@@ -12,7 +12,6 @@
 #ifndef RSP_CORE_LIB_MESSAGING_BROKER_INTERFACE_H
 #define RSP_CORE_LIB_MESSAGING_BROKER_INTERFACE_H
 
-#include <iostream>
 #include <memory>
 #include "SubscriberInterface.h"
 #include <rsp/utils/Singleton.h>
@@ -29,13 +28,10 @@ public:
         }
     }
     ~BrokerInterface() override
-    try {
+    {
         if (&GetInstance() == this) {
             SetInstance(nullptr);
         }
-    }
-    catch (...) {
-        std::cerr << "Exception in ~BrokerInterface()" << std::endl;
     }
 
     virtual size_t ProcessEvents() = 0;

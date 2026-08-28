@@ -8,7 +8,6 @@
  * \author      Steffen Brummer
  */
 
-#include <iostream>
 #include <rsp/utils/Thread.h>
 #include <rsp/utils/ThreadList.h>
 #ifdef ESP_PLATFORM
@@ -31,12 +30,9 @@ Thread::Thread(std::string_view aName)
 }
 
 Thread::~Thread()
-try {
+{
     ThreadList::GetInstance().RemoveThread(*this);
     stop();
-}
-catch (...) {
-    std::cerr << "Exception ~Thread()" << std::endl;
 }
 
 const std::string& Thread::GetName() const
