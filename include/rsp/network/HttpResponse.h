@@ -79,7 +79,7 @@ protected:
     std::string mHeaderData{};
     StatusLine mStatusLine{};
     HeaderList mHeaders{};
-    std::optional<size_t> mContentLength{};
+    size_t mContentLength = 0;
     HttpBody_t mpBody{};
 
     friend class EHttpRequest;

@@ -40,7 +40,7 @@ TerminalIO::~TerminalIO()
     tcsetattr(0, TCSANOW, &mOldTermios);
 }
 
-TerminalIO& TerminalIO::SetEcho(bool aEcho)
+TerminalIO& TerminalIO::SetEcho(const bool aEcho)
 {
     mCurrentTermios = mOldTermios;          // make new settings same as old settings
 
@@ -79,8 +79,7 @@ char TerminalIO::GetChar(EscapeCodes &arEscCode) const
         if (ext[1] == 0) {
             return c; // The Esc key is not followed by any extended values
         }
-        else
-        {
+        else {
             ext[2] = getChar();
             if (ext[2] < 0x3F) {
                 ext[3] = getChar();
@@ -116,7 +115,7 @@ char TerminalIO::GetChar(EscapeCodes &arEscCode) const
 }
 
 /**
- * Get a command line from the terminal
+ * Get a command line from the terminal.
  *
  * The terminal is simulated, with history and cursor controlled by ASCII escape commands.
  * @see https://en.wikipedia.org/wiki/ANSI_escape_code
@@ -130,8 +129,8 @@ std::string TerminalIO::GetLine()
 {
     char ch;
     std::string line;
-    unsigned int cursor = 0;
-    unsigned int history_cursor = mHistory.size();
+    auto cursor = 0u;
+    auto history_cursor = mHistory.size();
     bool edit_mode = false;
     int tab_count = 0;
     EscapeCodes esc;
@@ -189,12 +188,7 @@ std::string TerminalIO::GetLine()
             case EscapeCodes::ArrowDown:
                 if ((history_cursor+1) < mHistory.size()) {
                     if (edit_mode) {
-                        if (history_cursor <= mHistory.size()) {
-                            mHistory[history_cursor] = line;
-                        }
-                        else {
-                            mHistory.push_back(line);
-                        }
+                        mHistory.at(history_cursor) = line;
                     }
                     line = mHistory.at(++history_cursor);
                     cursor = line.length();
@@ -205,8 +199,8 @@ std::string TerminalIO::GetLine()
             case EscapeCodes::ArrowUp:
                 if (history_cursor > 0) {
                     if (edit_mode) {
-                        if (history_cursor <= mHistory.size()) {
-                            mHistory[history_cursor] = line;
+                        if (history_cursor < mHistory.size()) {
+                            mHistory.at(history_cursor) = line;
                         }
                         else {
                             mHistory.push_back(line);
@@ -235,7 +229,7 @@ std::string TerminalIO::GetLine()
         }
 
         if (esc != EscapeCodes::Tabulator) {
-            tab_count = 0; // Clear tabulator double click on all other keys.
+            tab_count = 0; // Clear tabulator double-click on all other keys.
         }
 
         std::cout << AnsiEscapeCodes::ec::cursor::EraseLineMoveToCol1 << std::flush; // Erase line and move cursor to column 1.
@@ -249,7 +243,7 @@ std::string TerminalIO::GetLine()
 
     if (mVerbose) {
         Console::Debug() << "$Debug: ";
-        for (auto c : line) {
+        for (const auto c : line) {
             Console::Debug() << std::hex << static_cast<int>(c) << " ";
         }
         Console::Debug() << "-- " << line << std::endl;
@@ -283,7 +277,7 @@ void TerminalIO::handleTabulator(int &arTabCount, std::string &arLine, unsigned 
         }
 
         int n = 0;
-        for (auto c : arLine) {
+        for (const auto c : arLine) {
             if (c == ' ') {
                 n++;
             }
@@ -292,7 +286,7 @@ void TerminalIO::handleTabulator(int &arTabCount, std::string &arLine, unsigned 
         Console::Info() << std::endl;
         for (std::string &s : matches) {
             int count = 0;
-            for (auto c : s) {
+            for (const auto c : s) {
                 if (c == ' ') {
                     count++;
                 }
@@ -337,9 +331,9 @@ TerminalIO::EscapeCodes TerminalIO::escString2Code(const char *apEscStr)
         { AnsiEscapeCodes::ec::Esc, EscapeCodes::Esc },
     };
 
-    for (auto &a : map) {
-        if (std::strcmp(a.aec, apEscStr) == 0) {
-            return a.ec;
+    for (const auto & [aec, ec] : map) {
+        if (std::strcmp(aec, apEscStr) == 0) {
+            return ec;
         }
     }
 
@@ -359,7 +353,7 @@ char TerminalIO::WaitForAnyKey()
 
 char TerminalIO::getChar()
 {
-    return char(std::getchar());
+    return static_cast<char>(std::getchar());
 }
 
 } /* namespace hwtest */

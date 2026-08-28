@@ -9,7 +9,6 @@
  */
 
 #include <rsp/network/HttpResponse.h>
-#include <rsp/network/parser-helpers.h>
 #include <stdexcept>
 #include <rsp/utils/StrUtils.h>
 #include <rsp/network/StringBody.h>
@@ -54,18 +53,7 @@ IHttpResponse& HttpResponse::MakeBody()
 
 size_t HttpResponse::GetContentLength() const
 {
-    if (!mContentLength.has_value()) {
-        if (GetStatusCode() == StatusCodes::NoContent) {
-            const_cast<HttpResponse*>(this)->mContentLength = 0;
-        }
-        else if (mHeaders.contains("content-length")) {
-            const_cast<HttpResponse*>(this)->mContentLength = string_to_integral<size_t>(mHeaders.at("content-length"));
-        }
-    }
-    if (mContentLength.has_value()) {
-        return *mContentLength;
-    }
-    return 0;
+    return mContentLength;
 }
 
 IHttpResponse& HttpResponse::Clear()
@@ -74,7 +62,7 @@ IHttpResponse& HttpResponse::Clear()
     mStatusLine = {};
     mHeaders.clear();
     mHeaderData.clear();
-    mContentLength.reset();
+    mContentLength = 0;
     MakeBody();
     return *this;
 }

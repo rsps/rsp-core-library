@@ -21,16 +21,16 @@ Timer::~Timer()
     Enable(false);
 }
 
-Timer& Timer::SetTimeout(std::chrono::milliseconds aTimeout)
+Timer& Timer::SetTimeout(const std::chrono::milliseconds aTimeout)
 {
-    bool enabled = IsEnabled();
+    const bool enabled = IsEnabled();
     Enable(false);
     mTimeout = aTimeout;
     Enable(enabled);
     return *this;
 }
 
-Timer& Timer::Enable(bool aOn)
+Timer& Timer::Enable(const bool aOn)
 {
     if (mEnabled == aOn) {
         return *this;
@@ -77,15 +77,11 @@ void TimerQueue::Poll()
 {
     std::vector<Timer*> expired;
 
-    for(;;) {
-        if (mQueue.empty()) {
-            TLOG("No timers exists.")
-            break;
-        }
+    while(!mQueue.empty()) {
         auto it = mQueue.begin();
 
         RunTime now;
-            TLOG("Timer " << (*it)->GetId()
+        TLOG("Timer " << (*it)->GetId()
             << " expires at " << (*it)->mTimeoutAt
             << ". Now: "
             << now)
