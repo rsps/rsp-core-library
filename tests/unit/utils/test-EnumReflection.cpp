@@ -186,4 +186,77 @@ TEST_CASE("EnumCast")
     }
 }
 
+TEST_CASE("EnumValues")
+{
+    SUBCASE("basic scoped enum in ascending order")
+    {
+        constexpr auto values = rsp::utils::EnumValues<States>();
+
+        static_assert(values.size() == 3u);
+        static_assert(values[0] == States::One);
+        static_assert(values[1] == States::Two);
+        static_assert(values[2] == States::Three);
+    }
+
+    SUBCASE("sparse and negative enums")
+    {
+        constexpr auto sparse = rsp::utils::EnumValues<Sparse>();
+        static_assert(sparse.size() == 3u);
+        static_assert(sparse[0] == Sparse::A);
+        static_assert(sparse[1] == Sparse::B);
+        static_assert(sparse[2] == Sparse::C);
+
+        constexpr auto negative = rsp::utils::EnumValues<Negative>();
+        static_assert(negative.size() == 3u);
+        static_assert(negative[0] == Negative::Low);
+        static_assert(negative[1] == Negative::Mid);
+        static_assert(negative[2] == Negative::High);
+    }
+
+    SUBCASE("range-based iteration matches EnumName")
+    {
+        for (auto value : rsp::utils::EnumValues<States>()) {
+            CHECK_FALSE(rsp::utils::EnumName(value).empty());
+        }
+    }
+
+    SUBCASE("values outside representable range are excluded")
+    {
+        constexpr auto values = rsp::utils::EnumValues<OutOfRange>();
+        static_assert(values.size() == 1u);
+        static_assert(values[0] == OutOfRange::InRange);
+    }
+}
+
+TEST_CASE("EnumNames")
+{
+    SUBCASE("basic scoped enum in ascending order")
+    {
+        constexpr auto names = rsp::utils::EnumNames<States>();
+
+        static_assert(names.size() == 3u);
+        static_assert(names[0] == "One"sv);
+        static_assert(names[1] == "Two"sv);
+        static_assert(names[2] == "Three"sv);
+    }
+
+    SUBCASE("order matches EnumValues")
+    {
+        constexpr auto values = rsp::utils::EnumValues<Sparse>();
+        constexpr auto names = rsp::utils::EnumNames<Sparse>();
+
+        static_assert(values.size() == names.size());
+        for (std::size_t i = 0; i < values.size(); ++i) {
+            CHECK_EQ(names[i], rsp::utils::EnumName(values[i]));
+        }
+    }
+
+    SUBCASE("values outside representable range are excluded")
+    {
+        constexpr auto names = rsp::utils::EnumNames<OutOfRange>();
+        static_assert(names.size() == 1u);
+        static_assert(names[0] == "InRange"sv);
+    }
+}
+
 TEST_SUITE_END();

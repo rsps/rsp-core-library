@@ -190,6 +190,54 @@ constexpr std::optional<E> EnumCast(std::string_view aName)
     return std::nullopt;
 }
 
+/**
+ * \brief Get all enumerator values of E within the range [-128, 127].
+ * \tparam E Enum type
+ * \return An array of the declared enumerator values, in ascending order of their
+ *         underlying integer value. Duplicate values (aliases) each appear once.
+ *
+ * Usage:
+ * \code
+ * for (auto value : rsp::utils::EnumValues<MyEnum>()) { ... }
+ * \endcode
+ */
+template <Enum E>
+consteval std::array<E, EnumCount<E>()> EnumValues()
+{
+    std::array<E, EnumCount<E>()> result{};
+    std::size_t index = 0;
+    for (const auto& entry : enum_reflection_detail::cEntries<E>) {
+        if (!entry.second.empty()) {
+            result[index++] = entry.first;
+        }
+    }
+    return result;
+}
+
+/**
+ * \brief Get the names of all enumerator values of E within the range [-128, 127].
+ * \tparam E Enum type
+ * \return An array of the enumerator names, in ascending order of their underlying
+ *         integer value, matching the order of EnumValues<E>().
+ *
+ * Usage:
+ * \code
+ * for (auto name : rsp::utils::EnumNames<MyEnum>()) { ... }
+ * \endcode
+ */
+template <Enum E>
+consteval std::array<std::string_view, EnumCount<E>()> EnumNames()
+{
+    std::array<std::string_view, EnumCount<E>()> result{};
+    std::size_t index = 0;
+    for (const auto& entry : enum_reflection_detail::cEntries<E>) {
+        if (!entry.second.empty()) {
+            result[index++] = entry.second;
+        }
+    }
+    return result;
+}
+
 } // namespace rsp::utils
 
 #endif // RSP_CORE_LIB_UTILS_ENUM_REFLECTION_H
