@@ -177,7 +177,8 @@ constexpr std::string_view EnumName(E aValue)
  * \brief Find the enumerator value of E with the given name.
  * \tparam E Enum type
  * \param aName Name to look up
- * \return The matching enumerator value, or std::nullopt if no enumerator of E has that name.
+ * \return The matching enumerator value, or std::nullopt if no enumerator
+ *         of E has that name.
  */
 template <Enum E>
 constexpr std::optional<E> EnumCast(std::string_view aName)
@@ -217,8 +218,8 @@ consteval std::array<E, EnumCount<E>()> EnumValues()
 /**
  * \brief Get the names of all enumerator values of E within the range [-128, 127].
  * \tparam E Enum type
- * \return An array of the enumerator names, in ascending order of their underlying
- *         integer value, matching the order of EnumValues<E>().
+ * \return An array of the enumerator names, in ascending order of their
+ *         underlying integer value, matching the order of EnumValues<E>().
  *
  * Usage:
  * \code
@@ -233,6 +234,31 @@ consteval std::array<std::string_view, EnumCount<E>()> EnumNames()
     for (const auto& entry : enum_reflection_detail::cEntries<E>) {
         if (!entry.second.empty()) {
             result[index++] = entry.second;
+        }
+    }
+    return result;
+}
+
+/**
+ * \brief Get all enumerator value/name pairs of E within the range [-128, 127].
+ * \tparam E Enum type
+ * \return An array of (value, name) pairs, in ascending order of their
+ *         underlying integer value, matching the order of EnumValues<E>()
+ *         and EnumNames<E>().
+ *
+ * Usage:
+ * \code
+ * for (auto& [value, name] : rsp::utils::EnumEntries<MyEnum>()) { ... }
+ * \endcode
+ */
+template <enum_reflection_detail::Enum E>
+consteval std::array<std::pair<E, std::string_view>, EnumCount<E>()> EnumEntries()
+{
+    std::array<std::pair<E, std::string_view>, EnumCount<E>()> result{};
+    std::size_t index = 0;
+    for (const auto& entry : enum_reflection_detail::cEntries<E>) {
+        if (!entry.second.empty()) {
+            result[index++] = entry;
         }
     }
     return result;

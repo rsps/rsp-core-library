@@ -259,4 +259,38 @@ TEST_CASE("EnumNames")
     }
 }
 
+TEST_CASE("EnumEntries")
+{
+    SUBCASE("basic scoped enum in ascending order")
+    {
+        constexpr auto entries = rsp::utils::EnumEntries<States>();
+
+        static_assert(entries.size() == 3u);
+        static_assert(entries[0].first == States::One && entries[0].second == "One"sv);
+        static_assert(entries[1].first == States::Two && entries[1].second == "Two"sv);
+        static_assert(entries[2].first == States::Three && entries[2].second == "Three"sv);
+    }
+
+    SUBCASE("order matches EnumValues and EnumNames")
+    {
+        constexpr auto values = rsp::utils::EnumValues<Sparse>();
+        constexpr auto names = rsp::utils::EnumNames<Sparse>();
+        constexpr auto entries = rsp::utils::EnumEntries<Sparse>();
+
+        static_assert(entries.size() == values.size());
+        for (std::size_t i = 0; i < entries.size(); ++i) {
+            CHECK_EQ(entries[i].first, values[i]);
+            CHECK_EQ(entries[i].second, names[i]);
+        }
+    }
+
+    SUBCASE("values outside representable range are excluded")
+    {
+        constexpr auto entries = rsp::utils::EnumEntries<OutOfRange>();
+        static_assert(entries.size() == 1u);
+        static_assert(entries[0].first == OutOfRange::InRange);
+        static_assert(entries[0].second == "InRange"sv);
+    }
+}
+
 TEST_SUITE_END();
