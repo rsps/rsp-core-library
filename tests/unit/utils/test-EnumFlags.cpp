@@ -33,7 +33,6 @@ enum class TestFlags : uint32_t {
     F32 = 1u << 31,
     // F33 = 1u << 32,
 };
-RSP_FLAGS(TestFlags);
 
 enum class SparseFlags {
     A = 0x01,
@@ -41,7 +40,6 @@ enum class SparseFlags {
     C = 0x04,
     D = A | B,
 };
-RSP_FLAGS(SparseFlags);
 
 enum class NotFlags {
     One,
@@ -58,7 +56,7 @@ static_assert(static_cast<int>(rsp::utils::EnumFlags<SparseFlags>{}) == 0);
 static_assert(static_cast<int>(rsp::utils::EnumFlags<SparseFlags>{SparseFlags::A}) == 0x01);
 static_assert(static_cast<int>(rsp::utils::EnumFlags<SparseFlags>{0x02}) == 0x02);
 static_assert(rsp::utils::EnumFlags<SparseFlags>{0x01}.IsSet(SparseFlags::A));
-static_assert(rsp::utils::EnumFlags<SparseFlags>{SparseFlags::D}.HasAll(SparseFlags::A | SparseFlags::B));
+static_assert(rsp::utils::EnumFlags<SparseFlags>{SparseFlags::D}.HasAll(rsp::utils::EnumFlags<SparseFlags>{SparseFlags::A, SparseFlags::B}));
 static_assert(!rsp::utils::EnumFlags<SparseFlags>{SparseFlags::D}.HasAny(SparseFlags::C));
 
 // Comparing unrelated enum types must not compile
@@ -68,20 +66,12 @@ concept Comparable = requires(A a, B b) {
 };
 static_assert(!Comparable<TestFlags, SparseFlags>);
 
-// Bit operators must not compile for non-flag enums (RSP_FLAGS not used)
-template <typename E>
-concept Bitwise = requires(E a, E b) {
-    a | b;
-    a & b;
-    a ^ b;
-    ~a;
-};
-static_assert(!Bitwise<NotFlags>);
-static_assert(Bitwise<TestFlags>);
-
-// Flags does not compile with unscoped enums
+// EnumFlags works for any scoped enum, no opt-in macro required
 template <typename E>
 concept HasEnumFlags = requires { typename rsp::utils::EnumFlags<E>; };
+static_assert(HasEnumFlags<NotFlags>);
+
+// ... but not for unscoped enums
 static_assert(!HasEnumFlags<MyUnscopedEnum>);
 
 class MyClass
@@ -91,29 +81,24 @@ public:
         A = 1,
         B = 2,
     };
-    RSP_FLAGS_MEMBER(NestedEnum);
 
-    // NestedEnum isn't complete yet here, so the hidden friend operator|
-    // can't be called in this constant expression - go through EnumFlags<>
-    // instead.
-    static constexpr NestedEnum value = rsp::utils::EnumFlags<NestedEnum>{NestedEnum::A} | NestedEnum::B;
+    static constexpr NestedEnum value = rsp::utils::EnumFlags<NestedEnum>{NestedEnum::A, NestedEnum::B};
 
     NestedEnum GetCombination() const noexcept;
 };
 
 MyClass::NestedEnum MyClass::GetCombination() const noexcept
 {
-    return NestedEnum::A | NestedEnum::B;
+    return rsp::utils::EnumFlags<NestedEnum>{NestedEnum::A, NestedEnum::B};
 }
-
-// To make sure EnumFlags.h doesn't introduce conflict with other overloads
-MyClass operator|(MyClass, MyClass);
 
 TEST_SUITE_BEGIN("Utils");
 
 TEST_CASE("EnumFlags")
 {
-    rsp::utils::EnumFlags<TestFlags> flags;
+    using namespace rsp::utils;
+
+    EnumFlags<TestFlags> flags;
 
     CHECK_EQ(sizeof(flags), 4u);
 
@@ -127,31 +112,31 @@ TEST_CASE("EnumFlags")
     CHECK(flags.HasAny(TestFlags::F3));
 
     flags |= TestFlags::F10;
-    CHECK_EQ(flags, (TestFlags::F3 | TestFlags::F10));
+    CHECK_EQ(flags, EnumFlags<TestFlags>{TestFlags::F3, TestFlags::F10});
 
     flags |= TestFlags::F16;
-    CHECK_EQ(flags, (TestFlags::F3 | TestFlags::F10 | TestFlags::F16));
+    CHECK_EQ(flags, EnumFlags<TestFlags>{TestFlags::F3, TestFlags::F10, TestFlags::F16});
     CHECK_EQ(flags & TestFlags::F10, TestFlags::F10);
 
-    flags &= TestFlags::F3 | TestFlags::F16;
-    CHECK_EQ(flags, (TestFlags::F3 | TestFlags::F16));
+    flags &= EnumFlags<TestFlags>{TestFlags::F3, TestFlags::F16};
+    CHECK_EQ(flags, EnumFlags<TestFlags>{TestFlags::F3, TestFlags::F16});
 
-    rsp::utils::EnumFlags<TestFlags> other(1u << 31);
+    EnumFlags<TestFlags> other(1u << 31);
     CHECK_EQ(other, TestFlags::F32);
 
     flags |= other;
-    CHECK_EQ(flags, (TestFlags::F3 | TestFlags::F16 | TestFlags::F32));
+    CHECK_EQ(flags, EnumFlags<TestFlags>{TestFlags::F3, TestFlags::F16, TestFlags::F32});
 
     flags &= other;
     CHECK_EQ(flags, TestFlags::F32);
 
     flags ^= TestFlags::F3;
-    CHECK_EQ(flags, (TestFlags::F32 | TestFlags::F3));
+    CHECK_EQ(flags, rsp::utils::EnumFlags<TestFlags>{TestFlags::F32, TestFlags::F3});
 
     flags ^= TestFlags::F3;
     CHECK_EQ(flags, TestFlags::F32);
 
-    CHECK_EQ(TestFlags::F3 ^ TestFlags::F10, (TestFlags::F3 | TestFlags::F10));
+    CHECK_EQ((EnumFlags<TestFlags>{TestFlags::F3} ^ TestFlags::F10), EnumFlags<TestFlags>{TestFlags::F3, TestFlags::F10});
 }
 
 TEST_SUITE_END();

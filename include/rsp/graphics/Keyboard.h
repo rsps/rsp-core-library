@@ -189,7 +189,6 @@ public:
         Space = 0x20,
         All = 0x3F
     };
-    RSP_FLAGS_MEMBER(Buttons);
 
     /**
      * \brief Constructor that builds all internal button objects.
