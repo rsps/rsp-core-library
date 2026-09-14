@@ -12,13 +12,7 @@
 #define RSP_CORE_LIB_SRC_NETWORK_CURL_CURL_HTTP_REQUEST_H
 
 #include <rsp/network/HttpRequestBase.h>
-// #include <iostream>
-// #include <string>
-// #include <cstring>
-// #include <map>
 #include <memory>
-// #include <stdexcept>
-// #include <utility>
 #include "EasyCurl.h"
 #include "CurlHttpResponse.h"
 
@@ -57,8 +51,8 @@ protected:
     void requestDone() override;
 
 private:
-    static size_t writeFunction(void *apPtr, size_t aSize, size_t aMemberCount, const CurlHttpResponse *data);
-    static size_t streamReadFunction(void *apPtr, size_t aSize, size_t aMemberCount, const IStreamDataProvider *apDataProvider);
+    static size_t writeFunction(std::byte *apPtr, size_t aSize, size_t aMemberCount, const CurlHttpResponse *apResponse);
+    static size_t streamReadFunction(std::byte *apPtr, size_t aSize, size_t aMemberCount, const IStreamDataProvider *apDataProvider);
     static size_t headerFunction(const char *apData, size_t aSize, size_t aMemberCount, CurlHttpResponse *apResponse);
     static size_t progressFunction(CurlHttpRequest *apRequest, curl_off_t aDlTotal, curl_off_t aDlNow, curl_off_t aUlTotal, curl_off_t aUlNow);
 

@@ -42,8 +42,8 @@ void CurlHttpRequest::readFromStream(const HttpBody_t& arBody)
     if (arBody->GetStreamSize() == 0) {
         return;
     }
-    if (dynamic_cast<MultipartBody*>(arBody.get())) {
-        mRequestOptions.Headers.try_emplace("Content-Type", dynamic_cast<MultipartBody&>(*arBody).GetBoundary().GetContentTypeHeader()); // Add header with boundary
+    if (const auto* p = dynamic_cast<MultipartBody*>(arBody.get()); p != nullptr) {
+        mRequestOptions.Headers.try_emplace("Content-Type", p->GetBoundary().GetContentTypeHeader()); // Add header with boundary
     }
 
     setCurlOption(CURLOPT_UPLOAD, 1L);
@@ -52,15 +52,15 @@ void CurlHttpRequest::readFromStream(const HttpBody_t& arBody)
     setCurlOption(CURLOPT_INFILESIZE_LARGE, arBody->GetStreamSize());
 }
 
-size_t CurlHttpRequest::writeFunction(void *apPtr, const size_t aSize, const size_t aMemberCount, const CurlHttpResponse *apResponse)
+size_t CurlHttpRequest::writeFunction(std::byte *apPtr, const size_t aSize, const size_t aMemberCount, const CurlHttpResponse *apResponse)
 {
-    apResponse->mpBody->Write({ static_cast<std::byte*>(apPtr), aSize * aMemberCount });
+    apResponse->mpBody->Write(std::span{ apPtr, aSize * aMemberCount });
     return aSize * aMemberCount;
 }
 
-size_t CurlHttpRequest::streamReadFunction(void *apPtr, const size_t aSize, const size_t aMemberCount, const IStreamDataProvider *apDataProvider)
+size_t CurlHttpRequest::streamReadFunction(std::byte *apPtr, const size_t aSize, const size_t aMemberCount, const IStreamDataProvider *apDataProvider)
 {
-    size_t written = apDataProvider->Read(std::span(static_cast<std::byte*>(apPtr), aSize * aMemberCount));
+    size_t written = apDataProvider->Read(std::span{apPtr, aSize * aMemberCount});
 #ifdef LOG_OUTPUT
     auto o = rsp::logging::LoggerInterface::GetDefault()->Info();
     o << "Request chunk (" << written << ") " << BufferToStream(static_cast<char*>(ptr), written, true);

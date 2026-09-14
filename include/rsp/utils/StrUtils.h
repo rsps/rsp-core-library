@@ -164,12 +164,12 @@ std::string ReduceToCommon(std::vector<std::string>& arList);
 /**
  * Find all occurrences of aFrom and replace them with aTo.
  *
- * @param aText
+ * @param arText
  * @param aFrom
  * @param aTo
  * @return
  */
-std::string& ReplaceAll(std::string& aText, const std::string& aFrom, const std::string& aTo);
+std::string& ReplaceAll(std::string& arText, const std::string& aFrom, const std::string& aTo);
 
 
 /**

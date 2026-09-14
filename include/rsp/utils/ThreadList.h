@@ -12,7 +12,6 @@
 
 #include <rsp/logging/LogChannel.h>
 #include <map>
-#include <string>
 #include <string_view>
 #include "Singleton.h"
 #include "ThreadInterface.h"
@@ -27,14 +26,14 @@ public:
     ~ThreadList() override;
 
     ThreadList& AddThread(ThreadInterface& arThread);
-    ThreadList& RemoveThread(ThreadInterface& arThread);
+    ThreadList& RemoveThread(const ThreadInterface& arThread);
 
-    ThreadInterface& GetThreadByName(std::string_view aName);
+    ThreadInterface& GetThreadByName(std::string_view aName) const;
 
     [[nodiscard]] std::vector<std::string_view> GetThreadNames() const;
 
 protected:
-    std::map<std::string_view, ThreadInterface&> mMap{};
+    std::map<std::string_view, std::reference_wrapper<ThreadInterface>> mMap{};
 };
 
 } // namespace rsp::utils

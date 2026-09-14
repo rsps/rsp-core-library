@@ -23,7 +23,7 @@ namespace rsp::utils
  */
 namespace detail
 {
-    template<typename DurationT, typename ReprT = typename DurationT::rep>
+    template<typename DurationT, typename ReprT = DurationT::rep>
     constexpr DurationT max_duration() noexcept
     {
         return DurationT { std::numeric_limits<ReprT>::max() };
@@ -54,15 +54,15 @@ namespace detail
  * \param tp
  * \param tolerance
  * \param limit
- * \return TimePoint in destination domain
+ * \return TimePoint in the destination domain
  */
 template<
     typename DstTimePointT,
     typename SrcTimePointT,
-    typename DstDurationT = typename DstTimePointT::duration,
-    typename SrcDurationT = typename SrcTimePointT::duration,
-    typename DstClockT = typename DstTimePointT::clock,
-    typename SrcClockT = typename SrcTimePointT::clock
+    typename DstDurationT = DstTimePointT::duration,
+    typename SrcDurationT = SrcTimePointT::duration,
+    typename DstClockT = DstTimePointT::clock,
+    typename SrcClockT = SrcTimePointT::clock
 >
 DstTimePointT ClockCast(const SrcTimePointT tp,
     const SrcDurationT tolerance = std::chrono::nanoseconds { 100 },

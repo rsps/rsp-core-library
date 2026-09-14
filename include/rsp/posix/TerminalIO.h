@@ -53,10 +53,10 @@ public:
     ~TerminalIO();
 
     /**
-     * Set this if the input character should be shown directly on the terminal.
+     * Set this if the input character should be shown directly in the terminal.
      *
-     * \param aEcho, defaults off.
-     * \return Reference to self for fluent call chain.
+     * \param aEcho
+     * \return Reference to self for a fluent call chain.
      */
     TerminalIO& SetEcho(bool aEcho = true);
     /**
@@ -65,7 +65,7 @@ public:
      * \param aVerbose
      * \return Reference to self for fluent call chain.
      */
-    TerminalIO& SetVerbose(bool aVerbose = true) { mVerbose = aVerbose; return *this; }
+    TerminalIO& SetVerbose(const bool aVerbose = true) { mVerbose = aVerbose; return *this; }
 
     /**
      * Read a single character from the input device.
@@ -94,18 +94,18 @@ public:
     void ClearPreset() { mPreset.clear(); }
 
     /**
-     * Set the prompt prefix to be shown on the terminal.
+     * Set the prompt prefix to be shown in the terminal.
      *
      * \param arPrompt
-     * \return Reference to self for fluent call chain.
+     * \return Reference to self for a fluent call chain.
      */
     TerminalIO& SetPrompt(const std::string& arPrompt) { mPrompt = arPrompt; return *this; }
 
     /**
-     * Set a list of strings that is used for auto completion in case the tab character is pressed on the terminal.
+     * Set a list of strings that is used for auto-completion in case the tab character is pressed on the terminal.
      *
-     * \param aPrompt
-     * \return Reference to self for fluent call chain.
+     * \param aDict
+     * \return Reference to self for a fluent call chain.
      */
     TerminalIO& SetAutocompletionDictionary(std::vector<std::string> aDict)
     {
@@ -131,7 +131,7 @@ protected:
 
     static char getChar();
     static EscapeCodes escString2Code(const char *apEscStr);
-    void handleTabulator(int &tab_count, std::string &line, unsigned int &cursor);
+    void handleTabulator(int &arTabCount, std::string &arLine, unsigned int &arCursor);
 };
 
 } /* namespace rsp::posix */
