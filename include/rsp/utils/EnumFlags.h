@@ -8,251 +8,238 @@
  * \author      Steffen Brummer
  */
 
-
 #ifndef RSP_CORE_LIB_UTILS_ENUM_FLAGS_H
 #define RSP_CORE_LIB_UTILS_ENUM_FLAGS_H
 
-#include <cstdint>
+#include <concepts>
+#include <initializer_list>
 #include <type_traits>
+#include <utility>
 
 namespace rsp::utils {
+namespace enum_flags_detail {
+
+template <typename E>
+concept ScopedEnum = std::is_scoped_enum_v<E>;
+
+} // namespace enum_flags_detail
 
 /**
- * \brief Template class to add bit operations to any enum class with a given underlying type.
- * \tparam T Enum type to use
- * \tparam Template validation check that T is of type enum.
+ * \brief Wraps an enum class to add bitmask operations.
+ *
+ * \code
+ * enum class MyEnum { A = 1, B = 2, C = 4 };
+ * rsp::utils::EnumFlags<MyEnum> flags{MyEnum::A, MyEnum::B};
+ * flags |= MyEnum::C;
+ * \endcode
+ *
+ * \tparam E Enum type to use
  */
-template<typename T, typename = typename std::enable_if<std::is_enum<T>::value, T>::type>
+template <enum_flags_detail::ScopedEnum E>
 class EnumFlags
 {
-    T mValue;
+    E _value{};
+
 public:
-    using underlying_type = typename std::underlying_type<T>::type;
+    using underlying_type = std::underlying_type_t<E>;
 
     /**
-     * \brief Default constructor, that assigns the value o to the enum storage.
+     * \brief Constructs an EnumFlags object with no flags set.
+     *
+     * \param aValue The enumerator to initialize the flags with.
      */
-    constexpr EnumFlags() : mValue(static_cast<T>(0)) {}
+    constexpr EnumFlags() noexcept = default;
 
     /**
-     * \brief Template constructor that tries to convert other types to this enum type.
-     * \tparam N Argument type. Could be int, uint, char or any other native type.
-     * \param aValue The value to assign to the internal enum storage.
+     * \brief Constructs an EnumFlags object storing the specified flag.
      */
-    template <typename N>
-    constexpr EnumFlags(N aValue) : mValue(static_cast<T>(aValue)) // NOLINT, Conversion constructor
+    constexpr EnumFlags(E aValue) noexcept
+        : _value{aValue}
+    {}
+
+    /**
+     * \brief Constructs an EnumFlags object initialized with the supplied flags
+     *        combined using the bitwise OR operator.
+     */
+    constexpr EnumFlags(std::initializer_list<E> aFlags) noexcept
     {
+        for (E flag : aFlags) {
+            _value = static_cast<E>(std::to_underlying(_value) | std::to_underlying(flag));
+        }
     }
 
     /**
-     * \brief Operator to get the enum value.
+     * \brief Builds a value from a raw integer bit pattern.
      */
-    constexpr operator T() const // NOLINT, Conversion operator
+    template <std::integral I>
+    constexpr explicit EnumFlags(I aValue) noexcept
+        : _value{static_cast<E>(aValue)}
+    {}
+
+    /**
+     * \brief Implicit conversion to the wrapped enum type.
+     *
+     * \return E
+     */
+    [[nodiscard]] constexpr operator E() const noexcept
     {
-        return mValue;
+        return _value;
     }
 
     /**
-     * \brief Operator to the the enum value converted to its underlying integer type.
+     * \brief Explicit conversion to the underlying integer type.
+     *
+     * \return underlying_type
      */
-    constexpr operator underlying_type() const // NOLINT, Conversion operator
+    [[nodiscard]] constexpr explicit operator underlying_type() const noexcept
     {
-        return static_cast<underlying_type>(mValue);
+        return std::to_underlying(_value);
     }
 
     /**
-     * \brief Operator to return true if the internal enum has any value other than 0
+     * \brief Test if any bit is set.
+     *
+     * \return true if any bit is set, false otherwise.
      */
-    constexpr operator bool() const // NOLINT, Conversion operator
+    [[nodiscard]] constexpr explicit operator bool() const noexcept
     {
-        return static_cast<underlying_type>(mValue) != 0;
+        return std::to_underlying(_value) != 0;
     }
 
     /**
-     * \brief Bitwise AND operation
-     * \param aValue rhs value for bitwise and operation
-     * \return Result of bitwise AND operation of this and aValue
+     * \brief Bitwise AND operator.
+     *
+     * \param aValue The flag to AND with.
+     * \return The result of the bitwise AND operation.
      */
-    constexpr EnumFlags<T> operator&(T aValue)
+    [[nodiscard]] constexpr EnumFlags<E> operator&(E aValue) const noexcept
     {
-        return static_cast<T>(
-            static_cast<underlying_type>(mValue) &
-            static_cast<underlying_type>(aValue));
+        return static_cast<E>(std::to_underlying(_value) & std::to_underlying(aValue));
     }
 
     /**
-     * \brief Bitwise AND assignment operator
-     * \param aValue rhs value to AND with this
-     * \return Returns the new value of this.
+     * \brief Bitwise AND assignment operator.
+     *
+     * \param aValue The flag to AND with.
+     * \return The result of the bitwise AND assignment operation.
      */
-    constexpr EnumFlags<T>& operator&=(T aValue)
+    constexpr EnumFlags<E>& operator&=(E aValue) noexcept
     {
-        mValue = static_cast<T>(
-            static_cast<underlying_type>(mValue) &
-            static_cast<underlying_type>(aValue));
+        _value = static_cast<E>(std::to_underlying(_value) & std::to_underlying(aValue));
         return *this;
     }
 
     /**
-     * \brief Bitwise OR operation
-     * \param aValue rhs value for bitwise or operation
-     * \return Result of bitwise OR operation of this and aValue.
+     * \brief Bitwise OR operator.
+     *
+     * \param aValue The flag to OR with.
+     * \return The result of the bitwise OR operation.
      */
-    constexpr EnumFlags<T> operator|(T aValue)
+    [[nodiscard]] constexpr EnumFlags<E> operator|(E aValue) const noexcept
     {
-        return static_cast<T>(
-            static_cast<underlying_type>(mValue) |
-            static_cast<underlying_type>(aValue));
+        return static_cast<E>(std::to_underlying(_value) | std::to_underlying(aValue));
     }
 
     /**
-     * \brief Bitwise OR assignment operator
-     * \param aValue rhs value to OR with this
-     * \return Returns new value of this
+     * \brief Bitwise OR assignment operator.
+     *
+     * \param aValue The flag to OR with.
+     * \return The result of the bitwise OR assignment operation.
      */
-    constexpr EnumFlags<T>& operator|=(T aValue)
+    constexpr EnumFlags<E>& operator|=(E aValue) noexcept
     {
-        mValue = static_cast<T>(
-            static_cast<underlying_type>(mValue) |
-            static_cast<underlying_type>(aValue));
+        _value = static_cast<E>(std::to_underlying(_value) | std::to_underlying(aValue));
         return *this;
     }
 
     /**
-     * \brief Equality operator
-     * \param aValue Other value of same enum type
-     * \return bool True if values are equal
+     * \brief Bitwise XOR operator.
+     *
+     * \param aValue The flag to XOR with.
+     * \return The result of the bitwise XOR operation.
      */
-    constexpr bool operator==(T aValue)
+    [[nodiscard]] constexpr EnumFlags<E> operator^(E aValue) const noexcept
     {
-        return static_cast<underlying_type>(mValue) == static_cast<underlying_type>(aValue);
+        return static_cast<E>(std::to_underlying(_value) ^ std::to_underlying(aValue));
     }
 
     /**
-     * \brief Inequality operator
-     * \param aValue Other value of same enum type
-     * \return bool True if values are not equal
+     * \brief Bitwise XOR assignment operator.
+     *
+     * \param aValue The flag to XOR with.
+     * \return The result of the bitwise XOR assignment operation.
      */
-    constexpr bool operator!=(T aValue)
+    constexpr EnumFlags<E>& operator^=(E aValue) noexcept
     {
-        return static_cast<underlying_type>(mValue) != static_cast<underlying_type>(aValue);
+        _value = static_cast<E>(std::to_underlying(_value) ^ std::to_underlying(aValue));
+        return *this;
     }
 
     /**
-     * \brief Bitwise NOT operator
-     * \return The result of inverting all bits in this.
+     * \brief Bitwise NOT operator.
+     *
+     * \return The result of the bitwise NOT operation.
      */
-    constexpr EnumFlags<T> operator~()
+    [[nodiscard]] constexpr EnumFlags<E> operator~() const noexcept
     {
-        return static_cast<T>(
-            ~static_cast<underlying_type>(mValue));
+        return static_cast<E>(~std::to_underlying(_value));
     }
 
     /**
-     * \brief Check if all flags in subset is set.
-     * \param aValue Mask with subset of enums that all must be set.
-     * \return bool True if this contains all from mask
+     * \brief Equality operator.
+     *
+     * \param aValue The flag to compare with.
+     * \return True if the flags are equal, false otherwise.
      */
-    constexpr bool HasAll(T aValue)
+    [[nodiscard]] constexpr bool operator==(E aValue) const noexcept
     {
-        return (static_cast<underlying_type>(mValue) & static_cast<underlying_type>(aValue)) == static_cast<underlying_type>(aValue);
+        return std::to_underlying(_value) == std::to_underlying(aValue);
     }
 
     /**
-     * \brief Alias of HasAll
+     * \brief Inequality operator.
+     *
+     * \param aValue The flag to compare with.
+     * \return True if the flags are not equal, false otherwise.
      */
-    constexpr bool IsSet(T aValue) { return HasAll(aValue); }
-
-    /**
-     * \brief Check if any flags in subset is set.
-     * \param aValue Mask with subset of enums.
-     * \return bool True if this contains any from mask
-     */
-    constexpr bool HasAny(T aValue)
+    [[nodiscard]] constexpr bool operator!=(E aValue) const noexcept
     {
-        return (static_cast<underlying_type>(mValue) & static_cast<underlying_type>(aValue)) != 0;
+        return std::to_underlying(_value) != std::to_underlying(aValue);
     }
 
-} __attribute__((packed));
+    /**
+     * \brief True if every flag in aValue is set.
+     *
+     * \param aValue The flag(s) to check.
+     * \return True if all specified flags are set, false otherwise.
+     */
+    [[nodiscard]] constexpr bool HasAll(E aValue) const noexcept
+    {
+        return (std::to_underlying(_value) & std::to_underlying(aValue)) == std::to_underlying(aValue);
+    }
 
+    /**
+     * \brief Alias of HasAll.
+     *
+     * \param aValue The flag(s) to check.
+     * \return True if all specified flags are set, false otherwise.
+     */
+    [[nodiscard]] constexpr bool IsSet(E aValue) const noexcept
+    {
+        return HasAll(aValue);
+    }
 
-/**
- * \brief Global enum equality operator
- * \tparam T Enum type
- * \tparam Check that T is of type enum
- * \param lhs Left hand side enum value
- * \param rhs Right hand side enum value
- * \return bool True if the two enums have the same content
- */
-template <class T, typename = typename std::enable_if<std::is_enum<T>::value, T>::type>
-inline bool operator==(T lhs, T rhs)
-{
-    return (
-        static_cast<typename std::underlying_type<T>::type>(lhs) ==
-        static_cast<typename std::underlying_type<T>::type>(rhs));
-}
-
-/**
- * \brief Global enum inequality operator
- * \tparam T Enum type
- * \tparam Check that T is of type enum
- * \param lhs Left hand side enum value
- * \param rhs Right hand side enum value
- * \return bool True if the two enums doest NOT have the same content
- */
-template <class T, typename = typename std::enable_if<std::is_enum<T>::value, T>::type>
-inline bool operator!=(T lhs, T rhs)
-{
-    return (
-        static_cast<typename std::underlying_type<T>::type>(lhs) !=
-        static_cast<typename std::underlying_type<T>::type>(rhs));
-}
-
-/**
- * \brief Global bitwise AND operator
- * \tparam T Enum type
- * \tparam Check that T is of type enum
- * \param lhs Left hand side enum value
- * \param rhs Right hand side enum value
- * \return Result of bitwise AND operation of the bit patterns of the two enums.
- */
-template <typename T, typename = typename std::enable_if<std::is_enum<T>::value, T>::type>
-constexpr T operator&(T lhs, T rhs)
-{
-    return static_cast<T>(
-        static_cast<typename std::underlying_type<T>::type>(lhs) &
-        static_cast<typename std::underlying_type<T>::type>(rhs));
-}
-
-/**
- * \brief Global bitwise OR operator
- * \tparam T Enum type
- * \tparam Check that T is of type enum
- * \param lhs Left hand side enum value
- * \param rhs Right hand side enum value
- * \return Result of bitwise OR operation of the bit patterns of the two enums.
- */
-template <typename T, typename = typename std::enable_if<std::is_enum<T>::value, T>::type>
-constexpr T operator|(T lhs, T rhs)
-{
-    return static_cast<T>(
-        static_cast<typename std::underlying_type<T>::type>(lhs) |
-        static_cast<typename std::underlying_type<T>::type>(rhs));
-}
-
-/**
- * \brief Global bitwise NOT operator
- * \tparam T Enum type
- * \tparam Check that T is of type enum
- * \param rhs Enum value to invert
- * \return Result of inverting all bits in the given value.
- */
-template <typename T, typename = typename std::enable_if<std::is_enum<T>::value, T>::type>
-constexpr T operator~(T rhs)
-{
-    return static_cast<T>(
-        ~static_cast<typename std::underlying_type<T>::type>(rhs));
-}
+    /**
+     * \brief True if at least one flag in aValue is set.
+     *
+     * \param aValue The flag(s) to check.
+     * \return True if any of the specified flags are set, false otherwise.
+     */
+    [[nodiscard]] constexpr bool HasAny(E aValue) const noexcept
+    {
+        return (std::to_underlying(_value) & std::to_underlying(aValue)) != 0;
+    }
+};
 
 } // namespace rsp::utils
 
