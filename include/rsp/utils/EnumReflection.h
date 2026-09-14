@@ -35,6 +35,10 @@ consteval std::string_view RawEnumName()
     return __PRETTY_FUNCTION__;
 }
 
+// Concept satisfied by enumeration types.
+template <typename E>
+concept Enum = std::is_enum_v<E>;
+
 // Detects whether I is a value that can legally be static_cast to E as a constant
 // expression. Needed because, for an unscoped enum without a fixed underlying type,
 // casting a value outside its representable range is undefined behaviour, which
@@ -133,17 +137,11 @@ inline constexpr auto cEntries = AllEntries<E>();
 
 } // namespace enum_reflection_detail
 
-/*!
- * \brief Concept satisfied by enumeration types.
- */
-template <typename E>
-concept Enum = std::is_enum_v<E>;
-
 /**
  * \brief Get the number of enumerator values of E within the range [-128, 127].
  * \tparam E Enum type
  */
-template <Enum E>
+template <enum_reflection_detail::Enum E>
 consteval std::size_t EnumCount()
 {
     std::size_t count = 0;
@@ -162,7 +160,7 @@ consteval std::size_t EnumCount()
  * \return The enumerator's name, or an empty view if aValue does not match any
  *         enumerator of E in the range [-128, 127].
  */
-template <Enum E>
+template <enum_reflection_detail::Enum E>
 constexpr std::string_view EnumName(E aValue)
 {
     for (const auto& entry : enum_reflection_detail::cEntries<E>) {
@@ -177,9 +175,10 @@ constexpr std::string_view EnumName(E aValue)
  * \brief Find the enumerator value of E with the given name.
  * \tparam E Enum type
  * \param aName Name to look up
- * \return The matching enumerator value, or std::nullopt if no enumerator of E has that name.
+ * \return The matching enumerator value, or std::nullopt if no enumerator
+ *         of E has that name.
  */
-template <Enum E>
+template <enum_reflection_detail::Enum E>
 constexpr std::optional<E> EnumCast(std::string_view aName)
 {
     for (const auto& entry : enum_reflection_detail::cEntries<E>) {
@@ -188,6 +187,79 @@ constexpr std::optional<E> EnumCast(std::string_view aName)
         }
     }
     return std::nullopt;
+}
+
+/**
+ * \brief Get all enumerator values of E within the range [-128, 127].
+ * \tparam E Enum type
+ * \return An array of the declared enumerator values, in ascending order of their
+ *         underlying integer value. Duplicate values (aliases) each appear once.
+ *
+ * Usage:
+ * \code
+ * for (auto value : rsp::utils::EnumValues<MyEnum>()) { ... }
+ * \endcode
+ */
+template <enum_reflection_detail::Enum E>
+consteval std::array<E, EnumCount<E>()> EnumValues()
+{
+    std::array<E, EnumCount<E>()> result{};
+    std::size_t index = 0;
+    for (const auto& entry : enum_reflection_detail::cEntries<E>) {
+        if (!entry.second.empty()) {
+            result[index++] = entry.first;
+        }
+    }
+    return result;
+}
+
+/**
+ * \brief Get the names of all enumerator values of E within the range [-128, 127].
+ * \tparam E Enum type
+ * \return An array of the enumerator names, in ascending order of their
+ *         underlying integer value, matching the order of EnumValues<E>().
+ *
+ * Usage:
+ * \code
+ * for (auto name : rsp::utils::EnumNames<MyEnum>()) { ... }
+ * \endcode
+ */
+template <enum_reflection_detail::Enum E>
+consteval std::array<std::string_view, EnumCount<E>()> EnumNames()
+{
+    std::array<std::string_view, EnumCount<E>()> result{};
+    std::size_t index = 0;
+    for (const auto& entry : enum_reflection_detail::cEntries<E>) {
+        if (!entry.second.empty()) {
+            result[index++] = entry.second;
+        }
+    }
+    return result;
+}
+
+/**
+ * \brief Get all enumerator value/name pairs of E within the range [-128, 127].
+ * \tparam E Enum type
+ * \return An array of (value, name) pairs, in ascending order of their
+ *         underlying integer value, matching the order of EnumValues<E>()
+ *         and EnumNames<E>().
+ *
+ * Usage:
+ * \code
+ * for (auto& [value, name] : rsp::utils::EnumEntries<MyEnum>()) { ... }
+ * \endcode
+ */
+template <enum_reflection_detail::Enum E>
+consteval std::array<std::pair<E, std::string_view>, EnumCount<E>()> EnumEntries()
+{
+    std::array<std::pair<E, std::string_view>, EnumCount<E>()> result{};
+    std::size_t index = 0;
+    for (const auto& entry : enum_reflection_detail::cEntries<E>) {
+        if (!entry.second.empty()) {
+            result[index++] = entry;
+        }
+    }
+    return result;
 }
 
 } // namespace rsp::utils
