@@ -16,7 +16,20 @@ pipeline {
                     }
                     axis {
                         name 'BUILD_PRESET'
-                        values 'gcc-release'
+                        values 'gcc-release', 'clang-release'
+                    }
+                }
+
+                excludes {
+                    exclude {
+                        axis {
+                            name 'OS_IMAGE'
+                            values 'debian:13'
+                        }
+                        axis {
+                            name 'BUILD_PRESET'
+                            values 'clang-release'
+                        }
                     }
                 }
 
