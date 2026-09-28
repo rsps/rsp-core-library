@@ -138,10 +138,11 @@
     ],
     "testPresets": [
         {
-            "name": "gcc-release",
-            "configurePreset": "gcc-release",
+            "name": "base",
+            "hidden": true,
             "output": {
-                "outputOnFailure": true
+                "outputOnFailure": true,
+                "outputJUnitFile": "${sourceDir}/build/${presetName}/test-results.xml"
             },
             "execution": {
                 "noTestsAction": "error",
@@ -149,15 +150,24 @@
             }
         },
         {
+            "inherits": "base",
+            "name": "gcc-release",
+            "configurePreset": "gcc-release"
+        },
+        {
+            "inherits": "base",
             "name": "gcc-debug",
-            "configurePreset": "gcc-debug",
-            "output": {
-                "outputOnFailure": true
-            },
-            "execution": {
-                "noTestsAction": "error",
-                "stopOnFailure": true
-            }
+            "configurePreset": "gcc-debug"
+        },
+        {
+            "inherits": "base",
+            "name": "clang-release",
+            "configurePreset": "clang-release"
+        },
+        {
+            "inherits": "base",
+            "name": "clang-debug",
+            "configurePreset": "clang-debug"
         }
     ]
 }
