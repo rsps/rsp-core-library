@@ -75,5 +75,46 @@ pipeline {
                 }
             }
         }
+
+        stage('Coverage') {
+            agent {
+                dockerfile {
+                    filename 'ci/Dockerfile'
+                    dir '.'
+                    label 'linux && docker'
+                    additionalBuildArgs '--build-arg BASE_IMAGE=ubuntu:26.04'
+                }
+            }
+
+            steps {
+                sh 'cmake --preset gcc-coverage'
+                sh 'cmake --build --preset gcc-coverage'
+                sh 'ctest --preset gcc-coverage'
+                sh '''
+                    mkdir -p build/gcc-coverage/coverage-html
+                    gcovr --root . build/gcc-coverage \
+                        --filter 'src/' --filter 'include/rspalgo/' --filter 'python/rspalgo_py.cpp' \
+                        --exclude '.*/_deps/.*' --exclude '.*/test/.*' \
+                        --cobertura build/gcc-coverage/coverage.xml \
+                        --html --html-details -o build/gcc-coverage/coverage-html/index.html \
+                        --print-summary
+                '''
+            }
+
+            post {
+                always {
+                    junit 'build/gcc-coverage/test-results.xml'
+                    recordCoverage tools: [[parser: 'COBERTURA', pattern: 'build/gcc-coverage/coverage.xml']]
+                    publishHTML(target: [
+                        reportDir: 'build/gcc-coverage/coverage-html',
+                        reportFiles: 'index.html',
+                        reportName: 'Coverage Report',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    cleanWs()
+                }
+            }
+        }
     }
 }

@@ -78,6 +78,18 @@
             }
         },
         {
+            "name": "gcc-coverage",
+            "displayName": "GCC Coverage",
+            "inherits": "gcc-base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_FLAGS_DEBUG": "-O0 -g --coverage",
+                "CMAKE_EXE_LINKER_FLAGS": "--coverage",
+                "CMAKE_MODULE_LINKER_FLAGS": "--coverage",
+                "CMAKE_SHARED_LINKER_FLAGS": "--coverage"
+            }
+        },
+        {
             "name": "clang-debug",
             "displayName": "Clang Debug",
             "inherits": "clang-base",
@@ -120,6 +132,10 @@
             "configurePreset": "gcc-release"
         },
         {
+            "name": "gcc-coverage",
+            "configurePreset": "gcc-coverage"
+        },
+        {
             "name": "clang-debug",
             "configurePreset": "clang-debug"
         },
@@ -158,6 +174,11 @@
             "inherits": "base",
             "name": "gcc-debug",
             "configurePreset": "gcc-debug"
+        },
+        {
+            "inherits": "base",
+            "name": "gcc-coverage",
+            "configurePreset": "gcc-coverage"
         },
         {
             "inherits": "base",
