@@ -22,7 +22,7 @@
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "gcc",
                 "CMAKE_CXX_COMPILER": "g++",
-                "CMAKE_C_FLAGS": "-D_GLIBCXX_ASSERTIONS -D_FORTIFY_SOURCE=2",
+                "CMAKE_C_FLAGS": "-D_FORTIFY_SOURCE=2",
                 "CMAKE_CXX_FLAGS": "-D_GLIBCXX_ASSERTIONS -D_FORTIFY_SOURCE=2",
                 "CMAKE_C_FLAGS_DEBUG": "-Og -g",
                 "CMAKE_CXX_FLAGS_DEBUG": "-Og -g",
@@ -53,7 +53,7 @@
             "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_TOOLCHAIN_FILE": "/opt/arm-buildroot-linux-gnueabihf_sdk-buildroot/share/buildroot/toolchainfile.cmake",
-                "CMAKE_C_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GLIBCXX_ASSERTIONS -D_FORTIFY_SOURCE=2",
+                "CMAKE_C_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2",
                 "CMAKE_CXX_FLAGS": "-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GLIBCXX_ASSERTIONS -D_FORTIFY_SOURCE=2",
                 "CMAKE_C_FLAGS_DEBUG": "-Og -g",
                 "CMAKE_CXX_FLAGS_DEBUG": "-Og -g",
@@ -75,6 +75,18 @@
             "inherits": "gcc-base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "gcc-coverage",
+            "displayName": "GCC Coverage",
+            "inherits": "gcc-base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_FLAGS_DEBUG": "-O0 -g --coverage",
+                "CMAKE_EXE_LINKER_FLAGS": "--coverage",
+                "CMAKE_MODULE_LINKER_FLAGS": "--coverage",
+                "CMAKE_SHARED_LINKER_FLAGS": "--coverage"
             }
         },
         {
@@ -120,6 +132,10 @@
             "configurePreset": "gcc-release"
         },
         {
+            "name": "gcc-coverage",
+            "configurePreset": "gcc-coverage"
+        },
+        {
             "name": "clang-debug",
             "configurePreset": "clang-debug"
         },
@@ -158,6 +174,11 @@
             "inherits": "base",
             "name": "gcc-debug",
             "configurePreset": "gcc-debug"
+        },
+        {
+            "inherits": "base",
+            "name": "gcc-coverage",
+            "configurePreset": "gcc-coverage"
         },
         {
             "inherits": "base",

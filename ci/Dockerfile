@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libc++abi-dev \
         cmake \
         ninja-build \
+        gcovr \
         git \
         ca-certificates \
         pkg-config \
