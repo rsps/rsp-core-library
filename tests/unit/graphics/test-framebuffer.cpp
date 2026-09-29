@@ -31,16 +31,17 @@ using namespace rsp::graphics;
 using namespace rsp::utils;
 using namespace rsp::exceptions;
 
-static void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer& fb)
+namespace {
+void CheckPixel(GuiUnit_t aX, GuiUnit_t aY, Color aColor, const Renderer& arFb)
 {
-    if (Rect(0, 0, fb.GetWidth(), fb.GetHeight()).IsHit(aX, aY)) {
-        CHECK_HEX(fb.GetPixel(aX, aY).ToARGB(), aColor.ToARGB());
+    if (Rect(0, 0, arFb.GetWidth(), arFb.GetHeight()).IsHit(aX, aY)) {
+        CHECK_HEX(arFb.GetPixel(aX, aY).ToARGB(), aColor.ToARGB());
     }
     else {
-        CHECK_HEX(fb.GetPixel(aX, aY).ToARGB(), 0);
+        CHECK_HEX(arFb.GetPixel(aX, aY).ToARGB(), 0);
     }
 }
-
+}
 
 TEST_SUITE_BEGIN("Graphics");
 
@@ -303,7 +304,7 @@ TEST_CASE("Framebuffer")
         }
         SUBCASE("Draw edited image file") {
             // Arrange
-            auto offset = [](const Point& point, const int val) { return (point + Point(val, val)); };
+            auto offset = [](const Point& arPoint, const int aVal) { return (arPoint + Point(aVal, aVal)); };
 
             // Act
             for (uint8_t i = 0 ; i < 16 ; ++i) {

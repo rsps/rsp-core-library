@@ -32,7 +32,6 @@ bool ResponseParser::ParseNewData(std::span<const std::byte> aNewData)
                 decodeHeaders(mrResponse.mHeaderData); // Include newline before empty line
                 mrResponse.MakeBody();
                 mContentReceived = 0;
-                (void)mrResponse.GetContentLength(); // Attempt to parse content-length from headers.
                 if (mrResponse.GetRequest().GetOptions().RequestType == HttpRequestType::HEAD) {
                     return true;
                 }
@@ -80,6 +79,13 @@ void ResponseParser::decodeHeaders(std::string_view aHeaderData)
         }
         auto key = line.FieldName();
         addHeader(key, line.FieldValue());
+    }
+
+    if (mrResponse.GetStatusCode() == StatusCodes::NoContent) {
+        mrResponse.mContentLength = 0;
+    }
+    else if (auto it = mrResponse.mHeaders.find("content-length"); it != mrResponse.mHeaders.end()) {
+        mrResponse.mContentLength = string_to_integral<size_t>(it->second).value_or(0);
     }
 }
 

@@ -7,6 +7,7 @@
 * \license     Mozilla Public License 2.0
 * \author      steffen
 */
+#include <ranges>
 #include <rsp/exceptions/CoreException.h>
 #include <rsp/utils/ThreadList.h>
 
@@ -27,31 +28,32 @@ ThreadList::~ThreadList()
 
 ThreadList& ThreadList::AddThread(ThreadInterface& arThread)
 {
-    auto const &pair = mMap.insert_or_assign(arThread.GetName(), arThread);
-    mLogger.Info() << (pair.second ? "Inserted: " : "Assigned: ") << arThread.GetName();
+    const auto& [fst, snd] = mMap.insert_or_assign(arThread.GetName(), arThread);
+    mLogger.Info() << (snd ? "Inserted: " : "Assigned: ") << arThread.GetName();
     return *this;
 }
 
-ThreadList& ThreadList::RemoveThread(ThreadInterface &arThread)
+ThreadList& ThreadList::RemoveThread(const ThreadInterface &arThread)
 {
     mMap.erase(arThread.GetName());
     return *this;
 }
 
-ThreadInterface& ThreadList::GetThreadByName(std::string_view aName)
-try
+ThreadInterface& ThreadList::GetThreadByName(const std::string_view aName) const
 {
-    return mMap.at(aName);
-}
-catch (const std::out_of_range &e) {
-    THROW_WITH_BACKTRACE1(exceptions::NotSetException, std::string("A thread with name '") + std::string(aName) + "' has not been registered.");
+    try {
+        return mMap.at(aName).get();
+    }
+    catch (const std::out_of_range &) {
+        THROW_WITH_BACKTRACE1(exceptions::NotSetException, std::string("A thread with name '") + std::string(aName) + "' has not been registered.");
+    }
 }
 
 std::vector<std::string_view> ThreadList::GetThreadNames() const
 {
     std::vector<std::string_view> result;
-    for (auto &item : mMap) {
-        result.emplace_back(item.first);
+    for (const auto& key: mMap | std::views::keys) {
+        result.emplace_back(key);
     }
     return result;
 }

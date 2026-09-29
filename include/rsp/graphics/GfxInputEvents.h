@@ -13,8 +13,6 @@
 
 #include <rsp/utils/Singleton.h>
 #include "GfxEvents.h"
-#include "Point.h"
-#include <rsp/utils/Timer.h>
 
 namespace rsp::graphics {
 
@@ -24,7 +22,7 @@ namespace rsp::graphics {
 class GfxInputEvents : public rsp::utils::Singleton<GfxInputEvents>
 {
 public:
-    explicit GfxInputEvents(bool aSelfRegister = true)
+    explicit GfxInputEvents(const bool aSelfRegister = true)
     {
         if (aSelfRegister) {
             SetInstance(this);
@@ -39,8 +37,8 @@ public:
     }
 
     /**
-     * \brief Parse input from event driver
-     * \param Reference to the event object to be populated
+     * \brief Parse input from the event driver
+     * \param arEvent Reference to the event object to be populated
      * \return bool True if the event is successfully filled
      */
     virtual bool Poll(GfxEvent &arEvent) = 0;
