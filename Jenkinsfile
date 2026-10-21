@@ -76,6 +76,33 @@ pipeline {
             }
         }
 
+
+        // Cross-compile using the image pushed by fw-buildroot-tgm (toolchain
+        // installed at /opt/arm-buildroot-linux-gnueabihf_sdk-buildroot).
+        stage('Build (ARM Buildroot)') {
+            agent {
+                dockerfile {
+                    filename 'ci/Dockerfile'
+                    dir '.'
+                    label 'linux && docker'
+                    additionalBuildArgs '--build-arg BASE_IMAGE=docker-registry:5000/fw-buildroot-tgm-sdk:dev'
+                    registryUrl 'http://docker-registry:5000'
+                    registryCredentialsId 'docker-registry-creds'
+                }
+            }
+
+            steps {
+                sh 'cmake --preset gcc-arm-buildroot-release'
+                sh 'cmake --build --preset gcc-arm-buildroot-release'
+            }
+
+            post {
+                always {
+                    cleanWs()
+                }
+            }
+        }
+
         stage('Coverage') {
             agent {
                 dockerfile {
