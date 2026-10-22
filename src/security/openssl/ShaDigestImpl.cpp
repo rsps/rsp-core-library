@@ -181,6 +181,11 @@ public:
         // EVP_DigestInit_ex2(mpMdctx, md, nullptr);
     }
 
+    ~OpenSSLSha() override
+    {
+        EVP_MD_CTX_destroy(mpMdctx);
+    }
+
     void Update(const uint8_t* apBuffer, std::size_t aSize) override
     {
         EVP_DigestUpdate(mpMdctx, apBuffer, aSize);
