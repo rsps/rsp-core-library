@@ -7,7 +7,9 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
 #include <doctest.h>
+#include <new>
 #include <rsp/security/SecureBuffer.h>
 #include <rsp/security/SecureString.h>
 
@@ -17,26 +19,23 @@ TEST_SUITE_BEGIN("Security");
 
 TEST_CASE("Secure Buffers")
 {
-
     SUBCASE("String")
     {
-        const char* p;
-        std::string unsecure;
+        // Explicit lifetime in raw storage: the SSO buffer stays readable after destruction
+        alignas(SecureString) unsigned char storage[sizeof(SecureString)];
+        auto* s = new (storage) SecureString("Hello World");
 
-        {
-            SecureString s("Hello World");
+        CHECK_EQ(*s, "Hello World");
 
-            CHECK_EQ(s, "Hello World");
+        const char* p = s->data();
+        CHECK_EQ(p[0], 'H');
+        CHECK_EQ(p[3], 'l');
+        CHECK_EQ(p[6], 'W');
 
-            MESSAGE(s);
-            unsecure = s;
+        std::string unsecure = *s;
 
-            p = s.data();
+        s->~SecureString();
 
-            CHECK_EQ(p[0], 'H');
-            CHECK_EQ(p[3], 'l');
-            CHECK_EQ(p[6], 'W');
-        }
         CHECK_NE(p[0], 'H');
         CHECK_NE(p[3], 'l');
         CHECK_NE(p[6], 'W');
@@ -46,26 +45,37 @@ TEST_CASE("Secure Buffers")
 
     SUBCASE("Buffer")
     {
-        uint8_t *p;
-        {
-            SecureBuffer sb;
-            sb.resize(10);
-            uint8_t v = 42;
-            for(auto &b : sb) {
-                b = v++;
-            }
-            MESSAGE(sb);
-
-            p = sb.data();
-
-            CHECK_EQ(sb[0], 42);
-            CHECK_EQ(sb[9], 51);
-            CHECK_EQ(*sb.data(), 42);
-            CHECK_EQ(p[0], 42);
-            CHECK_EQ(p[9], 51);
+        SecureBuffer sb;
+        sb.resize(10);
+        uint8_t v = 42;
+        for (auto& b : sb) {
+            b = v++;
         }
-        CHECK_NE(p[0], 42);
-        CHECK_NE(p[9], 51);
+        uint8_t* p = sb.data();
+
+        CHECK_EQ(sb[0], 42);
+        CHECK_EQ(sb[9], 51);
+        CHECK_EQ(*sb.data(), 42);
+        CHECK_EQ(p[0], 42);
+        CHECK_EQ(p[9], 51);
+    }
+
+    SUBCASE("Allocator cleanse")
+    {
+        // Freed heap memory can't be inspected safely, so verify cleanse() on
+        // live memory
+        SecureAllocator<uint8_t> alloc;
+        uint8_t* p = alloc.allocate(10);
+        for (std::size_t i = 0; i < 10; ++i) {
+            p[i] = static_cast<uint8_t>(42 + i);
+        }
+
+        alloc.cleanse(p, 10);
+
+        for (std::size_t i = 0; i < 10; ++i) {
+            CHECK_EQ(p[i], 0);
+        }
+        alloc.deallocate(p, 10);
     }
 }
 
