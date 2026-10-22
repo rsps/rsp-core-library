@@ -71,7 +71,10 @@ FTGlyph::FTGlyph(FT_Face apFace)
     mAdvanceY = apFace->glyph->advance.y >> 6;
 
     mPixels.resize(static_cast<std::vector<uint8_t>::size_type>(unSign(mPitch)) * unSign(mHeight), 0xFF);
-    memcpy(mPixels.data(), apFace->glyph->bitmap.buffer, mPixels.size());
+    // Empty glyphs (e.g. space) have a null bitmap buffer
+    if (apFace->glyph->bitmap.buffer != nullptr && !mPixels.empty()) {
+        memcpy(mPixels.data(), apFace->glyph->bitmap.buffer, mPixels.size());
+    }
 
 //    Rect r(apFace->bbox.xMin, apFace->bbox.yMin, apFace->bbox.xMax, apFace->bbox.yMax);
 //    std::cout << "BBOX: " << r << std::endl;
