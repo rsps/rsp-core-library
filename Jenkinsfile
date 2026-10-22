@@ -76,7 +76,6 @@ pipeline {
             }
         }
 
-
         // Cross-compile using the image pushed by fw-buildroot-tgm (toolchain
         // installed at /opt/arm-buildroot-linux-gnueabihf_sdk-buildroot).
         stage('Build (ARM Buildroot)') {
@@ -98,6 +97,30 @@ pipeline {
 
             post {
                 always {
+                    cleanWs()
+                }
+            }
+        }
+
+        stage('Sanitizers (ASan + UBSan)') {
+            agent {
+                dockerfile {
+                    filename 'ci/Dockerfile'
+                    dir '.'
+                    label 'linux && docker'
+                    additionalBuildArgs '--build-arg BASE_IMAGE=ubuntu:26.04'
+                }
+            }
+
+            steps {
+                sh 'cmake --preset gcc-asan'
+                sh 'cmake --build --preset gcc-asan'
+                sh 'ctest --preset gcc-asan'
+            }
+
+            post {
+                always {
+                    junit 'build/gcc-asan/test-results.xml'
                     cleanWs()
                 }
             }
