@@ -7,6 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+#include <algorithm>
 #include <cstring>
 #include <arpa/inet.h>
 #include <rsp/posix/Socket.h>
@@ -30,8 +31,9 @@ SocketAddress::SocketAddress(const sockaddr& arSockAddr, socklen_t aLen, Domain 
     : mType(aType),
       mProtocol(aProtocol)
 {
+    // aLen is the length of the whole sockaddr, including sa_family.
+    std::memcpy(&mAddress, &arSockAddr, std::min<size_t>(aLen, sizeof(mAddress)));
     mAddress.Unspecified.sa_family = int(aDomain);
-    std::memcpy(&mAddress.Unspecified.sa_data, &arSockAddr.sa_data, aLen);
 }
 
 SocketAddress::SocketAddress(uint32_t aIP, uint16_t aPort, Type aType, Protocol aProtocol)
@@ -50,8 +52,17 @@ struct sockaddr& SocketAddress::Get()
 
 SocketAddress &SocketAddress::operator=(const sockaddr &arSockAddr)
 {
-    mAddress.Unspecified.sa_family = arSockAddr.sa_family;
-    std::memcpy(&mAddress.Unspecified.sa_data, &arSockAddr.sa_data, GetSize());
+    size_t len = 0;
+    if (arSockAddr.sa_family == AF_INET) {
+        len = sizeof(sockaddr_in);
+    } else if (arSockAddr.sa_family == AF_INET6) {
+        len = sizeof(sockaddr_in6);
+    } else if (arSockAddr.sa_family == AF_UNIX) {
+        len = sizeof(sockaddr_un);
+    } else {
+        len = sizeof(sockaddr);
+    }
+    std::memcpy(&mAddress, &arSockAddr, len);
     return *this;
 }
 
