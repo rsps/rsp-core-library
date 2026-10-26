@@ -112,6 +112,12 @@ pipeline {
                 }
             }
 
+            environment {
+                // No display in the container; avoids Mesa EGL, whose leaks LSan reports.
+                SDL_VIDEODRIVER = 'dummy'
+                SDL_AUDIODRIVER = 'dummy'
+            }
+
             steps {
                 sh 'cmake --preset gcc-asan'
                 sh 'cmake --build --preset gcc-asan'
