@@ -132,6 +132,35 @@ pipeline {
             }
         }
 
+        stage('Sanitizers (TSan)') {
+            agent {
+                dockerfile {
+                    filename 'ci/Dockerfile'
+                    dir '.'
+                    label 'linux && docker'
+                    additionalBuildArgs '--build-arg BASE_IMAGE=ubuntu:26.04'
+                }
+            }
+
+            environment {
+                SDL_VIDEODRIVER = 'dummy'
+                SDL_AUDIODRIVER = 'dummy'
+            }
+
+            steps {
+                sh 'cmake --preset gcc-tsan'
+                sh 'cmake --build --preset gcc-tsan'
+                sh 'ctest --preset gcc-tsan'
+            }
+
+            post {
+                always {
+                    junit 'build/gcc-tsan/test-results.xml'
+                    cleanWs()
+                }
+            }
+        }
+
         stage('Coverage') {
             agent {
                 dockerfile {
