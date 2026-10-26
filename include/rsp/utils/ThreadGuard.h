@@ -11,6 +11,7 @@
 #ifndef RSP_CORE_LIB_UTILS_THREAD_GUARD_H
 #define RSP_CORE_LIB_UTILS_THREAD_GUARD_H
 
+#include <condition_variable>
 #include <thread>
 #include <mutex>
 
@@ -29,10 +30,6 @@ class ThreadGuard
 {
 public:
     ThreadGuard() = default;
-    /**
-     * \brief Destructor makes sure mutexes are unlocked before destruction.
-     */
-    ~ThreadGuard();
 
     /**
      * \brief Check if current thread has locked this
@@ -59,8 +56,8 @@ public:
 
 protected:
     std::thread::id mLockerId{};
-    std::mutex mMutex{};
-    std::mutex mLock{};
+    mutable std::mutex mMutex{};
+    std::condition_variable mCondition{};
 };
 
 } // rsp::utils
