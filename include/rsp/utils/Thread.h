@@ -12,6 +12,7 @@
 #define RSP_CORE_LIB_UTILS_THREAD_H
 
 #include <rsp/logging/LogChannel.h>
+#include <atomic>
 #include <string>
 #include <string_view>
 #include "ThreadInterface.h"
@@ -99,7 +100,7 @@ protected:
     rsp::logging::LogChannel mLogger;
     std::thread mThread{};
     ThreadCallback_t mWhenExecute{};
-    bool mTerminated = false;
+    std::atomic<bool> mTerminated = false;
     std::exception_ptr mpException = nullptr;
 
     void run();

@@ -105,6 +105,21 @@
             }
         },
         {
+            "name": "gcc-tsan",
+            "displayName": "GCC TSan",
+            "inherits": "gcc-base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_FLAGS": "-Wall -Wextra",
+                "CMAKE_CXX_FLAGS": "-Wall -Wextra -D_GLIBCXX_ASSERTIONS",
+                "CMAKE_C_FLAGS_DEBUG": "-O1 -g -fno-omit-frame-pointer -fsanitize=thread",
+                "CMAKE_CXX_FLAGS_DEBUG": "-O1 -g -fno-omit-frame-pointer -fsanitize=thread",
+                "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=thread",
+                "CMAKE_MODULE_LINKER_FLAGS": "-fsanitize=thread",
+                "CMAKE_SHARED_LINKER_FLAGS": "-fsanitize=thread"
+            }
+        },
+        {
             "name": "clang-debug",
             "displayName": "Clang Debug",
             "inherits": "clang-base",
@@ -153,6 +168,10 @@
         {
             "name": "gcc-asan",
             "configurePreset": "gcc-asan"
+        },
+        {
+            "name": "gcc-tsan",
+            "configurePreset": "gcc-tsan"
         },
         {
             "name": "clang-debug",
@@ -205,6 +224,16 @@
             "configurePreset": "gcc-asan",
             "environment": {
                 "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+            }
+        },
+        {
+            "inherits": "base",
+            "name": "gcc-tsan",
+            "configurePreset": "gcc-tsan",
+            "environment": {
+                "TSAN_OPTIONS": "halt_on_error=1:second_deadlock_stack=1",
+                "SDL_VIDEODRIVER": "dummy",
+                "SDL_AUDIODRIVER": "dummy"
             }
         },
         {
