@@ -11,6 +11,7 @@
 #define RSP_CORE_LIB_INCLUDE_UTILS_STREAM_STORAGE_H
 
 #include <fstream>
+#include <rsp/utils/FixedStreamBuf.h>
 #include <optional>
 #include <sstream>
 #include <type_traits>
@@ -208,9 +209,10 @@ public:
     }
 
     BinaryStringStream(char *apBuffer, const std::streamsize aSize)
+        : mFixedBuf(apBuffer, aSize)
     {
-        mpStreamBuf = mStringStream.rdbuf();
-        mpStreamBuf->pubsetbuf(apBuffer, aSize);
+        static_cast<std::ios&>(mStringStream).rdbuf(&mFixedBuf);
+        mpStreamBuf = &mFixedBuf;
     }
 
     std::stringstream& Get()
@@ -219,6 +221,7 @@ public:
     }
 
 protected:
+    FixedStreamBuf mFixedBuf{};
     std::stringstream mStringStream{};
 };
 

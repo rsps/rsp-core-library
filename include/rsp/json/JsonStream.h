@@ -16,6 +16,7 @@
 #include <string_view>
 #include <rsp/utils/DateTime.h>
 #include <rsp/utils/EnumReflection.h>
+#include <rsp/utils/FixedStreamBuf.h>
 #include <rsp/utils/Variant.h>
 #include <rsp/utils/StructElement.h>
 
@@ -70,7 +71,8 @@ public:
     explicit JsonStream(bool aPrettyPrint = false, unsigned aLevel = 0);
 
     /**
-     * \brief Set the internal work buffer to use.
+     * \brief Make the stream write directly into the given buffer.
+     * \note str() no longer reflects the output afterwards; use the buffer and GetSize().
      * \param apBuffer
      * \param aSize
      * \return self
@@ -107,6 +109,9 @@ public:
 
 protected:
     size_t mMaxSize = size_t(std::numeric_limits<std::streamsize>::max());
+
+private:
+    rsp::utils::FixedStreamBuf mFixedBuf{};
 };
 
 JsonStream& operator<<(JsonStream& o, const Comma &arComma);
