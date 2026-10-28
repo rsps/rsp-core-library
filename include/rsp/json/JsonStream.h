@@ -11,6 +11,8 @@
 #ifndef RSP_CORE_LIB_JSON_JSON_STREAM_H
 #define RSP_CORE_LIB_JSON_JSON_STREAM_H
 
+#include <limits>
+#include <ostream>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -57,9 +59,9 @@ struct Value
 
 /**
  * \class JsonStream
- * \brief std::ostringstream derivative to help with formatting data in human readable JSON format
+ * \brief std::ostream derivative to help with formatting data in human readable JSON format
  */
-class JsonStream : public std::ostringstream {
+class JsonStream : public std::ostream {
 public:
     /**
      * \fn JsonStream(bool aPrettyPrint, int aLevel)
@@ -70,14 +72,21 @@ public:
      */
     explicit JsonStream(bool aPrettyPrint = false, unsigned aLevel = 0);
 
+    JsonStream(const JsonStream&) = delete;
+    JsonStream& operator=(const JsonStream&) = delete;
+
     /**
      * \brief Make the stream write directly into the given buffer.
-     * \note str() no longer reflects the output afterwards; use the buffer and GetSize().
      * \param apBuffer
      * \param aSize
      * \return self
      */
     JsonStream& SetBuffer(char *apBuffer, size_t aSize);
+
+    /**
+     * \brief Get a copy of the stream content, from the internal or the supplied buffer.
+     */
+    [[nodiscard]] std::string str();
 
     /**
      * \brief Get the current size, in bytes, of the stream
@@ -111,7 +120,9 @@ protected:
     size_t mMaxSize = size_t(std::numeric_limits<std::streamsize>::max());
 
 private:
+    std::stringbuf mStringBuf;
     rsp::utils::FixedStreamBuf mFixedBuf{};
+    char *mpBuffer = nullptr;
 };
 
 JsonStream& operator<<(JsonStream& o, const Comma &arComma);
@@ -162,7 +173,7 @@ JsonStream& operator<< (JsonStream &o, E value) {
 
 template <class T> requires (!std::is_enum_v<T>)
 JsonStream& operator<<(JsonStream& o, const T& v) {
-    static_cast<std::ostringstream&>(o) << v;
+    static_cast<std::ostream&>(o) << v;
     return o;
 }
 

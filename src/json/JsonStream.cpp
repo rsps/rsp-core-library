@@ -18,9 +18,12 @@ namespace rsp::json {
 const int cIndentSize = 4;
 
 JsonStream::JsonStream(bool aPrettyPrint, unsigned aLevel)
-    : mPrettyPrint(aPrettyPrint),
-      mRootLevel(aLevel)
+    : std::ostream(nullptr),
+      mPrettyPrint(aPrettyPrint),
+      mRootLevel(aLevel),
+      mStringBuf(std::ios_base::out)
 {
+    rdbuf(&mStringBuf);
     if (mPrettyPrint) {
         indentation = std::string( (mRootLevel) * cIndentSize, ' ');
         space = " ";
@@ -31,6 +34,14 @@ JsonStream::JsonStream(bool aPrettyPrint, unsigned aLevel)
 size_t JsonStream::GetSize()
 {
     return size_t(tellp());
+}
+
+std::string JsonStream::str()
+{
+    if (mpBuffer != nullptr) {
+        return std::string(mpBuffer, GetSize());
+    }
+    return mStringBuf.str();
 }
 
 void JsonStream::StringToStream(const std::string& arString, std::ostream& o, bool aForceToUCS2)
@@ -111,8 +122,10 @@ void JsonStream::StringToStream(const char *apString, size_t aSize, std::ostream
 JsonStream& JsonStream::SetBuffer(char* apBuffer, size_t aSize)
 {
     mMaxSize = aSize;
+    mpBuffer = apBuffer;
     mFixedBuf.Reset(apBuffer, std::streamsize(aSize));
-    static_cast<std::ios&>(*this).rdbuf(&mFixedBuf); // Also clears the stream state
+    rdbuf(&mFixedBuf);
+    clear();
     return *this;
 }
 
@@ -128,13 +141,13 @@ size_t JsonStream::GetAvailable()
 
 JsonStream& operator <<(JsonStream &o, const Comma &arComma)
 {
-    static_cast<std::ostringstream&>(o) << arComma.mValue << o.newLine << o.indentation;
+    static_cast<std::ostream&>(o) << arComma.mValue << o.newLine << o.indentation;
     return o;
 }
 
 JsonStream& operator <<(JsonStream &o, const Key &arKey)
 {
-    static_cast<std::ostringstream&>(o) << "\"" << arKey.mpValue << "\":" << o.space;
+    static_cast<std::ostream&>(o) << "\"" << arKey.mpValue << "\":" << o.space;
     return o;
 }
 
@@ -143,7 +156,7 @@ JsonStream& operator <<(JsonStream &o, const OBegin &)
     if (o.mPrettyPrint) {
         o.indentation += std::string( cIndentSize, ' ');
     }
-    static_cast<std::ostringstream&>(o) << "{" << o.newLine << o.indentation;
+    static_cast<std::ostream&>(o) << "{" << o.newLine << o.indentation;
     return o;
 }
 
@@ -152,7 +165,7 @@ JsonStream& operator <<(JsonStream &o, const OEnd &)
     if (o.mPrettyPrint) {
         o.indentation.resize(o.indentation.size() - cIndentSize);
     }
-    static_cast<std::ostringstream&>(o) << o.newLine << o.indentation << "}";
+    static_cast<std::ostream&>(o) << o.newLine << o.indentation << "}";
     return o;
 }
 
@@ -161,7 +174,7 @@ JsonStream& operator <<(JsonStream &o, const ABegin &)
     if (o.mPrettyPrint) {
         o.indentation += std::string( cIndentSize, ' ');
     }
-    static_cast<std::ostringstream&>(o) << "[" << o.newLine << o.indentation;
+    static_cast<std::ostream&>(o) << "[" << o.newLine << o.indentation;
     return o;
 }
 
@@ -170,7 +183,7 @@ JsonStream& operator <<(JsonStream &o, const AEnd &)
     if (o.mPrettyPrint) {
         o.indentation.resize(o.indentation.size() - cIndentSize);
     }
-    static_cast<std::ostringstream&>(o) << o.newLine << o.indentation << "]";
+    static_cast<std::ostream&>(o) << o.newLine << o.indentation << "]";
     return o;
 }
 
@@ -194,19 +207,19 @@ JsonStream& operator<<(JsonStream& o, const char *apStr)
 
 JsonStream& operator<<(JsonStream &o, const Null&)
 {
-    static_cast<std::ostringstream&>(o) << "null";
+    static_cast<std::ostream&>(o) << "null";
     return o;
 }
 
 JsonStream& operator<<(JsonStream& o, const bool& arBool)
 {
-    static_cast<std::ostringstream&>(o) << (arBool ? "true" : "false");
+    static_cast<std::ostream&>(o) << (arBool ? "true" : "false");
     return o;
 }
 
 JsonStream& operator<<(JsonStream& o, const Raw& arJson)
 {
-    static_cast<std::ostringstream&>(o) << arJson.mJson;
+    static_cast<std::ostream&>(o) << arJson.mJson;
     return o;
 }
 
