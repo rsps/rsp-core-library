@@ -111,7 +111,8 @@ void JsonStream::StringToStream(const char *apString, size_t aSize, std::ostream
 JsonStream& JsonStream::SetBuffer(char* apBuffer, size_t aSize)
 {
     mMaxSize = aSize;
-    this->rdbuf()->pubsetbuf(apBuffer, std::streamsize(aSize));
+    mFixedBuf.Reset(apBuffer, std::streamsize(aSize));
+    static_cast<std::ios&>(*this).rdbuf(&mFixedBuf); // Also clears the stream state
     return *this;
 }
 
