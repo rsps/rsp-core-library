@@ -9,6 +9,7 @@
 */
 #include <doctest.h>
 #include <rsp/utils/BinaryStream.h>
+#include <cstring>
 #include <fstream>
 #include <vector>
 #include <rsp/utils/DateTime.h>
@@ -99,6 +100,22 @@ TEST_CASE("BinaryStream") {
         CHECK_EQ(s1, s2);
         CHECK_EQ(bs.Get().str().size(), 305u);
     }
+}
+
+TEST_CASE("BinaryStringStream with external buffer")
+{
+    constexpr char cSentinel = '#';
+
+    std::array<char, 16> buffer;
+    buffer.fill(cSentinel);
+
+    BinaryStringStream stream(buffer.data(), std::streamsize(buffer.size()));
+    const uint16_t value = 0x1234;
+    stream << value;
+
+    uint16_t stored = 0;
+    std::memcpy(&stored, buffer.data(), sizeof(stored));
+    CHECK_EQ(stored, value);
 }
 
 TEST_SUITE_END();
