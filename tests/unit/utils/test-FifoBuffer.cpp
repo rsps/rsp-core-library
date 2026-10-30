@@ -7,6 +7,8 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
+#include <cstring>
 #include <doctest.h>
 #include <rsp/utils/FifoBuffer.h>
 
