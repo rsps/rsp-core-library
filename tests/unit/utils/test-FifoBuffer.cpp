@@ -98,4 +98,22 @@ TEST_CASE("FifoBuffer")
     CHECK(Compare(out, {2, 3, 4, 5}));
 }
 
+TEST_CASE("FifoBuffer wrap-around with multi-byte elements")
+{
+    FifoBuffer<int, 5> fifo;
+    int in[4] = {1, 2, 3, 4};
+    int out[4]{};
+
+    REQUIRE_EQ(fifo.Write(in), 4u);
+    REQUIRE_EQ(fifo.Read(out), 4u);
+
+    // Head/tail are now at 4: next write and read both wrap
+    REQUIRE_EQ(fifo.Write(in), 4u);
+    CHECK_EQ(fifo.Read(out), 4u);
+    CHECK_EQ(out[0], 1);
+    CHECK_EQ(out[1], 2);
+    CHECK_EQ(out[2], 3);
+    CHECK_EQ(out[3], 4);
+}
+
 TEST_SUITE_END();
