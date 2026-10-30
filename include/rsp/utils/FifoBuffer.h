@@ -7,12 +7,14 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
 #ifndef RSP_CORE_LIB_FIFO_BUFFER_H
 #define RSP_CORE_LIB_FIFO_BUFFER_H
 
-#include <array>
-#include <cstring>
 #include <rsp/exceptions/CoreException.h>
+
+#include <algorithm>
+#include <array>
 #include <span>
 #include <type_traits>
 
@@ -157,9 +159,9 @@ public:
         }
 
         size_t first = std::min(size, mBuffer.size() - mTail);
-        std::memcpy(aBuffer.data(), &mBuffer[mTail], first * sizeof(T));
+        std::copy_n(mBuffer.data() + mTail, first, aBuffer.data());
         if (size > first) {
-            std::memcpy(aBuffer.data() + first, mBuffer.data(), (size - first) * sizeof(T));
+            std::copy_n(mBuffer.data(), size - first, aBuffer.data() + first);
         }
         mTail = (mTail + size) % mBuffer.size();
         mFull = false;
@@ -178,9 +180,9 @@ public:
             return 0;
         }
         size_t first = std::min(size, mBuffer.size() - mHead);
-        std::memcpy(&mBuffer[mHead], aBuffer.data(), first * sizeof(T));
+        std::copy_n(aBuffer.data(), first, mBuffer.data() + mHead);
         if (first < size) {
-            std::memcpy(mBuffer.data(), aBuffer.data() + first, (size - first) * sizeof(T));
+            std::copy_n(aBuffer.data() + first, size - first, mBuffer.data());
         }
         mHead = (mHead + size) % mBuffer.size();
         mFull = (mHead == mTail);
@@ -209,7 +211,7 @@ public:
     FifoBuffer()
         : FifoBufferBase<T>(mArrayBuffer) {}
 
-protected:
+private:
     std::array<T, N> mArrayBuffer{};
 };
 
