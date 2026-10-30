@@ -156,16 +156,10 @@ public:
             return size;
         }
 
-        if (mHead > mTail) {
-            std::memcpy(aBuffer.data(), &mBuffer[mTail], size);
-        }
-        else {
-            auto sz = std::min(size, mBuffer.size() - mTail);
-            std::memcpy(aBuffer.data(), &mBuffer[mTail], sz);
-            if (size > sz) {
-                sz = std::min(mHead, size - sz);
-                std::memcpy(aBuffer.data() + sz, mBuffer.data(), sz);
-            }
+        size_t first = std::min(size, mBuffer.size() - mTail);
+        std::memcpy(aBuffer.data(), &mBuffer[mTail], first * sizeof(T));
+        if (size > first) {
+            std::memcpy(aBuffer.data() + first, mBuffer.data(), (size - first) * sizeof(T));
         }
         mTail = (mTail + size) % mBuffer.size();
         mFull = false;
@@ -183,16 +177,10 @@ public:
         if (size == 0) {
             return 0;
         }
-        if (mHead >= mTail) {
-            auto sz = std::min(size, mBuffer.size() - mHead);
-            std::memcpy(&mBuffer[mHead], aBuffer.data(), sz);
-            if (sz < size) {
-                std::memcpy(&mBuffer[sz], &aBuffer[sz], size - sz);
-            }
-        }
-        else {
-            auto sz = std::min(size, mTail - mHead - 1);
-            std::memcpy(&mBuffer[mHead], aBuffer.data(), sz);
+        size_t first = std::min(size, mBuffer.size() - mHead);
+        std::memcpy(&mBuffer[mHead], aBuffer.data(), first * sizeof(T));
+        if (first < size) {
+            std::memcpy(mBuffer.data(), aBuffer.data() + first, (size - first) * sizeof(T));
         }
         mHead = (mHead + size) % mBuffer.size();
         mFull = (mHead == mTail);
