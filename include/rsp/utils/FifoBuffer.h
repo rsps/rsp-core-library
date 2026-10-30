@@ -26,7 +26,7 @@ namespace rsp::utils {
  * \tparam T Type of fifo elements
  */
 template <class T>
-    requires(std::is_trivially_copyable_v<T>)
+    requires(std::is_trivially_copyable_v<T> && std::default_initializable<T>)
 class FifoBufferBase
 {
 public:
@@ -130,7 +130,7 @@ public:
     T Pop()
     {
         ASSERT(!IsEmpty())
-        T result;
+        T result{};
         Read({&result, 1});
         return result;
     }
