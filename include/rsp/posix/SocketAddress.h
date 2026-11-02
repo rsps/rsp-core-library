@@ -30,8 +30,6 @@ public:
     explicit SocketAddress(std::string_view aUnixPath, Type aType, Protocol aProtocol = Protocol::Unspecified);
     explicit SocketAddress(uint32_t aIP, uint16_t aPort, Type aType, Protocol aProtocol = Protocol::Unspecified);
 
-    SocketAddress& operator=(const sockaddr& arSockAddr);
-
     [[nodiscard]] size_t GetSize() const;
     [[nodiscard]] bool IsEmpty() const;
     SocketAddress& SetDomain(Domain aDomain) noexcept;

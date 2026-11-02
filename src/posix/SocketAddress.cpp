@@ -50,12 +50,6 @@ sockaddr& SocketAddress::Get()
     return mAddress.Unspecified;
 }
 
-SocketAddress& SocketAddress::operator=(const sockaddr& arSockAddr)
-{
-    std::memcpy(&mAddress.Unspecified, &arSockAddr, sizeof(sockaddr));
-    return *this;
-}
-
 size_t SocketAddress::GetSize() const
 {
 #ifdef SUN_LEN
