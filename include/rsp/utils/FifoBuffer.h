@@ -7,12 +7,14 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
 #ifndef RSP_CORE_LIB_FIFO_BUFFER_H
 #define RSP_CORE_LIB_FIFO_BUFFER_H
 
-#include <array>
-#include <cstring>
 #include <rsp/exceptions/CoreException.h>
+
+#include <algorithm>
+#include <array>
 #include <span>
 #include <type_traits>
 
@@ -24,7 +26,7 @@ namespace rsp::utils {
  * \tparam T Type of fifo elements
  */
 template <class T>
-    requires(std::is_trivially_copyable_v<T>)
+    requires(std::is_trivially_copyable_v<T> && std::default_initializable<T>)
 class FifoBufferBase
 {
 public:
@@ -128,7 +130,7 @@ public:
     T Pop()
     {
         ASSERT(!IsEmpty())
-        T result;
+        T result{};
         Read({&result, 1});
         return result;
     }
@@ -156,16 +158,10 @@ public:
             return size;
         }
 
-        if (mHead > mTail) {
-            std::memcpy(aBuffer.data(), &mBuffer[mTail], size);
-        }
-        else {
-            auto sz = std::min(size, mBuffer.size() - mTail);
-            std::memcpy(aBuffer.data(), &mBuffer[mTail], sz);
-            if (size > sz) {
-                sz = std::min(mHead, size - sz);
-                std::memcpy(aBuffer.data() + sz, mBuffer.data(), sz);
-            }
+        size_t first = std::min(size, mBuffer.size() - mTail);
+        std::copy_n(mBuffer.data() + mTail, first, aBuffer.data());
+        if (size > first) {
+            std::copy_n(mBuffer.data(), size - first, aBuffer.data() + first);
         }
         mTail = (mTail + size) % mBuffer.size();
         mFull = false;
@@ -183,16 +179,10 @@ public:
         if (size == 0) {
             return 0;
         }
-        if (mHead >= mTail) {
-            auto sz = std::min(size, mBuffer.size() - mHead);
-            std::memcpy(&mBuffer[mHead], aBuffer.data(), sz);
-            if (sz < size) {
-                std::memcpy(&mBuffer[sz], &aBuffer[sz], size - sz);
-            }
-        }
-        else {
-            auto sz = std::min(size, mTail - mHead - 1);
-            std::memcpy(&mBuffer[mHead], aBuffer.data(), sz);
+        size_t first = std::min(size, mBuffer.size() - mHead);
+        std::copy_n(aBuffer.data(), first, mBuffer.data() + mHead);
+        if (first < size) {
+            std::copy_n(aBuffer.data() + first, size - first, mBuffer.data());
         }
         mHead = (mHead + size) % mBuffer.size();
         mFull = (mHead == mTail);
@@ -221,7 +211,7 @@ public:
     FifoBuffer()
         : FifoBufferBase<T>(mArrayBuffer) {}
 
-protected:
+private:
     std::array<T, N> mArrayBuffer{};
 };
 

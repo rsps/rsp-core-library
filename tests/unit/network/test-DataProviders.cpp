@@ -8,6 +8,7 @@
  * \author      Steffen Brummer
  */
 #include <doctest.h>
+#include <cstring>
 #include <string_view>
 #include <rsp/network/BinaryBody.h>
 #include <rsp/network/FileBody.h>

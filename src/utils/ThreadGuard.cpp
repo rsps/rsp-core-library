@@ -11,31 +11,13 @@
 
 namespace rsp::utils {
 
-ThreadGuard::~ThreadGuard()
-{
-    std::lock_guard guard(mMutex);
-    if (mLock.try_lock()) {
-        mLock.unlock();
-    }
-}
-
 ThreadGuard& ThreadGuard::Lock()
 {
-    while (mLockerId != std::this_thread::get_id())
-    {
-        {
-            std::lock_guard guard(mMutex);
-
-            if (mLockerId == std::thread::id()) { // if empty id
-                // Not set
-                mLock.lock();
-                mLockerId = std::this_thread::get_id();
-                break;
-            }
-        }
-
-        std::this_thread::yield();
-//        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    std::thread::id self = std::this_thread::get_id();
+    std::unique_lock lock{mMutex};
+    if (mLockerId != self) {
+        mCondition.wait(lock, [this] { return mLockerId == std::thread::id{}; });
+        mLockerId = self;
     }
 
     return *this;
@@ -43,18 +25,21 @@ ThreadGuard& ThreadGuard::Lock()
 
 bool ThreadGuard::Unlock()
 {
-    std::lock_guard guard(mMutex);
-    if (mLockerId == std::this_thread::get_id()) {
-        mLock.unlock();
-        mLockerId = std::thread::id(); // Set to empty id
-        return true;
+    {
+        std::lock_guard lock{mMutex};
+        if (mLockerId != std::this_thread::get_id()) {
+            return false;
+        }
+        mLockerId = std::thread::id{};
     }
 
-    return false;
+    mCondition.notify_one();
+    return true;
 }
 
 bool ThreadGuard::IsLocked() const
 {
+    std::lock_guard lock{mMutex};
     return (mLockerId == std::this_thread::get_id());
 }
 

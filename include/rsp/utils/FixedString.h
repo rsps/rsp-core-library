@@ -34,7 +34,7 @@ public:
     {
         _mStr[0] = _mStr[N] = 0;
         if (s) {
-            std::strncpy(_mStr, s, N);
+            assign(s);
         }
     }
 
@@ -45,15 +45,13 @@ public:
 
     FixedString<N>& operator=(const char *apS)
     {
-        std::strncpy(_mStr, apS, N);
-        _mStr[N] = 0;
+        assign(apS);
         return *this;
     }
 
     FixedString<N>& operator=(const std::string &arOther)
     {
-        std::strncpy(_mStr, arOther.data(), N);
-        _mStr[N] = 0;
+        assign(arOther.c_str());
         return *this;
     }
 
@@ -83,6 +81,17 @@ public:
     }
 
 private:
+    // Intentionally truncates to N chars; a manual loop avoids strncpy/strnlen
+    // -Wstringop-truncation and -Wstringop-overread false positives.
+    void assign(const char *apS)
+    {
+        std::size_t i = 0;
+        for (; i < N && apS[i] != '\0'; ++i) {
+            _mStr[i] = apS[i];
+        }
+        _mStr[i] = '\0';
+    }
+
     char _mStr[N + 1]{}; // keep an extra char for zero terminator
 } __attribute__((packed));
 

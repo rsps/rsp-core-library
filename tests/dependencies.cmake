@@ -7,7 +7,7 @@ function(rsp_core_test_add_dependencies ATARGET)
 
     FetchContent_Declare(doctest
         GIT_REPOSITORY https://github.com/doctest/doctest
-        GIT_TAG        v2.5.2
+        GIT_TAG        v2.5.3
         GIT_SHALLOW    TRUE
     )
     set(DOCTEST_NO_INSTALL ON CACHE BOOL "" FORCE)
