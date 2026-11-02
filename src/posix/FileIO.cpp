@@ -16,11 +16,9 @@
 #include <rsp/posix/FileIO.h>
 #include <unistd.h>
 
+namespace rsp::posix {
 
-namespace rsp::posix
-{
-
-FileIO::FileIO(const std::string &arFileName, std::ios_base::openmode aMode, int aPermissions)
+FileIO::FileIO(const std::string& arFileName, std::ios_base::openmode aMode, int aPermissions)
 {
     Open(arFileName, aMode, aPermissions);
 }
@@ -47,7 +45,7 @@ FileIO& FileIO::operator=(const FileIO& arOther)
     return *this;
 }
 
-void FileIO::Open(const std::string &arFileName, std::ios_base::openmode aMode, int aPermissions)
+void FileIO::Open(const std::string& arFileName, std::ios_base::openmode aMode, int aPermissions)
 {
     int flags = 0;
     if (aMode & std::ios_base::ate) {
@@ -101,7 +99,7 @@ size_t FileIO::Seek(size_t aOffset, std::ios_base::seekdir aSeekDir)
     return static_cast<size_t>(ret);
 }
 
-size_t FileIO::Read(void *apBuffer, size_t aNumberOfBytesToRead)
+size_t FileIO::Read(void* apBuffer, size_t aNumberOfBytesToRead)
 {
     off_t ret = read(mHandle.Get(), apBuffer, aNumberOfBytesToRead);
     if (ret < 0) {
@@ -111,7 +109,7 @@ size_t FileIO::Read(void *apBuffer, size_t aNumberOfBytesToRead)
     return static_cast<size_t>(ret);
 }
 
-void FileIO::ExactRead(void *apBuffer, size_t aNumberOfBytesToRead)
+void FileIO::ExactRead(void* apBuffer, size_t aNumberOfBytesToRead)
 {
     size_t len = 0;
     int retries = 3;
@@ -126,7 +124,7 @@ void FileIO::ExactRead(void *apBuffer, size_t aNumberOfBytesToRead)
     }
 }
 
-size_t FileIO::Write(const void *apBuffer, size_t aNumberOfBytesToWrite)
+size_t FileIO::Write(const void* apBuffer, size_t aNumberOfBytesToWrite)
 {
     ssize_t ret = write(mHandle.Get(), apBuffer, aNumberOfBytesToWrite);
     if (ret < 0) {
@@ -136,7 +134,7 @@ size_t FileIO::Write(const void *apBuffer, size_t aNumberOfBytesToWrite)
     return static_cast<size_t>(ret);
 }
 
-void FileIO::ExactWrite(const void *apBuffer, size_t aNumberOfBytesToWrite)
+void FileIO::ExactWrite(const void* apBuffer, size_t aNumberOfBytesToWrite)
 {
     size_t len = 0;
     int retries = 3;
@@ -166,24 +164,25 @@ std::string FileIO::GetLine()
     return ss.str();
 }
 
-void FileIO::PutLine(const std::string &arData)
+void FileIO::PutLine(const std::string& arData)
 {
     size_t offset = 0;
     size_t remaining = arData.size();
-    char *p = const_cast<char *>(arData.data());
+    char* p = const_cast<char*>(arData.data());
 
     do {
         size_t count = Write(p + offset, remaining);
         remaining -= count;
         offset += count;
-    } while (remaining > 0);
+    }
+    while (remaining > 0);
 }
 
 size_t FileIO::GetSize()
 {
     size_t current = Seek(0, std::ios_base::cur); // Get current position
     size_t result = Seek(0, std::ios_base::end);  // Get last position
-    Seek(current);                                     // Restore position
+    Seek(current);                                // Restore position
 
     return result;
 }
@@ -231,7 +230,7 @@ std::string FileIO::GetContents()
     return ss.str();
 }
 
-void FileIO::PutContents(const std::string &arData)
+void FileIO::PutContents(const std::string& arData)
 {
     Seek(0, std::ios_base::beg);
     PutLine(arData);

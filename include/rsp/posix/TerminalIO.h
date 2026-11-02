@@ -33,7 +33,20 @@ public:
     /**
      * \enum Used to map ANSI escape strings to enumerable type.
      */
-    enum class EscapeCodes { Character, ArrowUp, ArrowDown, ArrowRight, ArrowLeft, Backspace, Delete, Home, End, Tabulator, Esc, Unknown };
+    enum class EscapeCodes {
+        Character,
+        ArrowUp,
+        ArrowDown,
+        ArrowRight,
+        ArrowLeft,
+        Backspace,
+        Delete,
+        Home,
+        End,
+        Tabulator,
+        Esc,
+        Unknown
+    };
 
     /**
      * Constructors an empty terminal.
@@ -45,7 +58,7 @@ public:
      *
      * \param arPreset
      */
-    explicit TerminalIO(const std::string &arPreset);
+    explicit TerminalIO(const std::string& arPreset);
 
     /**
      * Destructor
@@ -65,7 +78,11 @@ public:
      * \param aVerbose
      * \return Reference to self for fluent call chain.
      */
-    TerminalIO& SetVerbose(const bool aVerbose = true) { mVerbose = aVerbose; return *this; }
+    TerminalIO& SetVerbose(const bool aVerbose = true)
+    {
+        mVerbose = aVerbose;
+        return *this;
+    }
 
     /**
      * Read a single character from the input device.
@@ -73,7 +90,7 @@ public:
      * \param arEscCode
      * \return char
      */
-    char GetChar(EscapeCodes &arEscCode) const;
+    char GetChar(EscapeCodes& arEscCode) const;
 
     /**
      * Read a full line from the input device.
@@ -88,6 +105,7 @@ public:
      * \return bool
      */
     [[nodiscard]] bool HasPreset() const { return (!mPreset.empty()); }
+
     /**
      * Remove all presets.
      */
@@ -99,7 +117,11 @@ public:
      * \param arPrompt
      * \return Reference to self for a fluent call chain.
      */
-    TerminalIO& SetPrompt(const std::string& arPrompt) { mPrompt = arPrompt; return *this; }
+    TerminalIO& SetPrompt(const std::string& arPrompt)
+    {
+        mPrompt = arPrompt;
+        return *this;
+    }
 
     /**
      * Set a list of strings that is used for auto-completion in case the tab character is pressed on the terminal.
@@ -130,10 +152,10 @@ protected:
     struct termios mCurrentTermios{};
 
     static char getChar();
-    static EscapeCodes escString2Code(const char *apEscStr);
-    void handleTabulator(int &arTabCount, std::string &arLine, unsigned int &arCursor);
+    static EscapeCodes escString2Code(const char* apEscStr);
+    void handleTabulator(int& arTabCount, std::string& arLine, unsigned int& arCursor);
 };
 
-} /* namespace rsp::posix */
+} // namespace rsp::posix
 
 #endif // RSP_CORE_LIB_POSIX_TERMINAL_IO_H

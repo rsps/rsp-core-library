@@ -53,10 +53,10 @@ public:
 #endif
     };
 
-    static void SetTime(Types aClockType, const rsp::utils::DateTime &arDT);
+    static void SetTime(Types aClockType, const rsp::utils::DateTime& arDT);
     static rsp::utils::DateTime GetTime(Types aClockType);
 };
 
-} /* namespace rsp::posix */
+} // namespace rsp::posix
 
 #endif // RSP_CORE_LIB_POSIX_CLOCK_H

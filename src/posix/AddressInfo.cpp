@@ -15,10 +15,10 @@
 namespace rsp::posix {
 
 AddressInfo::AddressInfo(std::string_view aUrn, bool aServer, Domain aFamily, Type aType, Protocol aProtocol)
-    : mServer(aServer),
-      mFamilyHint(aFamily),
-      mTypeHint(aType),
-      mProtocolHint(aProtocol)
+    : mServer(aServer)
+    , mFamilyHint(aFamily)
+    , mTypeHint(aType)
+    , mProtocolHint(aProtocol)
 {
     if (splitURN(aUrn)) {
         lookup();
@@ -30,12 +30,12 @@ size_t AddressInfo::GetCount() const
     return mAddresses.size();
 }
 
-const SocketAddress &AddressInfo::operator[](size_t aIndex) const
+const SocketAddress& AddressInfo::operator[](size_t aIndex) const
 {
     return mAddresses.at(aIndex);
 }
 
-const std::vector<SocketAddress> &AddressInfo::GetAddresses() const
+const std::vector<SocketAddress>& AddressInfo::GetAddresses() const
 {
     return mAddresses;
 }
@@ -73,13 +73,10 @@ bool AddressInfo::splitURN(std::string_view aUrn)
 
 void AddressInfo::lookup()
 {
-    struct addrinfo *p_info = nullptr;
-    struct addrinfo *p_hints = nullptr;
+    struct addrinfo* p_info = nullptr;
+    struct addrinfo* p_hints = nullptr;
     struct addrinfo hints{};
-    if ((mFamilyHint != Domain::Unspecified) ||
-        (mTypeHint != Type::Unspecified) ||
-        (mProtocolHint != Protocol::Unspecified))
-    {
+    if ((mFamilyHint != Domain::Unspecified) || (mTypeHint != Type::Unspecified) || (mProtocolHint != Protocol::Unspecified)) {
         hints.ai_family = int(mFamilyHint);
         hints.ai_socktype = int(mTypeHint);
         hints.ai_protocol = int(mProtocolHint);
@@ -90,8 +87,11 @@ void AddressInfo::lookup()
         p_hints = &hints;
     }
 
-    auto res = getaddrinfo(mNode.empty() ? nullptr : mNode.c_str(), mService.empty() ? nullptr : mService.c_str(),
-                           p_hints, &p_info);
+    auto res = getaddrinfo(mNode.empty() ? nullptr : mNode.c_str(),
+            mService.empty() ? nullptr : mService.c_str(),
+            p_hints,
+            &p_info);
+
     if (res) {
 #ifdef EAI_SYSTEM
         if (res == EAI_SYSTEM) {
@@ -100,9 +100,9 @@ void AddressInfo::lookup()
 #endif
         std::string err_code =
 #ifdef __linux__
-            gai_strerror(res);
+                gai_strerror(res);
 #else
-            std::to_string(res);
+                std::to_string(res);
 #endif
         THROW_WITH_BACKTRACE2(ESocketError, "getaddrinfo failed to parse socket address: ", err_code);
     }
@@ -117,4 +117,5 @@ void AddressInfo::lookup()
         freeaddrinfo(p_info);
     }
 }
-} // rsp::posix
+
+} // namespace rsp::posix

@@ -7,6 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
 #ifndef RSP_CORE_LIB_SOCKET_ADDRESS_H
 #define RSP_CORE_LIB_SOCKET_ADDRESS_H
 
@@ -25,22 +26,21 @@ class SocketAddress
 {
 public:
     SocketAddress() = default;
-    explicit SocketAddress(const struct sockaddr &arSockAddr, socklen_t aLen, Domain aDomain, Type aType,
-                           Protocol aProtocol);
+    explicit SocketAddress(const struct sockaddr& arSockAddr, socklen_t aLen, Domain aDomain, Type aType, Protocol aProtocol);
     explicit SocketAddress(std::string_view aUnixPath, Type aType, Protocol aProtocol = Protocol::Unspecified);
     explicit SocketAddress(uint32_t aIP, uint16_t aPort, Type aType, Protocol aProtocol = Protocol::Unspecified);
 
-    SocketAddress &operator=(const struct sockaddr &arSockAddr);
+    SocketAddress& operator=(const struct sockaddr& arSockAddr);
 
     [[nodiscard]] size_t GetSize() const;
     [[nodiscard]] bool IsEmpty() const;
-    SocketAddress &SetDomain(Domain aDomain) noexcept;
+    SocketAddress& SetDomain(Domain aDomain) noexcept;
 
     [[nodiscard]] uint16_t GetPort() const;
-    SocketAddress &SetPort(uint16_t aPort) noexcept;
+    SocketAddress& SetPort(uint16_t aPort) noexcept;
 
-    [[nodiscard]] const struct sockaddr &Get() const;
-    [[nodiscard]] struct sockaddr &Get();
+    [[nodiscard]] const struct sockaddr& Get() const;
+    [[nodiscard]] struct sockaddr& Get();
 
     [[nodiscard]] std::string AsString() const;
     [[nodiscard]] explicit operator std::string() const { return AsString(); }
@@ -50,7 +50,7 @@ public:
     [[nodiscard]] Protocol GetProtocol() const { return mProtocol; }
     [[nodiscard]] std::string GetCanonicalName() const;
 
-    void UpdateFromParent(const SocketAddress &arParent);
+    void UpdateFromParent(const SocketAddress& arParent);
 
 protected:
     union
@@ -63,6 +63,7 @@ protected:
     Type mType = Type::Unspecified;
     Protocol mProtocol = Protocol::Unspecified;
 };
-} // rsp::posix
 
-#endif //RSP_CORE_LIB_SOCKET_ADDRESS_H
+} // namespace rsp::posix
+
+#endif // RSP_CORE_LIB_SOCKET_ADDRESS_H

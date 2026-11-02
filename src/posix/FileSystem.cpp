@@ -12,12 +12,12 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #ifdef __linux__
-    #include <linux/limits.h>
-    #include <fts.h>
-    #include <sys/sysmacros.h>
-    #include <arpa/inet.h>
-    #include <pthread.h>
-    #include <sys/resource.h>
+#include <linux/limits.h>
+#include <fts.h>
+#include <sys/sysmacros.h>
+#include <arpa/inet.h>
+#include <pthread.h>
+#include <sys/resource.h>
 #endif
 #include <netinet/in.h>
 #include <rsp/exceptions/ExceptionHelper.h>
@@ -32,11 +32,9 @@
 #include <regex>
 #include <rsp/utils/StrUtils.h>
 
-
 using namespace rsp::utils;
 
-namespace rsp::posix::FileSystem
-{
+namespace rsp::posix::FileSystem {
 
 bool DirectoryExists(const std::string& arPath)
 {
@@ -74,7 +72,7 @@ bool FileExists(const std::string& arPath)
     return (info.st_mode & (S_IFCHR | S_IFBLK | S_IFREG)) != 0;
 }
 
-void DeleteFile(const std::string &arFileName)
+void DeleteFile(const std::string& arFileName)
 {
     if (!FileExists(arFileName)) {
         return;
@@ -87,19 +85,19 @@ void DeleteFile(const std::string &arFileName)
 void RecursiveDeleteDir(const std::string& arDir)
 {
 #ifdef __linux__
-    FTSENT *curr;
+    FTSENT* curr;
 
     // Cast needed (in C) because fts_open() takes a "char * const *", instead
     // of a "const char * const *", which is only allowed in C++. fts_open()
     // does not modify the argument.
-    char *files[] = {const_cast<char*>(arDir.c_str()), nullptr };
+    char* files[] = {const_cast<char*>(arDir.c_str()), nullptr};
 
     // FTS_NOCHDIR  - Avoid changing cwd, which could cause unexpected behavior
     //                in multi threaded programs
     // FTS_PHYSICAL - Don't follow symlinks. Prevents deletion of files outside
     //                of the specified directory
     // FTS_XDEV     - Don't cross filesystem boundaries
-    FTS *fts_ptr = fts_open(files, FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV, nullptr);
+    FTS* fts_ptr = fts_open(files, FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV, nullptr);
     if (!fts_ptr) {
         THROW_SYSTEM("FileSystem - fts_open failed: " + arDir);
     }
@@ -119,7 +117,7 @@ void RecursiveDeleteDir(const std::string& arDir)
             case FTS_NSOK:
                 // Not reached unless FTS_LOGICAL, FTS_SEEDOT, or FTS_NOSTAT were
                 // passed to fts_open()
-//                break;
+                // break;
 
             case FTS_D:
                 // Do nothing. Need depth-first search, so directories are deleted
@@ -148,12 +146,13 @@ void MakeDirectory(const std::string& arDir)
 {
     std::string work = arDir;
 
-    char *tmp = &work[0];
+    char* tmp = &work[0];
     size_t len = work.length();
 
     if (tmp[len - 1] == '/')
         tmp[len - 1] = 0;
-    for (char *p = tmp + 1; *p; p++) {
+
+    for (char* p = tmp + 1; *p; p++) {
         if (*p == '/') {
             *p = 0;
             if ((mkdir(tmp, 0755) != 0) && (errno != EEXIST)) {
@@ -193,7 +192,7 @@ std::string GetCurrentWorkingDirectory()
     return result + "/";
 }
 
-void SetPermissions(const std::string &arPath, uint32_t aPermissions)
+void SetPermissions(const std::string& arPath, uint32_t aPermissions)
 {
     if (chmod(arPath.c_str(), static_cast<mode_t>(aPermissions)) != 0) {
         std::stringstream ss;
@@ -202,7 +201,7 @@ void SetPermissions(const std::string &arPath, uint32_t aPermissions)
     }
 }
 
-uint32_t GetPermissions(const std::string &arPath)
+uint32_t GetPermissions(const std::string& arPath)
 {
     struct stat info{};
 
@@ -223,7 +222,7 @@ std::string GetCurrentIpAddress()
         THROW_SYSTEM("FileSystem - Could not create socket");
     }
 
-    const char *kExternalIp = "1.1.1.1";
+    const char* kExternalIp = "1.1.1.1";
     uint16_t kDnsPort = 53;
     struct sockaddr_in serv{};
 
@@ -245,7 +244,7 @@ std::string GetCurrentIpAddress()
     }
 
     char buffer[17];
-    const char *p = inet_ntop(AF_INET, &name.sin_addr, buffer, sizeof(buffer) - 1);
+    const char* p = inet_ntop(AF_INET, &name.sin_addr, buffer, sizeof(buffer) - 1);
     buffer[16] = 0;
 
     close(sock);
@@ -254,7 +253,7 @@ std::string GetCurrentIpAddress()
     return result;
 }
 
-int ExecuteCommand(const std::string &arCommand, std::string *apStdOut, std::string *apStdErrOut)
+int ExecuteCommand(const std::string& arCommand, std::string* apStdOut, std::string* apStdErrOut)
 {
     static int cnt = 0;
     std::stringstream cmd;
@@ -275,7 +274,7 @@ int ExecuteCommand(const std::string &arCommand, std::string *apStdOut, std::str
 
     if (apStdOut) {
         std::ifstream out(tmp_name + ".txt");
-        std::string ret { std::istreambuf_iterator<char>(out), std::istreambuf_iterator<char>() };
+        std::string ret{std::istreambuf_iterator<char>(out), std::istreambuf_iterator<char>()};
         out.close(); // close the file so it can be deleted
         *apStdOut = ret;
     }
@@ -283,7 +282,7 @@ int ExecuteCommand(const std::string &arCommand, std::string *apStdOut, std::str
 
     if (apStdErrOut) {
         std::ifstream err(tmp_name + ".err");
-        std::string ret { std::istreambuf_iterator<char>(err), std::istreambuf_iterator<char>() };
+        std::string ret{std::istreambuf_iterator<char>(err), std::istreambuf_iterator<char>()};
         err.close(); // close the file so it can be deleted
         *apStdErrOut = ret;
     }
@@ -306,7 +305,7 @@ std::string GetLastResumeId()
     return out;
 }
 
-void SetThreadPriority(std::thread &arThread, unsigned int aPriority)
+void SetThreadPriority(std::thread& arThread, unsigned int aPriority)
 {
 #ifdef __linux__
     sched_param sch{};
@@ -349,7 +348,7 @@ void SetThreadPriority(std::thread &arThread, unsigned int aPriority)
 #endif /* __linux__ */
 }
 
-std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, bool aRecursive, bool aDirOnly)
+std::vector<std::filesystem::path> Glob(const std::filesystem::path& arPath, bool aRecursive, bool aDirOnly)
 {
     std::vector<std::filesystem::path> result;
 
@@ -362,7 +361,7 @@ std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, boo
     std::regex self_regex(filter, std::regex_constants::basic);
 
     if (aRecursive) {
-        for(auto const& dir_entry: std::filesystem::recursive_directory_iterator{path}) {
+        for (auto const& dir_entry : std::filesystem::recursive_directory_iterator{path}) {
             if (std::regex_search(dir_entry.path().string(), self_regex)) {
                 if (!aDirOnly || dir_entry.is_directory()) {
                     result.push_back(dir_entry.path());
@@ -371,7 +370,7 @@ std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, boo
         }
     }
     else {
-        for(auto const& dir_entry: std::filesystem::directory_iterator{path}) {
+        for (auto const& dir_entry : std::filesystem::directory_iterator{path}) {
             if (std::regex_search(dir_entry.path().string(), self_regex)) {
                 if (!aDirOnly || dir_entry.is_directory()) {
                     result.push_back(dir_entry.path());
@@ -384,13 +383,13 @@ std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, boo
 }
 
 #ifndef major
-    #define major(a) ((a >> 12) & 0x000fu)
+#define major(a) ((a >> 12) & 0x000fu)
 #endif
 #ifndef minor
-    #define minor(a) (a  & 0x0fffu)
+#define minor(a) (a & 0x0fffu)
 #endif
 
-std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriverName, const std::filesystem::path &arPath)
+std::filesystem::path GetCharacterDeviceByDriverName(const std::string& arDriverName, const std::filesystem::path& arPath)
 {
     struct stat stat_buf{};
 
@@ -418,40 +417,40 @@ std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriver
     }
 
     return std::string();
-//        struct stat
-//          {
-//            __dev_t st_dev;     /* Device.  */
-//            __ino_t st_ino;     /* File serial number.  */
-//            __nlink_t st_nlink;     /* Link count.  */
-//            __mode_t st_mode;       /* File mode.  */
-//            __uid_t st_uid;     /* User ID of the file's owner. */
-//            __gid_t st_gid;     /* Group ID of the file's group.*/
-//            __dev_t st_rdev;        /* Device number, if device.  */
-//            __off_t st_size;            /* Size of file, in bytes.  */
-//            __blksize_t st_blksize; /* Optimal block size for I/O.  */
-//            __blkcnt_t st_blocks;       /* Number 512-byte blocks allocated. */
-//            __time_t st_atime;          /* Time of last access.  */
-//            __syscall_ulong_t st_atimensec; /* Nscecs of last access.  */
-//            __time_t st_mtime;          /* Time of last modification.  */
-//            __syscall_ulong_t st_mtimensec; /* Nsecs of last modification.  */
-//            __time_t st_ctime;          /* Time of last status change.  */
-//            __syscall_ulong_t st_ctimensec; /* Nsecs of last status change.  */
-//          };
-//        Path = fullpath;
-//        Size = stat_buf.st_size;
-//        Uid = stat_buf.st_uid;
-//        Gid = stat_buf.st_gid;
-//        Mode = stat_buf.st_mode;
-//        Major = major(stat_buf.st_rdev);
-//        Minor = minor(stat_buf.st_rdev);
+    // struct stat
+    //     {
+    //     __dev_t st_dev;     /* Device.  */
+    //     __ino_t st_ino;     /* File serial number.  */
+    //     __nlink_t st_nlink;     /* Link count.  */
+    //     __mode_t st_mode;       /* File mode.  */
+    //     __uid_t st_uid;     /* User ID of the file's owner. */
+    //     __gid_t st_gid;     /* Group ID of the file's group.*/
+    //     __dev_t st_rdev;        /* Device number, if device.  */
+    //     __off_t st_size;            /* Size of file, in bytes.  */
+    //     __blksize_t st_blksize; /* Optimal block size for I/O.  */
+    //     __blkcnt_t st_blocks;       /* Number 512-byte blocks allocated. */
+    //     __time_t st_atime;          /* Time of last access.  */
+    //     __syscall_ulong_t st_atimensec; /* Nscecs of last access.  */
+    //     __time_t st_mtime;          /* Time of last modification.  */
+    //     __syscall_ulong_t st_mtimensec; /* Nsecs of last modification.  */
+    //     __time_t st_ctime;          /* Time of last status change.  */
+    //     __syscall_ulong_t st_ctimensec; /* Nsecs of last status change.  */
+    //     };
+    // Path = fullpath;
+    // Size = stat_buf.st_size;
+    // Uid = stat_buf.st_uid;
+    // Gid = stat_buf.st_gid;
+    // Mode = stat_buf.st_mode;
+    // Major = major(stat_buf.st_rdev);
+    // Minor = minor(stat_buf.st_rdev);
 }
 
-DateTime GetFileModifiedTime(const std::filesystem::path &arFileName)
+DateTime GetFileModifiedTime(const std::filesystem::path& arFileName)
 {
     return DateTime(std::filesystem::last_write_time(arFileName));
 }
 
-void SetFileModifiedTime(const std::filesystem::path &arFileName, const DateTime &arTime)
+void SetFileModifiedTime(const std::filesystem::path& arFileName, const DateTime& arTime)
 {
 #ifndef NO_SET_FILE_MTIME
     std::filesystem::last_write_time(arFileName, arTime);
@@ -482,4 +481,4 @@ void GetFileInfo(const std::string &arPath)
 
 }
 */
-} // namespace FileSystem
+} // namespace rsp::posix::FileSystem

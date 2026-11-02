@@ -23,8 +23,7 @@
  *
  * Most are using POSIX compliant system calls.
  */
-namespace rsp::posix::FileSystem
-{
+namespace rsp::posix::FileSystem {
 
 /**
  * Check if a directory exists.
@@ -47,7 +46,7 @@ bool FileExists(const std::string& arPath);
  *
  * \param arFileName
  */
-void DeleteFile(const std::string &arFileName);
+void DeleteFile(const std::string& arFileName);
 
 /**
  * Recursively delete a directory and all of its content.
@@ -85,8 +84,8 @@ void Sleep(unsigned int aMilliSeconds);
  */
 std::string GetCurrentWorkingDirectory();
 
-void SetPermissions(const std::string &arPath, uint32_t aPermissions);
-uint32_t GetPermissions(const std::string &arPath);
+void SetPermissions(const std::string& arPath, uint32_t aPermissions);
+uint32_t GetPermissions(const std::string& arPath);
 
 /**
  * Get the current IP address of the default outgoing interface.
@@ -108,7 +107,7 @@ std::string GetCurrentIpAddress();
  * \param apStdErr Pointer to string to collect error output
  * \return integer exit code
  */
-int ExecuteCommand(const std::string &arCommand, std::string *apStdOut = nullptr, std::string *apStdErr = nullptr);
+int ExecuteCommand(const std::string& arCommand, std::string* apStdOut = nullptr, std::string* apStdErr = nullptr);
 
 /**
  * Function to retrieve a unique id of the latest resume
@@ -132,7 +131,7 @@ std::string GetLastResumeId();
  * \param arThread Reference to std::thread instance
  * \param aPriority Thread priority 1-99, Higher priority preempts lower
  */
-void SetThreadPriority(std::thread &arThread, unsigned int aPriority);
+void SetThreadPriority(std::thread& arThread, unsigned int aPriority);
 
 /**
  * \fn std::vector<std::filesystem::path> Glob(const std::filesystem::path&, bool=false, bool=false)
@@ -144,7 +143,7 @@ void SetThreadPriority(std::thread &arThread, unsigned int aPriority);
  * \param aDirOnly
  * \return List with real paths of every item matching.
  */
-std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, bool aRecursive = false, bool aDirOnly = false);
+std::vector<std::filesystem::path> Glob(const std::filesystem::path& arPath, bool aRecursive = false, bool aDirOnly = false);
 
 /**
  * \fn std::string GetCharacterDeviceByDriverName(const std::string&, const std::filesystem::path&)
@@ -154,7 +153,7 @@ std::vector<std::filesystem::path> Glob(const std::filesystem::path &arPath, boo
  * \param arPath
  * \return Path to character device
  */
-std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriverName, const std::filesystem::path &arPath);
+std::filesystem::path GetCharacterDeviceByDriverName(const std::string& arDriverName, const std::filesystem::path& arPath);
 
 /**
  * \fn std::chrono::system_clock::time_point GetFileModifiedTime(const std::string&)
@@ -163,7 +162,7 @@ std::filesystem::path GetCharacterDeviceByDriverName(const std::string &arDriver
  * \param arFileName
  * \return DateTime
  */
-rsp::utils::DateTime GetFileModifiedTime(const std::filesystem::path &arFileName);
+rsp::utils::DateTime GetFileModifiedTime(const std::filesystem::path& arFileName);
 
 /**
  * \fn void SetFileModifiedTime(const std::string&, std::chrono::system_clock::time_point)
@@ -172,7 +171,7 @@ rsp::utils::DateTime GetFileModifiedTime(const std::filesystem::path &arFileName
  * \param arFileName
  * \param DateTime
  */
-void SetFileModifiedTime(const std::filesystem::path &arFileName, const rsp::utils::DateTime &arTime);
+void SetFileModifiedTime(const std::filesystem::path& arFileName, const rsp::utils::DateTime& arTime);
 
 /**
  * \fn uint32_t GetUserId()
@@ -190,6 +189,6 @@ uint32_t GetUserId();
  */
 uint32_t GetGroupId();
 
-}
+} // namespace rsp::posix::FileSystem
 
 #endif // RSP_CORE_LIB_POSIX_FILE_SYSTEM_H

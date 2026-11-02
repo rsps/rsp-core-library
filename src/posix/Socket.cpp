@@ -1,12 +1,12 @@
 /**
-* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at https://mozilla.org/MPL/2.0/.
-*
-* \copyright   Copyright 2024 RSP Systems A/S. All rights reserved.
-* \license     Mozilla Public License 2.0
-* \author      steffen
-*/
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2024 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      steffen
+ */
 
 #include <arpa/inet.h>
 #include <charconv>
@@ -35,29 +35,29 @@ Socket::~Socket()
     try {
         Close();
     }
-    catch (const std::exception &e) {
+    catch (const std::exception& e) {
     }
 }
 
-Socket::Socket(const Socket &arServer, int aHandle, const SocketAddress& arLocalAddress, const SocketAddress& arPeerAddress)
-    : mHandle(aHandle),
-      mLocalAddress(arLocalAddress),
-      mPeerAddress(arPeerAddress),
-      mDomain(arServer.mDomain),
-      mType(arServer.mType),
-      mProtocol(arServer.mProtocol)
+Socket::Socket(const Socket& arServer, int aHandle, const SocketAddress& arLocalAddress, const SocketAddress& arPeerAddress)
+    : mHandle(aHandle)
+    , mLocalAddress(arLocalAddress)
+    , mPeerAddress(arPeerAddress)
+    , mDomain(arServer.mDomain)
+    , mType(arServer.mType)
+    , mProtocol(arServer.mProtocol)
 {
 }
 
-Socket::Socket(Socket &&arOther) noexcept
-    : mHandle(std::move(arOther.mHandle)),
-      mLocalAddress(arOther.mLocalAddress),
-      mPeerAddress(arOther.mPeerAddress),
-      mDomain(arOther.mDomain)
+Socket::Socket(Socket&& arOther) noexcept
+    : mHandle(std::move(arOther.mHandle))
+    , mLocalAddress(arOther.mLocalAddress)
+    , mPeerAddress(arOther.mPeerAddress)
+    , mDomain(arOther.mDomain)
 {
 }
 
-Socket& Socket::operator=(Socket &&arOther) noexcept
+Socket& Socket::operator=(Socket&& arOther) noexcept
 {
     if (this != &arOther) {
         mHandle.Close();
@@ -86,7 +86,7 @@ bool Socket::IsBroadcastAllowed() const
     return (result != 0);
 }
 
-Socket &Socket::SetBroadcastAllowed(bool aAllow)
+Socket& Socket::SetBroadcastAllowed(bool aAllow)
 {
     SetOptions(SockOptions::Broadcast, int(aAllow));
     return *this;
@@ -103,7 +103,7 @@ bool Socket::IsKeepAliveEnabled() const
     return (result != 0);
 }
 
-Socket &Socket::SetKeepAlive(bool aEnable)
+Socket& Socket::SetKeepAlive(bool aEnable)
 {
     SetOptions(SockOptions::KeepAlive, int(aEnable));
     return *this;
@@ -115,7 +115,7 @@ size_t Socket::GetReceiveBufSize() const
     return size_t(result);
 }
 
-Socket &Socket::SetReceiveBufSize(size_t aSize)
+Socket& Socket::SetReceiveBufSize(size_t aSize)
 {
     SetOptions(SockOptions::ReceiveBufSize, int(aSize));
     return *this;
@@ -126,7 +126,7 @@ std::chrono::system_clock::duration Socket::GetReceiveTimeout() const
     return getTimeoutOption(SockOptions::ReceiveTimeout);
 }
 
-Socket &Socket::SetReceiveTimeout(std::chrono::system_clock::duration aTimeout)
+Socket& Socket::SetReceiveTimeout(std::chrono::system_clock::duration aTimeout)
 {
     setTimeoutOption(SockOptions::ReceiveTimeout, aTimeout);
     return *this;
@@ -138,7 +138,7 @@ size_t Socket::GetSendBufSize() const
     return size_t(result);
 }
 
-Socket &Socket::SetSendBufSize(size_t aSize)
+Socket& Socket::SetSendBufSize(size_t aSize)
 {
     SetOptions(SockOptions::SendBufSize, int(aSize));
     return *this;
@@ -149,7 +149,7 @@ std::chrono::system_clock::duration Socket::GetSendTimeout() const
     return getTimeoutOption(SockOptions::SendTimeout);
 }
 
-Socket &Socket::SetSendTimeout(std::chrono::system_clock::duration aTimeout)
+Socket& Socket::SetSendTimeout(std::chrono::system_clock::duration aTimeout)
 {
     setTimeoutOption(SockOptions::SendTimeout, aTimeout);
     return *this;
@@ -187,12 +187,12 @@ Socket Socket::Accept()
     return {*this, res, result, mLocalAddress};
 }
 
-Socket &Socket::Bind(const AddressInfo &arAddrInfo, bool aBindAll)
+Socket& Socket::Bind(const AddressInfo& arAddrInfo, bool aBindAll)
 {
     bool first = true;
     int res = 0;
     int err = 0;
-    for (auto &sa : arAddrInfo.GetAddresses()) {
+    for (auto& sa : arAddrInfo.GetAddresses()) {
         if (sa.GetDomain() == Domain::Unix) {
             deleteOldSocketINode(sa);
         }
@@ -219,11 +219,11 @@ Socket &Socket::Bind(const AddressInfo &arAddrInfo, bool aBindAll)
     return *this;
 }
 
-Socket &Socket::Connect(const AddressInfo &arAddrInfo)
+Socket& Socket::Connect(const AddressInfo& arAddrInfo)
 {
     int res = -1;
-    for (size_t i=0 ; i < arAddrInfo.GetCount() ; ++i) {
-        auto &sa = arAddrInfo[i];
+    for (size_t i = 0; i < arAddrInfo.GetCount(); ++i) {
+        auto& sa = arAddrInfo[i];
         res = connect(mHandle.Get(), &sa.Get(), sa.GetSize());
         if (res == 0) {
             mPeerAddress = sa;
@@ -236,7 +236,7 @@ Socket &Socket::Connect(const AddressInfo &arAddrInfo)
     return *this;
 }
 
-Socket &Socket::Listen(size_t aAcceptQueueSize)
+Socket& Socket::Listen(size_t aAcceptQueueSize)
 {
     int res = listen(mHandle.Get(), int(aAcceptQueueSize));
     if (res < 0) {
@@ -255,12 +255,12 @@ size_t Socket::Receive(std::span<std::byte> aBuffer, int aFlags) const
 }
 
 
-size_t Socket::Receive(std::string &arStringBuffer, int aFlags) const
+size_t Socket::Receive(std::string& arStringBuffer, int aFlags) const
 {
     return Receive({reinterpret_cast<std::byte*>(arStringBuffer.data()), arStringBuffer.size()}, aFlags);
 }
 
-size_t Socket::ReceiveFrom(Socket &arPeer, std::span<std::byte> aBuffer, int aFlags) const
+size_t Socket::ReceiveFrom(Socket& arPeer, std::span<std::byte> aBuffer, int aFlags) const
 {
     SocketAddress sa{};
     socklen_t len = sizeof(sa);
@@ -273,7 +273,7 @@ size_t Socket::ReceiveFrom(Socket &arPeer, std::span<std::byte> aBuffer, int aFl
     return size_t(res);
 }
 
-size_t Socket::ReceiveFrom(Socket &arPeer, std::string &arStringBuffer, int aFlags) const
+size_t Socket::ReceiveFrom(Socket& arPeer, std::string& arStringBuffer, int aFlags) const
 {
     return ReceiveFrom(arPeer, {reinterpret_cast<std::byte*>(arStringBuffer.data()), arStringBuffer.size()}, aFlags);
 }
@@ -287,12 +287,12 @@ size_t Socket::Send(std::span<const std::byte> aBuffer, int aFlags) const
     return size_t(res);
 }
 
-size_t Socket::Send(const std::string &arStringBuffer, int aFlags) const
+size_t Socket::Send(const std::string& arStringBuffer, int aFlags) const
 {
     return Send({reinterpret_cast<const std::byte*>(arStringBuffer.data()), arStringBuffer.size()}, aFlags);
 }
 
-size_t Socket::SendTo(const Socket &arPeer, std::span<const std::byte> aBuffer, int aFlags) const
+size_t Socket::SendTo(const Socket& arPeer, std::span<const std::byte> aBuffer, int aFlags) const
 {
     ssize_t res = sendto(mHandle.Get(), aBuffer.data(), aBuffer.size_bytes(), aFlags, &arPeer.mLocalAddress.Get(), sizeof(arPeer.mLocalAddress));
     if (res == -1) {
@@ -301,7 +301,7 @@ size_t Socket::SendTo(const Socket &arPeer, std::span<const std::byte> aBuffer, 
     return size_t(res);
 }
 
-size_t Socket::SendTo(const Socket &arPeer, const std::string &arStringBuffer, int aFlags) const
+size_t Socket::SendTo(const Socket& arPeer, const std::string& arStringBuffer, int aFlags) const
 {
     return SendTo(arPeer, {reinterpret_cast<const std::byte*>(arStringBuffer.data()), arStringBuffer.size()}, aFlags);
 }
@@ -343,7 +343,7 @@ int Socket::GetOptions(SockOptions aOption, int aLevel) const
     return result;
 }
 
-Socket &Socket::SetOptions(SockOptions aOption, int aValue, int aLevel)
+Socket& Socket::SetOptions(SockOptions aOption, int aValue, int aLevel)
 {
     int res = setsockopt(mHandle.Get(), aLevel, int(aOption), &aValue, sizeof(aValue));
     if (res < 0) {
@@ -394,7 +394,7 @@ Socket& Socket::Close()
     return *this;
 }
 
-void Socket::deleteOldSocketINode(const SocketAddress &arAddr)
+void Socket::deleteOldSocketINode(const SocketAddress& arAddr)
 {
     FileSystem::DeleteFile(arAddr.AsString());
 }
@@ -429,4 +429,4 @@ Socket& Socket::SetBlocking(bool aBlocking)
     return *this;
 }
 
-} // rsp::posix
+} // namespace rsp::posix

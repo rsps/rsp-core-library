@@ -7,6 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
 #include <rsp/application/Console.h>
 #include <rsp/posix/TerminalIO.h>
 #include <cstdio>
@@ -24,12 +25,12 @@ namespace rsp::posix {
 
 TerminalIO::TerminalIO()
 {
-    tcgetattr(0, &mOldTermios);             // grab old terminal i/o settings
+    tcgetattr(0, &mOldTermios); // grab old terminal i/o settings
 
     SetEcho(false);
 }
 
-TerminalIO::TerminalIO(const std::string &arPreset)
+TerminalIO::TerminalIO(const std::string& arPreset)
     : TerminalIO()
 {
     mPreset = arPreset;
@@ -42,25 +43,25 @@ TerminalIO::~TerminalIO()
 
 TerminalIO& TerminalIO::SetEcho(const bool aEcho)
 {
-    mCurrentTermios = mOldTermios;          // make new settings same as old settings
+    mCurrentTermios = mOldTermios; // make new settings same as old settings
 
-    mCurrentTermios.c_lflag &= static_cast<tcflag_t>(~ICANON);     // disable buffered i/o
+    mCurrentTermios.c_lflag &= static_cast<tcflag_t>(~ICANON); // disable buffered i/o
     if (aEcho) {
-        mCurrentTermios.c_lflag |= ECHO;    // set echo mode
+        mCurrentTermios.c_lflag |= ECHO; // set echo mode
     }
     else {
-        mCurrentTermios.c_lflag &= static_cast<tcflag_t>(~ECHO);   // set no echo mode
+        mCurrentTermios.c_lflag &= static_cast<tcflag_t>(~ECHO); // set no echo mode
     }
 
     mCurrentTermios.c_cc[VTIME] = 1; // is non-zero: Wait up to 20ms for a character
-    mCurrentTermios.c_cc[VMIN]  = 0; // is zero: Return after timeout if no character has been received
+    mCurrentTermios.c_cc[VMIN] = 0;  // is zero: Return after timeout if no character has been received
 
     tcsetattr(0, TCSANOW, &mCurrentTermios); // Use these new terminal i/o settings now
 
     return *this;
 }
 
-char TerminalIO::GetChar(EscapeCodes &arEscCode) const
+char TerminalIO::GetChar(EscapeCodes& arEscCode) const
 {
     char c;
 
@@ -73,7 +74,7 @@ char TerminalIO::GetChar(EscapeCodes &arEscCode) const
 
     if (c == 0x1b) {
         // Escape character
-        char ext[6] {0};
+        char ext[6]{0};
         ext[0] = c;
         ext[1] = getChar();
         if (ext[1] == 0) {
@@ -141,7 +142,7 @@ std::string TerminalIO::GetLine()
 
     Console::Info() << mPrompt << TextColor::Input;
 
-    while( (ch = GetChar(esc)) ) {
+    while ((ch = GetChar(esc))) {
 
         switch (esc) {
             case EscapeCodes::Character:
@@ -186,7 +187,7 @@ std::string TerminalIO::GetLine()
                 break;
 
             case EscapeCodes::ArrowDown:
-                if ((history_cursor+1) < mHistory.size()) {
+                if ((history_cursor + 1) < mHistory.size()) {
                     if (edit_mode) {
                         mHistory.at(history_cursor) = line;
                     }
@@ -264,15 +265,14 @@ std::string TerminalIO::GetLine()
     return line;
 }
 
-void TerminalIO::handleTabulator(int &arTabCount, std::string &arLine, unsigned int &arCursor)
+void TerminalIO::handleTabulator(int& arTabCount, std::string& arLine, unsigned int& arCursor)
 {
     std::vector<std::string> matches = StrUtils::FindMatches(arLine, mDictionary);
 
     if (++arTabCount == 2) {
         arTabCount = 0;
 
-        if (matches.empty() ||
-           (matches.size() == 1 && matches[0] == arLine)) {
+        if (matches.empty() || (matches.size() == 1 && matches[0] == arLine)) {
             return;
         }
 
@@ -284,7 +284,7 @@ void TerminalIO::handleTabulator(int &arTabCount, std::string &arLine, unsigned 
         }
 
         Console::Info() << std::endl;
-        for (std::string &s : matches) {
+        for (std::string& s : matches) {
             int count = 0;
             for (const auto c : s) {
                 if (c == ' ') {
@@ -313,25 +313,26 @@ void TerminalIO::handleTabulator(int &arTabCount, std::string &arLine, unsigned 
     }
 }
 
-TerminalIO::EscapeCodes TerminalIO::escString2Code(const char *apEscStr)
+TerminalIO::EscapeCodes TerminalIO::escString2Code(const char* apEscStr)
 {
-    struct ansi2io_t {
+    struct ansi2io_t
+    {
         AnsiEscapeCodes::EscString aec;
         EscapeCodes ec;
     };
 
-    const ansi2io_t map[] {
-        { AnsiEscapeCodes::ec::arrow::Up, EscapeCodes::ArrowUp },
-        { AnsiEscapeCodes::ec::arrow::Down, EscapeCodes::ArrowDown },
-        { AnsiEscapeCodes::ec::arrow::Right, EscapeCodes::ArrowRight },
-        { AnsiEscapeCodes::ec::arrow::Left, EscapeCodes::ArrowLeft },
-        { AnsiEscapeCodes::ec::Delete, EscapeCodes::Delete },
-        { AnsiEscapeCodes::ec::Home, EscapeCodes::Home },
-        { AnsiEscapeCodes::ec::End, EscapeCodes::End },
-        { AnsiEscapeCodes::ec::Esc, EscapeCodes::Esc },
+    const ansi2io_t map[]{
+            {AnsiEscapeCodes::ec::arrow::Up, EscapeCodes::ArrowUp},
+            {AnsiEscapeCodes::ec::arrow::Down, EscapeCodes::ArrowDown},
+            {AnsiEscapeCodes::ec::arrow::Right, EscapeCodes::ArrowRight},
+            {AnsiEscapeCodes::ec::arrow::Left, EscapeCodes::ArrowLeft},
+            {AnsiEscapeCodes::ec::Delete, EscapeCodes::Delete},
+            {AnsiEscapeCodes::ec::Home, EscapeCodes::Home},
+            {AnsiEscapeCodes::ec::End, EscapeCodes::End},
+            {AnsiEscapeCodes::ec::Esc, EscapeCodes::Esc},
     };
 
-    for (const auto & [aec, ec] : map) {
+    for (const auto& [aec, ec] : map) {
         if (std::strcmp(aec, apEscStr) == 0) {
             return ec;
         }
@@ -356,4 +357,4 @@ char TerminalIO::getChar()
     return static_cast<char>(std::getchar());
 }
 
-} /* namespace hwtest */
+} // namespace rsp::posix

@@ -14,7 +14,7 @@ using namespace rsp::utils;
 
 namespace rsp::posix {
 
-void Clock::SetTime(Types aClockType, const rsp::utils::DateTime &arDT)
+void Clock::SetTime(Types aClockType, const rsp::utils::DateTime& arDT)
 {
     timespec ts = arDT.GetTimeSpec();
     int res = clock_settime(static_cast<clockid_t>(aClockType), &ts);
@@ -33,4 +33,4 @@ DateTime Clock::GetTime(Types aClockType)
     return DateTime(ts);
 }
 
-} /* namespace rsp::posix */
+} // namespace rsp::posix

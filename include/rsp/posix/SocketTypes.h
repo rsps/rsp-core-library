@@ -7,6 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
 #ifndef RSP_CORE_LIB_SOCKET_TYPES_H
 #define RSP_CORE_LIB_SOCKET_TYPES_H
 
@@ -15,21 +16,21 @@
 namespace rsp::posix {
 
 enum class Domain {
-    Unspecified = AF_UNSPEC,   ///< Unspecified
+    Unspecified = AF_UNSPEC, ///< Unspecified
 #ifdef AF_LOCAL
-    Local       = AF_LOCAL,    ///< Local to host (pipes and file-domain).
-    Unix        = AF_LOCAL,    ///< POSIX name for AF_LOCAL.
-    File        = AF_LOCAL,    ///< Another non-standard name for PF_LOCAL.
+    Local = AF_LOCAL, ///< Local to host (pipes and file-domain).
+    Unix = AF_LOCAL,  ///< POSIX name for AF_LOCAL.
+    File = AF_LOCAL,  ///< Another non-standard name for PF_LOCAL.
 #else
-    Unix        = 1,           ///< POSIX name for AF_LOCAL.
+    Unix = 1, ///< POSIX name for AF_LOCAL.
 #endif
-    Inet        = AF_INET,     ///< IP protocol family.
-    Inet6       = AF_INET6,    ///< IP version 6.
+    Inet = AF_INET,   ///< IP protocol family.
+    Inet6 = AF_INET6, ///< IP version 6.
 #ifdef AF_PACKET
-    Packet      = AF_PACKET,   ///< Packet family.
+    Packet = AF_PACKET, ///< Packet family.
 #endif
 #ifdef AF_BLUETOOTH
-    BlueTooth   = AF_BLUETOOTH ///< Bluetooth sockets.
+    BlueTooth = AF_BLUETOOTH ///< Bluetooth sockets.
 #endif
 };
 
@@ -41,21 +42,21 @@ enum class Type {
 };
 
 enum class Protocol {
-    Unspecified = PF_UNSPEC,   ///< Unspecified
+    Unspecified = PF_UNSPEC, ///< Unspecified
 #ifdef PF_LOCAL
-    Local       = PF_LOCAL,    ///< Local to host (pipes and file-domain).
-    Unix        = PF_LOCAL,    ///< POSIX name for PF_LOCAL.
-    File        = PF_LOCAL,    ///< Another non-standard name for PF_LOCAL.
+    Local = PF_LOCAL, ///< Local to host (pipes and file-domain).
+    Unix = PF_LOCAL,  ///< POSIX name for PF_LOCAL.
+    File = PF_LOCAL,  ///< Another non-standard name for PF_LOCAL.
 #else
-    Unix        = 1,           ///< POSIX name for PF_LOCAL.
+    Unix = 1, ///< POSIX name for PF_LOCAL.
 #endif
-    Inet        = PF_INET,     ///< IP protocol family.
-    Inet6       = PF_INET6,    ///< IP version 6.
+    Inet = PF_INET,   ///< IP protocol family.
+    Inet6 = PF_INET6, ///< IP version 6.
 #ifdef PF_PACKET
-    Packet      = PF_PACKET,   ///< Packet family. (Datagram/UDP)
+    Packet = PF_PACKET, ///< Packet family. (Datagram/UDP)
 #endif
 #ifdef PF_BLUETOOTH
-    BlueTooth   = PF_BLUETOOTH ///< Bluetooth sockets.
+    BlueTooth = PF_BLUETOOTH ///< Bluetooth sockets.
 #endif
 };
 
@@ -66,15 +67,15 @@ enum class SockOptions {
     DoNotRoute = SO_DONTROUTE,            ///< Non-zero requests bypass of normal routing; route based on destination address only.
     GetSocketError = SO_ERROR,            ///< Requests and clears pending error information on the socket (getsockopt() only).
     KeepAlive = SO_KEEPALIVE,             ///< Non-zero requests periodic transmission of keepalive messages (protocol-specific).
-//        Linger = SO_LINGER, /*struct linger*/ ///< Specify actions to be taken for queued, unsent data on close(): linger on/off and linger time in seconds.
+    // Linger = SO_LINGER,                ///< Specify actions to be taken for queued, unsent data on close(): linger on/off and linger time in seconds.
     OutOfBandInline = SO_OOBINLINE,       ///< Non-zero requests that out-of-band data be placed into normal data input queue as received.
     ReceiveBufSize = SO_RCVBUF,           ///< GetSize of receive buffer (in bytes).
     ReceiveLowAt = SO_RCVLOWAT,           ///< Minimum amount of data to return to application for input operations (in bytes).
-    ReceiveTimeout = SO_RCVTIMEO, /*struct timeval*/ ///< Timeout value for a socket receive operation.
+    ReceiveTimeout = SO_RCVTIMEO,         ///< Timeout value for a socket receive operation.
     ReUseAddress = SO_REUSEADDR,          ///< Non-zero requests reuse of local addresses in bind() (protocol-specific).
     SendBufSize = SO_SNDBUF,              ///< GetSize of send buffer (in bytes).
     SendLowAt = SO_SNDLOWAT,              ///< Minimum amount of data to send for output operations (in bytes).
-    SendTimeout = SO_SNDTIMEO, /*struct timeval*/ ///< Timeout value for a socket send operation.
+    SendTimeout = SO_SNDTIMEO,            ///< Timeout value for a socket send operation.
     GetSocketType = SO_TYPE,              ///< Identify socket type (getsockopt() only).
 };
 
@@ -86,4 +87,4 @@ enum class ShutdownFlags {
 
 } // namespace rsp::posix
 
-#endif //RSP_CORE_LIB_SOCKET_TYPES_H
+#endif // RSP_CORE_LIB_SOCKET_TYPES_H

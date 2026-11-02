@@ -18,8 +18,7 @@
 #include <rsp/utils/SystemHandle.h>
 #include <unistd.h>
 
-namespace rsp::posix
-{
+namespace rsp::posix {
 
 /**
  * \class FileIO
@@ -39,7 +38,7 @@ public:
      * Construct a FileIO object, open/create file if given as argument.
      */
     FileIO() = default;
-    FileIO(const std::string &arFileName, std::ios_base::openmode aMode, int aPermissions = 0);
+    FileIO(const std::string& arFileName, std::ios_base::openmode aMode, int aPermissions = 0);
     FileIO(const FileIO& arOther);
     FileIO(FileIO&& arOther) noexcept = default;
     virtual ~FileIO();
@@ -62,7 +61,7 @@ public:
      * \param aMode
      * \param aPermissions
      */
-    void Open(const std::string &arFileName, std::ios_base::openmode aMode, int aPermissions = 0);
+    void Open(const std::string& arFileName, std::ios_base::openmode aMode, int aPermissions = 0);
 
     /**
      * Close the current file if it is open.
@@ -95,14 +94,14 @@ public:
      * \param aNumberOfBytesToRead
      * \return Number of bytes read. Can be zero if no more bytes are currently available
      */
-    size_t Read(void *apBuffer, size_t aNumberOfBytesToRead);
+    size_t Read(void* apBuffer, size_t aNumberOfBytesToRead);
 
     /**
      * \brief Read exact amount of bytes into buffer
      * \param apBuffer
      * \param aNumberOfBytesToRead
      */
-    void ExactRead(void *apBuffer, size_t aNumberOfBytesToRead);
+    void ExactRead(void* apBuffer, size_t aNumberOfBytesToRead);
 
     /**
      * Write an amount of bytes from the buffer to the file.
@@ -111,14 +110,14 @@ public:
      * \param aNumberOfBytesToWrite
      * \return Number of bytes written.
      */
-    size_t Write(const void *apBuffer, size_t aNumberOfBytesToWrite);
+    size_t Write(const void* apBuffer, size_t aNumberOfBytesToWrite);
 
     /**
      * \brief Write an exact amount of bytes from the buffer to the file.
      * \param apBuffer
      * \param aNumberOfBytesToWrite
      */
-    void ExactWrite(const void *apBuffer, size_t aNumberOfBytesToWrite);
+    void ExactWrite(const void* apBuffer, size_t aNumberOfBytesToWrite);
 
     /**
      * Get the rest of the current line.
@@ -131,7 +130,7 @@ public:
      *
      * \param aData
      */
-    void PutLine(const std::string &arData); // Write a string to the file
+    void PutLine(const std::string& arData); // Write a string to the file
 
     /**
      * Read all file contents into a string.
@@ -146,7 +145,7 @@ public:
      *
      * \param aData
      */
-    void PutContents(const std::string &arData); // Write the string to file
+    void PutContents(const std::string& arData); // Write the string to file
 
     /**
      * Return the OS file handle.
@@ -186,7 +185,8 @@ public:
 protected:
     struct FileHandleDeleter
     {
-        void operator()(int aHandle) noexcept {
+        void operator()(int aHandle) noexcept
+        {
             ::close(aHandle);
         }
     };

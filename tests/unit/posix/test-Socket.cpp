@@ -1,12 +1,13 @@
 /**
-* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at https://mozilla.org/MPL/2.0/.
-*
-* \copyright   Copyright 2024 RSP Systems A/S. All rights reserved.
-* \license     Mozilla Public License 2.0
-* \author      steffen
-*/
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2024 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      steffen
+ */
+
 #include <doctest.h>
 #include <rsp/posix/Socket.h>
 #include <rsp/posix/SocketAddress.h>
@@ -22,17 +23,20 @@ TEST_CASE("Socket")
     auto logger = rsp::logging::LoggerInterface::GetDefault();
     auto handle = logger->MakeLogWriter<rsp::logging::ConsoleLogWriter>(rsp::logging::LogLevel::Debug);
 
-    SUBCASE("Address") {
+    SUBCASE("Address")
+    {
         CHECK_NOTHROW(SocketAddress socket_path("/tmp/test-sock", Type::Stream));
         CHECK_NOTHROW(AddressInfo info("/tmp/test-sock"));
     }
 
-    SUBCASE("Construct") {
+    SUBCASE("Construct")
+    {
         CHECK_NOTHROW(Socket s);
         CHECK_NOTHROW(Socket s(Domain::Unix, Type::Stream, Protocol::Unspecified));
     }
 
-    SUBCASE("Unix Socket") {
+    SUBCASE("Unix Socket")
+    {
         const std::string msg("Hello Client");
         std::string socket_path("/tmp/test-sock");
         AddressInfo info(socket_path);
@@ -57,7 +61,8 @@ TEST_CASE("Socket")
         CHECK_EQ(result, msg);
     }
 
-    SUBCASE("TCP Socket") {
+    SUBCASE("TCP Socket")
+    {
         const std::string hello_client("Hello TCP Client");
         const std::string hello_server("Hello TCP Server");
         std::string socket_path("localhost:46555");
@@ -96,7 +101,8 @@ TEST_CASE("Socket")
         CHECK_EQ(result, hello_server);
     }
 
-    SUBCASE("UDP Socket") {
+    SUBCASE("UDP Socket")
+    {
         const std::string hello_client("Hello UDP Client");
         const std::string hello_server("Hello UDP Server");
         std::string socket_path("localhost:46555");
@@ -132,7 +138,6 @@ TEST_CASE("Socket")
         MESSAGE(result);
         CHECK_EQ(result, hello_client);
     }
-
 }
 
 TEST_SUITE_END();

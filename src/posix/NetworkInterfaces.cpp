@@ -12,13 +12,13 @@
 #include <rsp/posix/NetworkInterfaces.h>
 #include <rsp/exceptions/CoreException.h>
 #ifdef __linux__
-    #include <cstring>
-    #include <unistd.h>
-    #include <ifaddrs.h>
-    #include <linux/wireless.h>
-    #include <sys/socket.h>
+#include <cstring>
+#include <unistd.h>
+#include <ifaddrs.h>
+#include <linux/wireless.h>
+#include <sys/socket.h>
 #elif defined(ESP_PLATFORM)
-    #include <esp_netif.h>
+#include <esp_netif.h>
 #endif
 
 namespace rsp::posix {
@@ -27,14 +27,14 @@ NetworkInterfaces::NetworkInterfaces()
     : mLogger("posix")
 {
 #ifdef __linux__
-    struct ifaddrs *interface_addresses;
+    struct ifaddrs* interface_addresses;
 
     if (getifaddrs(&interface_addresses) == -1) {
         THROW_SYSTEM("getifaddrs failed");
     }
 
     // Walk through the linked list of interfaces
-    for (struct ifaddrs *ifa = interface_addresses ; ifa != nullptr ; ifa = ifa->ifa_next) {
+    for (struct ifaddrs* ifa = interface_addresses; ifa != nullptr; ifa = ifa->ifa_next) {
 
         if ((ifa->ifa_addr == nullptr) || (ifa->ifa_addr->sa_family != AF_PACKET)) {
             continue;
@@ -53,7 +53,7 @@ NetworkInterfaces::NetworkInterfaces()
 
     freeifaddrs(interface_addresses);
 #elif defined(ESP_PLATFORM)
-    esp_netif_obj *net = esp_netif_next_unsafe(nullptr);
+    esp_netif_obj* net = esp_netif_next_unsafe(nullptr);
     int index = 0;
     while (net) {
         mWireless.emplace_back(std::to_string(index++));
@@ -76,10 +76,10 @@ bool NetworkInterfaces::isWireless(const std::string& arInterfaceName)
 {
 #ifdef __linux__
     const auto path = std::format("/sys/class/net/{}/wireless", arInterfaceName);
-    return ( access( path.c_str(), F_OK ) != -1 );
+    return (access(path.c_str(), F_OK) != -1);
 #else
     return false;
 #endif
 }
 
-} /* namespace rsp::posix */
+} // namespace rsp::posix
