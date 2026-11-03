@@ -89,7 +89,7 @@ std::string SocketAddress::AsString() const
 
     switch (GetDomain()) {
         case Domain::Unix:
-            return std::string{mAddress.Unix.sun_path, GetSize()};
+            return std::string{mAddress.Unix.sun_path, strnlen(mAddress.Unix.sun_path, sizeof(mAddress.Unix.sun_path))};
 
         case Domain::Inet:
             if (inet_ntop(AF_INET, &mAddress.Inet.sin_addr, buffer, sizeof(buffer))) {
