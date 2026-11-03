@@ -27,14 +27,14 @@ NetworkInterfaces::NetworkInterfaces()
     : mLogger("posix")
 {
 #ifdef __linux__
-    struct ifaddrs* interface_addresses;
+    ifaddrs* interface_addresses;
 
     if (getifaddrs(&interface_addresses) == -1) {
         THROW_SYSTEM("getifaddrs failed");
     }
 
     // Walk through the linked list of interfaces
-    for (struct ifaddrs* ifa = interface_addresses; ifa != nullptr; ifa = ifa->ifa_next) {
+    for (ifaddrs* ifa = interface_addresses; ifa != nullptr; ifa = ifa->ifa_next) {
 
         if ((ifa->ifa_addr == nullptr) || (ifa->ifa_addr->sa_family != AF_PACKET)) {
             continue;

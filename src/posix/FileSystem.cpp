@@ -224,7 +224,7 @@ std::string GetCurrentIpAddress()
 
     const char* kExternalIp = "1.1.1.1";
     uint16_t kDnsPort = 53;
-    struct sockaddr_in serv{};
+    sockaddr_in serv{};
 
     memset(&serv, 0, sizeof(serv));
     serv.sin_family = AF_INET;
@@ -310,7 +310,7 @@ void SetThreadPriority(std::thread& arThread, unsigned int aPriority)
 #ifdef __linux__
     sched_param sch{};
     int policy;
-    struct rlimit limit{};
+    rlimit limit{};
 
     if (getrlimit(RLIMIT_RTPRIO, &limit)) {
         THROW_SYSTEM("FileSystem - Failed to get realtime limits");
@@ -473,8 +473,8 @@ void GetFileInfo(const std::string &arPath)
     struct stat info;
     stat(filename, &info);  // Error check omitted
 
-    struct passwd *pw = getpwuid(info.st_uid);
-    struct group  *gr = getgrgid(info.st_gid);
+    passwd *pw = getpwuid(info.st_uid);
+    group  *gr = getgrgid(info.st_gid);
 
     // If pw != 0, pw->pw_name contains the user name
     // If gr != 0, gr->gr_name contains the group name

@@ -197,7 +197,7 @@ void FileIO::SetSize(size_t aSize)
 
 bool FileIO::WaitForDataReady(int aTimeoutMs) const
 {
-    struct pollfd fd{};
+    pollfd fd{};
     int ret;
     bool result = false;
 

@@ -158,7 +158,7 @@ Socket& Socket::SetSendTimeout(std::chrono::system_clock::duration aTimeout)
 SocketAddress Socket::GetAddr()
 {
     if (mLocalAddress.IsEmpty()) {
-        struct sockaddr sa{};
+        sockaddr sa{};
         socklen_t len = sizeof(sa);
 
         int res = getsockname(mHandle.Get(), &sa, &len);
@@ -308,7 +308,7 @@ size_t Socket::SendTo(const Socket& arPeer, const std::string& arStringBuffer, i
 
 bool Socket::IsDataReady() const
 {
-    struct pollfd fd{};
+    pollfd fd{};
     int ret;
     bool result = false;
     int timeout = 0;
@@ -355,7 +355,7 @@ Socket& Socket::SetOptions(SockOptions aOption, int aValue, int aLevel)
 std::chrono::system_clock::duration Socket::getTimeoutOption(SockOptions aOption) const
 {
     using namespace std::chrono;
-    struct timeval tv{};
+    timeval tv{};
     socklen_t len = sizeof(tv);
     int res = getsockopt(mHandle.Get(), SOL_SOCKET, int(aOption), &tv, &len);
     if (res < 0) {
@@ -367,7 +367,7 @@ std::chrono::system_clock::duration Socket::getTimeoutOption(SockOptions aOption
 void Socket::setTimeoutOption(SockOptions aOption, std::chrono::system_clock::duration aValue) const
 {
     using namespace std::chrono;
-    struct timeval tv{};
+    timeval tv{};
     tv.tv_sec = time_t(duration_cast<seconds>(aValue).count());
     tv.tv_usec = suseconds_t(duration_cast<microseconds>(aValue).count() % 1000000);
     int res = setsockopt(mHandle.Get(), SOL_SOCKET, int(aOption), &tv, sizeof(tv));

@@ -45,7 +45,7 @@ SocketAddress::SocketAddress(uint32_t aIP, uint16_t aPort, Type aType, Protocol 
     mAddress.Inet.sin_port = aPort;
 }
 
-struct sockaddr& SocketAddress::Get()
+sockaddr& SocketAddress::Get()
 {
     return mAddress.Unspecified;
 }
@@ -78,7 +78,7 @@ SocketAddress& SocketAddress::SetDomain(Domain aDomain) noexcept
     return *this;
 }
 
-const struct sockaddr& SocketAddress::Get() const
+const sockaddr& SocketAddress::Get() const
 {
     return mAddress.Unspecified;
 }

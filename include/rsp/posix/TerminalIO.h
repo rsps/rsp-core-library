@@ -148,8 +148,8 @@ protected:
     std::vector<std::string> mDictionary{};
     std::string mPreset{};
     std::string mPrompt{};
-    struct termios mOldTermios{};
-    struct termios mCurrentTermios{};
+    termios mOldTermios{};
+    termios mCurrentTermios{};
 
     static char getChar();
     static EscapeCodes escString2Code(const char* apEscStr);

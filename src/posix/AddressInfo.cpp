@@ -73,9 +73,9 @@ bool AddressInfo::splitURN(std::string_view aUrn)
 
 void AddressInfo::lookup()
 {
-    struct addrinfo* p_info = nullptr;
-    struct addrinfo* p_hints = nullptr;
-    struct addrinfo hints{};
+    addrinfo* p_info = nullptr;
+    addrinfo* p_hints = nullptr;
+    addrinfo hints{};
     if ((mFamilyHint != Domain::Unspecified) || (mTypeHint != Type::Unspecified) || (mProtocolHint != Protocol::Unspecified)) {
         hints.ai_family = int(mFamilyHint);
         hints.ai_socktype = int(mTypeHint);
