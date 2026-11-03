@@ -11,6 +11,7 @@
 #include <arpa/inet.h>
 #include <charconv>
 #include <fcntl.h>
+#include <format>
 #include <rsp/posix/FileSystem.h>
 #include <rsp/posix/Socket.h>
 #include <sys/poll.h>
@@ -179,7 +180,7 @@ Socket Socket::Accept()
 
     int res = accept(mHandle.Get(), &result.Get(), &len);
     if (res < 0) {
-        THROW_SYSTEM("accept() failed. Handle: " + std::to_string(mHandle.Get()));
+        THROW_SYSTEM(std::format("accept() failed. Handle: {}", mHandle.Get()));
     }
     result.UpdateFromParent(mLocalAddress);
 
