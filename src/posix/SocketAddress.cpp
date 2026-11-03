@@ -54,18 +54,21 @@ sockaddr& SocketAddress::Get()
 
 size_t SocketAddress::GetSize() const
 {
+    switch (GetDomain()) {
 #ifdef SUN_LEN
-    if (mAddress.Unspecified.sa_family == std::to_underlying(Domain::Unix)) {
-        return SUN_LEN(&mAddress.Unix);
-    }
+        case Domain::Unix:
+            return SUN_LEN(&mAddress.Unix);
 #endif
-    if (mAddress.Inet.sin_family == std::to_underlying(Domain::Inet)) {
-        return sizeof(mAddress.Inet);
+
+        case Domain::Inet:
+            return sizeof(mAddress.Inet);
+
+        case Domain::Inet6:
+            return sizeof(mAddress.Inet6);
+
+        default:
+            return sizeof(sockaddr);
     }
-    if (mAddress.Inet6.sin6_family == std::to_underlying(Domain::Inet6)) {
-        return sizeof(mAddress.Inet6);
-    }
-    return sizeof(mAddress);
 }
 
 SocketAddress& SocketAddress::SetDomain(Domain aDomain) noexcept
