@@ -43,7 +43,7 @@ public:
     [[nodiscard]] std::string AsString() const;
     [[nodiscard]] explicit operator std::string() const { return AsString(); }
 
-    [[nodiscard]] Domain GetDomain() const { return Domain(mAddress.Unspecified.sa_family); }
+    [[nodiscard]] Domain GetDomain() const { return static_cast<Domain>(mAddress.Unspecified.sa_family); }
     [[nodiscard]] Type GetType() const { return mType; }
     [[nodiscard]] Protocol GetProtocol() const { return mProtocol; }
     [[nodiscard]] std::string GetCanonicalName() const;

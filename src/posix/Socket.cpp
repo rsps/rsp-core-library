@@ -16,12 +16,13 @@
 #include <sys/poll.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <utility>
 
 namespace rsp::posix {
 
 Socket::Socket(Domain aDomain, Type aType, Protocol aProtocol)
 {
-    mHandle = socket(int(aDomain), int(aType), int(aProtocol));
+    mHandle = socket(std::to_underlying(aDomain), std::to_underlying(aType), std::to_underlying(aProtocol));
     if (!mHandle) {
         THROW_SYSTEM("socket() failed.");
     }
@@ -88,7 +89,7 @@ bool Socket::IsBroadcastAllowed() const
 
 Socket& Socket::SetBroadcastAllowed(bool aAllow)
 {
-    SetOptions(SockOptions::Broadcast, int(aAllow));
+    SetOptions(SockOptions::Broadcast, static_cast<int>(aAllow));
     return *this;
 }
 
@@ -105,19 +106,19 @@ bool Socket::IsKeepAliveEnabled() const
 
 Socket& Socket::SetKeepAlive(bool aEnable)
 {
-    SetOptions(SockOptions::KeepAlive, int(aEnable));
+    SetOptions(SockOptions::KeepAlive, static_cast<int>(aEnable));
     return *this;
 }
 
 size_t Socket::GetReceiveBufSize() const
 {
     int result = GetOptions(SockOptions::ReceiveBufSize);
-    return size_t(result);
+    return static_cast<size_t>(result);
 }
 
 Socket& Socket::SetReceiveBufSize(size_t aSize)
 {
-    SetOptions(SockOptions::ReceiveBufSize, int(aSize));
+    SetOptions(SockOptions::ReceiveBufSize, static_cast<int>(aSize));
     return *this;
 }
 
@@ -140,7 +141,7 @@ size_t Socket::GetSendBufSize() const
 
 Socket& Socket::SetSendBufSize(size_t aSize)
 {
-    SetOptions(SockOptions::SendBufSize, int(aSize));
+    SetOptions(SockOptions::SendBufSize, static_cast<int>(aSize));
     return *this;
 }
 
@@ -166,7 +167,7 @@ SocketAddress Socket::GetAddr()
             THROW_SYSTEM("getsockname() failed.");
         }
         mLocalAddress = SocketAddress(sa, len, mDomain, mType, mProtocol);
-        mDomain = Domain(sa.sa_family);
+        mDomain = static_cast<Domain>(sa.sa_family);
     }
     return mLocalAddress;
 }
@@ -238,7 +239,7 @@ Socket& Socket::Connect(const AddressInfo& arAddrInfo)
 
 Socket& Socket::Listen(size_t aAcceptQueueSize)
 {
-    int res = listen(mHandle.Get(), int(aAcceptQueueSize));
+    int res = listen(mHandle.Get(), static_cast<int>(aAcceptQueueSize));
     if (res < 0) {
         THROW_SYSTEM("listen() failed.");
     }
@@ -336,7 +337,7 @@ int Socket::GetOptions(SockOptions aOption, int aLevel) const
 {
     int result;
     socklen_t len = sizeof(result);
-    int res = getsockopt(mHandle.Get(), aLevel, int(aOption), &result, &len);
+    int res = getsockopt(mHandle.Get(), aLevel, std::to_underlying(aOption), &result, &len);
     if (res < 0) {
         THROW_SYSTEM("getsockopt() failed.");
     }
@@ -345,7 +346,7 @@ int Socket::GetOptions(SockOptions aOption, int aLevel) const
 
 Socket& Socket::SetOptions(SockOptions aOption, int aValue, int aLevel)
 {
-    int res = setsockopt(mHandle.Get(), aLevel, int(aOption), &aValue, sizeof(aValue));
+    int res = setsockopt(mHandle.Get(), aLevel, std::to_underlying(aOption), &aValue, sizeof(aValue));
     if (res < 0) {
         THROW_SYSTEM("setsockopt() failed.");
     }
@@ -357,7 +358,7 @@ std::chrono::system_clock::duration Socket::getTimeoutOption(SockOptions aOption
     using namespace std::chrono;
     timeval tv{};
     socklen_t len = sizeof(tv);
-    int res = getsockopt(mHandle.Get(), SOL_SOCKET, int(aOption), &tv, &len);
+    int res = getsockopt(mHandle.Get(), SOL_SOCKET, std::to_underlying(aOption), &tv, &len);
     if (res < 0) {
         THROW_SYSTEM("getsockopt() failed.");
     }
@@ -368,9 +369,9 @@ void Socket::setTimeoutOption(SockOptions aOption, std::chrono::system_clock::du
 {
     using namespace std::chrono;
     timeval tv{};
-    tv.tv_sec = time_t(duration_cast<seconds>(aValue).count());
-    tv.tv_usec = suseconds_t(duration_cast<microseconds>(aValue).count() % 1000000);
-    int res = setsockopt(mHandle.Get(), SOL_SOCKET, int(aOption), &tv, sizeof(tv));
+    tv.tv_sec = static_cast<time_t>(duration_cast<seconds>(aValue).count());
+    tv.tv_usec = static_cast<suseconds_t>(duration_cast<microseconds>(aValue).count() % 1000000);
+    int res = setsockopt(mHandle.Get(), SOL_SOCKET, std::to_underlying(aOption), &tv, sizeof(tv));
     if (res < 0) {
         THROW_SYSTEM("setsockopt() failed.");
     }
@@ -378,7 +379,7 @@ void Socket::setTimeoutOption(SockOptions aOption, std::chrono::system_clock::du
 
 Socket& Socket::Shutdown(ShutdownFlags aFlag)
 {
-    int res = shutdown(mHandle.Get(), int(aFlag));
+    int res = shutdown(mHandle.Get(), std::to_underlying(aFlag));
     if ((res < 0) && (errno != ENOTCONN)) {
         THROW_SYSTEM("shutdown() failed.");
     }

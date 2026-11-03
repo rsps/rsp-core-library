@@ -459,12 +459,12 @@ void SetFileModifiedTime(const std::filesystem::path& arFileName, const DateTime
 
 uint32_t GetUserId()
 {
-    return uint32_t(geteuid());
+    return static_cast<uint32_t>(geteuid());
 }
 
 uint32_t GetGroupId()
 {
-    return uint32_t(getegid());
+    return static_cast<uint32_t>(getegid());
 }
 
 /*
