@@ -169,7 +169,7 @@ std::string SocketAddress::GetCanonicalName() const
         default:
         case Domain::Unspecified:
             result.assign(mAddress.Unspecified.sa_data,
-                    strnlen(mAddress.Unspecified.sa_data, sizeof(mAddress.Unspecified.sa_data)));
+                          strnlen(mAddress.Unspecified.sa_data, sizeof(mAddress.Unspecified.sa_data)));
             break;
     }
     return result;

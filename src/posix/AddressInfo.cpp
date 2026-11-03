@@ -88,9 +88,9 @@ void AddressInfo::lookup()
     }
 
     auto res = getaddrinfo(mNode.empty() ? nullptr : mNode.c_str(),
-            mService.empty() ? nullptr : mService.c_str(),
-            p_hints,
-            &p_info);
+                           mService.empty() ? nullptr : mService.c_str(),
+                           p_hints,
+                           &p_info);
 
     if (res) {
 #ifdef EAI_SYSTEM
@@ -100,9 +100,9 @@ void AddressInfo::lookup()
 #endif
         std::string err_code =
 #ifdef __linux__
-                gai_strerror(res);
+            gai_strerror(res);
 #else
-                std::to_string(res);
+            std::to_string(res);
 #endif
         THROW_WITH_BACKTRACE2(ESocketError, "getaddrinfo failed to parse socket address: ", err_code);
     }

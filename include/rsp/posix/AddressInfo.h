@@ -21,7 +21,7 @@ class AddressInfo
 {
 public:
     explicit AddressInfo(std::string_view aUrn, bool aServer = false, Domain aFamily = Domain::Unspecified,
-            Type aType = Type::Unspecified, Protocol aProtocol = Protocol::Unspecified);
+                         Type aType = Type::Unspecified, Protocol aProtocol = Protocol::Unspecified);
 
     [[nodiscard]] size_t GetCount() const;
     [[nodiscard]] const SocketAddress& operator[](size_t aIndex) const;

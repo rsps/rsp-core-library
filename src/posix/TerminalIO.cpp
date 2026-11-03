@@ -322,14 +322,14 @@ TerminalIO::EscapeCodes TerminalIO::escString2Code(const char* apEscStr)
     };
 
     const ansi2io_t map[]{
-            {AnsiEscapeCodes::ec::arrow::Up, EscapeCodes::ArrowUp},
-            {AnsiEscapeCodes::ec::arrow::Down, EscapeCodes::ArrowDown},
-            {AnsiEscapeCodes::ec::arrow::Right, EscapeCodes::ArrowRight},
-            {AnsiEscapeCodes::ec::arrow::Left, EscapeCodes::ArrowLeft},
-            {AnsiEscapeCodes::ec::Delete, EscapeCodes::Delete},
-            {AnsiEscapeCodes::ec::Home, EscapeCodes::Home},
-            {AnsiEscapeCodes::ec::End, EscapeCodes::End},
-            {AnsiEscapeCodes::ec::Esc, EscapeCodes::Esc},
+        {AnsiEscapeCodes::ec::arrow::Up, EscapeCodes::ArrowUp},
+        {AnsiEscapeCodes::ec::arrow::Down, EscapeCodes::ArrowDown},
+        {AnsiEscapeCodes::ec::arrow::Right, EscapeCodes::ArrowRight},
+        {AnsiEscapeCodes::ec::arrow::Left, EscapeCodes::ArrowLeft},
+        {AnsiEscapeCodes::ec::Delete, EscapeCodes::Delete},
+        {AnsiEscapeCodes::ec::Home, EscapeCodes::Home},
+        {AnsiEscapeCodes::ec::End, EscapeCodes::End},
+        {AnsiEscapeCodes::ec::Esc, EscapeCodes::Esc},
     };
 
     for (const auto& [aec, ec] : map) {
