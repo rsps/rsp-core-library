@@ -7,6 +7,7 @@
  * \license     Mozilla Public License 2.0
  */
 
+#include <rsp/posix/Socket.h>
 #include <rsp/posix/SocketAddress.h>
 #include <doctest.h>
 #include <arpa/inet.h>
@@ -63,6 +64,42 @@ TEST_CASE("SocketAddress - Unix")
     CHECK_EQ(sa.GetSize(), SUN_LEN(&un));
     CHECK_EQ(sa.AsString(), path);
     CHECK_EQ(sa.GetCanonicalName(), path);
+}
+
+TEST_CASE("SocketAddress - Unix path constructor")
+{
+    const std::string path("/tmp/test.sock");
+    SocketAddress sa(path, Type::Datagram, Protocol::Unspecified);
+
+    CHECK_EQ(sa.GetDomain(), Domain::Unix);
+    CHECK_EQ(sa.GetType(), Type::Datagram);
+    CHECK_EQ(sa.GetSize(), SUN_LEN(&reinterpret_cast<const sockaddr_un&>(sa.Get())));
+    CHECK_EQ(sa.AsString(), path);
+    CHECK_EQ(sa.GetCanonicalName(), path);
+}
+
+TEST_CASE("SocketAddress - Unix path constructor length limit")
+{
+    constexpr size_t cMaxLen = sizeof(sockaddr_un::sun_path) - 1; // leave room for null terminator
+
+    SUBCASE("Longest path leaving room for terminator is accepted")
+    {
+        const std::string path(cMaxLen, 'a');
+        SocketAddress sa(path, Type::Stream);
+        CHECK_EQ(sa.AsString(), path);
+    }
+
+    SUBCASE("Path filling the whole buffer is rejected")
+    {
+        const std::string path(cMaxLen + 1, 'a');
+        CHECK_THROWS_AS(SocketAddress(path, Type::Stream), ESocketError);
+    }
+
+    SUBCASE("Path exceeding the buffer is rejected")
+    {
+        const std::string path(cMaxLen + 10, 'a');
+        CHECK_THROWS_AS(SocketAddress(path, Type::Stream), ESocketError);
+    }
 }
 
 TEST_SUITE_END();
