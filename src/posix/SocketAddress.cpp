@@ -156,13 +156,15 @@ std::string SocketAddress::GetCanonicalName() const
 
         case Domain::Inet6:
             if (inet_ntop(std::to_underlying(Domain::Inet6), &mAddress.Inet6.sin6_addr, ip, sizeof(ip))) {
-                result = std::string(ip) + ":" + std::to_string(int(ntohs(mAddress.Inet.sin_port)));
+                result = "[" + std::string(ip) + "]:" + std::to_string(int(ntohs(mAddress.Inet6.sin6_port)));
                 break;
             }
             THROW_SYSTEM("inet_ntop failed");
 
-        default:
         case Domain::Unspecified:
+            [[fallthrough]];
+
+        default:
             result.assign(mAddress.Unspecified.sa_data,
                           strnlen(mAddress.Unspecified.sa_data, sizeof(mAddress.Unspecified.sa_data)));
             break;
