@@ -84,29 +84,27 @@ const sockaddr& SocketAddress::Get() const
 
 std::string SocketAddress::AsString() const
 {
-    char buffer[INET6_ADDRSTRLEN + 1];
-    buffer[INET6_ADDRSTRLEN] = '\0';
+    std::array<char, INET6_ADDRSTRLEN + 1> buffer{};
 
     switch (GetDomain()) {
         case Domain::Unix:
             return std::string{mAddress.Unix.sun_path, strnlen(mAddress.Unix.sun_path, sizeof(mAddress.Unix.sun_path))};
 
         case Domain::Inet:
-            if (inet_ntop(AF_INET, &mAddress.Inet.sin_addr, buffer, sizeof(buffer))) {
-                return {buffer};
+            if (inet_ntop(AF_INET, &mAddress.Inet.sin_addr, buffer.data(), buffer.size()) == nullptr) {
+                THROW_SYSTEM("inet_ntop failed");
             }
-            break;
+            return {buffer.data()};
 
         case Domain::Inet6:
-            if (inet_ntop(AF_INET6, &mAddress.Inet6.sin6_addr, buffer, sizeof(buffer))) {
-                return {buffer};
+            if (inet_ntop(AF_INET6, &mAddress.Inet6.sin6_addr, buffer.data(), buffer.size()) == nullptr) {
+                THROW_SYSTEM("inet_ntop failed");
             }
-            break;
+            return {buffer.data()};
 
         default:
-            break;
+            return {};
     }
-    return {};
 }
 
 uint16_t SocketAddress::GetPort() const
@@ -143,37 +141,19 @@ bool SocketAddress::IsEmpty() const
 
 std::string SocketAddress::GetCanonicalName() const
 {
-    std::string result;
-    char ip[INET6_ADDRSTRLEN + 1];
-
     switch (GetDomain()) {
         case Domain::Unix:
-            result = mAddress.Unix.sun_path;
-            break;
+            return AsString();
 
         case Domain::Inet:
-            if (inet_ntop(std::to_underlying(Domain::Inet), &mAddress.Inet.sin_addr.s_addr, ip, sizeof(ip))) {
-                result = std::format("{}:{}", ip, ntohs(mAddress.Inet.sin_port));
-                break;
-            }
-            THROW_SYSTEM("inet_ntop failed");
+            return std::format("{}:{}", AsString(), ntohs(mAddress.Inet.sin_port));
 
         case Domain::Inet6:
-            if (inet_ntop(std::to_underlying(Domain::Inet6), &mAddress.Inet6.sin6_addr, ip, sizeof(ip))) {
-                result = std::format("[{}]:{}", ip, ntohs(mAddress.Inet6.sin6_port));
-                break;
-            }
-            THROW_SYSTEM("inet_ntop failed");
-
-        case Domain::Unspecified:
-            [[fallthrough]];
+            return std::format("[{}]:{}", AsString(), ntohs(mAddress.Inet6.sin6_port));
 
         default:
-            result.assign(mAddress.Unspecified.sa_data,
-                          strnlen(mAddress.Unspecified.sa_data, sizeof(mAddress.Unspecified.sa_data)));
-            break;
+            return {mAddress.Unspecified.sa_data, strnlen(mAddress.Unspecified.sa_data, sizeof(mAddress.Unspecified.sa_data))};
     }
-    return result;
 }
 
 void SocketAddress::UpdateFromParent(const SocketAddress& arParent)
