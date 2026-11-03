@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <format>
 #include <utility>
 #include <arpa/inet.h>
 #include <rsp/posix/Socket.h>
@@ -149,14 +150,14 @@ std::string SocketAddress::GetCanonicalName() const
 
         case Domain::Inet:
             if (inet_ntop(std::to_underlying(Domain::Inet), &mAddress.Inet.sin_addr.s_addr, ip, sizeof(ip))) {
-                result = std::string(ip) + ":" + std::to_string(int(ntohs(mAddress.Inet.sin_port)));
+                result = std::format("{}:{}", ip, ntohs(mAddress.Inet.sin_port));
                 break;
             }
             THROW_SYSTEM("inet_ntop failed");
 
         case Domain::Inet6:
             if (inet_ntop(std::to_underlying(Domain::Inet6), &mAddress.Inet6.sin6_addr, ip, sizeof(ip))) {
-                result = "[" + std::string(ip) + "]:" + std::to_string(int(ntohs(mAddress.Inet6.sin6_port)));
+                result = std::format("[{}]:{}", ip, ntohs(mAddress.Inet6.sin6_port));
                 break;
             }
             THROW_SYSTEM("inet_ntop failed");

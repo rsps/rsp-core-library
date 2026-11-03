@@ -29,6 +29,7 @@
 #include <fstream>
 #include <iostream>
 #include <cstring>
+#include <format>
 #include <regex>
 #include <rsp/utils/StrUtils.h>
 
@@ -78,7 +79,7 @@ void DeleteFile(const std::string& arFileName)
         return;
     }
     if (std::remove(arFileName.c_str()) != 0) {
-        THROW_SYSTEM("Could not delete " + arFileName);
+        THROW_SYSTEM(std::format("Could not delete {}", arFileName));
     }
 }
 
@@ -99,7 +100,7 @@ void RecursiveDeleteDir(const std::string& arDir)
     // FTS_XDEV     - Don't cross filesystem boundaries
     FTS* fts_ptr = fts_open(files, FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV, nullptr);
     if (!fts_ptr) {
-        THROW_SYSTEM("FileSystem - fts_open failed: " + arDir);
+        THROW_SYSTEM(std::format("FileSystem - fts_open failed: {}", arDir));
     }
 
     while ((curr = fts_read(fts_ptr))) {
@@ -110,7 +111,7 @@ void RecursiveDeleteDir(const std::string& arDir)
                 if (curr->fts_errno == ENOENT) {
                     break; // Ignore "No such file or directory", dir does not exist, so nothing to delete.
                 }
-                THROW_SYSTEM("FileSystem - fts_read error: " + std::string(curr->fts_accpath));
+                THROW_SYSTEM(std::format("FileSystem - fts_read error: {}", curr->fts_accpath));
 
             case FTS_DC:
             case FTS_DOT:
@@ -130,7 +131,7 @@ void RecursiveDeleteDir(const std::string& arDir)
             case FTS_SLNONE:
             case FTS_DEFAULT:
                 if (remove(curr->fts_accpath) < 0) {
-                    THROW_SYSTEM("FileSystem - remove error: " + std::string(curr->fts_accpath));
+                    THROW_SYSTEM(std::format("FileSystem - remove error: {}", curr->fts_accpath));
                 }
                 break;
             default:
@@ -156,21 +157,21 @@ void MakeDirectory(const std::string& arDir)
         if (*p == '/') {
             *p = 0;
             if ((mkdir(tmp, 0755) != 0) && (errno != EEXIST)) {
-                THROW_SYSTEM("FileSystem - Could not create directory: " + arDir);
+                THROW_SYSTEM(std::format("FileSystem - Could not create directory: {}", arDir));
             }
             *p = '/';
         }
     }
 
     if ((mkdir(tmp, 0755) != 0) && (errno != EEXIST)) {
-        THROW_SYSTEM("FileSystem - Could not create directory: " + arDir);
+        THROW_SYSTEM(std::format("FileSystem - Could not create directory: {}", arDir));
     }
 }
 
 void MakeSymlink(const std::string& arExisting, const std::string& arSymlink)
 {
     if ((symlink(arExisting.c_str(), arSymlink.c_str()) != 0) && (errno != EEXIST)) {
-        THROW_SYSTEM("FileSystem - Could not create symlink: " + arSymlink);
+        THROW_SYSTEM(std::format("FileSystem - Could not create symlink: {}", arSymlink));
     }
 }
 
@@ -187,17 +188,13 @@ std::string GetCurrentWorkingDirectory()
         THROW_SYSTEM("FileSystem - Could not get current working directory");
     }
 
-    std::string result(buf);
-
-    return result + "/";
+    return std::format("{}/", buf);
 }
 
 void SetPermissions(const std::string& arPath, uint32_t aPermissions)
 {
     if (chmod(arPath.c_str(), static_cast<mode_t>(aPermissions)) != 0) {
-        std::stringstream ss;
-        ss << "FileSystem - Could not set file permissions on " << arPath << " to " << std::oct << aPermissions;
-        THROW_SYSTEM(ss.str());
+        THROW_SYSTEM(std::format("FileSystem - Could not set file permissions on {} to {:o}", arPath, aPermissions));
     }
 }
 
@@ -207,9 +204,7 @@ uint32_t GetPermissions(const std::string& arPath)
 
     int statRC = stat(arPath.c_str(), &info);
     if (statRC != 0) {
-        std::stringstream ss;
-        ss << "FileSystem - Could not read file permissions on " << arPath;
-        THROW_SYSTEM(ss.str());
+        THROW_SYSTEM(std::format("FileSystem - Could not read file permissions on {}", arPath));
     }
 
     return info.st_mode;
@@ -256,21 +251,18 @@ std::string GetCurrentIpAddress()
 int ExecuteCommand(const std::string& arCommand, std::string* apStdOut, std::string* apStdErrOut)
 {
     static int cnt = 0;
-    std::stringstream cmd;
-
-    std::string tmp_name("/tmp/ExecuteCommand");
-    tmp_name += std::to_string(cnt++);
-
-    cmd << arCommand;
+    std::string cmd = arCommand;
+    std::string tmp_name = std::format("/tmp/ExecuteCommand{}", cnt);
+    ++cnt;
 
     if (apStdOut) {
-        cmd << " > " << tmp_name << ".txt";
+        cmd += std::format(" > {}.txt", tmp_name);
     }
     if (apStdErrOut) {
-        cmd << " 2> " << tmp_name << ".err";
+        cmd += std::format(" 2> {}.err", tmp_name);
     }
 
-    int result = std::system(cmd.str().c_str());
+    int result = std::system(cmd.c_str());
 
     if (apStdOut) {
         std::ifstream out(tmp_name + ".txt");
@@ -296,7 +288,7 @@ std::string GetLastResumeId()
     std::string out;
     std::string err;
 
-    int result = ExecuteCommand("journalctl -t systemd-sleep |tail -n1", &out, &err);
+    int result = ExecuteCommand("journalctl -t systemd-sleep | tail -n1", &out, &err);
 
     if (result != 0) {
         THROW_WITH_BACKTRACE1(std::runtime_error, err);
@@ -341,9 +333,10 @@ void SetThreadPriority(std::thread& arThread, unsigned int aPriority)
     }
 
     if (sch.sched_priority != static_cast<int>(aPriority)) {
-        std::stringstream ss;
-        ss << "FileSystem - Could not set thread priority. Expected: " << aPriority << ", Current: " << sch.sched_priority;
-        THROW_WITH_BACKTRACE1(std::runtime_error, ss.str());
+        THROW_WITH_BACKTRACE1(std::runtime_error,
+                              std::format("FileSystem - Could not set thread priority. Expected: {}, Current: {}",
+                                          aPriority,
+                                          sch.sched_priority));
     }
 #endif /* __linux__ */
 }
