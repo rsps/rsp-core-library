@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <utility>
 #include <arpa/inet.h>
 #include <rsp/posix/Socket.h>
 #include <rsp/exceptions/ExceptionHelper.h>
@@ -21,7 +22,7 @@ SocketAddress::SocketAddress(std::string_view aUnixPath, Type aType, Protocol aP
     : mType(aType)
     , mProtocol(aProtocol)
 {
-    mAddress.Unix.sun_family = int(Domain::Unix);
+    mAddress.Unix.sun_family = std::to_underlying(Domain::Unix);
     if (aUnixPath.size() > sizeof(mAddress.Unix.sun_path)) {
         THROW_WITH_BACKTRACE1(ESocketError, "Unix socket path is to long.");
     }
@@ -33,14 +34,14 @@ SocketAddress::SocketAddress(const sockaddr& arSockAddr, socklen_t aLen, Domain 
     , mProtocol(aProtocol)
 {
     std::memcpy(&mAddress, &arSockAddr, std::min<size_t>(aLen, sizeof(mAddress)));
-    mAddress.Unspecified.sa_family = int(aDomain);
+    mAddress.Unspecified.sa_family = std::to_underlying(aDomain);
 }
 
 SocketAddress::SocketAddress(uint32_t aIP, uint16_t aPort, Type aType, Protocol aProtocol)
     : mType(aType)
     , mProtocol(aProtocol)
 {
-    mAddress.Inet.sin_family = int(Domain::Inet);
+    mAddress.Inet.sin_family = std::to_underlying(Domain::Inet);
     mAddress.Inet.sin_addr.s_addr = aIP;
     mAddress.Inet.sin_port = aPort;
 }
@@ -53,14 +54,14 @@ sockaddr& SocketAddress::Get()
 size_t SocketAddress::GetSize() const
 {
 #ifdef SUN_LEN
-    if (mAddress.Unspecified.sa_family == int(Domain::Unix)) {
+    if (mAddress.Unspecified.sa_family == std::to_underlying(Domain::Unix)) {
         return SUN_LEN(&mAddress.Unix);
     }
 #endif
-    if (mAddress.Inet.sin_family == int(Domain::Inet)) {
+    if (mAddress.Inet.sin_family == std::to_underlying(Domain::Inet)) {
         return sizeof(mAddress.Inet);
     }
-    if (mAddress.Inet6.sin6_family == int(Domain::Inet6)) {
+    if (mAddress.Inet6.sin6_family == std::to_underlying(Domain::Inet6)) {
         return sizeof(mAddress.Inet6);
     }
     return sizeof(mAddress);
@@ -68,7 +69,7 @@ size_t SocketAddress::GetSize() const
 
 SocketAddress& SocketAddress::SetDomain(Domain aDomain) noexcept
 {
-    mAddress.Unspecified.sa_family = int(aDomain);
+    mAddress.Unspecified.sa_family = std::to_underlying(aDomain);
     return *this;
 }
 
@@ -82,7 +83,7 @@ std::string SocketAddress::AsString() const
     char buffer[INET6_ADDRSTRLEN + 1];
     buffer[INET6_ADDRSTRLEN] = '\0';
 
-    switch (Domain(mAddress.Unspecified.sa_family)) {
+    switch (GetDomain()) {
         case Domain::Unix:
             return std::string{mAddress.Unix.sun_path, GetSize()};
 
@@ -106,7 +107,7 @@ std::string SocketAddress::AsString() const
 
 uint16_t SocketAddress::GetPort() const
 {
-    switch (Domain(mAddress.Unspecified.sa_family)) {
+    switch (GetDomain()) {
         case Domain::Inet:
             return mAddress.Inet.sin_port;
         case Domain::Inet6:
@@ -118,7 +119,7 @@ uint16_t SocketAddress::GetPort() const
 
 SocketAddress& SocketAddress::SetPort(uint16_t aPort) noexcept
 {
-    switch (Domain(mAddress.Unspecified.sa_family)) {
+    switch (GetDomain()) {
         case Domain::Inet:
             mAddress.Inet.sin_port = aPort;
             break;
@@ -133,7 +134,7 @@ SocketAddress& SocketAddress::SetPort(uint16_t aPort) noexcept
 
 bool SocketAddress::IsEmpty() const
 {
-    return mAddress.Unspecified.sa_family == int(Domain::Unspecified);
+    return (GetDomain() == Domain::Unspecified);
 }
 
 std::string SocketAddress::GetCanonicalName() const
@@ -141,20 +142,20 @@ std::string SocketAddress::GetCanonicalName() const
     std::string result;
     char ip[INET6_ADDRSTRLEN + 1];
 
-    switch (Domain(mAddress.Unspecified.sa_family)) {
+    switch (GetDomain()) {
         case Domain::Unix:
             result = mAddress.Unix.sun_path;
             break;
 
         case Domain::Inet:
-            if (inet_ntop(int(Domain::Inet), &mAddress.Inet.sin_addr.s_addr, ip, sizeof(ip))) {
+            if (inet_ntop(std::to_underlying(Domain::Inet), &mAddress.Inet.sin_addr.s_addr, ip, sizeof(ip))) {
                 result = std::string(ip) + ":" + std::to_string(int(ntohs(mAddress.Inet.sin_port)));
                 break;
             }
             THROW_SYSTEM("inet_ntop failed");
 
         case Domain::Inet6:
-            if (inet_ntop(int(Domain::Inet6), &mAddress.Inet6.sin6_addr, ip, sizeof(ip))) {
+            if (inet_ntop(std::to_underlying(Domain::Inet6), &mAddress.Inet6.sin6_addr, ip, sizeof(ip))) {
                 result = std::string(ip) + ":" + std::to_string(int(ntohs(mAddress.Inet.sin_port)));
                 break;
             }

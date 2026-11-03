@@ -23,6 +23,7 @@
 #include <chrono>
 #include <span>
 #include <string>
+#include <utility>
 
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -112,7 +113,7 @@ protected:
     {
         void operator()(int aHandle) noexcept
         {
-            ::shutdown(aHandle, int(ShutdownFlags::ReadWrite));
+            ::shutdown(aHandle, std::to_underlying(ShutdownFlags::ReadWrite));
             ::close(aHandle);
         }
     };

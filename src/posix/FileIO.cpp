@@ -91,7 +91,7 @@ void FileIO::Close()
 
 size_t FileIO::Seek(size_t aOffset, std::ios_base::seekdir aSeekDir)
 {
-    off_t ret = lseek(mHandle.Get(), static_cast<off_t>(aOffset), int(aSeekDir));
+    off_t ret = lseek(mHandle.Get(), static_cast<off_t>(aOffset), static_cast<int>(aSeekDir));
     if (ret < 0) {
         THROW_SYSTEM("Error moving cursor in file " + mFileName);
     }
