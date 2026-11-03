@@ -53,6 +53,7 @@ public:
 protected:
     union
     {
+        sockaddr_storage Storage; // only the first union member is zero-initialized
         sockaddr Unspecified;
         sockaddr_in Inet;
         sockaddr_in6 Inet6;
