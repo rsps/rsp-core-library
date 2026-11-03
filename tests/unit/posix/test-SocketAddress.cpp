@@ -30,6 +30,7 @@ TEST_CASE("SocketAddress - Inet")
     CHECK_EQ(sa.GetDomain(), Domain::Inet);
     CHECK_EQ(sa.GetSize(), sizeof(sockaddr_in));
     CHECK_EQ(sa.GetPort(), in.sin_port);
+    CHECK_EQ(sa.AsString(), "10.1.2.3"s);
     CHECK_EQ(sa.GetCanonicalName(), "10.1.2.3:8080"s);
 }
 
@@ -45,6 +46,7 @@ TEST_CASE("SocketAddress - Inet6")
     CHECK_EQ(sa.GetDomain(), Domain::Inet6);
     CHECK_EQ(sa.GetSize(), sizeof(sockaddr_in6));
     CHECK_EQ(sa.GetPort(), in6.sin6_port);
+    CHECK_EQ(sa.AsString(), "2001:db8::1"s);
     CHECK_EQ(sa.GetCanonicalName(), "[2001:db8::1]:443"s);
 }
 
@@ -59,6 +61,7 @@ TEST_CASE("SocketAddress - Unix")
 
     CHECK_EQ(sa.GetDomain(), Domain::Unix);
     CHECK_EQ(sa.GetSize(), SUN_LEN(&un));
+    CHECK_EQ(sa.AsString(), path);
     CHECK_EQ(sa.GetCanonicalName(), path);
 }
 
