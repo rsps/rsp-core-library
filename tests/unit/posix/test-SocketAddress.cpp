@@ -58,6 +58,7 @@ TEST_CASE("SocketAddress - Unix")
     SocketAddress sa(reinterpret_cast<const sockaddr&>(un), sizeof(un), Domain::Unix, Type::Stream, Protocol::Unspecified);
 
     CHECK_EQ(sa.GetDomain(), Domain::Unix);
+    CHECK_EQ(sa.GetSize(), SUN_LEN(&un));
     CHECK_EQ(sa.GetCanonicalName(), path);
 }
 
