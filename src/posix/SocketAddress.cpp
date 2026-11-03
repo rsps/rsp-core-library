@@ -24,10 +24,10 @@ SocketAddress::SocketAddress(std::string_view aUnixPath, Type aType, Protocol aP
     , mProtocol(aProtocol)
 {
     mAddress.Unix.sun_family = std::to_underlying(Domain::Unix);
-    if (aUnixPath.size() > sizeof(mAddress.Unix.sun_path)) {
-        THROW_WITH_BACKTRACE1(ESocketError, "Unix socket path is to long.");
+    if (aUnixPath.size() >= sizeof(mAddress.Unix.sun_path)) { // guarantee room for null terminator
+        THROW_WITH_BACKTRACE1(ESocketError, "Unix socket path is too long.");
     }
-    std::memcpy(mAddress.Unix.sun_path, aUnixPath.data(), aUnixPath.size());
+    std::copy_n(aUnixPath.data(), aUnixPath.size(), mAddress.Unix.sun_path);
 }
 
 SocketAddress::SocketAddress(const sockaddr& arSockAddr, socklen_t aLen, Domain aDomain, Type aType, Protocol aProtocol)
