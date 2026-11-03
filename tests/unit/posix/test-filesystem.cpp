@@ -24,22 +24,25 @@ using namespace std::chrono;
 
 TEST_SUITE_BEGIN("Posix");
 
-TEST_CASE("FileSystem") {
-
+TEST_CASE("FileSystem")
+{
     const std::string cSubDir = "subdir/subdir1/subdir2";
     std::string cwd;
 
-    SUBCASE("Directory Exists") {
-        CHECK_NOTHROW( (cwd = FileSystem::GetCurrentWorkingDirectory()) );
+    SUBCASE("Directory Exists")
+    {
+        CHECK_NOTHROW((cwd = FileSystem::GetCurrentWorkingDirectory()));
 
         CHECK(FileSystem::DirectoryExists(cwd));
     }
 
-    SUBCASE("Make Directory") {
+    SUBCASE("Make Directory")
+    {
         CHECK_NOTHROW(FileSystem::MakeDirectory(cwd + cSubDir));
     }
 
-    SUBCASE("Set Permissions") {
+    SUBCASE("Set Permissions")
+    {
         std::string filename = cwd + cSubDir + "/tmpfile";
 
         std::ofstream fout(filename);
@@ -53,18 +56,21 @@ TEST_CASE("FileSystem") {
         CHECK_THROWS_AS(fo.open(filename), std::ios_base::failure);
     }
 
-    SUBCASE("Make Symlink") {
+    SUBCASE("Make Symlink")
+    {
         CHECK_NOTHROW(FileSystem::MakeSymlink(cwd + cSubDir, cwd + "subdir-link"));
 
         CHECK(FileSystem::DirectoryExists(cwd + "subdir-link"));
     }
 
-    SUBCASE("Recursive Delete Directory") {
+    SUBCASE("Recursive Delete Directory")
+    {
         CHECK_NOTHROW(FileSystem::RecursiveDeleteDir(cwd + "subdir"));
         CHECK_NOTHROW(FileSystem::RecursiveDeleteDir(cwd + "subdir-link"));
     }
 
-    SUBCASE("Sleep") {
+    SUBCASE("Sleep")
+    {
         auto start = std::chrono::system_clock::now();
 
         CHECK_NOTHROW(FileSystem::Sleep(100));
@@ -74,7 +80,8 @@ TEST_CASE("FileSystem") {
         CHECK_GE(milli_sec.count(), 100);
     }
 
-    SUBCASE("Get IP Address") {
+    SUBCASE("Get IP Address")
+    {
         std::string ip;
 
         CHECK_NOTHROW(ip = FileSystem::GetCurrentIpAddress());
@@ -85,12 +92,14 @@ TEST_CASE("FileSystem") {
         CHECK(!StrUtils::Contains(ip, "127.0.0.1"));
     }
 
-    SUBCASE("List Directory") {
+    SUBCASE("List Directory")
+    {
         std::vector<std::filesystem::path> list = FileSystem::Glob(std::filesystem::path{"/etc/hostn*"});
         CHECK_EQ(list[0].string(), "/etc/hostname");
     }
 
-    SUBCASE("Get Framebuffer Device By Driver Name") {
+    SUBCASE("Get Framebuffer Device By Driver Name")
+    {
         std::filesystem::path p = FileSystem::GetCharacterDeviceByDriverName("vfb2", std::filesystem::path{"/dev/fb?"});
 
         MESSAGE((p.empty() ? "Not Found!" : p.string()));
@@ -100,7 +109,8 @@ TEST_CASE("FileSystem") {
         }
     }
 
-    SUBCASE("File time") {
+    SUBCASE("File time")
+    {
         using namespace std::literals::chrono_literals;
         using namespace std::chrono;
 

@@ -16,31 +16,37 @@ using namespace rsp::posix;
 
 TEST_SUITE_BEGIN("Posix");
 
-TEST_CASE("File IO") {
+TEST_CASE("File IO")
+{
     const std::string cFileName = "temp.txt";
 
-    SUBCASE("Construct") {
+    SUBCASE("Construct")
+    {
         CHECK_NOTHROW(FileIO f);
     }
 
-    SUBCASE("Create File") {
+    SUBCASE("Create File")
+    {
         CHECK_NOTHROW(FileIO f(cFileName, std::ios_base::out, 0664));
     }
 
-    SUBCASE("Write File") {
+    SUBCASE("Write File")
+    {
         FileIO f(cFileName, std::ios_base::out);
 
         CHECK_NOTHROW(f.PutContents("Hello World"));
     }
 
-    SUBCASE("Read File") {
+    SUBCASE("Read File")
+    {
         FileIO f(cFileName, std::ios_base::in);
         std::string s = f.GetContents();
 
         CHECK_EQ(s, "Hello World");
     }
 
-    SUBCASE("Seek And Read") {
+    SUBCASE("Seek And Read")
+    {
         FileIO f(cFileName, std::ios_base::in);
         f.Seek(6, std::ios_base::beg);
         std::string s = f.GetLine();
@@ -48,7 +54,8 @@ TEST_CASE("File IO") {
         CHECK_EQ(s, "World");
     }
 
-    SUBCASE("Seek And Write") {
+    SUBCASE("Seek And Write")
+    {
         FileIO f(cFileName, std::ios_base::out);
         f.Seek(6, std::ios_base::beg);
 
@@ -56,14 +63,16 @@ TEST_CASE("File IO") {
         CHECK_NOTHROW(f.SetSize(10));
     }
 
-    SUBCASE("Read Hello") {
+    SUBCASE("Read Hello")
+    {
         FileIO f(cFileName, std::ios_base::in);
         std::string s = f.GetContents();
 
         CHECK_EQ(s, "Hello File");
     }
 
-    SUBCASE("Cleanup") {
+    SUBCASE("Cleanup")
+    {
         unlink(cFileName.c_str());
     }
 }

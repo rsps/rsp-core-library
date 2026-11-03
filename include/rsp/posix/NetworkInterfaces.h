@@ -17,7 +17,6 @@
 
 namespace rsp::posix {
 
-
 /**
  * \class NetworkInterfaces
  * \brief Helper to lookup all network interfaces and group them as wireless and cabled
@@ -29,13 +28,14 @@ public:
 
     [[nodiscard]] const std::vector<std::string>& GetWireless() const;
     [[nodiscard]] const std::vector<std::string>& GetCabled() const;
+
 protected:
     std::vector<std::string> mWireless{};
     std::vector<std::string> mCabled{};
     rsp::logging::LogChannel mLogger;
-    static bool isWireless(const std::string &arInterfaceName);
+    static bool isWireless(const std::string& arInterfaceName);
 };
 
-} /* namespace rsp::posix */
+} // namespace rsp::posix
 
 #endif // RSP_CORE_LIB_POSIX_NETWORK_INTERFACES_H

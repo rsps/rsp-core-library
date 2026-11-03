@@ -9,7 +9,6 @@ UseTab: Never
 AccessModifierOffset: -4
 IndentCaseLabels: true
 NamespaceIndentation: None
-ContinuationIndentWidth: 8
 
 # --- Column limit ---
 ColumnLimit: 0
@@ -54,7 +53,7 @@ ConstructorInitializerIndentWidth: 4
 PackConstructorInitializers: NextLine
 
 # --- Arguments/Parameters ---
-AlignAfterOpenBracket: false
+AlignAfterOpenBracket: Align
 BinPackArguments: true
 BinPackParameters: true
 

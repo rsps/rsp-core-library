@@ -7,6 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
 #ifndef RSP_CORE_LIB_ADDRESS_INFO_H
 #define RSP_CORE_LIB_ADDRESS_INFO_H
 
@@ -23,8 +24,8 @@ public:
                          Type aType = Type::Unspecified, Protocol aProtocol = Protocol::Unspecified);
 
     [[nodiscard]] size_t GetCount() const;
-    [[nodiscard]] const SocketAddress &operator[](size_t aIndex) const;
-    [[nodiscard]] const std::vector<SocketAddress> &GetAddresses() const;
+    [[nodiscard]] const SocketAddress& operator[](size_t aIndex) const;
+    [[nodiscard]] const std::vector<SocketAddress>& GetAddresses() const;
 
 protected:
     bool mServer;
@@ -38,6 +39,7 @@ protected:
     bool splitURN(std::string_view aUrn);
     void lookup();
 };
-} // rsp::posix
 
-#endif //RSP_CORE_LIB_ADDRESS_INFO_H
+} // namespace rsp::posix
+
+#endif // RSP_CORE_LIB_ADDRESS_INFO_H

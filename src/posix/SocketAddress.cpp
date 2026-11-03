@@ -7,6 +7,7 @@
  * \license     Mozilla Public License 2.0
  * \author      Steffen Brummer
  */
+
 #include <algorithm>
 #include <cstring>
 #include <arpa/inet.h>
@@ -17,8 +18,8 @@
 namespace rsp::posix {
 
 SocketAddress::SocketAddress(std::string_view aUnixPath, Type aType, Protocol aProtocol)
-    : mType(aType),
-      mProtocol(aProtocol)
+    : mType(aType)
+    , mProtocol(aProtocol)
 {
     mAddress.Unix.sun_family = int(Domain::Unix);
     if (aUnixPath.size() > sizeof(mAddress.Unix.sun_path)) {
@@ -28,28 +29,28 @@ SocketAddress::SocketAddress(std::string_view aUnixPath, Type aType, Protocol aP
 }
 
 SocketAddress::SocketAddress(const sockaddr& arSockAddr, socklen_t aLen, Domain aDomain, Type aType, Protocol aProtocol)
-    : mType(aType),
-      mProtocol(aProtocol)
+    : mType(aType)
+    , mProtocol(aProtocol)
 {
     std::memcpy(&mAddress, &arSockAddr, std::min<size_t>(aLen, sizeof(mAddress)));
     mAddress.Unspecified.sa_family = int(aDomain);
 }
 
 SocketAddress::SocketAddress(uint32_t aIP, uint16_t aPort, Type aType, Protocol aProtocol)
-    : mType(aType),
-      mProtocol(aProtocol)
+    : mType(aType)
+    , mProtocol(aProtocol)
 {
     mAddress.Inet.sin_family = int(Domain::Inet);
     mAddress.Inet.sin_addr.s_addr = aIP;
     mAddress.Inet.sin_port = aPort;
 }
 
-struct sockaddr& SocketAddress::Get()
+sockaddr& SocketAddress::Get()
 {
     return mAddress.Unspecified;
 }
 
-SocketAddress &SocketAddress::operator=(const sockaddr &arSockAddr)
+SocketAddress& SocketAddress::operator=(const sockaddr& arSockAddr)
 {
     std::memcpy(&mAddress.Unspecified, &arSockAddr, sizeof(sockaddr));
     return *this;
@@ -77,7 +78,7 @@ SocketAddress& SocketAddress::SetDomain(Domain aDomain) noexcept
     return *this;
 }
 
-const struct sockaddr& SocketAddress::Get() const
+const sockaddr& SocketAddress::Get() const
 {
     return mAddress.Unspecified;
 }
@@ -103,7 +104,8 @@ std::string SocketAddress::AsString() const
             }
             break;
 
-        default:break;
+        default:
+            break;
     }
     return {};
 }
@@ -111,20 +113,26 @@ std::string SocketAddress::AsString() const
 uint16_t SocketAddress::GetPort() const
 {
     switch (Domain(mAddress.Unspecified.sa_family)) {
-        case Domain::Inet:return mAddress.Inet.sin_port;
-        case Domain::Inet6:return mAddress.Inet6.sin6_port;
-        default:return 0;
+        case Domain::Inet:
+            return mAddress.Inet.sin_port;
+        case Domain::Inet6:
+            return mAddress.Inet6.sin6_port;
+        default:
+            return 0;
     }
 }
 
 SocketAddress& SocketAddress::SetPort(uint16_t aPort) noexcept
 {
     switch (Domain(mAddress.Unspecified.sa_family)) {
-        case Domain::Inet:mAddress.Inet.sin_port = aPort;
+        case Domain::Inet:
+            mAddress.Inet.sin_port = aPort;
             break;
-        case Domain::Inet6:mAddress.Inet6.sin6_port = aPort;
+        case Domain::Inet6:
+            mAddress.Inet6.sin6_port = aPort;
             break;
-        default:break;
+        default:
+            break;
     }
     return *this;
 }
@@ -167,7 +175,7 @@ std::string SocketAddress::GetCanonicalName() const
     return result;
 }
 
-void SocketAddress::UpdateFromParent(const SocketAddress &arParent)
+void SocketAddress::UpdateFromParent(const SocketAddress& arParent)
 {
     if (GetDomain() == Domain::Unix) {
         mAddress.Unix = arParent.mAddress.Unix;

@@ -1,12 +1,13 @@
 /**
-* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at https://mozilla.org/MPL/2.0/.
-*
-* \copyright   Copyright 2024 RSP Systems A/S. All rights reserved.
-* \license     Mozilla Public License 2.0
-* \author      steffen
-*/
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * \copyright   Copyright 2024 RSP Systems A/S. All rights reserved.
+ * \license     Mozilla Public License 2.0
+ * \author      steffen
+ */
+
 #ifndef RSP_CORE_LIB_INCLUDE_POSIX_SOCKET_H
 #define RSP_CORE_LIB_INCLUDE_POSIX_SOCKET_H
 
@@ -33,12 +34,13 @@ namespace rsp::posix {
 class ESocketError : public rsp::exceptions::CoreException
 {
 public:
-    explicit ESocketError(const std::string &arMsg, const char *apSystemMsg = nullptr)
-            : CoreException(((apSystemMsg == nullptr) ? arMsg : arMsg + std::string(apSystemMsg)))
+    explicit ESocketError(const std::string& arMsg, const char* apSystemMsg = nullptr)
+        : CoreException(((apSystemMsg == nullptr) ? arMsg : arMsg + std::string(apSystemMsg)))
     {
     }
-    explicit ESocketError(const std::string &arMsg, const std::string &arSystemMsg)
-          : CoreException(arMsg + arSystemMsg)
+
+    explicit ESocketError(const std::string& arMsg, const std::string& arSystemMsg)
+        : CoreException(arMsg + arSystemMsg)
     {
     }
 };
@@ -84,19 +86,19 @@ public:
     [[nodiscard]] SocketAddress GetAddr();
 
     [[nodiscard]] Socket Accept();
-    Socket& Bind(const AddressInfo &arAddrInfo, bool aBindAll = false);
-    Socket& Connect(const AddressInfo &arAddrInfo);
+    Socket& Bind(const AddressInfo& arAddrInfo, bool aBindAll = false);
+    Socket& Connect(const AddressInfo& arAddrInfo);
     Socket& Close();
     [[nodiscard]] int GetOptions(SockOptions aOption, int aLevel = SOL_SOCKET) const;
     Socket& Listen(size_t aAcceptQueueSize = 0);
     [[nodiscard]] size_t Receive(std::span<std::byte> aBuffer, int aFlags = 0) const;
-    [[nodiscard]] size_t Receive(std::string &arStringBuffer, int aFlags = 0) const;
-    [[nodiscard]] size_t ReceiveFrom(Socket &arPeer, std::span<std::byte> aBuffer, int aFlags = 0) const;
-    [[nodiscard]] size_t ReceiveFrom(Socket &arPeer, std::string &arStringBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t Receive(std::string& arStringBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t ReceiveFrom(Socket& arPeer, std::span<std::byte> aBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t ReceiveFrom(Socket& arPeer, std::string& arStringBuffer, int aFlags = 0) const;
     [[nodiscard]] size_t Send(std::span<const std::byte> aBuffer, int aFlags = 0) const;
-    [[nodiscard]] size_t Send(const std::string &arStringBuffer, int aFlags = 0) const;
-    [[nodiscard]] size_t SendTo(const Socket &arPeer, std::span<const std::byte> aBuffer, int aFlags = 0) const;
-    [[nodiscard]] size_t SendTo(const Socket &arPeer, const std::string &arStringBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t Send(const std::string& arStringBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t SendTo(const Socket& arPeer, std::span<const std::byte> aBuffer, int aFlags = 0) const;
+    [[nodiscard]] size_t SendTo(const Socket& arPeer, const std::string& arStringBuffer, int aFlags = 0) const;
 
     Socket& SetOptions(SockOptions aOption, int aValue, int aLevel = SOL_SOCKET);
     Socket& Shutdown(ShutdownFlags aFlag);
@@ -108,7 +110,8 @@ public:
 protected:
     struct SocketHandleDeleter
     {
-        void operator()(int aHandle) noexcept {
+        void operator()(int aHandle) noexcept
+        {
             ::shutdown(aHandle, int(ShutdownFlags::ReadWrite));
             ::close(aHandle);
         }
@@ -122,7 +125,7 @@ protected:
     Type mType = Type::Stream;
     Protocol mProtocol = Protocol::Unspecified;
 
-    static void deleteOldSocketINode(const SocketAddress &arAddr);
+    static void deleteOldSocketINode(const SocketAddress& arAddr);
 
     /**
      * \brief Special constructor for use in Accept
@@ -131,12 +134,12 @@ protected:
      * \param aLocalAddress
      * \param aPeerAddress
      */
-    Socket(const Socket &arServer, int aHandle, const SocketAddress& arLocalAddress, const SocketAddress& arPeerAddress);
+    Socket(const Socket& arServer, int aHandle, const SocketAddress& arLocalAddress, const SocketAddress& arPeerAddress);
 
     [[nodiscard]] std::chrono::system_clock::duration getTimeoutOption(SockOptions aOption) const;
     void setTimeoutOption(SockOptions aOption, std::chrono::system_clock::duration aValue) const;
 };
 
-} // rsp::posix
+} // namespace rsp::posix
 
-#endif //RSP_CORE_LIB_INCLUDE_POSIX_SOCKET_H
+#endif // RSP_CORE_LIB_INCLUDE_POSIX_SOCKET_H
