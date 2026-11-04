@@ -265,7 +265,7 @@ size_t Socket::Receive(std::string& arStringBuffer, int aFlags) const
 size_t Socket::ReceiveFrom(Socket& arPeer, std::span<std::byte> aBuffer, int aFlags) const
 {
     SocketAddress sa{};
-    socklen_t len = sizeof(sa);
+    socklen_t len = sa.GetSize();
 
     ssize_t res = recvfrom(mHandle.Get(), aBuffer.data(), aBuffer.size_bytes(), aFlags, &sa.Get(), &len);
     if (res == -1) {
@@ -296,7 +296,7 @@ size_t Socket::Send(const std::string& arStringBuffer, int aFlags) const
 
 size_t Socket::SendTo(const Socket& arPeer, std::span<const std::byte> aBuffer, int aFlags) const
 {
-    ssize_t res = sendto(mHandle.Get(), aBuffer.data(), aBuffer.size_bytes(), aFlags, &arPeer.mLocalAddress.Get(), sizeof(arPeer.mLocalAddress));
+    ssize_t res = sendto(mHandle.Get(), aBuffer.data(), aBuffer.size_bytes(), aFlags, &arPeer.mLocalAddress.Get(), arPeer.mLocalAddress.GetSize());
     if (res == -1) {
         THROW_SYSTEM("sendto() failed.");
     }
