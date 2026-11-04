@@ -30,8 +30,6 @@ public:
     explicit SocketAddress(std::string_view aUnixPath, Type aType, Protocol aProtocol = Protocol::Unspecified);
     explicit SocketAddress(uint32_t aIP, uint16_t aPort, Type aType, Protocol aProtocol = Protocol::Unspecified);
 
-    SocketAddress& operator=(const sockaddr& arSockAddr);
-
     [[nodiscard]] size_t GetSize() const;
     [[nodiscard]] bool IsEmpty() const;
     SocketAddress& SetDomain(Domain aDomain) noexcept;
@@ -45,7 +43,7 @@ public:
     [[nodiscard]] std::string AsString() const;
     [[nodiscard]] explicit operator std::string() const { return AsString(); }
 
-    [[nodiscard]] Domain GetDomain() const { return Domain(mAddress.Unspecified.sa_family); }
+    [[nodiscard]] Domain GetDomain() const { return static_cast<Domain>(mAddress.Unspecified.sa_family); }
     [[nodiscard]] Type GetType() const { return mType; }
     [[nodiscard]] Protocol GetProtocol() const { return mProtocol; }
     [[nodiscard]] std::string GetCanonicalName() const;
@@ -55,6 +53,7 @@ public:
 protected:
     union
     {
+        sockaddr_storage Storage; // only the first union member is zero-initialized
         sockaddr Unspecified;
         sockaddr_in Inet;
         sockaddr_in6 Inet6;
@@ -62,6 +61,8 @@ protected:
     } mAddress{};
     Type mType = Type::Unspecified;
     Protocol mProtocol = Protocol::Unspecified;
+
+    static_assert(sizeof(mAddress) == sizeof(sockaddr_storage));
 };
 
 } // namespace rsp::posix

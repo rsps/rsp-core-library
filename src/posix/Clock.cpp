@@ -9,6 +9,7 @@
 
 #include <rsp/exceptions/CoreException.h>
 #include <rsp/posix/Clock.h>
+#include <utility>
 
 using namespace rsp::utils;
 
@@ -17,7 +18,7 @@ namespace rsp::posix {
 void Clock::SetTime(Types aClockType, const rsp::utils::DateTime& arDT)
 {
     timespec ts = arDT.GetTimeSpec();
-    int res = clock_settime(static_cast<clockid_t>(aClockType), &ts);
+    int res = clock_settime(std::to_underlying(aClockType), &ts);
     if (res < 0) {
         THROW_SYSTEM("Failed to set system clock");
     }
@@ -26,7 +27,7 @@ void Clock::SetTime(Types aClockType, const rsp::utils::DateTime& arDT)
 DateTime Clock::GetTime(Types aClockType)
 {
     timespec ts{};
-    int res = clock_gettime(static_cast<clockid_t>(aClockType), &ts);
+    int res = clock_gettime(std::to_underlying(aClockType), &ts);
     if (res < 0) {
         THROW_SYSTEM("Failed to get system clock");
     }
