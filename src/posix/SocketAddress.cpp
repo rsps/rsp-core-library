@@ -67,7 +67,7 @@ size_t SocketAddress::GetSize() const
             return sizeof(mAddress.Inet6);
 
         default:
-            return sizeof(sockaddr);
+            return sizeof(sockaddr_storage);
     }
 }
 

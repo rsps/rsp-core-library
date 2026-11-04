@@ -61,6 +61,8 @@ protected:
     } mAddress{};
     Type mType = Type::Unspecified;
     Protocol mProtocol = Protocol::Unspecified;
+
+    static_assert(sizeof(mAddress) == sizeof(sockaddr_storage));
 };
 
 } // namespace rsp::posix
