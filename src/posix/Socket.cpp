@@ -68,9 +68,11 @@ Socket::Socket(const Socket& arServer, int aHandle, const SocketAddress& arLocal
 
 Socket::Socket(Socket&& arOther) noexcept
     : mHandle(std::move(arOther.mHandle))
-    , mLocalAddress(arOther.mLocalAddress)
-    , mPeerAddress(arOther.mPeerAddress)
+    , mLocalAddress(std::move(arOther.mLocalAddress))
+    , mPeerAddress(std::move(arOther.mPeerAddress))
     , mDomain(arOther.mDomain)
+    , mType(arOther.mType)
+    , mProtocol(arOther.mProtocol)
 {
 }
 
@@ -79,9 +81,11 @@ Socket& Socket::operator=(Socket&& arOther) noexcept
     if (this != &arOther) {
         mHandle.Close();
         mHandle = std::move(arOther.mHandle);
-        mLocalAddress = arOther.mLocalAddress;
-        mPeerAddress = arOther.mPeerAddress;
+        mLocalAddress = std::move(arOther.mLocalAddress);
+        mPeerAddress = std::move(arOther.mPeerAddress);
         mDomain = arOther.mDomain;
+        mType = arOther.mType;
+        mProtocol = arOther.mProtocol;
     }
     return *this;
 }
