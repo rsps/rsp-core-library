@@ -186,7 +186,7 @@ Socket Socket::Accept()
 
     mLogger.Info() << "Accepted connection from: " << result.GetCanonicalName();
 
-    return {*this, res, result, mLocalAddress};
+    return {*this, res, mLocalAddress, result};
 }
 
 Socket& Socket::Bind(const AddressInfo& arAddrInfo, bool aBindAll)
