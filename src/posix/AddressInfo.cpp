@@ -44,9 +44,15 @@ const std::vector<SocketAddress>& AddressInfo::GetAddresses() const
 bool AddressInfo::splitURN(std::string_view aUrn)
 {
     size_t colon_pos;
-    if (aUrn[0] == '/') {
+    if (aUrn.starts_with('/')) {
         mNode = aUrn;
         mAddresses.emplace_back(aUrn, mTypeHint, mProtocolHint);
+        return false;
+    }
+
+    if (aUrn.starts_with('@')) { // Linux abstract Unix socket, same notation as ss/netstat
+        mNode = aUrn;
+        mAddresses.push_back(SocketAddress::Abstract(aUrn.substr(1), mTypeHint, mProtocolHint));
         return false;
     }
 

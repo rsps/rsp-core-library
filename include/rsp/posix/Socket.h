@@ -27,10 +27,23 @@
 
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
 
 namespace rsp::posix {
+
+#ifdef SO_PEERCRED
+/**
+ * \brief Credentials of the process on the other end of a connected Unix socket (Linux).
+ */
+struct PeerCredentials
+{
+    pid_t Pid;
+    uid_t Uid;
+    gid_t Gid;
+};
+#endif
 
 class ESocketError : public rsp::exceptions::CoreException
 {
@@ -85,6 +98,15 @@ public:
 
     //---- Socket methods ----
     [[nodiscard]] SocketAddress GetAddr();
+    [[nodiscard]] const SocketAddress& GetPeerAddr() const { return mPeerAddress; }
+
+#ifdef SO_PEERCRED
+    /**
+     * \brief Ask the kernel who is on the other end of a connected Unix socket.
+     * Also usable when the peer address is anonymous.
+     */
+    [[nodiscard]] PeerCredentials GetPeerCredentials() const;
+#endif
 
     [[nodiscard]] Socket Accept();
     Socket& Bind(const AddressInfo& arAddrInfo, bool aBindAll = false);
