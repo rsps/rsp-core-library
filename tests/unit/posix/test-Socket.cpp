@@ -31,6 +31,31 @@ TEST_CASE("Socket")
         CHECK_NOTHROW(AddressInfo info("/tmp/test-sock"));
     }
 
+    SUBCASE("Move ctor/assign")
+    {
+        Socket source(Domain::Unix, Type::Datagram, Protocol::Unspecified);
+        const std::string expected_name = source.GetAddr().GetCanonicalName();
+
+        SUBCASE("Move constructor")
+        {
+            Socket moved(std::move(source));
+            CHECK_EQ(moved.GetAddr().GetDomain(), Domain::Unix);
+            CHECK_EQ(moved.GetAddr().GetType(), Type::Datagram);
+            CHECK_EQ(moved.GetAddr().GetProtocol(), Protocol::Unspecified);
+            CHECK_EQ(moved.GetAddr().GetCanonicalName(), expected_name);
+        }
+
+        SUBCASE("Move assignment")
+        {
+            Socket moved;
+            moved = std::move(source);
+            CHECK_EQ(moved.GetAddr().GetDomain(), Domain::Unix);
+            CHECK_EQ(moved.GetAddr().GetType(), Type::Datagram);
+            CHECK_EQ(moved.GetAddr().GetProtocol(), Protocol::Unspecified);
+            CHECK_EQ(moved.GetAddr().GetCanonicalName(), expected_name);
+        }
+    }
+
     SUBCASE("Construct")
     {
         CHECK_NOTHROW(Socket s);
