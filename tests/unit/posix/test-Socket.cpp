@@ -49,6 +49,8 @@ TEST_CASE("Socket")
         CHECK_NOTHROW(client.Connect(info));
         Socket sc;
         CHECK_NOTHROW(sc = server.Accept());
+        CHECK(sc.IsConnected());
+        CHECK_EQ(sc.GetAddr().GetCanonicalName(), server.GetAddr().GetCanonicalName());
         CHECK_FALSE(client.IsDataReady());
         CHECK_EQ(sc.Send(msg), msg.size());
         CHECK(client.IsDataReady());
@@ -79,6 +81,9 @@ TEST_CASE("Socket")
         CHECK_NOTHROW(client.Connect(info));
         Socket sc;
         CHECK_NOTHROW(sc = server.Accept());
+        CHECK(sc.IsConnected());
+        CHECK_EQ(sc.GetAddr().GetCanonicalName(), server.GetAddr().GetCanonicalName());
+        CHECK_EQ(sc.GetAddr().GetPort(), server.GetAddr().GetPort());
         CHECK_FALSE(client.IsDataReady());
         CHECK_EQ(sc.Send(hello_client), hello_client.size());
         CHECK(client.IsDataReady());
