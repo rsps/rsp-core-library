@@ -16,10 +16,25 @@
 #include <rsp/posix/Socket.h>
 #include <sys/poll.h>
 #include <sys/types.h>
-#include <unistd.h>
 #include <utility>
 
 namespace rsp::posix {
+
+namespace {
+
+#ifdef SO_PEERCRED
+PeerCredentials getPeerCredentials(int aHandle)
+{
+    ucred creds{};
+    socklen_t len = sizeof(creds);
+    if (getsockopt(aHandle, SOL_SOCKET, SO_PEERCRED, &creds, &len) < 0) {
+        THROW_SYSTEM("getsockopt(SO_PEERCRED) failed.");
+    }
+    return {creds.pid, creds.uid, creds.gid};
+}
+#endif
+
+} // namespace
 
 Socket::Socket(Domain aDomain, Type aType, Protocol aProtocol)
 {
@@ -173,6 +188,13 @@ SocketAddress Socket::GetAddr()
     return mLocalAddress;
 }
 
+#ifdef SO_PEERCRED
+PeerCredentials Socket::GetPeerCredentials() const
+{
+    return getPeerCredentials(mHandle.Get());
+}
+#endif
+
 Socket Socket::Accept()
 {
     sockaddr_storage ss{};
@@ -182,9 +204,21 @@ Socket Socket::Accept()
     if (res < 0) {
         THROW_SYSTEM(std::format("accept() failed. Handle: {}", mHandle.Get()));
     }
+
     SocketAddress peer(reinterpret_cast<const sockaddr&>(ss), len, static_cast<Domain>(ss.ss_family), mType, mProtocol);
 
-    mLogger.Info() << "Accepted connection from: " << peer.GetCanonicalName();
+    std::string peer_name = peer.GetCanonicalName();
+#ifdef SO_PEERCRED
+    if (peer.GetUnixKind() == UnixKind::Anonymous) {
+        try {
+            auto creds = getPeerCredentials(res);
+            peer_name += std::format(" (pid: {}, uid: {}, gid: {})", creds.Pid, creds.Uid, creds.Gid);
+        }
+        catch (const std::exception&) { // Credentials are only informational
+        }
+    }
+#endif
+    mLogger.Info() << "Accepted connection from: " << peer_name;
 
     return {*this, res, mLocalAddress, peer};
 }
