@@ -58,9 +58,10 @@ TEST_CASE("SocketAddress - Unix")
     const std::string path("/tmp/a-socket-path-longer-than-14-bytes");
     std::ranges::copy(path, un.sun_path);
 
-    SocketAddress sa(reinterpret_cast<const sockaddr&>(un), sizeof(un), Domain::Unix, Type::Stream, Protocol::Unspecified);
+    SocketAddress sa(reinterpret_cast<const sockaddr&>(un), SUN_LEN(&un), Domain::Unix, Type::Stream, Protocol::Unspecified);
 
     CHECK_EQ(sa.GetDomain(), Domain::Unix);
+    CHECK_EQ(sa.GetUnixKind(), UnixKind::Named);
     CHECK_EQ(sa.GetSize(), SUN_LEN(&un));
     CHECK_EQ(sa.AsString(), path);
     CHECK_EQ(sa.GetCanonicalName(), path);
@@ -76,6 +77,63 @@ TEST_CASE("SocketAddress - Unix path constructor")
     CHECK_EQ(sa.GetSize(), SUN_LEN(&reinterpret_cast<const sockaddr_un&>(sa.Get())));
     CHECK_EQ(sa.AsString(), path);
     CHECK_EQ(sa.GetCanonicalName(), path);
+}
+
+TEST_CASE("SocketAddress - Unix kinds")
+{
+    constexpr size_t cPathOffset = offsetof(sockaddr_un, sun_path);
+
+    SUBCASE("Named")
+    {
+        SocketAddress sa("/tmp/test.sock"s, Type::Stream);
+        CHECK_EQ(sa.GetUnixKind(), UnixKind::Named);
+        CHECK_EQ(sa.GetCanonicalName(), "/tmp/test.sock"s);
+    }
+
+    SUBCASE("Named with terminator included in kernel reported length")
+    {
+        sockaddr_un un{};
+        un.sun_family = AF_UNIX;
+        std::ranges::copy("/tmp/a.sock"s, un.sun_path);
+        SocketAddress sa(reinterpret_cast<const sockaddr&>(un), SUN_LEN(&un) + 1, Domain::Unix, Type::Stream, Protocol::Unspecified);
+        CHECK_EQ(sa.GetUnixKind(), UnixKind::Named);
+        CHECK_EQ(sa.AsString(), "/tmp/a.sock"s);
+    }
+
+    SUBCASE("Abstract")
+    {
+        SocketAddress sa = SocketAddress::Abstract("my-service", Type::Stream);
+        CHECK_EQ(sa.GetDomain(), Domain::Unix);
+        CHECK_EQ(sa.GetUnixKind(), UnixKind::Abstract);
+        CHECK_EQ(sa.GetSize(), cPathOffset + 1 + 10);
+        CHECK_EQ(sa.AsString(), "my-service"s);
+        CHECK_EQ(sa.GetCanonicalName(), "@my-service"s);
+    }
+
+    SUBCASE("Abstract name may contain NUL bytes")
+    {
+        SocketAddress sa = SocketAddress::Abstract("a\0b"s, Type::Stream);
+        CHECK_EQ(sa.GetUnixKind(), UnixKind::Abstract);
+        CHECK_EQ(sa.AsString(), "a\0b"s);
+    }
+
+    SUBCASE("Anonymous")
+    {
+        sockaddr_un un{};
+        un.sun_family = AF_UNIX;
+        SocketAddress sa(reinterpret_cast<const sockaddr&>(un), cPathOffset, Domain::Unix, Type::Stream, Protocol::Unspecified);
+        CHECK_EQ(sa.GetUnixKind(), UnixKind::Anonymous);
+        CHECK_EQ(sa.GetSize(), cPathOffset);
+        CHECK(sa.AsString().empty());
+        CHECK_EQ(sa.GetCanonicalName(), "<unnamed>"s);
+    }
+
+    SUBCASE("Not a Unix address")
+    {
+        SocketAddress sa;
+        CHECK_EQ(sa.GetUnixKind(), UnixKind::None);
+        CHECK_EQ(sa.GetSize(), 0u);
+    }
 }
 
 TEST_CASE("SocketAddress - Unix path constructor length limit")

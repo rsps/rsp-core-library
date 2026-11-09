@@ -9,6 +9,7 @@
  */
 
 #include <algorithm>
+#include <cstddef>
 #include <cstring>
 #include <format>
 #include <utility>
@@ -19,6 +20,18 @@
 
 namespace rsp::posix {
 
+namespace {
+
+constexpr size_t cUnixPathOffset = offsetof(sockaddr_un, sun_path);
+
+// Bytes of sun_path covered by the address length. Zero for an anonymous address.
+size_t unixPathLength(socklen_t aAddrLen)
+{
+    return (aAddrLen > cUnixPathOffset) ? std::min<size_t>(aAddrLen - cUnixPathOffset, sizeof(sockaddr_un::sun_path)) : 0;
+}
+
+} // namespace
+
 SocketAddress::SocketAddress(std::string_view aUnixPath, Type aType, Protocol aProtocol)
     : mType(aType)
     , mProtocol(aProtocol)
@@ -28,13 +41,15 @@ SocketAddress::SocketAddress(std::string_view aUnixPath, Type aType, Protocol aP
         THROW_WITH_BACKTRACE1(ESocketError, "Unix socket path is too long.");
     }
     std::copy_n(aUnixPath.data(), aUnixPath.size(), mAddress.Unix.sun_path);
+    mLength = static_cast<socklen_t>(cUnixPathOffset + aUnixPath.size());
 }
 
 SocketAddress::SocketAddress(const sockaddr& arSockAddr, socklen_t aLen, Domain aDomain, Type aType, Protocol aProtocol)
     : mType(aType)
     , mProtocol(aProtocol)
 {
-    std::memcpy(&mAddress, &arSockAddr, std::min<size_t>(aLen, sizeof(mAddress)));
+    mLength = static_cast<socklen_t>(std::min<size_t>(aLen, sizeof(mAddress)));
+    std::memcpy(&mAddress, &arSockAddr, mLength);
     mAddress.Unspecified.sa_family = std::to_underlying(aDomain);
 }
 
@@ -45,30 +60,30 @@ SocketAddress::SocketAddress(uint32_t aIP, uint16_t aPort, Type aType, Protocol 
     mAddress.Inet.sin_family = std::to_underlying(Domain::Inet);
     mAddress.Inet.sin_addr.s_addr = aIP;
     mAddress.Inet.sin_port = aPort;
+    mLength = sizeof(mAddress.Inet);
 }
 
-sockaddr& SocketAddress::Get()
+SocketAddress SocketAddress::Abstract(std::string_view aName, Type aType, Protocol aProtocol)
 {
-    return mAddress.Unspecified;
+    std::string path(1, '\0');
+    path.append(aName);
+    return SocketAddress(path, aType, aProtocol);
 }
 
 size_t SocketAddress::GetSize() const
 {
-    switch (GetDomain()) {
-#ifdef SUN_LEN
-        case Domain::Unix:
-            return SUN_LEN(&mAddress.Unix);
-#endif
+    return mLength;
+}
 
-        case Domain::Inet:
-            return sizeof(mAddress.Inet);
-
-        case Domain::Inet6:
-            return sizeof(mAddress.Inet6);
-
-        default:
-            return sizeof(sockaddr_storage);
+UnixKind SocketAddress::GetUnixKind() const
+{
+    if (GetDomain() != Domain::Unix) {
+        return UnixKind::None;
     }
+    if (unixPathLength(mLength) == 0) {
+        return UnixKind::Anonymous;
+    }
+    return (mAddress.Unix.sun_path[0] == '\0') ? UnixKind::Abstract : UnixKind::Named;
 }
 
 SocketAddress& SocketAddress::SetDomain(Domain aDomain) noexcept
@@ -87,8 +102,17 @@ std::string SocketAddress::AsString() const
     std::array<char, INET6_ADDRSTRLEN + 1> buffer{};
 
     switch (GetDomain()) {
-        case Domain::Unix:
-            return std::string{mAddress.Unix.sun_path, strnlen(mAddress.Unix.sun_path, sizeof(mAddress.Unix.sun_path))};
+        case Domain::Unix: {
+            const size_t path_len = unixPathLength(mLength);
+            switch (GetUnixKind()) {
+                case UnixKind::Named:
+                    return std::string{mAddress.Unix.sun_path, strnlen(mAddress.Unix.sun_path, path_len)};
+                case UnixKind::Abstract:
+                    return std::string{mAddress.Unix.sun_path + 1, path_len - 1};
+                default:
+                    return {};
+            }
+        }
 
         case Domain::Inet:
             if (inet_ntop(AF_INET, &mAddress.Inet.sin_addr, buffer.data(), buffer.size()) == nullptr) {
@@ -143,7 +167,14 @@ std::string SocketAddress::GetCanonicalName() const
 {
     switch (GetDomain()) {
         case Domain::Unix:
-            return AsString();
+            switch (GetUnixKind()) {
+                case UnixKind::Abstract:
+                    return "@" + AsString();
+                case UnixKind::Anonymous:
+                    return "<unnamed>";
+                default:
+                    return AsString();
+            }
 
         case Domain::Inet:
             return std::format("{}:{}", AsString(), ntohs(mAddress.Inet.sin_port));
@@ -154,15 +185,6 @@ std::string SocketAddress::GetCanonicalName() const
         default:
             return {mAddress.Unspecified.sa_data, strnlen(mAddress.Unspecified.sa_data, sizeof(mAddress.Unspecified.sa_data))};
     }
-}
-
-void SocketAddress::UpdateFromParent(const SocketAddress& arParent)
-{
-    if (GetDomain() == Domain::Unix) {
-        mAddress.Unix = arParent.mAddress.Unix;
-    }
-    mProtocol = arParent.mProtocol;
-    mType = arParent.mType;
 }
 
 } // namespace rsp::posix

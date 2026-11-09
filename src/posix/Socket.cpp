@@ -160,33 +160,33 @@ Socket& Socket::SetSendTimeout(std::chrono::system_clock::duration aTimeout)
 SocketAddress Socket::GetAddr()
 {
     if (mLocalAddress.IsEmpty()) {
-        sockaddr sa{};
-        socklen_t len = sizeof(sa);
+        sockaddr_storage ss{};
+        socklen_t len = sizeof(ss);
 
-        int res = getsockname(mHandle.Get(), &sa, &len);
+        int res = getsockname(mHandle.Get(), reinterpret_cast<sockaddr*>(&ss), &len);
         if (res < 0) {
             THROW_SYSTEM("getsockname() failed.");
         }
-        mLocalAddress = SocketAddress(sa, len, mDomain, mType, mProtocol);
-        mDomain = static_cast<Domain>(sa.sa_family);
+        mDomain = static_cast<Domain>(ss.ss_family);
+        mLocalAddress = SocketAddress(reinterpret_cast<const sockaddr&>(ss), len, mDomain, mType, mProtocol);
     }
     return mLocalAddress;
 }
 
 Socket Socket::Accept()
 {
-    SocketAddress result;
-    socklen_t len = result.GetSize();
+    sockaddr_storage ss{};
+    socklen_t len = sizeof(ss);
 
-    int res = accept(mHandle.Get(), &result.Get(), &len);
+    int res = accept(mHandle.Get(), reinterpret_cast<sockaddr*>(&ss), &len);
     if (res < 0) {
         THROW_SYSTEM(std::format("accept() failed. Handle: {}", mHandle.Get()));
     }
-    result.UpdateFromParent(mLocalAddress);
+    SocketAddress peer(reinterpret_cast<const sockaddr&>(ss), len, static_cast<Domain>(ss.ss_family), mType, mProtocol);
 
-    mLogger.Info() << "Accepted connection from: " << result.GetCanonicalName();
+    mLogger.Info() << "Accepted connection from: " << peer.GetCanonicalName();
 
-    return {*this, res, mLocalAddress, result};
+    return {*this, res, mLocalAddress, peer};
 }
 
 Socket& Socket::Bind(const AddressInfo& arAddrInfo, bool aBindAll)
@@ -195,7 +195,7 @@ Socket& Socket::Bind(const AddressInfo& arAddrInfo, bool aBindAll)
     int res = 0;
     int err = 0;
     for (auto& sa : arAddrInfo.GetAddresses()) {
-        if (sa.GetDomain() == Domain::Unix) {
+        if (sa.GetUnixKind() == UnixKind::Named) {
             deleteOldSocketINode(sa);
         }
         res = bind(mHandle.Get(), &sa.Get(), sa.GetSize());
@@ -264,14 +264,14 @@ size_t Socket::Receive(std::string& arStringBuffer, int aFlags) const
 
 size_t Socket::ReceiveFrom(Socket& arPeer, std::span<std::byte> aBuffer, int aFlags) const
 {
-    SocketAddress sa{};
-    socklen_t len = sa.GetSize();
+    sockaddr_storage ss{};
+    socklen_t len = sizeof(ss);
 
-    ssize_t res = recvfrom(mHandle.Get(), aBuffer.data(), aBuffer.size_bytes(), aFlags, &sa.Get(), &len);
+    ssize_t res = recvfrom(mHandle.Get(), aBuffer.data(), aBuffer.size_bytes(), aFlags, reinterpret_cast<sockaddr*>(&ss), &len);
     if (res == -1) {
         THROW_SYSTEM("recvfrom() failed.");
     }
-    arPeer.mLocalAddress = sa;
+    arPeer.mLocalAddress = SocketAddress(reinterpret_cast<const sockaddr&>(ss), len, static_cast<Domain>(ss.ss_family), mType, mProtocol);
     return size_t(res);
 }
 
