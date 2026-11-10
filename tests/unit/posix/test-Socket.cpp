@@ -99,6 +99,35 @@ TEST_CASE("Socket")
     }
 
 #ifdef __linux__
+    SUBCASE("Close releases the fd")
+    {
+        const std::string name = std::format("@rsp-core-test-close-{}", getpid());
+        AddressInfo info(name);
+
+        Socket server(Domain::Unix, Type::Stream, Protocol::Unspecified);
+        server.Bind(info).Listen(2);
+
+        Socket client(Domain::Unix, Type::Stream, Protocol::Unspecified);
+        client.Connect(info);
+        Socket sc = server.Accept();
+
+        CHECK_NOTHROW(client.Close());
+        CHECK_EQ(client.GetFd(), -1);
+        CHECK_FALSE(client.IsConnected());
+        std::string buf(8, 'A');
+        CHECK_EQ(sc.Receive(buf), 0u); // EOF, the peer is really closed
+
+        CHECK_NOTHROW(sc.Close());
+        CHECK_NOTHROW(server.Close());
+        CHECK_EQ(server.GetFd(), -1);
+
+        // The abstract name is free again only if the listening fd was released
+        Socket server2(Domain::Unix, Type::Stream, Protocol::Unspecified);
+        CHECK_NOTHROW(server2.Bind(info));
+
+        CHECK_NOTHROW(server.Close()); // Closing twice is harmless
+    }
+
     SUBCASE("Abstract Unix Socket")
     {
         const std::string msg("Hello Abstract");
