@@ -294,7 +294,6 @@ size_t Socket::Receive(std::span<std::byte> aBuffer, int aFlags) const
     return size_t(res);
 }
 
-
 size_t Socket::Receive(std::string& arStringBuffer, int aFlags) const
 {
     return Receive({reinterpret_cast<std::byte*>(arStringBuffer.data()), arStringBuffer.size()}, aFlags);
@@ -427,10 +426,9 @@ Socket& Socket::Shutdown(ShutdownFlags aFlag)
 
 Socket& Socket::Close()
 {
-    if (IsConnected()) {
-        Shutdown(ShutdownFlags::ReadWrite);
-        mPeerAddress.SetDomain(Domain::Unspecified); // Mark as unconnected
-    }
+    mHandle.Close(); // The deleter shuts the connection down before closing the fd
+    mLocalAddress = SocketAddress{};
+    mPeerAddress = SocketAddress{};
     return *this;
 }
 
