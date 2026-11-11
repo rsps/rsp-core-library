@@ -11,6 +11,7 @@
 #include <netdb.h>
 #include <rsp/posix/AddressInfo.h>
 #include <rsp/posix/Socket.h>
+#include <utility>
 
 namespace rsp::posix {
 
@@ -43,9 +44,15 @@ const std::vector<SocketAddress>& AddressInfo::GetAddresses() const
 bool AddressInfo::splitURN(std::string_view aUrn)
 {
     size_t colon_pos;
-    if (aUrn[0] == '/') {
+    if (aUrn.starts_with('/')) {
         mNode = aUrn;
         mAddresses.emplace_back(aUrn, mTypeHint, mProtocolHint);
+        return false;
+    }
+
+    if (aUrn.starts_with('@')) { // Linux abstract Unix socket, same notation as ss/netstat
+        mNode = aUrn;
+        mAddresses.push_back(SocketAddress::Abstract(aUrn.substr(1), mTypeHint, mProtocolHint));
         return false;
     }
 
@@ -77,9 +84,9 @@ void AddressInfo::lookup()
     addrinfo* p_hints = nullptr;
     addrinfo hints{};
     if ((mFamilyHint != Domain::Unspecified) || (mTypeHint != Type::Unspecified) || (mProtocolHint != Protocol::Unspecified)) {
-        hints.ai_family = int(mFamilyHint);
-        hints.ai_socktype = int(mTypeHint);
-        hints.ai_protocol = int(mProtocolHint);
+        hints.ai_family = std::to_underlying(mFamilyHint);
+        hints.ai_socktype = std::to_underlying(mTypeHint);
+        hints.ai_protocol = std::to_underlying(mProtocolHint);
         p_hints = &hints;
     }
     if (mServer) {
@@ -109,7 +116,11 @@ void AddressInfo::lookup()
 
     auto p = p_info;
     while (p) {
-        mAddresses.emplace_back(*(p->ai_addr), p->ai_addrlen, Domain(p->ai_family), Type(p->ai_socktype), Protocol(p->ai_protocol));
+        mAddresses.emplace_back(*(p->ai_addr),
+                                p->ai_addrlen,
+                                static_cast<Domain>(p->ai_family),
+                                static_cast<Type>(p->ai_socktype),
+                                static_cast<Protocol>(p->ai_protocol));
         p = p->ai_next;
     }
 
