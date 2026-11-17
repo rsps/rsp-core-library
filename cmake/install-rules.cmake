@@ -42,11 +42,16 @@ install(
 
 # CMake helper modules shipped with this package
 install(
-    FILES
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/parse-version-file.cmake"
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindSDL2.cmake"
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Findwpa_supplicant.cmake"
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/parse-version-file.cmake"
     DESTINATION "${RSP_CORE_LIB_INSTALL_CMAKEDIR}"
+)
+
+# Find-modules live in a subdirectory so only they are added to CMAKE_MODULE_PATH.
+install(
+    FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/FindSDL2.cmake"
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/Findwpa_supplicant.cmake"
+    DESTINATION "${RSP_CORE_LIB_INSTALL_CMAKEDIR}/modules"
 )
 
 # Generate the package config file from the template
