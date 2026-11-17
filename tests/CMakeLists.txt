@@ -61,6 +61,8 @@ rsp_core_test_add_dependencies(${TEST_BINARY})
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     include("gcc-compile-options")
     target_compile_options(${TEST_BINARY} PRIVATE "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(${TEST_BINARY} PRIVATE -Wall -Wextra)
 endif()
 
 target_include_directories(${TEST_BINARY}

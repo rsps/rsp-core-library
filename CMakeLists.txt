@@ -25,6 +25,7 @@ option(RSP_CORE_LIB_USE_STD_THREAD     "Thread architecture to use."            
 option(RSP_CORE_LIB_USE_SYSLOG         "Include syslog interface"                         ON)
 option(RSP_CORE_LIB_BUILD_TESTS        "Set to build test binaries"                       ${PROJECT_IS_TOP_LEVEL})
 option(RSP_CORE_LIB_INSTALL            "Set to register install rules for the library"    ${PROJECT_IS_TOP_LEVEL})
+option(RSP_CORE_LIB_WARNINGS_AS_ERRORS "Treat compiler warnings as errors (GCC)"          ${PROJECT_IS_TOP_LEVEL})
 
 include(CMakeDependentOption)
 cmake_dependent_option(RSP_CORE_LIB_INSTALL_TESTS "Set to install the rsp-core-lib-test binary" OFF
@@ -88,6 +89,8 @@ target_include_directories(${PROJECT_NAME}
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     include("gcc-compile-options")
     target_compile_options(${PROJECT_NAME} PRIVATE "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
 endif()
 
 # Macro definitions per build configuration

@@ -26,6 +26,8 @@ if (NOT DEFINED RSP_GCC_STRICT_COMPILE_OPTIONS)
         -Wno-unused
         -Wshadow
         -Weffc++
-        -Werror
     )
+    if(RSP_CORE_LIB_WARNINGS_AS_ERRORS)
+        list(APPEND RSP_GCC_STRICT_COMPILE_OPTIONS -Werror)
+    endif()
 endif()
