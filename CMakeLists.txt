@@ -86,11 +86,11 @@ target_include_directories(${PROJECT_NAME}
 )
 
 # Compile options
+include("compile-options")
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    include("gcc-compile-options")
     target_compile_options(${PROJECT_NAME} PRIVATE "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+    target_compile_options(${PROJECT_NAME} PRIVATE "${RSP_CLANG_STRICT_COMPILE_OPTIONS}")
 endif()
 
 # Macro definitions per build configuration
