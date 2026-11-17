@@ -70,6 +70,8 @@ pipeline {
                 post {
                     always {
                         junit "build/${BUILD_PRESET}/test-results.xml"
+                    }
+                    cleanup {
                         cleanWs()
                     }
                 }
@@ -96,7 +98,7 @@ pipeline {
             }
 
             post {
-                always {
+                cleanup {
                     cleanWs()
                 }
             }
@@ -127,6 +129,8 @@ pipeline {
             post {
                 always {
                     junit 'build/gcc-asan/test-results.xml'
+                }
+                cleanup {
                     cleanWs()
                 }
             }
@@ -156,6 +160,8 @@ pipeline {
             post {
                 always {
                     junit 'build/gcc-tsan/test-results.xml'
+                }
+                cleanup {
                     cleanWs()
                 }
             }
@@ -197,6 +203,8 @@ pipeline {
                         keepAll: true,
                         alwaysLinkToLastBuild: true
                     ])
+                }
+                cleanup {
                     cleanWs()
                 }
             }
