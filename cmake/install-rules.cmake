@@ -40,12 +40,6 @@ install(
     DESTINATION "${RSP_CORE_LIB_INSTALL_CMAKEDIR}"
 )
 
-# CMake helper modules shipped with this package
-install(
-    FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/parse-version-file.cmake"
-    DESTINATION "${RSP_CORE_LIB_INSTALL_CMAKEDIR}"
-)
-
 # Find-modules live in a subdirectory so only they are added to CMAKE_MODULE_PATH.
 install(
     FILES
