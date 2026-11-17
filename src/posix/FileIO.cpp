@@ -77,7 +77,7 @@ void FileIO::Open(const std::string& arFileName, std::ios_base::openmode aMode, 
     mFileName = arFileName;
 
     Close();
-    int ret = open(mFileName.c_str(), flags, aPermissions);
+    int ret = open(mFileName.c_str(), flags, static_cast<mode_t>(aPermissions));
     if (ret < 0) {
         THROW_SYSTEM(std::format("Error opening file {}", mFileName));
     }
