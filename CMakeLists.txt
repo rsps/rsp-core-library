@@ -33,10 +33,7 @@ cmake_dependent_option(RSP_CORE_LIB_INSTALL_TESTS "Set to install the rsp-core-l
 )
 
 # Append this project's local module paths.
-list(APPEND CMAKE_MODULE_PATH
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules"
-)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 # Set default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -86,12 +83,11 @@ target_include_directories(${PROJECT_NAME}
 )
 
 # Compile options
-include("compile-options")
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(${PROJECT_NAME} PRIVATE "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(${PROJECT_NAME} PRIVATE "${RSP_CLANG_STRICT_COMPILE_OPTIONS}")
-endif()
+include("cmake/compile-options.cmake")
+target_compile_options(${PROJECT_NAME} PRIVATE
+    "$<$<CXX_COMPILER_ID:GNU>:${RSP_CORE_LIB_STRICT_COMPILE_OPTIONS_GCC}>"
+    "$<$<CXX_COMPILER_ID:Clang,AppleClang>:${RSP_CORE_LIB_STRICT_COMPILE_OPTIONS_CLANG}>"
+)
 
 # Macro definitions per build configuration
 target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:RSP_CORE_LIB_DEBUG_LOG>")
