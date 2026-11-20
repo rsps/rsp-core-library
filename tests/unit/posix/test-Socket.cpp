@@ -13,6 +13,8 @@
 #include <rsp/posix/SocketAddress.h>
 #include <rsp/logging/LoggerInterface.h>
 #include <rsp/logging/ConsoleLogWriter.h>
+#include <format>
+#include <unistd.h>
 
 using namespace rsp::posix;
 
@@ -27,6 +29,31 @@ TEST_CASE("Socket")
     {
         CHECK_NOTHROW(SocketAddress socket_path("/tmp/test-sock", Type::Stream));
         CHECK_NOTHROW(AddressInfo info("/tmp/test-sock"));
+    }
+
+    SUBCASE("Move ctor/assign")
+    {
+        Socket source(Domain::Unix, Type::Datagram, Protocol::Unspecified);
+        const std::string expected_name = source.GetAddr().GetCanonicalName();
+
+        SUBCASE("Move constructor")
+        {
+            Socket moved(std::move(source));
+            CHECK_EQ(moved.GetAddr().GetDomain(), Domain::Unix);
+            CHECK_EQ(moved.GetAddr().GetType(), Type::Datagram);
+            CHECK_EQ(moved.GetAddr().GetProtocol(), Protocol::Unspecified);
+            CHECK_EQ(moved.GetAddr().GetCanonicalName(), expected_name);
+        }
+
+        SUBCASE("Move assignment")
+        {
+            Socket moved;
+            moved = std::move(source);
+            CHECK_EQ(moved.GetAddr().GetDomain(), Domain::Unix);
+            CHECK_EQ(moved.GetAddr().GetType(), Type::Datagram);
+            CHECK_EQ(moved.GetAddr().GetProtocol(), Protocol::Unspecified);
+            CHECK_EQ(moved.GetAddr().GetCanonicalName(), expected_name);
+        }
     }
 
     SUBCASE("Construct")
@@ -49,6 +76,16 @@ TEST_CASE("Socket")
         CHECK_NOTHROW(client.Connect(info));
         Socket sc;
         CHECK_NOTHROW(sc = server.Accept());
+        CHECK(sc.IsConnected());
+        CHECK_EQ(sc.GetAddr().GetCanonicalName(), server.GetAddr().GetCanonicalName());
+        CHECK_EQ(client.GetPeerAddr().GetCanonicalName(), socket_path);
+        CHECK_EQ(sc.GetPeerAddr().GetUnixKind(), UnixKind::Anonymous);
+#ifdef SO_PEERCRED
+        auto creds = sc.GetPeerCredentials();
+        CHECK_EQ(creds.Pid, getpid());
+        CHECK_EQ(creds.Uid, getuid());
+        CHECK_EQ(creds.Gid, getgid());
+#endif
         CHECK_FALSE(client.IsDataReady());
         CHECK_EQ(sc.Send(msg), msg.size());
         CHECK(client.IsDataReady());
@@ -60,6 +97,66 @@ TEST_CASE("Socket")
         MESSAGE(result);
         CHECK_EQ(result, msg);
     }
+
+#ifdef __linux__
+    SUBCASE("Close releases the fd")
+    {
+        const std::string name = std::format("@rsp-core-test-close-{}", getpid());
+        AddressInfo info(name);
+
+        Socket server(Domain::Unix, Type::Stream, Protocol::Unspecified);
+        server.Bind(info).Listen(2);
+
+        Socket client(Domain::Unix, Type::Stream, Protocol::Unspecified);
+        client.Connect(info);
+        Socket sc = server.Accept();
+
+        CHECK_NOTHROW(client.Close());
+        CHECK_EQ(client.GetFd(), -1);
+        CHECK_FALSE(client.IsConnected());
+        std::string buf(8, 'A');
+        CHECK_EQ(sc.Receive(buf), 0u); // EOF, the peer is really closed
+
+        CHECK_NOTHROW(sc.Close());
+        CHECK_NOTHROW(server.Close());
+        CHECK_EQ(server.GetFd(), -1);
+
+        // The abstract name is free again only if the listening fd was released
+        Socket server2(Domain::Unix, Type::Stream, Protocol::Unspecified);
+        CHECK_NOTHROW(server2.Bind(info));
+
+        CHECK_NOTHROW(server.Close()); // Closing twice is harmless
+    }
+
+    SUBCASE("Abstract Unix Socket")
+    {
+        const std::string msg("Hello Abstract");
+        const std::string name = std::format("@rsp-core-test-{}", getpid());
+        AddressInfo info(name);
+        REQUIRE_EQ(info.GetCount(), 1u);
+        CHECK_EQ(info[0].GetUnixKind(), UnixKind::Abstract);
+
+        Socket server(Domain::Unix, Type::Stream, Protocol::Unspecified);
+        CHECK_NOTHROW(server.Bind(info));
+        CHECK_NOTHROW(server.Listen(2));
+        CHECK_EQ(server.GetAddr().GetCanonicalName(), name);
+
+        Socket client(Domain::Unix, Type::Stream, Protocol::Unspecified);
+        CHECK_NOTHROW(client.Connect(info));
+        CHECK_EQ(client.GetPeerAddr().GetUnixKind(), UnixKind::Abstract);
+
+        Socket sc;
+        CHECK_NOTHROW(sc = server.Accept());
+        CHECK(sc.IsConnected());
+        CHECK_EQ(sc.GetAddr().GetCanonicalName(), name);
+        CHECK_EQ(sc.GetPeerAddr().GetUnixKind(), UnixKind::Anonymous);
+
+        CHECK_EQ(sc.Send(msg), msg.size());
+        std::string result(msg.size(), 'A');
+        CHECK_EQ(client.Receive(result), msg.size());
+        CHECK_EQ(result, msg);
+    }
+#endif
 
     SUBCASE("TCP Socket")
     {
@@ -79,6 +176,9 @@ TEST_CASE("Socket")
         CHECK_NOTHROW(client.Connect(info));
         Socket sc;
         CHECK_NOTHROW(sc = server.Accept());
+        CHECK(sc.IsConnected());
+        CHECK_EQ(sc.GetAddr().GetCanonicalName(), server.GetAddr().GetCanonicalName());
+        CHECK_EQ(sc.GetAddr().GetPort(), server.GetAddr().GetPort());
         CHECK_FALSE(client.IsDataReady());
         CHECK_EQ(sc.Send(hello_client), hello_client.size());
         CHECK(client.IsDataReady());

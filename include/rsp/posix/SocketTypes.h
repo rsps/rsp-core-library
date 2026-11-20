@@ -15,7 +15,7 @@
 
 namespace rsp::posix {
 
-enum class Domain {
+enum class Domain : sa_family_t {
     Unspecified = AF_UNSPEC, ///< Unspecified
 #ifdef AF_LOCAL
     Local = AF_LOCAL, ///< Local to host (pipes and file-domain).
@@ -34,14 +34,14 @@ enum class Domain {
 #endif
 };
 
-enum class Type {
+enum class Type : int {
     Unspecified = 0,
     Stream = SOCK_STREAM,             ///< Provides sequenced, reliable, bidirectional, connection-mode byte streams, and may provide a transmission mechanism for out-of-band data.
     Datagram = SOCK_DGRAM,            ///< Provides datagrams, which are connectionless-mode, unreliable messages of fixed maximum length.
     SequentialPacket = SOCK_SEQPACKET ///< Provides sequenced, reliable, bidirectional, connection-mode transmission paths for records. A record can be sent using one or more output operations and received using one or more input operations, but a single operation never transfers part of more than one record. Record boundaries are visible to the receiver via the MSG_EOR flag.
 };
 
-enum class Protocol {
+enum class Protocol : int {
     Unspecified = PF_UNSPEC, ///< Unspecified
 #ifdef PF_LOCAL
     Local = PF_LOCAL, ///< Local to host (pipes and file-domain).
@@ -60,7 +60,7 @@ enum class Protocol {
 #endif
 };
 
-enum class SockOptions {
+enum class SockOptions : int {
     GetAcceptConnections = SO_ACCEPTCONN, ///< Non-zero indicates that socket listening is enabled (getsockopt() only).
     Broadcast = SO_BROADCAST,             ///< Non-zero requests permission to transmit broadcast datagrams (SOCK_DGRAM sockets only).
     ProtocolDebug = SO_DEBUG,             ///< Non-zero requests debugging in underlying protocol modules.
@@ -79,7 +79,7 @@ enum class SockOptions {
     GetSocketType = SO_TYPE,              ///< Identify socket type (getsockopt() only).
 };
 
-enum class ShutdownFlags {
+enum class ShutdownFlags : int {
     Read = SHUT_RD,
     Write = SHUT_WR,
     ReadWrite = SHUT_RDWR

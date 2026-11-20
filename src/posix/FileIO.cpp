@@ -9,6 +9,7 @@
  */
 
 #include <rsp/exceptions/ExceptionHelper.h>
+#include <format>
 #include <iostream>
 
 #include <fcntl.h>
@@ -78,7 +79,7 @@ void FileIO::Open(const std::string& arFileName, std::ios_base::openmode aMode, 
     Close();
     int ret = open(mFileName.c_str(), flags, aPermissions);
     if (ret < 0) {
-        THROW_SYSTEM("Error opening file " + mFileName);
+        THROW_SYSTEM(std::format("Error opening file {}", mFileName));
     }
 
     mHandle = ret;
@@ -91,9 +92,9 @@ void FileIO::Close()
 
 size_t FileIO::Seek(size_t aOffset, std::ios_base::seekdir aSeekDir)
 {
-    off_t ret = lseek(mHandle.Get(), static_cast<off_t>(aOffset), int(aSeekDir));
+    off_t ret = lseek(mHandle.Get(), static_cast<off_t>(aOffset), static_cast<int>(aSeekDir));
     if (ret < 0) {
-        THROW_SYSTEM("Error moving cursor in file " + mFileName);
+        THROW_SYSTEM(std::format("Error moving cursor in file {}", mFileName));
     }
 
     return static_cast<size_t>(ret);
@@ -103,7 +104,7 @@ size_t FileIO::Read(void* apBuffer, size_t aNumberOfBytesToRead)
 {
     off_t ret = read(mHandle.Get(), apBuffer, aNumberOfBytesToRead);
     if (ret < 0) {
-        THROW_SYSTEM("Error reading from file " + mFileName);
+        THROW_SYSTEM(std::format("Error reading from file {}", mFileName));
     }
 
     return static_cast<size_t>(ret);
@@ -117,7 +118,7 @@ void FileIO::ExactRead(void* apBuffer, size_t aNumberOfBytesToRead)
     while (len != aNumberOfBytesToRead) {
         if (retries-- == 0) {
             errno = ENODATA;
-            THROW_SYSTEM("Error reading " + std::to_string(aNumberOfBytesToRead) + " bytes from file " + mFileName);
+            THROW_SYSTEM(std::format("Error reading {} bytes from file {}", aNumberOfBytesToRead, mFileName));
         }
 
         len += Read(&static_cast<uint8_t*>(apBuffer)[len], aNumberOfBytesToRead - len);
@@ -128,7 +129,7 @@ size_t FileIO::Write(const void* apBuffer, size_t aNumberOfBytesToWrite)
 {
     ssize_t ret = write(mHandle.Get(), apBuffer, aNumberOfBytesToWrite);
     if (ret < 0) {
-        THROW_SYSTEM("Error writing to file " + mFileName);
+        THROW_SYSTEM(std::format("Error writing to file {}", mFileName));
     }
 
     return static_cast<size_t>(ret);
@@ -142,7 +143,7 @@ void FileIO::ExactWrite(const void* apBuffer, size_t aNumberOfBytesToWrite)
     while (len != aNumberOfBytesToWrite) {
         if (retries-- == 0) {
             errno = ENOSPC;
-            THROW_SYSTEM("Error reading from file " + mFileName);
+            THROW_SYSTEM(std::format("Error reading from file {}", mFileName));
         }
 
         len += Write(&static_cast<const uint8_t*>(apBuffer)[len], aNumberOfBytesToWrite - len);
@@ -191,7 +192,7 @@ void FileIO::SetSize(size_t aSize)
 {
     int ret = ftruncate(mHandle.Get(), static_cast<long int>(aSize));
     if (ret < 0) {
-        THROW_SYSTEM("Error resizing file " + mFileName);
+        THROW_SYSTEM(std::format("Error resizing file {}", mFileName));
     }
 }
 

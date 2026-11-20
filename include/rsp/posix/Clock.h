@@ -21,7 +21,7 @@ namespace rsp::posix {
 class Clock
 {
 public:
-    enum class Types {
+    enum class Types : clockid_t {
         RealTime = CLOCK_REALTIME,
         Monotonic = CLOCK_MONOTONIC, // Monotonic system-wide clock.
 #ifdef CLOCK_PROCESS_CPUTIME_ID
