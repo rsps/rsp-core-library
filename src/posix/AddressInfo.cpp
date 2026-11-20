@@ -43,34 +43,32 @@ const std::vector<SocketAddress>& AddressInfo::GetAddresses() const
 
 bool AddressInfo::splitURN(std::string_view aUrn)
 {
-    size_t colon_pos;
     if (aUrn.starts_with('/')) {
         mNode = aUrn;
         mAddresses.emplace_back(aUrn, mTypeHint, mProtocolHint);
         return false;
     }
-
-    if (aUrn.starts_with('@')) { // Linux abstract Unix socket, same notation as ss/netstat
+    else if (aUrn.starts_with('@')) { // Linux abstract Unix socket, same notation as ss/netstat
         mNode = aUrn;
         mAddresses.push_back(SocketAddress::Abstract(aUrn.substr(1), mTypeHint, mProtocolHint));
         return false;
     }
 
-    if ((colon_pos = aUrn.find(']')) != std::string::npos) { // IPv6 with service/port
+    if (size_t pos = aUrn.find(']'); pos != std::string::npos) { // IPv6 with service/port
         if (mFamilyHint == Domain::Unspecified) {
             mFamilyHint = Domain::Inet6;
         }
-        mNode = aUrn.substr(0, colon_pos);
-        mService = aUrn.substr(colon_pos + 2);
+        mNode = aUrn.substr(0, pos);
+        mService = aUrn.substr(pos + 2);
         return true;
     }
 
-    if ((colon_pos = aUrn.find(':')) != std::string::npos) { // IPv4 with service/port
+    if (size_t pos = aUrn.find(':'); pos != std::string::npos) { // IPv4 with service/port
         if (mFamilyHint == Domain::Unspecified) {
             mFamilyHint = Domain::Inet;
         }
-        mNode = aUrn.substr(0, colon_pos);
-        mService = aUrn.substr(colon_pos + 1);
+        mNode = aUrn.substr(0, pos);
+        mService = aUrn.substr(pos + 1);
         return true;
     }
 
