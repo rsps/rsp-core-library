@@ -25,6 +25,7 @@ option(RSP_CORE_LIB_USE_STD_THREAD     "Thread architecture to use."            
 option(RSP_CORE_LIB_USE_SYSLOG         "Include syslog interface"                         ON)
 option(RSP_CORE_LIB_BUILD_TESTS        "Set to build test binaries"                       ${PROJECT_IS_TOP_LEVEL})
 option(RSP_CORE_LIB_INSTALL            "Set to register install rules for the library"    ${PROJECT_IS_TOP_LEVEL})
+option(RSP_CORE_LIB_WARNINGS_AS_ERRORS "Treat compiler warnings as errors (GCC)"          ${PROJECT_IS_TOP_LEVEL})
 
 include(CMakeDependentOption)
 cmake_dependent_option(RSP_CORE_LIB_INSTALL_TESTS "Set to install the rsp-core-lib-test binary" OFF
@@ -32,7 +33,7 @@ cmake_dependent_option(RSP_CORE_LIB_INSTALL_TESTS "Set to install the rsp-core-l
 )
 
 # Append this project's local module paths.
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 # Set default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -56,6 +57,7 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
+    POSITION_INDEPENDENT_CODE ON
 )
 
 # Dependencies
@@ -82,10 +84,11 @@ target_include_directories(${PROJECT_NAME}
 )
 
 # Compile options
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    include("gcc-compile-options")
-    target_compile_options(${PROJECT_NAME} PRIVATE "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
-endif()
+include("cmake/compile-options.cmake")
+target_compile_options(${PROJECT_NAME} PRIVATE
+    "$<$<CXX_COMPILER_ID:GNU>:${RSP_CORE_LIB_STRICT_COMPILE_OPTIONS_GCC}>"
+    "$<$<CXX_COMPILER_ID:Clang,AppleClang>:${RSP_CORE_LIB_STRICT_COMPILE_OPTIONS_CLANG}>"
+)
 
 # Macro definitions per build configuration
 target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:RSP_CORE_LIB_DEBUG_LOG>")

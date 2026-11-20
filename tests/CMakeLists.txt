@@ -58,10 +58,10 @@ add_executable(${TEST_BINARY})
 include("dependencies.cmake")
 rsp_core_test_add_dependencies(${TEST_BINARY})
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    include("gcc-compile-options")
-    target_compile_options(${TEST_BINARY} PRIVATE "${RSP_GCC_STRICT_COMPILE_OPTIONS}")
-endif()
+target_compile_options(${TEST_BINARY} PRIVATE
+    "$<$<CXX_COMPILER_ID:GNU>:${RSP_CORE_LIB_STRICT_COMPILE_OPTIONS_GCC}>"
+    "$<$<CXX_COMPILER_ID:Clang,AppleClang>:${RSP_CORE_LIB_STRICT_COMPILE_OPTIONS_CLANG}>"
+)
 
 target_include_directories(${TEST_BINARY}
     PRIVATE

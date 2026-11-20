@@ -9,7 +9,8 @@ include(CMakeFindDependencyMacro)
 
 # Make Find*.cmake modules shipped with the package discoverable by
 # find_dependency() below.
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+set(_rsp_core_lib_saved_module_path "${CMAKE_MODULE_PATH}")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/modules")
 
 # Feature flags the library was built with. These mirror the build-time
 # options, so consumers can introspect them and so the find_dependency()
@@ -63,6 +64,10 @@ endif()
 if(RSP_CORE_LIB_USE_WPA_SUPPLICANT)
     find_dependency(wpa_supplicant)
 endif()
+
+# Avoid leaking the path into the consumer's scope
+set(CMAKE_MODULE_PATH "${_rsp_core_lib_saved_module_path}")
+unset(_rsp_core_lib_saved_module_path)
 
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 
